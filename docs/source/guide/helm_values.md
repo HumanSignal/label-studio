@@ -324,4 +324,20 @@ global:
 !!! note
     If you are deploying to a production environment, you should set `SSRF_PROTECTION_ENABLED: true`. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments). 
 
+<div class="enterprise-only">
 
+### Lower the seat limit of your license
+
+Set `LICENSE_MAX_USERS_OVERRIDE` to use fewer seats than your license allows, for example to keep a staging deployment within a smaller budget:
+
+```yaml
+global:
+  extraEnvironmentVars:
+     LICENSE_MAX_USERS_OVERRIDE: 50
+```
+
+By default this variable is not set and the seat count from your license applies. It can only *lower* that count: if you set it higher than your licensed seats, or below `1`, the deployment fails to start. The license itself is not modified, so removing the variable and restarting restores the licensed seat count.
+
+Because on-premise seats are counted across all organizations in the deployment, the override applies to the whole deployment rather than to a single organization. It also lowers the number of free View-Only seats when your license does not set them explicitly. See [Usage & License](admin_usage#Seats-in-use).
+
+</div>

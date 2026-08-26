@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { Actions } from "./Actions";
 import { Controls } from "./Controls";
 import { CurrentTask } from "./CurrentTask";
@@ -13,7 +12,7 @@ export const BottomBar = observer(({ store }) => {
   const isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
 
   return store && !isViewAll ? (
     <div className={cn("bottombar").toClassName()}>

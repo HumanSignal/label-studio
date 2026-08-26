@@ -1,4 +1,4 @@
-import { PersonalInfo } from "./PersonalInfo";
+import { Profile } from "./Profile";
 import { EmailPreferences } from "./EmailPreferences";
 import { PersonalAccessToken, PersonalAccessTokenDescription } from "./PersonalAccessToken";
 import { MembershipInfo } from "./MembershipInfo";
@@ -15,30 +15,37 @@ export type SectionType = {
   id: string;
   component: React.FC;
   description?: React.FC;
+  rendersOwnCards?: boolean;
 };
 
-export const accountSettingsSections = (settings: AuthTokenSettings, permissions: AuthPermissions): SectionType[] => {
+export const accountSettingsSections = (
+  settings: AuthTokenSettings,
+  permissions: AuthPermissions,
+  extraSections: SectionType[] = [],
+): SectionType[] => {
   const canCreateTokens = permissions.can(ABILITY.can_create_tokens);
 
   return [
     {
-      title: "Personal Info",
+      title: "Profile",
       id: "personal-info",
-      component: PersonalInfo,
+      component: Profile,
+      rendersOwnCards: true,
     },
+    // Enterprise-injected sections (e.g. workforce "Skills & Expertise") render right after Profile.
+    ...extraSections,
     {
       title: (
         <div className="flex items-center gap-tight">
           <span>Hotkeys</span>
-          <Badge variant="beta" style="solid" shape="rounded">
+          <Badge variant="beta" look="solid" shape="rounded">
             Beta
           </Badge>
         </div>
       ),
       id: "hotkeys",
       component: HotkeysManager,
-      description: () =>
-        "Customize your keyboard shortcuts to speed up your workflow. Click on any hotkey below to assign a new key combination that works best for you.",
+      rendersOwnCards: true,
     },
     {
       title: "Email Preferences",

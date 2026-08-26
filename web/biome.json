@@ -11,7 +11,8 @@
       "!**/libs/editor/examples/**/*.json",
       "!**/libs/editor/src/examples/**/annotations/1.json",
       "!**/apps/labelstudio-e2e",
-      "!**/libs/datamanager/public/index.html"
+      "!**/libs/datamanager/public/index.html",
+      "!**/antd-no-reset.css"
     ],
     "maxSize": 3670016
   },
@@ -73,9 +74,8 @@
         "noShadowRestrictedNames": "off",
         "useGetterReturn": "off",
         "noDuplicateProperties": "warn",
-        "noShorthandPropertyOverrides": "warn",
         "useIterableCallbackReturn": "off",
-        "noUselessEscapeInString": "off",
+        "noUselessEscapeInString": "error",
         "noTsIgnore": "off"
       },
       "complexity": {

@@ -2,7 +2,7 @@ import type { BezierPoint, GhostPoint } from "./types";
 import { PointType } from "./types";
 import { HIT_RADIUS } from "./constants";
 import { snapToPixel, getDistance } from "./eventHandlers/utils";
-import { generatePointId } from "./utils";
+import { generatePointId, resolveDrawingOriginPointId } from "./utils";
 
 export interface PointCreationState {
   isCreating: boolean;
@@ -37,6 +37,8 @@ export interface PointCreationManagerProps {
   isShiftKeyHeld?: boolean;
   setGhostPoint?: (point: GhostPoint | null) => void;
   selectedPoints?: Set<number>;
+  selectedPointIndex?: number | null;
+  allowOutsideBounds?: boolean;
 }
 
 export class PointCreationManager {
@@ -75,8 +77,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -127,8 +128,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -199,8 +199,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x: finalX, y: finalY }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -299,8 +298,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -336,8 +334,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -381,8 +378,7 @@ export class PointCreationManager {
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
-    // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.width && this.props.height) {
+    if (!this.props.allowOutsideBounds && this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -454,29 +450,31 @@ export class PointCreationManager {
 
   // ===== PRIVATE HELPER METHODS =====
 
+  /**
+   * Resolve which existing point a newly committed segment should connect from, using the
+   * same priority chain as the ghost-line preview (active → selected → last added → last in
+   * array). Keeping both call sites on one resolver guarantees the dashed preview and the
+   * actual segment always share an origin (BROS-1412).
+   */
+  private resolveOriginPointId(): string | undefined {
+    if (!this.props) return undefined;
+    return (
+      resolveDrawingOriginPointId(this.props.initialPoints, {
+        activePointId: this.props.activePointId,
+        selectedPointIndex: this.props.selectedPointIndex,
+        lastAddedPointId: this.props.lastAddedPointId,
+      }) ?? undefined
+    );
+  }
+
   private createRegularPoint(x: number, y: number, prevPointId?: string): number | null {
     if (!this.props) return null;
 
-    // Determine the active point ID to connect from
-    // If prevPointId is explicitly provided (not undefined), use it
-    // Otherwise, check activePointId first (works for both skeleton and non-skeleton mode)
-    let finalPrevPointId: string | undefined = prevPointId;
-
-    // If prevPointId is not provided or is empty, check activePointId
-    if (!finalPrevPointId) {
-      if (this.props.activePointId) {
-        // Use activePointId if available (works for both skeleton and non-skeleton mode)
-        // In skeleton mode: can be any point
-        // In non-skeleton mode: should be first or last point
-        finalPrevPointId = this.props.activePointId;
-      } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-        // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
-        finalPrevPointId = this.props.lastAddedPointId;
-      } else if (this.props.initialPoints.length > 0) {
-        // Normal mode fallback: use last point in array
-        finalPrevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
-      }
-    }
+    // Determine the active point ID to connect from.
+    // If prevPointId is explicitly provided (not undefined), use it; otherwise resolve the
+    // origin with the same shared logic the ghost-line preview uses so the committed segment
+    // always starts from the point the preview drew from (BROS-1412).
+    const finalPrevPointId: string | undefined = prevPointId || this.resolveOriginPointId();
 
     // Create the new point
     const newPoint = {
@@ -511,21 +509,8 @@ export class PointCreationManager {
   private createBezierPoint(x: number, y: number): number | null {
     if (!this.props || !this.props.allowBezier) return null;
 
-    // Determine the active point ID to connect from
-    let prevPointId: string | undefined;
-
-    if (this.props.activePointId) {
-      // Use activePointId if available (works for both skeleton and non-skeleton mode)
-      // In skeleton mode: can be any point
-      // In non-skeleton mode: should be first or last point
-      prevPointId = this.props.activePointId;
-    } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-      // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
-      prevPointId = this.props.lastAddedPointId;
-    } else if (this.props.initialPoints.length > 0) {
-      // Normal mode fallback: use last point in array
-      prevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
-    }
+    // Determine the active point ID to connect from — shared with the ghost-line preview (BROS-1412)
+    const prevPointId: string | undefined = this.resolveOriginPointId();
 
     // Create initial control points
     const controlPoint1 = { x: x - 20, y: y - 20 };
@@ -584,23 +569,8 @@ export class PointCreationManager {
   ): number | null {
     if (!this.props || !this.props.allowBezier) return null;
 
-    // Determine the active point ID to connect from
-    let finalPrevPointId = prevPointId;
-
-    if (!finalPrevPointId) {
-      if (this.props.activePointId) {
-        // Use activePointId if available (works for both skeleton and non-skeleton mode)
-        // In skeleton mode: can be any point
-        // In non-skeleton mode: should be first or last point
-        finalPrevPointId = this.props.activePointId;
-      } else if (this.props.skeletonEnabled && this.props.lastAddedPointId) {
-        // Fallback to lastAddedPointId for backward compatibility (skeleton mode only)
-        finalPrevPointId = this.props.lastAddedPointId;
-      } else if (this.props.initialPoints.length > 0) {
-        // Normal mode fallback: use last point in array
-        finalPrevPointId = this.props.initialPoints[this.props.initialPoints.length - 1].id;
-      }
-    }
+    // Determine the active point ID to connect from — shared with the ghost-line preview (BROS-1412)
+    const finalPrevPointId = prevPointId || this.resolveOriginPointId();
 
     // Create initial control points
     const defaultControlPoint1 = { x: x - 20, y: y - 20 };

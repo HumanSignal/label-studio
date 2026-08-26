@@ -9,7 +9,11 @@ import { cn } from "../../../utils/bem";
 
 import { LinkState } from "./LinkState";
 import "./CommentForm.prefix.css";
-import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { NewTaxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { TaxonomyEcho466 } from "../../../components/TaxonomyEcho466/TaxonomyEcho466";
+import type { TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
+import { isFF } from "../../../utils/feature-flags";
 import { CommentFormButtons } from "./CommentFormButtons";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
@@ -165,12 +169,23 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
       {classificationsItems.length > 0 && (
         <div className={cn("comment-form-new").elem("classifications-row").toClassName()}>
           <div className={cn("comment-form-new").elem("category-selector").toClassName()}>
-            <Taxonomy
-              selected={selections}
-              items={classificationsItems}
-              onChange={taxonomyOnChange}
-              options={COMMENT_TAXONOMY_OPTIONS}
-            />
+            {isFF(FF_ECHO_466_TAXONOMY_ANTD_REMOVAL) ? (
+              <TaxonomyEcho466
+                selected={selections}
+                items={classificationsItems}
+                onChange={taxonomyOnChange}
+                options={COMMENT_TAXONOMY_OPTIONS}
+                isEditable
+              />
+            ) : (
+              <NewTaxonomy
+                selected={selections}
+                items={classificationsItems}
+                onChange={taxonomyOnChange}
+                options={COMMENT_TAXONOMY_OPTIONS}
+                isEditable
+              />
+            )}
           </div>
           <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
         </div>

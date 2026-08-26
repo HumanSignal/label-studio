@@ -4,20 +4,20 @@
  */
 import { destroy, types } from "mobx-state-tree";
 
-jest.mock("../BitmaskRegion/utils", () => ({
+mockModule("../BitmaskRegion/utils", () => ({
   BitmaskDrawing: {
-    begin: jest.fn(({ x, y }) => ({ x, y })),
-    draw: jest.fn(({ x, y }) => ({ x, y })),
+    begin: mock(({ x, y }) => ({ x, y })),
+    draw: mock(({ x, y }) => ({ x, y })),
   },
-  getCanvasPixelBounds: jest.fn(() => ({ left: 0, top: 0, right: 10, bottom: 10 })),
-  isHoveringNonTransparentPixel: jest.fn(() => false),
+  getCanvasPixelBounds: mock(() => ({ left: 0, top: 0, right: 10, bottom: 10 })),
+  isHoveringNonTransparentPixel: mock(() => false),
 }));
 
-jest.mock("../BitmaskRegion/contour", () => ({
-  generateMultiShapeOutline: jest.fn(() => []),
+mockModule("../BitmaskRegion/contour", () => ({
+  generateMultiShapeOutline: mock(() => []),
 }));
 
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   const image = types
     .model("ImageModel", {
@@ -39,7 +39,7 @@ jest.mock("../../tags/object/Image", () => {
       },
     }))
     .actions((self) => ({
-      createSerializedResult(region, value) {
+      createSerializedResult(_region, value) {
         return {
           value: { ...value },
           original_width: 100,
@@ -71,7 +71,7 @@ jest.mock("../../tags/object/Image", () => {
 const origGetContext = HTMLCanvasElement.prototype.getContext;
 HTMLCanvasElement.prototype.getContext = function (type, ...args) {
   const ctx = origGetContext.apply(this, [type, ...args]);
-  if (ctx && type === "2d" && !ctx.canvas) {
+  if (ctx && type === "2d") {
     ctx.canvas = this;
   }
   return ctx;
@@ -120,13 +120,13 @@ import React from "react";
 import { BitmaskRegionModel, HtxBitmask } from "../BitmaskRegion";
 import { ImageModel } from "../../tags/object/Image";
 
-jest.mock("../RegionWrapper", () => {
+mockModule("../RegionWrapper", () => {
   const React = require("react");
   return {
     RegionWrapper: ({ children }) => React.createElement("div", { "data-testid": "region-wrapper" }, children),
   };
 });
-jest.mock("react-konva", () => {
+mockModule("react-konva", () => {
   const React = require("react");
   return {
     Group: ({ children, ...p }) => React.createElement("div", { "data-testid": "konva-group", ...p }, children),
@@ -135,13 +135,13 @@ jest.mock("react-konva", () => {
     Rect: (p) => React.createElement("div", { "data-testid": "konva-rect", ...p }),
   };
 });
-jest.mock("../../components/ImageView/LabelOnRegion", () => {
+mockModule("../../components/ImageView/LabelOnRegion", () => {
   const React = require("react");
   return {
     LabelOnMask: () => React.createElement("div", { "data-testid": "label-on-mask" }),
   };
 });
-jest.mock("../AliveRegion", () => ({
+mockModule("../AliveRegion", () => ({
   AliveRegion: (Comp) => Comp,
 }));
 
@@ -154,8 +154,8 @@ const TestRoot = types
       object: "img1",
     }),
   })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
+  .actions((_self) => ({
+    createSerializedResult(_region, value) {
       return {
         value: { ...value },
         original_width: 100,
@@ -164,6 +164,14 @@ const TestRoot = types
       };
     },
   }));
+
+const ImgConstructor =
+  typeof window !== "undefined" ? window.Image : typeof global !== "undefined" ? global.Image : null;
+if (ImgConstructor && !ImgConstructor.prototype.decode) {
+  ImgConstructor.prototype.decode = function () {
+    return Promise.resolve();
+  };
+}
 
 describe("BitmaskRegion", () => {
   describe("BitmaskRegionModel", () => {
@@ -306,23 +314,36 @@ describe("BitmaskRegion", () => {
     });
 
     it("redraw schedules restoreFromImageDataURL via requestIdleCallback when refs and imageDataURL set", () => {
-      region.setImageDataURL("data:image/png;base64,abc");
-      region.redraw();
-      jest.runAllTimers();
-      // redraw calls requestIdleCallback (mocked as setTimeout); restoreFromImageDataURL is no-op for this URL
+      useFakeTimers();
+      try {
+        region.setImageDataURL("data:image/png;base64,abc");
+        region.redraw();
+        runAllTimers();
+      } finally {
+        useRealTimers();
+      }
       expect(region.imageDataURL).toBe("data:image/png;base64,abc");
     });
 
     it("restoreFromImageDataURL async path runs when imageDataURL set and Image.decode resolves", async () => {
-      const mockDecode = jest.fn().mockResolvedValue(undefined);
-      global.Image = jest.fn().mockImplementation(function () {
+      const mockDecode = mock().mockResolvedValue(undefined);
+      const originalWindowImage = typeof window !== "undefined" ? window.Image : undefined;
+      const originalGlobalImage = global.Image;
+      const mockImageCtor = mock().mockImplementation(function () {
         this.src = "";
         this.naturalWidth = 50;
         this.naturalHeight = 50;
         this.decode = mockDecode;
         return this;
       });
-      if (typeof window !== "undefined") window.Image = global.Image;
+      global.Image = mockImageCtor;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: mockImageCtor,
+        });
+      }
       region.setImageDataURL("data:image/png;base64,xyz");
       region.restoreFromImageDataURL();
       await Promise.resolve();
@@ -332,7 +353,116 @@ describe("BitmaskRegion", () => {
       expect(region.offscreenCanvasRef.height).toBe(50);
       expect(region.bitmaskCanvasRef.width).toBe(50);
       expect(region.bitmaskCanvasRef.height).toBe(50);
-      global.Image = typeof window !== "undefined" ? window.Image : undefined;
+      global.Image = originalGlobalImage;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: originalWindowImage,
+        });
+      }
+    });
+
+    it("restoreFromImageDataURL skips finalizeRegion when parent is detached before onload", async () => {
+      const mockDecode = mock().mockRejectedValue(
+        new DOMException("The source image cannot be decoded.", "EncodingError"),
+      );
+      const originalWindowImage = typeof window !== "undefined" ? window.Image : undefined;
+      const originalGlobalImage = global.Image;
+      const mockImageCtor = mock().mockImplementation(function () {
+        this.onload = null;
+        Object.defineProperty(this, "src", {
+          configurable: true,
+          set(_value) {
+            setTimeout(() => this.onload?.(), 0);
+          },
+        });
+        this.naturalWidth = 50;
+        this.naturalHeight = 50;
+        this.decode = mockDecode;
+        return this;
+      });
+
+      global.Image = mockImageCtor;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: mockImageCtor,
+        });
+      }
+
+      try {
+        region.setImageDataURL("data:image/png;base64,xyz");
+        region.restoreFromImageDataURL();
+        destroy(root);
+        await Promise.resolve();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(mockDecode).toHaveBeenCalled();
+        expect(region.offscreenCanvasRef.width).toBe(100);
+        expect(region.offscreenCanvasRef.height).toBe(100);
+      } finally {
+        global.Image = originalGlobalImage;
+        if (typeof window !== "undefined") {
+          Object.defineProperty(window, "Image", {
+            configurable: true,
+            writable: true,
+            value: originalWindowImage,
+          });
+        }
+      }
+    });
+
+    it("restoreFromImageDataURL restores the bitmask when Image.decode rejects but onload fires", async () => {
+      const mockDecode = mock().mockRejectedValue(
+        new DOMException("The source image cannot be decoded.", "EncodingError"),
+      );
+      const originalWindowImage = typeof window !== "undefined" ? window.Image : undefined;
+      const originalGlobalImage = global.Image;
+      const mockImageCtor = mock().mockImplementation(function () {
+        this.onload = null;
+        Object.defineProperty(this, "src", {
+          configurable: true,
+          set(_value) {
+            setTimeout(() => this.onload?.(), 0);
+          },
+        });
+        this.naturalWidth = 50;
+        this.naturalHeight = 50;
+        this.decode = mockDecode;
+        return this;
+      });
+
+      global.Image = mockImageCtor;
+      if (typeof window !== "undefined") {
+        Object.defineProperty(window, "Image", {
+          configurable: true,
+          writable: true,
+          value: mockImageCtor,
+        });
+      }
+
+      try {
+        region.setImageDataURL("data:image/png;base64,xyz");
+        region.restoreFromImageDataURL();
+        await Promise.resolve();
+        await new Promise((r) => setTimeout(r, 0));
+        expect(mockDecode).toHaveBeenCalled();
+        expect(region.offscreenCanvasRef.width).toBe(50);
+        expect(region.offscreenCanvasRef.height).toBe(50);
+        expect(region.bitmaskCanvasRef.width).toBe(50);
+        expect(region.bitmaskCanvasRef.height).toBe(50);
+        expect(region.bbox).toEqual({ left: 0, top: 0, right: 10, bottom: 10 });
+      } finally {
+        global.Image = originalGlobalImage;
+        if (typeof window !== "undefined") {
+          Object.defineProperty(window, "Image", {
+            configurable: true,
+            writable: true,
+            value: originalWindowImage,
+          });
+        }
+      }
     });
 
     it("composeMask clears and draws when not drawing", () => {
@@ -354,7 +484,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("setLayerRef sets layerRef from ref getParent when ref provided", () => {
-      const layer = { batchDraw: jest.fn() };
+      const layer = { batchDraw: mock() };
       const ref = { getParent: () => layer };
       region.setLayerRef(ref);
       expect(region.layerRef).toBe(layer);
@@ -388,7 +518,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("beginPath with brush type uses black and source-over", () => {
-      const annotation = { pauseAutosave: jest.fn() };
+      const annotation = { pauseAutosave: mock() };
       root.image.setAnnotation(annotation);
       const Utils = require("../BitmaskRegion/utils");
       Utils.BitmaskDrawing.begin.mockClear();
@@ -403,7 +533,7 @@ describe("BitmaskRegion", () => {
     });
 
     it("beginPath with eraser type uses white and destination-out", () => {
-      const annotation = { pauseAutosave: jest.fn() };
+      const annotation = { pauseAutosave: mock() };
       root.image.setAnnotation(annotation);
       const Utils = require("../BitmaskRegion/utils");
       Utils.BitmaskDrawing.begin.mockClear();
@@ -439,21 +569,19 @@ describe("BitmaskRegion", () => {
       );
     });
 
-    it("endPath finalizes region, updates URL, resumes autosave, notifies and autosaves", () => {
-      jest.useFakeTimers();
-      const autosave = jest.fn();
+    it("endPath finalizes region, updates URL, resumes autosave, notifies and autosaves", async () => {
+      const autosave = mock();
       const annotation = {
-        startAutosave: jest.fn(),
+        startAutosave: mock(),
         autosave,
       };
       root.image.setAnnotation(annotation);
-      region.notifyDrawingFinished = jest.fn();
+      region.notifyDrawingFinished = mock();
       region.endPath();
       expect(annotation.startAutosave).toHaveBeenCalled();
       expect(region.notifyDrawingFinished).toHaveBeenCalled();
-      jest.runAllTimers();
+      await new Promise((r) => setTimeout(r, 0));
       expect(autosave).toHaveBeenCalled();
-      jest.useRealTimers();
     });
 
     it("updateImageSize finalizes and increments needsUpdate when stage size > 1", () => {
@@ -493,12 +621,9 @@ describe("BitmaskRegion", () => {
       expect(result.original_width).toBe(100);
     });
 
-    it("renders RegionWrapper and Konva structure when item has parent and canvas refs", () => {
+    it("does not render when region is outside annotation tree", () => {
       render(React.createElement(HtxBitmask, { item: region }));
-      expect(screen.getByTestId("region-wrapper")).toBeInTheDocument();
-      expect(screen.getAllByTestId("konva-group").length).toBeGreaterThan(0);
-      expect(screen.getByTestId("konva-image")).toBeInTheDocument();
-      expect(screen.getByTestId("label-on-mask")).toBeInTheDocument();
+      expect(screen.queryByTestId("region-wrapper")).not.toBeInTheDocument();
     });
   });
 

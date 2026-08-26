@@ -22,6 +22,7 @@ import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
 import SelectedChoiceMixin from "../../mixins/SelectedChoiceMixin";
 import ClassificationBase from "./ClassificationBase";
 import PerItemMixin from "../../mixins/PerItem";
+import RandomizableMixin from "../../mixins/RandomizableMixin";
 import Infomodal from "../../components/Infomodal/Infomodal";
 import { useMemo } from "react";
 import { Select, Tooltip } from "@humansignal/ui";
@@ -75,6 +76,23 @@ import { Select, Tooltip } from "@humansignal/ui";
  *     <Choice value="Duo do not. There is no try." />
  *   </Choices>
  * </View>
+ *
+ * @example <caption>Randomize option order to reduce annotator position bias</caption>
+ * <!--
+ *   With `randomize="true"`, the order in which `Choice` options are rendered is
+ *   shuffled on every task open and on every annotator's session. Selecting a
+ *   choice still serializes its configured `value`/`alias`, so results stay
+ *   consistent. Auto-assigned hotkey hints (`[1]`, `[2]`, ...) follow the visible
+ *   order so digits always read sequentially top-to-bottom.
+ * -->
+ * <View>
+ *   <Text name="txt" value="$text" />
+ *   <Choices name="sentiment" toName="txt" randomize="true">
+ *     <Choice value="Positive" />
+ *     <Choice value="Neutral" />
+ *     <Choice value="Negative" />
+ *   </Choices>
+ * </View>
  * @name Choices
  * @meta_title Choices Tag for Multiple Choice Labels
  * @meta_description Customize Label Studio with multiple choice labels for machine learning and data science projects.
@@ -93,6 +111,7 @@ import { Select, Tooltip } from "@humansignal/ui";
  * @param {string} [value]             - Task data field containing a list of dynamically loaded choices (see example below)
  * @param {boolean} [allowNested]      - Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.
  * @param {select|inline|vertical} [layout] - Layout of the choices: `select` for dropdown/select box format, `inline` for horizontal single row display, `vertical` for vertically stacked display (default)
+ * @param {boolean} [randomize=false]  - Shuffle the order in which `Choice` options are displayed to the annotator on every task open to reduce position bias. The shuffle is ephemeral (a fresh order on each task load and on every annotator's session) and never affects serialized results - selecting a choice still serializes that choice's configured `value`/`alias`. Auto-assigned hotkeys follow the visible order so the `[1]`, `[2]`, `[3]` hints always read sequentially top-to-bottom, eliminating muscle-memory bias toward any specific option. Explicit `hotkey="..."` on a `<Choice>` is honored unchanged. Only direct top-level `<Choice>` children participate in the shuffle: non-`<Choice>` siblings (`<Header>`, `<View>`, `<HyperText>`) keep their layout position, and nested choices (`allowNested`) stay nested inside their parent `<Choice>`.
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
@@ -166,6 +185,8 @@ const Model = types
       // TODO depricate showInline
       if (self.showinline === true) self.layout = "inline";
       if (self.showinline === false) self.layout = "vertical";
+      // Establishes the initial display order when `randomize=true`; no-op otherwise.
+      self.reshuffle();
     },
 
     needsUpdate() {
@@ -247,6 +268,7 @@ const ChoicesModel = types.compose(
   VisibilityMixin,
   DynamicChildrenMixin,
   AnnotationMixin,
+  RandomizableMixin,
   TagAttrs,
   Model,
 );
@@ -254,7 +276,7 @@ const ChoicesModel = types.compose(
 const ChoicesSelectLayout = observer(({ item }) => {
   const options = useMemo(
     () =>
-      item.tiedChildren.map((i) => ({
+      item.displayChildren.map((i) => ({
         value: i._value,
         label: (
           <Tooltip title={i.hint}>
@@ -264,7 +286,7 @@ const ChoicesSelectLayout = observer(({ item }) => {
           </Tooltip>
         ),
       })),
-    [item.tiedChildren],
+    [item.displayChildren],
   );
   return (
     <Select
@@ -290,6 +312,24 @@ const ChoicesSelectLayout = observer(({ item }) => {
   );
 });
 
+/**
+ * Render `item.children` in their original config order, but replace each
+ * top-level `<Choice>` slot with the next entry from `displayChildren` (which
+ * is shuffled when `randomize=true`). Non-`<Choice>` siblings (`<Header>`,
+ * `<View>`, `<HyperText>`) keep their layout positions; nested `<Choice>`s
+ * stay nested inside their parent because `displayChildren` is direct-only.
+ */
+const renderInterleavedChildren = (item) => {
+  const queue = [...item.displayChildren];
+  return (item.children ?? []).map((child) => {
+    if (child?.type === "choice") {
+      const next = queue.shift();
+      return next ? Tree.renderItem(next, item.annotation) : null;
+    }
+    return Tree.renderItem(child, item.annotation);
+  });
+};
+
 const HtxChoices = observer(({ item }) => {
   return (
     <div
@@ -298,7 +338,13 @@ const HtxChoices = observer(({ item }) => {
         .toClassName()}
       ref={item.elementRef}
     >
-      {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
+      {item.layout === "select" ? (
+        <ChoicesSelectLayout item={item} />
+      ) : item.randomize ? (
+        renderInterleavedChildren(item)
+      ) : (
+        Tree.renderChildren(item, item.annotation)
+      )}
     </div>
   );
 });

@@ -5,8 +5,10 @@ export {
   useAnnotation,
   useAnnotationFetcher,
   annotationKeys,
+  ANNOTATION_DETAIL_TASK_SCOPE,
   fetchAnnotation,
   invalidateAnnotationCache,
-  invalidateDistributionCache,
+  invalidateAnnotationCachesForTask,
+  invalidateTaskAgreementCache,
   type AnnotationData,
 } from "./useAnnotationQuery";

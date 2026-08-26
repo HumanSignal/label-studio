@@ -11,30 +11,19 @@ import "../../object/RichText/index";
 import InfoModal from "../../../components/Infomodal/Infomodal";
 import { HtxDateTime } from "../DateTime";
 
-jest.mock("../../../components/Infomodal/Infomodal", () => ({
+mockModule("../../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
-  default: { warning: jest.fn() },
+  __skipMerge: true,
+  default: { error: mock(), warning: mock(), success: mock(), info: mock() },
 }));
 
-jest.mock("../../../utils/feature-flags", () => ({
-  FF_DEV_3391: "FF_DEV_3391",
-  FF_SIMPLE_INIT: "FF_SIMPLE_INIT",
-  FF_LSDV_4583: "FF_LSDV_4583",
-  isFF: jest.fn((flag) => flag === "FF_SIMPLE_INIT"),
-}));
-
+import { getRoot } from "mobx-state-tree";
 let mockRoot;
-jest.mock("mobx-state-tree", () => {
-  const actual = jest.requireActual("mobx-state-tree");
-  return {
-    ...actual,
-    getRoot: (node) => {
-      if (node && node.type === "datetime") {
-        return mockRoot;
-      }
-      return actual.getRoot(node);
-    },
-  };
+beforeEach(() => {
+  getRoot.mockImplementation((node) => {
+    if (node && node.type === "datetime") return mockRoot;
+    return globalThis.__mstOriginals.getRoot(node);
+  });
 });
 
 const CONFIG_DATETIME = `<View>
@@ -78,8 +67,8 @@ function createDateTimeNode(config = CONFIG_DATETIME, storeRef = { task: { dataO
       from_name: dateTime,
       mainValue: null,
       area: {
-        updateOriginOnEdit: jest.fn(),
-        setValue: jest.fn(),
+        updateOriginOnEdit: mock(),
+        setValue: mock(),
       },
     });
   }
@@ -87,7 +76,7 @@ function createDateTimeNode(config = CONFIG_DATETIME, storeRef = { task: { dataO
 }
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  clearAllMocks();
   window.STORE_INIT_OK = true;
 });
 afterEach(() => {
@@ -234,7 +223,7 @@ describe("DateTime model", () => {
 
   it("setDate updates day month year and calls updateResult", () => {
     const dt = createDateTimeNode();
-    const spy = jest.spyOn(dt, "updateResult");
+    const spy = spyOn(dt, "updateResult");
     dt.setDate([2024, 5, 10]);
     expect(dt.year).toBe(2024);
     expect(dt.month).toBe(5);
@@ -319,7 +308,7 @@ describe("DateTime model", () => {
 
   it("onMonthChange and onYearChange update and call updateResult", () => {
     const dt = createDateTimeNode();
-    const spy = jest.spyOn(dt, "updateResult");
+    const spy = spyOn(dt, "updateResult");
     dt.onMonthChange(4);
     expect(dt.month).toBe(4);
     dt.onYearChange(2023);
@@ -366,14 +355,14 @@ describe("HtxDateTime view", () => {
         "December",
       ],
       years: [2024, 2023, 2022],
-      setDate: jest.fn(),
-      validDateFormat: jest.fn((v) => (v === "2024-06-15" ? [2024, 6, 15] : null)),
-      setNeedsUpdate: jest.fn(),
+      setDate: mock(),
+      validDateFormat: mock((v) => (v === "2024-06-15" ? [2024, 6, 15] : null)),
+      setNeedsUpdate: mock(),
       updateValue: false,
       elementRef: { current: null },
-      onMonthChange: jest.fn(),
-      onYearChange: jest.fn(),
-      onTimeChange: jest.fn(),
+      onMonthChange: mock(),
+      onYearChange: mock(),
+      onTimeChange: mock(),
       ...overrides,
     };
   }
@@ -431,7 +420,7 @@ describe("HtxDateTime view", () => {
 
   it("calls setDate when date input changes with valid value", async () => {
     const user = userEvent.setup();
-    const setDate = jest.fn();
+    const setDate = mock();
     const item = createMockItem({
       setDate,
       validDateFormat: (v) => (v === "2024-06-15" ? [2024, 6, 15] : null),
@@ -448,8 +437,8 @@ describe("HtxDateTime view", () => {
   });
 
   it("does not call setDate when readonly and input changed", async () => {
-    const user = userEvent.setup();
-    const setDate = jest.fn();
+    const _user = userEvent.setup();
+    const setDate = mock();
     const item = createMockItem({
       isReadOnly: () => true,
       setDate,

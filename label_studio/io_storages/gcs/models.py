@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from core.redis import start_job_async_or_sync
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from google.auth.transport.requests import AuthorizedSession
@@ -260,7 +260,19 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         blob.upload_from_string(json.dumps(ser_annotation))
 
         # create link if everything ok
-        GCSExportStorageLink.create(annotation, self)
+        GCSExportStorageLink.create_or_skip_missing_annotation(annotation, self)
+
+    def delete_annotation(self, annotation):
+        bucket = self.get_bucket()
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+
+        key = GCSExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        blob = bucket.blob(key)
+        blob.delete()
+
+        GCSExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
 
 
 def async_export_annotation_to_gcs_storages(annotation: 'Annotation | int'):
@@ -283,6 +295,16 @@ def export_annotation_to_gcs_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_gcsexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         transaction.on_commit(lambda: start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance.pk))
+
+
+@receiver(pre_delete, sender=Annotation)
+def delete_annotation_from_gcs_storages(sender, instance, **kwargs):
+    links = GCSExportStorageLink.objects.filter(annotation=instance).select_related('storage')
+    for link in links:
+        storage = link.storage
+        if storage.can_delete_objects:
+            logger.debug(f'Delete {instance} from GCS storage {storage}')
+            storage.delete_annotation(instance)
 
 
 class GCSImportStorageLink(ImportStorageLink):

@@ -2,9 +2,21 @@
 
 from core.utils.io import validate_upload_url
 from django.conf import settings
-from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from ml.models import MLBackend, MLBackendAuth
 from rest_framework import serializers
+
+# Server-managed / response-only fields. Excluded from OpenAPI *request* schemas only —
+# do not put these on Meta.read_only_fields (that would change runtime PATCH/POST behavior).
+ML_BACKEND_REQUEST_EXCLUDE_FIELDS = (
+    'id',
+    'state',
+    'readable_state',
+    'error_message',
+    'created_at',
+    'updated_at',
+    'basic_auth_pass_is_set',
+)
 
 
 class MLBackendSerializer(serializers.ModelSerializer):
@@ -20,7 +32,7 @@ class MLBackendSerializer(serializers.ModelSerializer):
     def get_basic_auth_pass_is_set(self, obj):
         return bool(obj.basic_auth_pass)
 
-    def get_readable_state(self, obj):
+    def get_readable_state(self, obj) -> str:
         return obj.get_state_display()
 
     def validate_basic_auth_pass(self, value):
@@ -113,6 +125,14 @@ class MLBackendSerializer(serializers.ModelSerializer):
         ]
 
 
+@extend_schema_serializer(exclude_fields=list(ML_BACKEND_REQUEST_EXCLUDE_FIELDS))
+class MLBackendRequestSerializer(MLBackendSerializer):
+    """OpenAPI/SDK request body for ML backend create/update. Runtime still uses MLBackendSerializer."""
+
+    class Meta(MLBackendSerializer.Meta):
+        pass
+
+
 class MLInteractiveAnnotatingRequest(serializers.Serializer):
     """
     Serializer for ML interactive annotating request.
@@ -120,3 +140,11 @@ class MLInteractiveAnnotatingRequest(serializers.Serializer):
 
     task = serializers.IntegerField(help_text='ID of task to annotate', required=True)
     context = serializers.JSONField(help_text='Context for ML model', allow_null=True, default=None)
+
+
+class MLBackendTrainRequestSerializer(serializers.Serializer):
+    use_ground_truth = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text='Whether to include ground truth annotations in training',
+    )

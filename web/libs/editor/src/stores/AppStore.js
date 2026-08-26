@@ -17,14 +17,7 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
-import {
-  FF_CUSTOM_SCRIPT,
-  FF_LSDV_4620_3_ML,
-  FF_LSDV_4998,
-  FF_REVIEWER_FLOW,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 
@@ -209,8 +202,14 @@ export default types
   .volatile(() => ({
     version: typeof LSF_VERSION === "string" ? LSF_VERSION : "0.0.0",
     initialized: false,
-    hydrated: false,
+    // Submit/skip hotkeys are inert while false. Defaults to true so hosts that
+    // don't manage it keep hotkeys live; hosts with async task loading (DM) hold
+    // it false until the task and its annotations are fully presented.
+    hydrated: true,
     suggestionsRequest: null,
+    onDemandCourses: [],
+    hideInstructionsForCourses: false,
+    onOpenOnDemandCourse: null,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))
@@ -258,19 +257,6 @@ export default types
     },
   }))
   .actions((self) => {
-    let appControls;
-
-    function setAppControls(controls) {
-      appControls = controls;
-    }
-
-    function clearApp() {
-      appControls?.clear();
-    }
-
-    function renderApp() {
-      appControls?.render();
-    }
     /**
      * Update settings display state
      */
@@ -302,6 +288,10 @@ export default types
       for (const n of names) if (n in flags) self[n] = flags[n];
     }
 
+    function setHydrated(value) {
+      self.hydrated = value;
+    }
+
     /**
      * Check for interfaces
      * @param {string} name
@@ -327,6 +317,18 @@ export default types
       }
     }
 
+    function setCourseBottomBar({ courses, hideInstructionsForCourses, onOpenOnDemandCourse }) {
+      self.onDemandCourses = courses;
+      self.hideInstructionsForCourses = hideInstructionsForCourses;
+      self.onOpenOnDemandCourse = onOpenOnDemandCourse;
+      toggleInterface("learning:on-demand", courses.length > 0);
+      toggleInterface("instruction", false);
+    }
+
+    function setDescription(value) {
+      self.description = value;
+    }
+
     function toggleComments(state) {
       return (self.showComments = state);
     }
@@ -345,6 +347,59 @@ export default types
       getEnv(self).events.invoke("labelStudioLoad", self);
     }
 
+    function handleSubmitHotkey() {
+      // Stay inert until the host marks the task fully presented (hydrated):
+      // before that the selected annotation can be a blank placeholder, and
+      // submitting it would create a duplicate instead of updating the existing one.
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      const annotationStore = self.annotationStore;
+      const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
+      const entity = annotationStore.selected;
+      const areResultsEmpty = entity.results.length === 0;
+      const isReview = self.hasInterface("review") || entity.canBeReviewed;
+      const isUpdate = !isReview && isDefined(entity.pk);
+      // no changes were made over previously submitted version — no drafts, no pending changes
+      const noChanges = !entity.history.canUndo && !entity.draftId;
+      const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
+
+      if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
+      if (annotationStore.viewingAll) return;
+      if (isUpdateDisabled) return;
+      if (entity.isReadOnly()) return;
+      if (entity.hasIncompleteRegions) return;
+
+      entity?.submissionInProgress();
+
+      if (self.hasInterface("annotation:bulk")) {
+        const customButtons = self.customButtons?.get("_replace");
+        const submitButton = customButtons?.find((btn) => btn.name === "submit");
+        if (submitButton && !submitButton.disabled) {
+          self.handleCustomButton?.(submitButton);
+        }
+      } else if (isReview) {
+        self.acceptAnnotation();
+      } else if (!isUpdate && self.hasInterface("submit")) {
+        self.submitAnnotation();
+      } else if (self.hasInterface("update")) {
+        self.updateAnnotation();
+      }
+    }
+
+    function handleSkipHotkey() {
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      if (self.annotationStore.viewingAll) return;
+
+      const entity = self.annotationStore.selected;
+
+      entity?.submissionInProgress();
+
+      if (self.hasInterface("review")) {
+        self.rejectAnnotation();
+      } else {
+        self.skipTask();
+      }
+    }
+
     function attachHotkeys() {
       // Unbind previous keys in case LS was re-initialized
       hotkeys.unbindAll();
@@ -353,58 +408,14 @@ export default types
        * Hotkey for submit
        */
       if (self.hasInterface("submit", "update", "review")) {
-        hotkeys.addNamed("annotation:submit", () => {
-          const annotationStore = self.annotationStore;
-          const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
-          const entity = annotationStore.selected;
-          const areResultsEmpty = entity.results.length === 0;
-          const isReview = self.hasInterface("review") || entity.canBeReviewed;
-          const isUpdate = !isReview && isDefined(entity.pk);
-          // no changes were made over previously submitted version — no drafts, no pending changes
-          const noChanges = !entity.history.canUndo && !entity.draftId;
-          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
-
-          if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
-          if (annotationStore.viewingAll) return;
-          if (isUpdateDisabled) return;
-          if (entity.isReadOnly()) return;
-          if (entity.hasIncompletePolygons) return;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("annotation:bulk")) {
-            const customButtons = self.customButtons?.get("_replace");
-            const submitButton = customButtons?.find((btn) => btn.name === "submit");
-            if (submitButton && !submitButton.disabled) {
-              self.handleCustomButton?.(submitButton);
-            }
-          } else if (isReview) {
-            self.acceptAnnotation();
-          } else if (!isUpdate && self.hasInterface("submit")) {
-            self.submitAnnotation();
-          } else if (self.hasInterface("update")) {
-            self.updateAnnotation();
-          }
-        });
+        hotkeys.addNamed("annotation:submit", self.handleSubmitHotkey);
       }
 
       /**
        * Hotkey for skip task
        */
       if (self.hasInterface("skip", "review")) {
-        hotkeys.addNamed("annotation:skip", () => {
-          if (self.annotationStore.viewingAll) return;
-
-          const entity = self.annotationStore.selected;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("review")) {
-            self.rejectAnnotation();
-          } else {
-            self.skipTask();
-          }
-        });
+        hotkeys.addNamed("annotation:skip", self.handleSkipHotkey);
       }
 
       /**
@@ -480,6 +491,19 @@ export default types
         annotation.undo();
       });
 
+      // Quick toggle for Auto-Annotation so the user can temporarily drop
+      // out of SAM capture to select / edit an existing region and flip
+      // back without reaching for the bottombar switch. Mirrors the
+      // DynamicPreannotationsToggle click handler.
+      hotkeys.addNamed("annotation:toggle-auto-annotation", () => {
+        if (!self.hasInterface("auto-annotation") || self.forceAutoAnnotation) return;
+        const next = !self.autoAnnotation;
+        self.setAutoAnnotation(next);
+        if (!next) {
+          ToolsManager.allInstances().forEach((inst) => inst.selectDefault());
+        }
+      });
+
       hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
@@ -497,9 +521,37 @@ export default types
           .map((m) => m.findSelectedTool())
           .filter(Boolean)
           .filter((t) => t.isDrawing);
+        const selectedCompleteDrawingRegions =
+          c?.selectedRegions?.filter((region) => region?.isDrawing && !region.incomplete) ?? [];
+        const shouldUnselectAfterCompletingDrawing =
+          tools.some((t) => t.currentArea?.selected) || selectedCompleteDrawingRegions.length > 0;
+        const clearSelectedCompleteDrawingRegions = () => {
+          // Defer until tool completion and after-create selection have settled.
+          setTimeout(() => {
+            selectedCompleteDrawingRegions.forEach((region) => {
+              region.setDrawing(false);
+              region.notifyDrawingFinished?.();
+            });
+            c?.setIsDrawing(false);
+            c?.unselectAll();
+          });
+        };
 
         if (tools.length > 0) {
           tools.forEach((t) => t.complete?.());
+
+          // BROS-1451: VideoVector skeleton editing can resume drawing from an
+          // already-selected region while the user is adding a branch. In that state
+          // Esc used to only complete the tool, forcing a second Esc to unselect.
+          if (shouldUnselectAfterCompletingDrawing && c) {
+            if (selectedCompleteDrawingRegions.length > 0) {
+              clearSelectedCompleteDrawingRegions();
+            } else {
+              setTimeout(() => c.unselectAll());
+            }
+          }
+        } else if (selectedCompleteDrawingRegions.length > 0) {
+          clearSelectedCompleteDrawingRegions();
         } else if (c && c.isLinkingMode) {
           c.stopLinkingMode();
         } else if (!c.isDrawing) {
@@ -604,7 +656,7 @@ export default types
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
     function handleSubmittingFlag(fn, defaultMessage = "Error during submit") {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       self.setFlags({ isSubmitting: true });
       const res = fn();
 
@@ -625,7 +677,7 @@ export default types
     }
 
     function submitAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
       const event = entity.exists ? "updateAnnotation" : "submitAnnotation";
@@ -657,7 +709,7 @@ export default types
     }
 
     function updateAnnotation(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
 
@@ -686,7 +738,7 @@ export default types
     }
 
     function skipTask(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
 
       // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
@@ -707,14 +759,14 @@ export default types
     }
 
     function unskipTask() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       handleSubmittingFlag(() => {
         getEnv(self).events.invoke("unskipTask", self);
       }, "Error during cancel skipping task, try again");
     }
 
     function acceptAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
@@ -738,7 +790,7 @@ export default types
     }
 
     function rejectAnnotation({ comment = null }) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
@@ -761,7 +813,7 @@ export default types
     }
 
     function handleCustomButton(button) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const buttonName = button.name;
 
       handleSubmittingFlag(async () => {
@@ -844,9 +896,6 @@ export default types
 
       if (!as.initialized) {
         as.initRoot(self.config);
-        if (isFF(FF_LSDV_4620_3_ML) && !appControls?.isRendered()) {
-          appControls?.render();
-        }
       }
 
       // Ensure users referenced by annotations exist in the users store
@@ -893,12 +942,10 @@ export default types
         // simple logging to detect if simple init is used on users' machines
         console.log("LSF: deserialization is finished");
 
-        // next line might be unclear after removing FF_SIMPLE_INIT
-        // reversing the list caused problems before when task is reloaded and list is reversed again.
-        // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
-        // as simple as possible.
-        const current = as.annotations.at(-1);
-        const currentPrediction = !current && as.predictions.at(-1);
+        // Server payloads are appended in API order (newest first — see AnnotationStore.addAnnotation).
+        // Select the newest annotation (index 0), not the oldest (last index).
+        const current = as.annotations[0];
+        const currentPrediction = !current && as.predictions[0];
 
         if (current) {
           as.selectAnnotation(current.id);
@@ -932,7 +979,14 @@ export default types
           obj.reinitHistory();
         });
 
-        const current = as.annotations.at(-1);
+        // Last iteration left the oldest annotation selected; select the newest (API order: index 0).
+        if (as.annotations.length) {
+          as.selectAnnotation(as.annotations[0].id);
+        } else if (as.predictions.length) {
+          as.selectPrediction(as.predictions[0].id);
+        }
+
+        const current = as.annotations[0];
 
         if (current) current.setInitialValues();
 
@@ -965,12 +1019,19 @@ export default types
      * Hydrate a stubbed history item with full result (FIT-720 lazy load).
      * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
      */
-    function hydrateHistoryItem(historyId, fullItem) {
+    function hydrateHistoryItem(historyItemId, fullItem) {
       const as = self.annotationStore;
-      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
-      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      // historyItemId is the MST guid (item.id from AnnotationHistory.tsx), which is unique per
+      // history entry. We cannot match by pk because the API can return multiple history records
+      // with the same pk (e.g. "accepted" and "updated" both share pk=248 for the same review).
+      const item = as.history.find((h) => h.id === historyItemId);
       if (!item) return;
       item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      // Mark as no longer a stub so subsequent clicks use selectHistory() directly
+      // instead of re-invoking the async hydration callback. Without this, clicking
+      // A → B → A again re-hydrates A and area.addResult() accumulates duplicate
+      // label results per region ("Car" → "Car, Car").
+      item.is_stub = false;
       as.selectHistory(item);
     }
 
@@ -1068,9 +1129,12 @@ export default types
 
     return {
       setFlags,
+      setHydrated,
       addInterface,
       hasInterface,
       toggleInterface,
+      setCourseBottomBar,
+      setDescription,
 
       afterCreate,
       assignTask,
@@ -1081,6 +1145,8 @@ export default types
       setHistory,
       hydrateHistoryItem,
       attachHotkeys,
+      handleSubmitHotkey,
+      handleSkipHotkey,
 
       skipTask,
       unskipTask,
@@ -1113,12 +1179,8 @@ export default types
       incrementQueuePosition,
       beforeDestroy() {
         ToolsManager.removeAllTools();
-        appControls = null;
       },
 
-      setAppControls,
-      clearApp,
-      renderApp,
       selfDestroy() {
         const children = [];
 

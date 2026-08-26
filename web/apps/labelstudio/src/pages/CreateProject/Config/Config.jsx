@@ -7,7 +7,6 @@ import { Form, Input } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
-import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.prefix.css";
 import { Preview } from "./Preview";
@@ -156,10 +155,10 @@ const ConfigureControl = ({ control, template }) => {
         </Button>
       </form>
       <div className={configClass.elem("current-labels").toClassName()}>
-        <h3>
+        <h3 className={configClass.elem("current-labels-header").toClassName()}>
           {tagname === "Choices" ? "Choices" : "Labels"} ({control.children.length})
         </h3>
-        <ul>
+        <ul className={configClass.elem("labels-list").toClassName()}>
           {Array.from(control.children).map((label) => (
             <Label
               label={label}
@@ -443,7 +442,7 @@ const Configurator = ({
   // Once enabled, stays enabled until user clicks "Update Preview"
   const [manualUpdateMode, setManualUpdateMode] = React.useState(false);
   // Track if config has changed since last preview update
-  const [hasPendingChanges, setHasPendingChanges] = React.useState(false);
+  const [_hasPendingChanges, setHasPendingChanges] = React.useState(false);
   // Track the last config that was successfully validated and displayed
   const lastValidatedConfig = React.useRef(null);
   // Increment when configToDisplay changes so Preview remounts and LSF initializes with new config (avoids stale/empty main area)
@@ -711,7 +710,7 @@ const Configurator = ({
               <Button className="w-[120px]" onClick={onSave} waiting={waiting} aria-label="Save configuration">
                 {waiting ? "Saving..." : "Save"}
               </Button>
-              {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
+              <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />
             </Form.Actions>
           )}
         </div>

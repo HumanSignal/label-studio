@@ -14,13 +14,15 @@ import Konva from "konva";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Toolbar } from "../Toolbar/Toolbar";
 import { ImageViewProvider } from "./ImageViewContext";
+import { InteractiveOverlayHost } from "../../ml-interactive/InteractiveOverlayHost";
 import { Hotkey } from "../../core/Hotkey";
-import { useObserver } from "mobx-react";
 import ResizeObserver from "../../utils/resize-observer";
+import { ff } from "@humansignal/core";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import { FF_DEV_1442, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_LSDV_4930, isFF } from "../../utils/feature-flags";
+import { InteractiveActionsBar } from "../../ml-interactive/InteractiveActionsBar";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
@@ -61,17 +63,46 @@ const Region = observer(({ region, showSelected = false }) => {
   return Tree.renderItem(region, region.annotation, true);
 });
 
-const RegionsLayer = memo(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
-  const content = regions.map((el) => {
-    return <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />;
-  });
+const RegionsLayer = observer(({ regions, name, useLayers, showSelected = false, smoothing = true }) => {
+  if (useLayers === false) {
+    return regions.map((el) => <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />);
+  }
 
-  return useLayers === false ? (
-    content
-  ) : (
-    <Layer name={name} imageSmoothingEnabled={smoothing}>
-      {content}
-    </Layer>
+  // Brush regions with eraser touches need their own Layer so that
+  // destination-out compositing doesn't bleed into other regions.
+  // All other regions share a Layer (cheaper — see FIT-1482).
+  //
+  // To prevent blinking when adding the first eraser stroke: if a region is
+  // currently being drawn (isDrawing), we keep it in the shared layer even if
+  // it has eraser touches. It will move to an isolated layer on the next render
+  // after drawing completes. This avoids the unmount/remount mid-drawing.
+  const shared = [];
+  const isolated = [];
+
+  for (const el of regions) {
+    const needsIsolation = el.type === "brushregion" && el.hasEraserTouches && !el.isDrawing;
+    if (needsIsolation) {
+      isolated.push(el);
+    } else {
+      shared.push(el);
+    }
+  }
+
+  return (
+    <>
+      {shared.length > 0 && (
+        <Layer name={name} imageSmoothingEnabled={smoothing}>
+          {shared.map((el) => (
+            <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />
+          ))}
+        </Layer>
+      )}
+      {isolated.map((el) => (
+        <Layer key={`layer-${el.id}`} name={`eraser-${el.id}`} imageSmoothingEnabled={smoothing}>
+          <Region key={`region-${el.id}`} region={el} showSelected={showSelected} />
+        </Layer>
+      ))}
+    </>
   );
 });
 
@@ -271,24 +302,6 @@ const TransformerBack = observer(({ item }) => {
   );
 });
 
-const SelectedRegions = observer(({ item, selectedRegions }) => {
-  if (!selectedRegions) return null;
-  const { brushRegions = [], shapeRegions = [] } = splitRegions(selectedRegions);
-
-  return (
-    <>
-      {isFF(FF_LSDV_4930) ? null : <TransformerBack item={item} />}
-      {brushRegions.length > 0 && (
-        <Regions key="brushes" name="brushes" regions={brushRegions} useLayers={true} showSelected chankSize={0} />
-      )}
-
-      {shapeRegions.length > 0 && (
-        <Regions key="shapes" name="shapes" regions={shapeRegions} showSelected chankSize={0} />
-      )}
-    </>
-  );
-});
-
 const SelectionLayer = observer(({ item, selectionArea }) => {
   const scale = 1;
   const [isMouseWheelClick, setIsMouseWheelClick] = useState(false);
@@ -358,9 +371,28 @@ const SelectionLayer = observer(({ item, selectionArea }) => {
 const Selection = observer(({ item, ...triggeredOnResize }) => {
   const { selectionArea } = item;
 
+  // Separate selected brush regions with erasers into their own layers
+  // to prevent destination-out bleeding when multiple regions are selected
+  const selectedBrushesWithErasers = item.selectedRegions.filter((r) => r.type === "brushregion" && r.hasEraserTouches);
+  const currentEraserIds = selectedBrushesWithErasers.map((r) => r.cleanId);
+
+  // Eraser layers must outlive the Portal that moves region nodes into them.
+  // When a region is deselected, the Portal needs one render cycle to move
+  // the Konva nodes back; if the layer is unmounted in the same commit,
+  // its children (the portaled nodes) are destroyed and the region disappears.
+  // Merging previous IDs keeps the layer alive for that extra cycle.
+  const prevEraserIdsRef = useRef([]);
+  const eraserLayerIds = [...new Set([...prevEraserIdsRef.current, ...currentEraserIds])];
+  prevEraserIdsRef.current = currentEraserIds;
+
   return (
     <>
+      {/* Shared layer for selected regions without erasers */}
       <Layer name="selection-regions-layer" />
+      {/* Separate layers for each selected brush region with eraser */}
+      {eraserLayerIds.map((cleanId) => (
+        <Layer key={`layer-${cleanId}`} name={`selected-eraser-${cleanId}`} />
+      ))}
       <SelectionLayer item={item} selectionArea={selectionArea} />
     </>
   );
@@ -444,7 +476,7 @@ const PixelGridLayer = observer(({ item }) => {
   const visible = item.zoomScale > ZOOM_THRESHOLD;
   const { naturalWidth, naturalHeight } = item.currentImageEntity ?? {};
   const { stageWidth, stageHeight } = item;
-  const imageSmallerThanStage = naturalWidth < stageWidth || naturalHeight < stageHeight;
+  const _imageSmallerThanStage = naturalWidth < stageWidth || naturalHeight < stageHeight;
 
   const step = item.stageZoom; // image pixel
 
@@ -568,9 +600,9 @@ export default observer(
       // shape we can click on. Here we're relying on cursor position and non-transparent pixels
       // of the mask to detect cursor-region collision.
       const allowedHoverTypes = /bitmask|vector/i;
-      const hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
+      const _hasSelected = item.selectedRegions.some((r) => r.type.match(allowedHoverTypes) !== null);
       const tool = item.getToolsManager().findSelectedTool();
-      const isAllowedTool = tool?.toolName?.match?.(allowedHoverTypes) !== null ?? false;
+      const _isAllowedTool = Boolean(tool?.toolName?.match?.(allowedHoverTypes));
 
       const hoveredRegion = item.regs.find((reg) => {
         if (reg.selected || tool?.mode === "drawing") return false;
@@ -1155,7 +1187,10 @@ export default observer(
                 onWheel={item.zoom ? this.handleZoom : () => {}}
               />
             ) : null}
+            {imageIsLoaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveOverlayHost objectTag={item} />}
           </div>
+
+          {imageIsLoaded && ff.isSegmentAnythingEditorEnabled() && <InteractiveActionsBar objectTag={item} />}
 
           {toolsReady && imageIsLoaded && this.renderTools()}
           {item.images.length > 1 && (
@@ -1195,25 +1230,14 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
-    let size;
-    let position;
-
-    if (isFF(FF_ZOOM_OPTIM)) {
-      size = {
-        width: item.containerWidth,
-        height: item.containerHeight,
-      };
-      position = {
-        x: item.zoomingPositionX + item.alignmentOffset.x,
-        y: item.zoomingPositionY + item.alignmentOffset.y,
-      };
-    } else {
-      size = { ...item.canvasSize };
-      position = {
-        x: item.zoomingPositionX,
-        y: item.zoomingPositionY,
-      };
-    }
+    const size = {
+      width: item.containerWidth,
+      height: item.containerHeight,
+    };
+    const position = {
+      x: item.zoomingPositionX + item.alignmentOffset.x,
+      y: item.zoomingPositionY + item.alignmentOffset.y,
+    };
 
     return (
       <Stage
@@ -1326,7 +1350,7 @@ const CursorLayer = observer(({ item, tool }) => {
   useEffect(() => {
     if (!item.stageRef) return;
     const stage = item.stageRef;
-    const onMouseMove = (e) => {
+    const onMouseMove = (_e) => {
       const { x, y } = stage.getPointerPosition();
       const { x: deltaX, y: deltaY } = stage.position();
       const { x: scaleX, y: scaleY } = stage.scale();
@@ -1444,13 +1468,7 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
       <DrawingRegion item={item} />
       {item.smoothingEnabled === false && <PixelGridLayer item={item} />}
 
-      {item.crosshair && (
-        <Crosshair
-          ref={crosshairRef}
-          width={isFF(FF_ZOOM_OPTIM) ? item.containerWidth : item.stageWidth}
-          height={isFF(FF_ZOOM_OPTIM) ? item.containerHeight : item.stageHeight}
-        />
-      )}
+      {item.crosshair && <Crosshair ref={crosshairRef} width={item.containerWidth} height={item.containerHeight} />}
 
       {tool && tool.toolName?.match(/bitmask/i) && <CursorLayer item={item} tool={tool} />}
     </>

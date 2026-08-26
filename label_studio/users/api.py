@@ -3,64 +3,25 @@
 import logging
 
 from core.permissions import ViewClassPermission, all_permissions
+from django import forms
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from projects.models import ProjectHotkeyPreference
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import APIException, MethodNotAllowed
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from users.functions import check_avatar
+from users.hotkeys import get_hotkey_project
 from users.models import User
 from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerUpdate, WhoAmIUserSerializer
 
 logger = logging.getLogger(__name__)
-
-_user_schema = {
-    'type': 'object',
-    'properties': {
-        'id': {
-            'type': 'integer',
-            'description': 'User ID',
-        },
-        'first_name': {
-            'type': 'string',
-            'description': 'First name of the user',
-        },
-        'last_name': {
-            'type': 'string',
-            'description': 'Last name of the user',
-        },
-        'username': {
-            'type': 'string',
-            'description': 'Username of the user',
-        },
-        'email': {
-            'type': 'string',
-            'description': 'Email of the user',
-        },
-        'avatar': {
-            'type': 'string',
-            'description': 'Avatar URL of the user',
-        },
-        'initials': {
-            'type': 'string',
-            'description': 'Initials of the user',
-        },
-        'phone': {
-            'type': 'string',
-            'description': 'Phone number of the user',
-        },
-        'allow_newsletters': {
-            'type': 'boolean',
-            'description': 'Whether the user allows newsletters',
-        },
-    },
-}
 
 
 @method_decorator(
@@ -99,9 +60,7 @@ _user_schema = {
         tags=['Users'],
         summary='Create new user',
         description='Create a user in Label Studio.',
-        request={
-            'application/json': _user_schema,
-        },
+        request=UserSerializer,
         responses={201: UserSerializer},
         extensions={
             'x-fern-sdk-group-name': 'users',
@@ -139,9 +98,7 @@ _user_schema = {
         parameters=[
             OpenApiParameter(name='id', type=OpenApiTypes.INT, location='path', description='User ID'),
         ],
-        request={
-            'application/json': _user_schema,
-        },
+        request=UserSerializerUpdate,
         responses={200: UserSerializer},
         extensions={
             'x-fern-sdk-group-name': 'users',
@@ -185,7 +142,10 @@ class UserAPI(viewsets.ModelViewSet):
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)
     def avatar(self, request, pk):
         if request.method == 'POST':
-            avatar = check_avatar(request.FILES)
+            try:
+                avatar = check_avatar(request.FILES)
+            except forms.ValidationError as e:
+                return Response({'detail': '; '.join(e.messages)}, status=400)
             request.user.avatar = avatar
             request.user.save()
             return Response({'detail': 'avatar saved'}, status=200)
@@ -341,14 +301,37 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)
 
 
+_hotkey_project_parameter = OpenApiParameter(
+    name='project',
+    type=OpenApiTypes.INT,
+    location=OpenApiParameter.QUERY,
+    required=False,
+    description='Project ID for a personal project-specific hotkey override. Omit for account defaults.',
+)
+
+_hotkey_access_error_responses = {
+    401: OpenApiResponse(description='Authentication credentials were not provided or are invalid.'),
+    403: OpenApiResponse(description='The user does not have access to the requested project.'),
+    404: OpenApiResponse(description='The project does not exist in the user’s active organization.'),
+    500: OpenApiResponse(description='An unexpected server error occurred.'),
+}
+
+
 @method_decorator(
     name='patch',
     decorator=extend_schema(
         tags=['Users'],
         summary='Update user hotkeys',
-        description='Update the custom hotkeys configuration for the current user.',
+        description=(
+            'Update the current user’s account hotkeys, or their personal override for the optional project scope.'
+        ),
+        parameters=[_hotkey_project_parameter],
         request=HotkeysSerializer,
-        responses={200: HotkeysSerializer},
+        responses={
+            200: HotkeysSerializer,
+            400: OpenApiResponse(description='The project parameter or hotkey payload is invalid.'),
+            **_hotkey_access_error_responses,
+        },
         extensions={
             'x-fern-sdk-group-name': 'users',
             'x-fern-sdk-method-name': 'update_hotkeys',
@@ -361,9 +344,17 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
     decorator=extend_schema(
         tags=['Users'],
         summary='Get user hotkeys',
-        description='Retrieve the custom hotkeys configuration for the current user.',
+        description=(
+            'Retrieve the current user’s account hotkeys, or their stored personal override for the optional '
+            'project scope.'
+        ),
+        parameters=[_hotkey_project_parameter],
         request=None,
-        responses={200: HotkeysSerializer},
+        responses={
+            200: HotkeysSerializer,
+            400: OpenApiResponse(description='The project parameter is invalid.'),
+            **_hotkey_access_error_responses,
+        },
         extensions={
             'x-fern-sdk-group-name': 'users',
             'x-fern-sdk-method-name': 'get_hotkeys',
@@ -378,43 +369,63 @@ class UserHotkeysAPI(APIView):
     def get(self, request, *args, **kwargs):
         """Retrieve the current user's hotkeys configuration"""
         try:
-            user = request.user
-            custom_hotkeys = user.custom_hotkeys or {}
+            project = get_hotkey_project(request.user, request.query_params.get('project'))
+            if project is None:
+                custom_hotkeys = request.user.custom_hotkeys or {}
+            else:
+                custom_hotkeys = (
+                    ProjectHotkeyPreference.objects.filter(user=request.user, project=project)
+                    .values_list('custom_hotkeys', flat=True)
+                    .first()
+                    or {}
+                )
 
             serializer = HotkeysSerializer(data={'custom_hotkeys': custom_hotkeys})
             if serializer.is_valid():
                 return Response(serializer.validated_data, status=200)
             else:
                 # If stored data is invalid, return empty config
-                logger.warning(f'Invalid hotkeys data for user {user.pk}: {serializer.errors}')
+                logger.warning(f'Invalid hotkeys data for user {request.user.pk}: {serializer.errors}')
                 return Response({'custom_hotkeys': {}}, status=200)
 
-        except Exception as e:
-            logger.error(f'Error retrieving hotkeys for user {request.user.pk}: {str(e)}')
+        except APIException:
+            raise
+        except Exception:
+            logger.exception(f'Error retrieving hotkeys for user {request.user.pk}')
             return Response({'error': 'Failed to retrieve hotkeys configuration'}, status=500)
 
     def patch(self, request, *args, **kwargs):
         """Update the current user's hotkeys configuration"""
+        serializer = HotkeysSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response({'error': 'Invalid hotkeys configuration', 'details': serializer.errors}, status=400)
+
         try:
-            serializer = HotkeysSerializer(data=request.data)
+            project = get_hotkey_project(request.user, request.query_params.get('project'))
+            custom_hotkeys = serializer.validated_data['custom_hotkeys']
 
-            if not serializer.is_valid():
-                return Response({'error': 'Invalid hotkeys configuration', 'details': serializer.errors}, status=400)
+            if project is None:
+                request.user.custom_hotkeys = custom_hotkeys
+                request.user.save(update_fields=['custom_hotkeys'])
+            elif custom_hotkeys:
+                ProjectHotkeyPreference.objects.update_or_create(
+                    user=request.user,
+                    project=project,
+                    defaults={'custom_hotkeys': custom_hotkeys},
+                )
+            else:
+                ProjectHotkeyPreference.objects.filter(
+                    user=request.user,
+                    project=project,
+                ).delete()
 
-            user = request.user
-
-            # Security check: Ensure user can only update their own hotkeys
-            if not user.is_authenticated:
-                return Response({'error': 'Authentication required'}, status=401)
-
-            # Update user's hotkeys
-            user.custom_hotkeys = serializer.validated_data['custom_hotkeys']
-            user.save(update_fields=['custom_hotkeys'])
-
-            logger.info(f'Updated hotkeys for user {user.pk}')
+            logger.info(f'Updated hotkeys for user {request.user.pk}')
 
             return Response(serializer.validated_data, status=200)
 
-        except Exception as e:
-            logger.error(f'Error updating hotkeys for user {request.user.pk}: {str(e)}')
+        except APIException:
+            raise
+        except Exception:
+            logger.exception(f'Error updating hotkeys for user {request.user.pk}')
             return Response({'error': 'Failed to update hotkeys configuration'}, status=500)

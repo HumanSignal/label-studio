@@ -48,7 +48,7 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
 });
 
 export const TableRow = observer(
-  ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, onContextMenu }) => {
+  ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, contextMenuTriggerProps }) => {
     const { columns, cellViews, contextMenuRowId } = React.useContext(TableContext);
     const rowWrapperCN = tableCN.elem("row-wrapper");
     const tableRowCN = cn("table-row");
@@ -67,7 +67,7 @@ export const TableRow = observer(
         className={rowWrapperCN.mod(mods).toClassName()}
         style={wrapperStyle}
         onClick={(e) => onClick?.(data, e)}
-        onContextMenu={(e) => onContextMenu?.(e, data)}
+        {...contextMenuTriggerProps}
         data-testid="table-row-wrapper"
       >
         <div className={tableRowCN.toClassName()} style={style} data-leave={true} data-testid="table-row">

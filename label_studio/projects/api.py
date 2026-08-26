@@ -5,7 +5,7 @@ import os
 import pathlib
 
 from core.feature_flags import flag_set
-from core.filters import ListFilter
+from core.filters import NumberInFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
@@ -28,6 +28,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
+from projects.functions.search import search_projects
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
@@ -69,34 +70,6 @@ logger = logging.getLogger(__name__)
 
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
-_result_schema = {
-    'title': 'Labeling result',
-    'description': 'Labeling result (choices, labels, bounding boxes, etc.)',
-    'type': 'object',
-    'properties': {
-        'from_name': {
-            'type': 'string',
-            'description': 'The name of the labeling tag from the project config',
-        },
-        'to_name': {
-            'type': 'string',
-            'description': 'The name of the labeling tag from the project config',
-        },
-        'value': {
-            'type': 'object',
-            'description': 'Labeling result value. Format depends on chosen ML backend',
-        },
-    },
-    'example': {'from_name': 'image_class', 'to_name': 'image', 'value': {'labels': ['Cat']}},
-}
-
-_task_data_schema = {
-    'title': 'Task data',
-    'description': 'Task data',
-    'type': 'object',
-    'example': {'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
-}
-
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
@@ -105,7 +78,7 @@ class ProjectListPagination(PageNumberPagination):
 
 
 class ProjectFilterSet(FilterSet):
-    ids = ListFilter(field_name='id', lookup_expr='in')
+    ids = NumberInFilter(field_name='id', lookup_expr='in')
     title = CharFilter(field_name='title', lookup_expr='icontains')
 
 
@@ -171,25 +144,68 @@ class ProjectListAPI(generics.ListCreateAPIView):
     )
     pagination_class = ProjectListPagination
 
+    def get_sparse_fields(self):
+        """Return fields selected by rest-flex-fields, or None for the normal full response."""
+        sparse_fields = self.request.query_params.get('fields')
+        if not sparse_fields:
+            return None
+        return [field.strip() for field in sparse_fields.split(',') if field.strip()]
+
+    def get_requested_fields(self, serializer=None):
+        """Return fields needed for list enrichment, preferring sparse response fields over count includes."""
+        sparse_fields = self.get_sparse_fields()
+        if sparse_fields is not None:
+            return sparse_fields
+
+        if serializer is None:
+            serializer = GetFieldsSerializer(data=self.request.query_params)
+            serializer.is_valid(raise_exception=True)
+        return serializer.validated_data.get('include')
+
     def get_queryset(self):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
-        fields = serializer.validated_data.get('include')
+        fields = self.get_requested_fields(serializer)
+        sparse_fields = self.get_sparse_fields()
         filter = serializer.validated_data.get('filter')
         projects = Project.objects.filter(organization=self.request.user.active_organization).order_by(
             F('pinned_at').desc(nulls_last=True), '-created_at'
         )
+        search = serializer.validated_data.get('search')
+        if search:
+            projects = search_projects(projects, search)
         if filter in ['pinned_only', 'exclude_pinned']:
             projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
-        projects = ProjectManager.with_counts_annotate(projects, fields=fields)
+        if fields is None or set(fields) & set(ProjectManager.COUNTER_FIELDS):
+            projects = ProjectManager.with_counts_annotate(projects, fields=fields)
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+        state_requested = (
+            sparse_fields is None
+            or 'state' in sparse_fields
+            or 'state' in self.request.query_params.get('ordering', '')
+            or bool(self.request.query_params.get('state'))
+        )
+        if (
+            state_requested
+            and flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=self.request.user)
         ):
             projects = projects.with_state()
 
-        return projects.prefetch_related('members', 'created_by')
+        prefetch_fields = []
+        if sparse_fields is None or 'members' in sparse_fields:
+            prefetch_fields.append('members')
+        if sparse_fields is None or 'created_by' in sparse_fields:
+            prefetch_fields.append('created_by')
+        return projects.prefetch_related(*prefetch_fields) if prefetch_fields else projects
+
+    def get_serializer(self, *args, **kwargs):
+        sparse_fields = self.get_sparse_fields()
+        if self.request.method == 'GET' and sparse_fields is not None:
+            fields_param = settings.REST_FLEX_FIELDS.get('FIELDS_PARAM', 'fields')
+            kwargs[fields_param] = sparse_fields
+        return super().get_serializer(*args, **kwargs)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -548,9 +564,13 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
         if not label_config:
             raise RestValidationError('Label config is not set or is empty')
 
-        # check new config includes meaningful changes
-        has_changed = config_essential_data_has_changed(label_config, project.label_config)
-        project.validate_config(label_config, strict=True)
+        try:
+            # check new config includes meaningful changes
+            has_changed = config_essential_data_has_changed(label_config, project.label_config)
+            project.validate_config(label_config, strict=True)
+        except ValueError as exc:
+            # lxml raises ValueError on a str carrying an XML encoding declaration; surface as 400.
+            raise RestValidationError(str(exc))
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
     @extend_schema(exclude=True)
@@ -840,14 +860,16 @@ class ProjectSampleTask(generics.RetrieveAPIView):
                     annotation['completed_by'] = user_id
                 return Response({'sample_task': complete_task}, status=200)
             except Exception as e:
-                logger.error(
-                    f'Error generating enhanced sample task, falling back to original method: {str(e)}. Label config: {label_config}'
+                logger.warning(
+                    f'Error generating enhanced sample task, falling back to original method: {str(e)}. Label config: {label_config}',
+                    exc_info=True,
                 )
-                # Fallback to project.get_sample_task if LabelInterface.generate_complete_sample_task failed
-                return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
-        else:
-            # Use the simple sample task generation method
+        try:
+            # Fallback to project.get_sample_task if enhanced generation failed, or the simple path otherwise.
             return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
+        except Exception as e:
+            logger.warning(f'Failed to generate sample task for project={project.id}: {e}', exc_info=True)
+            return Response({'detail': 'Unable to generate sample task from the provided label config.'}, status=400)
 
 
 @extend_schema(exclude=True)

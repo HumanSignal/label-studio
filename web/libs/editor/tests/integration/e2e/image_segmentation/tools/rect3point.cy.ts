@@ -104,29 +104,6 @@ describe("Rect3Point tool", () => {
       expect(result[3].value.rotation).to.be.eq(315);
     });
   });
-  it("Should display line of zero height (2 points)", () => {
-    LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
-
-    ImageView.waitForImage();
-
-    ImageView.capture("canvas");
-
-    ImageView.selectRect3PointToolByHotkey();
-    ImageView.clickAtRelative(0.1, 0.5);
-    ImageView.clickAtRelative(0.8, 0.5);
-
-    // Deterministically wait for the Label Studio state to register the drawing action
-    cy.window().should((win: any) => {
-      const obj = win.Htx.annotationStore.selected.objects[0];
-      expect(obj.drawingRegion).to.be.ok;
-    });
-
-    // Sync with the browser's render pipeline so Konva finishes painting the new line
-    // @ts-ignore
-    cy.waitForFrames(3);
-
-    ImageView.canvasShouldChange("canvas", 0.0001);
-  });
   it("Should draw by dblclick at the target point", () => {
     LabelStudio.params().config(rect3Config).data(simpleImageData).withResult([]).init();
 

@@ -213,6 +213,30 @@
   ],
   "authPage": [
     {
+      "title": "Vibe code any interface!",
+      "description": "Build any UI with Label Studio's agent on the web or skill for local development.",
+      "link": {
+        "label": "Explore examples",
+        "url": "https://docs.humansignal.com/templates/gallery_interfaces",
+        "params": {
+          "experiment": "login_revamp",
+          "treatment": "vibe_coding_interfaces_live"
+        }
+      }
+    },
+    {
+      "title": "Need help with data annotation?",
+      "description": "HumanSignal's data services team can run your projects end-to-end, from novel data creation to annotation and evaluation.",
+      "link": {
+        "label": "Learn more",
+        "url": "https://humansignal.com/data-services/",
+        "params": {
+          "experiment": "login_revamp",
+          "treatment": "data_services_live"
+        }
+      }
+    },
+    {
       "title": "Are you building agents?",
       "description": "Introducing Human-in-the-Loop Evaluation for Agentic AI Observability",
       "link": {

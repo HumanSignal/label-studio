@@ -1,5 +1,3 @@
-import { Callout, CalloutContent, CalloutHeader, CalloutIcon, CalloutTitle } from "@humansignal/ui/lib/callout/callout";
-import { IconWarning } from "@humansignal/icons";
 import { atomWithMutation, atomWithQuery, queryClientAtom } from "jotai-tanstack-query";
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
@@ -7,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
-import { Button } from "@humansignal/ui";
+import { Button, Message } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
@@ -81,10 +79,10 @@ const revokeTokenAtom = atomWithMutation((get) => {
       // We need to keep everything but one token that we just deleted
       const filtered = previousTokens.filter((t) => t.token !== token);
       // We now optimistically override data inside the query
-      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (old: Token[]) => filtered as Token[]);
+      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (_old: Token[]) => filtered as Token[]);
       return { previousTokens };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       // If error, reset query to its previous state (without changes from `onMutate`)
       queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, context?.previousTokens);
     },
@@ -220,18 +218,10 @@ function CreateTokenForm() {
         </div>
       )}
 
-      <Callout variant="warning">
-        <CalloutHeader>
-          <CalloutIcon>
-            <IconWarning />
-          </CalloutIcon>
-          <CalloutTitle>Manage your access tokens securely</CalloutTitle>
-        </CalloutHeader>
-        <CalloutContent>
-          Do not share this key with anyone. If you suspect any keys have been compromised, you should revoke them and
-          create new ones.
-        </CalloutContent>
-      </Callout>
+      <Message variant="warning" title="Manage your access tokens securely">
+        Do not share this key with anyone. If you suspect any keys have been compromised, you should revoke them and
+        create new ones.
+      </Message>
     </div>
   );
 }

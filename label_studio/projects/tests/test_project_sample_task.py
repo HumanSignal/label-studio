@@ -1,4 +1,5 @@
 import json
+import logging
 from unittest.mock import patch
 
 import projects.api
@@ -121,6 +122,39 @@ class TestProjectSampleTask(TestCase):
             assert 'sample_task' in response_data
             assert response_data['sample_task'] == fallback_data
 
+    def test_sample_task_returns_400_when_both_enhanced_and_fallback_fail(self):
+        """Test that endpoint returns 400 instead of 500 when both generation paths fail."""
+        client = APIClient()
+        client.force_authenticate(user=self.project.created_by)
+        label_config = """
+        <View>
+          <Text name='text' value='$text'/>
+          <Choices name='sentiment' toName='text'>
+            <Choice value='Positive'/>
+            <Choice value='Negative'/>
+            <Choice value='Neutral'/>
+          </Choices>
+        </View>
+        """
+
+        with (
+            patch.object(
+                projects.api.LabelInterface,
+                'generate_complete_sample_task',
+                side_effect=ValueError('Enhanced generation failed'),
+            ),
+            patch('projects.api.Project.get_sample_task', side_effect=ValueError('Fallback generation failed')),
+        ):
+            response = client.post(
+                self.url,
+                data=json.dumps({'label_config': label_config, 'include_annotation_and_prediction': True}),
+                content_type='application/json',
+            )
+
+            assert response.status_code == 400
+            response_data = response.json()
+            assert 'Unable to generate sample task from the provided label config.' in json.dumps(response_data)
+
     def test_sample_task_fallback_when_prediction_generation_fails(self):
         """Test fallback to project.get_sample_task when LabelInterface.generate_sample_prediction raises an exception"""
         client = APIClient()
@@ -215,3 +249,82 @@ class TestProjectSampleTask(TestCase):
 
             mock_get_sample_task.assert_called_once()
             mock_generate_complete.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_sample_task_ignores_malformed_embedded_task_json_without_error_log(caplog):
+    """Malformed sample-task JSON comments should fall back without creating Sentry error logs."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+    label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+      <Choices name="sentiment" toName="text">
+        <Choice value="Positive"/>
+        <Choice value="Negative"/>
+      </Choices>
+    </View>
+    <!-- {
+      "data": {"text": "broken"
+    } -->
+    """
+
+    with caplog.at_level(logging.ERROR):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': label_config}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    assert response.json()['sample_task']['text']
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+@pytest.mark.django_db
+def test_sample_task_returns_400_for_invalid_xml_without_error_log(caplog):
+    """Invalid user-authored XML should be a validation response, not a Sentry error log."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+
+    with caplog.at_level(logging.ERROR):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': '<View><Text name="text" value="$text"/></View><View/>'}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 400
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+@pytest.mark.django_db
+def test_sample_task_enhanced_generation_fallback_does_not_log_error(caplog):
+    """Enhanced generation failures should use the simple fallback without creating Sentry error logs."""
+    project = ProjectFactory()
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+    label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+    </View>
+    """
+
+    with (
+        caplog.at_level(logging.ERROR),
+        patch.object(projects.api.LabelInterface, 'generate_complete_sample_task', side_effect=ValueError('boom')),
+    ):
+        response = client.post(
+            url,
+            data=json.dumps({'label_config': label_config, 'include_annotation_and_prediction': True}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    assert response.json()['sample_task']['text']
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]

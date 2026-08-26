@@ -37,7 +37,7 @@ export const RadioGroup = ({
       setValue={(value) => setCurrentValue(value)}
       {...props}
     >
-      {(ref, dep, form) => (
+      {(ref, _dep, form) => (
         <RadioContext.Provider
           value={{
             value: currentValue,

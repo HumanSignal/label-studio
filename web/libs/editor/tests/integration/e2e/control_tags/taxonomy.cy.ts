@@ -22,9 +22,11 @@ describe("Control Tags - Taxonomy", () => {
       .first();
 
   const expandTreeNode = (title: string) => {
-    cy.contains(".htx-taxonomy-dropdown .ant-select-tree-title", title)
-      .closest(".ant-select-tree-treenode")
-      .find(".ant-select-tree-switcher")
+    cy.get(".htx-taxonomy-dropdown")
+      .find('[data-testid="taxonomy-tree-row-label"]')
+      .contains(title)
+      .closest("div.flex.h-8")
+      .find("button[aria-expanded]")
       .first()
       .click({ force: true });
   };
@@ -44,7 +46,8 @@ describe("Control Tags - Taxonomy", () => {
     LabelStudio.params().config(taxonomyConfig).data(simpleData).withResult([]).init();
 
     Taxonomy.open();
-    Taxonomy.findItem("Choice 2").trigger("mouseover");
+    // Match choice.cy.ts: React maps mouseover to enter handling; mouseenter/pointer alone often do not reach Tooltip.
+    Taxonomy.findItem("Choice 2").find("span.truncate").first().trigger("mouseover", { force: true });
     Tooltip.hasText("A hint for Choice 2");
   });
 

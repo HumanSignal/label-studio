@@ -1,80 +1,61 @@
 # syntax=docker/dockerfile:1
 ARG NODE_VERSION=22
 ARG PYTHON_VERSION=3.13
-ARG POETRY_VERSION=2.3.2
-ARG VERSION_OVERRIDE
-ARG BRANCH_OVERRIDE
+ARG UV_VERSION=0.12.3
 
 ################################ Overview
 
 # This Dockerfile builds a Label Studio environment.
-# It consists of five main stages:
-# 1. "frontend-builder" - Compiles the frontend assets using Node.
-# 2. "frontend-version-generator" - Generates version files for frontend sources.
+# Build context is the repository root.
+# Stages:
+# 1. "uv" - Pinned uv binary.
+# 2. "frontend-builder" - Compiles the frontend assets using Bun.
 # 3. "venv-builder" - Prepares the virtualenv environment.
-# 4. "py-version-generator" - Generates version files for python sources.
-# 5. "prod" - Creates the final production image with the Label Studio, Nginx, and other dependencies.
+# 4. "production" - Final image with Label Studio, Nginx, and other dependencies.
+
+# label-studio-sdk is a git-pinned dependency in pyproject.toml/uv.lock
+# (maintained by the monorepo sync); uv fetches it during the build.
+
+################################ Stage: uv (pinned uv binary)
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
 ################################ Stage: frontend-builder (build frontend assets)
-FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION}-alpine AS frontend-builder
+FROM --platform=${BUILDPLATFORM} oven/bun:1.3-alpine AS frontend-builder
 ENV BUILD_NO_SERVER=true \
     BUILD_NO_HASH=true \
     BUILD_NO_CHUNKS=true \
     BUILD_MODULE=true \
-    YARN_CACHE_FOLDER=/root/web/.yarn \
-    NX_CACHE_DIRECTORY=/root/web/.nx \
     NODE_ENV=production \
     NODE_OPTIONS="--max-old-space-size=4096"
 
 WORKDIR /label-studio/web
 
-RUN apk add --no-cache \
-    build-base \
-    pkgconfig \
-    cairo-dev \
-    giflib-dev \
-    libjpeg-turbo-dev \
-    libpng-dev \
-    pango-dev \
-    git \
-    python3
+RUN apk add --no-cache git
 
-COPY web/package.json .
-COPY web/yarn.lock .
-COPY web/tools tools
-RUN --mount=type=cache,target=/root/web/.yarn,id=yarn-cache,sharing=locked \
-    --mount=type=cache,target=/root/web/.nx,id=nx-cache,sharing=locked \
-    yarn install --prefer-offline --no-progress --pure-lockfile --frozen-lockfile --ignore-engines --non-interactive --production=false
+COPY web/package.json \
+     web/bun.lock \
+     ./
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
+    bun install --frozen-lockfile --prefer-offline
 
-COPY web/ .
+COPY web ./
+# Target path for django-manifest-plugin → label_studio/core/static/js/manifest.json (collectstatic input).
+RUN mkdir -p /label-studio/label_studio/core/static/js
 COPY pyproject.toml ../pyproject.toml
-RUN --mount=type=cache,target=/root/web/.yarn,id=yarn-cache,sharing=locked \
-    --mount=type=cache,target=/root/web/.nx,id=nx-cache,sharing=locked \
-    yarn run build
-
-################################ Stage: frontend-version-generator
-FROM frontend-builder AS frontend-version-generator
-RUN --mount=type=cache,target=/root/web/.yarn,id=yarn-cache,sharing=locked \
-    --mount=type=cache,target=/root/web/.nx,id=nx-cache,sharing=locked \
-    --mount=type=bind,source=.git,target=../.git \
-    yarn version:libs
+RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
+    bun run build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
 FROM python:${PYTHON_VERSION}-alpine AS venv-builder
-ARG POETRY_VERSION
-ARG PYTHON_VERSION
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100 \
-    PIP_CACHE_DIR="/.cache" \
-    POETRY_CACHE_DIR="/.poetry-cache" \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_VIRTUALENVS_PREFER_ACTIVE_PYTHON=true \
-    PATH="/opt/poetry/bin:$PATH"
+    UV_CACHE_DIR="/.uv-cache" \
+    UV_PROJECT_ENVIRONMENT="/label-studio/.venv" \
+    UV_LINK_MODE="copy" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
+    PATH="/label-studio/.venv/bin:$PATH"
 
 RUN apk add --no-cache \
     build-base \
@@ -83,46 +64,43 @@ RUN apk add --no-cache \
     python3-dev \
     pcre2-dev
 
-ADD https://install.python-poetry.org /tmp/install-poetry.py
-RUN python /tmp/install-poetry.py
+# Install uv
+COPY --from=uv /uv /usr/local/bin/uv
 
 WORKDIR /label-studio
 
-ENV VENV_PATH="/label-studio/.venv"
-ENV PATH="$VENV_PATH/bin:$PATH"
+# --- Phase 1: Install dependencies (highly cacheable) ---
+# Copy only manifest files — no source code. This layer is invalidated only
+# when pyproject.toml or uv.lock change, preserving expensive C-extension
+# builds across source edits. label-studio-sdk comes from its git pin.
+COPY pyproject.toml uv.lock README.md ./
 
-## Starting from this line all packages will be installed in $VENV_PATH
-
-# Copy dependency files
-COPY pyproject.toml poetry.lock README.md ./
-
-# Set a default build argument for including dev dependencies
 ARG INCLUDE_DEV=false
 
-# Install dependencies
-RUN --mount=type=cache,target=/.poetry-cache,id=poetry-cache-alpine,sharing=locked \
-    poetry check --lock && \
+RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
     if [ "$INCLUDE_DEV" = "true" ]; then \
-        poetry install --no-root --extras uwsgi --with test; \
+        uv sync --frozen --no-install-project --group test --extra uwsgi; \
     else \
-        poetry install --no-root --without test --extras uwsgi; \
+        uv sync --frozen --no-install-project --no-dev --extra uwsgi; \
     fi
 
-# Install LS
-COPY label_studio label_studio
-RUN --mount=type=cache,target=/.poetry-cache,id=poetry-cache-alpine,sharing=locked \
-    # `--extras uwsgi` is mandatory here due to poetry bug: https://github.com/python-poetry/poetry/issues/7302
-    poetry install --only-root --extras uwsgi && \
-    python3 label_studio/manage.py collectstatic --no-input
+# --- Phase 2: Install project (only reruns on source changes) ---
+COPY label_studio ./label_studio
 
-################################ Stage: py-version-generator
-FROM venv-builder AS py-version-generator
-ARG VERSION_OVERRIDE
-ARG BRANCH_OVERRIDE
+# Vite emits this path in frontend-builder; collectstatic must see it before STATIC_ROOT is populated.
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/manifest.json ./label_studio/core/static/js/manifest.json
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js ./label_studio/core/static/js/sw.js
+COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js.map ./label_studio/core/static/js/sw.js.map
 
-# Create version_.py and ls-version_.py
-RUN --mount=type=bind,source=.git,target=./.git \
-    VERSION_OVERRIDE=${VERSION_OVERRIDE} BRANCH_OVERRIDE=${BRANCH_OVERRIDE} poetry run python label_studio/core/version.py
+RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
+    if [ "$INCLUDE_DEV" = "true" ]; then \
+        uv sync --frozen --group test --extra uwsgi; \
+    else \
+        uv sync --frozen --no-dev --extra uwsgi; \
+    fi
+
+# Collect static files
+RUN DJANGO_SETTINGS_MODULE=core.settings.label_studio python3 ./label_studio/manage.py collectstatic --no-input
 
 ################################### Stage: prod
 FROM python:${PYTHON_VERSION}-alpine AS production
@@ -139,11 +117,9 @@ ENV LS_DIR=/label-studio \
 WORKDIR $LS_DIR
 
 # install prerequisites for app
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache && apk add --no-cache \
     expat \
-    mesa-gl \
     glib \
-    curl \
     nginx \
     bash \
     procps
@@ -154,21 +130,26 @@ RUN set -eux; \
 
 COPY --chown=1001:0 deploy/default.conf /etc/nginx/nginx.conf
 
-# Copy essential files for installing Label Studio and its dependencies
-COPY --chown=1001:0 pyproject.toml .
-COPY --chown=1001:0 poetry.lock .
-COPY --chown=1001:0 README.md .
 COPY --chown=1001:0 LICENSE LICENSE
 COPY --chown=1001:0 licenses licenses
 COPY --chown=1001:0 deploy deploy
 
 # Copy files from build stages
-COPY --chown=1001:0 --from=venv-builder               $LS_DIR                                           $LS_DIR
-COPY --chown=1001:0 --from=py-version-generator       $LS_DIR/label_studio/core/version_.py             $LS_DIR/label_studio/core/version_.py
-COPY --chown=1001:0 --from=frontend-builder           $LS_DIR/web/dist                                  $LS_DIR/web/dist
-COPY --chown=1001:0 --from=frontend-version-generator $LS_DIR/web/dist/apps/labelstudio/version.json    $LS_DIR/web/dist/apps/labelstudio/version.json
-COPY --chown=1001:0 --from=frontend-version-generator $LS_DIR/web/dist/libs/editor/version.json         $LS_DIR/web/dist/libs/editor/version.json
-COPY --chown=1001:0 --from=frontend-version-generator $LS_DIR/web/dist/libs/datamanager/version.json    $LS_DIR/web/dist/libs/datamanager/version.json
+COPY --chown=1001:0 --from=venv-builder               /label-studio                                  $LS_DIR
+COPY --chown=1001:0 --from=frontend-builder           /label-studio/web/dist                        $LS_DIR/web/dist
+
+ARG COMMIT_VERSION=N/A
+ARG COMMIT_BRANCH=N/A
+ARG COMMIT_MESSAGE=N/A
+ARG COMMIT_DATE=N/A
+ARG COMMIT_SHA=N/A
+
+ENV COMMIT_VERSION=${COMMIT_VERSION} \
+    COMMIT_BRANCH=${COMMIT_BRANCH} \
+    COMMIT_MESSAGE=${COMMIT_MESSAGE} \
+    COMMIT_DATE=${COMMIT_DATE} \
+    COMMIT_SHA=${COMMIT_SHA}
+RUN echo "info = {'message': '${COMMIT_MESSAGE}', 'commit': '${COMMIT_SHA}', 'date': '${COMMIT_DATE}', 'branch': '${COMMIT_BRANCH}', 'version': '${COMMIT_VERSION}'}" > $LS_DIR/label_studio/core/version_.py
 
 USER 1001
 

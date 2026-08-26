@@ -12,7 +12,7 @@ from label_studio_sdk.label_interface import LabelInterface
 from projects.models import ProjectImport, ProjectReimport, ProjectSummary
 from rest_framework.exceptions import ValidationError
 from tasks.models import Task
-from tasks.serializers import sanitize_prediction_import_payload
+from tasks.serializers import FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, sanitize_prediction_import_payload
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -103,7 +103,12 @@ def async_import_background(
             summary = ProjectSummary.objects.select_for_update().get(project=project)
 
             # Immediately create project tasks and update project states and counters
-            serializer = ImportApiSerializer(data=tasks, many=True, context={'project': project})
+            # BROS-1092: pass user so BaseTaskSerializerBulk can attribute unknown
+            # completed_by entries back to the importer instead of project.created_by.
+            ctx = {'project': project}
+            if flag_set(FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=user):
+                ctx['user'] = user
+            serializer = ImportApiSerializer(data=tasks, many=True, context=ctx)
             serializer.is_valid(raise_exception=True)
 
             try:
@@ -486,7 +491,11 @@ def _async_import_background_streaming(project_import, user):
                 with transaction.atomic():
                     summary = ProjectSummary.objects.select_for_update().get(project=project)
 
-                    serializer = ImportApiSerializer(data=batch_tasks, many=True, context={'project': project})
+                    # BROS-1092: see async_import_background above for rationale.
+                    ctx = {'project': project}
+                    if flag_set(FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=user):
+                        ctx['user'] = user
+                    serializer = ImportApiSerializer(data=batch_tasks, many=True, context=ctx)
                     serializer.is_valid(raise_exception=True)
                     batch_db_tasks = serializer.save(project_id=project.id)
 

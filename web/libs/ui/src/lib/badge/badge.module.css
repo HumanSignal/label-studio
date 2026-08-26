@@ -26,6 +26,10 @@
   color: var(--color-neutral-content);
 }
 
+.has-trailing-icon {
+  padding-right: var(--spacing-tighter);
+}
+
 /* Shape variants */
 .shape-rounded {
   border-radius: var(--corner-radius-large);
@@ -36,6 +40,25 @@
 }
 
 /* Size variants */
+.size-large {
+  padding: var(--spacing-tighter) var(--spacing-tight);
+  font-size: var(--font-size-label-smaller);
+  min-height: 28px;
+  height: auto;
+  white-space: normal;
+  align-items: center;
+
+  .closeButton {
+    --badge-close-icon-size: 18px;
+  }
+
+  .icon svg,
+  .iconTrailing svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .size-small,
 .size-compact {
   padding: 0 var(--spacing-tighter);
@@ -50,6 +73,19 @@
       width: 12px;
       height: 12px;
     }
+  }
+
+  .iconTrailing {
+    margin-left: var(--spacing-tightest);
+
+    & svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.has-trailing-icon {
+    padding-right: var(--spacing-tightest);
   }
 }
 
@@ -115,8 +151,8 @@
   color: var(--color-accent-sand-bold);
 }
 
-/* Outline style */
-.style-outline {
+/* Outline look */
+.look-outline {
   &.variant-grape {
     background: transparent;
     border-color: var(--color-accent-grape-subtle);
@@ -178,10 +214,10 @@
   }
 }
 
-/* Ghost style */
-.style-ghost {
+/* Ghost look */
+.look-ghost {
   background: none !important;
-  border: none !important;
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     color: var(--color-accent-grape-bold);
@@ -224,9 +260,9 @@
   }
 }
 
-/* Solid style */
-.style-solid {
-  border: none !important;
+/* Solid look */
+.look-solid {
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     background: var(--color-accent-grape-subtle);
@@ -337,7 +373,7 @@
     -webkit-text-fill-color: transparent;
   }
 
-  &.style-filled {
+  &.look-filled {
     .badge-content {
       background: linear-gradient(
         135deg,
@@ -348,7 +384,7 @@
       height: calc(100% - 2px);
     }
 
-    /* Shape variants for filled style */
+    /* Shape variants for filled look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -362,13 +398,13 @@
     }
   }
 
-  &.style-outline {
+  &.look-outline {
     .badge-content {
       background: var(--color-neutral-background);
       height: calc(100% - 2px);
     }
 
-    /* Shape variants for outline style */
+    /* Shape variants for outline look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -382,7 +418,7 @@
     }
   }
 
-  &.style-solid {
+  &.look-solid {
     .badge-content {
       border: none;
       background: none;
@@ -396,13 +432,14 @@
       color: var(--color-neutral-on-dark-content);
     }
 
-    .icon {
+    .icon,
+    .iconTrailing {
       & path {
         fill: var(--color-neutral-on-dark-content);
       }
     }
 
-    /* Shape variants for solid style */
+    /* Shape variants for solid look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
@@ -416,7 +453,7 @@
     }
   }
 
-  &.style-ghost {
+  &.look-ghost {
     background: none;
     border-radius: 0;
 
@@ -465,6 +502,19 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  margin-right: var(--spacing-tighter);
+
+  & svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.iconTrailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--spacing-tightest);
 
   & svg {
     width: 14px;
@@ -482,6 +532,9 @@
 
 /* Close button */
 .closeButton {
+  --badge-close-icon-size: 12px;
+
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -499,8 +552,25 @@
     opacity: 1;
   }
 
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  /* Reaches the 24px minimum target size without growing the badge or shifting its content. */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+  }
+
   & svg {
-    width: 12px;
-    height: 12px;
+    width: var(--badge-close-icon-size);
+    height: var(--badge-close-icon-size);
   }
 }

@@ -55,8 +55,32 @@ body {
     --bottombar-height: 50px;
   }
 
+  &_annotationsSidebar {
+    display: flex;
+    flex-direction: row;
+    min-height: 0;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
   & .menu {
     padding-bottom: 8px;
+  }
+}
+
+@keyframes lsf-main-view-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -67,6 +91,7 @@ body {
   position: relative;
   flex-direction: column;
   justify-content: space-between;
+  animation: lsf-main-view-enter 200ms ease-out;
 
   &__annotation {
     padding: 1em;

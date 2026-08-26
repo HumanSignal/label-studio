@@ -1,28 +1,54 @@
 import { Button } from "@humansignal/ui";
+import { FF_DEV_1752, FF_DEV_2186, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 import {
-  FF_DEV_1752,
-  FF_DEV_2186,
-  FF_DEV_2887,
-  FF_DEV_3034,
-  FF_LSDV_4620_3_ML,
-  FF_FIT_1304_STRICT_OVERLAP,
-  isFF,
-} from "../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+  isActive,
+  FF_FIT_720_LAZY_LOAD_ANNOTATIONS,
+  FF_UTC_950_FIREWALL,
+} from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
+import { errorHandlerAllowSpecialErrors } from "./special-errors";
 // import { LSFHistory } from "./lsf-history";
-import { annotationToServer, taskToLSFormat } from "./lsf-utils";
+import { annotationToServer, formatDraftCreatedUsernameFromUser, taskToLSFormat } from "./lsf-utils";
 import { when, runInAction } from "mobx";
-import { isAlive } from "mobx-state-tree";
+
 import { imageCache } from "@humansignal/core";
-import { invalidateAnnotationCache, invalidateDistributionCache } from "@humansignal/core/lib/utils/annotation-cache";
+import {
+  invalidateAnnotationCachesForTask,
+  invalidateTaskAgreementCache,
+} from "@humansignal/core/lib/utils/annotation-cache";
+import {
+  annotationNeedsHydration,
+  applyAnnotationHydrationFromApi,
+} from "@humansignal/core/lib/utils/annotationLazyHydration";
 
 const waitForPaint = () =>
   new Promise((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(resolve));
   });
+
+export const shouldSaveDraftOnSelectionChange = (annotation) => {
+  if (typeof annotation?.needsDraftSave === "function") {
+    return annotation.needsDraftSave();
+  }
+  return Boolean(annotation?.history?.undoIdx);
+};
+
+/** Upper bound for lazy stub GET /api/annotations/:id/ so loading state cannot hang forever (FIT-1570). */
+const STUB_ANNOTATION_FETCH_TIMEOUT_MS = 120_000;
+
+/** Upper bound for awaiting another save's in-flight draft create before proceeding independently. */
+const DRAFT_CREATE_AWAIT_TIMEOUT_MS = 30_000;
+
+function promiseWithTimeout(promise, ms, label = "Operation") {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    }),
+  ]);
+}
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -49,26 +75,8 @@ const resolveLabelStudio = () => {
   }
 };
 
-// Returns true to suppress (swallow) the error, false to bubble to global handler.
-// We allow certain errors to bubble so the app-level ApiProvider can show modals:
-// - 403 PAUSED: User is paused in the project
-// - 400 OVERLAP_REACHED: Annotation overlap limit has been reached (only when feature flag is enabled)
-const errorHandlerAllowSpecialErrors = (result) => {
-  const isPaused =
-    result?.status === 403 &&
-    typeof result?.response === "object" &&
-    result?.response?.display_context?.reason === "PAUSED";
-
-  // Only handle OVERLAP_REACHED when feature flag is enabled
-  const isOverlapReached =
-    isFF(FF_FIT_1304_STRICT_OVERLAP) &&
-    result?.status === 400 &&
-    typeof result?.response === "object" &&
-    result?.response?.display_context?.reason === "OVERLAP_REACHED";
-
-  // Return false to allow these errors to bubble up to the global handler
-  return !(isPaused || isOverlapReached);
-};
+// errorHandlerAllowSpecialErrors lives in ./special-errors so lsf-sdk can share overlap/pause
+// bubbling without inlining the display_context checks.
 
 // Support portal URL constants used to construct error reporting links
 // These are used in showOperationToast() to create support links with request IDs
@@ -107,6 +115,15 @@ export class LSFWrapper {
 
   /** @type {function} */
   interfacesModifier = (interfaces) => interfaces;
+
+  /**
+   * FIT-1570: Incremented for each stub hydration that shows the app loader (annotation tab switches).
+   * Used so an older in-flight fetch does not clear loading after a newer selection.
+   */
+  _hydrateStubAnnotationSeq = 0;
+
+  /** In-flight draft-create requests by annotation id — single-flight guard in _submitDraft. */
+  _draftCreateRequests = new Map();
 
   /**
    *
@@ -155,7 +172,7 @@ export class LSFWrapper {
       interfaces.push("annotations:deny-empty");
     }
 
-    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled && this.labelStream) {
+    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled && this.labelStream && !isActive(FF_UTC_950_FIREWALL)) {
       interfaces.push("annotations:hide-info");
     }
 
@@ -176,6 +193,7 @@ export class LSFWrapper {
         "annotations:delete",
         "annotations:tabs",
         "predictions:tabs",
+        "predictions:delete",
         "annotations:copy-link",
       );
     }
@@ -192,10 +210,8 @@ export class LSFWrapper {
       interfaces.push("auto-annotation");
     }
 
-    if (isFF(FF_DEV_2887)) {
-      interfaces.push("annotations:comments");
-      interfaces.push("comments:resolve-any");
-    }
+    interfaces.push("annotations:comments");
+    interfaces.push("comments:resolve-any");
 
     if (this.project.review_settings?.require_comment_on_reject) {
       interfaces.push("comments:reject");
@@ -241,6 +257,7 @@ export class LSFWrapper {
       onSubmitAnnotation: this.onSubmitAnnotation,
       onUpdateAnnotation: this.onUpdateAnnotation,
       onDeleteAnnotation: this.onDeleteAnnotation,
+      onDeletePrediction: this.onDeletePrediction,
       onSkipTask: this.onSkipTask,
       onUnskipTask: this.onUnskipTask,
       onGroundTruth: this.onGroundTruth,
@@ -273,9 +290,7 @@ export class LSFWrapper {
         });
       });
 
-      if (isFF(FF_DEV_2887)) {
-        new CommentsSdk(this.lsfInstance, this.datamanager);
-      }
+      new CommentsSdk(this.lsfInstance, this.datamanager);
 
       this.datamanager.invoke("lsfInit", this, this.lsfInstance);
     } catch (err) {
@@ -349,7 +364,7 @@ export class LSFWrapper {
       if (newTask) await this.selectTask(newTask, annotationID, fromHistory);
     };
 
-    if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.hasUnsaved) {
+    if (this.lsf?.commentStore?.hasUnsaved) {
       Modal.confirm({
         title: "You have unsaved changes",
         body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
@@ -392,77 +407,104 @@ export class LSFWrapper {
 
     const hasChangedTasks = this.lsf?.task?.id !== task?.id && task?.id;
 
-    this.setLoading(true, hasChangedTasks);
+    this.setLoading(true);
+    // Disarm hotkeys while the store is mutated; re-armed at the end of this load
+    // unless a newer load has started (seq) or an error left the store partial.
+    this._setLSFTaskSeq = (this._setLSFTaskSeq ?? 0) + 1;
+    const loadSeq = this._setLSFTaskSeq;
+    this.lsf.setHydrated?.(false);
 
-    // Let the browser paint the loading indicator before heavy store operations
-    await waitForPaint();
-
-    if (!this.lsf) return;
-
-    // Pure data preparation (no MobX mutations)
-    const lsfTask = taskToLSFormat(task);
-    const isRejectedQueue = isDefined(task.default_selected_annotation);
-    const taskList = this.datamanager.store.taskStore.list;
-    const taskHistory = taskList
-      .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
-      .filter(Boolean);
-
-    const extracted = taskHistory.find((item) => item.taskId === task.id);
-
-    if (!fromHistory && extracted) {
-      taskHistory.splice(taskHistory.indexOf(extracted), 1);
-      taskHistory.push(extracted);
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      // Invalidate in-flight stub hydrations from annotation tab switches so their finally
+      // does not call setLoading(false) while this task load is in progress (FIT-1570).
+      this._hydrateStubAnnotationSeq++;
     }
 
-    if (!extracted) {
-      taskHistory.push({ taskId: task.id, annotationId: null });
-    }
+    try {
+      // Let the browser paint the loading indicator before heavy store operations
+      await waitForPaint();
 
-    if (isRejectedQueue && !annotationID) {
-      annotationID = task.default_selected_annotation;
-    }
-
-    // Batch store reset and interface mutations in a single MobX transaction
-    // so reactions fire only once instead of cascading after each action.
-    // initializeStore must run OUTSIDE this batch because it calls afterReset()
-    // which re-attaches shared stores (e.g. Taxonomy). If detach() and re-attach
-    // happen in the same transaction, MST throws "already part of state tree".
-    runInAction(() => {
-      if (hasChangedTasks) {
-        this.lsf.resetState();
-      } else {
-        this.lsf.resetAnnotationStore();
+      if (!this.lsf) {
+        return;
       }
 
-      this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-      this.lsf.toggleInterface("topbar:task-counter", true);
+      // Pure data preparation (no MobX mutations)
+      const lsfTask = taskToLSFormat(task);
+      const isRejectedQueue = isDefined(task.default_selected_annotation);
+      const taskList = this.datamanager.store.taskStore.list;
+      const taskHistory = taskList
+        .map((task) => this.taskHistory.find((item) => item.taskId === task.id))
+        .filter(Boolean);
 
-      if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
-        const overlapReached = this.task.overlap_reached === true;
-        this.overlapReached = overlapReached;
-        this.overlapReachedMessage =
-          this.task.overlap_reached_message ||
-          "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+      const extracted = taskHistory.find((item) => item.taskId === task.id);
 
-        this.lsf.setFlags({
-          overlapReached,
-          overlapReachedMessage: this.overlapReachedMessage,
-        });
-      } else {
-        this.overlapReached = false;
-        this.overlapReachedMessage = "";
+      if (!fromHistory && extracted) {
+        taskHistory.splice(taskHistory.indexOf(extracted), 1);
+        taskHistory.push(extracted);
       }
 
-      this.lsf.assignTask(task);
-    });
+      if (!extracted) {
+        taskHistory.push({ taskId: task.id, annotationId: null });
+      }
 
-    this.lsf.initializeStore(lsfTask);
+      if (isRejectedQueue && !annotationID) {
+        annotationID = task.default_selected_annotation;
+      }
 
-    await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
-    this.setLoading(false);
+      // Batch store reset and interface mutations in a single MobX transaction
+      // so reactions fire only once instead of cascading after each action.
+      // initializeStore must run OUTSIDE this batch because it calls afterReset()
+      // which re-attaches shared stores (e.g. Taxonomy). If detach() and re-attach
+      // happen in the same transaction, MST throws "already part of state tree".
+      runInAction(() => {
+        if (hasChangedTasks) {
+          this.lsf.resetState();
+        } else {
+          this.lsf.resetAnnotationStore();
+        }
 
-    if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
-      this.showOverlapReachedMessage();
+        this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
+        this.lsf.toggleInterface("topbar:task-counter", true);
+
+        if (isFF(FF_FIT_1304_STRICT_OVERLAP)) {
+          const overlapReached = this.task.overlap_reached === true;
+          this.overlapReached = overlapReached;
+          this.overlapReachedMessage =
+            this.task.overlap_reached_message ||
+            "Annotation overlap has been reached for this task. Your draft is preserved but cannot be submitted.";
+
+          this.lsf.setFlags({
+            overlapReached,
+            overlapReachedMessage: this.overlapReachedMessage,
+          });
+        } else {
+          this.overlapReached = false;
+          this.overlapReachedMessage = "";
+        }
+
+        this.lsf.assignTask(task);
+      });
+
+      this.lsf.initializeStore(lsfTask);
+
+      await this.setAnnotation(annotationID, fromHistory || isRejectedQueue, selectPrediction);
+
+      if (isFF(FF_FIT_1304_STRICT_OVERLAP) && this.overlapReached) {
+        this.showOverlapReachedMessage();
+      }
+
+      // The task is fully presented: annotations deserialized, the right one selected
+      // and hydrated. Only now submit/skip hotkeys may fire. Deliberately not in
+      // `finally` — a failed load must leave hotkeys inert.
+      if (loadSeq === this._setLSFTaskSeq) {
+        this.lsf.setHydrated?.(true);
+      }
+    } catch (error) {
+      console.error("[LSFWrapper] setLSFTask failed", error);
+      throw error;
+    } finally {
+      // Always clear loading: early return after waitForPaint, thrown errors, or success (FIT-1570 hardening).
+      this.setLoading(false);
     }
   }
 
@@ -513,7 +555,8 @@ export class LSFWrapper {
    * @private
    */
   async ensureAnnotationLoaded(annotationPk) {
-    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) || !this.labelStream) {
+    // Not label-stream-only: Grid / other callers may hydrate stubs outside label stream (FIT-1570).
+    if (!isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       return null;
     }
 
@@ -529,39 +572,7 @@ export class LSFWrapper {
       const fullAnnotation = await taskStore.loadAnnotation(annotationPk);
 
       if (fullAnnotation && !fullAnnotation.error) {
-        // IMPORTANT: Re-fetch the annotation from the store after async operation
-        // The original reference might be stale (user navigated, scrolled, etc.)
-        // which causes MST "object is protected" errors
-        const lsfAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
-        if (!lsfAnnotation) {
-          // Annotation no longer exists in the store
-          return fullAnnotation;
-        }
-        if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) {
-          // Annotation node was detached while hydration request was in-flight
-          return fullAnnotation;
-        }
-
-        // Check if already hydrated while we were fetching
-        const versionsResult = lsfAnnotation.versions?.result;
-        const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-        const hasRegions = lsfAnnotation.areas?.size > 0;
-
-        if (hasVersionsResult || hasRegions) {
-          // Already hydrated
-          return fullAnnotation;
-        }
-
-        if (fullAnnotation.result) {
-          if (!isAlive(lsfAnnotation) || !isAlive(lsfAnnotation.trackedState)) return fullAnnotation;
-          lsfAnnotation.history.freeze();
-          lsfAnnotation.deserializeResults(fullAnnotation.result);
-          // Critical: updateObjects() is required to render visual regions after deserializing
-          lsfAnnotation.updateObjects();
-          lsfAnnotation.history.safeUnfreeze();
-          lsfAnnotation.history.reinit();
-        }
-
+        applyAnnotationHydrationFromApi(this.annotations, annotationPk, fullAnnotation);
         return fullAnnotation;
       }
     } catch {
@@ -578,16 +589,37 @@ export class LSFWrapper {
     let annotation;
     const activeDrafts = cs.annotations.map((a) => a.draftId).filter(Boolean);
 
+    // The user's real submitted annotation, if any — reopening it (instead of restoring an
+    // orphan draft or creating a blank) is what prevents duplicate annotations on revisits.
+    // Annotator-only, mirroring the backend guard: elevated roles may legitimately hold an
+    // annotation and a second draft at once. Inert when the user id is unresolvable, since
+    // an undefined id would match userless rows.
+    const currentUserId = this.lsf.user?.id ?? window.APP_SETTINGS?.user?.id;
+    const isAnnotator = window.APP_SETTINGS?.user?.role === "AN";
+    const ownSubmittedAnnotation =
+      isAnnotator && isDefined(currentUserId)
+        ? cs.annotations.find((a) => isDefined(a.pk) && !a.skipped && !a.ground_truth && a.user?.id === currentUserId)
+        : undefined;
+
     if (this.task.drafts) {
       for (const draft of this.task.drafts) {
         if (activeDrafts.includes(draft.id)) continue;
         let c;
 
+        // An orphan draft restored over the owner's submitted annotation becomes a Submit
+        // state that persists a duplicate; keep it server-side. No created_by means own
+        // draft (the API scopes task.drafts to the requesting user).
+        const draftIsOwn = draft.created_by?.id == null || draft.created_by.id === currentUserId;
+        if (!draft.annotation && ownSubmittedAnnotation && draftIsOwn) {
+          console.warn(`Skipping orphan draft ${draft.id}: owner already has an annotation on task ${this.task.id}`);
+          continue;
+        }
+
         if (draft.annotation) {
           // Annotation existed - add draft to existed annotation
           const draftAnnotationPk = String(draft.annotation);
 
-          c = cs.annotations.find((c) => c.pk === draftAnnotationPk);
+          c = cs.annotations.find((c) => String(c.pk) === String(draftAnnotationPk));
           if (c) {
             c.history.freeze();
             c.addVersions({ draft: draft.result });
@@ -599,12 +631,16 @@ export class LSFWrapper {
           }
         } else {
           // Annotation not found - restore annotation from draft
+          const cb = draft?.created_by;
+          const ownerUser = cb && typeof cb.id === "number" ? cb : undefined;
+          const createdBy = draft.created_username || (ownerUser ? formatDraftCreatedUsernameFromUser(ownerUser) : "");
           c = cs.addAnnotation({
             draft: draft.result,
             userGenerate: true,
+            user: ownerUser,
             comment_count: draft.comment_count,
             unresolved_comment_count: draft.unresolved_comment_count,
-            createdBy: draft.created_username,
+            createdBy,
             createdAgo: draft.created_ago,
             createdDate: draft.created_at,
           });
@@ -614,7 +650,9 @@ export class LSFWrapper {
         c.setDraftId(draft.id);
         c.setDraftSaved(draft.created_at);
         c.history.safeUnfreeze();
-        c.history.reinit();
+        // reinitHistory cancels autosave and sets initial values so the hydration
+        // isn't treated as a user modification (prevents unwanted draft creation)
+        c.reinitHistory?.();
       }
     }
     const first = this.annotations?.length ? this.annotations[0] : null;
@@ -629,27 +667,26 @@ export class LSFWrapper {
         // not submitted draft, most likely from previous labeling session
         annotation = first;
       } else if (isDefined(annotationID) && selectAnnotation) {
-        // Lazy load annotation if it's a stub (FIT-720)
-        await this.ensureAnnotationLoaded(annotationID);
-        annotation = this.annotations.find(({ pk }) => pk === annotationID);
+        annotation = this.annotations.find(({ pk }) => String(pk) === String(annotationID));
       } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
       } else {
-        annotation = cs.createAnnotation();
+        // Reopen the user's own annotation on revisits — a blank create persists a duplicate.
+        annotation = ownSubmittedAnnotation ?? cs.createAnnotation();
       }
     } else {
       if (selectPrediction) {
-        annotation = this.predictions.find((p) => p.pk === id);
+        annotation = this.predictions.find((p) => String(p.pk) === String(id));
         annotation ??= first; // if prediction not found, select first annotation and resume existing behaviour
       } else if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
         const predictionByModelVersion = this.predictions.find((p) => p.createdBy === this.project.model_version);
         annotation = cs.addAnnotationFromPrediction(predictionByModelVersion ?? this.predictions[0]);
       } else if (this.annotations.length > 0 && id && id !== "auto") {
-        annotation = this.annotations.find((c) => c.pk === id || c.id === id);
+        annotation = this.annotations.find((c) => String(c.pk) === String(id) || String(c.id) === String(id));
       } else if (this.annotations.length > 0 && (id === "auto" || hasAutoAnnotations)) {
         annotation = first;
       } else {
-        annotation = cs.createAnnotation();
+        annotation = ownSubmittedAnnotation ?? cs.createAnnotation();
       }
     }
 
@@ -663,6 +700,17 @@ export class LSFWrapper {
         cs.selectAnnotation(annotation.id);
       }
       this.datamanager.invoke("annotationSet", annotation);
+
+      // FIT-1570: Stub hydration is debounced in onSelectAnnotation (setTimeout(0)), so it used to run
+      // after setLoading(false). Await hydration here so the editor stays blocked until results exist,
+      // avoiding drafts that overwrite the payload still in flight.
+      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+        const selected = this.lsf.annotationStore.selected;
+        if (selected?.type === "annotation" && selected?.pk) {
+          // setLSFTask already set isLoading; do not toggle again inside hydration (FIT-1570)
+          await this._hydrateStubAnnotation(selected, { showLoadingWhileFetching: false });
+        }
+      }
     }
   }
 
@@ -717,6 +765,11 @@ export class LSFWrapper {
     this.datamanager.invoke("labelStudioLoad", ls);
     this.lsf = ls;
 
+    // Runs synchronously within store creation (events.invoke dispatches inline), so
+    // submit/skip hotkeys are inert from the editor's very first moment until
+    // setLSFTask fully presents a task and re-arms them.
+    this.lsf.setHydrated?.(false);
+
     if (!this.lsf.task) this.setLoading(true);
 
     const _taskHistory = await this.datamanager.store.taskStore.loadTaskHistory({
@@ -769,8 +822,7 @@ export class LSFWrapper {
     this.datamanager.invoke("onStorageInitialized", ls);
 
     if (this.task && this.labelStream === false) {
-      const annotationID =
-        this.initialAnnotation?.pk ?? this.task.lastAnnotation?.pk ?? this.task.lastAnnotation?.id ?? "auto";
+      const annotationID = this.initialAnnotation?.pk ?? this.initialAnnotation?.id ?? "auto";
 
       await this.setAnnotation(annotationID);
     }
@@ -804,7 +856,8 @@ export class LSFWrapper {
       }
 
       const requestId = result?.$meta?.headers?.get("x-ls-request-id");
-      const supportUrl = requestId ? `${SUPPORT_URL}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : SUPPORT_URL;
+      const baseSupportUrl = window?.APP_SETTINGS?.flags?.support_link || SUPPORT_URL;
+      const supportUrl = requestId ? `${baseSupportUrl}?${SUPPORT_URL_REQUEST_ID_PARAM}=${requestId}` : baseSupportUrl;
 
       this.datamanager.invoke("toast", {
         message: (
@@ -857,12 +910,9 @@ export class LSFWrapper {
 
     // FIT-720: Invalidate caches after successful submit
     if (status < 400) {
-      // Invalidate specific annotation if ID is in result
-      if (result?.id) {
-        invalidateAnnotationCache(result.id);
-      }
-      // Invalidate distribution for the task
-      invalidateDistributionCache(this.task?.id);
+      // Single prefix invalidation for all GET /api/annotations/:id/ entries on this task (task-scoped query keys).
+      invalidateAnnotationCachesForTask(this.task?.id);
+      invalidateTaskAgreementCache(this.task?.id);
     }
 
     if (exitStream) return this.exitStream();
@@ -900,8 +950,8 @@ export class LSFWrapper {
 
     // FIT-720: Invalidate annotation cache after successful update
     if (status < 400 && annotation.pk) {
-      invalidateAnnotationCache(annotation.pk);
-      invalidateDistributionCache(task.id);
+      invalidateAnnotationCachesForTask(task.id);
+      invalidateTaskAgreementCache(task.id);
     }
 
     if (exitStream) return this.exitStream();
@@ -932,6 +982,8 @@ export class LSFWrapper {
   /**@private */
   onDeleteAnnotation = async (ls, annotation) => {
     const { task } = this;
+    const deletedAnnotationPk = annotation.pk;
+    const taskId = task.id;
     let response;
 
     task.deleteAnnotation(annotation);
@@ -945,8 +997,8 @@ export class LSFWrapper {
     } else {
       response = await this.withinLoadingState(async () => {
         return this.datamanager.apiCall("deleteAnnotation", {
-          taskID: task.id,
-          annotationID: annotation.pk,
+          taskID: taskId,
+          annotationID: deletedAnnotationPk,
         });
       });
 
@@ -954,11 +1006,52 @@ export class LSFWrapper {
       this.datamanager.invoke("deleteAnnotation", ls, annotation);
     }
 
-    if (response.ok) {
-      const lastAnnotation = this.annotations[this.annotations.length - 1] ?? {};
-      const annotationID = lastAnnotation.pk ?? undefined;
+    const status = response?.$meta?.status ?? response?.status;
+    const deleteSucceeded = !response?.error && (status === undefined ? response?.ok !== false : status < 400);
 
-      await this.setAnnotation(annotationID);
+    if (deleteSucceeded) {
+      invalidateTaskAgreementCache(taskId);
+      invalidateAnnotationCachesForTask(taskId);
+
+      const isRejectedQueue = isDefined(task.default_selected_annotation);
+      const next = this.currentAnnotation;
+      const nextAnnotationId = next?.pk ?? next?.id;
+
+      if (isRejectedQueue) {
+        await this.loadTask();
+      } else {
+        await this.loadTask(taskId, nextAnnotationId, true);
+      }
+    }
+  };
+
+  /**@private */
+  onDeletePrediction = async (ls, prediction) => {
+    const { task } = this;
+    const deletedPredictionPk = prediction.pk;
+    const taskId = task.id;
+
+    task.deletePrediction(prediction);
+
+    const response = await this.withinLoadingState(async () => {
+      return this.datamanager.apiCall("deletePrediction", {
+        predictionID: deletedPredictionPk,
+      });
+    });
+
+    this.datamanager.invoke("deletePrediction", ls, prediction);
+
+    const status = response?.$meta?.status ?? response?.status;
+    const deleteSucceeded = !response?.error && (status === undefined ? response?.ok !== false : status < 400);
+
+    if (deleteSucceeded) {
+      invalidateTaskAgreementCache(taskId);
+      invalidateAnnotationCachesForTask(taskId);
+
+      const next = this.currentAnnotation;
+      const nextAnnotationId = next?.pk ?? next?.id;
+
+      await this.loadTask(taskId, nextAnnotationId, true);
     }
   };
 
@@ -966,17 +1059,24 @@ export class LSFWrapper {
     this.showOperationToast(status, "Draft saved successfully", "Draft is not saved", result);
   };
 
+  usesCustomInterface() {
+    return Boolean(this.datamanager?.store?.project?.use_custom_interface);
+  }
+
   needsDraftSave = (annotation) => {
-    if (annotation.history?.hasChanges && !annotation.draftSaved) return true;
-    if (
-      annotation.history?.hasChanges &&
-      new Date(annotation.history.lastAdditionTime) > new Date(annotation.draftSaved)
-    )
-      return true;
-    return false;
+    if (this.usesCustomInterface()) return false;
+    try {
+      return annotation?.needsDraftSave?.() ?? false;
+    } catch (error) {
+      console.warn("[LSFWrapper] needsDraftSave failed:", error);
+      return false;
+    }
   };
 
   saveDraft = async (target = null) => {
+    // Custom interface persists drafts via editor-shell; hidden LSF must not overwrite them.
+    if (this.usesCustomInterface()) return;
+
     const selected = target || this.lsf?.annotationStore?.selected;
     const hasChanges = selected ? this.needsDraftSave(selected) : false;
 
@@ -991,19 +1091,27 @@ export class LSFWrapper {
   };
 
   onSubmitDraft = async (_studio, annotation, params = {}) => {
+    return this._submitDraft(annotation, params);
+  };
+
+  async _submitDraft(annotation, params = {}) {
     // It should be preserved as soon as possible because each `await` will allow it to be changed
     const taskId = this.task.id;
-    const annotationDoesntExist = !annotation.pk;
     const data = { body: this.prepareData(annotation, { isNewDraft: true }) }; // serializedAnnotation
     const hasChanges = this.needsDraftSave(annotation);
     const showToast = params?.useToast && hasChanges;
-    // console.log('onSubmitDraft', params?.useToast, hasChanges);
 
     if (params?.useToast) delete params.useToast;
 
     Object.assign(data.body, params);
 
     await this.saveUserLabels();
+
+    // Single-flight: overlapping saves would both see draftId=0 and create two drafts,
+    // orphaning one. Waiting (bounded, so a hung request can't wedge later saves) lets the
+    // newer payload flow through the update branch instead.
+    const pendingCreate = this._draftCreateRequests.get(annotation.id);
+    if (pendingCreate) await promiseWithTimeout(pendingCreate, DRAFT_CREATE_AWAIT_TIMEOUT_MS).catch(() => {});
 
     if (annotation.draftId > 0) {
       // draft has been already created
@@ -1013,23 +1121,25 @@ export class LSFWrapper {
       this.datamanager.invoke("submitDraft", this, annotation, res);
       return res;
     }
-    let response;
 
-    if (annotationDoesntExist) {
-      response = await this.datamanager.apiCall("createDraftForTask", { taskID: taskId }, data);
-    } else {
-      response = await this.datamanager.apiCall(
-        "createDraftForAnnotation",
-        { taskID: taskId, annotationID: annotation.pk },
-        data,
-      );
+    // Fresh pk read: a submit during the awaits above must not yield a task-level orphan.
+    const createRequest = !annotation.pk
+      ? this.datamanager.apiCall("createDraftForTask", { taskID: taskId }, data)
+      : this.datamanager.apiCall("createDraftForAnnotation", { taskID: taskId, annotationID: annotation.pk }, data);
+
+    this._draftCreateRequests.set(annotation.id, createRequest);
+    let response;
+    try {
+      response = await createRequest;
+    } finally {
+      this._draftCreateRequests.delete(annotation.id);
     }
     response?.id && annotation.setDraftId(response?.id);
     showToast && this.draftToast(response.$meta?.status, response);
     this.datamanager.invoke("submitDraft", this, annotation, response);
 
     return response;
-  };
+  }
 
   onSkipTask = async (_, { comment } = {}) => {
     // Prevent skipping if overlap is reached (only when feature flag is enabled)
@@ -1090,43 +1200,9 @@ export class LSFWrapper {
     await this.withinLoadingState(async () => {
       currentAnnotation.pauseAutosave();
 
-      if (isFF(FF_DEV_3034)) {
-        await this.datamanager.apiCall("convertToDraft", {
-          annotationID: currentAnnotation.pk,
-        });
-      } else {
-        if (currentAnnotation.draftId > 0) {
-          await this.datamanager.apiCall(
-            "updateDraft",
-            {
-              draftID: currentAnnotation.draftId,
-            },
-            {
-              body: { annotation: null },
-            },
-          );
-        } else {
-          const annotationData = { body: this.prepareData(currentAnnotation) };
-
-          await this.datamanager.apiCall(
-            "createDraftForTask",
-            {
-              taskID: this.task.id,
-            },
-            annotationData,
-          );
-        }
-
-        // Carry over any comments to when the annotation draft is eventually submitted
-        if (isFF(FF_DEV_2887) && this.lsf?.commentStore?.toCache) {
-          this.lsf.commentStore.toCache(`task.${task.id}`);
-        }
-
-        await this.datamanager.apiCall("deleteAnnotation", {
-          taskID: task.id,
-          annotationID: currentAnnotation.pk,
-        });
-      }
+      await this.datamanager.apiCall("convertToDraft", {
+        annotationID: currentAnnotation.pk,
+      });
     });
     await this.loadTask(task.id);
     this.datamanager.invoke("unskipTask");
@@ -1170,7 +1246,7 @@ export class LSFWrapper {
     // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
     // During init, selectAnnotation fires for ALL annotations in rapid succession.
     // This debounce ensures only the final selection triggers the callback.
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       if (this._selectAnnotationTimeout) {
         clearTimeout(this._selectAnnotationTimeout);
         // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
@@ -1203,7 +1279,7 @@ export class LSFWrapper {
     // Invoke the DataManager callback first so that history fetch can start immediately.
     // The history endpoint only needs the annotation pk (available on stubs).
     // Hydration (which fetches full annotation data) runs in parallel afterwards.
-    if (nextAnnotation?.history?.undoIdx) {
+    if (shouldSaveDraftOnSelectionChange(nextAnnotation)) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);
       });
@@ -1214,87 +1290,69 @@ export class LSFWrapper {
     // FIT-720: Hydrate stub annotations when selected
     // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
     // The debounce may have caused the callback annotation to be stale
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
       const currentSelected = this.lsf?.annotationStore?.selected;
       if (currentSelected?.pk) {
-        // Prefetch comments on annotation selection so region comment indicators
-        // are visible immediately, without waiting for the Comments tab to be opened.
-        // Deduplication in CommentStore.listComments prevents redundant API calls
-        // if the Comments tab is already open and triggers its own fetch.
-        this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+        // Custom interface quick view / shell owns comments via editor-comments + TanStack Query.
+        // Hidden LSF must not prefetch /api/comments in parallel (duplicate + stale tab state).
+        if (!this.usesCustomInterface()) {
+          // Prefetch comments on annotation selection so region comment indicators
+          // are visible immediately, without waiting for the Comments tab to be opened.
+          // Deduplication in CommentStore.listComments prevents redundant API calls
+          // if the Comments tab is already open and triggers its own fetch.
+          this.lsf?.commentStore?.listComments({ suppressClearComments: false });
+        }
 
-        await this._hydrateStubAnnotation(currentSelected);
+        // FIT-1570: This path runs from setTimeout(0) (debounced) and is not awaited by the editor.
+        // Show the app loader until the stub fetch completes so users cannot edit or create drafts first.
+        await this._hydrateStubAnnotation(currentSelected, { showLoadingWhileFetching: true });
       }
     }
   };
 
-  // FIT-720: Hydrate a stub annotation by fetching full data from API
-  _hydrateStubAnnotation = async (annotation) => {
-    // Check if annotation is a stub (no regions/results)
-    // Stubs have empty results - check via the areas map which holds deserialized regions
-    const hasRegions = annotation.areas?.size > 0;
-    const isUserGenerated = annotation.userGenerate && !annotation.sentUserGenerate;
+  /**
+   * FIT-720: Hydrate a stub annotation by fetching full data from API.
+   * @param {{ showLoadingWhileFetching?: boolean }} [options] - When true, toggles LSF isLoading during fetch (annotation switch path only; initial task load already has loading).
+   */
+  _hydrateStubAnnotation = async (annotation, options = {}) => {
+    const { showLoadingWhileFetching = false } = options;
+    const needsFullHydration = annotationNeedsHydration(annotation);
+    const versionsResult = annotation?.versions?.result;
+    const needsVersionsPopulated =
+      !needsFullHydration &&
+      annotation?.type === "annotation" &&
+      (!Array.isArray(versionsResult) || versionsResult.length === 0);
 
-    // Also check versions.result to see if the annotation was loaded with actual results
-    const versionsResult = annotation.versions?.result;
-    const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-
-    // Skip if already hydrated or is a new user-generated annotation
-    // Use versionsResult as the source of truth - if it has data, the annotation is already hydrated
-    if (hasVersionsResult || isUserGenerated) {
+    if (!needsFullHydration && !needsVersionsPopulated) {
       return;
     }
 
     const annotationPk = annotation.pk;
+    let seq = 0;
+    if (showLoadingWhileFetching && isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+      seq = ++this._hydrateStubAnnotationSeq;
+      this.setLoading(true);
+    }
 
     try {
-      const fullAnnotation = await this.datamanager.apiCall("fetchAnnotation", {
-        annotationID: annotationPk,
-      });
+      const fullAnnotation = await promiseWithTimeout(
+        this.datamanager.apiCall("fetchAnnotation", {
+          annotationID: annotationPk,
+        }),
+        STUB_ANNOTATION_FETCH_TIMEOUT_MS,
+        "fetchAnnotation",
+      );
 
-      if (fullAnnotation?.result && !fullAnnotation.error) {
-        // IMPORTANT: Re-fetch the annotation from the store after async operation
-        // The original reference might be stale (user navigated, scrolled, etc.)
-        // which causes MST "object is protected" errors
-        const freshAnnotation = this.annotations.find((a) => String(a.pk) === String(annotationPk));
-        if (!freshAnnotation) {
-          // Annotation no longer exists in the store
-          return;
-        }
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) {
-          // Annotation node was detached while hydration request was in-flight
-          return;
-        }
-
-        // Check if annotation was already hydrated while we were fetching
-        const freshVersionsResult = freshAnnotation.versions?.result;
-        const freshHasVersionsResult = Array.isArray(freshVersionsResult) && freshVersionsResult.length > 0;
-        const freshHasRegions = freshAnnotation.areas?.size > 0;
-
-        if (freshHasVersionsResult || freshHasRegions) {
-          // Already hydrated (possibly by another code path)
-          return;
-        }
-
-        // Freeze history to prevent undo/redo issues during hydration
-        freshAnnotation.history?.freeze?.();
-
-        // Deserialize the results into the annotation
-        if (!isAlive(freshAnnotation) || !isAlive(freshAnnotation.trackedState)) return;
-        freshAnnotation.deserializeResults(fullAnnotation.result);
-
-        // Critical: updateObjects() MUST be called to render visual regions after deserializing
-        freshAnnotation.updateObjects?.();
-
-        // Unfreeze history
-        freshAnnotation.history?.safeUnfreeze?.();
-
-        // reinitHistory cancels autosave and sets initial values so LSF knows this is the base state
-        // This prevents the hydration from being treated as a user modification
-        freshAnnotation.reinitHistory?.();
-      }
-    } catch {
+      applyAnnotationHydrationFromApi(this.annotations, annotationPk, fullAnnotation);
+    } catch (error) {
       // Failed to hydrate annotation - will show stub state
+      if (String(error?.message ?? "").includes("timed out")) {
+        console.warn("[LSFWrapper] Annotation hydration timed out", { annotationPk });
+      }
+    } finally {
+      if (showLoadingWhileFetching && seq > 0 && seq === this._hydrateStubAnnotationSeq) {
+        this.setLoading(false);
+      }
     }
   };
 
@@ -1335,11 +1393,7 @@ export class LSFWrapper {
       this.datamanager.invoke(eventName, this.lsf, eventData, result);
 
       // Persist any queued comments which are not currently attached to an annotation
-      if (
-        isFF(FF_DEV_2887) &&
-        ["submitAnnotation", "skipTask"].includes(eventName) &&
-        this.lsf?.commentStore?.persistQueuedComments
-      ) {
+      if (["submitAnnotation", "skipTask"].includes(eventName) && this.lsf?.commentStore?.persistQueuedComments) {
         await this.lsf.commentStore.persistQueuedComments();
       }
     }
@@ -1413,10 +1467,19 @@ export class LSFWrapper {
     const result = {
       lead_time: leadTime,
       result: (isNewDraft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
-      draft_id: annotation.draftId,
+      // The Annotation MST model uses `draftId: 0` as a "no draft" sentinel.
+      // Sending 0 over the wire poisons backend bulk-update filters (BROS-1185
+      // AnnotationHistory cross-contamination, BROS-1298 lse_tasks_taskevent FK
+      // violation). Normalize at the payload boundary so the wire always
+      // carries either a real positive draft id or null.
+      draft_id: annotation.draftId || null,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
       started_at: startedAt.toISOString(),
+      // Parity with custom interface: backend uses these for TaskEvent meta and
+      // label-stream vs Quick View overlap policy (FIT-2625 / FIT-2600).
+      work_activity_source: this.labelStream ? "stream" : "datamanager",
+      work_activity_mode: this.lastWorkActivityMode ?? "annotation",
     };
 
     if (includeId && userGenerate) {
@@ -1427,22 +1490,19 @@ export class LSFWrapper {
   }
 
   /** @private */
-  setLoading(isLoading, shouldReset = false) {
-    if (isFF(FF_LSDV_4620_3_ML) && shouldReset) this.lsf.clearApp();
+  setLoading(isLoading) {
     this.lsf.setFlags({ isLoading });
-    if (isFF(FF_LSDV_4620_3_ML) && shouldReset) this.lsf.renderApp();
   }
 
   async withinLoadingState(callback) {
-    let result;
-
     this.setLoading(true);
-    if (callback) {
-      result = await callback.call(this);
+    try {
+      if (callback) {
+        return await callback.call(this);
+      }
+    } finally {
+      this.setLoading(false);
     }
-    this.setLoading(false);
-
-    return result;
   }
 
   destroy() {

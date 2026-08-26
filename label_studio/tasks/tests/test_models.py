@@ -88,6 +88,31 @@ class TestTaskResolveUris(TestCase):
         mock_resolve.assert_called_once()
 
     @override_settings(CLOUD_FILE_STORAGE_ENABLED=False)
+    def test_fallback_storage_used_after_unresolved_project_storage_container(self):
+        """Fallback storage still resolves non-empty containers not changed by project storages."""
+        gcs_storage = GCSImportStorageFactory(project=self.project, bucket='gcs-bucket')
+        fallback_storage = S3ImportStorageFactory(bucket='fallback-bucket')
+        unchanged_payload = {'image': 's3://fallback-bucket/file.jpg'}
+        resolved_payload = {'image': 'RESOLVED'}
+
+        with (
+            patch.object(
+                Project,
+                'get_all_import_storage_objects',
+                new_callable=PropertyMock,
+                return_value=[gcs_storage],
+            ),
+            patch.object(gcs_storage, 'resolve_uris', return_value=unchanged_payload),
+            patch.object(Task, 'storage', new_callable=PropertyMock, return_value=fallback_storage),
+            patch.object(fallback_storage, 'resolve_uris', return_value=resolved_payload) as mock_resolve,
+        ):
+            task_data = {'payload': unchanged_payload.copy()}
+            result = self.task.resolve_uris(task_data, self.project)
+
+        assert result['payload'] == resolved_payload
+        mock_resolve.assert_called_once()
+
+    @override_settings(CLOUD_FILE_STORAGE_ENABLED=False)
     def test_fallback_storage_not_duplicated(self):
         """When self.storage has the same id as a storage in storage_objects,
         it is not called a second time.
@@ -128,7 +153,7 @@ class TestTaskResolveUris(TestCase):
 
     @override_settings(HOSTNAME='http://localhost:8080')
     @patch('tasks.models.reverse', return_value='/projects/1/file-proxy/')
-    def test_credential_based_proxy(self, mock_reverse):
+    def test_credential_based_proxy(self, _mock_reverse):
         """When the project has task_data_login/password set,
         all URL values are proxied through the file-proxy endpoint instead.
         """

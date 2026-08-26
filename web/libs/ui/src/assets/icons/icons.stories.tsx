@@ -1,6 +1,26 @@
-import React, { useState } from "react";
 import type { Meta } from "@storybook/react";
+import React, { useState } from "react";
 import * as Icons from "./";
+
+const iconCardClassName =
+  "group inline-flex w-full flex-col items-center rounded-small border border-neutral-border bg-neutral-background p-4 text-left transition-all duration-200 " +
+  "cursor-pointer hover:border-neutral-border-bold hover:bg-neutral-surface-hover hover:shadow-sm " +
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus-outline " +
+  "active:scale-[0.99]";
+
+/**
+ * forwardRef/memo components are typeof "object". The catalog previously used
+ * `typeof comp === "function"` only, which hid every Phosphor and SVGR icon in Storybook.
+ */
+const isRenderableIcon = (value: unknown): value is React.ElementType => {
+  if (typeof value === "function") return true;
+  if (typeof value !== "object" || value === null) return false;
+  const t = (value as { $$typeof?: symbol }).$$typeof;
+  return t === Symbol.for("react.forward_ref") || t === Symbol.for("react.memo");
+};
+
+/** Low-level Phosphor exports that are valid element types but not standalone icons for the grid. */
+const PHOSPHOR_STORYBOOK_EXCLUSIONS = new Set(["IconBase"]);
 
 // Function to get SVG file name from component name
 const getFileNameFromIcon = (iconName: string): string => {
@@ -211,26 +231,104 @@ const categoryDescriptions: Record<string, string> = {
   Animated: "Animated icons",
 };
 
-// Component for a single icon
+// Component for a single custom SVG icon
 const IconItem = ({ name, Icon }: { name: string; Icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }) => {
   const fileName = getFileNameFromIcon(name);
 
   return (
-    <div
-      className="icon-item cursor-pointer flex flex-col items-center p-4 border border-neutral-border rounded-small transition-all duration-200"
+    <button
+      type="button"
+      className={iconCardClassName}
+      data-testid={`icon-card-${name}`}
+      aria-label={`Copy ${name} to clipboard`}
       onClick={() => {
-        navigator.clipboard.writeText(name);
+        void navigator.clipboard.writeText(name);
       }}
-      title={`Click to copy: ${name}`}
     >
-      <div className="icon-preview flex items-center justify-center h-10 w-10 mb-2">
-        {React.createElement(Icon, {
-          width: 24,
-          height: 24,
-        })}
+      <div className="icon-preview mb-2 flex h-10 w-10 items-center justify-center text-neutral-content transition-transform duration-200 group-hover:scale-150">
+        {React.createElement(Icon, { width: 24, height: 24 })}
       </div>
-      <div className="icon-name text-xs font-bold text-center text-neutral-content-subtle break-word mb-1">{name}</div>
-      <div className="icon-file-name text-10 text-neutral-content-subtle break-word text-center">{fileName}</div>
+      <div className="icon-name mb-1 break-words text-center text-xs font-bold text-neutral-content-subtle">{name}</div>
+      <div className="icon-file-name text-10 break-words text-center text-neutral-content-subtle">{fileName}</div>
+      <span className="mt-2 text-center text-10 font-medium text-primary-content-subtle opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        Click to copy
+      </span>
+    </button>
+  );
+};
+
+// Component for a single Phosphor icon (uses size prop)
+const PhosphorIconItem = ({
+  name,
+  IconComponent,
+}: {
+  name: string;
+  IconComponent: React.ComponentType<{ size?: number }>;
+}) => {
+  const copyLabel = name;
+
+  return (
+    <button
+      type="button"
+      className={iconCardClassName}
+      data-testid={`phosphor-icon-card-${name}`}
+      aria-label={`Copy ${copyLabel} to clipboard`}
+      onClick={() => {
+        void navigator.clipboard.writeText(copyLabel);
+      }}
+    >
+      <div className="icon-preview mb-2 flex h-10 w-10 items-center justify-center text-neutral-content transition-transform duration-200 group-hover:scale-150">
+        {React.createElement(IconComponent, { size: 24 })}
+      </div>
+      <div className="icon-name mb-1 w-full break-words text-center text-xs font-bold text-neutral-content-subtle">
+        {copyLabel}
+      </div>
+      <span className="mt-2 text-center text-10 font-medium text-primary-content-subtle opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        Click to copy
+      </span>
+    </button>
+  );
+};
+
+// Component to display all Phosphor icons
+const PhosphorIconCatalog = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const phosphorEntries = Object.entries(Icons).filter(([name, comp]) => {
+    // Only show canonical XxxIcon names; skip deprecated unsuffixed duplicates (e.g. ArrowRight)
+    if (!name.endsWith("Icon")) return false;
+    if (PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name)) return false;
+    if (!isRenderableIcon(comp)) return false;
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  return (
+    <div className="icon-catalog flex flex-col gap-4 p-8">
+      <h2 className="mb-2 text-2xl font-bold">Phosphor Icons ({phosphorEntries.length})</h2>
+      <p className="mb-1 text-sm text-neutral-content-subtle">
+        Cards are interactive: hover shows a copy hint and emphasis; click to copy the export name.
+      </p>
+      <p className="mb-4 text-sm text-neutral-content-subtle">
+        Usage:{" "}
+        <code>{'import { FolderSimplePlusIcon } from "@humansignal/icons"; <FolderSimplePlusIcon size={24} />'}</code>
+      </p>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search Phosphor icons..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="p-2 rounded border border-neutral-border bg-neutral-background text-neutral-content focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-focus-outline w-full text-sm mb-4"
+        />
+      </div>
+      <div className="icons-grid grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5">
+        {phosphorEntries.map(([name, comp]) => (
+          <PhosphorIconItem key={name} name={name} IconComponent={comp as React.ComponentType<{ size?: number }>} />
+        ))}
+      </div>
+      {phosphorEntries.length === 0 && (
+        <div className="text-center my-10 text-neutral-content-subtle">No icons found matching "{searchTerm}"</div>
+      )}
     </div>
   );
 };
@@ -239,8 +337,14 @@ const IconItem = ({ name, Icon }: { name: string; Icon: React.ComponentType<Reac
 const IconCatalog = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Get all icons from the imported icons
-  const iconEntries = Object.entries(Icons);
+  // Only custom SVG icons: start with "Icon" prefix, never end with "Icon" suffix (Phosphor convention)
+  const iconEntries = Object.entries(Icons).filter(
+    ([name, comp]) =>
+      name.startsWith("Icon") &&
+      !name.endsWith("Icon") &&
+      !PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name) &&
+      isRenderableIcon(comp),
+  );
 
   // Filter icons based on search term (component name or file name)
   const filteredIcons = iconEntries.filter(([name]) => {
@@ -251,7 +355,10 @@ const IconCatalog = () => {
   });
 
   return (
-    <div className="icon-catalog p-8 flex flex-col gap-4">
+    <div className="icon-catalog flex flex-col gap-4 p-8">
+      <p className="text-sm text-neutral-content-subtle">
+        Hover a card for visual feedback and a copy hint; click to copy the component name.
+      </p>
       <div className="search-container">
         <input
           type="text"
@@ -263,12 +370,9 @@ const IconCatalog = () => {
       </div>
 
       <div className="icons-grid grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5">
-        {filteredIcons.map(([name, Icon]) => {
-          // Don't render exports that aren't components
-          if (typeof Icon !== "function" && typeof Icon !== "object") return null;
-
-          return <IconItem key={name} name={name} Icon={Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>} />;
-        })}
+        {filteredIcons.map(([name, Icon]) => (
+          <IconItem key={name} name={name} Icon={Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>} />
+        ))}
       </div>
       {filteredIcons.length === 0 && (
         <div className="text-center my-10 text-neutral-content-subtle">No icons found matching "{searchTerm}"</div>
@@ -281,8 +385,14 @@ const IconCatalog = () => {
 const IconCatalogByCategory = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Get all icons from the imported icons
-  const iconEntries = Object.entries(Icons);
+  // Only custom SVG icons: start with "Icon" prefix, never end with "Icon" suffix (Phosphor convention)
+  const iconEntries = Object.entries(Icons).filter(
+    ([name, comp]) =>
+      name.startsWith("Icon") &&
+      !name.endsWith("Icon") &&
+      !PHOSPHOR_STORYBOOK_EXCLUSIONS.has(name) &&
+      isRenderableIcon(comp),
+  );
 
   // Group icons by category
   const categorizedIcons: Record<string, Array<[string, unknown]>> = Object.keys(categoryDescriptions).reduce(
@@ -295,7 +405,7 @@ const IconCatalogByCategory = () => {
 
   iconEntries.forEach((entry) => {
     const [name, Icon] = entry;
-    if (typeof Icon !== "object" && typeof Icon !== "function") return;
+    if (!isRenderableIcon(Icon)) return;
 
     const category = getIconCategory(name);
     if (!categorizedIcons[category]) {
@@ -322,7 +432,10 @@ const IconCatalogByCategory = () => {
     .filter(({ icons }) => icons.length > 0);
 
   return (
-    <div className="icon-catalog-by-category p-8 flex flex-col gap-4">
+    <div className="icon-catalog-by-category flex flex-col gap-4 p-8">
+      <p className="text-sm text-neutral-content-subtle">
+        Hover a card for visual feedback and a copy hint; click to copy the component name.
+      </p>
       <div className="search-container mb-5">
         <input
           type="text"
@@ -365,7 +478,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          "A catalog of all available icons in the system. Click on any icon to copy its component name. The file name is displayed below each icon.",
+          "A catalog of all available icons in the system. Hover a card for hover styles and a copy hint; click to copy the component name. File names appear below custom SVG icons.",
       },
     },
   },
@@ -373,13 +486,26 @@ const meta: Meta = {
 
 export default meta;
 
-export const AllIcons = {
-  render: () => <IconCatalog />,
-  name: "All Icons",
+export const PhosphorIcons = {
+  render: () => <PhosphorIconCatalog />,
+  name: "Phosphor Icons",
   parameters: {
     docs: {
       description: {
-        story: "All icons displayed in a grid, searchable by name or file name.",
+        story:
+          "All Phosphor icons exported as Icon.* namespace. Use size prop for sizing. Default size is 24 (set via IconContext.Provider in App root).",
+      },
+    },
+  },
+};
+
+export const AllIcons = {
+  render: () => <IconCatalog />,
+  name: "Custom SVG Icons",
+  parameters: {
+    docs: {
+      description: {
+        story: "All custom Label Studio SVG icons displayed in a grid, searchable by name or file name.",
       },
     },
   },
@@ -387,11 +513,11 @@ export const AllIcons = {
 
 export const CategorizedIcons = {
   render: () => <IconCatalogByCategory />,
-  name: "Categorized",
+  name: "Categorized Custom SVGs",
   parameters: {
     docs: {
       description: {
-        story: "Icons grouped by categories, making it easier to find related icons.",
+        story: "Custom SVG icons grouped by categories, making it easier to find related icons.",
       },
     },
   },

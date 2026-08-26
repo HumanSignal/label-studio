@@ -13,7 +13,7 @@ export const initDevApp = async (DataManager) => {
   const dm = new DataManager({
     root: document.getElementById("app"),
     toolbar:
-      "actions columns filters ordering review-button label-button loading-possum error-box | refresh view-toggle",
+      "grid-select-all actions columns filters ordering review-button label-button loading-possum error-box | refresh view-toggle",
     apiGateway: gatewayAPI,
     apiVersion: 2,
     apiMockDisabled: useExternalSource,

@@ -35,7 +35,8 @@
  * toolbar?: string,
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
- * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
+ * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean, lock?: boolean },
+ * AgreementSettingsSummary?: import("react").ComponentType<{ filters: unknown }>,
  * }} DMConfig
  */
 
@@ -54,7 +55,7 @@ import { LSFWrapper } from "./lsf-sdk";
 import { taskToLSFormat } from "./lsf-utils";
 
 const DEFAULT_TOOLBAR =
-  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button density-toggle grid-size view-toggle";
+  "grid-select-all actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button density-toggle grid-size view-toggle";
 
 const prepareInstruments = (instruments) => {
   const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);
@@ -131,6 +132,7 @@ export class DataManager {
     delete: true,
     edit: true,
     duplicate: true,
+    lock: true,
   };
 
   /** @type {"dm" | "labelops"} */
@@ -191,10 +193,12 @@ export class DataManager {
 
     Object.assign(this.tabControls, config.tabControls ?? {});
 
-    // Store LSE-specific callbacks and components
+    // Store enterprise-host callbacks and components (LSE); OSS Data Manager does not set these.
     this.onViewAnalytics = config.onViewAnalytics;
     this.onViewReviewerAnalytics = config.onViewReviewerAnalytics;
     this.RowContextMenuComponent = config.RowContextMenuComponent;
+    /** LSE only: rich agreement header tooltip (`filters` prop). OSS uses built-in plain summary. */
+    this.AgreementSettingsSummary = config.AgreementSettingsSummary ?? null;
 
     this.updateActions(config.actions);
 
@@ -443,21 +447,51 @@ export class DataManager {
     }
 
     if (!isLabelStream && (!taskSelected || isDefined(annotation))) {
-      const annotationID = annotation?.id ?? task.lastAnnotation?.id;
+      // When opening a task from Data Manager rows (without explicit annotation),
+      // let LSF pick the default annotation from the loaded task payload.
+      const annotationID = annotation?.id;
 
       // this.lsf.loadTask(task.id, annotationID);
       this.lsf.selectTask(task, annotationID);
     }
   }
 
-  destroyLSF() {
-    this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
-    this.lsf?.destroy();
-    this.lsf = undefined;
+  async destroyLSF() {
+    if (this._destroyLSFInFlight) return this._destroyLSFInFlight;
+
+    this._destroyLSFInFlight = this._destroyLSFImpl();
+    return this._destroyLSFInFlight;
   }
 
-  destroy(detachCallbacks = true) {
-    this.destroyLSF();
+  async _destroyLSFImpl() {
+    try {
+      // A failed draft save (network error, page teardown) must never abort
+      // teardown: skipping lsf.destroy() leaves a fully alive second editor
+      // (store, message listeners, autosave) parked on the old task, which then
+      // absorbs postMessage mutations meant for the next session.
+      try {
+        await this.lsf?.saveDraft?.();
+      } catch (err) {
+        console.error("destroyLSF: saveDraft failed, continuing teardown", err);
+      }
+      try {
+        await this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
+      } catch (err) {
+        console.error("destroyLSF: beforeLsfDestroy failed, continuing teardown", err);
+      }
+      try {
+        this.lsf?.destroy();
+      } catch (err) {
+        console.error("destroyLSF: lsf.destroy failed, continuing teardown", err);
+      }
+      this.lsf = undefined;
+    } finally {
+      this._destroyLSFInFlight = null;
+    }
+  }
+
+  async destroy(detachCallbacks = true) {
+    await this.destroyLSF();
     unmountComponentAtNode(this.root);
 
     if (this.store) {
@@ -470,9 +504,9 @@ export class DataManager {
     }
   }
 
-  reload() {
-    this.destroy(false);
-    this.initApp();
+  async reload() {
+    await this.destroy(false);
+    await this.initApp();
     this.installActions();
   }
 

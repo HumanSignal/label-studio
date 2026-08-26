@@ -2,6 +2,7 @@
   --frame-size: 10px;
   --view-size: 0;
   --view-height: 64px;
+  --indicator-overlay-opacity: 5%;
 
   width: 100%;
   min-height: var(--view-height);
@@ -71,7 +72,11 @@
       inset 0 1px var(--color-neutral-border),
       inset 0 -1px var(--color-neutral-border);
     background:
-      linear-gradient(0deg, rgb(var(--color-neutral-shadow-raw) / 5%), rgb(var(--color-neutral-shadow-raw) / 5%)),
+      linear-gradient(
+        0deg,
+        rgb(var(--color-neutral-shadow-raw) / var(--indicator-overlay-opacity)),
+        rgb(var(--color-neutral-shadow-raw) / var(--indicator-overlay-opacity))
+      ),
       var(--color-neutral-background);
 
     &::before {
@@ -111,7 +116,11 @@
     position: absolute;
     pointer-events: none;
     background:
-      linear-gradient(0deg, rgb(var(--color-neutral-shadow-raw) / 5%), rgb(var(--color-neutral-shadow-raw) / 5%)),
+      linear-gradient(
+        0deg,
+        rgb(var(--color-neutral-shadow-raw) / var(--indicator-overlay-opacity)),
+        rgb(var(--color-neutral-shadow-raw) / var(--indicator-overlay-opacity))
+      ),
       var(--color-neutral-surface);
 
     &::before {
@@ -140,4 +149,8 @@
   &__keypoints {
     position: relative;
   }
+}
+
+[data-color-scheme="dark"] .timeline-frames {
+  --indicator-overlay-opacity: 38%;
 }

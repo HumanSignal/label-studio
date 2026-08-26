@@ -82,6 +82,7 @@ function configureApplication(params) {
     onSubmitAnnotation: params.onSubmitAnnotation ? params.onSubmitAnnotation : External.onSubmitAnnotation,
     onUpdateAnnotation: params.onUpdateAnnotation ? params.onUpdateAnnotation : External.onUpdateAnnotation,
     onDeleteAnnotation: params.onDeleteAnnotation ? params.onDeleteAnnotation : External.onDeleteAnnotation,
+    onDeletePrediction: params.onDeletePrediction ? params.onDeletePrediction : External.onDeletePrediction,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
     onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onPresignUrlForProject: params.onPresignUrlForProject,

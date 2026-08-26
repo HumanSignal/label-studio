@@ -138,7 +138,7 @@ class RichTextPieceView extends Component {
     const classes = [STATE_CLASS_MODS.leftHandle, STATE_CLASS_MODS.rightHandle];
     const isHandle = target.classList.contains(classes[0]) || target.classList.contains(classes[1]);
 
-    if (ev.buttons === 1 && region?.selected && isHandle) {
+    if (ev.buttons === 1 && region?.selected && !region.isReadOnly?.() && isHandle) {
       const tag = item.mountNodeRef.current;
       const doc = tag?.contentDocument ?? tag?.ownerDocument ?? tag;
 
@@ -192,7 +192,7 @@ class RichTextPieceView extends Component {
 
       // don't collapse region into nothing
       if (selection.isCollapsed) return false;
-      if (!area) return false;
+      if (!area || area.isReadOnly?.()) return false;
 
       let range = fixRange(selection.getRangeAt(0));
 

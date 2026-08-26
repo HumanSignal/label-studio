@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { Label } from "@humansignal/ui";
 import styles from "./toggle.module.css";
 
-type ToggleProps = {
+type ToggleProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> & {
   className?: string;
   label?: string;
   labelProps?: Partial<React.ComponentProps<typeof Label>>;

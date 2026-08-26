@@ -1,58 +1,35 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
+import * as uiModule from "@humansignal/ui";
 import { Controls } from "../Controls";
-
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
-  return {
-    Button: forwardRef(({ children, ...props }: { children: React.ReactNode }) => {
-      return (
-        <button {...props} data-testid="button">
-          {children}
-        </button>
-      );
-    }),
-    Tooltip: ({ children }: { children: React.ReactNode }) => {
-      return <div data-testid="tooltip">{children}</div>;
-    },
-    Userpic: ({ children }: { children: React.ReactNode }) => {
-      return (
-        <div
-          data-testid="userpic"
-          className="userpic--tBKCQ"
-          style={{ background: "rgb(155, 166, 211)", color: "rgb(0, 0, 0)" }}
-        >
-          {children}
-        </div>
-      );
-    },
-  };
-});
 const mockStore = {
-  hasInterface: jest.fn(),
+  hasInterface: mock(),
   isSubmitting: false,
+  overlapReached: false,
   settings: {
     enableTooltips: true,
   },
   task: { id: 1, allow_skip: true },
-  skipTask: jest.fn(),
+  skipTask: mock(),
   commentStore: {
     currentComment: {
       a3r0fa: "It's working",
       a0lsuf: "It's working fine",
     },
-    commentFormSubmit: jest.fn(),
-    setTooltipMessage: jest.fn(),
+    commentFormSubmit: mock(),
+    setTooltipMessage: mock(),
   },
   annotationStore: {
     selected: {
-      submissionInProgress: jest.fn(),
+      submissionInProgress: mock(),
       history: {
         canUndo: false,
       },
     },
+    selectedHistory: null,
   },
   customButtons: new Map(),
+  rejectAnnotation: mock(),
 };
 
 const mockHistory = {
@@ -73,6 +50,7 @@ const mockAnnotation = {
 const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
+      id: 999,
       role: options.role,
     },
     billing: {
@@ -83,10 +61,24 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("Controls", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset APP_SETTINGS before each test
+    mock.clearAllMocks();
+    spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (
+      // Preserve caller data-testid (e.g. bottombar-update-button); default only when absent.
+      <button data-testid="button" {...props}>
+        {children}
+      </button>
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children }: any) => <div data-testid="tooltip">{children}</div>);
+    spyOn(uiModule, "Userpic").mockImplementation(({ children }: any) => (
+      <div
+        data-testid="userpic"
+        className="userpic--tBKCQ"
+        style={{ background: "rgb(155, 166, 211)", color: "rgb(0, 0, 0)" }}
+      >
+        {children}
+      </div>
+    ));
     (window as any).APP_SETTINGS = undefined;
-    // Reset mockStore task to default
     mockStore.task = { id: 1, allow_skip: true };
   });
 
@@ -204,5 +196,166 @@ describe("Controls", () => {
     fireEvent.click(skipTask);
 
     expect(mockStore.skipTask).not.toHaveBeenCalled();
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Owner (OW) in LSE", () => {
+    setupAppSettings({ role: "OW", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).not.toBeDisabled();
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Manager (MA) in LSE", () => {
+    setupAppSettings({ role: "MA", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).not.toBeDisabled();
+  });
+
+  test("Skip button disabled when allow_skip=false and user is Annotator (AN) in LSE", () => {
+    setupAppSettings({ role: "AN", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("skip-task")).toBeDisabled();
+  });
+
+  test("disables accept and reject in review when viewing submitted while a draft exists (FIT-2105)", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: false,
+      versions: { draft: [{ id: "r1" }] },
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("reject-annotation")).toBeDisabled();
+  });
+
+  test("keeps Update enabled when viewing submitted while a draft exists (BROS-1477 QA 93973)", () => {
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+    mockStore.updateAnnotation = mock();
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftSelected: false,
+      draftId: 99,
+      versions: { draft: [{ id: "r1" }], result: [{ id: "s1" }] },
+      submissionInProgress: mock(),
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+    mockHistory.canUndo = true;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).not.toBeDisabled();
+  });
+
+  test("disables Update when a non-live history item is selected", () => {
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+    mockStore.updateAnnotation = mock();
+
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftSelected: false,
+      draftId: 99,
+      versions: { draft: [{ id: "r1" }], result: [{ id: "s1" }] },
+      submissionInProgress: mock(),
+    };
+    mockStore.annotationStore.selectedHistory = { id: "hist-1" };
+    mockStore.annotationStore.selected = annotation;
+    mockHistory.canUndo = true;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).toBeDisabled();
+  });
+
+  test("keeps accept and reject enabled in review when draft is the active view (FIT-2105)", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: true,
+      versions: { draft: [{ id: "r1" }] },
+      submissionInProgress: mock(),
+      history: { canUndo: true },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
+    expect(getByLabelText("reject-annotation")).not.toBeDisabled();
+  });
+
+  test("Skip triggers skipTask when allow_skip=false but user is Manager (MA) in LSE", async () => {
+    setupAppSettings({ role: "MA", enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+    mockStore.skipTask.mockClear();
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    fireEvent.click(getByLabelText("skip-task"));
+
+    await waitFor(() => {
+      expect(mockStore.skipTask).toHaveBeenCalled();
+    });
   });
 });

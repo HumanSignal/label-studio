@@ -256,7 +256,7 @@ class TextHighlight extends Component {
     return letterGroup;
   }
 
-  getNode(i, range, text, url, isEmoji) {
+  getNode(i, range, _text, url, isEmoji) {
     if (url.length) {
       return this.getUrlNode(i, range, url);
     }

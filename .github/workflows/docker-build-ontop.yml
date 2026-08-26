@@ -65,7 +65,7 @@ jobs:
 
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'recursive'
           ref: ${{ inputs.ref }}
@@ -95,7 +95,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Push Docker image (${{ matrix.platform }})
-        uses: docker/build-push-action@v7.0.0
+        uses: docker/build-push-action@v7.3.0
         id: docker_build_and_push
         with:
           context: .

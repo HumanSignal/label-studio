@@ -11,7 +11,7 @@ export const random = (min: number, max?: number) => {
 
 export const Generator = {
   generateImageUrl({ width, height }) {
-    return cy.document().then((doc) => {
+    return cy.document().then((_doc) => {
       const canvas = document.createElement("canvas");
 
       canvas.width = width;
@@ -35,7 +35,7 @@ export const Generator = {
     });
   },
   generatePixeledImageUrl({ width, height }) {
-    return cy.document().then((doc) => {
+    return cy.document().then((_doc) => {
       const canvas = document.createElement("canvas");
 
       canvas.width = width;
@@ -43,8 +43,8 @@ export const Generator = {
 
       const ctx = canvas.getContext("2d");
 
-      const centerX = width / 2;
-      const centerY = height / 2;
+      const _centerX = width / 2;
+      const _centerY = height / 2;
 
       for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {

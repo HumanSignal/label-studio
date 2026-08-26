@@ -34,13 +34,30 @@
   min-height: 50px;
 }
 
+/* Match the disabled Select trigger (select.module.css .isDisabled) so locked
+   filter value controls read as disabled regardless of control type (FIT-2447). */
+.input-dm:disabled,
+.textarea-dm:disabled {
+  color: var(--color-neutral-content-subtlest);
+  background: var(--color-neutral-surface);
+  box-shadow: 0 1px 2px rgb(var(--color-neutral-shadow-raw) / 6%) inset;
+  cursor: not-allowed;
+}
+
 .input-dm:focus,
 .textarea-dm:focus {
   outline: none;
   box-shadow:
-    0 0 0 6px var(--color-primary-focus-outline),
-    inset 0 -1px 0 var(--black_10),
-    inset 0 0 0 1px var(--black_15),
-    inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+    0 0 0 4px var(--color-primary-focus-outline),
+    inset 0 -1px 0 rgb(var(--color-neutral-shadow-raw) / 10%),
+    inset 0 0 0 1px rgb(var(--color-neutral-shadow-raw) / 15%),
+    inset 0 0 0 1px rgb(var(--color-primary-border-subtle-raw) / 20%);
   border-color: var(--color-primary-border);
+}
+
+.input-dm_size_small:focus {
+  box-shadow:
+    0 0 0 2px var(--color-primary-focus-outline),
+    inset 0 -1px 0 rgb(var(--color-neutral-shadow-raw) / 10%),
+    inset 0 0 0 1px rgb(var(--color-neutral-shadow-raw) / 15%);
 }

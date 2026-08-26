@@ -733,26 +733,13 @@ def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
         yield
 
 
-@pytest.fixture(name='ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on')
-def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
-    from core.feature_flags import flag_set
-
-    def fake_flag_set(*args, **kwargs):
-        if args[0] == 'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short':
-            return True
-        return flag_set(*args, **kwargs)
-
-    with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
-        yield
-
-
 @pytest.fixture(name='local_files_storage')
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     subdir = tempdir / Path('subdir')
     os.makedirs(str(subdir), exist_ok=True)
-    test_image = Path(*'tests/test_suites/samples/test_image.png'.split('/'))
+    test_image = Path(__file__).parent / 'test_suites' / 'samples' / 'test_image.png'
     shutil.copyfile(str(test_image), str(tempdir / Path('test_image1.png')))
     shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
 

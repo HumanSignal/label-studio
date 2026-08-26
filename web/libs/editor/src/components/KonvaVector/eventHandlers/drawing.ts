@@ -4,6 +4,113 @@ import { PointType } from "../types";
 import { HIT_RADIUS } from "../constants";
 import { getDistance, isPointInCanvasBounds, snapToPixel, stageToImageCoordinates } from "./utils";
 
+export interface ShiftInsertGateState {
+  /** Whether the Shift key is held (Shift+Click inserts a point on a segment) */
+  shiftKey: boolean;
+  /** Whether the Alt key is held — reserved for other interactions, blocks insertion */
+  altKey: boolean;
+  /** Whether the region is currently selected in the editor */
+  selected: boolean;
+  /** Whether the vector is disabled (read-only) */
+  disabled: boolean;
+  /** Whether point creation is managed externally (true for video/image vector regions) */
+  disableInternalPointAddition: boolean;
+  /**
+   * Opt-in: allow Shift+Click point insertion even when the region is not selected.
+   * Video Vectors set this so points can be added to a deselected region (BROS-1200);
+   * image vectors leave it false and keep requiring selection.
+   */
+  allowShiftPointInsertWhenUnselected: boolean;
+  /** Current number of vertices on the path */
+  pointCount: number;
+  /** Optional maximum number of points the region may hold */
+  maxPoints?: number;
+}
+
+/**
+ * Decide whether a Shift+Click on a path segment should insert a new vertex.
+ *
+ * Centralizes the gate used by KonvaVector's stage-level mouseup handler so the
+ * "insert point on segment" decision is unit-testable. The key BROS-1200 change
+ * is that a non-selected region accepts insertion when the caller opts in via
+ * allowShiftPointInsertWhenUnselected (Video Vectors); otherwise the region must
+ * be selected, preserving the existing image-vector behavior.
+ */
+export function canInsertPointOnSegment(state: ShiftInsertGateState): boolean {
+  const {
+    shiftKey,
+    altKey,
+    selected,
+    disabled,
+    disableInternalPointAddition,
+    allowShiftPointInsertWhenUnselected,
+    pointCount,
+    maxPoints,
+  } = state;
+
+  if (disabled) return false;
+  if (!shiftKey || altKey) return false;
+  if (!disableInternalPointAddition) return false;
+  if (!selected && !allowShiftPointInsertWhenUnselected) return false;
+  if (pointCount < 2) return false;
+  if (maxPoints !== undefined && pointCount >= maxPoints) return false;
+
+  return true;
+}
+
+export interface ResolveActivePointIdState {
+  /** The activePointId KonvaVector currently holds (the ghost-line origin) */
+  currentActivePointId: string | null;
+  /** The current point list (only `id` is needed for this decision) */
+  points: { id: string }[];
+  /**
+   * Whether skeleton mode is enabled. Retained for caller compatibility, but the
+   * decision no longer branches on it: an append at the end advances the active
+   * point in both modes (BROS-1410).
+   */
+  skeletonEnabled: boolean;
+  /** The id of the last point the previous time this ran (to detect appends) */
+  previousLastPointId: string | null;
+}
+
+/**
+ * Decide which point the drawing "pointing line" (GhostLine) should originate
+ * from when KonvaVector's init effect re-runs on a point-count change.
+ *
+ * FIT-1924: Video Vectors append vertices through the MobX store rather than
+ * KonvaVector's internal point-creation manager (disableInternalPointAddition),
+ * so nothing advances activePointId and it stays pinned to the FIRST point —
+ * the pointing line then always draws from the first point instead of the last.
+ *
+ * Rules:
+ * - No points → null.
+ * - Active point missing/stale → fall back to the last point.
+ * - A new point was appended at the end (last id changed) → advance to the last
+ *   point so the line follows the most recent point. This applies in both
+ *   non-skeleton and skeleton modes: skeleton Video Vectors append through the
+ *   same externally-managed store, and the region geometry continues from the
+ *   last point, so the pointing line must too (BROS-1410). The internal
+ *   image-vector flow is unaffected — its creation manager already advances
+ *   activePointId to the new last point, so this is a no-op there.
+ * - Otherwise keep the current active point (mid-segment inserts that don't
+ *   change the last point).
+ */
+export function resolveActivePointId(state: ResolveActivePointIdState): string | null {
+  const { currentActivePointId, points, previousLastPointId } = state;
+
+  if (points.length === 0) return null;
+
+  const lastPointId = points[points.length - 1].id;
+  const activeIsValid = currentActivePointId !== null && points.some((p) => p.id === currentActivePointId);
+
+  if (!activeIsValid) return lastPointId;
+
+  const lastPointChanged = lastPointId !== previousLastPointId;
+  if (lastPointChanged) return lastPointId;
+
+  return currentActivePointId;
+}
+
 export interface AddPointOptions {
   x: number;
   y: number;
@@ -156,8 +263,7 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
 
   const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
-  // Check if we're within canvas bounds (only if bounds checking is enabled)
-  if (!isPointInCanvasBounds(imagePos, props.width, props.height)) {
+  if (!props.allowOutsideBounds && !isPointInCanvasBounds(imagePos, props.width, props.height)) {
     return false;
   }
 

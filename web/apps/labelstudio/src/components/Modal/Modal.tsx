@@ -52,6 +52,9 @@ const createModal = (type: keyof typeof modalTypes) => {
 };
 
 // Re-export Modal component and hooks
+/**
+ * @deprecated Prefer `ModalWindow` from `@humansignal/ui` for new app chrome; keep using for gradual migration behind feature flags.
+ */
 export const modal = createModal("modal");
 export const confirm = createModal("confirm");
 export const info = createModal("info");

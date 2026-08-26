@@ -7,4 +7,4 @@ import { FF_SELF_SERVE, isActive } from "./feature-flags";
  * Formerly known as isSelfServe
  * @returns {boolean}
  */
-export const isStarterCloudPlan = (): boolean => !window.APP_SETTINGS.billing?.enterprise && isActive(FF_SELF_SERVE);
+export const isStarterCloudPlan = (): boolean => !window.APP_SETTINGS?.billing?.enterprise && isActive(FF_SELF_SERVE);

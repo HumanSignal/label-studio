@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { Select } from "./select";
 
 // Mock ResizeObserver which is used by cmdk
@@ -10,17 +9,17 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock scrollIntoView
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = mock();
 
 // Mock the styles
-jest.mock("./select.module.css", () => ({
+mockModule("./select.module.css", () => ({
   selectTrigger: "selectTrigger",
   isInline: "isInline",
   isOpen: "isOpen",
   isDisabled: "isDisabled",
+  sizeSmaller: "sizeSmaller",
   sizeSmall: "sizeSmall",
-  sizeMedium: "sizeMedium",
-  sizeLarge: "sizeLarge",
+  selectCaret: "selectCaret",
   selectLoading: "selectLoading",
   valueInput: "valueInput",
   selectedItemsGroup: "selectedItemsGroup",
@@ -31,8 +30,8 @@ jest.mock("./select.module.css", () => ({
 }));
 
 // Mock react-window and react-window-infinite-loader to capture props
-const mockVariableSizeList = jest.fn();
-jest.mock("react-window", () => ({
+const mockVariableSizeList = mock();
+mockModule("react-window", () => ({
   VariableSizeList: (props: any) => {
     mockVariableSizeList(props);
     // Render the items directly for testing
@@ -52,11 +51,11 @@ jest.mock("react-window", () => ({
   },
 }));
 
-jest.mock("react-window-infinite-loader", () => ({
+mockModule("react-window-infinite-loader", () => ({
   __esModule: true,
   default: ({ children, ...props }: any) => {
     return children({
-      onItemsRendered: jest.fn(),
+      onItemsRendered: mock(),
       ref: { current: null },
     });
   },
@@ -226,7 +225,7 @@ describe("Select Component", () => {
 
   describe("Infinite Loading Support", () => {
     it("supports loadMore callback for infinite scroll", async () => {
-      const loadMore = jest.fn();
+      const loadMore = mock();
       const options = Array.from({ length: 10 }, (_, i) => `Option ${i + 1}`);
 
       render(
@@ -251,7 +250,7 @@ describe("Select Component", () => {
     });
 
     it("maintains correct height calculation with paginated flat options", async () => {
-      const loadMore = jest.fn();
+      const loadMore = mock();
       // Simulate first page of 10 items loaded
       const options = Array.from({ length: 10 }, (_, i) => `User ${i + 1}`);
 
@@ -297,9 +296,46 @@ describe("Select Component", () => {
     });
   });
 
+  describe("Select All", () => {
+    const openSelectAllDropdown = (extraProps: Record<string, unknown> = {}) => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          alwaysShowSelectedGroup={true}
+          onSelectAllClick={mock()}
+          {...extraProps}
+        />,
+      );
+
+      fireEvent.click(screen.getAllByRole("button")[0]);
+    };
+
+    it("describes the select all action as covering the rendered items by default", async () => {
+      openSelectAllDropdown();
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Select all rendered items" })).toBeInTheDocument();
+      });
+    });
+
+    it("lets consumers describe what select all covers", async () => {
+      openSelectAllDropdown({ selectAllLabel: "Select all members matching the current filters" });
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: "Select all members matching the current filters" }),
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
   describe("Selection Behavior", () => {
     it("selects an option when clicked", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
 
       render(
         <Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select a fruit" onChange={onChange} />,
@@ -317,7 +353,7 @@ describe("Select Component", () => {
     });
 
     it("handles multiple selection", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
 
       render(
         <Select
@@ -392,7 +428,7 @@ describe("Select Component", () => {
     });
 
     it("deselects item from selected group when clicking option", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -437,7 +473,7 @@ describe("Select Component", () => {
 
   describe("Search and callbacks", () => {
     it("calls onSearch when search input changes", async () => {
-      const onSearch = jest.fn();
+      const onSearch = mock();
       render(
         <Select options={["Apple", "Banana"] as any} placeholder="Select" searchable={true} onSearch={onSearch} />,
       );
@@ -448,7 +484,7 @@ describe("Select Component", () => {
     });
 
     it("uses custom searchFilter when provided", async () => {
-      const searchFilter = jest.fn((option: any, q: string) => {
+      const searchFilter = mock((option: any, q: string) => {
         const label = option?.label ?? option;
         return String(label).toLowerCase().startsWith(q.toLowerCase());
       });
@@ -469,8 +505,8 @@ describe("Select Component", () => {
 
   describe("Open/close callbacks", () => {
     it("calls onOpen when dropdown opens and onClose when option selected (single)", async () => {
-      const onOpen = jest.fn();
-      const onClose = jest.fn();
+      const onOpen = mock();
+      const onClose = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onOpen={onOpen} onClose={onClose} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(onOpen).toHaveBeenCalled());
@@ -481,7 +517,7 @@ describe("Select Component", () => {
 
   describe("renderSelected and selectFirstIfEmpty", () => {
     it("uses renderSelected when provided", async () => {
-      const renderSelected = jest.fn((selected: any[], placeholder: string) =>
+      const renderSelected = mock((selected: any[], placeholder: string) =>
         selected.length ? selected.map((s) => s?.label ?? s).join(", ") : placeholder,
       );
       render(<Select options={["Apple", "Banana"] as any} placeholder="Pick one" renderSelected={renderSelected} />);
@@ -493,7 +529,7 @@ describe("Select Component", () => {
     });
 
     it("selects first option when selectFirstIfEmpty and no value", () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={[{ value: "a", label: "Option A" }] as any}
@@ -521,7 +557,7 @@ describe("Select Component", () => {
 
   describe("Option keyboard navigation", () => {
     it("selects option on Enter key", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
@@ -532,7 +568,7 @@ describe("Select Component", () => {
     });
 
     it("selects option on Space key", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
@@ -545,7 +581,7 @@ describe("Select Component", () => {
 
   describe("Group option with multiple", () => {
     it("toggles all children when clicking group header in multiple mode", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       const options = [
         {
           label: "Fruits",
@@ -565,7 +601,7 @@ describe("Select Component", () => {
 
   describe("SelectedItemsGroup disabled and deselect all", () => {
     it("does not deselect when clicking option in selected group if disabled", () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -583,7 +619,7 @@ describe("Select Component", () => {
     });
 
     it("deselects all when clicking deselect all checkbox in selected group", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana", "Cherry"] as any}
@@ -606,7 +642,7 @@ describe("Select Component", () => {
     });
 
     it("collapses selected group when all items are deselected", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -657,7 +693,7 @@ describe("Select Component", () => {
 
   describe("defaultSearchValue and open/close", () => {
     it("restores defaultSearchValue when opening and resets when closing", async () => {
-      const onSearch = jest.fn();
+      const onSearch = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -722,7 +758,7 @@ describe("Select Component", () => {
 
   describe("selectedValueRenderer", () => {
     it("uses selectedValueRenderer for each selected option in display", async () => {
-      const selectedValueRenderer = jest.fn((option: any) => (
+      const selectedValueRenderer = mock((option: any) => (
         <span data-testid="custom-label">{option?.label ?? option}</span>
       ));
       render(
@@ -742,16 +778,16 @@ describe("Select Component", () => {
   });
 
   describe("Trigger size and props", () => {
+    it("applies size smaller to trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" size="smaller" />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toHaveClass("sizeSmaller");
+    });
+
     it("applies size small to trigger", () => {
       render(<Select options={["A"] as any} placeholder="Select" size="small" />);
       const trigger = screen.getByRole("button");
       expect(trigger).toHaveClass("sizeSmall");
-    });
-
-    it("applies size large to trigger", () => {
-      render(<Select options={["A"] as any} placeholder="Select" size="large" />);
-      const trigger = screen.getByRole("button");
-      expect(trigger).toHaveClass("sizeLarge");
     });
 
     it("spreads triggerProps onto trigger", () => {
@@ -777,7 +813,7 @@ describe("Select Component", () => {
 
   describe("searchFilter with empty query", () => {
     it("calls custom searchFilter even with empty query when searchFilter provided", async () => {
-      const searchFilter = jest.fn(() => true);
+      const searchFilter = mock(() => true);
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -793,10 +829,116 @@ describe("Select Component", () => {
 
   describe("onChange when disabled", () => {
     it("does not call onChange when selecting and component is disabled", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" disabled={true} onChange={onChange} />);
       const trigger = screen.getByRole("button");
       expect(trigger).toBeDisabled();
+    });
+  });
+
+  describe("readOnly", () => {
+    const groupedOptions = [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+    ];
+
+    it("keeps the trigger enabled so the dropdown can open", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      const trigger = screen.getByTestId("readonly-select");
+      expect(trigger).not.toBeDisabled();
+      fireEvent.click(trigger);
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+    });
+
+    it("does not call onChange when an option is clicked", async () => {
+      const onChange = mock();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          multiple
+          readOnly
+          onChange={onChange}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-Banana")).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId("select-option-Banana"));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("keeps search enabled while blocking selection", async () => {
+      const onSearch = mock();
+      render(
+        <Select
+          options={["Apple", "Banana", "Apricot"] as any}
+          placeholder="Select"
+          value={["Apple"]}
+          multiple
+          searchable
+          readOnly
+          onSearch={onSearch}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      const searchInput = await screen.findByTestId("select-search-field");
+      expect(searchInput).not.toBeDisabled();
+      fireEvent.change(searchInput, { target: { value: "Ap" } });
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("Ap"));
+    });
+
+    it("hides group All/None actions when readOnly", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "None" })).toBeNull();
+    });
+
+    it("shows group All/None actions when editable", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          dataTestid="editable-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("editable-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.getAllByRole("button", { name: "All" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: "None" }).length).toBeGreaterThan(0);
     });
   });
 

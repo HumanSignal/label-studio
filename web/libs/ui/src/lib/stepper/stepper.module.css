@@ -1,0 +1,447 @@
+/*
+ * Stepper — presentation matrix (semantic tokens only)
+ *
+ * Badge surface (from currentStepIndex only):
+ *   - primary: active step and every step before it
+ *   - neutral: steps after the active one
+ * Badge content: check icon when step.completed === true, else step number.
+ * Completion: `.badgeStamp` matches badge background, scales 1.5→1 + fade-in over the number area; check above it.
+ * After stamp entry (only on false→true completed): `.badgeEntryRipple` behind badge, delayed by `--stepper-badge-stamp-duration`.
+ *
+ * Label: labelActive = current step index (stronger default text).
+ *
+ * Hover: only when .stepNavigable is on the <button> (canNavigate && onStepSelect && !step.disabled).
+ *
+ * Non-navigable steps (.stepNonNavigable): default cursor — including read-only steppers without `onStepSelect`,
+ * and steps with `canNavigate: false` when `onStepSelect` is set.
+ *   - .badgePrimary: background → primary surface hover
+ *   - default .badge (future / neutral): background → primary emphasis, text → primary content
+ *   - label: text → primary content hover
+ *
+ * Disabled: .step:disabled (step.disabled === true only — not canNavigate: false).
+ *   - badges + label → neutral surface / subtlest text
+ */
+
+/* Shared tokens for badge rail, grid columns, and stacked connectors (connector is outside `.step`). */
+.stepperRoot {
+  --stepper-badge-size: 24px;
+  --stepper-stacked-list-gap: var(--spacing-tighter);
+  --stepper-stacked-connector-inset: var(--spacing-tighter);
+}
+
+.stepperListStacked {
+  gap: var(--stepper-stacked-list-gap);
+}
+
+/* --- Step button --- */
+.step {
+  /* Stamp + check entry duration; ripple delay matches (see `.badgeEntryRipple`). */
+
+  --stepper-badge-stamp-duration: 400ms;
+  --stepper-badge-stamp-easing: cubic-bezier(0.68, 0.48, 0.24, 1);
+  --stepper-badge-stamp-enter-opacity: 0.5;
+  --stepper-badge-ripple-easing: cubic-bezier(0, 0.86, 0.78, 0.96);
+  --stepper-badge-ripple-duration: 700ms;
+  --stepper-badge-ripple-enter-opacity: 0.5;
+
+  display: flex;
+  max-width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+}
+
+.step:disabled {
+  cursor: not-allowed;
+}
+
+.stepNavigable {
+  cursor: pointer;
+  border-radius: var(--corner-radius-small);
+  transition:
+    color 150ms ease-out,
+    background-color 150ms ease-out,
+    outline-color 150ms ease-out;
+}
+
+.stepNavigable:focus-visible {
+  outline: 2px solid var(--color-primary-border);
+  outline-offset: 2px;
+}
+
+/* Not navigable (no handler, or canNavigate false, or disabled navigation intent) — not `disabled` (that uses :disabled). */
+.stepNonNavigable {
+  cursor: default;
+}
+
+.stepLayoutDefault {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-tighter);
+  padding-block: var(--spacing-tight);
+  text-align: center;
+}
+
+.stepLayoutCompact {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight);
+  text-align: left;
+}
+
+/* Vertical variant: grid places badge + connector in column 1, text in column 2. */
+.stepItemStacked {
+  display: grid;
+  grid-template-columns: var(--stepper-badge-size) minmax(0, 1fr);
+  column-gap: var(--spacing-tight);
+  padding: var(--spacing-tight);
+}
+
+.stepStackedButton {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: var(--stepper-badge-size) minmax(0, 1fr);
+  column-gap: var(--spacing-tight);
+  align-items: stretch;
+  width: 100%;
+  text-align: left;
+}
+
+.stackedBadgeCell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+}
+
+.stackedTextCell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+/* Rail between badges with inset; spans step padding, list gap, and next step padding-top. */
+.stackedConnectorCell {
+  position: absolute;
+  top: calc(var(--stepper-badge-size) + var(--stepper-stacked-connector-inset));
+  left: 50%;
+  width: 2px;
+  height: calc(
+    100% -
+    var(--stepper-badge-size) +
+    var(--stepper-stacked-list-gap) +
+    2 *
+    var(--spacing-tight) -
+    2 *
+    var(--stepper-stacked-connector-inset)
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Beat `.connector.connectorVertical { height: var(--spacing-base) }` — fill the rail. */
+.stackedConnectorCell .connector.connectorVertical {
+  width: 2px;
+  min-width: 2px;
+  max-width: 2px;
+  height: 100%;
+  min-height: 0;
+}
+
+.stepTextBlock {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-tightest);
+}
+
+.badgeWrap {
+  position: relative;
+  display: flex;
+  height: var(--stepper-badge-size);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* Post-stamp ripple: behind badge, starts when `.badgeStampEnter` finishes. */
+.badgeEntryRipple {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  width: var(--stepper-badge-size);
+  height: var(--stepper-badge-size);
+  border-radius: 9999px;
+  transform: scale(1);
+  transform-origin: center;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: stepperBadgeEntryRipple var(--stepper-badge-ripple-duration) var(--stepper-badge-ripple-easing)
+    var(--stepper-badge-stamp-duration) forwards;
+}
+
+.badgeWrap[data-stepper-badge-wrap-tone="primary"] .badgeEntryRipple {
+  background: rgb(var(--color-primary-surface-raw) / 28%);
+}
+
+.badgeWrap[data-stepper-badge-wrap-tone="neutral"] .badgeEntryRipple {
+  background: rgb(var(--color-neutral-surface-inset-raw) / 32%);
+}
+
+.badgeWrap:has(.badgeEntryRipple) [data-stepper-badge] {
+  position: relative;
+  z-index: 1;
+}
+
+.step:disabled .badgeEntryRipple {
+  animation: none;
+  opacity: 0;
+}
+
+/* --- Badge --- */
+/* Default = pending/neutral; primary and completed add modifiers below. */
+.badge {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: var(--stepper-badge-size);
+  height: var(--stepper-badge-size);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-neutral-surface-inset);
+  color: var(--color-neutral-content-subtler);
+  z-index: 1;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.badgeNumber {
+  font-size: var(--font-size-label-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badgePrimary {
+  background: var(--color-primary-surface);
+  color: var(--color-primary-surface-content);
+}
+
+.stepNavigable:hover .badgePrimary {
+  background: var(--color-primary-surface-hover);
+}
+
+.stepNavigable:hover .badge:not(.badgePrimary) {
+  background: var(--color-primary-emphasis);
+  color: var(--color-primary-content);
+}
+
+.step:disabled .badge {
+  background: var(--color-neutral-surface);
+  color: var(--color-neutral-content-subtlest);
+}
+
+.badgeIcon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  transform: scale(1.2);
+}
+
+/* Stamp overlay: same surface as badge (inherit), scales down onto the badge like a stamp. */
+.badgeCompletedStamp {
+  position: relative;
+  pointer-events: none;
+}
+
+/* Keep the check above the full-bleed stamp disk (stamp has z-index: 0). */
+.badgeCompletedStamp .badgeIcon {
+  position: relative;
+  z-index: 2;
+}
+
+/* Base stamp: final state when step loads already completed (no entry animation). */
+.badgeStamp {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: var(--spacing-wide);
+  height: var(--spacing-wide);
+  border-radius: 9999px;
+  background: inherit;
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Entry: only when `completed` flips false → true (see StepBadge useLayoutEffect). */
+.badgeStampEnter {
+  transform: scale(2.5);
+  opacity: var(--stepper-badge-stamp-enter-opacity);
+  animation: stepperBadgeStamp var(--stepper-badge-stamp-duration) cubic-bezier(0.68, 0.48, 0.24, 1) forwards;
+}
+
+.badgeIconEnter {
+  opacity: var(--stepper-badge-stamp-enter-opacity);
+  animation: stepperBadgeCheckReveal var(--stepper-badge-stamp-duration) var(--stepper-badge-stamp-easing) forwards;
+}
+
+@keyframes stepperBadgeStamp {
+  from {
+    transform: scale(2.5);
+    opacity: var(--stepper-badge-stamp-enter-opacity);
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes stepperBadgeCheckReveal {
+  from {
+    transform: scale(2.5);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes stepperBadgeEntryRipple {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badgeStampEnter {
+    animation: none;
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .badgeIconEnter {
+    animation: none;
+    opacity: 1;
+  }
+
+  .badgeEntryRipple {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* --- Label (Typography provides type scale; `.step` raises specificity over typography color) --- */
+.step .label {
+  white-space: nowrap;
+  color: var(--color-neutral-content-subtler);
+  transition: color 150ms ease-out;
+}
+
+.stepLayoutCompact .label,
+.stepHasDescription .label {
+  white-space: normal;
+}
+
+.stepLayoutCompact .label,
+.stepHasDescription .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.step .labelActive {
+  color: var(--color-neutral-content);
+}
+
+.step .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-neutral-content-subtle);
+}
+
+.stepNavigable:hover .label {
+  color: var(--color-primary-content-hover);
+}
+
+.step:disabled .label {
+  color: var(--color-neutral-content-subtlest);
+}
+
+.step:disabled .description {
+  color: var(--color-neutral-content-subtlest);
+}
+
+/* --- Connector --- */
+.connector {
+  position: relative;
+  height: 2px;
+  width: 100%;
+  min-width: var(--spacing-tight);
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+.connector.connectorVertical {
+  width: 2px;
+  min-width: 2px;
+  max-width: 2px;
+  height: var(--spacing-base);
+  min-height: var(--spacing-tight);
+}
+
+.connectorTrack {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--color-neutral-border);
+}
+
+.connectorFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--color-primary-border);
+  transform-origin: left center;
+  transition: transform 150ms ease-out;
+}
+
+.connectorVertical .connectorFill {
+  transform-origin: top center;
+}
+
+.connectorFillIncomplete {
+  transform: scaleX(0);
+}
+
+.connectorFillComplete {
+  transform: scaleX(1);
+}
+
+.connectorVertical .connectorFillIncomplete {
+  transform: scaleY(0);
+}
+
+.connectorVertical .connectorFillComplete {
+  transform: scaleY(1);
+}

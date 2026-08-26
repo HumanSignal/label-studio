@@ -1,15 +1,20 @@
 import {
-  type Table,
+  type CellContext,
+  type Column,
+  type ColumnDef,
+  type ColumnDefTemplate,
+  type ColumnSizingColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
-  type Row,
-  type ColumnDef,
-  type TableMeta,
-  type VisibilityState,
   type HeaderContext,
+  type Row,
   type SortingState,
+  type StringOrTemplateHeader,
+  type Table,
+  type TableMeta,
+  useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 
 // Extend ColumnMeta to include noDivider
@@ -18,40 +23,96 @@ declare module "@tanstack/react-table" {
     noDivider?: boolean;
   }
 }
-import { memo, useState, useMemo, useCallback } from "react";
-import { cn } from "../../utils/utils";
+
+import { ArrowDownIcon, ArrowUpIcon, InfoIcon, MagnifyingGlassIcon } from "@humansignal/icons";
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  memo,
+  type UIEventHandler,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
+import { cn } from "../../utils/utils";
 import { Checkbox } from "../checkbox/checkbox";
-import { Typography } from "../typography/typography";
-import { Tooltip } from "../Tooltip/Tooltip";
-import { IconSortUp, IconSortDown, IconSearch, IconInfoOutline } from "@humansignal/icons";
 import { EmptyState } from "../empty-state/empty-state";
 import { Skeleton } from "../skeleton/skeleton";
+import { Tooltip } from "../Tooltip/Tooltip";
+import { Typography } from "../typography/typography";
 import styles from "./data-table.module.css";
 
 export type DataShape = Record<string, any>[];
+export type DataTableHeaders<T extends DataShape> = {
+  [key in keyof T[number]]?: StringOrTemplateHeader<T[number], unknown>;
+};
+
+export type DataTableCells<T extends DataShape> = {
+  [key in keyof T[number]]?: ColumnDefTemplate<CellContext<T[number], T[number][key]>>;
+} & {
+  restCells?: ColumnDefTemplate<CellContext<T[number], T[number][string]>>;
+};
+
+export type DataTableSizes<T extends DataShape> = {
+  [key in keyof T[number]]?: ColumnSizingColumnDef;
+} & {
+  restColumns?: ColumnSizingColumnDef;
+};
+
+/**
+ * Which edge a column's header label sits against.
+ *
+ * Numeric columns are conventionally right-aligned in their cells, and the header has to follow or the
+ * label floats away from the figures underneath it. Declare it here rather than reaching into the header's
+ * internal layout from a consumer stylesheet.
+ */
+export type DataTableColumnAlign = "left" | "right";
 
 /**
  * Extended ColumnDef type that includes custom properties for generic DataTable
  */
 export type ExtendedDataTableColumnDef<T> = ColumnDef<T> & {
   help?: string; // Optional help text to display in a tooltip with info icon
+  /** Header label alignment within the header cell. Defaults to "left". */
+  align?: DataTableColumnAlign;
 };
 
 export type DataTableProps<T extends DataShape> = {
   data: T;
   meta?: TableMeta<any>;
   columns?: ExtendedDataTableColumnDef<T[number]>[];
+  headers?: DataTableHeaders<T>;
+  cells?: DataTableCells<T>;
+  sizes?: DataTableSizes<T>;
   extraColumns?: ColumnDef<any>[];
   includeColumns?: (keyof T[number])[];
   excludeColumns?: (keyof T[number])[];
   pinColumns?: (keyof T[number])[];
+  /** Column ids pinned to the left (e.g. first user column) for horizontal scroll context */
+  pinLeftColumns?: string[];
   columnOrder?: (keyof T[number])[];
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: (updater: VisibilityState | ((state: VisibilityState) => VisibilityState)) => void;
   cellSizesStorageKey?: string;
-  onRowClick?: (row?: Row<T[number]>) => void;
+  /** Fires after layout with pixel widths from TanStack (resize, visibility, pin). Use to align external footer rows. */
+  onLeafColumnSizesChange?: (sizesByColumnId: Record<string, number>) => void;
+  onRowClick?: (row?: Row<T[number]>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T[number]>) => string | undefined;
+  rowDataTestId?: (row: Row<T[number]>) => string | undefined;
+  /**
+   * Extra props merged onto each body row root (e.g. context-menu trigger handlers).
+   * Prefer this over wrapping rows when the host already owns the row element.
+   */
+  getRowProps?: (row: Row<T[number]>) => HTMLAttributes<HTMLDivElement> | undefined;
+  /**
+   * Row id that should keep the hover appearance even when the pointer leaves
+   * the row (e.g. while a context menu opened from that row is open).
+   * Compared against TanStack `row.id` (see `getRowId`).
+   */
+  hoveredRowId?: string;
+  bodyCellClassName?: string;
   selectable?: boolean;
   rowSelection?: Record<string, boolean>;
   onRowSelectionChange?: (
@@ -64,12 +125,17 @@ export type DataTableProps<T extends DataShape> = {
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
   enableSorting?: boolean; // Global enable/disable sorting
+  /**
+   * When true, a third click on the active sorted header clears sorting (asc → desc → unsorted).
+   * Default is false so existing tables keep the historic two-state cycle (asc ↔ desc, never clear).
+   */
+  enableSortingRemoval?: boolean;
   /** When true, sorting is handled server-side. Bypasses TanStack's getSortedRowModel so data is displayed in the exact order received. Required when column accessors return objects (not primitive values), as TanStack's 'basic' comparator produces inconsistent results for objects with identical string representations. */
   manualSorting?: boolean;
   // Empty state props
   /** Empty state configuration when no data is available */
   emptyState?: {
-    /** Icon to display (defaults to IconSearch) */
+    /** Icon to display (defaults to MagnifyingGlassIcon) */
     icon?: React.ReactNode;
     /** Title text (defaults to "No items found") */
     title?: string;
@@ -86,6 +152,18 @@ export type DataTableProps<T extends DataShape> = {
   className?: string;
   /** Test ID for the table container */
   dataTestId?: string;
+  /**
+   * Scroll events from the table body element.
+   * When column pinning is off, this is the vertical scroll container. When pinning is on,
+   * the body does not scroll (parent should scroll); use a wrapper `onScroll` for infinite lists.
+   */
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
+  /**
+   * `default` — table body scrolls inside the component (nested scroll).
+   * `page` — no inner vertical scroll; use a fixed-height ancestor with `overflow-auto` for a single scrollport
+   * (pairs with sticky header / left-pinned columns).
+   */
+  layoutScroll?: "default" | "page";
   /** Controlled active row ID - when provided, controls which row is active */
   activeRowId?: string;
   /** Custom function to extract row ID from row data - useful when row.id is not the primary identifier */
@@ -102,6 +180,17 @@ const getColumnStyle = (size: number, minSize: number, maxSize: number | undefin
   flex: `0 0 ${size}px`,
 });
 
+const getPinnedOffsetStyle = <T,>(column: Column<T, unknown>): CSSProperties => {
+  const pin = column.getIsPinned();
+  if (pin === "left") {
+    return { left: `${column.getStart("left")}px` };
+  }
+  if (pin === "right") {
+    return { right: `${column.getAfter("right")}px` };
+  }
+  return {};
+};
+
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const {
     selectable = false,
@@ -110,11 +199,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
+    enableSortingRemoval = false,
     manualSorting = false,
     isRowSelectable,
     onSelectAllChange,
     invertedSelectionEnabled,
     loadingRows = 5,
+    layoutScroll = "default",
     className,
     dataTestId,
     activeRowId: controlledActiveRowId,
@@ -202,6 +293,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             enableSorting={columnSortingEnabled}
             originalHeader={originalHeader}
             help={extendedCol.help}
+            align={extendedCol.align}
           />
         ),
       };
@@ -308,6 +400,12 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     return [selectionColumn, ...columnsWithHeaders];
   }, [columnsWithHeaders, selectable]);
 
+  // Only enable TanStack column pinning when used — avoids pinning feature overhead and
+  // keeps behavior aligned with pre-pinning tables (all current @humansignal/ui consumers
+  // except callers that pass pinLeftColumns / pinColumns).
+  const columnPinningEnabled =
+    (props.pinLeftColumns?.length ?? 0) > 0 || (Array.isArray(props.pinColumns) && props.pinColumns.length > 0);
+
   const table = useReactTable({
     data: props.data,
     meta: props.meta ?? {},
@@ -319,7 +417,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     },
     state: {
       columnPinning: {
-        right: props.pinColumns as string[],
+        left: props.pinLeftColumns ?? [],
+        right: (props.pinColumns ?? []) as string[],
       },
       columnVisibility: props.columnVisibility,
       rowSelection,
@@ -369,7 +468,9 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         return rowId !== undefined ? String(rowId) : String(index);
       }),
     columnResizeMode: "onChange",
+    enableColumnPinning: columnPinningEnabled,
     enableSorting: enableSorting,
+    enableSortingRemoval,
     manualSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -379,13 +480,18 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   useColumnSizing(table, props.cellSizesStorageKey);
 
   const { columnSizing } = table.getState();
+
+  useLayoutEffect(() => {
+    if (!props.onLeafColumnSizesChange) return;
+    props.onLeafColumnSizesChange(Object.fromEntries(table.getVisibleLeafColumns().map((c) => [c.id, c.getSize()])));
+  }, [props.onLeafColumnSizesChange, table, columnSizing, props.columnVisibility]);
   const rows = table.getRowModel().rows;
 
   const handleRowClick = useCallback(
-    (row?: Row<T[number]>) => {
+    (row?: Row<T[number]>, event?: React.MouseEvent<HTMLDivElement>) => {
       // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
-        props.onRowClick(row);
+        props.onRowClick(row, event);
       }
       // Active state is only enabled when onRowClick is provided
       // No internal state management for active rows
@@ -396,23 +502,39 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
+  const bodyShellClassName = cn(
+    styles.body,
+    layoutScroll === "page" && styles.bodyInPageScroll,
+    columnPinningEnabled && styles.bodyWithColumnPins,
+  );
+
   return (
-    <div className={cn(styles.container, className)} data-testid={dataTestId}>
-      <DataTableHead table={table} />
+    <div
+      className={cn(
+        styles.container,
+        columnPinningEnabled && styles.containerWithColumnPins,
+        layoutScroll === "page" && styles.containerInPageScroll,
+        className,
+      )}
+      data-testid={dataTestId}
+    >
+      <DataTableHead table={table} enableSortingRemoval={enableSortingRemoval} />
       {props.isLoading ? (
         <DataTableSkeletonBody
           table={table}
           loadingRows={loadingRows}
           columnSizing={columnSizing}
           selectable={selectable}
+          bodyClassName={bodyShellClassName}
+          onBodyScroll={props.onBodyScroll}
         />
       ) : showEmptyState ? (
-        <div className={styles.body}>
+        <div className={bodyShellClassName} onScroll={props.onBodyScroll}>
           <EmptyState
             className="px-wide py-widest"
             size="small"
             variant="warning"
-            icon={props.emptyState?.icon ?? <IconSearch />}
+            icon={props.emptyState?.icon ?? <MagnifyingGlassIcon />}
             title={props.emptyState?.title ?? "No items found"}
             description={
               props.emptyState?.description ?? "Try adjusting your search or clearing the filters to see more results."
@@ -424,11 +546,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         <MemoizedDataTableBody
           rows={rows}
           rowClassName={props.rowClassName}
+          rowDataTestId={props.rowDataTestId}
+          getRowProps={props.getRowProps}
+          bodyCellClassName={props.bodyCellClassName}
           onRowClick={props.onRowClick ? handleRowClick : undefined}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
           rowSelection={rowSelection}
           activeRowId={activeRowId}
+          hoveredRowId={props.hoveredRowId}
+          bodyClassName={bodyShellClassName}
+          onBodyScroll={props.onBodyScroll}
         />
       )}
     </div>
@@ -437,16 +565,20 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
 interface DataTableHeadProps<T> {
   table: Table<T>;
+  enableSortingRemoval?: boolean;
 }
 
-const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHeadProps<T>) => {
+const DataTableHead = <T extends Record<string, unknown>>({
+  table,
+  enableSortingRemoval = false,
+}: DataTableHeadProps<T>) => {
   return (
     <div className={styles.head}>
       {table.getHeaderGroups().map((group) => (
         <div className={styles.headRow} key={group.id}>
           {group.headers.map((header, index) => {
             const { column } = header;
-            const isPinned = column.getIsPinned();
+            const pinSide = column.getIsPinned();
             const columnDef = column.columnDef;
             const minSize = columnDef.minSize ?? 50;
             const maxSize = columnDef.maxSize ?? 1200;
@@ -456,7 +588,10 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             const isSortable = column.getCanSort();
 
             // Calculate column style
-            const style = getColumnStyle(size, minSize, maxSize);
+            const style = {
+              ...getColumnStyle(size, minSize, maxSize),
+              ...getPinnedOffsetStyle(column),
+            };
 
             const noDivider = column.columnDef.meta?.noDivider;
             // Also check if previous column has noDivider to prevent divider between them
@@ -465,12 +600,15 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             // Don't show divider if this column or previous column has noDivider
             const hideDivider = noDivider || prevNoDivider;
 
-            // Custom click handler for sorting that only toggles between asc/desc (doesn't clear)
+            // Default: toggle only between asc/desc (never clear) so existing tables stay two-state.
+            // `enableSortingRemoval` opts into asc → desc → unsorted so callers can restore a default order.
             const handleHeaderClick = isSortable
               ? () => {
                   const currentSort = column.getIsSorted();
                   if (currentSort === "asc") {
                     column.toggleSorting(true); // Sort descending
+                  } else if (enableSortingRemoval && currentSort === "desc") {
+                    column.clearSorting();
                   } else {
                     column.toggleSorting(false); // Sort ascending
                   }
@@ -481,13 +619,16 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
               <div
                 className={cn(
                   styles.headCell,
-                  isPinned && styles.headCellPinned,
+                  pinSide === "right" && styles.headCellPinnedRight,
+                  pinSide === "left" && styles.headCellPinnedLeft,
                   hideDivider && styles.headCellNoDivider,
                   isSortable && styles.headCellSortable,
                 )}
                 key={header.id}
                 style={style}
                 data-testid={`data-table-header-${header.id}`}
+                data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
               >
                 <div className={styles.headCellContent} onClick={handleHeaderClick}>
                   {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
@@ -513,12 +654,26 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
 interface DataTableRowProps<T> {
   row: Row<T>;
   className?: string;
-  onRowClick?: (row?: Row<T>) => void;
+  onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
+  dataTestId?: string;
+  rowProps?: HTMLAttributes<HTMLDivElement>;
+  bodyCellClassName?: string;
   isSelected?: boolean;
   isActive?: boolean;
+  isHovered?: boolean;
 }
 
-const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: DataTableRowProps<T>) => {
+const DataTableRow = <T,>({
+  row,
+  className,
+  onRowClick,
+  dataTestId,
+  rowProps,
+  bodyCellClassName,
+  isSelected,
+  isActive,
+  isHovered,
+}: DataTableRowProps<T>) => {
   const isError = className?.includes("error") || className?.includes("bodyRowError");
 
   const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -527,8 +682,10 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
     if (target.closest('input[type="checkbox"]') || target.closest(".checkbox")) {
       return;
     }
-    onRowClick?.(row);
+    onRowClick?.(row, e);
   };
+
+  const { className: rowPropsClassName, onClick: rowPropsOnClick, ...restRowProps } = rowProps ?? {};
 
   return (
     <div
@@ -538,23 +695,48 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         isError && styles.bodyRowError,
         isSelected && styles.bodyRowSelected,
         isActive && styles.bodyRowActive,
+        isHovered && styles.bodyRowHovered,
         className,
+        rowPropsClassName,
       )}
-      onClick={onRowClick ? handleRowClick : undefined}
-      data-testid={`data-table-row-${row.id}`}
+      onClick={
+        onRowClick || rowPropsOnClick
+          ? (e) => {
+              rowPropsOnClick?.(e);
+              if (onRowClick) handleRowClick(e);
+            }
+          : undefined
+      }
+      data-testid={dataTestId ?? `data-table-row-${row.id}`}
+      {...(isHovered ? { "data-hovered": "" } : {})}
+      {...restRowProps}
     >
       {row.getVisibleCells().map((cell) => {
-        const isPinned = cell.column.getIsPinned();
+        const pinSide = cell.column.getIsPinned();
         const columnDef = cell.column.columnDef;
         const minSize = columnDef.minSize ?? 50;
         const maxSize = columnDef.maxSize ?? 1200;
         const size = cell.column.getSize();
 
         // Calculate column style
-        const style = getColumnStyle(size, minSize, maxSize);
+        const style = {
+          ...getColumnStyle(size, minSize, maxSize),
+          ...getPinnedOffsetStyle(cell.column),
+        };
 
         return (
-          <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={cell.id} style={style}>
+          <div
+            className={cn(
+              styles.bodyCell,
+              pinSide === "right" && styles.bodyCellPinnedRight,
+              pinSide === "left" && styles.bodyCellPinnedLeft,
+              bodyCellClassName,
+            )}
+            key={cell.id}
+            style={style}
+            data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+            {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
+          >
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         );
@@ -565,33 +747,50 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
 
 interface DataTableBodyProps<T> {
   rows: Row<T>[];
-  onRowClick?: (row?: Row<T>) => void;
+  onRowClick?: (row?: Row<T>, event?: React.MouseEvent<HTMLDivElement>) => void;
   rowClassName?: (row: Row<T>) => string | undefined;
+  rowDataTestId?: (row: Row<T>) => string | undefined;
+  getRowProps?: (row: Row<T>) => HTMLAttributes<HTMLDivElement> | undefined;
+  bodyCellClassName?: string;
   columnVisibility?: Record<string, boolean>;
   columnSizing?: Record<string, number>;
   rowSelection?: Record<string, boolean>;
   activeRowId?: string;
+  hoveredRowId?: string;
+  /** Merged `styles.body` (+ pinned scroll shell when column pinning is on) */
+  bodyClassName: string;
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
 }
 
 const DataTableBody = <T,>({
   rows,
   onRowClick,
   rowClassName,
+  rowDataTestId,
+  getRowProps,
+  bodyCellClassName,
   columnVisibility: _columnVisibility, // used to retrigger memo
   columnSizing: _columnSizing,
   rowSelection, // used to retrigger memo when selection changes
   activeRowId,
+  hoveredRowId,
+  bodyClassName,
+  onBodyScroll,
 }: DataTableBodyProps<T>) => {
   return (
-    <div className={styles.body}>
+    <div className={bodyClassName} onScroll={onBodyScroll}>
       {rows.map((row) => (
         <DataTableRow
           key={row.id}
           row={row}
           className={rowClassName?.(row) ?? ""}
+          dataTestId={rowDataTestId?.(row)}
+          rowProps={getRowProps?.(row)}
+          bodyCellClassName={bodyCellClassName}
           onRowClick={onRowClick}
           isSelected={rowSelection?.[row.id] === true}
           isActive={activeRowId === row.id}
+          isHovered={hoveredRowId === row.id}
         />
       ))}
     </div>
@@ -604,7 +803,13 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     JSON.stringify(prev.columnVisibility) === JSON.stringify(next.columnVisibility) &&
     JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing) &&
     JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection) &&
-    prev.activeRowId === next.activeRowId
+    prev.activeRowId === next.activeRowId &&
+    prev.hoveredRowId === next.hoveredRowId &&
+    prev.rowDataTestId === next.rowDataTestId &&
+    prev.getRowProps === next.getRowProps &&
+    prev.bodyCellClassName === next.bodyCellClassName &&
+    prev.bodyClassName === next.bodyClassName &&
+    prev.onBodyScroll === next.onBodyScroll
   );
 }) as typeof DataTableBody;
 
@@ -617,6 +822,8 @@ interface DataTableSkeletonBodyProps<T> {
   loadingRows: number;
   columnSizing: Record<string, number>;
   selectable: boolean;
+  bodyClassName: string;
+  onBodyScroll?: UIEventHandler<HTMLDivElement>;
 }
 
 const DataTableSkeletonBody = <T,>({
@@ -624,6 +831,8 @@ const DataTableSkeletonBody = <T,>({
   loadingRows,
   columnSizing: _columnSizing,
   selectable: _selectable,
+  bodyClassName,
+  onBodyScroll,
 }: DataTableSkeletonBodyProps<T>) => {
   const headerGroups = table.getHeaderGroups();
   const headers = headerGroups[0]?.headers || [];
@@ -662,24 +871,37 @@ const DataTableSkeletonBody = <T,>({
   };
 
   return (
-    <div className={styles.body}>
+    <div className={bodyClassName} onScroll={onBodyScroll}>
       {Array.from({ length: loadingRows }).map((_, rowIndex) => (
         <div className={styles.bodyRow} key={rowIndex}>
           {headers.map((header, columnIndex) => {
             const { column } = header;
-            const isPinned = column.getIsPinned();
+            const pinSide = column.getIsPinned();
             const columnDef = column.columnDef;
             const minSize = columnDef.minSize ?? 50;
             const maxSize = columnDef.maxSize ?? 1200;
             const size = header.getSize();
 
             // Calculate column style
-            const style = getColumnStyle(size, minSize, maxSize);
+            const style = {
+              ...getColumnStyle(size, minSize, maxSize),
+              ...getPinnedOffsetStyle(column),
+            };
 
             // For selection column, show empty cell
             if (column.id === "select") {
               return (
-                <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+                <div
+                  className={cn(
+                    styles.bodyCell,
+                    pinSide === "right" && styles.bodyCellPinnedRight,
+                    pinSide === "left" && styles.bodyCellPinnedLeft,
+                  )}
+                  key={header.id}
+                  style={style}
+                  data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                  {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
+                >
                   <div className="w-4 h-4" />
                 </div>
               );
@@ -689,7 +911,17 @@ const DataTableSkeletonBody = <T,>({
             const patternColumnIndex = headers[0]?.column.id === "select" ? columnIndex - 1 : columnIndex;
 
             return (
-              <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+              <div
+                className={cn(
+                  styles.bodyCell,
+                  pinSide === "right" && styles.bodyCellPinnedRight,
+                  pinSide === "left" && styles.bodyCellPinnedLeft,
+                )}
+                key={header.id}
+                style={style}
+                data-pinned={typeof pinSide === "string" ? pinSide : undefined}
+                {...(pinSide === "left" ? { "data-pinned-left": "" } : {})}
+              >
                 {renderSkeletonPattern(patternColumnIndex)}
               </div>
             );
@@ -712,6 +944,8 @@ export type HeaderProps<T> = {
   enableSorting?: boolean;
   originalHeader?: string | React.ReactNode;
   help?: string; // Optional help text to display in a tooltip with info icon
+  /** Header label alignment within the header cell. Defaults to "left". */
+  align?: DataTableColumnAlign;
 };
 
 export const Header = <T,>({
@@ -721,6 +955,7 @@ export const Header = <T,>({
   enableSorting = false,
   originalHeader,
   help,
+  align = "left",
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
   let headerLabel: string | React.ReactNode;
@@ -743,7 +978,11 @@ export const Header = <T,>({
 
   const headerContent = (
     <div className={cn(styles.headerContent, help && "gap-tighter")}>
-      <div className="flex items-center gap-2">
+      {/* Right-aligned labels reach the far edge via an auto left margin rather than by stretching this
+          group: stretching it lets the label shrink, and since the overflow is clipped from the start of a
+          right-aligned string, a long label in a narrow column loses its first words ("ed to pay (est.)").
+          An auto margin keeps the label at its content width and pushes it over instead. */}
+      <div className={cn("flex items-center gap-2", align === "right" && "ml-auto")}>
         {isStringHeader ? (
           <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
             {headerLabel}
@@ -753,13 +992,21 @@ export const Header = <T,>({
         )}
         {help && (
           <Tooltip title={help} alignment="top-center">
-            <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
+            <InfoIcon width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
           </Tooltip>
         )}
       </div>
       {enableSorting && (
         <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>
-          {isSorted ? isDesc ? <IconSortUp /> : <IconSortDown /> : <IconSortDown />}
+          {isSorted ? (
+            isDesc ? (
+              <ArrowUpIcon size={18} className="text-neutral-content-subtler" />
+            ) : (
+              <ArrowDownIcon size={18} className="text-neutral-content-subtler" />
+            )
+          ) : (
+            <ArrowDownIcon size={18} className="text-neutral-content-subtler" />
+          )}
         </div>
       )}
     </div>

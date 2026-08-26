@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { observer } from "mobx-react";
 import { flow, getRoot, types } from "mobx-state-tree";
-import { Spin } from "antd";
+import { Message, Spinner } from "@humansignal/ui";
 
 import Infomodal from "../../../components/Infomodal/Infomodal";
 import { NewTaxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { TaxonomyEcho466 } from "../../../components/TaxonomyEcho466/TaxonomyEcho466";
 import { Taxonomy } from "../../../components/Taxonomy/Taxonomy";
 import { guidGenerator } from "../../../core/Helpers";
 import Registry from "../../../core/Registry";
@@ -19,11 +21,13 @@ import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
 import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
 import VisibilityMixin from "../../../mixins/Visibility";
 import { parseValue } from "../../../utils/data";
-import { FF_LSDV_4583, FF_TAXONOMY_LABELING, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
+import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
-import styles from "./Taxonomy.prefix.css";
+import { cn } from "../../../utils/bem";
+import "./Taxonomy.prefix.css";
 import messages from "../../../utils/messages";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 
@@ -79,14 +83,17 @@ import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
  * @param {boolean} [perRegion]           - Use this tag to classify specific regions instead of the whole object
  * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object
  * @param {boolean} [labeling]            - Use taxonomy to label regions in text. Only supported with `<Text>` and `<HyperText>` object tags.
- * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.
+ * @param {boolean} [legacy]              - **Deprecated.** Enables the legacy Taxonomy UI (annotators can add labels as needed). When true, the `apiUrl` parameter is not usable. Prefer the default Taxonomy UI.
+ * @param {boolean} [allowAddLabels=false] - **New taxonomy UI only.** When `true`, annotators can add and remove user-defined labels where the project supports it. Defaults to `false` so choices stay limited to the configured taxonomy unless you opt in. If you omit this attribute but set `legacy`, `allowAddLabels` defaults to the same value as `legacy`. Ignored when `legacy` is `true` and when `apiUrl` is set (external taxonomies are expected to be managed at their source).
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
   labeling: types.optional(types.boolean, false),
   leafsonly: types.optional(types.boolean, false),
   showfullpath: types.optional(types.boolean, false),
+  /** @deprecated Retained for compatibility; prefer the default Taxonomy UI. */
   legacy: types.optional(types.boolean, false),
+  allowAddLabels: types.optional(types.boolean, false),
   pathseparator: types.optional(types.string, " / "),
   apiurl: types.maybeNull(types.string),
   placeholder: "",
@@ -141,6 +148,7 @@ const TaxonomyLabelingResult = types
   .model({})
   .views((self) => ({
     get result() {
+      if (!self.annotation) return null;
       // @todo make it without duplication of ClassificationBase code
       if (!self.isLabeling && !self.perregion) {
         if (self.peritem) {
@@ -228,7 +236,7 @@ const Model = types
       self._children = val;
     },
     get isLabeling() {
-      return isFF(FF_TAXONOMY_LABELING) && self.labeling;
+      return self.labeling;
     },
 
     get userLabels() {
@@ -499,7 +507,7 @@ const Model = types
     },
 
     unselectAll() {
-      if (isFF(FF_TAXONOMY_LABELING) && self.isLabeling) self.selected = [];
+      if (self.isLabeling) self.selected = [];
     },
 
     onAddLabel(path) {
@@ -551,6 +559,14 @@ const Model = types
     };
   })
   .preProcessSnapshot((sn) => {
+    if (sn.allowAddLabels === undefined && sn.allowaddlabels !== undefined) {
+      sn.allowAddLabels = sn.allowaddlabels;
+    }
+
+    if (sn.allowAddLabels === undefined && sn.legacy !== undefined) {
+      sn.allowAddLabels = sn.legacy;
+    }
+
     const children = sn._children ?? sn.children;
 
     if (children && !ChildrenSnapshots.has(sn.name)) {
@@ -559,6 +575,7 @@ const Model = types
 
     delete sn._children;
     delete sn.children;
+    delete sn.allowaddlabels;
 
     return sn;
   });
@@ -575,15 +592,55 @@ const TaxonomyModel = types.compose(
   SharedStoreMixin,
   PerRegionMixin,
   ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
-  ...(isFF(FF_TAXONOMY_LABELING) ? [TaxonomyLabelingResult] : []),
+  TaxonomyLabelingResult,
   ReadOnlyControlMixin,
   SelectedChoiceMixin,
   VisibilityMixin,
 );
 
+/** `node.path.join(separator)` → node; rebuild only when `items` identity changes. */
+function buildTaxonomyItemsByPathKey(items, pathSeparator) {
+  const byPathStr = new Map();
+  const walk = (nodes) => {
+    if (!nodes?.length) return;
+    for (const n of nodes) {
+      byPathStr.set(n.path.join(pathSeparator), n);
+      if (n.children?.length) walk(n.children);
+    }
+  };
+  walk(items);
+  return byPathStr;
+}
+
+/**
+ * Same shape as `TaxonomyModel`’s `selectedItems` view, but selection toggles only remap paths (O(paths × depth))
+ * instead of re-walking sibling lists with `.find` per level on every MobX read.
+ */
+function taxonomyDisplaySelectedFromPaths(selectedPaths, pathSeparator, byPathStr) {
+  if (!selectedPaths?.length) return [];
+  return selectedPaths.map((segments) => {
+    const levels = [];
+    for (let i = 0; i < segments.length; i++) {
+      const prefixKey = segments.slice(0, i + 1).join(pathSeparator);
+      const node = byPathStr.get(prefixKey);
+      const value = segments[i];
+      levels.push({ label: node?.label ?? value, value });
+    }
+    return levels;
+  });
+}
+
 const HtxTaxonomy = observer(({ item }) => {
-  // literal "taxonomy" class name is for external styling
-  const className = [styles.taxonomy, "taxonomy", styles.taxonomy__new].filter(Boolean).join(" ");
+  const items = item.items;
+  const pathSep = item.pathseparator;
+  const taxonomyItemsByPathKey = useMemo(() => buildTaxonomyItemsByPathKey(items, pathSep), [items, pathSep]);
+  const selectedForUi = useMemo(
+    () => taxonomyDisplaySelectedFromPaths(item.selected, pathSep, taxonomyItemsByPathKey),
+    [item.selected, pathSep, taxonomyItemsByPathKey],
+  );
+
+  // literal "taxonomy" class name is for external styling (unprefixed hook)
+  const className = [cn("taxonomy").mix("taxonomy__new").toClassName(), "taxonomy"].filter(Boolean).join(" ");
   const visibleStyle = item.perRegionVisible() && item.isVisible ? {} : { display: "none" };
   const options = {
     showFullPath: item.showfullpath,
@@ -600,13 +657,15 @@ const HtxTaxonomy = observer(({ item }) => {
   // without full api there will be just one initial loading;
   // with full api we should not block UI with spinner on nested requests —
   // they are indicated by loading icon on the item itself
-  const firstLoad = item.isLoadedByApi ? !item.items.length : true;
+  const firstLoad = item.isLoadedByApi ? !items.length : true;
+  const canManageUserLabels = item.userLabels && item.allowAddLabels && !item.isLoadedByApi;
+  const showApiAllowAddLabelsWarning = !item.legacy && item.isLoadedByApi && item.allowAddLabels;
 
   if (item.loading && firstLoad) {
     return (
       <div className={className} style={visibleStyle}>
-        <div className={styles.taxonomy__loading}>
-          <Spin size="small" />
+        <div className={cn("taxonomy").elem("loading").toClassName()} data-testid="taxonomy-loading">
+          <Spinner size={20} />
         </div>
       </div>
     );
@@ -614,24 +673,48 @@ const HtxTaxonomy = observer(({ item }) => {
 
   return (
     <div className={className} style={visibleStyle} ref={item.elementRef}>
-      {!item.legacy ? (
-        <NewTaxonomy
-          items={item.items}
-          selected={item.selectedItems}
+      {showApiAllowAddLabelsWarning ? (
+        <div className="mb-tight w-full min-w-0 max-w-full">
+          <Message
+            variant="warning"
+            size="small"
+            className="w-full max-w-full"
+            data-testid="taxonomy-api-allowAddLabels-warning"
+          >
+            Invalid Taxonomy config: `allowAddLabels` cannot be used with `apiUrl`. Add/remove labels is disabled for
+            external taxonomies.
+          </Message>
+        </div>
+      ) : null}
+      {item.legacy ? (
+        <Taxonomy
+          items={items}
+          selected={item.selected}
           onChange={item.onChange}
-          onLoadData={item.loadItems}
           onAddLabel={item.userLabels && item.onAddLabel}
           onDeleteLabel={item.userLabels && item.onDeleteLabel}
           options={options}
           isEditable={!item.isReadOnly()}
         />
-      ) : (
-        <Taxonomy
-          items={item.items}
-          selected={item.selected}
+      ) : isFF(FF_ECHO_466_TAXONOMY_ANTD_REMOVAL) ? (
+        <TaxonomyEcho466
+          items={items}
+          selected={selectedForUi}
           onChange={item.onChange}
-          onAddLabel={item.userLabels && item.onAddLabel}
-          onDeleteLabel={item.userLabels && item.onDeleteLabel}
+          onLoadData={item.loadItems}
+          onAddLabel={canManageUserLabels ? item.onAddLabel : undefined}
+          onDeleteLabel={canManageUserLabels ? item.onDeleteLabel : undefined}
+          options={options}
+          isEditable={!item.isReadOnly()}
+        />
+      ) : (
+        <NewTaxonomy
+          items={items}
+          selected={selectedForUi}
+          onChange={item.onChange}
+          onLoadData={item.loadItems}
+          onAddLabel={canManageUserLabels ? item.onAddLabel : undefined}
+          onDeleteLabel={canManageUserLabels ? item.onDeleteLabel : undefined}
           options={options}
           isEditable={!item.isReadOnly()}
         />

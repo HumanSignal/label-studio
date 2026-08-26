@@ -39,7 +39,7 @@ const downloadFile = (blob, filename) => {
   link.click();
 };
 
-const wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
+const _wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
 
 const isTimeoutLikeStatus = (status) => status === 408 || status === 502 || status === 504;
 
@@ -49,7 +49,7 @@ export const ExportPage = () => {
   const pageParams = useParams();
   const api = useAPI();
 
-  const [previousExports, setPreviousExports] = useState([]);
+  const [_previousExports, setPreviousExports] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [downloadingMessage, setDownloadingMessage] = useState(false);
   const [availableFormats, setAvailableFormats] = useState([]);

@@ -356,6 +356,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       );
     }
 
+    this.getSamplesPerPx();
     this.invoke("initialized", [this]);
     setTimeout(() => this.draw(), 10);
   }
@@ -479,6 +480,17 @@ export class Visualizer extends Events<VisualizerEvents> {
 
   drawRequestId: number | null = null;
   drawRequestDry = true;
+  clearRenderCache() {
+    for (const renderer of this.renderers) {
+      if ("lastWaveformRenderedWidth" in renderer) {
+        (renderer as any).lastWaveformRenderedWidth = 0;
+      }
+      if ("lastSpectrogramRenderedWidth" in renderer) {
+        (renderer as any).lastSpectrogramRenderedWidth = 0;
+      }
+    }
+  }
+
   draw(dry = false) {
     if (!isSyncedBuffering) {
       this._draw(dry);
@@ -1117,6 +1129,10 @@ export class Visualizer extends Events<VisualizerEvents> {
     // Update container height
     this.setContainerHeight();
 
+    if (this.audio && this.width > 0) {
+      this.maxZoom = Math.max(1, Math.ceil(this.audio.dataLength / this.width));
+    }
+
     // Update layer dimensions
     const mainLayer = this.getLayer("main");
     if (mainLayer) {
@@ -1298,7 +1314,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     const timelineLayer = this.getLayer("timeline");
     const waveformLayer = this.getLayer("waveform");
-    const spectrogramLayer = this.getLayer("spectrogram");
+    const _spectrogramLayer = this.getLayer("spectrogram");
 
     // Calculate Y offset based on composition structure
     let offsetY = 0;

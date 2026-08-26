@@ -296,7 +296,9 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
         {pageSizeOptions?.length > 0 && showPageSize && (
           <div className={cn("pagination-dm").elem("page-size").toClassName()}>
             <Select
-              size={size}
+              // Data Manager's "small" row is 24px = Select `smaller`. Medium is Select's default,
+              // so only override when the denser step is required.
+              size={size === "small" ? "smaller" : undefined}
               value={pageSize}
               options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
               onChange={(val: any) => {

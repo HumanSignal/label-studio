@@ -1,12 +1,12 @@
-import { IconInfoOutline, IconSettings } from "@humansignal/icons";
+import { InfoIcon, SlidersHorizontalIcon } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
+import { ProjectCoursesBottomBarButton } from "./ProjectCoursesBottomBarButton";
 import "./Actions.prefix.css";
 
 export const Actions = ({ store }) => {
@@ -14,14 +14,17 @@ export const Actions = ({ store }) => {
   const entity = annotationStore.selected;
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll === true;
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const hideInstructionsForCourses = store.hideInstructionsForCourses === true;
+  const showInstructions = store.description && store.hasInterface("instruction") && !hideInstructionsForCourses;
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>
       {!isPrediction && !isViewAll && store.hasInterface("edit-history") && <EditingHistory entity={entity} />}
 
       <div className={cn("action-buttons").toClassName()}>
-        {store.description && store.hasInterface("instruction") && (
+        <ProjectCoursesBottomBarButton store={store} />
+        {showInstructions && (
           <Button
             type="text"
             aria-label="Instructions"
@@ -31,7 +34,7 @@ export const Actions = ({ store }) => {
             tooltip="Show instructions"
             onClick={() => store.toggleDescription()}
             className="aspect-square"
-            leading={<IconInfoOutline />}
+            leading={<InfoIcon size={24} />}
             data-testid="bottombar-instructions-button"
           />
         )}
@@ -44,7 +47,7 @@ export const Actions = ({ store }) => {
           onClick={() => store.toggleSettings()}
           tooltip="Settings"
           className="aspect-square"
-          leading={<IconSettings />}
+          leading={<SlidersHorizontalIcon size={24} />}
           data-testid="bottombar-settings-button"
         />
       </div>

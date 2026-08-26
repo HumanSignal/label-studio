@@ -13,6 +13,7 @@
 | [highlightColor] | <code>string</code> |  | Hex string with highlight color, if not provided uses the labels color |
 | [showLabels] | <code>boolean</code> |  | Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings |
 | [granularity] | <code>symbol</code> \| <code>word</code> \| <code>sentence</code> \| <code>paragraph</code> |  | Control region selection granularity |
+| [resolveUrls] | <code>boolean</code> | <code>true</code> | Whether to resolve cloud storage URIs (s3://, gs://, etc.) in the loaded content when valueType is "url" |
 
 ### Result parameters
 

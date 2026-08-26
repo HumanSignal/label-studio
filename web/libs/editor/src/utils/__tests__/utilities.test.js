@@ -18,7 +18,6 @@ import {
   chunks,
   minMax,
   humanDateDiff,
-  sortAnnotations,
   findClosestParent,
   camelizeKeys,
   snakeizeKeys,
@@ -245,20 +244,6 @@ describe("humanDateDiff", () => {
     const result = humanDateDiff(d.getTime());
     expect(typeof result).toBe("string");
     expect(result.length).toBeGreaterThan(0);
-  });
-});
-
-describe("sortAnnotations", () => {
-  it("sorts by createdDate latest first", () => {
-    const list = [
-      { id: "a", createdDate: "2020-01-01" },
-      { id: "b", createdDate: "2020-01-03" },
-      { id: "c", createdDate: "2020-01-02" },
-    ];
-    const result = sortAnnotations([...list]);
-    expect(result[0].id).toBe("b");
-    expect(result[1].id).toBe("c");
-    expect(result[2].id).toBe("a");
   });
 });
 

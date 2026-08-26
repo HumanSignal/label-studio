@@ -7,7 +7,7 @@
   --button-border-color-active: var(--color-neutral-border-bold);
   --button-text-color: var(--color-neutral-content);
   --button-icon-color: var(--color-neutral-content);
-  --button-font-size: var(--font-size-16);
+  --button-font-size: var(--font-size-label-medium);
 
   display: flex;
   justify-content: center;

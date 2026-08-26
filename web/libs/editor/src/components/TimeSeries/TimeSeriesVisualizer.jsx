@@ -1,11 +1,10 @@
 import { getRoot } from "mobx-state-tree";
-import React, {} from "react";
+import React from "react";
 import { observer } from "mobx-react";
 import * as d3 from "d3";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { checkD3EventLoop, getOptimalWidth, getRegionColor, sparseValues } from "../../tags/object/TimeSeries/helpers";
 import { markerSymbol } from "../../tags/object/TimeSeries/symbols";
-import {} from "../../utils/feature-flags";
 import { fixMobxObserve } from "../../utils/utilities";
 import { getCurrentTheme } from "@humansignal/ui";
 

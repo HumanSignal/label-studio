@@ -2,7 +2,7 @@ import type React from "react";
 import { forwardRef } from "react";
 import { useAtomValue } from "jotai";
 import { IconCollapseSmall, IconExpandSmall } from "@humansignal/icons";
-import { cnm } from "@humansignal/ui/utils/utils";
+import { cnm } from "@humansignal/ui";
 import { annotationAtom, sampleTaskAtom } from "../../atoms/configAtoms";
 
 export type BottomPanelRef = {
@@ -16,7 +16,7 @@ interface BottomPanelProps {
 
 const HEADER_HEIGHT = 33;
 
-export const BottomPanel = forwardRef<BottomPanelRef, BottomPanelProps>(({ isCollapsed, setIsCollapsed }, ref) => {
+export const BottomPanel = forwardRef<BottomPanelRef, BottomPanelProps>(({ isCollapsed, setIsCollapsed }, _ref) => {
   const currentAnnotation = useAtomValue(annotationAtom);
   const sampleTask = useAtomValue(sampleTaskAtom);
 

@@ -4,13 +4,13 @@ import os
 
 from core.utils.exceptions import extract_message
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 
 class GCSImportStorageSerializer(ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     presign = serializers.BooleanField(required=False, default=True)
     secure_fields = ['google_application_credentials']
 
@@ -44,7 +44,7 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
 
 class GCSExportStorageSerializer(ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

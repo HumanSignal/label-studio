@@ -12,7 +12,9 @@ section: "Integrate & Extend"
 ---
 
 !!! attention
-    As of [Label Studio 1.11.0](https://github.com/HumanSignal/label-studio/releases/tag/1.11.0), the Label Studio frontend has been deprecated as a separate library and is no longer supported as a standalone distribution. For information about using the frontend library within Label Studio, see [the README](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/README.md). 
+    As of [Label Studio 1.11.0](https://github.com/HumanSignal/label-studio/releases/tag/1.11.0), the Label Studio frontend has been deprecated as a separate library and is no longer supported as a standalone distribution. For information about using the frontend library within Label Studio, see [the README](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/README.md).
+
+    Rather than building a new labeling application from scratch, AI agents can build powerful labeling interfaces on top of Label Studio by combining the [XML labeling config builder skill](https://github.com/HumanSignal/create-xml-labeling-config-skill) with the [Label Studio SDK/CLI](https://api.labelstud.io/api-reference/introduction/getting-started). This lets agents generate optimized labeling configs directly from your specs and wire them into projects programmatically.
 
 The [Label Studio Frontend](https://github.com/HumanSignal/label-studio-frontend) (LSF) is the main labeling interface distributed within Label Studio and as a separate package via NPM and Unpkg. You can integrate the LSF into your projects without Label Studio to provide data labeling capabilities to your users.
 

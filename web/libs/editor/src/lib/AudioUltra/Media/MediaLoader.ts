@@ -84,6 +84,7 @@ export class MediaLoader extends Destructable {
       splitChannels: this.wf.params.splitChannels,
       decoderType: this.wf.params.decoderType,
       playerType: this.wf.params.playerType,
+      wf: this.wf,
     });
 
     // If this failed to allocate an audio decoder, we can't continue
@@ -98,6 +99,32 @@ export class MediaLoader extends Destructable {
       this.duration = this.audio.duration;
       this.decoderResolve?.();
       return this.audio;
+    }
+
+    // Special handling for wasm-stream decoder - initialize immediately without pre-fetching
+    if (this.wf.params.decoderType === "wasm-stream") {
+      try {
+        await this.audio.initDecoder();
+
+        // Notify the waveform that the audio decoder is ready
+        this.decoderResolve?.();
+
+        if (!this.audio) return null;
+
+        // Get the duration from the audio file as soon as it is ready
+        this.duration = this.audio.duration;
+
+        // Proceed with the rest of the decoding (attaches proxy chunks)
+        await this.decodeAudioData();
+
+        return this.audio ?? null;
+      } catch (err) {
+        this.wf.setError(
+          `An error occurred while decoding the audio file. Please select another file or try again. ${err.message}`,
+        );
+        console.error("An audio decoding error occurred", err);
+      }
+      return null;
     }
 
     // Get the audio data from the url src
@@ -264,12 +291,22 @@ export class MediaLoader extends Destructable {
 
       const signedUrlParams = [
         "X-Goog-Signature", // Google Cloud Storage
+        "X-Goog-Algorithm",
         "X-Amz-Signature", // S3|Minio|DigitalOcean|Backblaze
+        "X-Amz-Algorithm",
+        "X-Amz-Credential",
+        "Signature",
+        "signature",
         "sig", // Azure
+        "AWSAccessKeyId",
+        "GoogleAccessId",
+        "Expires",
+        "expires",
+        "key", // Label Studio proxy key
       ];
 
       // If the url is signed, we need to preserve the query params otherwise the signature will be invalid
-      if (!signedUrlParams.some((p) => newUrl.searchParams.has(p))) {
+      if (!newUrl.protocol.startsWith("data") && !signedUrlParams.some((p) => newUrl.searchParams.has(p))) {
         // Arbitrary setting of query param to stop caching from reusing any media requests which may have less headers
         // cached than this request. This is to prevent a CORS error when the headers are different between partial
         // content and full content requests.
@@ -289,6 +326,12 @@ export class MediaLoader extends Destructable {
     this.audio.on("decodingProgress", (chunk, total) => {
       this.wf.setDecodingProgress(chunk, total);
     });
+
+    if (options.decoderType === "wasm-stream") {
+      this.audio.on("chunkLoaded", () => {
+        this.wf.draw(true);
+      });
+    }
 
     return this.audio;
   }

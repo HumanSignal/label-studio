@@ -695,9 +695,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
     const labels = { [control.valueType]: control.selectedValues() };
 
     for (const range of ranges) {
-      const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-        ? self.annotation.createResult(range, labels, control, self, false, rest)
-        : self.annotation.createResult(range, labels, control, self, false);
+      const area = self.annotation.createResult(range, labels, control, self, false, rest);
 
       area.setText(range.text);
 
@@ -719,9 +717,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
 
     const [control, ...rest] = states;
     const labels = { [control.valueType]: control.selectedValues() };
-    const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-      ? self.annotation.createResult(range, labels, control, self, false, rest)
-      : self.annotation.createResult(range, labels, control, self, false);
+    const area = self.annotation.createResult(range, labels, control, self, false, rest);
 
     area.setText(range.text);
 

@@ -5167,8 +5167,12 @@
       "figmaId": "VariableCollectionId:3139:42774",
       "modes": [
         {
-          "key": "default",
-          "name": "default"
+          "key": "desktop",
+          "name": "desktop"
+        },
+        {
+          "key": "mobile",
+          "name": "mobile"
         }
       ]
     },
@@ -5181,7 +5185,8 @@
           "name": "font-family/body",
           "figmaId": "VariableID:3139:42775",
           "modes": {
-            "default": "{@primitives.$typography.$font-family.base}"
+            "desktop": "{@primitives.$typography.$font-family.base}",
+            "mobile": "{@primitives.$typography.$font-family.base}"
           }
         }
       },
@@ -5193,7 +5198,8 @@
           "name": "font-family/headings",
           "figmaId": "VariableID:3139:42776",
           "modes": {
-            "default": "{@primitives.$typography.$font-family.base}"
+            "desktop": "{@primitives.$typography.$font-family.base}",
+            "mobile": "{@primitives.$typography.$font-family.base}"
           }
         }
       },
@@ -5205,7 +5211,8 @@
           "name": "font-family/monospace",
           "figmaId": "VariableID:3139:42777",
           "modes": {
-            "default": "{@primitives.$typography.$font-family.mono}"
+            "desktop": "{@primitives.$typography.$font-family.mono}",
+            "mobile": "{@primitives.$typography.$font-family.mono}"
           }
         }
       }
@@ -5219,7 +5226,8 @@
           "name": "font-weight/light",
           "figmaId": "VariableID:3158:36383",
           "modes": {
-            "default": 300
+            "desktop": 300,
+            "mobile": 300
           }
         }
       },
@@ -5231,7 +5239,8 @@
           "name": "font-weight/light-italic",
           "figmaId": "VariableID:3158:36387",
           "modes": {
-            "default": "Light Italic"
+            "desktop": "Light Italic",
+            "mobile": "Light Italic"
           }
         }
       },
@@ -5243,7 +5252,8 @@
           "name": "font-weight/regular",
           "figmaId": "VariableID:3158:36378",
           "modes": {
-            "default": 400
+            "desktop": 400,
+            "mobile": 400
           }
         }
       },
@@ -5255,7 +5265,8 @@
           "name": "font-weight/regular-italic",
           "figmaId": "VariableID:3158:36386",
           "modes": {
-            "default": "Italic"
+            "desktop": "Italic",
+            "mobile": "Italic"
           }
         }
       },
@@ -5267,7 +5278,8 @@
           "name": "font-weight/medium",
           "figmaId": "VariableID:3158:36377",
           "modes": {
-            "default": 500
+            "desktop": 500,
+            "mobile": 500
           }
         }
       },
@@ -5279,7 +5291,8 @@
           "name": "font-weight/medium-italic",
           "figmaId": "VariableID:3158:36379",
           "modes": {
-            "default": "Medium Italic"
+            "desktop": "Medium Italic",
+            "mobile": "Medium Italic"
           }
         }
       },
@@ -5291,7 +5304,8 @@
           "name": "font-weight/semibold",
           "figmaId": "VariableID:3158:36380",
           "modes": {
-            "default": 600
+            "desktop": 600,
+            "mobile": 600
           }
         }
       },
@@ -5303,7 +5317,8 @@
           "name": "font-weight/semibold-italic",
           "figmaId": "VariableID:3158:36388",
           "modes": {
-            "default": "Semibold Italic"
+            "desktop": "Semibold Italic",
+            "mobile": "Semibold Italic"
           }
         }
       },
@@ -5315,7 +5330,8 @@
           "name": "font-weight/bold",
           "figmaId": "VariableID:3158:36381",
           "modes": {
-            "default": 700
+            "desktop": 700,
+            "mobile": 700
           }
         }
       },
@@ -5327,7 +5343,8 @@
           "name": "font-weight/bold-italic",
           "figmaId": "VariableID:3158:36389",
           "modes": {
-            "default": "Bold Italic"
+            "desktop": "Bold Italic",
+            "mobile": "Bold Italic"
           }
         }
       }
@@ -5342,7 +5359,8 @@
             "name": "font-size/body/tinier",
             "figmaId": "VariableID:3139:42783",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.8}"
+              "desktop": "{@primitives.$typography.$font-size.8}",
+              "mobile": "{@primitives.$typography.$font-size.8}"
             }
           }
         },
@@ -5354,7 +5372,8 @@
             "name": "font-size/body/tiny",
             "figmaId": "VariableID:3139:42784",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.9}"
+              "desktop": "{@primitives.$typography.$font-size.9}",
+              "mobile": "{@primitives.$typography.$font-size.9}"
             }
           }
         },
@@ -5366,7 +5385,8 @@
             "name": "font-size/body/smallest",
             "figmaId": "VariableID:3139:42778",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.10}"
+              "desktop": "{@primitives.$typography.$font-size.10}",
+              "mobile": "{@primitives.$typography.$font-size.10}"
             }
           }
         },
@@ -5378,7 +5398,8 @@
             "name": "font-size/body/smaller",
             "figmaId": "VariableID:3139:42779",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.12}"
+              "desktop": "{@primitives.$typography.$font-size.12}",
+              "mobile": "{@primitives.$typography.$font-size.11}"
             }
           }
         },
@@ -5390,7 +5411,8 @@
             "name": "font-size/body/small",
             "figmaId": "VariableID:3139:42780",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.14}"
+              "desktop": "{@primitives.$typography.$font-size.14}",
+              "mobile": "{@primitives.$typography.$font-size.12}"
             }
           }
         },
@@ -5402,7 +5424,8 @@
             "name": "font-size/body/medium",
             "figmaId": "VariableID:3139:42781",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.16}"
+              "desktop": "{@primitives.$typography.$font-size.16}",
+              "mobile": "{@primitives.$typography.$font-size.14}"
             }
           }
         }
@@ -5416,7 +5439,8 @@
             "name": "font-size/label/tinier",
             "figmaId": "VariableID:3139:42802",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.8}"
+              "desktop": "{@primitives.$typography.$font-size.8}",
+              "mobile": "{@primitives.$typography.$font-size.8}"
             }
           }
         },
@@ -5428,7 +5452,8 @@
             "name": "font-size/label/tiny",
             "figmaId": "VariableID:3139:42801",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.9}"
+              "desktop": "{@primitives.$typography.$font-size.9}",
+              "mobile": "{@primitives.$typography.$font-size.9}"
             }
           }
         },
@@ -5440,7 +5465,8 @@
             "name": "font-size/label/smallest",
             "figmaId": "VariableID:3139:42799",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.11}"
+              "desktop": "{@primitives.$typography.$font-size.11}",
+              "mobile": "{@primitives.$typography.$font-size.10}"
             }
           }
         },
@@ -5452,7 +5478,8 @@
             "name": "font-size/label/smaller",
             "figmaId": "VariableID:3139:42798",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.12}"
+              "desktop": "{@primitives.$typography.$font-size.12}",
+              "mobile": "{@primitives.$typography.$font-size.11}"
             }
           }
         },
@@ -5464,7 +5491,8 @@
             "name": "font-size/label/small",
             "figmaId": "VariableID:3139:42797",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.14}"
+              "desktop": "{@primitives.$typography.$font-size.14}",
+              "mobile": "{@primitives.$typography.$font-size.12}"
             }
           }
         },
@@ -5476,7 +5504,8 @@
             "name": "font-size/label/medium",
             "figmaId": "VariableID:3139:42796",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.16}"
+              "desktop": "{@primitives.$typography.$font-size.16}",
+              "mobile": "{@primitives.$typography.$font-size.14}"
             }
           }
         }
@@ -5490,7 +5519,8 @@
             "name": "font-size/title/small",
             "figmaId": "VariableID:3139:42787",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.18}"
+              "desktop": "{@primitives.$typography.$font-size.18}",
+              "mobile": "{@primitives.$typography.$font-size.16}"
             }
           }
         },
@@ -5502,7 +5532,8 @@
             "name": "font-size/title/medium",
             "figmaId": "VariableID:3139:42788",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.20}"
+              "desktop": "{@primitives.$typography.$font-size.20}",
+              "mobile": "{@primitives.$typography.$font-size.18}"
             }
           }
         },
@@ -5514,7 +5545,8 @@
             "name": "font-size/title/large",
             "figmaId": "VariableID:3139:42786",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.24}"
+              "desktop": "{@primitives.$typography.$font-size.24}",
+              "mobile": "{@primitives.$typography.$font-size.22}"
             }
           }
         }
@@ -5528,7 +5560,8 @@
             "name": "font-size/headline/small",
             "figmaId": "VariableID:3139:42790",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.28}"
+              "desktop": "{@primitives.$typography.$font-size.28}",
+              "mobile": "{@primitives.$typography.$font-size.24}"
             }
           }
         },
@@ -5540,7 +5573,8 @@
             "name": "font-size/headline/medium",
             "figmaId": "VariableID:3139:42791",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.32}"
+              "desktop": "{@primitives.$typography.$font-size.32}",
+              "mobile": "{@primitives.$typography.$font-size.28}"
             }
           }
         },
@@ -5552,7 +5586,8 @@
             "name": "font-size/headline/large",
             "figmaId": "VariableID:3139:42792",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.36}"
+              "desktop": "{@primitives.$typography.$font-size.36}",
+              "mobile": "{@primitives.$typography.$font-size.32}"
             }
           }
         }
@@ -5566,7 +5601,8 @@
             "name": "font-size/display/small",
             "figmaId": "VariableID:3139:42793",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.48}"
+              "desktop": "{@primitives.$typography.$font-size.48}",
+              "mobile": "{@primitives.$typography.$font-size.36}"
             }
           }
         },
@@ -5578,7 +5614,8 @@
             "name": "font-size/display/medium",
             "figmaId": "VariableID:3139:42794",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.56}"
+              "desktop": "{@primitives.$typography.$font-size.56}",
+              "mobile": "{@primitives.$typography.$font-size.48}"
             }
           }
         },
@@ -5590,7 +5627,8 @@
             "name": "font-size/display/large",
             "figmaId": "VariableID:3139:42795",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.64}"
+              "desktop": "{@primitives.$typography.$font-size.64}",
+              "mobile": "{@primitives.$typography.$font-size.56}"
             }
           }
         }
@@ -5605,7 +5643,8 @@
           "name": "font-style/normal",
           "figmaId": "VariableID:3282:4135",
           "modes": {
-            "default": "normal"
+            "desktop": "normal",
+            "mobile": "normal"
           }
         }
       },
@@ -5617,7 +5656,8 @@
           "name": "font-style/italic",
           "figmaId": "VariableID:3282:4136",
           "modes": {
-            "default": "italic"
+            "desktop": "italic",
+            "mobile": "italic"
           }
         }
       }
@@ -5631,7 +5671,8 @@
           "name": "line-height/auto",
           "figmaId": "VariableID:3139:42827",
           "modes": {
-            "default": "auto"
+            "desktop": "auto",
+            "mobile": "auto"
           }
         }
       },
@@ -5644,7 +5685,8 @@
             "name": "line-height/body/smallest",
             "figmaId": "VariableID:3249:175",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.12}"
+              "desktop": "{@primitives.$typography.$line-height.12}",
+              "mobile": "{@primitives.$typography.$line-height.12}"
             }
           }
         },
@@ -5656,7 +5698,8 @@
             "name": "line-height/body/smaller",
             "figmaId": "VariableID:3249:176",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.16}"
+              "desktop": "{@primitives.$typography.$line-height.16}",
+              "mobile": "{@primitives.$typography.$line-height.16}"
             }
           }
         },
@@ -5668,7 +5711,8 @@
             "name": "line-height/body/small",
             "figmaId": "VariableID:3249:177",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.18}"
+              "desktop": "{@primitives.$typography.$line-height.18}",
+              "mobile": "{@primitives.$typography.$line-height.18}"
             }
           }
         },
@@ -5680,7 +5724,8 @@
             "name": "line-height/body/medium",
             "figmaId": "VariableID:3249:178",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.24}"
+              "desktop": "{@primitives.$typography.$line-height.24}",
+              "mobile": "{@primitives.$typography.$line-height.20}"
             }
           }
         }
@@ -5694,7 +5739,8 @@
             "name": "line-height/label/smallest",
             "figmaId": "VariableID:3249:181",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.16}"
+              "desktop": "{@primitives.$typography.$line-height.16}",
+              "mobile": "{@primitives.$typography.$line-height.16}"
             }
           }
         },
@@ -5706,7 +5752,8 @@
             "name": "line-height/label/smaller",
             "figmaId": "VariableID:3249:182",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.16}"
+              "desktop": "{@primitives.$typography.$line-height.16}",
+              "mobile": "{@primitives.$typography.$line-height.16}"
             }
           }
         },
@@ -5718,7 +5765,8 @@
             "name": "line-height/label/small",
             "figmaId": "VariableID:3249:183",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.18}"
+              "desktop": "{@primitives.$typography.$line-height.18}",
+              "mobile": "{@primitives.$typography.$line-height.18}"
             }
           }
         },
@@ -5730,7 +5778,8 @@
             "name": "line-height/label/medium",
             "figmaId": "VariableID:3249:184",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.24}"
+              "desktop": "{@primitives.$typography.$line-height.24}",
+              "mobile": "{@primitives.$typography.$line-height.20}"
             }
           }
         }
@@ -5744,7 +5793,8 @@
             "name": "line-height/title/small",
             "figmaId": "VariableID:3249:188",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.20}"
+              "desktop": "{@primitives.$typography.$line-height.20}",
+              "mobile": "{@primitives.$typography.$line-height.20}"
             }
           }
         },
@@ -5756,7 +5806,8 @@
             "name": "line-height/title/medium",
             "figmaId": "VariableID:3249:189",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.24}"
+              "desktop": "{@primitives.$typography.$line-height.24}",
+              "mobile": "{@primitives.$typography.$line-height.24}"
             }
           }
         },
@@ -5768,7 +5819,8 @@
             "name": "line-height/title/large",
             "figmaId": "VariableID:3249:190",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.28}"
+              "desktop": "{@primitives.$typography.$line-height.28}",
+              "mobile": "{@primitives.$typography.$line-height.28}"
             }
           }
         }
@@ -5782,7 +5834,8 @@
             "name": "line-height/headline/small",
             "figmaId": "VariableID:3249:198",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.32}"
+              "desktop": "{@primitives.$typography.$line-height.32}",
+              "mobile": "{@primitives.$typography.$line-height.32}"
             }
           }
         },
@@ -5794,19 +5847,21 @@
             "name": "line-height/headline/medium",
             "figmaId": "VariableID:3249:199",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.36}"
+              "desktop": "{@primitives.$typography.$line-height.36}",
+              "mobile": "{@primitives.$typography.$line-height.36}"
             }
           }
         },
         "large": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$line-height.40}",
+          "$value": "{@primitives.$typography.$line-height.60}",
           "$description": "",
           "$variable_metadata": {
             "name": "line-height/headline/large",
             "figmaId": "VariableID:3249:200",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.40}"
+              "desktop": "{@primitives.$typography.$line-height.60}",
+              "mobile": "{@primitives.$typography.$line-height.40}"
             }
           }
         }
@@ -5820,7 +5875,8 @@
             "name": "line-height/display/small",
             "figmaId": "VariableID:3249:191",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.48}"
+              "desktop": "{@primitives.$typography.$line-height.48}",
+              "mobile": "{@primitives.$typography.$line-height.40}"
             }
           }
         },
@@ -5832,7 +5888,8 @@
             "name": "line-height/display/medium",
             "figmaId": "VariableID:3249:192",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.56}"
+              "desktop": "{@primitives.$typography.$line-height.56}",
+              "mobile": "{@primitives.$typography.$line-height.52}"
             }
           }
         },
@@ -5844,7 +5901,8 @@
             "name": "line-height/display/large",
             "figmaId": "VariableID:3249:193",
             "modes": {
-              "default": "{@primitives.$typography.$line-height.72}"
+              "desktop": "{@primitives.$typography.$line-height.72}",
+              "mobile": "{@primitives.$typography.$line-height.64}"
             }
           }
         }
@@ -5859,7 +5917,8 @@
           "name": "letter-spacing/densest",
           "figmaId": "VariableID:3139:42815",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-20}"
+            "desktop": "{@primitives.$typography.$letter-spacing.-20}",
+            "mobile": "{@primitives.$typography.$letter-spacing.-20}"
           }
         }
       },
@@ -5871,7 +5930,8 @@
           "name": "letter-spacing/denser",
           "figmaId": "VariableID:3139:42817",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-15}"
+            "desktop": "{@primitives.$typography.$letter-spacing.-15}",
+            "mobile": "{@primitives.$typography.$letter-spacing.-15}"
           }
         }
       },
@@ -5883,7 +5943,8 @@
           "name": "letter-spacing/dense",
           "figmaId": "VariableID:3139:42818",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.-10}"
+            "desktop": "{@primitives.$typography.$letter-spacing.-10}",
+            "mobile": "{@primitives.$typography.$letter-spacing.-10}"
           }
         }
       },
@@ -5895,7 +5956,8 @@
           "name": "letter-spacing/base",
           "figmaId": "VariableID:3139:42819",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.0}"
+            "desktop": "{@primitives.$typography.$letter-spacing.0}",
+            "mobile": "{@primitives.$typography.$letter-spacing.0}"
           }
         }
       },
@@ -5907,7 +5969,8 @@
           "name": "letter-spacing/wide",
           "figmaId": "VariableID:3139:42820",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.15}"
+            "desktop": "{@primitives.$typography.$letter-spacing.15}",
+            "mobile": "{@primitives.$typography.$letter-spacing.15}"
           }
         }
       },
@@ -5919,7 +5982,8 @@
           "name": "letter-spacing/wider",
           "figmaId": "VariableID:3139:42821",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.25}"
+            "desktop": "{@primitives.$typography.$letter-spacing.25}",
+            "mobile": "{@primitives.$typography.$letter-spacing.25}"
           }
         }
       },
@@ -5931,7 +5995,8 @@
           "name": "letter-spacing/widest",
           "figmaId": "VariableID:3139:42822",
           "modes": {
-            "default": "{@primitives.$typography.$letter-spacing.50}"
+            "desktop": "{@primitives.$typography.$letter-spacing.50}",
+            "mobile": "{@primitives.$typography.$letter-spacing.50}"
           }
         }
       }
@@ -5945,7 +6010,8 @@
           "name": "paragraph-spacing/none",
           "figmaId": "VariableID:3141:42834",
           "modes": {
-            "default": "{@sizing.$spacing.none}"
+            "desktop": "{@sizing.$spacing.none}",
+            "mobile": "{@sizing.$spacing.none}"
           }
         }
       },
@@ -5957,7 +6023,8 @@
           "name": "paragraph-spacing/tightest",
           "figmaId": "VariableID:3139:42816",
           "modes": {
-            "default": "{@sizing.$spacing.tightest}"
+            "desktop": "{@sizing.$spacing.tightest}",
+            "mobile": "{@sizing.$spacing.tightest}"
           }
         }
       },
@@ -5969,7 +6036,8 @@
           "name": "paragraph-spacing/tighter",
           "figmaId": "VariableID:3139:42823",
           "modes": {
-            "default": "{@sizing.$spacing.tighter}"
+            "desktop": "{@sizing.$spacing.tighter}",
+            "mobile": "{@sizing.$spacing.tighter}"
           }
         }
       },
@@ -5981,7 +6049,8 @@
           "name": "paragraph-spacing/tight",
           "figmaId": "VariableID:3139:42824",
           "modes": {
-            "default": "{@sizing.$spacing.tight}"
+            "desktop": "{@sizing.$spacing.tight}",
+            "mobile": "{@sizing.$spacing.tight}"
           }
         }
       },
@@ -5993,7 +6062,8 @@
           "name": "paragraph-spacing/regular",
           "figmaId": "VariableID:3139:42825",
           "modes": {
-            "default": "{@sizing.$spacing.base}"
+            "desktop": "{@sizing.$spacing.base}",
+            "mobile": "{@sizing.$spacing.base}"
           }
         }
       },
@@ -6005,7 +6075,8 @@
           "name": "paragraph-spacing/large",
           "figmaId": "VariableID:3139:42826",
           "modes": {
-            "default": "{@sizing.$spacing.wide}"
+            "desktop": "{@sizing.$spacing.wide}",
+            "mobile": "{@sizing.$spacing.wide}"
           }
         }
       },
@@ -6017,7 +6088,8 @@
           "name": "paragraph-spacing/larger",
           "figmaId": "VariableID:3141:42835",
           "modes": {
-            "default": "{@sizing.$spacing.wider}"
+            "desktop": "{@sizing.$spacing.wider}",
+            "mobile": "{@sizing.$spacing.wider}"
           }
         }
       },
@@ -6029,7 +6101,8 @@
           "name": "paragraph-spacing/largest",
           "figmaId": "VariableID:3141:42836",
           "modes": {
-            "default": "{@sizing.$spacing.widest}"
+            "desktop": "{@sizing.$spacing.widest}",
+            "mobile": "{@sizing.$spacing.widest}"
           }
         }
       }

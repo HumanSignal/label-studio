@@ -249,6 +249,13 @@ class TaskState(BaseState):
             models.Index(fields=['task_id', '-id'], name='task_current_state_idx'),
             # Reporting and filtering
             models.Index(fields=['project_id', 'state', '-id'], name='task_project_state_idx'),
+            # Project-scoped latest state per task, e.g. "give me tasks in project X with state Y"
+            # (filter by state after selecting the latest row).
+            models.Index(
+                fields=['project_id', 'task_id', '-id'],
+                include=['state'],
+                name='task_project_latest_idx',
+            ),
             models.Index(fields=['organization_id', 'state', '-id'], name='task_org_reporting_idx'),
             # History queries
             models.Index(fields=['task_id', 'id'], name='task_history_idx'),

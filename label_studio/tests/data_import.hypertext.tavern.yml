@@ -25,7 +25,7 @@ stages:
 - name: Import file via UI uploads
   request:
     files:
-      image: tests/test_suites/samples/first.jpg
+      image: label_studio/tests/test_suites/samples/first.jpg
     headers:
       content-type: multipart/form-data
     method: POST

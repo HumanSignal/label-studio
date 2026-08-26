@@ -122,9 +122,9 @@ def validate_label_config(config_string: Union[str, None]) -> None:
         raise ValidationError(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
-    all_names = re.findall(r'name="([^"]*)"', cleaned_config_string)
+    all_names = re.findall(r'(?:^|[^\w])name="([^"]*)"', cleaned_config_string)
     if len(set(all_names)) != len(all_names):
-        raise ValidationError('Label config contains non-unique names')
+        raise ValidationError('Label config contains non-unique names: ' + ', '.join(all_names))
 
     # toName points to existent name
     names = set(all_names)
@@ -230,8 +230,8 @@ def get_task_from_labeling_config(config):
         try:
             logger.debug('Parse ' + config[start : start + end])
             body = json.loads(config[start : start + end])
-        except Exception:
-            logger.error("Can't parse task from labeling config", exc_info=True)
+        except Exception as exc:
+            logger.warning("Can't parse task from labeling config: %s", exc)
             pass
         else:
             logger.debug(json.dumps(body, indent=2))

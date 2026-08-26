@@ -1,20 +1,15 @@
-/**
- * Unit tests for TimeSeriesVisualizer (parity-81).
- * Covers render, mount with minimal props, updatePlayhead (null/out-of-domain), changeWidth, and axis branches.
- */
-import React from "react";
 import { render, act } from "@testing-library/react";
 import TimeSeriesVisualizer from "../TimeSeriesVisualizer";
 
-jest.mock("@humansignal/ui", () => ({
-  getCurrentTheme: jest.fn(() => "Light"),
+mockModule("@humansignal/ui", () => ({
+  getCurrentTheme: mock(() => "Light"),
 }));
 
-jest.mock("../../../tags/object/TimeSeries/helpers", () => {
-  const actual = jest.requireActual("../../../tags/object/TimeSeries/helpers");
+mockModule("../../../tags/object/TimeSeries/helpers", () => {
+  const actual = requireActual("../../../tags/object/TimeSeries/helpers");
   return {
     ...actual,
-    getOptimalWidth: jest.fn(() => 1),
+    getOptimalWidth: mock(() => 1),
   };
 });
 
@@ -201,7 +196,7 @@ describe("TimeSeriesVisualizer", () => {
   });
 
   it("unmounts and removes resize listener", () => {
-    const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+    const removeEventListenerSpy = spyOn(window, "removeEventListener");
     const { unmount } = render(<TimeSeriesVisualizer {...defaultProps} />);
     unmount();
     expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));

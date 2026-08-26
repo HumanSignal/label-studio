@@ -1,3 +1,7 @@
+import type { Mock } from "bun:test";
+import * as sentryBrowserModule from "@sentry/browser";
+import * as sentryReactModule from "@sentry/react";
+
 const mockAppSettings = {
   debug: false,
   sentry_dsn: "test-dsn",
@@ -13,22 +17,25 @@ Object.defineProperty(window, "APP_SETTINGS", {
   value: mockAppSettings,
 });
 
-jest.mock("@sentry/browser", () => ({
-  captureException: jest.fn(() => "test-event-id"),
-}));
-
 describe("Sentry Configuration (Open Source)", () => {
   let Sentry: any;
   let captureException: any;
 
   beforeAll(async () => {
-    Sentry = await import("@sentry/browser");
-    const SentryModule = await import("./Sentry");
+    Sentry = sentryBrowserModule;
+    const SentryModule = await import(`./Sentry?bun_reload=${Date.now()}`);
     captureException = SentryModule.captureException;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
+    spyOn(sentryBrowserModule, "init").mockImplementation(mock());
+    spyOn(sentryBrowserModule, "setUser").mockImplementation(mock());
+    spyOn(sentryBrowserModule, "setTags").mockImplementation(mock());
+    spyOn(sentryBrowserModule, "browserTracingIntegration").mockImplementation(mock(() => ({})));
+    spyOn(sentryBrowserModule, "captureException").mockImplementation(mock(() => "test-event-id"));
+    spyOn(sentryReactModule, "reactRouterV5BrowserTracingIntegration").mockImplementation(mock(() => ({})));
+    spyOn(sentryReactModule, "withSentryRouting").mockImplementation((component: any) => component);
   });
 
   describe("captureException with sentry_skip flag", () => {
@@ -88,10 +95,10 @@ describe("Sentry Configuration (Open Source)", () => {
   });
 
   describe("SENTRY_ENABLED=false behavior", () => {
-    let consoleSpy: jest.SpyInstance;
+    let consoleSpy: Mock<any>;
 
     beforeEach(() => {
-      consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      consoleSpy = spyOn(console, "error").mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -99,10 +106,9 @@ describe("Sentry Configuration (Open Source)", () => {
     });
 
     it("should not call Sentry when debug=true", async () => {
-      jest.resetModules();
       (global as any).APP_SETTINGS = { ...mockAppSettings, debug: true };
 
-      const SentryModule = await import("./Sentry");
+      const SentryModule = await import(`./Sentry?bun_reload=${Date.now()}`);
       const error = new Error("Test error");
       const result = SentryModule.captureException(error);
 
@@ -114,10 +120,9 @@ describe("Sentry Configuration (Open Source)", () => {
     });
 
     it("should not call Sentry when DSN is missing", async () => {
-      jest.resetModules();
       (global as any).APP_SETTINGS = { ...mockAppSettings, sentry_dsn: null };
 
-      const SentryModule = await import("./Sentry");
+      const SentryModule = await import(`./Sentry?bun_reload=${Date.now()}`);
       const error = new Error("Test error");
       const result = SentryModule.captureException(error);
 

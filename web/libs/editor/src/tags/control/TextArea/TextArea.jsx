@@ -10,14 +10,13 @@ import Registry from "../../../core/Registry";
 import Tree from "../../../core/Tree";
 import Types from "../../../core/Types";
 import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
-import LeadTimeMixin from "../../../mixins/LeadTime";
 import PerItemMixin from "../../../mixins/PerItem";
 import PerRegionMixin, { PER_REGION_MODES } from "../../../mixins/PerRegion";
 import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
 import RequiredMixin from "../../../mixins/Required";
 import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
-import { FF_LEAD_TIME, FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
@@ -154,7 +153,7 @@ const Model = types
       return value.some((val) => val.toLowerCase() === normalized);
     },
   }))
-  .actions(() => (isFF(FF_LEAD_TIME) ? {} : { countTime: () => {} }))
+  .actions(() => ({ countTime: () => {} }))
   .actions((self) => {
     let lastActiveElement = null;
     let lastActiveElementModel = null;
@@ -253,19 +252,7 @@ const Model = types
        *   on undo/redo, on switching annotations, on switching regions...
        * After adding lead_time to the result, we should reset all lead_time numbers
        */
-      updateLeadTime() {
-        if (!isFF(FF_LEAD_TIME)) return;
-
-        const result = self.result;
-
-        if (!result) return;
-
-        // add current stored leadTime to the main stored lead_time
-        result.setMetaValue("lead_time", (result.meta?.lead_time ?? 0) + self.leadTime / 1000);
-
-        self.leadTime = 0;
-        self.resetLeadTimeCounters();
-      },
+      updateLeadTime() {},
 
       addTextToResult(text, result) {
         if (!self.validateText(text)) return;
@@ -325,7 +312,6 @@ const TextAreaModel = types.compose(
   ControlBase,
   ClassificationBase,
   TagAttrs,
-  ...(isFF(FF_LEAD_TIME) ? [LeadTimeMixin] : []),
   ProcessAttrsMixin,
   RequiredMixin,
   PerRegionMixin,
