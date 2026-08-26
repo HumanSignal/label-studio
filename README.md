@@ -138,7 +138,7 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 <a href="https://www.heroku.com/deploy?template=https://github.com/HumanSignal/label-studio/tree/heroku-persistent-pg"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy" height="30px"></a>
 [<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhumansignal%2Flabel-studio%2Fdevelop%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
-[<img src="https://d16t0pc4846x52.cloudfront.net/deploylobe.svg" alt="Deploy on RepoCloud" height="30px">](https://repocloud.io/details/Label%20Studio/)
+[<img src="https://dnk92k33or340.cloudfront.net/rcdeploy-30px.png" alt="Deploy on RepoCloud" height="30px">](https://repocloud.io/details/Label%20Studio/)
 
 
 #### Apply frontend changes
