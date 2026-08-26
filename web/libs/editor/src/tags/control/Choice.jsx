@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Button, Radio, Checkbox } from "antd";
 import { inject, observer } from "mobx-react";
-import { types } from "mobx-state-tree";
+import { getParent, getRoot, getType, types } from "mobx-state-tree";
 
 import Hint from "../../components/Hint/Hint";
 import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
@@ -16,6 +16,72 @@ import "./Choice/Choice.prefix.css";
 import { IconChevron } from "@humansignal/icons";
 import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
 import { sanitizeHtml } from "../../utils/html";
+
+/**
+ * Taxonomy Choice nodes live in a SharedStore (MST parent ≠ Taxonomy).
+ * Resolve the owning Taxonomy by matching SharedStore identity to `taxonomy.store`.
+ */
+function findOwningTaxonomy(choice) {
+  if (choice.parent?.type === "taxonomy") return choice.parent;
+
+  let store = null;
+
+  try {
+    let node = choice;
+
+    while (node) {
+      node = getParent(node);
+      if (!node) break;
+      if (getType(node).name === "SharedStoreModel") {
+        store = node;
+        break;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  if (!store) return null;
+
+  // Production getRoot(choice) is AppStore — Taxonomy lives on the annotation tree,
+  // not under AppStore.children/view/wrapper. Unit-test roots are AnnotationStore + wrapper.
+  const annotation = choice.annotation;
+
+  if (annotation?.traverseTree) {
+    let found = null;
+
+    annotation.traverseTree((node) => {
+      if (!found && node?.type === "taxonomy" && node.store === store) {
+        found = node;
+      }
+    });
+
+    if (found) return found;
+  }
+
+  const stack = [getRoot(choice)];
+  const seen = new Set();
+
+  while (stack.length) {
+    const node = stack.pop();
+
+    if (!node || typeof node !== "object" || seen.has(node)) continue;
+    seen.add(node);
+
+    if (node.type === "taxonomy" && node.store === store) return node;
+
+    if (Array.isArray(node.children)) stack.push(...node.children);
+    if (node.view) stack.push(node.view);
+    if (node.wrapper) stack.push(node.wrapper);
+    if (node.annotationStore?.selected) stack.push(node.annotationStore.selected);
+  }
+
+  return null;
+}
+
+function isAnnotationReadOnly(annotation) {
+  return typeof annotation?.isReadOnly === "function" && annotation.isReadOnly();
+}
 
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
@@ -134,7 +200,7 @@ const Model = types
   }))
   .actions((self) => ({
     toggleSelected() {
-      if (self.parent?.readonly || self.annotation?.isReadOnly()) return;
+      if (self.parent?.readonly || isAnnotationReadOnly(self.annotation)) return;
       const choices = self.parent;
       const selected = self.sel;
 
@@ -158,15 +224,39 @@ const Model = types
       }
     },
   }))
-  .actions((self) => {
-    if (self.parent?.type === "choices")
-      return {
-        onHotKey() {
-          return self.toggleSelected();
-        },
-      };
-    return {};
-  });
+  .actions((self) => ({
+    onHotKey() {
+      const parent = self.parent;
+
+      if (parent?.type === "choices") {
+        return self.toggleSelected();
+      }
+
+      // Taxonomy UI is path-based (`selected`); Choice nodes live in SharedStore so
+      // TagParentMixin.parent is null — resolve via SharedStore ↔ Taxonomy.store.
+      const taxonomy = findOwningTaxonomy(self);
+
+      if (!taxonomy) return;
+      // SharedStore Choice nodes have parent === null, so self.isReadOnly() never
+      // sees taxonomy/annotation read-only — gate on those directly (matches UI).
+      if (taxonomy.isReadOnly?.() || isAnnotationReadOnly(self.annotation)) return;
+      if (taxonomy.leafsonly && !self.isLeaf) return;
+
+      const path = Array.isArray(self.resultValue) ? [...self.resultValue] : [self.resultValue];
+      const selected = [...(taxonomy.selected ?? [])];
+      const pathEqual = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+      const idx = selected.findIndex((p) => pathEqual(p, path));
+
+      if (idx >= 0) {
+        selected.splice(idx, 1);
+      } else {
+        if (taxonomy.maxusages && selected.length >= Number(taxonomy.maxusages)) return;
+        selected.push(path);
+      }
+
+      taxonomy.onChange(null, selected);
+    },
+  }));
 
 const ChoiceModel = types.compose("ChoiceModel", TagParentMixin, TagAttrs, ProcessAttrsMixin, Model, AnnotationMixin);
 

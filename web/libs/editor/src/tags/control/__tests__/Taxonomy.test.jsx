@@ -13,6 +13,36 @@ import "../Choice";
 import "../Taxonomy/Taxonomy";
 import "../../object/RichText";
 import { HtxTaxonomy, traverse } from "../Taxonomy/Taxonomy";
+import { ChoicesModel } from "../Choices";
+import { unprotect } from "mobx-state-tree";
+
+/** Stand-in for Annotation.setupHotKeys pass-3 generic auto-assign branch. */
+function createHotkeysContext() {
+  const taken = new Set();
+  const ALPHABET = "1234567890qwetasdfgzxcvbyiopjklnm".split("");
+  return {
+    makeComb() {
+      for (const ch of ALPHABET) {
+        if (!taken.has(ch)) {
+          taken.add(ch);
+          return ch;
+        }
+      }
+      return null;
+    },
+    addKey() {},
+  };
+}
+
+function runPass3GenericAutoAssign(node, hotkeys) {
+  if (node?.onHotKey && !node.hotkey) {
+    if (node.type === "choice" && node.parent?.type !== "choices") return;
+    const comb = hotkeys.makeComb();
+    if (!comb) return;
+    node.hotkey = comb;
+    hotkeys.addKey(node.hotkey, node.onHotKey);
+  }
+}
 
 const mockUnlock = mock();
 const mockAddErrors = mock();
@@ -96,6 +126,11 @@ function createTaxonomyNode(
       store: types.frozen(),
       highlightedNode: types.maybeNull(types.frozen()),
     })
+    .views(() => ({
+      isReadOnly() {
+        return false;
+      },
+    }))
     .actions((self) => ({
       addResult(result) {
         self.results.push(result);
@@ -131,7 +166,7 @@ function createTaxonomyNode(
     sharedStores: {},
     annotationStore: {
       selected: annotationSnapshot,
-      selectedHistory: annotationSnapshot,
+      selectedHistory: null,
     },
     wrapper: { view: config },
   });
@@ -211,6 +246,38 @@ describe("traverse", () => {
     const result = traverse(roots);
     expect(result).toHaveLength(1);
   });
+
+  it("uses html for display label while keeping path from value", () => {
+    const root = { value: "house_nr", html: "House Number", hotkey: "h" };
+    const result = traverse(root);
+
+    expect(result[0]).toMatchObject({
+      label: "House Number",
+      path: ["house_nr"],
+      depth: 0,
+      hotkey: "h",
+    });
+  });
+
+  it("strips tags from html when building the display label", () => {
+    const root = { value: "street", html: "<b>Street Name</b>", hint: "Street", color: "#FF0000" };
+    const result = traverse(root);
+
+    expect(result[0]).toMatchObject({
+      label: "Street Name",
+      path: ["street"],
+      hint: "Street",
+      color: "#FF0000",
+    });
+  });
+
+  it("prefers alias for path when html is set", () => {
+    const root = { value: "House Number", alias: "house_nr", html: "<i>House</i>" };
+    const result = traverse(root);
+
+    expect(result[0].label).toBe("House");
+    expect(result[0].path).toEqual(["house_nr"]);
+  });
 });
 
 describe("Taxonomy model", () => {
@@ -286,6 +353,112 @@ describe("Taxonomy model", () => {
     expect(first).toHaveProperty("label");
     expect(first).toHaveProperty("path");
     expect(first).toHaveProperty("depth");
+  });
+
+  it("items use Choice html for labels and keep value paths", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1">
+          <Choice value="house_nr" html="House Number" hotkey="h" />
+          <Choice value="street" html="Street Name" hint="Street" color="#FF0000" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    const items = taxonomy.items;
+
+    expect(items).toHaveLength(2);
+    expect(items[0]).toMatchObject({ label: "House Number", path: ["house_nr"], hotkey: "h" });
+    expect(items[1]).toMatchObject({
+      label: "Street Name",
+      path: ["street"],
+      hint: "Street",
+      color: "#FF0000",
+    });
+  });
+
+  it("Choice hotkey under Taxonomy toggles selected path without changing result value", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1">
+          <Choice value="house_nr" html="House Number" hotkey="h" />
+          <Choice value="street" html="Street Name" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    taxonomy.updateResult = mock();
+    const house = taxonomy.children.find((c) => c.value === "house_nr");
+
+    expect(house).toBeTruthy();
+    expect(typeof house.onHotKey).toBe("function");
+    expect(house.hotkey).toBe("h");
+
+    house.onHotKey();
+    expect(taxonomy.selected).toEqual([["house_nr"]]);
+
+    house.onHotKey();
+    expect(taxonomy.selected).toEqual([]);
+  });
+
+  it("setupHotKeys pass-3 auto-assigns Choices children but skips Taxonomy SharedStore choices", () => {
+    const choices = ChoicesModel.create({
+      name: "ch",
+      toname: "t1",
+      choice: "single",
+      children: [{ type: "choice", value: "A", _value: "A" }],
+    });
+    choices.updateResult = () => {};
+    unprotect(choices);
+
+    const taxonomy = createTaxonomyNode();
+    const hotkeys = createHotkeysContext();
+    runPass3GenericAutoAssign(choices.children[0], hotkeys);
+    runPass3GenericAutoAssign(taxonomy.children[0], hotkeys);
+
+    expect(choices.children[0].hotkey).toBe("1");
+    expect(taxonomy.children[0].hotkey).toBeFalsy();
+  });
+
+  it("Taxonomy Choice onHotKey no-ops when taxonomy is read-only", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1">
+          <Choice value="house_nr" html="House Number" hotkey="h" />
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    taxonomy.updateResult = mock();
+    spyOn(taxonomy, "isReadOnly").mockReturnValue(true);
+    const house = taxonomy.children.find((c) => c.value === "house_nr");
+
+    house.onHotKey();
+    expect(taxonomy.selected).toEqual([]);
+  });
+
+  it("items with alias keep path segments for nested userLabels lookup (not html labels)", () => {
+    const taxonomy = createTaxonomyNodeWithConfig(
+      `<View>
+        <Taxonomy name="tax" toName="t1">
+          <Choice value="parent_v" alias="parent_a" html="Parent HTML">
+            <Choice value="child_v" alias="child_a" html="Child HTML" />
+          </Choice>
+        </Taxonomy>
+        <Text name="t1" value="$text" />
+      </View>`,
+    );
+    const items = taxonomy.items;
+    expect(items[0]).toMatchObject({
+      label: "Parent HTML",
+      path: ["parent_a"],
+    });
+    expect(items[0].children[0]).toMatchObject({
+      label: "Child HTML",
+      path: ["parent_a", "child_a"],
+    });
+    // Nested find walks path.at(-1), not display label — alias must still resolve.
+    expect(taxonomy.findItemByValueOrAlias("child_a")).toMatchObject({ label: "Child HTML" });
   });
 
   it("holdsState and isSelected reflect selected length", () => {

@@ -1099,6 +1099,12 @@ const _Annotation = types
         }
 
         if (node && node.onHotKey && !node.hotkey) {
+          // Taxonomy Choice nodes live in SharedStore (TagParentMixin.parent is
+          // not Choices). Auto-assigning would write across MST trees and throw,
+          // and large taxonomies must not receive sequential [1]/[2]/… hotkeys.
+          // Explicit `hotkey` attrs are bound in pass 1 above.
+          if (node.type === "choice" && node.parent?.type !== "choices") return;
+
           const comb = hotkeys.makeComb();
 
           if (!comb) return;
