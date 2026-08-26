@@ -57,7 +57,7 @@ export const Frames: FC<TimelineViewProps> = ({
     return length * step;
   }, [length, step]);
 
-  const { width: scrollableWidth } = useResizeObserver(scrollable.current || []);
+  const { width: scrollableWidth, height: scrollableHeight } = useResizeObserver(scrollable.current || []);
   const framesInView = useMemo(
     () => toSteps(roundToStep((scrollableWidth ?? 0) - timelineStartOffset, step), step),
     [step, timelineStartOffset, scrollableWidth],
@@ -447,6 +447,7 @@ export const Frames: FC<TimelineViewProps> = ({
             regions={regions}
             scrollTop={currentOffsetY}
             startOffset={timelineStartOffset}
+            viewHeight={scrollableHeight ?? 165}
             onSelectRegion={onSelectRegion}
             disabled={regionSelectionDisabled}
           />
@@ -462,19 +463,20 @@ interface KeypointsVirtualProps {
   regions: TimelineRegion[];
   startOffset: number;
   scrollTop: number;
+  viewHeight: number;
   disabled?: boolean;
   onSelectRegion: TimelineViewProps["onSelectRegion"];
 }
 
-const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scrollTop, disabled, onSelectRegion }) => {
+const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scrollTop, viewHeight, disabled, onSelectRegion }) => {
   const extra = 5;
   const height = 24;
   const bounds = useMemo(() => {
     const sIdx = clamp(Math.ceil(scrollTop / height) - 1, 0, regions.length);
-    const eIdx = clamp(sIdx + (Math.ceil(165 / height) - 1), 0, regions.length);
+    const eIdx = clamp(sIdx + (Math.ceil(viewHeight / height) - 1), 0, regions.length);
 
     return [clamp(sIdx - extra, 0, regions.length), clamp(eIdx + extra, 0, regions.length)];
-  }, [scrollTop, regions.length]);
+  }, [scrollTop, regions.length, viewHeight]);
 
   return (
     <div className={cn("timeline-frames").elem("keypoints").toClassName()} style={{ height: regions.length * height }}>
