@@ -57,3 +57,6 @@ export {
 
 // FIT-720: Lazy annotation stub hydration (editor + datamanager)
 export { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./lib/utils/annotationLazyHydration";
+
+// FIT-2442: Telemetry SDK & iFrame Relay
+export * from "./telemetry";

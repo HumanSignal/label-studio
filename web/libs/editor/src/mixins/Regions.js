@@ -1,6 +1,7 @@
 import { getEnv, getParent, getRoot, getType, types } from "mobx-state-tree";
 import { guidGenerator } from "../core/Helpers";
 import { isDefined } from "../utils/utilities";
+import { emitRegionSelected, emitRelationCreated } from "../utils/labelingTelemetry";
 import { AnnotationMixin } from "./AnnotationMixin";
 import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
 
@@ -186,6 +187,14 @@ const RegionsMixin = types
 
         if (!self.isReadOnly() && annotation.isLinkingMode) {
           annotation.addLinkedRegion(self);
+          const relation = annotation.relationStore?.relations?.at(-1);
+          if (relation) {
+            emitRelationCreated(annotation.store, annotation, {
+              relation_id: relation.id,
+              source_region_id: relation.node1?.id,
+              target_region_id: relation.node2?.id,
+            });
+          }
           annotation.stopLinkingMode();
           annotation.regionStore.unselectAll();
         } else {
@@ -198,12 +207,17 @@ const RegionsMixin = types
         const annotation = self.annotation;
 
         if (additiveMode) {
+          const wasNotSelected = !self.selected;
           annotation.toggleRegionSelection(self);
+          if (wasNotSelected) {
+            emitRegionSelected(annotation.store, annotation, self);
+          }
         } else {
           const wasNotSelected = !self.selected;
 
           if (wasNotSelected) {
             annotation.selectArea(self);
+            emitRegionSelected(annotation.store, annotation, self);
           } else {
             annotation.unselectAll();
           }

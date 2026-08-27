@@ -347,6 +347,14 @@ const Result = types
       self.meta = { ...self.meta, [key]: value };
     },
 
+    removeMetaKey(key) {
+      if (!self.meta?.[key]) return;
+
+      const { [key]: _removed, ...rest } = self.meta;
+
+      self.meta = rest;
+    },
+
     // update region appearence based on it's current states, for
     // example bbox needs to update its colors when you change the
     // label, becuase it takes color from the label

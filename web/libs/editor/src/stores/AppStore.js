@@ -17,6 +17,7 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
+import { emitRegionDeleted } from "../utils/labelingTelemetry";
 import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
@@ -563,6 +564,12 @@ export default types
         const c = self.annotationStore.selected;
 
         if (c) {
+          for (const region of c.selectedRegions) {
+            emitRegionDeleted(c.store, c, {
+              region_id: region.id,
+              region_type: region.type ?? null,
+            });
+          }
           c.deleteSelectedRegions();
         }
       });

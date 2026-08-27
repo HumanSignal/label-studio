@@ -12,6 +12,7 @@
 
 import { useCallback, useMemo } from "react";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
+import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 import { TaskSummaryDashboard } from "./TaskSummaryDashboard";
 import type { LabelColors, ObjectTypes } from "./types";
 import { buildControlsList, buildObjectDataTypes } from "./utils";
@@ -47,11 +48,13 @@ const TaskSummary = ({
     (annotationPk: number) => {
       const match = navigableAnnotations.find((a) => String(a.pk) === String(annotationPk));
       if (!match) return;
+      const previous = annotationStore.selected;
       if (match.type === "prediction") {
         annotationStore.selectPrediction(match.id, { exitViewAll: true });
       } else {
         annotationStore.selectAnnotation(match.id, { exitViewAll: true });
       }
+      emitAnnotationTabSelected(annotationStore.store, match, previous, { exitViewAll: true });
     },
     [navigableAnnotations, annotationStore],
   );

@@ -13,6 +13,7 @@
 import { observer } from "mobx-react";
 import { TopBar as SharedTopBar, isStarterCloudPlan, ff } from "@humansignal/core";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
+import { emitAnnotationCreated, emitOverviewOpenedOrClosed } from "../../utils/labelingTelemetry";
 
 export const TopBar = observer(({ store }) => {
   if (!store) return null;
@@ -32,6 +33,18 @@ export const TopBar = observer(({ store }) => {
   const onAddNew = () => {
     const created = annotationStore.createAnnotation();
     annotationStore.selectAnnotation(created.id, { exitViewAll: true });
+    emitAnnotationCreated(store, created, "new");
+  };
+
+  const onToggleViewAll = () => {
+    const closing = isViewAll;
+    if (closing) {
+      annotationStore.toggleViewingAllAnnotations();
+      emitOverviewOpenedOrClosed(store, "closed", annotationStore.selected ?? null);
+    } else {
+      emitOverviewOpenedOrClosed(store, "opened");
+      annotationStore.toggleViewingAllAnnotations();
+    }
   };
 
   return (
@@ -39,7 +52,7 @@ export const TopBar = observer(({ store }) => {
       visible={visible}
       showViewAll={showViewAll}
       isViewAll={isViewAll}
-      onToggleViewAll={annotationStore.toggleViewingAllAnnotations}
+      onToggleViewAll={onToggleViewAll}
       showAddNew={showAddNew}
       onAddNew={onAddNew}
     >

@@ -1,5 +1,6 @@
 import { destroy, flow, types } from "mobx-state-tree";
 import { runInAction } from "mobx";
+import { emitDatamanagerEvent, labelingDisplayViewFromLsf } from "../utils/datamanagerTelemetry";
 import { Modal } from "../components/Common/Modal/Modal";
 import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
@@ -194,7 +195,7 @@ export const AppStore = types
       self.toolbar = toolbarString;
     },
 
-    setTask: flow(function* ({ taskID, annotationID, pushState, interface: interfaceOption }) {
+    setTask: flow(function* ({ taskID, annotationID, pushState, interface: interfaceOption, quickviewTelemetryEvent }) {
       if (pushState !== false) {
         History.navigate({
           task: taskID,
@@ -292,6 +293,14 @@ export const AppStore = types
             }
             // Don't set the tab - let it use whatever was last selected
           }
+
+          if (quickviewTelemetryEvent) {
+            emitDatamanagerEvent(quickviewTelemetryEvent, {
+              project_id: self.project?.id,
+              task_id: self.taskStore.selected?.id,
+              ...labelingDisplayViewFromLsf(self.LSF),
+            });
+          }
         } else {
           console.error("LSF not initialized properly");
         }
@@ -387,7 +396,10 @@ export const AppStore = types
             });
           }
 
-          self.setTask(labelingParams);
+          self.setTask({
+            ...labelingParams,
+            quickviewTelemetryEvent: isDefined(item?.task_id) ? "review_quickview_opened" : "label_quickview_opened",
+          });
         } else {
           self.closeLabeling();
         }

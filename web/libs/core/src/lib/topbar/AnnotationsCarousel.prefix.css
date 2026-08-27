@@ -204,6 +204,22 @@
         color: var(--color-primary-content);
       }
     }
+
+    &_disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--color-neutral-surface);
+        border-color: var(--color-primary-border-subtler);
+
+        & .annotations-carousel__addNewRowIcon {
+          background-color: unset;
+          color: unset;
+        }
+      }
+    }
   }
 
   &__addNewRowIcon {

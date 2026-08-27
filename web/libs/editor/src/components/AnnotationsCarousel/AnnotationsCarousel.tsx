@@ -26,6 +26,7 @@ import {
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { AnnotationButton } from "./AnnotationButton";
+import { emitAnnotationCreated, emitOverviewOpenedOrClosed } from "../../utils/labelingTelemetry";
 
 interface AnnotationsCarouselInterface {
   store: any;
@@ -126,7 +127,10 @@ export const AnnotationsCarousel = observer(
         onSetGroundTruth: () => {},
         onDuplicate: () => {},
         onDelete: () => {},
-        onShowOtherAnnotations: () => annotationStore.toggleViewingAllAnnotations(),
+        onShowOtherAnnotations: () => {
+          emitOverviewOpenedOrClosed(store, "opened");
+          annotationStore.toggleViewingAllAnnotations();
+        },
       }),
       [annotationStore],
     );
@@ -173,7 +177,8 @@ export const AnnotationsCarousel = observer(
     const handleAddNew = useCallback(() => {
       const created = annotationStore.createAnnotation();
       annotationStore.selectAnnotation(created.id, { exitViewAll: true });
-    }, [annotationStore]);
+      emitAnnotationCreated(store, created, "new");
+    }, [annotationStore, store]);
 
     if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) return null;
 

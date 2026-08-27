@@ -8,6 +8,7 @@ import "./OutlinerPanel.prefix.css";
 import { IconInfo, IconLsLabeling } from "@humansignal/icons";
 import { EmptyState } from "../Components/EmptyState";
 import { getDocsUrl } from "../../../utils/docs";
+import { emitRegionListGrouped, emitRegionListSorted } from "../../../utils/labelingTelemetry";
 
 // Local type definitions based on ViewControls and RegionStore
 type GroupingOptions = "manual" | "label" | "type";
@@ -30,6 +31,11 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
   const onOrderingChange = useCallback(
     (value: OrderingOptions) => {
       regions.setSort(value);
+      const annotation = regions?.annotation;
+      emitRegionListSorted(annotation?.store, annotation, {
+        sort_key: regions.sort,
+        ascending: regions.sortOrder === "asc",
+      });
     },
     [regions],
   );
@@ -38,6 +44,8 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
     (value: GroupingOptions) => {
       regions.setGrouping(value);
       setGroup(value);
+      const annotation = regions?.annotation;
+      emitRegionListGrouped(annotation?.store, annotation, { group_by: value });
     },
     [regions],
   );
@@ -66,6 +74,11 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   const onOrderingChange = useCallback(
     (value: OrderingOptions) => {
       regions.setSort(value);
+      const annotation = regions?.annotation;
+      emitRegionListSorted(annotation?.store, annotation, {
+        sort_key: regions.sort,
+        ascending: regions.sortOrder === "asc",
+      });
     },
     [regions],
   );
@@ -73,6 +86,8 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   const onGroupingChange = useCallback(
     (value: GroupingOptions) => {
       regions.setGrouping(value);
+      const annotation = regions?.annotation;
+      emitRegionListGrouped(annotation?.store, annotation, { group_by: value });
     },
     [regions],
   );

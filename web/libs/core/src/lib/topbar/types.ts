@@ -120,6 +120,10 @@ export interface AnnotationActionHandlers {
   onShowOtherAnnotations: () => void;
   /** Optional: open the performance dashboard for this annotation's user/project. */
   onOpenPerformanceDashboard?: (annotation: SharedAnnotation) => void;
+  /** Optional: invoked after "Copy Annotation ID" / "Copy Prediction ID" succeeds. */
+  onCopyAnnotationId?: (annotation: SharedAnnotation) => void;
+  /** Optional: invoked after "Copy Annotation Link" / "Copy Prediction Link" succeeds. */
+  onCopyAnnotationLink?: (annotation: SharedAnnotation) => void;
   /** Optional: invoked after any menu item closes the dropdown — used by classic for refresh hooks. */
   onAnnotationChange?: () => void;
 }

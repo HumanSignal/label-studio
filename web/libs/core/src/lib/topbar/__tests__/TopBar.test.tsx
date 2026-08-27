@@ -101,4 +101,28 @@ describe("shared TopBar", () => {
     fireEvent.click(getByLabelText("Create an annotation"));
     expect(onAddNew).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the add-new button visible but inert, with an explaining tooltip, when disabled", () => {
+    const onAddNew = jest.fn();
+    const { getByLabelText } = render(
+      <TopBar
+        visible
+        showViewAll={false}
+        isViewAll={false}
+        onToggleViewAll={() => {}}
+        showAddNew
+        onAddNew={onAddNew}
+        addNewDisabled
+        addNewDisabledTooltip="Data Collection projects hold one submission per task."
+      />,
+    );
+
+    // Still rendered — the affordance explains itself instead of disappearing.
+    const button = getByLabelText("Create an annotation");
+    expect(button).toBeInTheDocument();
+    expect(button).toBeDisabled();
+
+    fireEvent.click(button);
+    expect(onAddNew).not.toHaveBeenCalled();
+  });
 });
