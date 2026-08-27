@@ -31,6 +31,12 @@ import {
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import {
+  emitAnnotationCreated,
+  emitAnnotationTabSelected,
+  emitAnnotationMenuAction,
+  emitOverviewOpenedOrClosed,
+} from "../../utils/labelingTelemetry";
+import {
   annotationNeedsHydration,
   applyAnnotationHydrationFromApi,
 } from "@humansignal/core/lib/utils/annotationLazyHydration";
@@ -163,14 +169,17 @@ const AnnotationButtonInner = injector(
             if (!entityIsAlive) return;
             const { selected, id, type } = entity;
             if (selected) return;
+            const previous = annotationStore.selected;
             if (type === "prediction") {
               annotationStore.selectPrediction(id, { exitViewAll: true });
             } else {
               annotationStore.selectAnnotation(id, { exitViewAll: true });
             }
+            emitAnnotationTabSelected(store, entity, previous, { exitViewAll: true });
           },
           onSetGroundTruth: (_a, value) => {
             if (!entityIsAlive) return;
+            emitAnnotationMenuAction(store, entity, "set_ground_truth", { ground_truth: value });
             entity.setGroundTruth(value);
           },
           onDuplicate: async () => {
@@ -196,6 +205,7 @@ const AnnotationButtonInner = injector(
               }
               if (!isAlive(entity)) return;
               const c = annotationStore.addAnnotationFromPrediction(entity);
+              emitAnnotationCreated(store, c, "duplicate", entity);
               window.setTimeout(() => {
                 annotationStore.selectAnnotation(c.id, { exitViewAll: true });
               });
@@ -218,6 +228,7 @@ const AnnotationButtonInner = injector(
               buttonLook: "negative",
               okText: "Delete",
               onOk: () => {
+                emitAnnotationMenuAction(store, entity, "delete");
                 if (isPredictionLocal) {
                   entity.list.deletePrediction(entity);
                 } else {
@@ -227,10 +238,12 @@ const AnnotationButtonInner = injector(
             });
           },
           onShowOtherAnnotations: () => {
+            emitOverviewOpenedOrClosed(store, "opened");
             annotationStore.toggleViewingAllAnnotations();
           },
           onOpenPerformanceDashboard: () => {
             if (!isLSE) return;
+            emitAnnotationMenuAction(store, entity, "open_performance_dashboard");
             const url = new URL(window.location.origin);
             const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
             url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
@@ -240,8 +253,16 @@ const AnnotationButtonInner = injector(
             window.open(url.toString(), "_blank");
           },
           onAnnotationChange,
+          onCopyAnnotationId: () => {
+            if (!entityIsAlive) return;
+            emitAnnotationMenuAction(store, entity, "copy_id");
+          },
+          onCopyAnnotationLink: () => {
+            if (!entityIsAlive) return;
+            emitAnnotationMenuAction(store, entity, "copy_link");
+          },
         }),
-        [entityIsAlive, entity, annotationStore, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
+        [entityIsAlive, entity, annotationStore, store, fetchAnnotationCached, toast, isLSE, onAnnotationChange],
       );
 
       if (!entityIsAlive || !sharedAnnotation) return null;

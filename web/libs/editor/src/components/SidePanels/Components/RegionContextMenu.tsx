@@ -4,6 +4,7 @@ import { Button, ToastType, useToast } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { cn } from "../../../utils/bem";
+import { emitRegionMenuAction } from "../../../utils/labelingTelemetry";
 import { ContextMenu, type ContextMenuAction, ContextMenuTrigger, type MenuActionOnClick } from "../../ContextMenu";
 
 export const RegionContextMenu: FC<{ item: any }> = observer(({ item }: { item: any }) => {
@@ -24,13 +25,17 @@ export const RegionContextMenu: FC<{ item: any }> = observer(({ item }: { item: 
   const onCopyLink = useCallback<MenuActionOnClick>(
     (_, ctx) => {
       copyLink();
+      emitRegionMenuAction(item.annotation?.store, item.annotation, "copy_link", {
+        region_id: item.id,
+        region_type: item.type ?? null,
+      });
       ctx.dropdown?.close();
       toast.show({
         message: "Region link copied to clipboard",
         type: ToastType.info,
       });
     },
-    [copyLink],
+    [copyLink, item.annotation, item.id, item.type, toast],
   );
 
   const actions = useMemo<ContextMenuAction[]>(

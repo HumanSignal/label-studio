@@ -21,6 +21,12 @@ import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2755, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
+import {
+  emitRegionSelected,
+  emitRegionVisibilityToggled,
+  emitRegionLockToggled,
+  emitRelationCreated,
+} from "../../../utils/labelingTelemetry";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionContextMenu } from "../Components/RegionContextMenu";
@@ -259,12 +265,24 @@ const useEventHandlers = () => {
     const annotation = self.annotation;
 
     if (multi) {
+      const wasSelected = self.selected;
       annotation.toggleRegionSelection(self);
+      if (!wasSelected) {
+        emitRegionSelected(annotation.store, annotation, self);
+      }
       return;
     }
 
     if (!self.isReadOnly() && annotation.isLinkingMode) {
       annotation.addLinkedRegion(self);
+      const relation = annotation.relationStore?.relations?.at(-1);
+      if (relation) {
+        emitRelationCreated(annotation.store, annotation, {
+          relation_id: relation.id,
+          source_region_id: relation.node1?.id,
+          target_region_id: relation.node2?.id,
+        });
+      }
       annotation.stopLinkingMode();
       annotation.regionStore.unselectAll();
       return;
@@ -274,6 +292,7 @@ const useEventHandlers = () => {
 
     if (wasNotSelected) {
       annotation.selectArea(self);
+      emitRegionSelected(annotation.store, annotation, self);
       // post-select hook
       self.onSelectInOutliner?.(wasNotSelected);
       // navigate to connected page for per-item classifications
@@ -533,14 +552,31 @@ const RegionControls: FC<RegionControlsProps> = injector(
     }, [entity?.hidden, type, regions]);
 
     const onToggleHidden = useCallback(() => {
+      const annotation = item?.annotation;
       if (type?.includes("region") || type?.includes("range") || type?.includes("reactcode")) {
+        const nextVisible = Boolean(entity?.hidden);
+        emitRegionVisibilityToggled(annotation?.store, annotation, {
+          region_id: entity?.id,
+          visible: nextVisible,
+          scope: "region",
+        });
         entity.toggleHidden();
       } else if (!type || type.includes("label")) {
+        emitRegionVisibilityToggled(annotation?.store, annotation, {
+          region_id: entity?.id ?? null,
+          visible: hidden,
+          scope: "label",
+        });
         regionStore.setHiddenByLabel(!hidden, entity);
       } else if (type?.includes("tool")) {
+        emitRegionVisibilityToggled(annotation?.store, annotation, {
+          region_id: entity?.id ?? null,
+          visible: hidden,
+          scope: "tool",
+        });
         regionStore.setHiddenByTool(!hidden, entity);
       }
-    }, [item, item?.toggleHidden, hidden]);
+    }, [entity, item?.annotation, type, hidden, regionStore]);
 
     const onToggleCollapsed = useCallback(
       (e: MouseEvent) => {
@@ -550,8 +586,13 @@ const RegionControls: FC<RegionControlsProps> = injector(
     );
 
     const onToggleLocked = useCallback(() => {
+      const nextLocked = !item?.locked;
+      emitRegionLockToggled(item?.annotation?.store, item?.annotation, {
+        region_id: item?.id,
+        locked: nextLocked,
+      });
       item.setLocked((locked: boolean) => !locked);
-    }, []);
+    }, [item]);
 
     return (
       <div

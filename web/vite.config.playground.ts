@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => {
         "@humansignal/ui/shad": path.resolve(__dirname, "libs/ui/src/shad"),
         "@humansignal/ui/fonts": path.resolve(__dirname, "libs/ui/src/fonts"),
         "@humansignal/ui": path.resolve(__dirname, "libs/ui"),
+        "@humansignal/core/telemetry": path.resolve(__dirname, "libs/core/src/telemetry"),
         "@humansignal/core/providers": path.resolve(__dirname, "libs/core/src/providers"),
         "@humansignal/core/lib": path.resolve(__dirname, "libs/core/src/lib"),
         "@humansignal/core/hooks": path.resolve(__dirname, "libs/core/src/hooks"),

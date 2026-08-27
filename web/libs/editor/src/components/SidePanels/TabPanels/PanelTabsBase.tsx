@@ -23,6 +23,7 @@ import { type BaseProps as OrigBaseProps, Side } from "./types";
 import { resizers } from "./utils";
 import "./PanelTabsBase.prefix.css";
 import React from "react";
+import { emitLabelSidebarToggled } from "../../../utils/labelingTelemetry";
 
 const distance = (x1: number, x2: number, y1: number, y2: number) => {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
@@ -72,6 +73,7 @@ export const PanelTabsBase: FC<BasePropsWithChildren> = ({
   lockPanelContents,
   isBottomPanel,
   contentRef,
+  currentEntity,
   ...props
 }) => {
   const headerRef = useRef<HTMLDivElement>();
@@ -339,7 +341,9 @@ export const PanelTabsBase: FC<BasePropsWithChildren> = ({
   );
 
   const handleGroupPanelToggle = () => {
-    setSidePanelCollapsed({ ...sidePanelCollapsed, [alignment]: !sidePanelCollapsed[alignment as Side] });
+    const nextCollapsed = !sidePanelCollapsed[alignment as Side];
+    emitLabelSidebarToggled(currentEntity?.store, { side: alignment, collapsed: nextCollapsed });
+    setSidePanelCollapsed({ ...sidePanelCollapsed, [alignment]: nextCollapsed });
   };
 
   const handlePanelToggle = useCallback(

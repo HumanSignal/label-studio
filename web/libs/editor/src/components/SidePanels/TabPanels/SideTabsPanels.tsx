@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { emitLabelingEvent } from "../../../utils/labelingTelemetry";
 import { cn } from "../../../utils/bem";
 import { useMedia } from "../../../hooks/useMedia";
 import ResizeObserver from "../../../utils/resize-observer";
@@ -158,8 +159,22 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   );
 
   const setActiveTab = useCallback(
-    (key: string, tabIndex: number) => setPanelData((state) => setActive(state, key, tabIndex)),
-    [panelData],
+    (key: string, tabIndex: number) =>
+      setPanelData((state) => {
+        const previous = state[key]?.panelViews?.find((view) => view.active);
+        const next = setActive(state, key, tabIndex);
+        const selected = next[key]?.panelViews?.[tabIndex];
+
+        if (selected?.name && previous?.name !== selected.name) {
+          emitLabelingEvent(currentEntity?.store, "label_sidebar_tab_selected", {
+            tab: selected.name,
+            panel: key,
+          });
+        }
+
+        return next;
+      }),
+    [currentEntity],
   );
 
   const onVisibilityChange = useCallback(

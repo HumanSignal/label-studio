@@ -1,5 +1,6 @@
 import { types } from "mobx-state-tree";
 import Constants from "../core/Constants";
+import { emitRelationCreated } from "../utils/labelingTelemetry";
 
 export const KonvaRegionMixin = types
   .model({})
@@ -154,6 +155,14 @@ export const KonvaRegionMixin = types
 
         if (!annotation.isReadOnly() && annotation.isLinkingMode) {
           annotation.addLinkedRegion(self);
+          const relation = annotation.relationStore?.relations?.at(-1);
+          if (relation) {
+            emitRelationCreated(annotation.store, annotation, {
+              relation_id: relation.id,
+              source_region_id: relation.node1?.id,
+              target_region_id: relation.node2?.id,
+            });
+          }
           annotation.stopLinkingMode();
           annotation.regionStore.unselectAll();
         } else {

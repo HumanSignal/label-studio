@@ -23,6 +23,7 @@ import {
   SkipButton,
   UnskipButton,
 } from "./buttons";
+import { annotationActionProps, emitLabelingEvent } from "../../utils/labelingTelemetry";
 
 import "./Controls.prefix.css";
 
@@ -183,12 +184,22 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const onReject = async (e: React.MouseEvent) => {
           const selected = store.annotationStore?.selected;
 
+          const runReject = () => {
+            const comment = store.commentStore.currentComment[annotation.id];
+            const commentText = (comment?.text ?? comment)?.trim();
+            action();
+            emitLabelingEvent(store, "annotation_rejected", {
+              ...annotationActionProps(store, selected),
+              has_comment: Boolean(commentText) || store.commentStore.addedCommentThisSession,
+            });
+          };
+
           if (store.hasInterface("comments:reject")) {
-            handleActionWithComments(e, action, "Please enter a comment before rejecting");
+            handleActionWithComments(e, runReject, "Please enter a comment before rejecting");
           } else {
             selected?.submissionInProgress();
             await store.commentStore.commentFormSubmit();
-            action();
+            runReject();
           }
         };
 
@@ -243,6 +254,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
                 await store.commentStore.commentFormSubmit();
                 onClickMethod();
+                const selectedAfter = store.annotationStore?.selected;
+                emitLabelingEvent(store, isUpdate ? "annotation_updated" : "annotation_submitted", {
+                  ...annotationActionProps(store, selectedAfter),
+                  and_exit: true,
+                });
               }}
               data-testid={`bottombar-${isUpdate ? "update" : "submit"}-and-exit-button`}
             >
@@ -277,6 +293,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                     selected?.submissionInProgress();
                     await store.commentStore.commentFormSubmit();
                     store.submitAnnotation();
+                    emitLabelingEvent(store, "annotation_submitted", annotationActionProps(store, selected));
                   }}
                   data-testid="bottombar-submit-button"
                 >
@@ -331,6 +348,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                     selected?.submissionInProgress();
                     await store.commentStore.commentFormSubmit();
                     store.updateAnnotation();
+                    emitLabelingEvent(store, "annotation_updated", annotationActionProps(store, selected));
                   }}
                   data-testid="bottombar-update-button"
                 >

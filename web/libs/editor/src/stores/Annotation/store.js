@@ -217,6 +217,7 @@ const AnnotationStoreModel = types
 
       getEnv(self).events.invoke("selectAnnotation", c, selected, options ?? {});
       if (c.pk) getParent(self).addAnnotationToTaskHistory(c.pk);
+
       return c;
     }
 
@@ -498,6 +499,7 @@ const AnnotationStoreModel = types
       } else {
         c.setDefaultValues();
       }
+
       return c;
     }
 

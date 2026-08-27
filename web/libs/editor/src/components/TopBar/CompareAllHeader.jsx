@@ -9,9 +9,13 @@
 import { observer } from "mobx-react";
 import { IntersectSquareIcon, XIcon } from "@humansignal/icons";
 import { Button, Typography } from "@humansignal/ui";
+import { emitOverviewOpenedOrClosed } from "../../utils/labelingTelemetry";
 
 export const CompareAllHeader = observer(({ store }) => {
-  const onClose = () => store.annotationStore.toggleViewingAllAnnotations();
+  const onClose = () => {
+    store.annotationStore.toggleViewingAllAnnotations();
+    emitOverviewOpenedOrClosed(store, "closed", store.annotationStore.selected ?? null);
+  };
 
   return (
     <div
