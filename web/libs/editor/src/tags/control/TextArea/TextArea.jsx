@@ -27,6 +27,9 @@ import { cn } from "../../../utils/bem";
 
 const { TextArea } = Input;
 
+/** Meta key on textarea results for in-flight input that is not yet committed via Add/Submit. */
+export const TEXTAREA_PENDING_DRAFT_META_KEY = "textAreaPendingInput";
+
 /**
  * The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.
  *
@@ -177,7 +180,11 @@ const Model = types
       },
 
       needsUpdate() {
+        const pending = self.result?.meta?.[TEXTAREA_PENDING_DRAFT_META_KEY];
         self.updateFromResult(self.result?.mainValue);
+        if (pending) {
+          self.setValue(pending, { skipDraftSave: true });
+        }
       },
 
       requiredModal() {
@@ -199,8 +206,48 @@ const Model = types
         value && self.setResult(value);
       },
 
-      setValue(value) {
+      setValue(value, options = {}) {
         self._value = value;
+        const { skipDraftSave = false } = options;
+
+        if (skipDraftSave || !self.annotation?.editable || self.annotation.isReadOnly()) return;
+
+        if (self.annotation.autosave) {
+          self.annotation.autosave();
+        }
+      },
+
+      getPendingDraftInput() {
+        if (!self.annotation || self.isReadOnly()) return null;
+
+        const pending = self._value?.trim();
+
+        if (!pending) return null;
+
+        const committed = self.selectedValues();
+
+        if (committed.some((value) => value === pending)) return null;
+
+        return pending;
+      },
+
+      clearPendingDraftMeta() {
+        self.result?.removeMetaKey?.(TEXTAREA_PENDING_DRAFT_META_KEY);
+      },
+
+      syncPendingDraftState() {
+        if (!self.annotation?.editable || self.annotation.isReadOnly()) return;
+
+        const pending = self.getPendingDraftInput();
+
+        if (pending) {
+          if (!self.result) {
+            self.createPerObjectResult();
+          }
+          self.result?.setMetaValue(TEXTAREA_PENDING_DRAFT_META_KEY, pending);
+        } else {
+          self.clearPendingDraftMeta();
+        }
       },
 
       remove(region) {
@@ -243,6 +290,7 @@ const Model = types
 
         // should go after `onChange` because it uses result and area
         self.updateLeadTime();
+        self.clearPendingDraftMeta();
       },
 
       /**

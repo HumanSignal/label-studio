@@ -685,6 +685,13 @@ const _Annotation = types
       self.unselectAll();
     },
 
+    /** UTC-945: persist uncommitted TextArea `_value` into draft payloads via result meta. */
+    syncPendingControlsForDraft() {
+      self.traverseTree((node) => {
+        node.syncPendingDraftState?.();
+      });
+    },
+
     /**
      * Delete region
      * @param {*} region
@@ -894,6 +901,7 @@ const _Annotation = types
         return;
       }
 
+      self.syncPendingControlsForDraft();
       const result = self.serializeAnnotation({ fast: true });
 
       await getEnv(self).events.invoke("beforeSaveDraft", self.store, self, result);
