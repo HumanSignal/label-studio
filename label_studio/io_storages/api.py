@@ -6,6 +6,7 @@ import os
 import time
 
 from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import load_func
 from core.utils.io import read_yaml
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
@@ -144,6 +145,11 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
         if not storage.synchronizable:
             response_data = {'message': f'Storage {str(storage.id)} is not synchronizable'}
             return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
+        sync_guard = load_func(getattr(settings, 'IMPORT_STORAGE_SYNC_GUARD', None))
+        if sync_guard:
+            error = sync_guard(storage)
+            if error:
+                return Response(status=status.HTTP_409_CONFLICT, data={'message': error})
         storage.validate_connection()
         storage.sync()
         storage.refresh_from_db()
