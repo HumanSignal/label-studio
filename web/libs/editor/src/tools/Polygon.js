@@ -1,5 +1,5 @@
 import { ff } from "@humansignal/core";
-import { isAlive, types } from "mobx-state-tree";
+import { isAlive, isStateTreeNode, types } from "mobx-state-tree";
 
 import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
 import ToolMixin from "../mixins/Tool";
@@ -7,8 +7,10 @@ import { MultipleClicksDrawingTool } from "../mixins/DrawingTool";
 import { NodeViews } from "../components/Node/Node";
 import { observe } from "mobx";
 import { FF_POLYGON_FREEHAND, isFF } from "../utils/feature-flags";
+import { isValidFreehandContour } from "../utils/freehand";
 
 const FREEHAND_HISTORY_KEY = "polygon-freehand";
+const FREEHAND_REPAIR_HISTORY_KEY = "polygon-contour-repair";
 
 const _Tool = types
   .model("PolygonTool", {
@@ -106,18 +108,63 @@ const _Tool = types
       return true;
     };
 
+    const isFreehandRepairTarget = (region) => {
+      const annotation = self.annotation;
+      const selectedRegions = annotation?.selectedRegions;
+
+      if (!isFF(FF_POLYGON_FREEHAND)) return false;
+      if (self.disabled || self.isDrawing) return false;
+      if (!region || (isStateTreeNode(region) && !isAlive(region))) return false;
+      if (!Array.isArray(selectedRegions) || selectedRegions.length !== 1 || selectedRegions[0] !== region) {
+        return false;
+      }
+      if (region.type !== "polygonregion" || !region.closed || region.hidden || region.filtered) return false;
+      if (region.isDrawing || region.locked || region.readonly) return false;
+      if (annotation?.editable === false || annotation?.isDrawing || annotation?.isReadOnly?.()) return false;
+      if (region.isReadOnly?.() !== false) return false;
+      if (region.annotation !== annotation || region.object !== self.obj || region.control !== self.control)
+        return false;
+      if (typeof region.replacePoints !== "function" || typeof region.notifyDrawingFinished !== "function")
+        return false;
+
+      return true;
+    };
+
+    const hasValidFreehandRepairPoints = (points) =>
+      Array.isArray(points) &&
+      points.length >= 3 &&
+      points.every((point) => {
+        const x = Array.isArray(point) ? point[0] : point?.x;
+        const y = Array.isArray(point) ? point[1] : point?.y;
+
+        return Number.isFinite(x) && Number.isFinite(y);
+      });
+
     return {
+      canRepairFreehand(region) {
+        return isFreehandRepairTarget(region);
+      },
+      commitFreehandRepair(region, points) {
+        if (!isFreehandRepairTarget(region) || !hasValidFreehandRepairPoints(points)) return false;
+
+        self.annotation.history.freeze(FREEHAND_REPAIR_HISTORY_KEY);
+        try {
+          const replaced = region.replacePoints(points);
+
+          if (!replaced) return false;
+          region.notifyDrawingFinished();
+          return true;
+        } finally {
+          self.annotation.history.unfreeze(FREEHAND_REPAIR_HISTORY_KEY);
+        }
+      },
       canStartFreehand() {
         return isFF(FF_POLYGON_FREEHAND) && self.canStartDrawing();
       },
       commitFreehand(points) {
         if (!Array.isArray(points) || points.length < 3 || !self.canStartFreehand()) return false;
-
-        const validPoints = points.filter(
-          (point) => Array.isArray(point) && Number.isFinite(point[0]) && Number.isFinite(point[1]),
-        );
-
-        if (validPoints.length < 3) return false;
+        if (!isValidFreehandContour(points)) return false;
+        const validPoints = points;
 
         self.stopListening();
         closed = false;

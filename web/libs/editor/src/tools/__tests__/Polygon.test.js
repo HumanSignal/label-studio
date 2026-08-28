@@ -82,8 +82,25 @@ const createPolygonTool = () => {
   const manager = { name: "image", obj: object, findSelectedTool: jest.fn(), selectTool: jest.fn() };
   const tool = Polygon.create({}, { manager, control, object });
 
-  return { tool, annotation, history, area };
+  return { tool, annotation, history, area, control, object };
 };
+
+const createRepairRegion = ({ annotation, control, object }, overrides = {}) => ({
+  type: "polygonregion",
+  closed: true,
+  hidden: false,
+  filtered: false,
+  locked: false,
+  readonly: false,
+  isDrawing: false,
+  annotation,
+  control,
+  object,
+  isReadOnly: jest.fn(() => false),
+  replacePoints: jest.fn(() => true),
+  notifyDrawingFinished: jest.fn(),
+  ...overrides,
+});
 
 describe("Polygon freehand", () => {
   beforeEach(() => {
@@ -135,6 +152,24 @@ describe("Polygon freehand", () => {
     expect(history.unfreeze).toHaveBeenCalledWith("polygon-freehand");
   });
 
+  it("rejects a self-touching creation contour before creating a region", () => {
+    mockFreehandEnabled = true;
+    const { tool, annotation, history } = createPolygonTool();
+
+    expect(
+      tool.commitFreehand([
+        [10, 10],
+        [100, 50],
+        [100, 100],
+        [50, 100],
+        [100, 100],
+        [90, 90],
+      ]),
+    ).toBe(false);
+    expect(annotation.createResult).not.toHaveBeenCalled();
+    expect(history.freeze).not.toHaveBeenCalled();
+  });
+
   it("releases history when deferred completion is skipped", () => {
     mockFreehandEnabled = true;
     const { tool, annotation, history, area } = createPolygonTool();
@@ -173,5 +208,96 @@ describe("Polygon freehand", () => {
     jest.runOnlyPendingTimers();
     expect(annotation.afterCreateResult).toHaveBeenCalledTimes(1);
     expect(history.unfreeze).toHaveBeenCalledTimes(1);
+  });
+
+  it("only allows repairing the one selected editable polygon from the same tool context", () => {
+    mockFreehandEnabled = true;
+    const context = createPolygonTool();
+    const region = createRepairRegion(context);
+    const expectRejected = (overrides) => {
+      const candidate = createRepairRegion(context, overrides);
+
+      context.annotation.selectedRegions = [candidate];
+      expect(context.tool.canRepairFreehand(candidate)).toBe(false);
+    };
+
+    context.annotation.selectedRegions = [region];
+
+    expect(context.tool.canRepairFreehand(region)).toBe(true);
+
+    context.annotation.selectedRegions = [region, createRepairRegion(context)];
+    expect(context.tool.canRepairFreehand(region)).toBe(false);
+
+    expectRejected({ closed: false });
+    expectRejected({ hidden: true });
+    expectRejected({ isReadOnly: () => true });
+    expectRejected({ object: {} });
+    expectRejected({ control: {} });
+    expectRejected({ annotation: {} });
+  });
+
+  it("does not allow contour repair when the feature flag is off", () => {
+    const context = createPolygonTool();
+    const region = createRepairRegion(context);
+
+    context.annotation.selectedRegions = [region];
+
+    expect(context.tool.canRepairFreehand(region)).toBe(false);
+    expect(
+      context.tool.commitFreehandRepair(region, [
+        [10, 10],
+        [20, 10],
+        [20, 20],
+      ]),
+    ).toBe(false);
+    expect(context.history.freeze).not.toHaveBeenCalled();
+  });
+
+  it("repairs the selected polygon in one synchronous history transaction", () => {
+    mockFreehandEnabled = true;
+    const context = createPolygonTool();
+    const region = createRepairRegion(context);
+    const points = [
+      [10, 10],
+      [25, 5],
+      [30, 20],
+      [10, 20],
+    ];
+
+    context.annotation.selectedRegions = [region];
+
+    expect(context.tool.commitFreehandRepair(region, points)).toBe(true);
+    expect(context.history.freeze).toHaveBeenCalledTimes(1);
+    expect(context.history.freeze).toHaveBeenCalledWith("polygon-contour-repair");
+    expect(region.replacePoints).toHaveBeenCalledTimes(1);
+    expect(region.replacePoints).toHaveBeenCalledWith(points);
+    expect(region.notifyDrawingFinished).toHaveBeenCalledTimes(1);
+    expect(context.annotation.createResult).not.toHaveBeenCalled();
+    expect(context.annotation.afterCreateResult).not.toHaveBeenCalled();
+    expect(context.history.unfreeze).toHaveBeenCalledTimes(1);
+    expect(context.history.unfreeze).toHaveBeenCalledWith("polygon-contour-repair");
+  });
+
+  it("always releases contour-repair history when replacement fails", () => {
+    mockFreehandEnabled = true;
+    const context = createPolygonTool();
+    const error = new Error("replacement failed");
+    const region = createRepairRegion(context);
+
+    region.replacePoints = jest.fn(() => {
+      throw error;
+    });
+    context.annotation.selectedRegions = [region];
+
+    expect(() =>
+      context.tool.commitFreehandRepair(region, [
+        [10, 10],
+        [20, 10],
+        [20, 20],
+      ]),
+    ).toThrow(error);
+    expect(region.notifyDrawingFinished).not.toHaveBeenCalled();
+    expect(context.history.unfreeze).toHaveBeenCalledTimes(1);
+    expect(context.history.unfreeze).toHaveBeenCalledWith("polygon-contour-repair");
   });
 });

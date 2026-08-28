@@ -26,7 +26,11 @@ import { Image } from "./Image";
 import {
   appendFreehandPoint,
   FREEHAND_MIN_DISTANCE,
+  FREEHAND_REPAIR_MIN_RAW_POINTS,
+  FREEHAND_REPAIR_SNAP_RADIUS,
   FREEHAND_SIMPLIFY_EPSILON,
+  buildFreehandRepairContour,
+  isValidFreehandContour,
   simplifyFreehandPoints,
 } from "../../utils/freehand";
 
@@ -37,6 +41,18 @@ const imgDefaultProps = { crossOrigin: "anonymous" };
 const FREEHAND_COMPATIBILITY_GUARD_MS = 1500;
 const FREEHAND_COMPATIBILITY_GUARD_DISTANCE = 25;
 const FREEHAND_DRAG_THRESHOLD = 5;
+
+const projectPointToEdge = (point, start, end) => {
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const lengthSquared = deltaX * deltaX + deltaY * deltaY;
+
+  if (!Number.isFinite(lengthSquared) || lengthSquared === 0) return null;
+  const projection = ((point.x - start.x) * deltaX + (point.y - start.y) * deltaY) / lengthSquared;
+  const ratio = Math.max(0, Math.min(1, projection));
+
+  return { x: start.x + ratio * deltaX, y: start.y + ratio * deltaY };
+};
 
 export const splitRegions = (regions) => {
   const brushRegions = [];
@@ -540,8 +556,13 @@ export default observer(
     freehandPointerId = null;
     freehandCaptureTarget = null;
     freehandTool = null;
+    freehandMode = null;
     freehandTrace = [];
     freehandDragging = false;
+    pendingFreehandMouseDown = null;
+    freehandRepairRegion = null;
+    freehandRepairEdgeIndex = null;
+    freehandRepairDragState = null;
     freehandCompatibilityGuard = null;
     freehandCompatibilityClock = Date.now;
 
@@ -557,6 +578,77 @@ export default observer(
       const tool = this.props.item.getToolsManager().findSelectedTool();
 
       return tool?.toolName === "PolygonTool" && tool.canStartFreehand && tool.commitFreehand ? tool : null;
+    };
+
+    getFreehandRepairTarget = (target, tool, event) => {
+      if (event?.metaKey || event?.ctrlKey || event?.altKey || event?.shiftKey) return null;
+
+      const { item } = this.props;
+      const selectedRegions = Array.from(item.selectedRegions ?? item.annotation?.selectedRegions ?? []);
+
+      if (selectedRegions.length !== 1) return null;
+      const region = selectedRegions[0];
+
+      if (tool?.canRepairFreehand?.(region) !== true) return null;
+
+      let node = target;
+      let edgeIndex = null;
+      let belongsToRegion = false;
+
+      while (node) {
+        const name = typeof node.name === "function" ? node.name() : (node.attrs?.name ?? node.name);
+        const edgeMatch = typeof name === "string" ? /^border_(\d+)_\d+$/.exec(name) : null;
+
+        if (edgeMatch) edgeIndex = Number(edgeMatch[1]);
+        if (node === region.shapeRef || String(name) === String(region.id)) {
+          belongsToRegion = true;
+          break;
+        }
+        node = node.getParent?.() ?? node.parent ?? null;
+      }
+
+      return belongsToRegion && Number.isInteger(edgeIndex) ? { region, edgeIndex } : null;
+    };
+
+    getFreehandRepairContour = (region) =>
+      Array.from(region?.points ?? [], (point) => ({ x: point.canvasX, y: point.canvasY })).filter(
+        ({ x, y }) => Number.isFinite(x) && Number.isFinite(y),
+      );
+
+    suspendFreehandRepairDragging = (region) => {
+      const node = region?.shapeRef;
+
+      if (!node?.draggable) return;
+      this.freehandRepairDragState = { node, draggable: node.draggable() };
+      node.stopDrag?.();
+      node.draggable(false);
+    };
+
+    restoreFreehandRepairDragging = () => {
+      const dragState = this.freehandRepairDragState;
+
+      this.freehandRepairDragState = null;
+      if (dragState?.node?.draggable) dragState.node.draggable(dragState.draggable);
+    };
+
+    insertFreehandRepairPoint = (event) => {
+      const region = this.freehandRepairRegion;
+      const edgeIndex = this.freehandRepairEdgeIndex;
+
+      if (!region || !Number.isInteger(edgeIndex) || !region.insertPoint) return false;
+      if (this.freehandTool?.canRepairFreehand?.(region) !== true) return false;
+
+      const point = this.getFreehandPoint(event);
+      const contour = this.getFreehandRepairContour(region);
+      const start = contour[edgeIndex];
+      const end = contour[(edgeIndex + 1) % contour.length];
+
+      if (!point || !start || !end) return false;
+
+      const anchor = projectPointToEdge(point.canvas, start, end);
+
+      if (!anchor) return false;
+      return Boolean(region.insertPoint(edgeIndex + 1, anchor.x, anchor.y));
     };
 
     isRightElementToCatchToolInteractions = (element, isMoveTool) => {
@@ -599,10 +691,17 @@ export default observer(
 
       if (!screen || !Number.isFinite(screen.x) || !Number.isFinite(screen.y)) return null;
 
-      const [canvasX, canvasY] = item.fixZoomedCoords([screen.x, screen.y]);
+      const [rawCanvasX, rawCanvasY] = item.fixZoomedCoords([screen.x, screen.y]);
+      const maxCanvasX = item.stageWidth;
+      const maxCanvasY = item.stageHeight;
+      const canvasX = Number.isFinite(maxCanvasX) ? Math.max(0, Math.min(maxCanvasX, rawCanvasX)) : rawCanvasX;
+      const canvasY = Number.isFinite(maxCanvasY) ? Math.max(0, Math.min(maxCanvasY, rawCanvasY)) : rawCanvasY;
+      const clampedScreen = item.zoomOriginalCoords?.([canvasX, canvasY]);
+      const screenX = Number.isFinite(clampedScreen?.[0]) ? clampedScreen[0] : screen.x;
+      const screenY = Number.isFinite(clampedScreen?.[1]) ? clampedScreen[1] : screen.y;
 
       return {
-        screen,
+        screen: { x: screenX, y: screenY },
         canvas: { x: canvasX, y: canvasY },
         internal: [item.canvasToInternalX(canvasX), item.canvasToInternalY(canvasY)],
       };
@@ -615,7 +714,7 @@ export default observer(
 
       const nextTrace = appendFreehandPoint(
         this.freehandTrace,
-        { ...point.screen, internal: point.internal },
+        { ...point.screen, canvas: point.canvas, internal: point.internal },
         FREEHAND_MIN_DISTANCE,
         force,
       );
@@ -629,6 +728,7 @@ export default observer(
         const deltaY = last.y - first.y;
 
         this.freehandDragging = deltaX * deltaX + deltaY * deltaY >= FREEHAND_DRAG_THRESHOLD * FREEHAND_DRAG_THRESHOLD;
+        if (this.freehandDragging) this.cancelDeferredFreehandCompatibility();
       }
       this.setState(({ freehandPoints }) => ({
         freehandPoints: [...freehandPoints, point.canvas.x, point.canvas.y],
@@ -652,11 +752,16 @@ export default observer(
       const pointerId = this.freehandPointerId;
       const captureTarget = this.freehandCaptureTarget;
 
+      this.restoreFreehandRepairDragging();
       this.freehandPointerId = null;
       this.freehandCaptureTarget = null;
       this.freehandTool = null;
+      this.freehandMode = null;
       this.freehandTrace = [];
       this.freehandDragging = false;
+      this.pendingFreehandMouseDown = null;
+      this.freehandRepairRegion = null;
+      this.freehandRepairEdgeIndex = null;
       this.detachFreehandFallback();
       captureTarget?.removeEventListener?.("lostpointercapture", this.handleLostPointerCapture);
       if (pointerId !== null && captureTarget?.hasPointerCapture?.(pointerId)) {
@@ -671,20 +776,36 @@ export default observer(
     };
 
     rememberFreehandCompatibilityEvent = (event) => {
+      this.cancelDeferredFreehandCompatibility();
       const clientX = Number.isFinite(event?.clientX) ? event.clientX : event?.offsetX;
       const clientY = Number.isFinite(event?.clientY) ? event.clientY : event?.offsetY;
 
       if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
-      this.freehandCompatibilityGuard = {
+      const guard = {
         clientX,
         clientY,
         expiresAt: this.freehandCompatibilityClock() + FREEHAND_COMPATIBILITY_GUARD_MS,
       };
+
+      this.freehandCompatibilityGuard = guard;
+      if (this.freehandMode === "repair") {
+        this.freehandRepairRegion?.suppressNextEdgeClick?.({
+          ...guard,
+          radius: FREEHAND_COMPATIBILITY_GUARD_DISTANCE,
+        });
+      }
     };
 
     shouldSuppressFreehandCompatibilityEvent = (event) => {
       if (!isFF(FF_POLYGON_FREEHAND)) return false;
-      if (this.freehandDragging) return true;
+      if (this.freehandPointerId !== null) {
+        if (this.freehandDragging) this.cancelDeferredFreehandCompatibility();
+        return true;
+      }
+      if (this.freehandDragging) {
+        this.cancelDeferredFreehandCompatibility();
+        return true;
+      }
 
       const guard = this.freehandCompatibilityGuard;
 
@@ -699,12 +820,14 @@ export default observer(
       const deltaX = clientX - guard.clientX;
       const deltaY = clientY - guard.clientY;
 
-      return (
+      const shouldSuppress =
         Number.isFinite(deltaX) &&
         Number.isFinite(deltaY) &&
         deltaX * deltaX + deltaY * deltaY <=
-          FREEHAND_COMPATIBILITY_GUARD_DISTANCE * FREEHAND_COMPATIBILITY_GUARD_DISTANCE
-      );
+          FREEHAND_COMPATIBILITY_GUARD_DISTANCE * FREEHAND_COMPATIBILITY_GUARD_DISTANCE;
+
+      if (shouldSuppress) this.cancelDeferredFreehandCompatibility();
+      return shouldSuppress;
     };
 
     handlePointerDown = (eventLike) => {
@@ -713,25 +836,52 @@ export default observer(
       if (this.freehandPointerId !== null || event.isPrimary === false || (event.button ?? 0) !== 0) return;
 
       const tool = this.getFreehandTool();
+      const repairTarget = this.getFreehandRepairTarget(eventLike.target, tool, event);
 
-      if (!tool?.canStartFreehand()) return;
+      if (!repairTarget && !tool?.canStartFreehand()) return;
 
       const { item } = this.props;
 
       item.updateSkipInteractions(eventLike);
       if (item.annotation.isReadOnly()) return;
       if (eventLike.target?.getParent?.()?.className === "Transformer") return;
-      if (!this.isToolInteractionTarget(eventLike.target)) return;
+      if (!repairTarget && !this.isToolInteractionTarget(eventLike.target)) return;
 
       const point = this.getFreehandPoint(event);
 
       if (!point) return;
 
+      let initialCanvasPoint = point.canvas;
+
+      if (repairTarget) {
+        const contour = this.getFreehandRepairContour(repairTarget.region);
+        const edgeStart = contour[repairTarget.edgeIndex];
+        const edgeEnd = contour[(repairTarget.edgeIndex + 1) % contour.length];
+        const anchor = edgeStart && edgeEnd ? projectPointToEdge(point.canvas, edgeStart, edgeEnd) : null;
+        const zoom = Number.isFinite(item.zoomScale) && item.zoomScale > 0 ? item.zoomScale : 1;
+        const anchorDistanceSquared = anchor
+          ? (anchor.x - point.canvas.x) ** 2 + (anchor.y - point.canvas.y) ** 2
+          : Number.POSITIVE_INFINITY;
+
+        if (!anchor || anchorDistanceSquared > (FREEHAND_REPAIR_SNAP_RADIUS / zoom) ** 2) return;
+        initialCanvasPoint = anchor;
+        event.preventDefault?.();
+        eventLike.cancelBubble = true;
+      }
+
       this.freehandCompatibilityGuard = null;
       this.freehandPointerId = event.pointerId;
       this.freehandTool = tool;
-      this.freehandTrace = appendFreehandPoint([], { ...point.screen, internal: point.internal });
-      this.setState({ freehandPoints: [point.canvas.x, point.canvas.y] });
+      this.freehandMode = repairTarget ? "repair" : "create";
+      this.freehandRepairRegion = repairTarget?.region ?? null;
+      this.freehandRepairEdgeIndex = repairTarget?.edgeIndex ?? null;
+      this.freehandTrace = appendFreehandPoint([], {
+        ...point.screen,
+        canvas: initialCanvasPoint,
+        internal: point.internal,
+      });
+      this.setState({ freehandPoints: [initialCanvasPoint.x, initialCanvasPoint.y] });
+      if (repairTarget) this.suspendFreehandRepairDragging(repairTarget.region);
 
       const captureTarget = this.props.item.stageRef?.content;
 
@@ -763,34 +913,73 @@ export default observer(
 
       if (event.pointerId !== this.freehandPointerId) return;
 
-      this.appendFreehandEventPoint(event, true);
-      const wasDragging = this.freehandDragging;
+      let replayMouseDown = null;
 
-      if (wasDragging) {
-        event.preventDefault?.();
-        this.rememberFreehandCompatibilityEvent(event);
-        const points = simplifyFreehandPoints(this.freehandTrace, FREEHAND_SIMPLIFY_EPSILON).map(
-          ({ internal }) => internal,
-        );
+      try {
+        this.appendFreehandEventPoint(event, true);
+        const wasDragging = this.freehandDragging;
+        const mode = this.freehandMode;
 
-        if (points.length >= 3 && this.freehandTool === this.getFreehandTool() && isAlive(this.freehandTool)) {
-          this.freehandTool.commitFreehand(points);
+        if (wasDragging) {
+          event.preventDefault?.();
+          this.rememberFreehandCompatibilityEvent(event);
+          const simplifiedTrace = simplifyFreehandPoints(this.freehandTrace, FREEHAND_SIMPLIFY_EPSILON);
+          const toolIsCurrent = this.freehandTool === this.getFreehandTool() && isAlive(this.freehandTool);
+
+          if (mode === "repair") {
+            const { item } = this.props;
+            const region = this.freehandRepairRegion;
+            const zoom = Number.isFinite(item.zoomScale) && item.zoomScale > 0 ? item.zoomScale : 1;
+            const repair =
+              this.freehandTrace.length >= FREEHAND_REPAIR_MIN_RAW_POINTS &&
+              simplifiedTrace.length >= 2 &&
+              toolIsCurrent &&
+              this.freehandTool.canRepairFreehand?.(region) === true
+                ? buildFreehandRepairContour(
+                    this.getFreehandRepairContour(region),
+                    simplifiedTrace.map(({ canvas }) => canvas),
+                    { snapRadius: FREEHAND_REPAIR_SNAP_RADIUS / zoom },
+                  )
+                : null;
+
+            if (repair) {
+              const points = repair.points.map(({ x, y }) => [item.canvasToInternalX(x), item.canvasToInternalY(y)]);
+
+              this.freehandTool.commitFreehandRepair?.(region, points);
+            }
+          } else {
+            const points = simplifiedTrace.map(({ internal }) => internal);
+
+            if (points.length >= 3 && toolIsCurrent && isValidFreehandContour(points)) {
+              this.freehandTool.commitFreehand(points);
+            }
+          }
+        } else if (mode === "repair") {
+          event.preventDefault?.();
+          this.rememberFreehandCompatibilityEvent(event);
+          this.insertFreehandRepairPoint(event);
+        } else if (mode === "create") {
+          replayMouseDown = this.pendingFreehandMouseDown;
+          this.pendingFreehandMouseDown = null;
         }
+      } finally {
+        this.resetFreehand();
+        if (replayMouseDown) this.handleMouseDown(replayMouseDown);
       }
-
-      this.resetFreehand();
     };
 
     handlePointerCancel = (eventLike) => {
       const event = eventLike.evt || eventLike;
 
       if (event.pointerId !== this.freehandPointerId) return;
-      if (this.freehandDragging) this.rememberFreehandCompatibilityEvent(event);
+      if (this.freehandDragging || this.freehandMode === "repair") this.rememberFreehandCompatibilityEvent(event);
       this.resetFreehand();
     };
 
     handleLostPointerCapture = (event) => {
-      if (event.pointerId === this.freehandPointerId) this.resetFreehand();
+      if (event.pointerId !== this.freehandPointerId) return;
+      if (this.freehandDragging || this.freehandMode === "repair") this.rememberFreehandCompatibilityEvent(event);
+      this.resetFreehand();
     };
 
     handleOnClick = (e) => {
@@ -856,6 +1045,12 @@ export default observer(
       }
     };
 
+    cancelDeferredFreehandCompatibility = () => {
+      this.resetDeferredClickTimeout();
+      this.handleDeferredMouseDown = null;
+      this.pendingFreehandMouseDown = null;
+    };
+
     handleDeferredClick = (handleDeferredMouseDownCallback, handleDeselection, eligibleToDeselect = false) => {
       this.handleDeferredMouseDown = (wasClicked) => {
         if (wasClicked && eligibleToDeselect) {
@@ -877,6 +1072,10 @@ export default observer(
     };
 
     handleMouseDown = (e) => {
+      if (isFF(FF_POLYGON_FREEHAND) && this.freehandPointerId !== null) {
+        if (this.freehandMode === "create" && !this.freehandDragging) this.pendingFreehandMouseDown = e;
+        return true;
+      }
       if (this.shouldSuppressFreehandCompatibilityEvent(e.evt || e)) return true;
       this.mouseDown = true;
       const { item } = this.props;
@@ -1230,6 +1429,13 @@ export default observer(
     }
 
     componentDidUpdate() {
+      if (this.freehandPointerId !== null) {
+        const tool = this.getFreehandTool();
+        const repairIsInvalid =
+          this.freehandMode === "repair" && tool?.canRepairFreehand?.(this.freehandRepairRegion) !== true;
+
+        if (tool !== this.freehandTool || !isAlive(this.freehandTool) || repairIsInvalid) this.resetFreehand();
+      }
       this.onResize();
       this.updateReadyStatus();
     }

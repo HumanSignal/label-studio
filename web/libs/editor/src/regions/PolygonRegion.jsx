@@ -18,6 +18,7 @@ import { AliveRegion } from "./AliveRegion";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { observer } from "mobx-react";
 import { createDragBoundFunc } from "../utils/image";
+import { isValidFreehandContour } from "../utils/freehand";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 
 const Model = types
@@ -39,6 +40,7 @@ const Model = types
     preferTransformer: false,
     supportsRotate: false,
     supportsScale: true,
+    edgeClickGuard: null,
   }))
   .views((self) => ({
     get store() {
@@ -72,6 +74,22 @@ const Model = types
     },
   }))
   .actions((self) => {
+    const shouldSuppressEdgeClick = (event) => {
+      const guard = self.edgeClickGuard;
+
+      self.edgeClickGuard = null;
+      if (!guard || Date.now() >= guard.expiresAt) return false;
+
+      const x = Number.isFinite(event?.clientX) ? event.clientX : event?.offsetX;
+      const y = Number.isFinite(event?.clientY) ? event.clientY : event?.offsetY;
+      const deltaX = x - guard.clientX;
+      const deltaY = y - guard.clientY;
+
+      return (
+        Number.isFinite(deltaX) && Number.isFinite(deltaY) && deltaX * deltaX + deltaY * deltaY <= guard.radius ** 2
+      );
+    };
+
     return {
       afterCreate() {
         if (!self.points.length) return;
@@ -127,6 +145,7 @@ const Model = types
         if (!self.closed || !self.selected) return;
 
         e.cancelBubble = true;
+        if (self.consumeEdgeClickGuard(e.evt)) return;
 
         removeHoverAnchor({ layer: e.currentTarget.getLayer() });
 
@@ -136,6 +155,15 @@ const Model = types
         const point = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
         self.insertPoint(insertIdx, point[0], point[1]);
+      },
+
+      suppressNextEdgeClick({ clientX, clientY, expiresAt, radius }) {
+        if (![clientX, clientY, expiresAt, radius].every(Number.isFinite) || radius < 0) return;
+        self.edgeClickGuard = { clientX, clientY, expiresAt, radius };
+      },
+
+      consumeEdgeClickGuard(event) {
+        return shouldSuppressEdgeClick(event);
       },
 
       deletePoint(point) {
@@ -161,6 +189,87 @@ const Model = types
           p.x = points[idx * 2];
           p.y = points[idx * 2 + 1];
         });
+      },
+
+      replacePoints(points) {
+        if (!Array.isArray(points) || points.length < 3) return false;
+
+        const snappedPoints = points.map((point) => {
+          const x = Array.isArray(point) ? point[0] : point?.x;
+          const y = Array.isArray(point) ? point[1] : point?.y;
+          const snappedPoint =
+            Number.isFinite(x) && Number.isFinite(y) ? (self.control?.getSnappedPoint?.({ x, y }) ?? { x, y }) : null;
+
+          return snappedPoint;
+        });
+
+        if (snappedPoints.some((point) => !point || !Number.isFinite(point.x) || !Number.isFinite(point.y))) {
+          return false;
+        }
+
+        const normalizedPoints = snappedPoints.reduce((result, point) => {
+          const previous = result[result.length - 1];
+
+          if (!previous || previous.x !== point.x || previous.y !== point.y) result.push(point);
+          return result;
+        }, []);
+
+        const firstPoint = normalizedPoints[0];
+        const lastPoint = normalizedPoints[normalizedPoints.length - 1];
+
+        if (firstPoint && lastPoint && firstPoint.x === lastPoint.x && firstPoint.y === lastPoint.y) {
+          normalizedPoints.pop();
+        }
+        if (normalizedPoints.length < 3) return false;
+
+        if (
+          normalizedPoints.length === self.points.length &&
+          normalizedPoints.every(({ x, y }, index) => self.points[index].x === x && self.points[index].y === y)
+        ) {
+          return false;
+        }
+
+        const uniquePoints = new Set(normalizedPoints.map(({ x, y }) => `${x}:${y}`));
+
+        if (uniquePoints.size !== normalizedPoints.length) return false;
+
+        const signedDoubleArea = normalizedPoints.reduce((area, point, index) => {
+          const next = normalizedPoints[(index + 1) % normalizedPoints.length];
+
+          return area + point.x * next.y - next.x * point.y;
+        }, 0);
+        const previousSignedDoubleArea = self.points.reduce((area, point, index) => {
+          const next = self.points[(index + 1) % self.points.length];
+
+          return area + point.x * next.y - next.x * point.y;
+        }, 0);
+
+        if (Math.abs(signedDoubleArea) < 1e-12) return false;
+        if (
+          Math.sign(previousSignedDoubleArea) !== 0 &&
+          Math.sign(signedDoubleArea) !== Math.sign(previousSignedDoubleArea)
+        ) {
+          return false;
+        }
+        if (!isValidFreehandContour(normalizedPoints)) return false;
+
+        const pointSize = self.points[0]?.size ?? self.pointSize ?? "small";
+        const pointStyle = self.points[0]?.style ?? self.pointStyle ?? "circle";
+
+        if (self.selectedPoint) self.selectedPoint.selected = false;
+        self.selectedPoint = null;
+        self.points.replace(
+          normalizedPoints.map(({ x, y }, index) => ({
+            id: guidGenerator(),
+            x,
+            y,
+            size: pointSize,
+            style: pointStyle,
+            index,
+          })),
+        );
+
+        return true;
       },
 
       insertPoint(insertIdx, x, y) {

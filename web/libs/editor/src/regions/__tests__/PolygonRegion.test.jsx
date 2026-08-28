@@ -241,6 +241,149 @@ describe("PolygonRegion", () => {
       expect(region.points[2].y).toBe(20);
     });
 
+    it("replacePoints safely rebuilds a contour with a different number of points", () => {
+      const previousIds = region.points.map((point) => point.id);
+
+      region.setSelectedPoint(region.points[1]);
+
+      expect(
+        region.replacePoints([
+          [5, 5],
+          [30, 0],
+          [60, 20],
+          [45, 60],
+          [5, 45],
+        ]),
+      ).toBe(true);
+      expect(region.selectedPoint).toBeNull();
+      expect(region.points).toHaveLength(5);
+      expect(region.points.map(({ x, y }) => [x, y])).toEqual([
+        [5, 5],
+        [30, 0],
+        [60, 20],
+        [45, 60],
+        [5, 45],
+      ]);
+      expect(region.points.map((point) => point.index)).toEqual([0, 1, 2, 3, 4]);
+      expect(region.points.every((point) => !previousIds.includes(point.id))).toBe(true);
+
+      expect(
+        region.replacePoints([
+          { x: 10, y: 10 },
+          { x: 40, y: 10 },
+          { x: 25, y: 40 },
+        ]),
+      ).toBe(true);
+      expect(region.points).toHaveLength(3);
+      expect(region.points.map(({ x, y }) => [x, y])).toEqual([
+        [10, 10],
+        [40, 10],
+        [25, 40],
+      ]);
+    });
+
+    it("replacePoints rejects malformed or degenerate contours without changing the region", () => {
+      const originalPoints = region.points.map(({ id, x, y, index }) => ({ id, x, y, index }));
+
+      expect(
+        region.replacePoints([
+          [0, 0],
+          [10, 10],
+        ]),
+      ).toBe(false);
+      expect(
+        region.replacePoints([
+          [0, 0],
+          [10, Number.NaN],
+          [20, 20],
+        ]),
+      ).toBe(false);
+      expect(
+        region.replacePoints([
+          [10, 10],
+          [10, 10],
+          [10, 10],
+        ]),
+      ).toBe(false);
+      expect(region.points.map(({ id, x, y, index }) => ({ id, x, y, index }))).toEqual(originalPoints);
+    });
+
+    it("normalizes duplicate adjacent and closing points before rebuilding", () => {
+      expect(
+        region.replacePoints([
+          [0, 0],
+          [0, 0],
+          [50, 0],
+          [50, 50],
+          [0, 50],
+          [0, 0],
+        ]),
+      ).toBe(true);
+      expect(region.points.map(({ x, y }) => [x, y])).toEqual([
+        [0, 0],
+        [50, 0],
+        [50, 50],
+        [0, 50],
+      ]);
+    });
+
+    it("rejects a zero-area contour after normalization", () => {
+      const originalPoints = region.points.map(({ x, y }) => [x, y]);
+
+      expect(
+        region.replacePoints([
+          [0, 0],
+          [10, 0],
+          [20, 0],
+        ]),
+      ).toBe(false);
+      expect(region.points.map(({ x, y }) => [x, y])).toEqual(originalPoints);
+    });
+
+    it("rejects a self-intersecting contour after snapping without changing the region", () => {
+      const originalPoints = region.points.map(({ id, x, y, index }) => ({ id, x, y, index }));
+
+      expect(
+        region.replacePoints([
+          [10, 10],
+          [12, 11],
+          [10, 12],
+          [11, 10],
+        ]),
+      ).toBe(false);
+      expect(region.points.map(({ id, x, y, index }) => ({ id, x, y, index }))).toEqual(originalPoints);
+    });
+
+    it("consumes one nearby compatibility click after a freehand repair", () => {
+      region.suppressNextEdgeClick({
+        clientX: 50,
+        clientY: 20,
+        expiresAt: Date.now() + 1000,
+        radius: 25,
+      });
+
+      expect(region.consumeEdgeClickGuard({ clientX: 55, clientY: 25 })).toBe(true);
+      expect(region.consumeEdgeClickGuard({ clientX: 55, clientY: 25 })).toBe(false);
+    });
+
+    it("does not suppress an expired or distant edge click", () => {
+      region.suppressNextEdgeClick({
+        clientX: 50,
+        clientY: 20,
+        expiresAt: Date.now() - 1,
+        radius: 25,
+      });
+      expect(region.consumeEdgeClickGuard({ clientX: 50, clientY: 20 })).toBe(false);
+
+      region.suppressNextEdgeClick({
+        clientX: 50,
+        clientY: 20,
+        expiresAt: Date.now() + 1000,
+        radius: 25,
+      });
+      expect(region.consumeEdgeClickGuard({ clientX: 100, clientY: 20 })).toBe(false);
+    });
+
     it("afterUnselectRegion clears selectedPoint.selected", () => {
       const firstPoint = region.points[0];
       region.setSelectedPoint(firstPoint);
