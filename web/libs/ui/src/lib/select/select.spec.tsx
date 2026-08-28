@@ -61,6 +61,18 @@ mockModule("react-window-infinite-loader", () => ({
   },
 }));
 
+function getLastVirtualListProps() {
+  const calls = mockVariableSizeList.mock.calls;
+  for (let i = calls.length - 1; i >= 0; i--) {
+    const entry = calls[i];
+    const props = Array.isArray(entry) ? entry[0] : entry;
+    if (props && typeof props === "object" && "itemCount" in props) {
+      return props;
+    }
+  }
+  throw new Error("VariableSizeList was not called with list props");
+}
+
 describe("Select Component", () => {
   beforeEach(() => {
     mockVariableSizeList.mockClear();
@@ -220,6 +232,56 @@ describe("Select Component", () => {
         const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
         expect(lastCall.height).toBe(2 * ITEM_HEIGHT);
       });
+    });
+
+    it("passes raw option data as itemData instead of prebuilt React elements", async () => {
+      const options = Array.from({ length: 20 }, (_, i) => ({
+        value: String(i),
+        label: `Option ${i}`,
+        badge: `id=${i}`,
+      }));
+
+      render(<Select options={options as any} isVirtualList={true} searchable={true} placeholder="Select" />);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(mockVariableSizeList).toHaveBeenCalled();
+      });
+
+      const lastCall = getLastVirtualListProps();
+      expect(lastCall.itemData).toEqual(options);
+      expect(lastCall.itemData[0].$$typeof).toBeUndefined();
+      expect(lastCall.overscanCount).toBe(4);
+    });
+
+    it("renders visible virtual rows with optionRenderer and badge", async () => {
+      const optionRenderer = mock(({ option }: { option: { label: string } }) => `rendered:${option.label}`);
+      const options = Array.from({ length: 20 }, (_, i) => ({
+        value: String(i),
+        label: `Option ${i}`,
+        badge: `id=${i}`,
+      }));
+
+      render(
+        <Select
+          options={options as any}
+          isVirtualList={true}
+          searchable={true}
+          placeholder="Select"
+          optionRenderer={optionRenderer}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("rendered:Option 0")).toBeInTheDocument();
+        expect(screen.getByText("id=0")).toBeInTheDocument();
+      });
+
+      expect(optionRenderer.mock.calls.length).toBeLessThanOrEqual(5);
+      expect(screen.queryByText("rendered:Option 19")).not.toBeInTheDocument();
     });
   });
 

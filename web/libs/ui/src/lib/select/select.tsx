@@ -535,7 +535,42 @@ export const Select = forwardRef(
       );
     }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
 
+    const hasNestedChildren = useMemo(
+      () => !groupedOptions && _options.some((option) => option?.children?.length),
+      [groupedOptions, _options],
+    );
+    const isLazyVirtualList = Boolean(isVirtualList && !groupedOptions && !hasNestedChildren);
+
+    const renderFlatOption = (option: any, index: number) => {
+      const optionValue = option?.value ?? option;
+      const label = option?.label ?? optionValue;
+      const isOptionSelected = isSelected(optionValue);
+
+      return (
+        <Option
+          key={`${optionValue}_${index}`}
+          value={optionValue}
+          label={label}
+          option={option}
+          {...(optionRenderer && {
+            optionRenderer,
+            optionIndex: index,
+          })}
+          isOptionSelected={isOptionSelected}
+          disabled={readOnly || option?.disabled}
+          style={option?.style}
+          multiple={multiple}
+          onSelect={() => {
+            _onChange(optionValue, isOptionSelected);
+          }}
+        />
+      );
+    };
+
     const renderedOptions = useMemo(() => {
+      if (isLazyVirtualList) {
+        return [];
+      }
       if (groupedOptions) {
         let globalIndex = 0;
         return groupedOptions.map((group, groupIdx) => {
@@ -655,27 +690,10 @@ export const Select = forwardRef(
             </CommandGroup>
           );
         }
-        return (
-          <Option
-            key={`${optionValue}_${index}`}
-            value={optionValue}
-            label={label}
-            option={option}
-            {...(optionRenderer && {
-              optionRenderer,
-              optionIndex: index,
-            })}
-            isOptionSelected={isOptionSelected}
-            disabled={readOnly || option?.disabled}
-            style={option?.style}
-            multiple={multiple}
-            onSelect={() => {
-              _onChange(optionValue, isOptionSelected);
-            }}
-          />
-        );
+        return renderFlatOption(option, index);
       });
     }, [
+      isLazyVirtualList,
       _options,
       groupedOptions,
       multiple,
@@ -779,12 +797,12 @@ export const Select = forwardRef(
                   {props.header ? props.header : null}
                   {isVirtualList ? (
                     <InfiniteLoader
-                      itemCount={itemCount ?? renderedOptions.length}
+                      itemCount={itemCount ?? (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       loadMoreItems={() => {
                         loadMore?.();
                         return Promise.resolve();
                       }}
-                      isItemLoaded={(index) => index < renderedOptions.length}
+                      isItemLoaded={(index) => index < (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       threshold={1}
                       minimumBatchSize={pageSize / 2}
                     >
@@ -795,6 +813,7 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
+                        const listItems = isLazyVirtualList ? _options : renderedOptions;
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
                         const maxVisibleItems = virtualListMaxVisible ?? VARIABLE_LIST_COUNT_RENDERED;
 
@@ -810,17 +829,21 @@ export const Select = forwardRef(
                         return (
                           <VariableSizeList
                             key="virtual-list"
-                            itemData={renderedOptions}
+                            itemData={listItems}
                             itemSize={getItemHeight}
-                            itemCount={renderedOptions.length}
+                            itemCount={listItems.length}
                             height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
-                            overscanCount={0}
+                            overscanCount={isLazyVirtualList ? 4 : 0}
                           >
                             {({ index, style }) => {
-                              return <div style={style}>{renderedOptions[index]}</div>;
+                              return (
+                                <div style={style}>
+                                  {isLazyVirtualList ? renderFlatOption(listItems[index], index) : listItems[index]}
+                                </div>
+                              );
                             }}
                           </VariableSizeList>
                         );
