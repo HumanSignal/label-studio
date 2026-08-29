@@ -53,6 +53,7 @@ export const IconBookEdit = IconStub;
 export const IconBookOpenText = IconStub;
 export const IconBouncing3Dots = IconStub;
 export const IconBoundingBox = IconStub;
+export const IconBrain = IconStub;
 export const IconBraces = IconStub;
 export const IconBrightnessTool = IconStub;
 export const IconBrushTool = IconStub;

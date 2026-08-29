@@ -41,6 +41,7 @@ export { ReactComponent as IconBookOpenText } from "./book-open-text.svg";
 export { ReactComponent as IconClosedBook } from "./closed-book.svg";
 export { ReactComponent as IconBouncing3Dots } from "./bouncing-3-dots.svg";
 export { ReactComponent as IconBoundingBox } from "./bounding-box.svg";
+export { ReactComponent as IconBrain } from "./brain.svg";
 export { ReactComponent as IconBrightnessTool } from "./brightness-tool.svg";
 export { ReactComponent as IconBrushTool } from "./brush-tool.svg";
 export { ReactComponent as IconBrushToolSmart } from "./brush-tool-smart.svg";
