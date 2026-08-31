@@ -486,7 +486,7 @@ MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_second
 # The most time that can elapse between activity with the server before the user is logged out
 MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
-SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', True)
 USE_DEFAULT_BANNED_SUBNETS = get_bool_env('USE_DEFAULT_BANNED_SUBNETS', True)
 USER_ADDITIONAL_BANNED_SUBNETS = get_env_list('USER_ADDITIONAL_BANNED_SUBNETS', default=[])
 
