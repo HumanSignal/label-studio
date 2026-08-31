@@ -139,6 +139,11 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3_MEMBERS = "fflag_feat_lse_project_dash
 export const FF_LSE_PROJECT_DASHBOARDS_V3_DATA_QUALITY = "fflag_feat_lse_project_dashboards_v3_data_quality_short";
 
 /**
+ * Enables filtered Label Distribution reads and their Data Quality filter-state shell.
+ */
+export const FF_FILTERED_LABEL_DISTRIBUTION = "fflag_feat_all_fit_2318_filtered_label_distribution";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
