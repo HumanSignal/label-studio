@@ -808,7 +808,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             )
                             prediction_score = None
 
-                    last_model_version = prediction.get('model_version', 'undefined')
+                    last_model_version = prediction.get('model_version') or None
                     db_predictions.append(
                         Prediction(
                             task=self.db_tasks[i],

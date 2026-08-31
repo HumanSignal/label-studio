@@ -55,13 +55,15 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
     [version, onDelete],
   );
 
+  const hasNoVersion = !version.model_version || version.model_version === "undefined";
+
   return (
     <div className={rootClass.toClassName()}>
       <div>
         <div className={rootClass.elem("title").toClassName()}>
-          {version.model_version}
-          {version.model_version === "undefined" && (
-            <Tooltip title="Model version is undefined. Likely means that model_version field was missing when predictions were imported.">
+          {hasNoVersion ? "No model version" : version.model_version}
+          {hasNoVersion && (
+            <Tooltip title="No model version on these predictions. Usually means the model_version field was missing when predictions were imported.">
               <IconInfoOutline className={cn("help-icon").toClassName()} width="14" height="14" />
             </Tooltip>
           )}

@@ -825,20 +825,24 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
     def delete_predictions(self, model_version=None):
         """
-        Deletes the predictions based on the provided model version.
-        If no model version is provided, it deletes all the predictions for this project.
+        Deletes predictions for this project filtered by model version.
 
-        :param model_version: Identifier of the model version (default is None)
+        :param model_version: If None, deletes predictions whose model_version
+            is NULL, empty, or the legacy placeholder 'undefined' (predictions
+            imported without a version label — see the data migration that
+            backfills 'undefined' to NULL). Otherwise filters by exact match.
         :type model_version: str, optional
         :return: Dictionary with count of deleted predictions
         :rtype: dict
         """
-        params = {'project': self}
-
-        if model_version:
-            params.update({'model_version': model_version})
-
-        predictions = Prediction.objects.filter(**params)
+        if model_version is None:
+            predictions = Prediction.objects.filter(project=self).filter(
+                Q(model_version__isnull=True)
+                | Q(model_version='')
+                | Q(model_version='undefined')
+            )
+        else:
+            predictions = Prediction.objects.filter(project=self, model_version=model_version)
 
         with transaction.atomic():
             # If we are deleting specific model_version then we need
