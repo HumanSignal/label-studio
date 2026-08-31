@@ -1203,10 +1203,14 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         return values
 
     def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
-        from io_storages.functions import get_storage_by_url
+        from io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
 
         storage_objects = self.get_all_import_storage_objects
         storage = get_storage_by_url(url, storage_objects)
+        if not storage:
+            # Project-produced assets (e.g. Data Collection submissions) live in
+            # an export target; import first keeps existing resolution unchanged.
+            storage = resolve_own_collection_export_storage(url, self)
 
         if storage:
             return {

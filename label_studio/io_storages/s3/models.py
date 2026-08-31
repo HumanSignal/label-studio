@@ -278,6 +278,23 @@ class S3ImportStorage(ProjectStorageMixin, S3ImportStorageBase):
 
 
 class S3ExportStorage(S3StorageMixin, ExportStorage):
+    # Read-back support. An export target holds assets the project itself
+    # produced (annotation JSON, and for Data Collection the submitted media),
+    # which the editor and Data Manager must be able to preview. Plain class
+    # attributes, not model fields: there is nothing per-connection to store or
+    # migrate, but an org that requires proxy-only access can still turn
+    # presigning off instance-wide via EXPORT_STORAGE_PRESIGN.
+    presign = settings.EXPORT_STORAGE_PRESIGN
+    presign_ttl = settings.EXPORT_STORAGE_PRESIGN_TTL_MINUTES
+
+    @catch_and_reraise_from_none
+    def generate_http_url(self, url):
+        return resolve_s3_url(url, self.get_client(), presign=self.presign, expires_in=self.presign_ttl * 60)
+
+    @catch_and_reraise_from_none
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
+        return storage_can_resolve_bucket_url(self, url)
+
     @catch_and_reraise_from_none
     def save_annotation(self, annotation):
         client, s3 = self.get_client_and_resource()

@@ -881,6 +881,16 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+# TTL for presigned reads of export-target objects. Export connections have no
+# per-connection presign settings (nothing to configure on a write target), so
+# previews of project-produced assets sign with this instead. Long enough to
+# scrub a video without re-resolving; short enough to bound a leaked link.
+EXPORT_STORAGE_PRESIGN_TTL_MINUTES = int(get_env('EXPORT_STORAGE_PRESIGN_TTL_MINUTES', 15))
+# Whether reads of export-target objects are presigned. Turning this off keeps
+# an org that requires proxy-only access proxying these objects through Label
+# Studio's own auth, exactly as the presign flag does on import connections.
+EXPORT_STORAGE_PRESIGN = get_bool_env('EXPORT_STORAGE_PRESIGN', default=True)
+
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))

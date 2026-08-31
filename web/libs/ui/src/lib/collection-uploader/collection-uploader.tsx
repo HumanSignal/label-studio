@@ -33,6 +33,10 @@ export interface CollectionUploaderProps {
   disabled?: boolean;
   hint?: string;
   className?: string;
+  /** Highlight the dropzone from outside — e.g. while a file is dragged
+   * anywhere over a host surface that will forward the drop here, so the user
+   * can see there is somewhere for the file to land. */
+  dragActive?: boolean;
 }
 
 function formatSize(bytes: number): string {
@@ -64,9 +68,11 @@ export const CollectionUploader = ({
   disabled = false,
   hint,
   className,
+  dragActive = false,
 }: CollectionUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const highlighted = (dragging || dragActive) && !disabled;
 
   const pick = useCallback(
     (files: FileList | null) => {
@@ -102,7 +108,7 @@ export const CollectionUploader = ({
         data-testid="collection-uploader-dropzone"
         className={cn(
           "flex flex-col items-center justify-center gap-tightest rounded-small border-2 border-dashed p-wide text-center transition-colors",
-          dragging ? "border-primary-border bg-primary-background" : "border-neutral-border bg-neutral-surface",
+          highlighted ? "border-primary-border bg-primary-background" : "border-neutral-border bg-neutral-surface",
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-primary-border",
         )}
         onClick={() => !disabled && inputRef.current?.click()}
