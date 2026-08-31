@@ -9,14 +9,13 @@ on:
 
 env:
   DJANGO_SETTINGS_MODULE: core.settings.label_studio
-  COVERAGE_PROCESS_START: 1
+  COVERAGE_PROCESS_START: label_studio/.coveragerc
   LOG_DIR: pytest_logs
   COLLECT_ANALYTICS: true
   DEBUG_CONTEXTLOG: true
   LABEL_STUDIO_TEST_ENVIRONMENT: false
   SENTRY_RATE: 0
   JSON_LOG: 0
-  POETRY_VERSION: 2.3.2
 
 jobs:
   sqlite-migrations:
@@ -31,19 +30,16 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: "Checkout"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v6
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: "Install OS dependencies"
         run: |
@@ -51,11 +47,11 @@ jobs:
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
       - name: "Install dependencies"
-        run: poetry install
+        run: uv sync --frozen
 
       - name: "Test migrations"
         run: |
-          output=$(poetry run python label_studio/manage.py makemigrations)
+          output=$(uv run --no-sync python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
             error="${output}"
             error="${error//'%'/'%25'}"
@@ -76,7 +72,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13.8
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
@@ -93,20 +89,17 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: "Checkout"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 2147483647
 
-      - name: "Install poetry"
-        run: pipx install "poetry==${{ env.POETRY_VERSION }}"
-
-      - name: "Set up Python"
-        id: setup_python
-        uses: actions/setup-python@v6
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.13'
-          cache: 'poetry'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: "Install OS dependencies"
         run: |
@@ -115,12 +108,17 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          poetry install
+          uv sync --frozen
 
       - name: "Test migrations"
         run: |
-          poetry run python label_studio/manage.py makemigrations
+          uv run --no-sync python label_studio/manage.py makemigrations
 
       - name: "Lint migrations"
         run: |
-          poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            echo "Base commit $BASE_SHA is not reachable (force-push or new branch), skipping migration lint"
+            exit 0
+          fi
+          uv run --no-sync python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id "$BASE_SHA"

@@ -11,8 +11,6 @@ import { Hotkey } from "./core/Hotkey";
 import defaultOptions from "./defaultOptions";
 import { destroy as destroySharedStore } from "./mixins/SharedChoiceStore/mixin";
 import { EventInvoker } from "./utils/events";
-import { FF_LSDV_4620_3_ML, isFF } from "./utils/feature-flags";
-import { cleanDomAfterReact, findReactKey } from "./utils/reactCleaner";
 import { isDefined } from "./utils/utilities";
 
 // Extend window interface for TypeScript
@@ -129,55 +127,20 @@ export class LabelStudio {
     this.store = store;
     window.Htx = this.store;
 
-    const isRendered = false;
-
     const renderApp = () => {
-      if (isRendered) {
-        clearRenderedApp();
-      }
       render(<App store={this.store} />, rootElement);
     };
 
-    const clearRenderedApp = () => {
-      if (!rootElement.childNodes?.length) return;
-
-      const childNodes = [...rootElement.childNodes];
-      // cleanDomAfterReact needs this key to be sure that cleaning affects only current react subtree
-      const reactKey = findReactKey(childNodes[0]);
-
-      unmountComponentAtNode(rootElement);
-      /*
-        Unmounting doesn't help with clearing React's fibers
-        but removing the manually helps
-        @see https://github.com/facebook/react/pull/20290 (similar problem)
-        That's maybe not relevant in version 18
-       */
-      cleanDomAfterReact(childNodes, reactKey);
-      cleanDomAfterReact([rootElement], reactKey);
-    };
-
     renderApp();
-    store.setAppControls({
-      isRendered() {
-        return isRendered;
-      },
-      render: renderApp,
-      clear: clearRenderedApp,
-    });
 
     this.destroy = () => {
-      if (isFF(FF_LSDV_4620_3_ML)) {
-        clearRenderedApp();
-      }
+      // Unmount the React tree first (same order as createAppV18), while the
+      // stores are still alive for cleanup effects. Without the unmount,
+      // mounted components keep window-level listeners (e.g. ReactCode's
+      // message handler) alive, and a lingering editor absorbs postMessage
+      // mutations meant for the next one.
+      unmountComponentAtNode(rootElement);
       destroySharedStore();
-      if (isFF(FF_LSDV_4620_3_ML)) {
-        /*
-           It seems that destroying children separately helps GC to collect garbage
-           ...
-         */
-        this.store.selfDestroy();
-      }
-
       window.Htx = null;
       destroy(this.store);
       Hotkey.unbindAll();
@@ -217,14 +180,6 @@ export class LabelStudio {
     };
 
     renderApp();
-
-    store.setAppControls({
-      isRendered() {
-        return isRendered;
-      },
-      render: renderApp,
-      clear: clearRenderedApp,
-    });
 
     this.destroy = () => {
       // Clear rendered app

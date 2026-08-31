@@ -5,10 +5,10 @@ import { PanelBase, type PanelProps } from "../PanelBase";
 import { OutlinerTree } from "./OutlinerTree";
 import { ViewControls } from "./ViewControls";
 import "./OutlinerPanel.prefix.css";
-import { IconInfo } from "@humansignal/icons";
-import { IconLsLabeling } from "@humansignal/ui";
+import { IconInfo, IconLsLabeling } from "@humansignal/icons";
 import { EmptyState } from "../Components/EmptyState";
 import { getDocsUrl } from "../../../utils/docs";
+import { emitRegionListGrouped, emitRegionListSorted } from "../../../utils/labelingTelemetry";
 
 // Local type definitions based on ViewControls and RegionStore
 type GroupingOptions = "manual" | "label" | "type";
@@ -31,6 +31,11 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
   const onOrderingChange = useCallback(
     (value: OrderingOptions) => {
       regions.setSort(value);
+      const annotation = regions?.annotation;
+      emitRegionListSorted(annotation?.store, annotation, {
+        sort_key: regions.sort,
+        ascending: regions.sortOrder === "asc",
+      });
     },
     [regions],
   );
@@ -39,6 +44,8 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
     (value: GroupingOptions) => {
       regions.setGrouping(value);
       setGroup(value);
+      const annotation = regions?.annotation;
+      emitRegionListGrouped(annotation?.store, annotation, { group_by: value });
     },
     [regions],
   );
@@ -67,6 +74,11 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   const onOrderingChange = useCallback(
     (value: OrderingOptions) => {
       regions.setSort(value);
+      const annotation = regions?.annotation;
+      emitRegionListSorted(annotation?.store, annotation, {
+        sort_key: regions.sort,
+        ascending: regions.sortOrder === "asc",
+      });
     },
     [regions],
   );
@@ -74,6 +86,8 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   const onGroupingChange = useCallback(
     (value: GroupingOptions) => {
       regions.setGrouping(value);
+      const annotation = regions?.annotation;
+      emitRegionListGrouped(annotation?.store, annotation, { group_by: value });
     },
     [regions],
   );
@@ -115,6 +129,8 @@ const OutlinerEmptyState = () => (
 
 const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ regions }) => {
   const allRegionsHidden = regions?.regions?.length > 0 && regions?.filter?.length === 0;
+  const hasClassifications = regions?.classificationAreas?.length > 0;
+  const hasContent = regions?.regions?.length > 0 || hasClassifications;
 
   const hiddenRegions = useMemo(() => {
     if (!regions?.regions?.length || !regions.filter?.length) return 0;
@@ -124,7 +140,7 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
 
   return (
     <>
-      {allRegionsHidden ? (
+      {allRegionsHidden && !hasClassifications ? (
         <div className={cn("filters-info").toClassName()}>
           <IconInfo width={21} height={20} />
           <div className={cn("filters-info").elem("filters-title").toClassName()}>All regions hidden</div>
@@ -132,7 +148,7 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
             Adjust or remove the filters to view
           </div>
         </div>
-      ) : regions?.regions?.length > 0 ? (
+      ) : hasContent ? (
         <>
           <OutlinerTree
             regions={regions}

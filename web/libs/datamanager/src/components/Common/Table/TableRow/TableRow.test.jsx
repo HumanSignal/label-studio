@@ -1,22 +1,23 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { TableRow } from "./TableRow";
 import { TableContext } from "../TableContext";
+import { FF_LOPS_E_3 } from "../../../../utils/feature-flags";
 
 // Mock SkeletonLoader
-jest.mock("../../SkeletonLoader", () => ({
+mockModule("../../SkeletonLoader", () => ({
   SkeletonLoader: () => <div data-testid="skeleton-loader">Loading...</div>,
 }));
 
 // Mock feature flags
-jest.mock("../../../../utils/feature-flags", () => ({
-  FF_LOPS_E_3: "fflag_feat_all_lops_e_3_short",
-  isFF: jest.fn(() => false),
+let mockFlags = {};
+mockModule("../../../../utils/feature-flags", () => ({
+  FF_LOPS_E_3: "fflag_feat_all_lops_e_3_datasets_short",
+  isFF: mock((id) => mockFlags[id] === true),
 }));
 
 // Mock utils
-jest.mock("../utils", () => ({
-  getProperty: jest.fn((obj, path) => {
+mockModule("../utils", () => ({
+  getProperty: mock((obj, path) => {
     const keys = path.split(".");
     let result = obj;
     for (const key of keys) {
@@ -24,17 +25,12 @@ jest.mock("../utils", () => ({
     }
     return result;
   }),
-  getStyle: jest.fn(() => ({})),
-}));
-
-// Mock normalizeCellAlias
-jest.mock("../../../CellViews", () => ({
-  normalizeCellAlias: jest.fn((alias) => alias),
+  getStyle: mock(() => ({})),
 }));
 
 // Mock BEM utility
-jest.mock("../../../../utils/bem", () => ({
-  cn: jest.fn((name) => {
+mockModule("../../../../utils/bem", () => ({
+  cn: mock((name) => {
     const createCN = (fullName, mods = {}) => {
       const modClasses = Object.entries(mods)
         .filter(([_, value]) => value)
@@ -59,7 +55,7 @@ jest.mock("../../../../utils/bem", () => ({
 }));
 
 // Mock styles
-jest.mock("./TableRow.prefix.css", () => ({}));
+mockModule("./TableRow.prefix.css", () => ({}));
 
 describe("TableRow", () => {
   const mockData = {
@@ -73,8 +69,18 @@ describe("TableRow", () => {
   };
 
   const mockColumns = [
-    { id: "col1", Header: "Column 1", alias: "col1", original: { currentType: "String" } },
-    { id: "col2", Header: "Column 2", alias: "col2", original: { currentType: "String" } },
+    {
+      id: "col1",
+      Header: "Column 1",
+      alias: "col1",
+      original: { currentType: "String" },
+    },
+    {
+      id: "col2",
+      Header: "Column 2",
+      alias: "col2",
+      original: { currentType: "String" },
+    },
   ];
 
   const mockCellViews = {
@@ -91,13 +97,13 @@ describe("TableRow", () => {
     even: false,
     style: {},
     wrapperStyle: {},
-    onClick: jest.fn(),
+    onClick: mock(),
     stopInteractions: false,
     decoration: null,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
   });
 
   const renderWithContext = (props = {}, contextOverrides = {}) => {
@@ -168,7 +174,7 @@ describe("TableRow", () => {
 
   describe("Click Handling", () => {
     it("should call onClick when row is clicked", () => {
-      const mockOnClick = jest.fn();
+      const mockOnClick = mock();
       renderWithContext({ onClick: mockOnClick });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -178,7 +184,7 @@ describe("TableRow", () => {
     });
 
     it("should not call onClick when stopInteractions is true", () => {
-      const mockOnClick = jest.fn();
+      const mockOnClick = mock();
       renderWithContext({ onClick: mockOnClick, stopInteractions: true });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
@@ -190,14 +196,19 @@ describe("TableRow", () => {
   });
 
   describe("Context Menu Integration", () => {
-    it("should call onContextMenu when right-clicked", () => {
-      const mockOnContextMenu = jest.fn();
-      renderWithContext({ onContextMenu: mockOnContextMenu });
+    it("should apply contextMenuTriggerProps handlers", () => {
+      const mockOnContextMenu = mock();
+      renderWithContext({
+        contextMenuTriggerProps: {
+          onContextMenu: mockOnContextMenu,
+          onKeyDown: mock(),
+        },
+      });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
       fireEvent.contextMenu(rowWrapper);
 
-      expect(mockOnContextMenu).toHaveBeenCalledWith(expect.any(Object), mockData);
+      expect(mockOnContextMenu).toHaveBeenCalled();
     });
 
     it("should apply context-menu-open modifier when contextMenuRowId matches", () => {
@@ -212,18 +223,38 @@ describe("TableRow", () => {
       expect(screen.getByTestId("table-row-wrapper")).toBeInTheDocument();
     });
 
-    it("should pass event and data to onContextMenu callback", () => {
-      const mockOnContextMenu = jest.fn();
-      renderWithContext({ onContextMenu: mockOnContextMenu });
+    it("should keep the same row DOM node when contextMenuRowId opens and closes", () => {
+      const { rerender } = renderWithContext({}, { contextMenuRowId: null });
+      const rowNode = screen.getByTestId("table-row-wrapper");
+
+      rerender(
+        <TableContext.Provider value={{ ...contextValue, contextMenuRowId: mockData.id }}>
+          <TableRow {...defaultProps} />
+        </TableContext.Provider>,
+      );
+      expect(screen.getByTestId("table-row-wrapper")).toBe(rowNode);
+
+      rerender(
+        <TableContext.Provider value={{ ...contextValue, contextMenuRowId: null }}>
+          <TableRow {...defaultProps} />
+        </TableContext.Provider>,
+      );
+      expect(screen.getByTestId("table-row-wrapper")).toBe(rowNode);
+    });
+
+    it("should forward keyboard events via contextMenuTriggerProps", () => {
+      const mockOnKeyDown = mock();
+      renderWithContext({
+        contextMenuTriggerProps: {
+          onContextMenu: mock(),
+          onKeyDown: mockOnKeyDown,
+        },
+      });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
-      const event = new MouseEvent("contextmenu", { bubbles: true });
-      fireEvent(rowWrapper, event);
+      fireEvent.keyDown(rowWrapper, { key: "F10", shiftKey: true });
 
-      expect(mockOnContextMenu).toHaveBeenCalledTimes(1);
-      const [eventArg, dataArg] = mockOnContextMenu.mock.calls[0];
-      expect(eventArg).toBeDefined();
-      expect(dataArg).toEqual(mockData);
+      expect(mockOnKeyDown).toHaveBeenCalled();
     });
   });
 
@@ -258,20 +289,23 @@ describe("TableRow", () => {
     });
 
     it("should show skeleton loader when cell is loading", () => {
-      const { isFF } = require("../../../../utils/feature-flags");
-      isFF.mockReturnValue(true);
+      mockFlags[FF_LOPS_E_3] = true;
 
-      const loadingData = { ...mockData, loading: "col1" };
-      renderWithContext({ data: loadingData });
+      try {
+        const loadingData = { ...mockData, loading: "col1" };
+        renderWithContext({ data: loadingData });
 
-      expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
+        expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
+      } finally {
+        mockFlags[FF_LOPS_E_3] = false;
+      }
     });
   });
 
   describe("Decoration", () => {
     it("should apply decoration styles to cells", () => {
       const mockDecoration = {
-        get: jest.fn(() => ({ style: { color: "red" } })),
+        get: mock(() => ({ style: { color: "red" } })),
       };
 
       renderWithContext({ decoration: mockDecoration });
@@ -286,7 +320,7 @@ describe("TableRow", () => {
       renderWithContext({ wrapperStyle });
 
       const rowWrapper = screen.getByTestId("table-row-wrapper");
-      expect(rowWrapper).toHaveStyle(wrapperStyle);
+      expect(rowWrapper.style.backgroundColor).toBe("blue");
     });
 
     it("should apply style to table row", () => {

@@ -470,7 +470,7 @@ class HtxParagraphsView extends Component {
    * Only checks when FF_NER_SELECT_ALL is enabled
    * Prevents exact same position + exact same labels + exact same offsets
    */
-  isDuplicateRegion(range, selectedLabels, control) {
+  isDuplicateRegion(range, selectedLabels, _control) {
     if (!isFF(FF_NER_SELECT_ALL)) {
       return false; // No duplicate detection when feature flag is off
     }

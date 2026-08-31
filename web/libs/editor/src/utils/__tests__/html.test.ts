@@ -80,6 +80,51 @@ describe("Helper function html sanitize", () => {
   test("strips invalid iframe src (bad URL)", () => {
     expect(sanitizeHtml('<iframe src="not-a-url"></iframe>')).toBe("");
   });
+
+  describe("ALLOWED_IFRAME_DOMAINS configuration", () => {
+    let prevSettings: any;
+
+    beforeEach(() => {
+      prevSettings = (window as any).APP_SETTINGS;
+    });
+
+    afterEach(() => {
+      (window as any).APP_SETTINGS = prevSettings;
+    });
+
+    test("allows Canva embed iframe by default", () => {
+      // Default list (in services/lso/web/libs/editor/src/utils/html.js) ships with Canva.
+      delete (window as any).APP_SETTINGS;
+      const input = '<iframe src="https://www.canva.com/design/DAHK/view?embed=access_restricted"></iframe>';
+      const result = sanitizeHtml(input);
+      expect(result).toContain("iframe");
+      expect(result).toContain("canva.com");
+    });
+
+    test("uses APP_SETTINGS.allowed_iframe_domains override when provided", () => {
+      (window as any).APP_SETTINGS = { allowed_iframe_domains: ["example.com"] };
+      expect(sanitizeHtml('<iframe src="https://example.com/x"></iframe>')).toContain("iframe");
+      // Domains absent from the override (and not on the default list) are still rejected.
+      expect(sanitizeHtml('<iframe src="https://www.youtube.com/embed/abc"></iframe>')).toBe("");
+      expect(sanitizeHtml('<iframe src="https://www.canva.com/design/DAHK/view"></iframe>')).toBe("");
+    });
+
+    test("falls back to defaults when APP_SETTINGS.allowed_iframe_domains is empty", () => {
+      (window as any).APP_SETTINGS = { allowed_iframe_domains: [] };
+      expect(sanitizeHtml('<iframe src="https://www.youtube.com/embed/abc"></iframe>')).toContain("iframe");
+      expect(sanitizeHtml('<iframe src="https://www.canva.com/design/DAHK/view"></iframe>')).toContain("iframe");
+    });
+
+    test("falls back to defaults when APP_SETTINGS.allowed_iframe_domains is not an array", () => {
+      (window as any).APP_SETTINGS = { allowed_iframe_domains: "not-an-array" };
+      expect(sanitizeHtml('<iframe src="https://www.youtube.com/embed/abc"></iframe>')).toContain("iframe");
+    });
+
+    test("override still rejects non-https iframes", () => {
+      (window as any).APP_SETTINGS = { allowed_iframe_domains: ["example.com"] };
+      expect(sanitizeHtml('<iframe src="http://example.com/x"></iframe>')).toBe("");
+    });
+  });
 });
 
 describe("htmlEscape", () => {

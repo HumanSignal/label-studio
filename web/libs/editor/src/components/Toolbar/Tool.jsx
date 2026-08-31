@@ -94,7 +94,7 @@ export const Tool = ({
     };
 
     const addShortcuts = () => {
-      Object.entries(extraShortcuts).forEach(([key, [label, fn]]) => {
+      Object.entries(extraShortcuts).forEach(([key, [_label, fn]]) => {
         if (!hotkeys.hasKeyByName(key)) hotkeys.overwriteNamed(key, fn);
       });
     };

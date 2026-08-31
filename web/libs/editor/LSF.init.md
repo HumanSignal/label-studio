@@ -66,7 +66,7 @@ Can be submitted in current session, but this flag will remain the same.
 called from 3 places:
 
 - `setLSFTask()`
-- `onStorageInitialized()` — called from `AppStore#initializeStore()`, one of the core LSF methods; if there is a task and that’s not a Label Stream it selects annotation based on `initialAnnotation` and `lastAnnotation`
+- `onStorageInitialized()` — called from `AppStore#initializeStore()`, one of the core LSF methods; if there is a task and that’s not a Label Stream it selects annotation based on `initialAnnotation` (or LSF defaulting when unset)
 - `onDeleteAnnotation()`
 
 ## Huge mess with "side panels"

@@ -5,7 +5,7 @@ class TaxonomyHelper {
 
   /**
    * Whether the fragment is operating in legacy mode.
-   * NewTaxonomy (Ant Design TreeSelect) is the default since the FF_TAXONOMY_ASYNC
+   * NewTaxonomy (Popover + tree) is the default since the FF_TAXONOMY_ASYNC
    * flag was removed. Set isLegacy = true only when the config uses legacy="true".
    */
   public isLegacy: boolean;
@@ -35,16 +35,14 @@ class TaxonomyHelper {
 
   private _newSelectors = {
     root: this._baseRootSelector,
-    // .ant-select-selector is the clickable area showing selected items
-    selected: ".ant-select-selector",
-    // .htx-taxonomy is the className set on TreeSelect
+    selected: ".htx-taxonomy-trigger",
     input: ".htx-taxonomy",
-    // .htx-taxonomy-dropdown is the popupClassName set on TreeSelect (portal)
+    /** Portaled content; closed panels are typically unmounted by Radix. */
     dropdown: ".htx-taxonomy-dropdown",
-    // Ant Design tree node inside the dropdown portal
-    item: ".ant-select-tree-treenode",
-    open: ".ant-select-open",
-    closed: ":not(.ant-select-open)",
+    /** Stable across Button vs plain markup; keep `.htx-taxonomy-node-title` on the same nodes for backwards compatibility. */
+    item: '[data-testid="taxonomy-tree-row-label"]',
+    open: '[data-taxonomy-open="true"]',
+    closed: '[data-taxonomy-open="false"]',
   };
 
   constructor(rootSelector: string, isLegacy = false) {
@@ -71,15 +69,7 @@ class TaxonomyHelper {
   }
 
   findItem(text: string) {
-    if (this.isLegacy) {
-      return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
-    }
-    // In rc-tree-select with treeCheckable, both onSelect (clicking title) and
-    // onCheck (clicking checkbox) map to the same onInternalSelect handler.
-    // So clicking the title text triggers selection just like clicking the checkbox.
-    // Returning the title element also makes .trigger("mouseover") work for tooltips,
-    // since Ant Design's <Tooltip> wraps the title content in NewTaxonomy.
-    return this.dropdown.contains(".ant-select-tree-title", text);
+    return this.dropdown.contains(this.selectors.item, text).scrollIntoView();
   }
   /** Click a taxonomy item (uses force: true so it works when dropdown is partially covered by BottomBar). */
   clickItem(text: string) {
@@ -89,11 +79,7 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       return this.selected.contains("div", text).should("exist");
     }
-    // NewTaxonomy: selected items are rendered as
-    //   <span class="ant-select-selection-item">
-    //     <span class="ant-select-selection-item-content">Choice 1</span>
-    //   </span>
-    return this.root.find(".ant-select-selection-item-content").contains(text).should("exist");
+    return this.root.find(".htx-taxonomy-selection-item-label").contains(text).should("exist");
   }
 
   hasNoSelected(text: string) {
@@ -102,18 +88,14 @@ class TaxonomyHelper {
     }
     // For NewTaxonomy, check that no selection item contains the text.
     // Use the selector within root to scope appropriately.
-    return this.root.find(".ant-select-selection-item-content").should("not.contain.text", text);
+    return this.root.find(".htx-taxonomy-selection-item-label").should("not.contain.text", text);
   }
 
   open() {
     if (this.isLegacy) {
       this.input.filter(this.selectors.closed).click();
     } else {
-      // Must click .ant-select-selector (not the outer .htx-taxonomy wrapper)
-      // because Ant Design TreeSelect's open/close handler lives on the selector.
-      // force:true is needed because a previously-closed taxonomy's dropdown portal
-      // (containing a search input) can linger in the DOM and overlap the selector.
-      this.input.filter(this.selectors.closed).find(".ant-select-selector").scrollIntoView().click({ force: true });
+      this.input.filter(this.selectors.closed).find(".htx-taxonomy-trigger").scrollIntoView().click({ force: true });
     }
   }
 
@@ -121,7 +103,13 @@ class TaxonomyHelper {
     if (this.isLegacy) {
       this.input.filter(this.selectors.open).click();
     } else {
-      this.input.filter(this.selectors.open).find(".ant-select-selector").scrollIntoView().click({ force: true });
+      // Leaf selection often closes the popover; only click the trigger when still open.
+      // Use jQuery filtering here to avoid Cypress `filter()` failing on empty matches.
+      this.input.then(($inputs) => {
+        const $open = $inputs.filter(this.selectors.open);
+        if ($open.length === 0) return;
+        cy.wrap($open.eq(0)).find(".htx-taxonomy-trigger").first().scrollIntoView().click({ force: true });
+      });
     }
   }
 }

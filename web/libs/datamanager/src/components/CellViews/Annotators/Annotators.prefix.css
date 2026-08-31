@@ -1,7 +1,12 @@
+@import "../../../../../ui/src/styles/userpic-badge.prefix.css";
+
 .annotators {
   display: grid;
   grid-auto-flow: column;
-  grid-column-gap: 4px;
+  grid-column-gap: var(--spacing-tighter);
+  overflow: hidden;
+  width: 100%;
+  justify-content: flex-start;
 
   &__item {
     z-index: 1;
@@ -9,32 +14,10 @@
     height: 28px;
     border-radius: 100%;
     position: relative;
+    flex-shrink: 0;
 
     &:hover {
       z-index: 10;
     }
-  }
-}
-
-.userpic-badge {
-  width: 10px;
-  height: 10px;
-  color: var(--color-neutral-background);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-  box-shadow: 0 0 0 2px var(--color-neutral-background);
-
-  &_accepted {
-    background-color: var(--color-accent-kale-base);
-  }
-
-  &_rejected {
-    background-color: var(--color-accent-persimmon-base);
-  }
-
-  &_fixed {
-    background-color: var(--color-accent-canteloupe-base);
   }
 }

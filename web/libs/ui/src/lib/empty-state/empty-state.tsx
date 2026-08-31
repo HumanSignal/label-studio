@@ -72,9 +72,9 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
 
   /**
-   * Description text below the title
+   * Description text below the title (string or rich content, e.g. line breaks)
    */
-  description: string;
+  description: ReactNode;
 
   /**
    * Action buttons or other interactive elements

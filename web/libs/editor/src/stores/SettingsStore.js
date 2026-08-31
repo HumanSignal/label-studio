@@ -73,6 +73,8 @@ const SettingsModel = types
     videoDrawOutside: types.optional(types.boolean, false),
 
     invertedZoom: types.optional(types.boolean, false),
+
+    annotationsListLayout: types.optional(types.enumeration(["horizontal", "vertical"]), "horizontal"),
   })
   .views((self) => ({
     get annotation() {
@@ -95,7 +97,7 @@ const SettingsModel = types
         const { localStorage } = window;
 
         if (!localStorage) return;
-      } catch (e) {
+      } catch (_e) {
         return;
       }
 
@@ -240,6 +242,12 @@ const SettingsModel = types
 
     setVideoHopSize(value) {
       self.videoHopSize = value;
+    },
+
+    setAnnotationsListLayout(value) {
+      if (value === "horizontal" || value === "vertical") {
+        self.annotationsListLayout = value;
+      }
     },
 
     setProperty(name, value) {

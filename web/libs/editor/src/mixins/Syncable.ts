@@ -97,10 +97,6 @@ export class SyncManager {
 
     const shouldSkipLocking = !this.isLockable(event);
 
-    // @todo remove
-    if (shouldSkipLocking || !this.locked || this.locked === origin)
-      console.log("SYNC", { event, locked: this.locked, data, origin });
-
     if (!shouldSkipLocking) {
       if (this.locked && this.locked !== origin)
         ///// locking mechanism

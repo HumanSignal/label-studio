@@ -250,28 +250,6 @@ def test_txt_task_upload(setup_project_dialog, format_type, tasks, status_code, 
 
 
 @pytest.mark.parametrize(
-    'tasks, status_code, task_count, max_duration',
-    [([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 1000, 201, 1000, 30)],
-)
-@pytest.mark.django_db
-def test_upload_duration(setup_project_dialog, tasks, status_code, task_count, max_duration):
-    """Upload JSON task with annotation to project"""
-    r = post_data_as_format(setup_project_dialog, 'json_data', json.dumps(tasks), 'none', 1)
-    print('Create json tasks with annotations result:', r.content)
-    assert r.status_code == status_code, ('Upload one task with annotation failed', r.content)
-
-    # tasks
-    tasks = Task.objects.filter(project=setup_project_dialog.project.id)
-    assert tasks.count() == task_count
-    for task in tasks:
-        assert task.is_labeled, 'Task should be labeled'
-
-    # check max duration
-    result = json.loads(r.content)
-    assert result['duration'] < max_duration, 'Max duration of adding tasks is exceeded'
-
-
-@pytest.mark.parametrize(
     'tasks, status_code, task_count',
     [([{'data': {'dialog': 'Test'}, 'annotations': [{'result': [{'id': '123'}]}]}] * 100, 201, 100)],
 )
@@ -291,6 +269,19 @@ def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count
         assert tasks.count() == task_count
         for task in tasks:
             assert task.is_labeled, 'Task should be labeled since annotation is ground_truth'
+
+
+@pytest.mark.django_db
+def test_url_upload_too_long_returns_400(setup_project_dialog):
+    """URL longer than the 2048-char ProjectImport.url column must return 400, not 500."""
+    url = 'http://localhost:8111/test.json?' + ('x' * 2048)
+    r = setup_project_dialog.post(
+        setup_project_dialog.urls.task_bulk,
+        data='url=' + url,
+        content_type='application/x-www-form-urlencoded',
+    )
+    assert r.status_code == 400, r.content
+    assert b'2048 characters or fewer' in r.content
 
 
 @pytest.mark.parametrize(

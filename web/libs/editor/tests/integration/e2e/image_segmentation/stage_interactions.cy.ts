@@ -6,12 +6,6 @@ import {
   imageToolsConfigWithRotate,
 } from "../../data/image_segmentation/stage_interactions";
 
-beforeEach(() => {
-  LabelStudio.addFeatureFlagsOnPageLoad({
-    fflag_fix_front_leap_32_zoom_perf_190923_short: true,
-  });
-});
-
 describe("Image Segmentation Stage Interactions", () => {
   it("should not be able to draw outside of image's boundaries", () => {
     LabelStudio.params().config(imageToolsConfig).data(imageData).withResult([]).init();

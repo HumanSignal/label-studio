@@ -1255,7 +1255,7 @@ stages:
 - name: import tasks with s3 links
   request:
     files:
-      file: tests/test_suites/samples/unexisted_s3_links.txt
+      file: label_studio/tests/test_suites/samples/unexisted_s3_links.txt
     headers:
       content-type: multipart/form-data
     method: POST

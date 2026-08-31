@@ -1,0 +1,17 @@
+steps:
+  - target: '[data-testid="project-dashboard-top-nav-link"]'
+    placement: bottom
+    offset: 8
+    floaterProps:
+      disableFlip: true
+    title: "New Project Dashboards!"
+    content: >
+      Monitor throughput, data quality, and member performance in one place.
+    disableBeacon: true
+    spotlightClicks: true
+    styles:
+      spotlight:
+        backgroundColor: transparent
+    locale:
+      last: "Got it"
+      skip: "Don't show this again"

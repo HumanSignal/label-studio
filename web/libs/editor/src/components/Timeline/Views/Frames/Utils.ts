@@ -1,4 +1,25 @@
+import { clamp } from "../../../../utils/utilities";
 import type { TimelineRegionKeyframe } from "../../Types";
+
+/** Default timeline viewport height when `timelineHeight` is not set on `<Video>`. */
+export const DEFAULT_TIMELINE_VIEWPORT_HEIGHT = 64;
+
+const KEYPOINT_ROW_HEIGHT = 24;
+const KEYPOINT_VIRTUAL_OVERSCAN = 5;
+
+export const computeKeypointsVirtualBounds = (
+  scrollTop: number,
+  regionsLength: number,
+  viewportHeight: number,
+  rowHeight = KEYPOINT_ROW_HEIGHT,
+  extra = KEYPOINT_VIRTUAL_OVERSCAN,
+): [number, number] => {
+  const sIdx = clamp(Math.ceil(scrollTop / rowHeight) - 1, 0, regionsLength);
+  const visibleRows = Math.max(1, Math.ceil(viewportHeight / rowHeight));
+  const eIdx = clamp(sIdx + visibleRows - 1, 0, regionsLength);
+
+  return [clamp(sIdx - extra, 0, regionsLength), clamp(eIdx + extra, 0, regionsLength)];
+};
 
 export interface Lifespan {
   offset: number;

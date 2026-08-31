@@ -52,7 +52,7 @@
 
 /* Body */
 .body {
-  @apply text-neutral-content flex flex-col gap-tight;
+  @apply text-neutral-content gap-tight;
 }
 
 /* Close Button */
@@ -109,4 +109,31 @@
   .icon svg {
     @apply text-warning-icon;
   }
+}
+
+/* Enterprise Variant — exclusively for gated/enterprise-only feature callouts */
+.variant-enterprise {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--color-accent-canteloupe-subtlest),
+    var(--color-accent-persimmon-subtlest),
+    var(--color-accent-plum-subtlest)
+  );
+  border-color: var(--color-accent-persimmon-subtle);
+
+  .title {
+    color: var(--color-accent-persimmon-base);
+  }
+}
+
+/* Look Styles */
+
+/* Card Look - Default: background, border, border-radius and padding applied via base and size classes */
+.look-card {
+  /* inherits all base, size, and variant styling — no overrides needed */
+}
+
+/* Ghost Look - No card wrapper: transparent background, no border, no padding */
+.look-ghost {
+  @apply bg-transparent border-transparent rounded-none p-0;
 }

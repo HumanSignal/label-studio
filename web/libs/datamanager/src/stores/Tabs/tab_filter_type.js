@@ -23,7 +23,7 @@ export const FilterItemType = types.union({
 
 export const FilterValueList = types
   .model("FilterValueList", {
-    items: types.array(FilterItemType),
+    items: types.optional(types.array(FilterItemType), []),
     multiple: types.maybeNull(types.boolean),
   })
   .views((self) => ({
@@ -66,7 +66,7 @@ export const FilterSchema = types.union({
   dispatcher(s) {
     if (!s) return types.null;
 
-    if (isDefined(s.items)) {
+    if (isDefined(s.items) || isDefined(s.multiple)) {
       return FilterValueList;
     }
     return FilterValueRange;

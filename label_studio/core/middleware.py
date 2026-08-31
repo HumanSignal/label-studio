@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
+import re
 import time
 from datetime import timedelta
 from uuid import uuid4
@@ -113,6 +114,65 @@ class SetSessionUIDMiddleware(CommonMiddleware):
             request.session['uid'] = str(uuid4())
 
 
+class NoindexUrlMiddleware:
+    """Add crawler directives to configured URLs that should not be indexed."""
+
+    ROBOTS_DIRECTIVES = ('noindex', 'nofollow')
+    ROBOTS_HEADER = ', '.join(ROBOTS_DIRECTIVES)
+    NOINDEX_URL_PATTERNS = [
+        r'^/api/invite/?$',
+        r'^/api/invite/reset-token/?$',
+        r'^/user/email-verification/?$',
+        r'^/user/login/?$',
+        r'^/user/signup/?$',
+        r'^/password-reset/?$',
+        r'^/password-reset/done/?$',
+        r'^/password-reset/[^/]+/[^/]+/?$',
+        r'^/password-set/[^/]+/[^/]+/?$',
+        r'^/password-reset/complete/?$',
+        r'^/saml/[^/]+/acs/?$',
+        r'^/saml/[^/]+/welcome/?$',
+        r'^/saml/[^/]+/denied/?$',
+        r'^/saml/[^/]+/login/?$',
+        r'^/saml/[^/]+/logout/?$',
+        r'^/saml/[^/]+/xml/?$',
+    ]
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # Downstream apps (e.g. enterprise features) contribute extra noindex patterns via settings,
+        # so this OSS middleware carries no feature-specific routes. Compiled per-instance so the
+        # patterns reflect the settings active at startup.
+        extra_patterns = getattr(settings, 'ADDITIONAL_NOINDEX_URL_PATTERNS', ())
+        self.noindex_compiled_patterns = tuple(
+            re.compile(pattern) for pattern in (*self.NOINDEX_URL_PATTERNS, *extra_patterns)
+        )
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if self._should_noindex(request):
+            self._append_robots_directives(response)
+        return response
+
+    def _should_noindex(self, request):
+        return any(pattern.match(request.path_info) for pattern in self.noindex_compiled_patterns)
+
+    def _append_robots_directives(self, response):
+        existing_header = response.get('X-Robots-Tag', '')
+        if not existing_header:
+            response['X-Robots-Tag'] = self.ROBOTS_HEADER
+            return
+
+        existing_directives = [directive.strip() for directive in existing_header.split(',') if directive.strip()]
+        existing_directives_lower = {directive.lower() for directive in existing_directives}
+
+        for directive in self.ROBOTS_DIRECTIVES:
+            if directive not in existing_directives_lower:
+                existing_directives.append(directive)
+
+        response['X-Robots-Tag'] = ', '.join(existing_directives)
+
+
 class ContextLogMiddleware(CommonMiddleware):
     def __init__(self, get_response):
         self.get_response = get_response
@@ -168,6 +228,19 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         return response
 
 
+def authorization_header_from_x_api_key(api_key: str) -> str:
+    """Map X-API-Key to an Authorization header value.
+
+    JWT-formatted keys use Bearer (see jwt_auth.middleware.JWTAuthenticationMiddleware);
+    legacy API keys use Token.
+    """
+    from jwt_auth.token_format import is_jwt_formatted
+
+    if is_jwt_formatted(api_key):
+        return f'Bearer {api_key}'
+    return f'Token {api_key}'
+
+
 class XApiKeySupportMiddleware:
     """Middleware that adds support for the X-Api-Key header, by having its value supersede
     anything that's set in the Authorization header."""
@@ -177,7 +250,7 @@ class XApiKeySupportMiddleware:
 
     def __call__(self, request):
         if 'HTTP_X_API_KEY' in request.META:
-            request.META['HTTP_AUTHORIZATION'] = f'Token {request.META["HTTP_X_API_KEY"]}'
+            request.META['HTTP_AUTHORIZATION'] = authorization_header_from_x_api_key(request.META['HTTP_X_API_KEY'])
             del request.META['HTTP_X_API_KEY']
 
         return self.get_response(request)

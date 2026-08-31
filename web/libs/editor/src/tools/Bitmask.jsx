@@ -120,7 +120,7 @@ const _Tool = types
         self.applyActiveStates(newArea);
         try {
           self.deleteRegion();
-        } catch (e) {
+        } catch (_e) {
           /* do nothing*/
         }
         newArea.notifyDrawingFinished();
@@ -226,7 +226,7 @@ const BitmaskCursorMixin = types
   .model("BitmaskCursorMixin")
   .views((self) => ({
     get cursorStyleRule() {
-      const val = self.strokeWidth;
+      const _val = self.strokeWidth;
       return "crosshair";
     },
   }))

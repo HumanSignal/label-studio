@@ -198,6 +198,18 @@ The Storage Proxy API is a critical component that handles access to files store
 
 This architecture ensures secure, controlled access to cloud storage resources while maintaining flexibility for different deployment scenarios and security requirements.
 
+### Storage types delegated to the Streamer (PLT-1188)
+
+For storage types listed in `STREAMER_DELEGATED_STORAGE_TYPES` (currently `s3`, `s3s`) running in **Proxy Mode**, Django does not stream bytes itself. Instead, `ResolveStorageUriAPIMixin.delegate_to_streamer` (`io_storages/proxy_api.py`) returns a JSON payload with `(storage_type, storage_id, bucket, key, content_type)`; the Go `streamer` service (see [`services/streamer/README.md`](../../../streamer/README.md) and `services/streamer/internal/storageproxy/`) then loads credentials from Postgres and streams the object directly from S3, honoring the client's `Range` header. The streamer authenticates to Django with `X-Streamer-Secret = sha256(SECRET_KEY).hexdigest()`, validated by `htx.middleware.StreamerSecretMiddleware`.
+
+For other storage types, or when `presign=True`, Django's response is relayed by the streamer verbatim — there is no behavioural change versus the pre-streamer routing.
+
+To add a new delegated storage type, register it in **both** places:
+- `STREAMER_DELEGATED_STORAGE_TYPES` in `services/lso/label_studio/io_storages/proxy_api.py`
+- the `providers` map in `services/streamer/internal/storageproxy/storages/storages.go`
+
+Drift between the two causes `500` "unknown storage_type" from the streamer.
+
 ### Proxy Mode Optimizations*
 
 The Proxy Mode has been optimized with several mechanisms to improve performance, reliability, and resource utilization:
@@ -231,14 +243,20 @@ The `prepare_headers` function manages HTTP response headers for optimal client 
 
 ### *Environment Variables*
 
-The Storage Proxy API behavior can be configured using the following environment variables:
+The Storage Proxy API behavior can be configured using the following environment variables. The first four are **Django-side**; the last four are **streamer-side** (used only when the Go `streamer` service fronts the resolve endpoint — see [Storage types delegated to the Streamer](#storage-types-delegated-to-the-streamer-plt-1188)).
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `RESOLVER_PROXY_BUFFER_SIZE` | Size in bytes of each chunk when streaming data | 64*1024 |
-| `RESOLVER_PROXY_TIMEOUT` | Maximum time in seconds a streaming connection can remain open | 10 |
-| `RESOLVER_PROXY_MAX_RANGE_SIZE` | Maximum size in bytes for a single range request | 7*1024*1024 |
-| `RESOLVER_PROXY_CACHE_TIMEOUT` | Cache TTL in seconds for proxy responses | 3600 |
+| `RESOLVER_PROXY_BUFFER_SIZE` | Size in bytes of each chunk when streaming data (Django) | 64*1024 |
+| `RESOLVER_PROXY_TIMEOUT` | Maximum time in seconds a streaming connection can remain open (Django) | 10 |
+| `RESOLVER_PROXY_MAX_RANGE_SIZE` | Maximum size in bytes for a single range request (Django) | 7*1024*1024 |
+| `RESOLVER_PROXY_CACHE_TIMEOUT` | Cache TTL in seconds for proxy responses (Django) | 3600 |
+| `STORAGE_BUFFER_SIZE` | Read buffer size in bytes used by the streamer when reading from S3 | 524288 |
+| `STORAGE_STREAM_TIMEOUT` | Maximum duration a single streamer→S3 object stream may remain open | 300s |
+| `DJANGO_INTERNAL_DEADLINE` | Total deadline across all streamer → Django delegation attempts | 30s |
+| `DJANGO_INTERNAL_RETRY_MAX` | Maximum retries for transient 5xx / timeout failures during delegation | 3 |
+| `DJANGO_INTERNAL_INITIAL_TIMEOUT` | Timeout for the first delegation attempt; doubles each retry | 1s |
+| `AWS_EXTERNAL_STORAGE_ROLE_ARN` | Bridge role assumed by the streamer before assuming an LSE `s3s` storage's `role_arn` (cross-account). Empty unless an LSE IAM-role storage is configured. | empty |
 
 These optimizations ensure that the Proxy API remains responsive and resource-efficient, even when handling large files or many concurrent requests.
 

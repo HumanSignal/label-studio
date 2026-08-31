@@ -1,44 +1,20 @@
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import { SkipButton } from "../buttons";
-
-jest.mock("@humansignal/ui", () => {
-  const { forwardRef } = jest.requireActual("react");
-  return {
-    Button: forwardRef(({ children, disabled, tooltip, onClick, ...props }: any, ref: any) => {
-      return (
-        <button {...props} ref={ref} data-testid="skip-button" disabled={disabled} title={tooltip} onClick={onClick}>
-          {children}
-        </button>
-      );
-    }),
-    Tooltip: ({ children, title }: any) => {
-      return (
-        <div data-testid="tooltip" title={title}>
-          {children}
-        </div>
-      );
-    },
-  };
-});
-
-jest.mock("@humansignal/icons", () => ({
-  IconInfoOutline: ({ width, height, className }: any) => (
-    <svg data-testid="info-icon" width={width} height={height} className={className} />
-  ),
-}));
+import * as uiModule from "@humansignal/ui";
+import * as iconsModule from "@humansignal/icons";
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
-  skipTask: jest.fn(),
-  hasInterface: jest.fn((name: string) => overrides.interfaces?.includes(name) ?? false),
+  skipTask: mock(),
+  hasInterface: mock((name: string) => overrides.interfaces?.includes(name) ?? false),
   annotationStore: {
     selected: {
-      submissionInProgress: jest.fn(),
+      submissionInProgress: mock(),
     },
   },
   commentStore: {
-    commentFormSubmit: jest.fn(),
+    commentFormSubmit: mock(),
   },
   ...overrides,
 });
@@ -47,6 +23,7 @@ const createMockStore = (overrides: any = {}) => ({
 const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
+      id: 999,
       role: options.role,
     },
     billing: {
@@ -57,8 +34,20 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 
 describe("SkipButton", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset APP_SETTINGS before each test
+    mock.clearAllMocks();
+    spyOn(uiModule, "Button").mockImplementation(({ children, disabled, tooltip, onClick, ...props }: any) => (
+      <button {...props} data-testid="skip-button" disabled={disabled} title={tooltip} onClick={onClick}>
+        {children}
+      </button>
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children, title }: any) => (
+      <div data-testid="tooltip" title={title}>
+        {children}
+      </div>
+    ));
+    spyOn(iconsModule, "IconInfoOutline").mockImplementation(({ width, height, className }: any) => (
+      <svg data-testid="info-icon" width={width} height={height} className={className} />
+    ));
     (window as any).APP_SETTINGS = undefined;
   });
 
@@ -68,7 +57,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -87,7 +76,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -105,7 +94,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -122,7 +111,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1 }, // no allow_skip property
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -139,7 +128,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: null },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -158,7 +147,7 @@ describe("SkipButton", () => {
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -179,7 +168,7 @@ describe("SkipButton", () => {
       task: { id: 1, allow_skip: true },
       interfaces: ["skip", "comments:skip"],
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -197,7 +186,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -215,7 +204,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -235,7 +224,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -255,7 +244,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -275,7 +264,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -293,7 +282,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -312,7 +301,7 @@ describe("SkipButton", () => {
       task: { id: 1, allow_skip: false },
       interfaces: ["skip", "comments:skip"],
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId } = render(
       <Provider store={mockStore}>
@@ -331,7 +320,7 @@ describe("SkipButton", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
     });
-    const onSkipWithComment = jest.fn();
+    const onSkipWithComment = mock();
 
     const { getByTestId, queryByTestId } = render(
       <Provider store={mockStore}>

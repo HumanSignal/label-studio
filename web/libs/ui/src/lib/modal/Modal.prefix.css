@@ -11,7 +11,6 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(var(--color-neutral-shadow-raw) / 50%);
-  backdrop-filter: blur(2px);
   will-change: opacity;
   overflow: hidden;
 

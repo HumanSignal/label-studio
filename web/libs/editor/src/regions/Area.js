@@ -16,7 +16,7 @@ import { TimelineRegionModel } from "./TimelineRegion";
 import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
 import { ParagraphsRegionModel } from "./ParagraphsRegion";
 import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
-import { VideoVectorRegionModel } from "./VideoVectorRegion";
+import { isVideoVectorRegionValue, VideoVectorRegionModel } from "./VideoVectorRegion";
 import { BitmaskRegionModel } from "./BitmaskRegion";
 
 // general Area type for classification Results which doesn't belong to any real Area
@@ -31,7 +31,7 @@ const ClassificationArea = types.compose(
       // true only for global classifications
       classification: true,
     })
-    .views((self) => ({
+    .views((_self) => ({
       get supportSuggestions() {
         return false;
       },
@@ -80,11 +80,7 @@ const Area = types.union(
         const seq = sn.sequence || sn.value?.sequence;
 
         if (seq) {
-          const firstItem = Array.isArray(seq) ? seq[0] : null;
-
-          if (firstItem?.vertices !== undefined || sn.value?.vertices !== undefined) {
-            return VideoVectorRegionModel;
-          }
+          if (isVideoVectorRegionValue(sn)) return VideoVectorRegionModel;
           return VideoRectangleRegionModel;
         }
         return TimelineRegionModel;
@@ -112,4 +108,5 @@ const Area = types.union(
   ...Registry.customTags.map((t) => t.region).filter(Boolean),
 );
 
+export { ClassificationArea };
 export default Area;

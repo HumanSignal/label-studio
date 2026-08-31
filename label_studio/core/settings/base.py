@@ -121,6 +121,25 @@ if DOMAIN_FROM_REQUEST:
     if HOSTNAME and not HOSTNAME.startswith('/'):
         raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
+
+def _get_secure_proxy_ssl_header():
+    value = get_env('SECURE_PROXY_SSL_HEADER')
+    if not value:
+        return None
+
+    parts = [part.strip() for part in value.split(',')]
+    if len(parts) != 2 or not all(parts):
+        raise ImproperlyConfigured(
+            'SECURE_PROXY_SSL_HEADER must be configured as "<header>,<value>", '
+            'for example "HTTP_X_FORWARDED_PROTO,https".'
+        )
+    return tuple(parts)
+
+
+SECURE_PROXY_SSL_HEADER = _get_secure_proxy_ssl_header()
+USE_X_FORWARDED_HOST = get_bool_env('USE_X_FORWARDED_HOST', False)
+USE_X_FORWARDED_PORT = get_bool_env('USE_X_FORWARDED_PORT', False)
+
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -256,6 +275,7 @@ MIDDLEWARE = [
     'core.middleware.XApiKeySupportMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'core.middleware.NoindexUrlMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
@@ -264,6 +284,12 @@ MIDDLEWARE = [
     'core.current_request.ThreadLocalMiddleware',
     'jwt_auth.middleware.JWTAuthenticationMiddleware',
 ]
+
+# Extension points for downstream apps (e.g. enterprise features) to contribute extra noindex URL
+# patterns (NoindexUrlMiddleware) and secured contextlog view names without adding feature-specific
+# routes to OSS. Each is a tuple appended to the OSS defaults.
+ADDITIONAL_NOINDEX_URL_PATTERNS = ()
+ADDITIONAL_CONTEXTLOG_SECURED_VIEWS = ()
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
@@ -413,6 +439,109 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {'url': 'https://labelstud.io'},
     'X_LOGO': {'url': '../../static/icons/logo-black.svg'},
     'ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE': False,
+    'ENUM_NAME_OVERRIDES': {
+        'AnnotationHistoryActionEnum': (
+            ('prediction', 'Created from prediction'),
+            ('propagated_annotation', 'Created from another annotation'),
+            ('imported', 'Imported'),
+            ('submitted', 'Submitted'),
+            ('updated', 'Updated'),
+            ('skipped', 'Skipped'),
+            ('accepted', 'Accepted'),
+            ('rejected', 'Rejected'),
+            ('fixed_and_accepted', 'Fixed and accepted'),
+            ('deleted_review', 'Deleted review'),
+        ),
+        'DataManagerFilterModeEnum': (
+            ('only', 'only'),
+            ('exclude', 'exclude'),
+            (None, None),
+        ),
+        'FsmBackfillJobStatusEnum': (
+            ('PENDING', 'Pending'),
+            ('QUEUED', 'Queued'),
+            ('RUNNING', 'Running'),
+            ('COMPLETED', 'Completed'),
+            ('FAILED', 'Failed'),
+        ),
+        # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
+        # FIT-2196), which can appear in responses but is never assignable via role APIs.
+        'OrganizationRoleEnum': (
+            ('OW', 'Owner'),
+            ('AD', 'Administrator'),
+            ('MA', 'Manager'),
+            ('RE', 'Reviewer'),
+            ('AN', 'Annotator'),
+            ('DI', 'Deactivated'),
+            ('NO', 'Not Activated'),
+            ('VO', 'View Only'),
+        ),
+        # Assignable roles (OrganizationRole.public_choices()): what role-assignment
+        # inputs accept — hidden backing roles are excluded.
+        'AssignableOrganizationRoleEnum': (
+            ('OW', 'Owner'),
+            ('AD', 'Administrator'),
+            ('MA', 'Manager'),
+            ('RE', 'Reviewer'),
+            ('AN', 'Annotator'),
+            ('DI', 'Deactivated'),
+            ('NO', 'Not Activated'),
+        ),
+        # Provenance for how a member/project role was set (RoleSource.choices).
+        'RoleSourceEnum': (
+            ('manual', 'Manual'),
+            ('saml', 'SAML'),
+            ('scim', 'SCIM'),
+            ('ldap', 'LDAP'),
+            ('api', 'API'),
+            ('billing', 'Billing'),
+        ),
+        # Seat types assignable through invite/membership APIs
+        # (UserType.assignable_choices()): Service Accounts are provisioned via
+        # their dedicated API and are excluded.
+        'AssignableUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('flex', 'Flex'),
+            ('viewonly', 'View Only'),
+        ),
+        # Membership updates support only the paid upgrade direction. View-Only
+        # creation is exposed separately through the invite contract.
+        'StandardUserTypeEnum': (('standard', 'Standard'),),
+        'OrganizationPermissionRoleEnum': (
+            'OW',
+            'AD',
+            'MA',
+            'RE',
+            'AN',
+            'DI',
+            'NO',
+            'VO',
+        ),
+        'ProjectImportStatusEnum': (
+            ('created', 'Created'),
+            ('in_progress', 'In progress'),
+            ('failed', 'Failed'),
+            ('completed', 'Completed'),
+        ),
+        'ProjectSamplingEnum': (
+            ('Sequential sampling', 'Tasks are ordered by Data manager ordering'),
+            ('Uniform sampling', 'Tasks are chosen randomly'),
+            ('Uncertainty sampling', 'Tasks are chosen according to model uncertainty scores (active learning mode)'),
+        ),
+        'StorageStatusEnum': (
+            ('initialized', 'Initialized'),
+            ('queued', 'Queued'),
+            ('in_progress', 'In progress'),
+            ('failed', 'Failed'),
+            ('completed', 'Completed'),
+            ('completed_with_errors', 'Completed with errors'),
+        ),
+        # Task assignment type (Annotate / Review) used by assignees mutation APIs.
+        'AssignmentTypeEnum': (
+            ('AN', 'Annotate'),
+            ('RE', 'Review'),
+        ),
+    },
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -575,6 +704,10 @@ REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
+# Stage Add or Update Columns mutations above 100 tasks so the current Data Manager page updates promptly.
+ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD = int(get_env('ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD', 100))
+# Batch size for updating data columns in the DB using jsonb_set, to not timeout on large projects
+UPDATE_COLUMN_BATCH_SIZE = int(get_env('UPDATE_COLUMN_BATCH_SIZE', 100))
 # Maximum number of tasks to process in a single batch during export operations
 MAX_TASK_BATCH_SIZE = int(get_env('MAX_TASK_BATCH_SIZE', 1000))
 # Total size of task data (in bytes) to process per batch - used to calculate dynamic batch sizes
@@ -635,15 +768,19 @@ POST_PROCESS_REIMPORT = 'core.utils.common.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 WHOAMI_USER_SERIALIZER = 'users.serializers.BaseWhoAmIUserSerializer'
 USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
+ANNOTATOR_REVIEWER_FIREWALL = 'users.firewall.AnnotatorReviewerFirewall'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
+DATA_MANAGER_GET_PROJECT_USER_IDS = 'users.project_access.get_user_ids_in_projects'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
+DATA_MANAGER_LIST_FILTER_MAX_VALUES = int(get_env('DATA_MANAGER_LIST_FILTER_MAX_VALUES', 5000))
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
+BULK_CREATE_ANNOTATIONS_FSM_INITIALIZER = None
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
@@ -692,8 +829,10 @@ PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
-WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 10.0))
 WEBHOOK_BATCH_SIZE = int(get_env('WEBHOOK_BATCH_SIZE', 5000))
+# Auto-disable a webhook after this many consecutive failed deliveries (<= 0 disables the feature)
+WEBHOOK_MAX_CONSECUTIVE_FAILURES = int(get_env('WEBHOOK_MAX_CONSECUTIVE_FAILURES', 50))
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
@@ -823,6 +962,22 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
     ],
 )
 
+# Hostnames whose iframes are allowed to survive the editor's HTML sanitizer
+# (see services/lso/web/libs/editor/src/utils/html.js: sanitizeHtml).
+# Override with the LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS env var (comma-separated).
+ALLOWED_IFRAME_DOMAINS = get_env_list(
+    'ALLOWED_IFRAME_DOMAINS',
+    default=[
+        'www.youtube.com',
+        'youtube.com',
+        'www.youtube-nocookie.com',
+        'youtube-nocookie.com',
+        'youtu.be',
+        'www.canva.com',
+        'canva.com',
+    ],
+)
+
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
 PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
@@ -941,3 +1096,11 @@ FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_n
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
 SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
+
+# Delay (seconds) before a migration-scheduled RQ job actually starts. Gives a rolling deploy
+# time to finish so the job runs on NEW workers, not stale ones still alive during the deploy.
+MIGRATION_JOB_START_DELAY_SECONDS = int(get_env('MIGRATION_JOB_START_DELAY_SECONDS', 15 * 60))
+
+# Delay (seconds) before a migration runner retries when the target import fails (stale worker
+# not yet upgraded during a rolling deploy). Short, since this is a fast retry loop.
+MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS = int(get_env('MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS', 30))

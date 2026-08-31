@@ -10,14 +10,13 @@ import Registry from "../../../core/Registry";
 import Tree from "../../../core/Tree";
 import Types from "../../../core/Types";
 import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
-import LeadTimeMixin from "../../../mixins/LeadTime";
 import PerItemMixin from "../../../mixins/PerItem";
 import PerRegionMixin, { PER_REGION_MODES } from "../../../mixins/PerRegion";
 import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
 import RequiredMixin from "../../../mixins/Required";
 import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
-import { FF_LEAD_TIME, FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
+import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
@@ -27,6 +26,9 @@ import "./TextArea.prefix.css";
 import { cn } from "../../../utils/bem";
 
 const { TextArea } = Input;
+
+/** Meta key on textarea results for in-flight input that is not yet committed via Add/Submit. */
+export const TEXTAREA_PENDING_DRAFT_META_KEY = "textAreaPendingInput";
 
 /**
  * The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.
@@ -154,7 +156,7 @@ const Model = types
       return value.some((val) => val.toLowerCase() === normalized);
     },
   }))
-  .actions(() => (isFF(FF_LEAD_TIME) ? {} : { countTime: () => {} }))
+  .actions(() => ({ countTime: () => {} }))
   .actions((self) => {
     let lastActiveElement = null;
     let lastActiveElementModel = null;
@@ -178,7 +180,11 @@ const Model = types
       },
 
       needsUpdate() {
+        const pending = self.result?.meta?.[TEXTAREA_PENDING_DRAFT_META_KEY];
         self.updateFromResult(self.result?.mainValue);
+        if (pending) {
+          self.setValue(pending, { skipDraftSave: true });
+        }
       },
 
       requiredModal() {
@@ -200,8 +206,48 @@ const Model = types
         value && self.setResult(value);
       },
 
-      setValue(value) {
+      setValue(value, options = {}) {
         self._value = value;
+        const { skipDraftSave = false } = options;
+
+        if (skipDraftSave || !self.annotation?.editable || self.annotation.isReadOnly()) return;
+
+        if (self.annotation.autosave) {
+          self.annotation.autosave();
+        }
+      },
+
+      getPendingDraftInput() {
+        if (!self.annotation || self.isReadOnly()) return null;
+
+        const pending = self._value?.trim();
+
+        if (!pending) return null;
+
+        const committed = self.selectedValues();
+
+        if (committed.some((value) => value === pending)) return null;
+
+        return pending;
+      },
+
+      clearPendingDraftMeta() {
+        self.result?.removeMetaKey?.(TEXTAREA_PENDING_DRAFT_META_KEY);
+      },
+
+      syncPendingDraftState() {
+        if (!self.annotation?.editable || self.annotation.isReadOnly()) return;
+
+        const pending = self.getPendingDraftInput();
+
+        if (pending) {
+          if (!self.result) {
+            self.createPerObjectResult();
+          }
+          self.result?.setMetaValue(TEXTAREA_PENDING_DRAFT_META_KEY, pending);
+        } else {
+          self.clearPendingDraftMeta();
+        }
       },
 
       remove(region) {
@@ -244,6 +290,7 @@ const Model = types
 
         // should go after `onChange` because it uses result and area
         self.updateLeadTime();
+        self.clearPendingDraftMeta();
       },
 
       /**
@@ -253,19 +300,7 @@ const Model = types
        *   on undo/redo, on switching annotations, on switching regions...
        * After adding lead_time to the result, we should reset all lead_time numbers
        */
-      updateLeadTime() {
-        if (!isFF(FF_LEAD_TIME)) return;
-
-        const result = self.result;
-
-        if (!result) return;
-
-        // add current stored leadTime to the main stored lead_time
-        result.setMetaValue("lead_time", (result.meta?.lead_time ?? 0) + self.leadTime / 1000);
-
-        self.leadTime = 0;
-        self.resetLeadTimeCounters();
-      },
+      updateLeadTime() {},
 
       addTextToResult(text, result) {
         if (!self.validateText(text)) return;
@@ -325,7 +360,6 @@ const TextAreaModel = types.compose(
   ControlBase,
   ClassificationBase,
   TagAttrs,
-  ...(isFF(FF_LEAD_TIME) ? [LeadTimeMixin] : []),
   ProcessAttrsMixin,
   RequiredMixin,
   PerRegionMixin,

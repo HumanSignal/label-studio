@@ -93,7 +93,7 @@ export class VectorSelectionTracker {
   }
 
   // Check if an instance can have selection
-  canInstanceHaveSelection(instanceId: string): boolean {
+  canInstanceHaveSelection(_instanceId: string): boolean {
     // Allow all instances to have selections simultaneously
     return true;
   }
@@ -105,7 +105,7 @@ export class VectorSelectionTracker {
 
   clearSelection(): void {
     // Clear all instance selections
-    for (const [instanceId, instance] of this.instances) {
+    for (const [_instanceId, instance] of this.instances) {
       instance.setSelectedPoints(new Set());
       instance.setSelectedPointIndex(null);
       instance.onPointSelected?.(null);

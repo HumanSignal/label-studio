@@ -46,7 +46,7 @@ export const PlaygroundApp = () => {
           const text = await res.text();
           // Replace all <br> tags with newlines
           config = replaceBrTagsWithNewlines(text);
-        } catch (e) {
+        } catch (_e) {
           setError("Failed to fetch config from URL.");
         } finally {
           setLoading(false);
@@ -63,10 +63,10 @@ export const PlaygroundApp = () => {
           try {
             throwUnlessXmlLike(config);
             setConfig(replaceBrTagsWithNewlines(config));
-          } catch (e) {
+          } catch (_e) {
             setConfig(replaceBrTagsWithNewlines(decodeURIComponent(config)));
           }
-        } catch (e) {
+        } catch (_e) {
           setError("Failed to decode config. Are you sure it's a valid urlencoded string?");
         }
         return;

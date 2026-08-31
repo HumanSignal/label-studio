@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { shallowEqualObjects } from "shallow-equal";
 import { addVisitedProject } from "@humansignal/core";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
-import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { useAPI, type WrappedResponse } from "./ApiProvider";
 import { useAppStore } from "./AppStoreProvider";
 import { useParams } from "./RoutesProvider";
@@ -85,17 +84,10 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
         errorFilter: options?.returnErrors ? undefined : () => true,
       });
 
-      if (isFF(FF_UNSAVED_CHANGES)) {
-        if (result?.$meta?.ok) {
-          setProjectData(result as unknown as APIProject);
-          updateStore({ project: result });
-          projectCache.set(result.id, result);
-        }
-      } else {
-        if (result.$meta) {
-          setProjectData(result as unknown as APIProject);
-          updateStore({ project: result });
-        }
+      if (result?.$meta?.ok) {
+        setProjectData(result as unknown as APIProject);
+        updateStore({ project: result });
+        projectCache.set(result.id, result);
       }
 
       return result;

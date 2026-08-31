@@ -1,0 +1,40 @@
+.payment-status {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
+
+  &__item {
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    position: relative;
+
+    &:hover {
+      z-index: 10;
+    }
+  }
+}
+
+.payment-badge {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px var(--color-neutral-background, #fff);
+
+  &_approved {
+    background-color: #faad14;
+  }
+
+  &_in-payout {
+    background-color: #597ef7;
+  }
+
+  &_paid {
+    background-color: #52c41a;
+  }
+
+  &_excluded {
+    background-color: #bfbfbf;
+  }
+}

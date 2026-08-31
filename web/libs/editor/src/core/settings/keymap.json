@@ -340,5 +340,9 @@
     "key": "ctrl+shift+a",
     "mac": "command+shift+a",
     "description": "Select all and annotate current phrase"
+  },
+  "annotation:toggle-auto-annotation": {
+    "key": "shift+alt+a",
+    "description": "Toggle Auto-Annotation"
   }
 }

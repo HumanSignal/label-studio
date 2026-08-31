@@ -1,9 +1,13 @@
+import {
+  FF_ECHO_466_TAXONOMY_ANTD_REMOVAL,
+  FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT,
+} from "@humansignal/core/lib/utils/feature-flags";
 import * as FLAGS from "../../src/utils/feature-flags";
 
 export const CURRENT_FLAGS = {
+  [FF_ECHO_466_TAXONOMY_ANTD_REMOVAL]: true,
+  [FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT]: true,
   [FLAGS.FF_LSDV_4930]: true,
-  [FLAGS.FF_LSDV_4620_3_ML]: false,
   fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short: true,
   fflag_fix_front_fit_31_synced_media_buffering: true,
-  fflag_feat_front_bros_327_multiple_labels_regions_short: true,
 };

@@ -52,11 +52,7 @@ const CommentsTab: FC<any> = inject("store")(
           <div className={cn("comments-panel").toClassName()}>
             <div className={cn("comments-panel").elem("section-tab").toClassName()}>
               <div className={cn("comments-panel").elem("section-content").toClassName()}>
-                <CommentsComponent
-                  annotationStore={store.annotationStore}
-                  commentStore={store.commentStore}
-                  cacheKey={`task.${store.task.id}`}
-                />
+                <CommentsComponent annotationStore={store.annotationStore} commentStore={store.commentStore} />
               </div>
             </div>
           </div>
@@ -199,11 +195,7 @@ const GeneralPanel: FC<any> = inject("store")(
           <div className={cn("details").elem("section").toClassName()}>
             <div className={cn("details").elem("section-head").toClassName()}>Comments</div>
             <div className={cn("details").elem("section-content").toClassName()}>
-              <CommentsComponent
-                annotationStore={store.annotationStore}
-                commentStore={store.commentStore}
-                cacheKey={`task.${store.task.id}`}
-              />
+              <CommentsComponent annotationStore={store.annotationStore} commentStore={store.commentStore} />
             </div>
           </div>
         )}

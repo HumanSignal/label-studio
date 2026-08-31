@@ -1,35 +1,37 @@
-jest.mock("../../../utils/feature-flags", () => ({
-  isFF: () => false,
-  FF_DEV_3391: "fflag_fix_front_dev_3391_interactive_view_all",
-  FF_SIMPLE_INIT: "fflag_fix_front_leap_443_select_annotation_once",
-}));
-
-jest.mock("../../../core/Hotkey", () => {
-  const addNamed = jest.fn();
-  const removeNamed = jest.fn();
+mockModule("../../../core/Hotkey", () => {
+  const addNamed = mock();
+  const removeNamed = mock();
   const instance = { addNamed, removeNamed };
   const Hotkey = () => instance;
+  Hotkey.setScope = mock();
+  Hotkey.DEFAULT_SCOPE = "all";
+  Hotkey.keymap = {};
+  Hotkey.namespaces = () => ({});
+  Hotkey.unbindAll = mock();
   Hotkey._testInstance = instance;
-  return { Hotkey };
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    Hotkey,
+    default: {
+      DEFAULT_SCOPE: Hotkey.DEFAULT_SCOPE,
+      Hotkey,
+    },
+  };
 });
 
-jest.mock("../../../tools/Manager", () => ({
-  __esModule: true,
-  default: {
-    getInstance: () => ({
-      addToolsFromControl: jest.fn(),
-    }),
-  },
-}));
+import ToolsManager from "../../../tools/Manager";
+spyOn(ToolsManager, "getInstance").mockReturnValue({
+  addToolsFromControl: mock(),
+});
 
 let PolygonModel;
 let Store;
 let HotkeyMock;
 
-beforeAll(() => {
-  jest.resetModules();
+beforeAll(async () => {
   const { types } = require("mobx-state-tree");
-  const Polygon = require("../Polygon");
+  const Polygon = await import(`../Polygon?bun_reload=${Date.now()}`);
   PolygonModel = Polygon.PolygonModel;
   HotkeyMock = require("../../../core/Hotkey").Hotkey;
 
@@ -45,8 +47,8 @@ beforeAll(() => {
     .volatile(() => ({
       selected: true,
       isDrawing: true,
-      undo: jest.fn(),
-      redo: jest.fn(),
+      undo: mock(),
+      redo: mock(),
     }));
 
   Store = types.model("Store", {

@@ -1,95 +1,95 @@
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import * as bemModule from "../../../../utils/bem";
+import * as commentsModule from "../../../Comments/Comments";
+import * as annotationHistoryModule from "../../../CurrentEntity/AnnotationHistory";
+import * as regionDetailsModule from "../RegionDetails";
+import * as regionItemModule from "../RegionItem";
+import * as relationsModule from "../Relations";
+import * as relationsControlsModule from "../RelationsControls";
+import * as emptyStateModule from "../../Components/EmptyState";
+import * as iconsModule from "@humansignal/icons";
+import * as docsModule from "../../../../utils/docs";
 import { Relations, Info } from "../DetailsPanel";
 
-// Mock the dependencies
-jest.mock("../../../../utils/bem", () => ({
-  cn: (block: string) => ({
-    elem: (elem: string) => ({
-      toClassName: () => `dm-${block}__${elem}`,
-      mod: (mods: any) => ({
-        toClassName: () => `dm-${block}__${elem}`,
-      }),
-    }),
-    mod: (mods: any) => ({
-      toClassName: () => `dm-${block}`,
-      mix: (...args: any[]) => ({
-        toClassName: () => `dm-${block}`,
-      }),
-    }),
-    toClassName: () => `dm-${block}`,
-    mix: (...args: any[]) => ({
-      toClassName: () => `dm-${block}`,
-    }),
-  }),
-}));
-
-jest.mock("../../../Comments/Comments", () => ({
-  Comments: (props: any) => <div data-testid="comments-component" {...props} />,
-}));
-
-jest.mock("../../../CurrentEntity/AnnotationHistory", () => ({
-  AnnotationHistory: (props: any) => <div data-testid="annotation-history" {...props} />,
-}));
-
-jest.mock("../RegionDetails", () => ({
-  RegionDetailsMain: (props: any) => <div data-testid="region-details-main" {...props} />,
-  RegionDetailsMeta: (props: any) => <div data-testid="region-details-meta" {...props} />,
-}));
-
-jest.mock("../RegionItem", () => ({
-  RegionItem: ({ region, mainDetails, metaDetails }: any) => (
-    <div data-testid="detailed-region">
-      <div data-testid="region-id">{region.id}</div>
-      {mainDetails && <div data-testid="main-details">Main Details</div>}
-      {metaDetails && <div data-testid="meta-details">Meta Details</div>}
-    </div>
-  ),
-}));
-
-jest.mock("../Relations", () => ({
-  Relations: (props: any) => <div data-testid="relations-component" {...props} />,
-}));
-
-jest.mock("../RelationsControls", () => ({
-  RelationsControls: (props: any) => <div data-testid="relations-controls" {...props} />,
-}));
-
-jest.mock("../../Components/EmptyState", () => ({
-  EmptyState: ({ icon, header, description, learnMore }: any) => (
-    <div data-testid="empty-state">
-      <div data-testid="empty-state-icon">{icon}</div>
-      <div data-testid="empty-state-header">{header}</div>
-      <div data-testid="empty-state-description">{description}</div>
-      {learnMore && (
-        <a href={learnMore.href} data-testid={learnMore.testId} target="_blank" rel="noopener noreferrer">
-          {learnMore.text}
-        </a>
-      )}
-    </div>
-  ),
-}));
-
-jest.mock("@humansignal/icons", () => ({
-  IconCursor: ({ width, height }: { width: number; height: number }) => (
-    <svg data-testid="icon-cursor" width={width} height={height} />
-  ),
-  IconRelationLink: ({ width, height }: { width: number; height: number }) => (
-    <svg data-testid="icon-relation-link" width={width} height={height} />
-  ),
-}));
-
-jest.mock("../../../../utils/docs", () => ({
-  getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
-}));
-
-// Mock observer and inject
-jest.mock("mobx-react", () => ({
-  observer: (component: any) => component,
-  inject: (storeName: string) => (component: any) => component,
-}));
+const injectedStore = { hasInterface: () => false };
 
 describe("DetailsPanel", () => {
+  beforeEach(() => {
+    spyOn(bemModule, "cn").mockImplementation((block: string) => ({
+      elem: (elem: string) => ({
+        toClassName: () => `dm-${block}__${elem}`,
+        mod: (_mods: any) => ({
+          toClassName: () => `dm-${block}__${elem}`,
+        }),
+      }),
+      mod: (_mods: any) => ({
+        toClassName: () => `dm-${block}`,
+        mix: (..._args: any[]) => ({
+          toClassName: () => `dm-${block}`,
+        }),
+      }),
+      toClassName: () => `dm-${block}`,
+      mix: (..._args: any[]) => ({
+        toClassName: () => `dm-${block}`,
+      }),
+    }));
+
+    spyOn(commentsModule, "Comments").mockImplementation((props: any) => (
+      <div data-testid="comments-component" {...props} />
+    ));
+
+    spyOn(annotationHistoryModule, "AnnotationHistory").mockImplementation((props: any) => (
+      <div data-testid="annotation-history" {...props} />
+    ));
+
+    spyOn(regionDetailsModule, "RegionDetailsMain").mockImplementation((props: any) => (
+      <div data-testid="region-details-main" {...props} />
+    ));
+    spyOn(regionDetailsModule, "RegionDetailsMeta").mockImplementation((props: any) => (
+      <div data-testid="region-details-meta" {...props} />
+    ));
+
+    spyOn(regionItemModule, "RegionItem").mockImplementation(({ region, mainDetails, metaDetails }: any) => (
+      <div data-testid="detailed-region">
+        <div data-testid="region-id">{region.id}</div>
+        {mainDetails && <div data-testid="main-details">Main Details</div>}
+        {metaDetails && <div data-testid="meta-details">Meta Details</div>}
+      </div>
+    ));
+
+    spyOn(relationsModule, "Relations").mockImplementation((props: any) => (
+      <div data-testid="relations-component" {...props} />
+    ));
+
+    spyOn(relationsControlsModule, "RelationsControls").mockImplementation((props: any) => (
+      <div data-testid="relations-controls" {...props} />
+    ));
+
+    spyOn(emptyStateModule, "EmptyState").mockImplementation(({ icon, header, description, learnMore }: any) => (
+      <div data-testid="empty-state">
+        <div data-testid="empty-state-icon">{icon}</div>
+        <div data-testid="empty-state-header">{header}</div>
+        <div data-testid="empty-state-description">{description}</div>
+        {learnMore && (
+          <a href={learnMore.href} data-testid={learnMore.testId} target="_blank" rel="noopener noreferrer">
+            {learnMore.text}
+          </a>
+        )}
+      </div>
+    ));
+
+    spyOn(iconsModule, "IconCursor").mockImplementation(({ width, height }: { width: number; height: number }) => (
+      <svg data-testid="icon-cursor" width={width} height={height} />
+    ));
+    spyOn(iconsModule, "IconRelationLink").mockImplementation(
+      ({ width, height }: { width: number; height: number }) => (
+        <svg data-testid="icon-relation-link" width={width} height={height} />
+      ),
+    );
+
+    spyOn(docsModule, "getDocsUrl").mockImplementation((path: string) => `https://docs.example.com/${path}`);
+  });
+
   describe("RelationsTab", () => {
     const mockCurrentEntityWithRelations = {
       relationStore: {
@@ -105,7 +105,7 @@ describe("DetailsPanel", () => {
 
     describe("when hasRelations is false", () => {
       it("renders empty state with correct icon", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         const emptyState = screen.getByTestId("empty-state");
         expect(emptyState).toBeInTheDocument();
@@ -117,7 +117,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders empty state with correct header", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         const header = screen.getByTestId("empty-state-header");
         expect(header).toBeInTheDocument();
@@ -125,7 +125,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders empty state with correct description", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         const description = screen.getByTestId("empty-state-description");
         expect(description).toBeInTheDocument();
@@ -133,7 +133,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders learn more link with correct attributes", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         const learnMoreLink = screen.getByTestId("relations-panel-learn-more");
         expect(learnMoreLink).toBeInTheDocument();
@@ -147,14 +147,14 @@ describe("DetailsPanel", () => {
       });
 
       it("does not render relations controls when no relations exist", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         expect(screen.queryByTestId("relations-controls")).not.toBeInTheDocument();
         expect(screen.queryByTestId("relations-component")).not.toBeInTheDocument();
       });
 
       it("does not render relations count header when no relations exist", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithoutRelations} store={injectedStore} />);
 
         expect(screen.queryByText(/Relations \(/)).not.toBeInTheDocument();
       });
@@ -162,20 +162,20 @@ describe("DetailsPanel", () => {
 
     describe("when hasRelations is true", () => {
       it("does not render empty state when relations exist", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithRelations} store={injectedStore} />);
 
         expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
       });
 
       it("renders relations controls and component when relations exist", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithRelations} store={injectedStore} />);
 
         expect(screen.getByTestId("relations-controls")).toBeInTheDocument();
         expect(screen.getByTestId("relations-component")).toBeInTheDocument();
       });
 
       it("renders relations count in header when relations exist", () => {
-        render(<Relations currentEntity={mockCurrentEntityWithRelations} />);
+        render(<Relations currentEntity={mockCurrentEntityWithRelations} store={injectedStore} />);
 
         expect(screen.getByText("Relations (3)")).toBeInTheDocument();
       });
@@ -198,7 +198,7 @@ describe("DetailsPanel", () => {
 
     describe("when nothingSelected is true", () => {
       it("renders empty state with correct icon when no selection", () => {
-        render(<Info selection={mockSelectionEmpty} />);
+        render(<Info selection={mockSelectionEmpty} store={injectedStore} />);
 
         const emptyState = screen.getByTestId("empty-state");
         expect(emptyState).toBeInTheDocument();
@@ -210,7 +210,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders empty state with correct header when no selection", () => {
-        render(<Info selection={mockSelectionEmpty} />);
+        render(<Info selection={mockSelectionEmpty} store={injectedStore} />);
 
         const header = screen.getByTestId("empty-state-header");
         expect(header).toBeInTheDocument();
@@ -218,7 +218,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders empty state with correct description when no selection", () => {
-        render(<Info selection={mockSelectionEmpty} />);
+        render(<Info selection={mockSelectionEmpty} store={injectedStore} />);
 
         const description = screen.getByTestId("empty-state-description");
         expect(description).toBeInTheDocument();
@@ -226,28 +226,28 @@ describe("DetailsPanel", () => {
       });
 
       it("does not render region details on info panel when no selection", () => {
-        render(<Info selection={mockSelectionEmpty} />);
+        render(<Info selection={mockSelectionEmpty} store={injectedStore} />);
 
         const detailedRegions = screen.queryAllByTestId("detailed-region");
         expect(detailedRegions).toHaveLength(0);
       });
 
       it("does not render info panel when no selection", () => {
-        render(<Info selection={mockSelectionEmpty} />);
+        render(<Info selection={mockSelectionEmpty} store={injectedStore} />);
 
         const detailedRegions = screen.queryAllByTestId("detailed-region");
         expect(detailedRegions).toHaveLength(0);
       });
 
       it("renders empty state when selection is null", () => {
-        render(<Info selection={null} />);
+        render(<Info selection={null} store={injectedStore} />);
 
         const emptyState = screen.getByTestId("empty-state");
         expect(emptyState).toBeInTheDocument();
       });
 
       it("renders empty state when selection is undefined", () => {
-        render(<Info selection={undefined} />);
+        render(<Info selection={undefined} store={injectedStore} />);
 
         const emptyState = screen.getByTestId("empty-state");
         expect(emptyState).toBeInTheDocument();
@@ -256,20 +256,20 @@ describe("DetailsPanel", () => {
 
     describe("when nothingSelected is false", () => {
       it("does not render empty state when regions are selected", () => {
-        render(<Info selection={mockSelectionWithRegions} />);
+        render(<Info selection={mockSelectionWithRegions} store={injectedStore} />);
 
         expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
       });
 
       it("renders selection details when regions are selected", () => {
-        render(<Info selection={mockSelectionWithRegions} />);
+        render(<Info selection={mockSelectionWithRegions} store={injectedStore} />);
 
         const detailedRegions = screen.getAllByTestId("detailed-region");
         expect(detailedRegions).toHaveLength(2);
       });
 
       it("renders region info with specific regions selected", () => {
-        render(<Info selection={mockSelectionWithRegions} />);
+        render(<Info selection={mockSelectionWithRegions} store={injectedStore} />);
 
         const detailedRegions = screen.getAllByTestId("detailed-region");
         expect(detailedRegions).toHaveLength(2);
@@ -280,7 +280,7 @@ describe("DetailsPanel", () => {
       });
 
       it("renders main and meta details for each region", () => {
-        render(<Info selection={mockSelectionWithRegions} />);
+        render(<Info selection={mockSelectionWithRegions} store={injectedStore} />);
 
         const mainDetails = screen.getAllByTestId("main-details");
         const metaDetails = screen.getAllByTestId("meta-details");
@@ -297,7 +297,7 @@ describe("DetailsPanel", () => {
           list: [{ id: "region1", type: "rectangle" }], // Inconsistent state
         };
 
-        render(<Info selection={edgeCaseSelection} />);
+        render(<Info selection={edgeCaseSelection} store={injectedStore} />);
 
         // Should render empty state based on size property
         const emptyState = screen.getByTestId("empty-state");
@@ -310,7 +310,7 @@ describe("DetailsPanel", () => {
           list: [], // Inconsistent state
         };
 
-        render(<Info selection={edgeCaseSelection} />);
+        render(<Info selection={edgeCaseSelection} store={injectedStore} />);
 
         // Should not render empty state based on size property
         expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();

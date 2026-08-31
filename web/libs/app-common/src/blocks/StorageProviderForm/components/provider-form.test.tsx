@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { ProviderForm } from "./provider-form";
 import type { ProviderConfig } from "../types/provider";
 import { z } from "zod";
@@ -75,7 +74,7 @@ describe("ProviderForm visibleWhen", () => {
   const defaultProps = {
     provider: createTestProvider(),
     errors: {},
-    onChange: jest.fn(),
+    onChange: mock(),
   };
 
   it("renders fields without visibleWhen condition", () => {
@@ -173,7 +172,7 @@ describe("ProviderForm visibleWhen with function values", () => {
         provider={createProviderWithFunctionCondition()}
         formData={{ enable_advanced: true }}
         errors={{}}
-        onChange={jest.fn()}
+        onChange={mock()}
       />,
     );
 
@@ -186,7 +185,7 @@ describe("ProviderForm visibleWhen with function values", () => {
         provider={createProviderWithFunctionCondition()}
         formData={{ enable_advanced: false }}
         errors={{}}
-        onChange={jest.fn()}
+        onChange={mock()}
       />,
     );
 

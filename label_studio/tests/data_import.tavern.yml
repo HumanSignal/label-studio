@@ -22,8 +22,8 @@ stages:
 - name: stage
   request:
     files:
-      image_0: tests/test_suites/samples/test_image.jpg
-      image_1: tests/test_suites/samples/test_image.png
+      image_0: label_studio/tests/test_suites/samples/test_image.jpg
+      image_1: label_studio/tests/test_suites/samples/test_image.png
     headers:
       content-type: multipart/form-data
     method: POST
@@ -65,7 +65,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/test_1.csv
+      csv_0: label_studio/tests/test_suites/samples/test_1.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -79,7 +79,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/test_2.csv
+      csv_0: label_studio/tests/test_suites/samples/test_2.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -132,7 +132,7 @@ stages:
 - name: stage
   request:
     files:
-      csv_0: tests/test_suites/samples/random-with-predictions.json
+      csv_0: label_studio/tests/test_suites/samples/random-with-predictions.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -212,8 +212,8 @@ stages:
 - name: stage
   request:
     files:
-      image_0: tests/test_suites/samples/first.jpg
-      image_1: tests/test_suites/samples/second.jpg
+      image_0: label_studio/tests/test_suites/samples/first.jpg
+      image_1: label_studio/tests/test_suites/samples/second.jpg
     headers:
       content-type: multipart/form-data
     method: POST
@@ -317,8 +317,8 @@ stages:
 - name: stage
   request:
     files:
-      csv_1: tests/test_suites/samples/test_3.csv
-      csv_2: tests/test_suites/samples/test_4.csv
+      csv_1: label_studio/tests/test_suites/samples/test_3.csv
+      csv_2: label_studio/tests/test_suites/samples/test_4.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -387,39 +387,10 @@ stages:
       json:
         project_pk: id
     status_code: 201
-- name: stage
+- name: Import with unknown completed_by email re-attributes to importer (BROS-1092)
   request:
     files:
-      json: tests/test_suites/samples/previous_export.json
-    headers:
-      content-type: multipart/form-data
-    method: POST
-    url: '{django_live_url}/api/projects/{project_pk}/import'
-  response:
-    status_code: 400
-    json:
-      validation_errors:
-        non_field_errors:
-          - "Unknown annotator's email annotator_from_past@project.com"
-# Now let's create missed user and try again...
-- id: logout
-  type: ref
-- id: signup
-  name: Sign up
-  request:
-    url: "{django_live_url}/user/signup"
-    data:
-      email: annotator_from_past@project.com
-      password: 12345678
-    method: POST
-  response:
-    status_code: 302
-- id: login
-  type: ref
-- name: stage
-  request:
-    files:
-      json: tests/test_suites/samples/previous_export.json
+      json: label_studio/tests/test_suites/samples/previous_export.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -434,20 +405,23 @@ stages:
       found_formats: {'.json': 1}
       data_columns: ['image']
 
-- name: stage
+- name: Import with unknown completed_by id re-attributes to importer (BROS-1092)
   request:
     files:
-      json: tests/test_suites/samples/previous_export_unknown_completed_by.json
+      json: label_studio/tests/test_suites/samples/previous_export_unknown_completed_by.json
     headers:
       content-type: multipart/form-data
     method: POST
     url: '{django_live_url}/api/projects/{project_pk}/import'
   response:
-    status_code: 400
+    status_code: 201
     json:
-      validation_errors:
-        non_field_errors:
-          - "Import data contains completed_by=99999 which is not a valid annotator's email or ID"
+      task_count: 1
+      annotation_count: 1
+      prediction_count: 0
+      could_be_tasks_list: false
+      found_formats: {'.json': 1}
+      data_columns: ['image']
 
 
 ---
@@ -475,7 +449,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_classes.csv
+      csv: label_studio/tests/test_suites/samples/image_urls_with_classes.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -548,7 +522,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_bboxes.json
+      csv: label_studio/tests/test_suites/samples/image_urls_with_bboxes.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -609,7 +583,7 @@ stages:
 - name: Import images
   request:
     files:
-      csv: tests/test_suites/samples/image_urls.csv
+      csv: label_studio/tests/test_suites/samples/image_urls.csv
     headers:
       content-type: multipart/form-data
     method: POST
@@ -725,7 +699,7 @@ stages:
 - name: Import images with preannotations
   request:
     files:
-      csv: tests/test_suites/samples/image_urls_with_bboxes_gt.json
+      csv: label_studio/tests/test_suites/samples/image_urls_with_bboxes_gt.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -769,7 +743,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/test.wrong_ext
+      file: label_studio/tests/test_suites/samples/test.wrong_ext
     headers:
       content-type: multipart/form-data
     method: POST
@@ -805,7 +779,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/test_file_without_extension
+      file: label_studio/tests/test_suites/samples/test_file_without_extension
     headers:
       content-type: multipart/form-data
     method: POST

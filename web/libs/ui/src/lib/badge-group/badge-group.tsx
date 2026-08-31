@@ -16,8 +16,8 @@ export interface BadgeGroupProps {
   variant?: BadgeProps["variant"];
   /** Badge shape (default: "square") */
   shape?: BadgeProps["shape"];
-  /** Badge style (default: "filled") */
-  style?: BadgeProps["style"];
+  /** Badge look (default: "filled") */
+  look?: BadgeProps["look"];
   /** Badge size (default: "medium") */
   size?: BadgeProps["size"];
   /** Additional CSS class for the container */
@@ -56,7 +56,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
       items,
       variant = "primary",
       shape = "square",
-      style,
+      look,
       size,
       className,
       "data-testid": dataTestId,
@@ -115,7 +115,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
               key={item.id}
               variant={variant}
               shape={shape}
-              style={style}
+              look={look}
               size={size}
               maxWidth={badgeMaxWidth}
               className={shouldHide ? "invisible absolute" : undefined}
@@ -126,7 +126,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
         })}
         {/* Show +n badge if truncate is enabled and there are hidden badges */}
         {truncate && visibleBadgeCount !== null && visibleBadgeCount < items.length && (
-          <Badge variant={variant} shape={shape} style={style} size={size} data-overflow-badge="true">
+          <Badge variant={variant} shape={shape} look={look} size={size} data-overflow-badge="true">
             +{items.length - visibleBadgeCount}
           </Badge>
         )}

@@ -1,6 +1,20 @@
 import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
-import { destroy, detach, flow, getEnv, getParent, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
+import { toJS } from "mobx";
+import {
+  destroy,
+  detach,
+  flow,
+  getEnv,
+  getParent,
+  getRoot,
+  getSnapshot,
+  isAlive,
+  isStateTreeNode,
+  onSnapshot,
+  types,
+} from "mobx-state-tree";
 import { ff } from "@humansignal/core";
+import { canWriteDraftSnapshot, draftViewModeFromClassic, shouldPersistBeforeLeave } from "./draft-policy";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { guidGenerator } from "../../core/Helpers";
 import { Hotkey } from "../../core/Hotkey";
@@ -10,6 +24,7 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
+import { dedupeAnnotationWireResults } from "../../utils/dedupeAnnotationWireResults";
 import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
@@ -19,6 +34,22 @@ import { UserExtended } from "../UserStore";
 import { LinkingModes } from "./LinkingModes";
 
 const hotkeys = Hotkey("Annotations", "Annotations");
+
+/**
+ * Submission gate (BROS-1194): any region still being drawn — an unclosed
+ * polygon/vector, or a vector below its `minPoints` — must block submission,
+ * not only polygons. Extracted as a pure helper so the gate logic is unit
+ * testable without booting a full editor store, whose MST reference unions are
+ * import-order sensitive in the test runner.
+ *
+ * @param {Iterable<{ incomplete?: boolean }>} areas
+ */
+export function hasIncompleteRegion(areas) {
+  for (const area of areas) {
+    if (area?.incomplete) return true;
+  }
+  return false;
+}
 
 /**
  * Omit value fields from the object.
@@ -129,6 +160,8 @@ const _Annotation = types
     type: types.enumeration(["annotation", "prediction", "history"]),
 
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
+    /** ISO timestamp of the last update (server `updated_at`). */
+    updatedDate: types.optional(types.string, ""),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
     user: types.optional(types.maybeNull(UserOrReference), null),
@@ -143,6 +176,9 @@ const _Annotation = types
 
     loadedDate: types.optional(types.Date, () => new Date()),
     leadTime: types.maybeNull(types.number),
+
+    // LSE review badge / filter state from API accepted_state (stub and full payloads).
+    acceptedState: types.maybeNull(types.string),
 
     // @todo use types.Date
     draftSaved: types.maybe(types.string),
@@ -226,6 +262,10 @@ const _Annotation = types
       return snapshot.draft_created_at ?? snapshot.created_at ?? snapshot.createdDate;
     };
 
+    const getUpdatedAt = (snapshot) => {
+      return snapshot.updated_at ?? snapshot.updatedDate ?? getCreatedAt(snapshot) ?? "";
+    };
+
     return {
       ...sn,
       ...(isFF(FF_DEV_3391) ? { root } : {}),
@@ -233,6 +273,7 @@ const _Annotation = types
       editable: sn.editable ?? sn.type === "annotation",
       createdBy: getCreatedBy(sn),
       createdDate: getCreatedAt(sn),
+      updatedDate: getUpdatedAt(sn),
       ground_truth: sn.honeypot ?? sn.ground_truth ?? false,
       skipped: sn.skipped || sn.was_cancelled,
       acceptedState: sn.accepted_state ?? sn.acceptedState ?? null,
@@ -284,12 +325,9 @@ const _Annotation = types
       return results;
     },
 
-    get hasIncompletePolygons() {
+    get hasIncompleteRegions() {
       if (!isAlive(self)) return false;
-      for (const area of self.areas.values()) {
-        if (area.type === "polygonregion" && area.incomplete) return true;
-      }
-      return false;
+      return hasIncompleteRegion(self.areas.values());
     },
 
     get serialized() {
@@ -368,6 +406,26 @@ const _Annotation = types
     isReadOnly() {
       return self.isNonEditableDraft || self.readonly || !self.editable;
     },
+
+    /**
+     * Whether callers (DataManager, route DraftGuard) should persist draft before leaving.
+     * Centralizes the same preconditions as the `saveDraft` action (submission, editable,
+     * FIT-1685 preview) plus change tracking: `history.hasChanges` alone is not enough once
+     * a draft was saved — we compare `lastAdditionTime` to `draftSaved`.
+     */
+    needsDraftSave() {
+      const history = self.history;
+
+      return shouldPersistBeforeLeave({
+        submissionStarted: Boolean(self.submissionStarted),
+        editable: self.editable,
+        hasPersistedDraftVersion: Boolean(self.versions?.draft),
+        viewMode: draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected),
+        hasUnsavedEdits: Boolean(history?.hasChanges),
+        draftSavedAt: self.draftSaved,
+        lastEditAt: history?.lastAdditionTime,
+      });
+    },
   }))
   .volatile(() => ({
     hidden: false,
@@ -398,8 +456,10 @@ const _Annotation = types
       return (
         isFF(FF_REVIEWER_FLOW) &&
         // not a current user — we can only review others' annotations
-        self.user?.email &&
-        store.user?.email !== self.user?.email &&
+        // when PII is hidden, user ids are fake and negative,
+        // but current user id is real so comparison will work anyway
+        self.user?.id &&
+        store.user?.id !== self.user?.id &&
         // we have this only in LSE
         getEnv(self).events.hasEvent("acceptAnnotation") &&
         // Quick View — we don't have View All in Label Stream
@@ -420,6 +480,11 @@ const _Annotation = types
 
     setEditable(val) {
       self.editable = val;
+    },
+
+    /** LSE review badge / History — must run inside an MST action (FIT-2498). */
+    setAcceptedState(val) {
+      self.acceptedState = val ?? null;
     },
 
     setReadonly(val) {
@@ -620,6 +685,13 @@ const _Annotation = types
       self.unselectAll();
     },
 
+    /** UTC-945: persist uncommitted TextArea `_value` into draft payloads via result meta. */
+    syncPendingControlsForDraft() {
+      self.traverseTree((node) => {
+        node.syncPendingDraftState?.();
+      });
+    },
+
     /**
      * Delete region
      * @param {*} region
@@ -761,6 +833,7 @@ const _Annotation = types
       self.pauseAutosave();
 
       // reinit annotation from required state
+      self.history.setSkipNextUndoState();
       self.deleteAllRegions({ deleteReadOnly: true });
       if (shouldSelectDraft) {
         self.deserializeResults(self.versions.draft);
@@ -771,6 +844,12 @@ const _Annotation = types
 
       // reinit objects
       self.updateObjects();
+
+      // History navigation loads a version snapshot — it is not an unsaved draft edit.
+      // Reset undo/dirty tracking to the loaded content so needsDraftSave() stays false
+      // (BROS-1477 QA 93466; QA 93940: edits while previewing Updated under FIT-1685).
+      self.history.reinit(false);
+
       self.startAutosave();
     },
 
@@ -809,17 +888,60 @@ const _Annotation = types
       if (self.submissionStarted) return;
       // if this is now a history item or prediction don't save it
       if (!self.editable) return;
+      const viewMode = draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected);
+      if (
+        !canWriteDraftSnapshot({
+          submissionStarted: Boolean(self.submissionStarted),
+          editable: self.editable,
+          readOnly: false,
+          viewMode,
+        })
+      ) {
+        if (self.isDraftSaving) self.setDraftSaving(false);
+        return;
+      }
 
+      self.syncPendingControlsForDraft();
       const result = self.serializeAnnotation({ fast: true });
+
+      await getEnv(self).events.invoke("beforeSaveDraft", self.store, self, result);
 
       self.setDraftSelected();
       self.versions.draft = result;
       self.setDraftSaving(true);
-      return self.store.submitDraft(self, params).then((res) => {
+
+      try {
+        if (!isAlive(self)) {
+          self.setDraftSaving(false);
+          return;
+        }
+
+        const root = self.store;
+        const events = getEnv(self).events;
+
+        if (!events?.hasEvent?.("submitDraft")) {
+          self.setDraftSaving(false);
+          return;
+        }
+
+        let res;
+
+        if (root && typeof root.submitDraft === "function") {
+          res = await root.submitDraft(self, params);
+        } else {
+          // AppStore may be mid-teardown during route change; handlers stay on LSF events.
+          res = await Promise.resolve(events.invokeFirst("submitDraft", root, self, params));
+        }
+
+        if (!isAlive(self)) return res;
+
         self.onDraftSaved(res);
 
         return res;
-      });
+      } catch (err) {
+        self.setDraftSaving(false);
+        throw err;
+      }
     },
 
     submissionInProgress() {
@@ -833,10 +955,26 @@ const _Annotation = types
     async saveDraftImmediatelyWithResults(params) {
       // There is no draft to save as it was already saved as an annotation
       if (self.submissionStarted || self.isDraftSaving) return {};
+      // FIT-1685: Mirror the guard in `saveDraft` so the draft-saving flag is
+      // never set for a preview-only save. If we set it here and `saveDraft`
+      // short-circuits, callers observing `isDraftSaving` would hang.
+      if (
+        !canWriteDraftSnapshot({
+          submissionStarted: Boolean(self.submissionStarted),
+          editable: self.editable,
+          readOnly: false,
+          viewMode: draftViewModeFromClassic(Boolean(self.versions?.draft), self.draftSelected),
+        })
+      ) {
+        return {};
+      }
       self.setDraftSaving(true);
-      const res = await self.saveDraft(params);
-
-      return res;
+      try {
+        return await self.saveDraft(params);
+      } catch (err) {
+        self.setDraftSaving(false);
+        throw err;
+      }
     },
 
     pauseAutosave() {
@@ -946,10 +1084,35 @@ const _Annotation = types
       });
 
       self.traverseTree((node) => {
-        /**
-         * Hotkey for controls
-         */
+        // For tags composing `RandomizableMixin`, assign auto-hotkeys to the
+        // direct shuffled `displayChildren` first so `[N]` hints stay aligned
+        // with the rendered top-level rows. The shuffle is owned by the host's
+        // lifecycle, not by this pass, so repeated `setupHotKeys` calls on the
+        // same MST root are idempotent. Traversal then continues into the
+        // subtree: top-level children already have `hotkey` set so the generic
+        // branch skips them, and any nested choices (`allowNested`) still get
+        // auto-hotkeys assigned in their natural MST order.
+        if (node && node.randomize === true && typeof node.reshuffle === "function") {
+          for (const child of node.displayChildren ?? []) {
+            if (child?.onHotKey && !child.hotkey) {
+              const comb = hotkeys.makeComb();
+
+              if (!comb) break;
+
+              child.hotkey = comb;
+              hotkeys.addKey(child.hotkey, child.onHotKey);
+            }
+          }
+          return;
+        }
+
         if (node && node.onHotKey && !node.hotkey) {
+          // Taxonomy Choice nodes live in SharedStore (TagParentMixin.parent is
+          // not Choices). Auto-assigning would write across MST trees and throw,
+          // and large taxonomies must not receive sequential [1]/[2]/… hotkeys.
+          // Explicit `hotkey` attrs are bound in pass 1 above.
+          if (node.type === "choice" && node.parent?.type !== "choices") return;
+
           const comb = hotkeys.makeComb();
 
           if (!comb) return;
@@ -1014,12 +1177,10 @@ const _Annotation = types
 
       if (!area) return;
 
-      if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-        // Add additional states before any deselection happens
-        additionalStates.forEach((state) => {
-          area.setValue(state);
-        });
-      }
+      // Add additional states before any deselection happens
+      additionalStates.forEach((state) => {
+        area.setValue(state);
+      });
 
       // This is added mostly for the reason of updating indexes in labels
       // for the elements (like highlights in text) that won't be dynamically changed
@@ -1084,13 +1245,39 @@ const _Annotation = types
     // Some annotations may be created with wrong assumptions
     // And this problems are fixable, so better to fix them on start
     fixBrokenAnnotation(json) {
-      return (json ?? []).reduce((res, objRaw) => {
+      // FIT-1669: collapse `(id, from_name, type)` collisions at the
+      // deserialize entry point so the rest of the pipeline
+      // (deserializeSingleResult -> area.addResult -> Outliner) never sees
+      // stacked duplicates. This is the canonical path for every
+      // hydration — live annotation, history items, and predictions — so
+      // it also protects the AnnotationHistory panel from rendering ghost
+      // rows when a tainted `result` payload lands on the client.
+      // Applied after the reducer so label-redirect rewrites on
+      // `obj.from_name` / `obj.type` are reflected in the dedupe key.
+      const normalized = (json ?? []).reduce((res, objRaw) => {
         if (!objRaw) return res;
 
-        const obj = structuredClone(objRaw) ?? {};
+        // Draft payloads must not retain live MST references (e.g. brush `touches` from
+        // serialize fast). Break tree nodes to snapshots first; then deep plain JS for
+        // nested MobX observables before structuredClone (FIT-1686, FIT-1692).
+        let source = objRaw;
+        if (isStateTreeNode(objRaw)) {
+          try {
+            source = getSnapshot(objRaw);
+          } catch {
+            return res;
+          }
+        }
+
+        let obj;
+        try {
+          obj = structuredClone(toJS(source, { recurseEverything: true })) ?? {};
+        } catch {
+          obj = toJS(source, { recurseEverything: true }) ?? {};
+        }
 
         if (obj.type === "relation") {
-          res.push(objRaw);
+          res.push(obj);
           return res;
         }
 
@@ -1159,6 +1346,8 @@ const _Annotation = types
 
         return res;
       }, []);
+
+      return dedupeAnnotationWireResults(normalized);
     },
 
     setSuggestions(rawSuggestions) {
@@ -1260,14 +1449,19 @@ const _Annotation = types
         }
 
         for (const obj of objAnnotation) {
-          if (obj.type === "relation") {
-            self.relationStore.deserializeRelation(
-              `${obj.from_id}#${self.id}`,
-              `${obj.to_id}#${self.id}`,
-              obj.direction,
-              obj.labels,
+          if (obj.type !== "relation") continue;
+
+          const fromId = `${obj.from_id}#${self.id}`;
+          const toId = `${obj.to_id}#${self.id}`;
+
+          if (!areas.has(fromId) || !areas.has(toId)) {
+            console.warn(
+              `Skipping relation ${obj.id ?? ""}: region not found (from_id=${obj.from_id}, to_id=${obj.to_id})`,
             );
+            continue;
           }
+
+          self.relationStore.deserializeRelation(fromId, toId, obj.direction, obj.labels);
         }
       } catch (e) {
         console.error(e);

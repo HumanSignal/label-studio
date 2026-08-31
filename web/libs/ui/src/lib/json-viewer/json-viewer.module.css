@@ -29,6 +29,7 @@
   align-items: stretch;
   justify-content: stretch;
   flex: 1;
+  min-height: 0;
 }
 
 .controls {
@@ -36,6 +37,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-base);
+  flex-shrink: 0;
 }
 
 .leftControls {
@@ -171,6 +173,14 @@
   overflow: auto;
   height: 100%;
   flex: 1 1 auto;
+  min-height: 0;
+
+  &.jsonEditorContainerVirtualized {
+    /* Scroll must live inside react-json-virtualization's viewport, not this wrapper. */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
   &.inset {
     background-color: var(--json-viewer-container-background);
@@ -180,10 +190,10 @@
 
   /* Override json-edit-react styles to match Label Studio theme */
   :global {
-    .jer-container {
+    .jer-editor-container {
       background-color: var(--json-viewer-background);
       font-family: var(--font-family-mono);
-      font-size: var(--font-size-smaller);
+      font-size: var(--font-size-body-smaller);
       line-height: 1.6;
     }
 
@@ -320,8 +330,141 @@
       color: var(--json-viewer-copy-pulse) !important;
     }
 
-    .jer-accordion-icon svg {
+    .rjv-accordion-icon svg {
       color: var(--json-viewer-accordion-icon) !important;
     }
   }
+}
+
+.virtualizedJsonViewer {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-smaller);
+  line-height: 1.6;
+
+  :global {
+    /* Strip library chrome — inset wrapper provides border/background like legacy .jer inside .inset */
+    .rjv-container {
+      border: none;
+      border-radius: 0;
+      padding-bottom: 0;
+      color: var(--color-neutral-content);
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-body-smaller);
+      line-height: inherit;
+      background: transparent;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .rjv-row {
+      align-items: center;
+      min-height: 24px;
+      height: 24px;
+    }
+
+    /* Reserve a fixed toggle column so leaf rows align with expandable siblings. */
+    .rjv-toggle {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      min-width: 14px;
+      height: 14px;
+      margin-right: 4px;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    span.rjv-toggle {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Legacy-style chevron (replaces ▾/▸ text toggles). */
+    button.rjv-toggle {
+      color: var(--json-viewer-accordion-icon);
+      font-size: 0;
+      line-height: 0;
+    }
+
+    button.rjv-toggle::before {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      margin: 3px auto;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 150ms ease;
+    }
+
+    .rjv-row[aria-expanded="false"] button.rjv-toggle::before {
+      transform: rotate(-45deg);
+    }
+
+    .rjv-token-meta {
+      color: var(--json-viewer-color-collection-count);
+      opacity: 1;
+    }
+
+    .rjv-row-content {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .rjv-row-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-tightest);
+      flex-shrink: 0;
+      margin-left: var(--spacing-tight);
+      opacity: 0;
+      transition: opacity 150ms ease-out;
+    }
+
+    .rjv-row:hover .rjv-row-actions,
+    .rjv-row:focus-within .rjv-row-actions {
+      opacity: 1;
+    }
+  }
+}
+
+.collectionItemCount {
+  color: var(--json-viewer-color-collection-count);
+  font-style: italic;
+  margin-left: var(--spacing-tight);
+}
+
+.virtualizedRowBody {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+.truncatedStringValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+.virtualizedJsonViewerTree {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  border: none;
+  border-radius: var(--corner-radius-small);
+  background: var(--json-viewer-background);
 }

@@ -1,8 +1,8 @@
 /* global describe, test, expect */
 import { timeFormat } from "d3";
-import { parseCSV, parseValue, tryToParseJSON, parseTypeAndOption } from "../data";
+import { isDataBound, parseCSV, parseValue, tryToParseJSON, parseTypeAndOption } from "../data";
 
-const now = +new Date();
+const now = Date.now();
 const dateISO = timeFormat("%Y-%m-%d %H:%M:%S");
 const minute = 60 * 1000;
 const data = {
@@ -153,6 +153,29 @@ describe("parseValue", () => {
     expect(parseValue("", data)).toBe("");
     expect(parseValue(null, data)).toBe("");
     expect(parseValue(undefined, data)).toBe("");
+  });
+});
+
+describe("isDataBound", () => {
+  test("static strings are not data-bound", () => {
+    expect(isDataBound("Content Violation?")).toBe(false);
+    expect(isDataBound("")).toBe(false);
+  });
+
+  test("$field references are data-bound", () => {
+    expect(isDataBound("$text")).toBe(true);
+    expect(isDataBound("$messages.greeting")).toBe(true);
+    expect(isDataBound("$images[0]")).toBe(true);
+  });
+
+  test("inline interpolation is data-bound", () => {
+    expect(isDataBound("Title: $title")).toBe(true);
+  });
+
+  test("non-strings are not data-bound", () => {
+    expect(isDataBound(undefined)).toBe(false);
+    expect(isDataBound(null)).toBe(false);
+    expect(isDataBound(0)).toBe(false);
   });
 });
 

@@ -57,7 +57,7 @@ jobs:
           chmod +x /usr/local/bin/gitleaks
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2147483647
           ref: ${{ inputs.head_sha }}

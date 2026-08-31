@@ -3,13 +3,14 @@ from datetime import datetime
 
 from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from jwt_auth.auth import TokenAuthenticationPhaseout
 from jwt_auth.models import LSAPIToken, TruncatedLSAPIToken
 from jwt_auth.serializers import (
     JWTSettingsSerializer,
     LSAPITokenCreateSerializer,
     LSAPITokenListSerializer,
+    TokenDetailErrorSerializer,
     TokenRefreshResponseSerializer,
     TokenRotateResponseSerializer,
 )
@@ -197,8 +198,11 @@ class LSTokenBlacklistView(TokenViewBase):
         summary='Blacklist a JWT refresh token',
         description='Adds a JWT refresh token to the blacklist, preventing it from being used to obtain new access tokens.',
         responses={
-            status.HTTP_204_NO_CONTENT: 'Token was successfully blacklisted',
-            status.HTTP_404_NOT_FOUND: 'Token is already blacklisted',
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(description='Token was successfully blacklisted'),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                response=TokenDetailErrorSerializer,
+                description='Token is already blacklisted',
+            ),
         },
         extensions={
             'x-fern-sdk-group-name': 'tokens',
@@ -234,7 +238,10 @@ class LSAPITokenRotateView(TokenViewBase):
         description='Creates a new JWT refresh token and blacklists the current one.',
         responses={
             status.HTTP_200_OK: TokenRotateResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: 'Invalid token or token already blacklisted',
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                response=TokenDetailErrorSerializer,
+                description='Invalid token or token already blacklisted',
+            ),
         },
         extensions={
             'x-fern-sdk-group-name': 'tokens',

@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useContext, useCallback } from "react";
+import { createPortal } from "react-dom";
 import JoyRide, { ACTIONS, EVENTS, STATUS, type BaseProps } from "react-joyride";
 import { TourContext, userTourStateReducer } from "./TourProvider";
 
@@ -22,24 +23,43 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
   }
   const [state, dispatch] = userTourStateReducer();
 
+  // Skip product tours during E2E automation runs:
+  //  - Cypress sets `window.Cypress`.
+  //  - Selenium / WebDriver-controlled browsers (ChromeDriver, GeckoDriver, SafariDriver,
+  //    MSEdgeDriver, Selenium grid, etc.) set `navigator.webdriver === true` per the W3C
+  //    WebDriver spec.
+  // FIT-1758: before this gate covered WebDriver, selenium TC1700 was racing the joyride
+  // overlay on Project Settings → Members. Once the publish-state tour started firing
+  // reliably (FIT-1758 target-wait fix), the joyride backdrop began blocking the "Add
+  // Members" click 100% of the time on the PR branch deploy. Suppressing the tour in
+  // any WebDriver-controlled browser keeps the joyride overlay out of every automation
+  // run without changing behavior for real users.
+  const isAutomationE2E =
+    typeof window !== "undefined" &&
+    ("Cypress" in window || (typeof navigator !== "undefined" && navigator.webdriver === true));
+
   useEffect(() => {
-    if (tourContext) {
-      tourContext.registerTour(name, dispatch);
-
-      let timeout = null;
-      if (autoStart) {
-        timeout = setTimeout(() => {
-          tourContext.startTour(name);
-        }, delay);
-      }
-
-      return () => {
-        if (timeout) {
-          clearTimeout(timeout);
-        }
-        tourContext.unregisterTour(name);
-      };
+    // E2E: skip registration and product-tour fetch. Joyride still mounts a subtree when steps exist
+    // even with run=false, which can block clicks and destabilize datamanager / labeling flows.
+    if (isAutomationE2E) {
+      return;
     }
+
+    tourContext.registerTour(name, dispatch);
+
+    let timeout = null;
+    if (autoStart) {
+      timeout = setTimeout(() => {
+        tourContext.startTour(name);
+      }, delay);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      tourContext.unregisterTour(name);
+    };
   }, []);
 
   /**
@@ -90,10 +110,13 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
         (status === STATUS.SKIPPED && state.run) || action === ACTIONS.CLOSE || status === STATUS.FINISHED;
 
       if (shouldEndTour) {
-        // mark tour as viewed and update onboarding state if it's the final step or the tour was skipped
-        if (status === STATUS.SKIPPED || status === STATUS.FINISHED) {
-          tourContext?.setTourViewed(name, status === STATUS.SKIPPED, { index, action, type, status });
-        }
+        void (async () => {
+          // mark tour as viewed and update onboarding state if it's the final step or the tour was skipped
+          if (status === STATUS.SKIPPED || status === STATUS.FINISHED) {
+            await tourContext?.setTourViewed(name, status === STATUS.SKIPPED, { index, action, type, status });
+          }
+          await tourContext?.onTourClosed(name);
+        })();
         dispatch({ type: "STOP" });
         return;
       }
@@ -107,16 +130,24 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
         });
       }
     },
-    [name, state.run],
+    [name, state.run, tourContext],
   );
 
   const { key, ...joyrideState } = state;
 
-  // Disable tours when running in Cypress tests
-  const isCypressTest = typeof window !== "undefined" && !!(window as any).Cypress;
-  const shouldRunTour = !isCypressTest && joyrideState.run;
+  const shouldRunTour = !isAutomationE2E && joyrideState.run;
 
-  return state.steps.length > 0 ? (
+  if (isAutomationE2E) {
+    return null;
+  }
+
+  if (state.steps.length === 0) {
+    return null;
+  }
+
+  // Joyride always mounts a root div.react-joyride (even when run=false), which breaks flex layouts
+  // (e.g. breadcrumbs + gap) when Tour sits next to other controls. Portal keeps it out of the flow.
+  const joyride = (
     <JoyRide
       key={key}
       {...joyrideState}
@@ -131,11 +162,14 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
           backgroundColor: "var(--color-neutral-background)",
           primaryColor: "var(--color-primary-surface)",
           textColor: "var(--color-neutral-content)",
-          overlayColor: "rgba(var(--color-neutral-shadow-raw) / calc( 50% * var(--shadow-intensity)))",
-          arrowColor: "var(--color-primary-surface)",
+          overlayColor: "rgba(var(--color-neutral-shadow-raw) / 50%)",
+          // Match tooltip card so the floater arrow is not a contrasting primary wedge
+          arrowColor: "var(--color-neutral-background)",
         },
       }}
       hideCloseButton={true}
     />
-  ) : null;
+  );
+
+  return typeof document !== "undefined" && document.body ? createPortal(joyride, document.body) : joyride;
 };

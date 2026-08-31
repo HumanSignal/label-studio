@@ -344,3 +344,20 @@ export const MinimalControls: Story = {
     fontSize: 14,
   },
 };
+
+/**
+ * Enable `fflag_feat_fit_2007_virtualized_json_editor_short` in LaunchDarkly (or local
+ * `FLAGS_OVERRIDE` in dev) to preview the virtualized tree renderer in Storybook.
+ */
+export const VirtualizedPathNote: Story = {
+  ...Default,
+  name: "Virtualized path (flag on)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Renders `VirtualizeJSON.Collapsable` when `FF_FIT_2007_VIRTUALIZED_JSON_EDITOR` is active. Toggle the flag locally to compare with the legacy `json-edit-react` tree.",
+      },
+    },
+  },
+};

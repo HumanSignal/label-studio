@@ -1,14 +1,21 @@
-import { flow, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { flow, getRoot, getSnapshot, types, isAlive } from "mobx-state-tree";
 import { DataStore, DataStoreItem } from "../../mixins/DataStore";
 import { getAnnotationSnapshot } from "../../sdk/lsf-utils";
 import { isDefined } from "../../utils/utils";
 import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
-import { FF_DEV_2536, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
+import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
+import { logLabelStreamDebug } from "@humansignal/core/lib/utils/streamDebugLog";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
+const DM_USER_CHIP_FIELDS = ["annotators", "reviewers", "updated_by", "comment_authors"];
+const DM_USER_CHIP_COUNT_FIELDS = {
+  annotators_count: "annotators",
+  reviewers_count: "reviewers",
+  comment_authors_count: "comment_authors",
+};
 const fileAttributes = types.model({
   certainty: types.optional(types.maybeNull(types.number), 0),
   distance: types.optional(types.maybeNull(types.number), 0),
@@ -28,6 +35,9 @@ export const create = (columns) => {
     annotations: types.optional(types.array(CustomJSON), []),
     predictions: types.optional(types.array(CustomJSON), []),
     drafts: types.frozen(),
+    // Data Collection: the file of the latest submitted annotation, computed
+    // server-side (null until something is submitted).
+    submission: types.frozen(),
     source: types.maybeNull(types.string),
     was_cancelled: false,
     overlap_reached: types.maybeNull(types.boolean),
@@ -40,13 +50,9 @@ export const create = (columns) => {
     allow_skip: types.optional(types.maybeNull(types.boolean), true),
     unique_lock_id: types.maybeNull(types.string),
     updated_by: types.optional(types.array(Assignee), []),
-    ...(isFF(FF_DISABLE_GLOBAL_USER_FETCHING)
-      ? {
-          annotators_count: types.optional(types.maybeNull(types.number), 0),
-          reviewers_count: types.optional(types.maybeNull(types.number), 0),
-          comment_authors_count: types.optional(types.maybeNull(types.number), 0),
-        }
-      : {}),
+    annotators_count: types.optional(types.maybeNull(types.number), 0),
+    reviewers_count: types.optional(types.maybeNull(types.number), 0),
+    comment_authors_count: types.optional(types.maybeNull(types.number), 0),
     ...(isFF(FF_LOPS_E_3)
       ? {
           _additional: types.optional(fileAttributes, {}),
@@ -54,68 +60,97 @@ export const create = (columns) => {
           project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
         }
       : {}),
-  })
-    .views((self) => ({
-      get lastAnnotation() {
-        return self.annotations[this.annotations.length - 1];
-      },
-    }))
-    .actions((self) => ({
-      mergeAnnotations(annotations) {
-        // skip drafts, they'll be added later
-        self.annotations = annotations
-          .filter((a) => a.pk)
-          .map((c) => {
-            const existingAnnotation = self.annotations.find((ec) => ec.id === Number(c.pk));
+  }).actions((self) => ({
+    mergeAnnotations(annotations) {
+      // skip drafts, they'll be added later
+      self.annotations = annotations
+        .filter((a) => a.pk)
+        .map((c) => {
+          const existingAnnotation = self.annotations.find((ec) => ec.id === Number(c.pk));
 
-            if (existingAnnotation) {
-              return existingAnnotation;
+          if (existingAnnotation) {
+            // FIT-1660: Task reload can replace merged rows with API stubs while LSF still holds
+            // fully hydrated in-memory annotations — prefer live serialized results over stale stubs.
+            if (existingAnnotation.is_stub === true && typeof c.serializeAnnotation === "function") {
+              try {
+                const live = c.serializeAnnotation();
+                if (Array.isArray(live) && live.length > 0) {
+                  // FIT-1680: Keep userGenerate/sentUserGenerate from the freshly-fetched server
+                  // snapshot. The in-memory LSF annotation still carries userGenerate=true and
+                  // sentUserGenerate=true right after a Quick View submit (LSF never resets the
+                  // local creation flag), and copying those here pins Controls.tsx into the
+                  // "Submit" branch instead of the disabled "Update" button.
+                  return {
+                    ...existingAnnotation,
+                    id: existingAnnotation.id,
+                    pk: c.pk,
+                    draftId: c.draftId,
+                    result: live,
+                    leadTime: c.leadTime,
+                    is_stub: false,
+                  };
+                }
+              } catch {
+                // ignore serialization errors from detached nodes
+              }
             }
-            return {
-              id: c.id,
-              pk: c.pk,
-              draftId: c.draftId,
-              result: c.serializeAnnotation(),
-              leadTime: c.leadTime,
-              userGenerate: !!c.userGenerate,
-              sentUserGenerate: !!c.sentUserGenerate,
-            };
-          });
-      },
-
-      updateAnnotation(annotation) {
-        const existingAnnotation = self.annotations.find((c) => {
-          return c.id === Number(annotation.pk) || c.pk === annotation.pk;
+            return existingAnnotation;
+          }
+          return {
+            id: c.id,
+            pk: c.pk,
+            draftId: c.draftId,
+            result: c.serializeAnnotation(),
+            leadTime: c.leadTime,
+            userGenerate: !!c.userGenerate,
+            sentUserGenerate: !!c.sentUserGenerate,
+          };
         });
+    },
 
-        if (existingAnnotation) {
-          Object.assign(existingAnnotation, getAnnotationSnapshot(annotation));
-        } else {
-          self.annotations.push(getAnnotationSnapshot(annotation));
-        }
-      },
+    updateAnnotation(annotation) {
+      const existingAnnotation = self.annotations.find((c) => {
+        return c.id === Number(annotation.pk) || c.pk === annotation.pk;
+      });
 
-      deleteAnnotation(annotation) {
-        const index = self.annotations.findIndex((c) => {
-          return c.id === Number(annotation.pk) || c.pk === annotation.pk;
-        });
+      if (existingAnnotation) {
+        Object.assign(existingAnnotation, getAnnotationSnapshot(annotation));
+      } else {
+        self.annotations.push(getAnnotationSnapshot(annotation));
+      }
+    },
 
-        if (index >= 0) self.annotations.splice(index, 1);
-      },
+    deleteAnnotation(annotation) {
+      const index = self.annotations.findIndex((c) => {
+        return c.id === Number(annotation.pk) || c.pk === annotation.pk;
+      });
 
-      deleteDraft(id) {
-        if (!self.drafts) return;
-        const index = self.drafts.findIndex((d) => d.id === id);
+      if (index >= 0) self.annotations.splice(index, 1);
+    },
 
-        if (index >= 0) self.drafts.splice(index, 1);
-      },
+    deletePrediction(prediction) {
+      const index = self.predictions.findIndex((p) => {
+        return p.id === Number(prediction.pk) || p.id === prediction.id || p.pk === prediction.pk;
+      });
 
-      loadAnnotations: flow(function* () {
-        const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
+      if (index >= 0) self.predictions.splice(index, 1);
+    },
 
-        self.annotations = annotations[0];
-      }),
-    }));
+    deleteDraft(id) {
+      if (!self.drafts) return;
+      const index = self.drafts.findIndex((d) => d.id === id);
+
+      if (index >= 0) self.drafts.splice(index, 1);
+    },
+
+    loadAnnotations: flow(function* () {
+      const annotations = yield Promise.all([getRoot(self).apiCall("annotations", { taskID: self.id })]);
+
+      if (!isAlive(self)) return;
+
+      self.annotations = annotations[0];
+    }),
+  }));
 
   const TaskModel = types.compose("TaskModel", TaskModelBase, DataStoreItem);
   const AssociatedType = types.model("AssociatedModelBase", {
@@ -138,6 +173,8 @@ export const create = (columns) => {
     .actions((self) => ({
       loadTaskHistory: flow(function* (props) {
         const taskHistory = yield self.root.apiCall("taskHistory", props);
+
+        if (!isAlive(self)) return [];
 
         if (!Array.isArray(taskHistory)) {
           return [];
@@ -167,8 +204,12 @@ export const create = (columns) => {
         if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
           taskParams.annotations_stub = true;
         }
+        // Django-style: GET /api/tasks/:id/?annotations_ordering=-id
+        taskParams.annotations_ordering = "-id";
 
         const taskData = yield self.root.apiCall("task", taskParams);
+
+        if (!isAlive(self)) return null;
 
         const taskStatusCode =
           taskData?.status ??
@@ -204,6 +245,8 @@ export const create = (columns) => {
           reload: false,
         });
 
+        if (!isAlive(self)) return null;
+
         if (taskData?.$meta?.status === 404) {
           getRoot(self).SDK.invoke("labelStreamFinished");
           return null;
@@ -227,13 +270,14 @@ export const create = (columns) => {
         }
 
         const isLabelStream = getRoot(self).SDK?.mode === "labelstream";
-        if (isLabelStream) {
-          const selectedAnnotationID = getRoot(self).annotationStore.selected?.id;
-          if (task && selectedAnnotationID) {
-            console.log(
-              `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${getRoot(self)?.SDK?.project?.id}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
-            );
-          }
+        if (isLabelStream && task) {
+          logLabelStreamDebug({
+            queue: task.queue,
+            taskId: task.id,
+            projectId: getRoot(self)?.SDK?.project?.id,
+            userId: getRoot(self).LSF?.lsf?.user?.id,
+            annotationId: getRoot(self).annotationStore.selected?.id,
+          });
         }
 
         return task;
@@ -246,6 +290,9 @@ export const create = (columns) => {
        */
       loadAnnotation: flow(function* (annotationID) {
         const annotationData = yield self.root.apiCall("fetchAnnotation", { annotationID });
+
+        if (!isAlive(self)) return null;
+
         return annotationData;
       }),
 
@@ -267,9 +314,36 @@ export const create = (columns) => {
 
       mergeSnapshot(taskID, taskData) {
         const task = self.list.find(({ id }) => id === taskID);
-        const snapshot = task ? { ...getSnapshot(task) } : {};
+        const existingSnapshot = task ? getSnapshot(task) : null;
+        const snapshot = existingSnapshot ? { ...existingSnapshot } : {};
 
         Object.assign(snapshot, taskData);
+
+        if (existingSnapshot) {
+          const preservedUserChipFields = new Set();
+
+          for (const field of DM_USER_CHIP_FIELDS) {
+            if (
+              Array.isArray(existingSnapshot[field]) &&
+              existingSnapshot[field].length > 0 &&
+              Array.isArray(taskData?.[field]) &&
+              taskData[field].length === 0
+            ) {
+              snapshot[field] = existingSnapshot[field];
+              preservedUserChipFields.add(field);
+            }
+          }
+
+          for (const [field, chipField] of Object.entries(DM_USER_CHIP_COUNT_FIELDS)) {
+            if (
+              preservedUserChipFields.has(chipField) &&
+              (existingSnapshot[field] ?? 0) > 0 &&
+              taskData?.[field] === 0
+            ) {
+              snapshot[field] = existingSnapshot[field];
+            }
+          }
+        }
 
         if (snapshot.predictions) {
           snapshot.predictions.forEach((p) => {

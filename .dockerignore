@@ -23,4 +23,4 @@ label_studio/**/*.pyc
 !licenses/**
 !LICENSE
 !pyproject.toml
-!poetry.lock
+!uv.lock

@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.lib.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": ["cypress", "node"]
+  },
+  "include": []
+}

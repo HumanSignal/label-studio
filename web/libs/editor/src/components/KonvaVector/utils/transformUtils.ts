@@ -31,8 +31,8 @@ export function applyTransformationToControlPoints(
   currentRotation: number,
   currentScaleX: number,
   currentScaleY: number,
-  transformerCenterX: number,
-  transformerCenterY: number,
+  _transformerCenterX: number,
+  _transformerCenterY: number,
   isRotation = false,
   pixelSnapping = false,
 ): BezierPoint[] {
@@ -157,8 +157,8 @@ export function updateOriginalPositions(
 export function applyTransformationToPoints(
   transformer: Konva.Transformer,
   initialPoints: BezierPoint[],
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>,
-  updateControlPoints = true,
+  _proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>,
+  _updateControlPoints = true,
   originalPositions?: {
     [key: number]: {
       x: number;
@@ -167,10 +167,10 @@ export function applyTransformationToPoints(
       controlPoint2?: { x: number; y: number };
     };
   },
-  transformerCenter?: { x: number; y: number },
-  bounds?: { width: number; height: number },
+  _transformerCenter?: { x: number; y: number },
+  _bounds?: { width: number; height: number },
   getCurrentPointsRef?: () => BezierPoint[],
-  updateCurrentPointsRef?: (points: BezierPoint[]) => void,
+  _updateCurrentPointsRef?: (points: BezierPoint[]) => void,
   pixelSnapping = false,
 ): TransformResult {
   const nodes = transformer.nodes();
@@ -190,9 +190,9 @@ export function applyTransformationToPoints(
 
   // Use the current rotation directly - the transformer handles the rotation correctly
   // We just need to apply this rotation to the control points relative to their anchor points
-  const rotationRadians = currentRotation * (Math.PI / 180);
-  const scaleX = transformer.scaleX();
-  const scaleY = transformer.scaleY();
+  const _rotationRadians = currentRotation * (Math.PI / 180);
+  const _scaleX = transformer.scaleX();
+  const _scaleY = transformer.scaleY();
 
   // Apply the transformation to each selected point
   for (const node of nodes) {
@@ -209,7 +209,7 @@ export function applyTransformationToPoints(
       const transformedY = node.y();
 
       // Use stored original positions if available, otherwise use current positions
-      const originalPos = originalPositions?.[pointIndex] || originalPoint;
+      const _originalPos = originalPositions?.[pointIndex] || originalPoint;
 
       // Update the point position with pixel snapping if enabled
       const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);

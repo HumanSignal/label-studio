@@ -4,52 +4,50 @@
 
 import { debounce } from "./debounce";
 
-jest.useFakeTimers();
-
 describe("debounce", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
   });
 
-  it("invokes the function only once after wait when called repeatedly", () => {
-    const func = jest.fn();
-    const debouncedFunc = debounce(func, 1000);
+  it("invokes the function only once after wait when called repeatedly", async () => {
+    const func = mock();
+    const debouncedFunc = debounce(func, 10);
 
     for (let i = 0; i < 100; i++) {
       debouncedFunc();
     }
 
     expect(func).not.toHaveBeenCalled();
-    jest.runAllTimers();
+    await new Promise((resolve) => setTimeout(resolve, 30));
     expect(func).toHaveBeenCalledTimes(1);
   });
 
-  it("invokes with the last passed arguments", () => {
-    const func = jest.fn();
-    const debouncedFunc = debounce(func, 100);
+  it("invokes with the last passed arguments", async () => {
+    const func = mock();
+    const debouncedFunc = debounce(func, 10);
 
     debouncedFunc("a");
     debouncedFunc("b");
     debouncedFunc("c");
-    jest.runAllTimers();
+    await new Promise((resolve) => setTimeout(resolve, 30));
 
     expect(func).toHaveBeenCalledTimes(1);
     expect(func).toHaveBeenCalledWith("c");
   });
 
-  it("supports cancel to clear pending invocation", () => {
-    const func = jest.fn();
-    const debouncedFunc = debounce(func, 1000);
+  it("supports cancel to clear pending invocation", async () => {
+    const func = mock();
+    const debouncedFunc = debounce(func, 20);
 
     debouncedFunc();
     debouncedFunc.cancel();
-    jest.runAllTimers();
+    await new Promise((resolve) => setTimeout(resolve, 40));
 
     expect(func).not.toHaveBeenCalled();
   });
 
   it("supports flush to invoke pending call immediately", () => {
-    const func = jest.fn(() => 42);
+    const func = mock(() => 42);
     const debouncedFunc = debounce(func, 1000);
 
     debouncedFunc("x");

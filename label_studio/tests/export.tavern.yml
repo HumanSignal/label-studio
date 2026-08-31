@@ -24,7 +24,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/lines.txt
+      file: label_studio/tests/test_suites/samples/lines.txt
     headers:
       content-type: multipart/form-data
     method: POST
@@ -232,6 +232,15 @@ stages:
           - "image segmentation"
           - "brush annotations"
         name: "BRUSH_TO_COCO"
+        disabled: true
+      - title: DocLang (.dclx)
+        description: Package annotations from the Doclang Interface as DocLang OPC archives
+          (document.xml + page image) for downstream Docling model training.
+        link: https://github.com/doclang-project/doclang/blob/main/spec.md#doclang-archive-format
+        tags:
+        - document
+        - doclang
+        name: DOCLANG
         disabled: true
 
 

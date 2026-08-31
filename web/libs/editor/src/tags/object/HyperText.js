@@ -35,5 +35,6 @@
  * @param {string} [highlightColor]                       Hex string with highlight color, if not provided uses the labels color
  * @param {boolean} [showLabels]                          Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings
  * @param {symbol|word|sentence|paragraph} [granularity]  Control region selection granularity
+ * @param {boolean} [resolveUrls=true]                    Whether to resolve cloud storage URIs (s3://, gs://, etc.) in the loaded content when valueType is "url"
  */
 export const HyperTextModel = {};

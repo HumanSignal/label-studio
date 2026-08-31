@@ -8,17 +8,11 @@
 import { getEnv, types } from "mobx-state-tree";
 import ToolMixinComposed from "../Tool";
 
-const mockFfIsActive = jest.fn(() => false);
-jest.mock("@humansignal/core", () => ({
-  ff: {
-    isActive: (flag) => mockFfIsActive(flag),
-  },
-}));
-
-jest.mock("../../utils/feature-flags", () => ({
-  FF_DEV_3391: "ff_3391",
-  isFF: jest.fn(() => false),
-}));
+const mockFfIsActive = mock(() => false);
+mockModule("@humansignal/core", () => {
+  const actual = requireActual("@humansignal/core");
+  return { ...actual, ff: { ...actual.ff, isActive: (flag) => mockFfIsActive(flag) } };
+});
 
 // Stub that provides toolName and dynamic so ToolMixin views work
 const StubTool = types.model("StubTool", {}).views((self) => ({
@@ -94,10 +88,14 @@ function createRoot(options = {}) {
 describe("Tool mixin", () => {
   beforeEach(() => {
     mockFfIsActive.mockReturnValue(false);
-    jest.clearAllMocks();
+    clearAllMocks();
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.clear();
     }
+  });
+
+  afterAll(() => {
+    mockFfIsActive.mockReturnValue(false);
   });
 
   describe("model defaults", () => {
@@ -217,7 +215,7 @@ describe("Tool mixin", () => {
   describe("actions", () => {
     it("setSelected sets selected and calls afterUpdateSelected", () => {
       const root = createRoot();
-      const spy = jest.spyOn(root.tool, "afterUpdateSelected");
+      const spy = spyOn(root.tool, "afterUpdateSelected");
       root.tool.setSelected(true, true);
       expect(root.tool.selected).toBe(true);
       expect(spy).toHaveBeenCalled();
@@ -249,7 +247,7 @@ describe("Tool mixin", () => {
       const root = createRoot();
       const ev = {};
       const args = [];
-      root.tool.clickEv = jest.fn();
+      root.tool.clickEv = mock();
       root.tool.event("click", ev, args);
       expect(root.tool.clickEv).toHaveBeenCalledWith(ev, args);
     });

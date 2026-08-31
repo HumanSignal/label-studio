@@ -4,7 +4,7 @@ import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
 import { Select as SelectUI } from "@humansignal/ui";
 
-const SelectOption = ({ value, label, disabled = false, hidden = false, ...props }) => {
+const _SelectOption = ({ value, label, disabled = false, hidden = false, ...props }) => {
   return (
     <option value={value} disabled={disabled} hidden={hidden} {...props}>
       {label ?? value}
@@ -24,7 +24,7 @@ const Select = ({ label, className, options, validate, required, skip, labelProp
     return groupedOptions;
   }, {});
 
-  const classList = rootClass.mod({ ghost }).mix(className);
+  const _classList = rootClass.mod({ ghost }).mix(className);
 
   useEffect(() => {
     setValue(initialValue);

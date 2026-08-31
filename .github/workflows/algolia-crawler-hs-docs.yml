@@ -9,6 +9,7 @@ on:
 
 jobs:
   algolia_indexer:
+    if: github.repository_owner == 'HumanSignal'
     runs-on: ubuntu-latest
     env:
       APPLICATION_ID: "M7RXTHKYPM"

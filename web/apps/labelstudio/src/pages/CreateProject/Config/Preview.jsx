@@ -18,6 +18,16 @@ const loadDependencies = async () => {
   return dependencies;
 };
 
+const isCodeMirrorFocused = (el) => el?.closest?.(".CodeMirror");
+
+const withFocusGuard = (fn) => {
+  const prev = document.activeElement;
+  fn();
+  if (prev && prev !== document.activeElement && isCodeMirrorFocused(prev)) {
+    prev.focus();
+  }
+};
+
 export const Preview = ({ config, data, error, loading, project }) => {
   // @see comment about dependencies above
   loadDependencies();
@@ -84,14 +94,18 @@ export const Preview = ({ config, data, error, loading, project }) => {
         interfaces: ["side-column"],
         // with SharedStore we should use more late event
         onStorageInitialized(LS) {
-          LS.settings.bottomSidePanel = true;
+          if (!LS.settings.bottomSidePanel) {
+            LS.settings.toggleBottomSP();
+          }
 
           const initAnnotation = () => {
-            const as = LS.annotationStore;
-            const c = as.createAnnotation();
+            withFocusGuard(() => {
+              const as = LS.annotationStore;
+              const c = as.createAnnotation();
 
-            as.selectAnnotation(c.id);
-            setStoreReady(true);
+              as.selectAnnotation(c.id);
+              setStoreReady(true);
+            });
           };
 
           // and even then we need to wait a little even after the store is initialized
@@ -115,18 +129,20 @@ export const Preview = ({ config, data, error, loading, project }) => {
     mountedRef.current = true;
     initLabelStudio(currentConfig, currentTask).then(() => {
       if (!mountedRef.current || !lsf.current?.store) return;
-      const store = lsf.current.store;
+      withFocusGuard(() => {
+        const store = lsf.current.store;
 
-      store.resetState();
-      store.assignTask(currentTask);
-      store.assignConfig(currentConfig);
-      store.initializeStore(currentTask);
+        store.resetState();
+        store.assignTask(currentTask);
+        store.assignConfig(currentConfig);
+        store.initializeStore(currentTask);
 
-      const c = store.annotationStore.addAnnotation({
-        userGenerate: true,
+        const c = store.annotationStore.addAnnotation({
+          userGenerate: true,
+        });
+
+        store.annotationStore.selectAnnotation(c.id);
       });
-
-      store.annotationStore.selectAnnotation(c.id);
     });
     return () => {
       mountedRef.current = false;
@@ -145,10 +161,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   return (
     <div className={configClass.elem("preview").toClassName()}>
-      <h3>Preview</h3>
+      <h3 className={configClass.elem("preview-header").toClassName()}>Preview</h3>
       {error && (
         <div className={configClass.elem("preview-error").toClassName()}>
-          <h2>
+          <h2 className={configClass.elem("preview-error-header").toClassName()}>
             {error.detail} {error.id}
           </h2>
           {error.validation_errors?.non_field_errors?.map?.((err) => (

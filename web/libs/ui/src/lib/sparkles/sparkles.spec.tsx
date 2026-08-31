@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { Sparkles, type SparklesProps } from "./sparkles";
 
@@ -9,13 +8,13 @@ const defaultProps: SparklesProps = {
 beforeAll(() => {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: jest.fn().mockImplementation((query: string) => ({
+    value: mock().mockImplementation((query: string) => ({
       matches: false,
       media: query,
       onchange: null,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
+      addEventListener: mock(),
+      removeEventListener: mock(),
+      dispatchEvent: mock(),
     })),
   });
 });
@@ -50,14 +49,16 @@ describe("Sparkles", () => {
   });
 
   it("renders correct number of sparkles (animation enabled)", () => {
-    jest.useFakeTimers();
-    render(<Sparkles {...defaultProps} sparkleCount={3} sparkleLifetime={100} />);
-    jest.advanceTimersByTime(500);
-    const root = screen.getByText("Test").parentElement?.parentElement;
-    expect(root).toBeInTheDocument();
-    // With reduced-motion and jsdom, sparkles/overlay may or may not render; ensure root rendered
-    expect(root?.querySelectorAll("svg").length).toBeGreaterThanOrEqual(0);
-    jest.useRealTimers();
+    useFakeTimers();
+    try {
+      render(<Sparkles {...defaultProps} sparkleCount={3} sparkleLifetime={100} />);
+      advanceTimersByTime(500);
+      const root = screen.getByText("Test").parentElement?.parentElement;
+      expect(root).toBeInTheDocument();
+      expect(root?.querySelectorAll("svg").length).toBeGreaterThanOrEqual(0);
+    } finally {
+      useRealTimers();
+    }
   });
 
   it("supports custom color", () => {

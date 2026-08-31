@@ -3,6 +3,7 @@
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -26,6 +27,39 @@ class ViewBaseModel(models.Model):
         help_text='User who made this view',
         null=True,
     )
+    is_locked = models.BooleanField(
+        _('is locked'),
+        null=True,
+        default=False,
+        db_default=False,
+        help_text='Whether this data manager tab is locked against configuration changes',
+    )
+    locked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='locked_%(app_label)s_%(class)ss',
+        on_delete=models.SET_NULL,
+        help_text='User who locked this view',
+        null=True,
+        blank=True,
+        db_constraint=False,
+        db_index=False,
+    )
+    locked_at = models.DateTimeField(
+        _('locked at'),
+        null=True,
+        blank=True,
+        help_text='Time when this view was locked',
+    )
+
+    def lock(self, user):
+        self.is_locked = True
+        self.locked_by = user
+        self.locked_at = timezone.now()
+
+    def unlock(self):
+        self.is_locked = False
+        self.locked_by = None
+        self.locked_at = None
 
     class Meta:
         ordering = ['order', 'id']

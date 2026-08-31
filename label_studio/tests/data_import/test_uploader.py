@@ -2,7 +2,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from core.utils.io import validate_upload_url
+from core.utils.io import validate_url_for_ssrf
 from data_import.uploader import check_tasks_max_file_size, load_tasks, tasks_from_url
 from django.conf import settings
 from organizations.tests.factories import OrganizationFactory
@@ -38,19 +38,21 @@ class TestUploader:
         return configured_project
 
     class TestLoadTasks:
-        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
+        @mock.patch('core.utils.io.validate_url_for_ssrf', wraps=validate_url_for_ssrf)
         @pytest.mark.parametrize('url', ('file:///etc/passwd', 'ftp://example.org'))
-        def test_raises_for_unsafe_urls(self, validate_upload_url_mock, url, project):
+        def test_raises_for_unsafe_urls(self, validate_url_for_ssrf_mock, url, project):
             request = MockedRequest(url=url)
 
             with pytest.raises(ValidationError) as e:
                 load_tasks(request, project)
                 assert 'The provided URL was not valid.' in e.value
 
-            validate_upload_url_mock.assert_called_once_with(url, block_local_urls=False)
+            validate_url_for_ssrf_mock.assert_called_once_with(url, block_local_urls=False)
 
-        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
-        def test_raises_for_local_urls_with_ssrf_protection_enabled(self, validate_upload_url_mock, project, settings):
+        @mock.patch('core.utils.io.validate_url_for_ssrf', wraps=validate_url_for_ssrf)
+        def test_raises_for_local_urls_with_ssrf_protection_enabled(
+            self, validate_url_for_ssrf_mock, project, settings
+        ):
             settings.SSRF_PROTECTION_ENABLED = True
             request = MockedRequest(url='http://0.0.0.0')
 
@@ -58,7 +60,7 @@ class TestUploader:
                 load_tasks(request, project)
                 assert 'The provided URL was not valid.' in e.value
 
-            validate_upload_url_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
+            validate_url_for_ssrf_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
 
         def test_local_url_after_redirect(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
@@ -68,9 +70,9 @@ class TestUploader:
             mock_response = Mock()
             mock_response.raw._connection.sock.getpeername.return_value = ('127.0.0.1', 8080)
 
-            # Patch the requests.get call in the data_import.uploader module
             with (
-                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.requests.request', return_value=mock_response),
                 pytest.raises(ValidationError) as e,
             ):
                 load_tasks(request, project)
@@ -85,9 +87,9 @@ class TestUploader:
             mock_response = Mock()
             mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
 
-            # Patch the requests.get call in the data_import.uploader module
             with (
-                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.requests.request', return_value=mock_response),
                 pytest.raises(ValidationError) as e,
             ):
                 load_tasks(request, project)
@@ -95,7 +97,8 @@ class TestUploader:
 
             mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
             with (
-                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.requests.request', return_value=mock_response),
                 pytest.raises(ValidationError) as e,
             ):
                 load_tasks(request, project)
@@ -111,9 +114,9 @@ class TestUploader:
             mock_response = Mock()
             mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
 
-            # Patch the requests.get call in the data_import.uploader module
             with (
-                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.requests.request', return_value=mock_response),
                 pytest.raises(ValidationError) as e,
             ):
                 load_tasks(request, project)
@@ -121,7 +124,8 @@ class TestUploader:
 
             mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
             with (
-                mock.patch('core.utils.io.requests.get', return_value=mock_response),
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.requests.request', return_value=mock_response),
                 pytest.raises(ValidationError) as e,
             ):
                 load_tasks(request, project)

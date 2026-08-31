@@ -5,11 +5,17 @@
 
 import { clamp, get, isMatch, throttle, uniqBy } from "./lodash-replacements";
 
-jest.useFakeTimers();
-
 describe("throttle", () => {
+  beforeEach(() => {
+    useFakeTimers();
+  });
+
+  afterEach(() => {
+    useRealTimers();
+  });
+
   it("limits invocations when called repeatedly (throttled)", () => {
-    const func = jest.fn();
+    const func = mock();
     const throttled = throttle(func, 100);
 
     for (let i = 0; i < 20; i++) {
@@ -21,13 +27,13 @@ describe("throttle", () => {
   });
 
   it("exposes cancel and flush", () => {
-    const func = jest.fn();
+    const func = mock();
     const throttled = throttle(func, 100);
     expect(typeof throttled.cancel).toBe("function");
     expect(typeof throttled.flush).toBe("function");
     throttled();
     throttled.cancel();
-    jest.runAllTimers();
+    runAllTimers();
     // After cancel, pending trailing is cleared; only leading may have fired once
     expect(func.mock.calls.length).toBeLessThanOrEqual(1);
   });

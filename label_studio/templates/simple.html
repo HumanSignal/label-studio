@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load filters %}
 
 <!doctype html>
 <html lang="en">
@@ -15,7 +16,9 @@
 
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet"/>
   {% block app-css %}
-    <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
+    {% if not settings.FRONTEND_HMR %}
+      <link href="{% manifest_asset 'main.css' %}" rel="stylesheet">
+    {% endif %}
   {% endblock %}
 
 

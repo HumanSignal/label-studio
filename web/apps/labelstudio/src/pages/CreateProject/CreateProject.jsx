@@ -61,7 +61,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
             Workspace
             <EnterpriseBadge className="ml-tight" />
           </label>
-          <Select placeholder="Select an option" disabled options={[]} triggerClassName="!flex-1" />
+          <Select placeholder="Select an option" disabled options={[]} />
           <Typography size="small" className="mt-tight mb-wider">
             Simplify project management by organizing projects into workspaces.{" "}
             <a

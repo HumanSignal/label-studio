@@ -1,0 +1,145 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tighter);
+  width: 100%;
+  min-width: 0;
+}
+
+.triggerContent {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.triggerPlaceholder {
+  color: var(--color-neutral-content-subtler);
+}
+
+.addPill {
+  border-style: dashed !important;
+  color: var(--color-neutral-content-subtler);
+  pointer-events: none;
+  flex-shrink: 0;
+  gap: var(--spacing-tighter);
+  transition: border-color 200ms ease-out;
+}
+
+:global(.multi-tree-select__input:hover) .addPill {
+  border-color: var(--color-neutral-border-bold);
+}
+
+.selectedCount {
+  color: var(--color-neutral-content-subtler);
+  margin-top: var(--spacing-tighter);
+  margin-bottom: var(--spacing-tightest);
+}
+
+.selections {
+  display: flex;
+  min-width: 0;
+  gap: var(--spacing-tight);
+}
+
+.selectionsInline {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.selectionsStacked {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Lets the chip use the width the container offers and truncate only when it runs out. */
+.simpleChip {
+  max-width: 100%;
+}
+
+.compoundChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  max-width: 100%;
+  padding-top: var(--spacing-tighter);
+  padding-bottom: var(--spacing-tighter);
+}
+
+.compoundChipStacked {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.chipLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-label-small);
+}
+
+.chipInteractive {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--spacing-tight);
+  margin-left: auto;
+}
+
+.chipSelect {
+  /* Steps of Select's own size scale: `smaller` by default, `small` where a touch target is needed. */
+  --chip-select-height: var(--spacing-600);
+
+  height: var(--chip-select-height) !important;
+  min-width: auto;
+  width: auto;
+  padding-left: var(--spacing-tighter);
+  padding-right: var(--spacing-tightest);
+  font-size: var(--font-size-label-small);
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+.chipSelectPending {
+  background: var(--color-neutral-background) !important;
+  border-color: var(--color-neutral-border-bold) !important;
+  color: var(--color-neutral-content) !important;
+  box-shadow: none !important;
+  padding-left: var(--spacing-tighter);
+  padding-right: var(--spacing-tightest);
+}
+
+.chipSelectPending:hover:not(:global(.isDisabled)),
+.chipSelectPending:focus,
+.chipSelectPending:global(.isOpen) {
+  background: var(--color-neutral-background) !important;
+  border-color: var(--color-neutral-border-bolder) !important;
+  box-shadow: none !important;
+  color: var(--color-neutral-content) !important;
+}
+
+.chipSelectInvalid {
+  border-color: var(--color-negative-border-subtle) !important;
+  background: var(--color-negative-background) !important;
+}
+
+.chipSelectInvalid:hover:not(:global(.isDisabled)),
+.chipSelectInvalid:focus,
+.chipSelectInvalid:global(.isOpen) {
+  border-color: var(--color-negative-border-bold) !important;
+  box-shadow: 0 0 0 1px var(--color-negative-border-bold) !important;
+}
+
+.dropdown {
+  min-width: min(480px, calc(100vw - var(--spacing-wider)));
+}
+
+@media (max-width: 720px) {
+  .chipSelect {
+    --chip-select-height: var(--spacing-800);
+  }
+}

@@ -32,10 +32,10 @@ export interface JsonViewerProps {
   toolbarExtra?: React.ReactNode;
 
   // Display settings
-  /** Container min height */
-  minHeight?: string | number;
-  /** Container max height */
-  maxHeight?: string | number;
+  /** Container min height. Pass `null` to fill the parent height instead of using the default. */
+  minHeight?: string | number | null;
+  /** Container max height. Pass `null` to fill the parent height instead of using the default. */
+  maxHeight?: string | number | null;
   /** Font size for the JSON content (passed to json-edit-react's rootFontSize) */
   fontSize?: string | number;
   /** Number of characters before truncating strings (click to expand) */

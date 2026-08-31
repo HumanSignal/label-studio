@@ -1,9 +1,15 @@
-import { useState } from "react";
-import { IconWarning, ToastType, useToast } from "@humansignal/ui";
-
-// Shadcn UI components
-import { Button } from "@humansignal/ui";
-import { Card, CardContent, CardHeader } from "@humansignal/shad/components/ui/card";
+import { useCallback, useEffect, useState } from "react";
+import { Badge, Button, cnm, Message, ToastType, Typography, useToast } from "@humansignal/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
+import { confirm } from "@humansignal/ui/lib/modal";
+import { IconWarning } from "@humansignal/icons";
+import { useLocation } from "react-router-dom";
+import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
+import {
+  Card as ShadCard,
+  CardContent as ShadCardContent,
+  CardHeader as ShadCardHeader,
+} from "@humansignal/shad/components/ui/card";
 import { Skeleton } from "@humansignal/shad/components/ui/skeleton";
 import {
   Dialog,
@@ -21,37 +27,100 @@ import type { Hotkey, Section, DirtyState, DuplicateConfirmDialog, ImportData } 
 // @ts-ignore
 import { HOTKEY_SECTIONS } from "./Hotkeys/defaults";
 import styles from "../AccountSettings.module.css";
-import { useHotkeys } from "../hooks/useHotkeys";
+import { getSaveSuccessMessage, type HotkeyScope, useHotkeys } from "../hooks/useHotkeys";
+import {
+  parseProjectHotkeyScopeFromSearch,
+  ProjectHotkeyScopeSelector,
+  type ProjectHotkeyScopeResolution,
+} from "../components/ProjectHotkeyScopeSelector";
 
-// Type the imported defaults
 const typedHotkeySections = HOTKEY_SECTIONS as Section[];
 
-export const HotkeysHeaderButtons = () => {
-  const [importDialogOpen, setImportDialogOpen] = useState<boolean>(false);
-  const { handleResetToDefaults, handleExportHotkeys, handleImportHotkeys } = useHotkeys();
+export const HotkeysManager = () => {
+  const location = useLocation();
+  const [isDirty, setIsDirty] = useState(false);
+  const [resolution, setResolution] = useState<ProjectHotkeyScopeResolution>(() =>
+    parseProjectHotkeyScopeFromSearch(location.search),
+  );
+
+  const handleResolutionChange = useCallback((nextResolution: ProjectHotkeyScopeResolution) => {
+    setResolution(nextResolution);
+  }, []);
+
+  const handleDirtyNavigation = useCallback(({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
+    confirm({
+      title: "Discard unsaved hotkey changes?",
+      body: "Changing hotkey scope will discard your unsaved changes.",
+      okText: "Discard Changes",
+      buttonLook: "negative",
+      onOk: () => {
+        setIsDirty(false);
+        continueCallback?.();
+      },
+      onCancel: cancelCallback,
+    });
+  }, []);
+
+  const scope: HotkeyScope | null =
+    resolution.status === "account"
+      ? { kind: "account" }
+      : resolution.status === "project"
+        ? { kind: "project", projectId: resolution.projectId }
+        : null;
 
   return (
-    <>
-      <div className={`${styles.flexRow} justify-end gap-tight`}>
-        <Button variant="neutral" look="outlined" onClick={() => setImportDialogOpen(true)}>
-          Import
-        </Button>
-        <Button variant="neutral" look="outlined" onClick={handleExportHotkeys}>
-          Export
-        </Button>
-        <Button variant="negative" look="outlined" onClick={handleResetToDefaults}>
-          Reset to Defaults
-        </Button>
-      </div>
-
-      {/* Import Dialog */}
-      <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleImportHotkeys} />
-    </>
+    <Card className="!w-full">
+      <CardHeader>
+        <div className="flex flex-col gap-tight">
+          <CardTitle>
+            <div className="flex items-center gap-tight">
+              <span>Hotkeys</span>
+              <Badge variant="beta" look="solid" shape="rounded">
+                Beta
+              </Badge>
+            </div>
+          </CardTitle>
+          <CardDescription>
+            Customize your keyboard shortcuts to speed up your workflow. Click on any hotkey below to assign a new key
+            combination that works best for you.
+          </CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div id="hotkeys-manager" className="flex flex-col gap-wide">
+          <LeaveBlocker key={location.search} active={isDirty} onBlock={handleDirtyNavigation} />
+          <ProjectHotkeyScopeSelector onResolutionChange={handleResolutionChange} />
+          {resolution.status === "project" && (
+            <div className="flex flex-col gap-tighter">
+              <Typography variant="headline" size="small">
+                Project override for {resolution.projectTitle}
+              </Typography>
+              <Typography variant="body" className="text-neutral-content-subtle">
+                Only shortcuts that differ from your account defaults apply while you work in this project.
+              </Typography>
+            </div>
+          )}
+          {scope && (
+            <ScopedHotkeysContent
+              key={scope.kind === "project" ? `project:${scope.projectId}` : "account"}
+              scope={scope}
+              onDirtyChange={setIsDirty}
+            />
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
-export const HotkeysManager = () => {
+interface PropsScopedHotkeysContent {
+  scope: HotkeyScope;
+  onDirtyChange: (isDirty: boolean) => void;
+}
+
+const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysContent) => {
   const toast = useToast();
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editingHotkeyId, setEditingHotkeyId] = useState<string | null>(null);
   const [dirtyState, setDirtyState] = useState<DirtyState>({});
   const [duplicateConfirmDialog, setDuplicateConfirmDialog] = useState<DuplicateConfirmDialog>({
@@ -61,17 +130,43 @@ export const HotkeysManager = () => {
     conflictingHotkeys: [],
   });
 
-  // Use the shared hook for common functionality
-  const { hotkeys, setHotkeys, isLoading, setIsLoading, saveHotkeysToAPI } = useHotkeys();
+  const {
+    hotkeys,
+    setHotkeys,
+    isLoading,
+    setIsLoading,
+    saveHotkeysToAPI,
+    handleResetToDefaults,
+    handleExportHotkeys,
+    handleImportHotkeys,
+    hasProjectAccessError,
+    isReadOnly,
+  } = useHotkeys(scope);
 
-  // Check if a hotkey conflicts with others globally
+  useEffect(() => {
+    onDirtyChange(Object.values(dirtyState).some(Boolean));
+  }, [dirtyState, onDirtyChange]);
+
+  const handleScopedReset = useCallback(() => {
+    if (isReadOnly) return;
+    handleResetToDefaults(() => setDirtyState({}));
+  }, [handleResetToDefaults, isReadOnly]);
+
+  const handleScopedImport = useCallback(
+    async (data: ImportData | Hotkey[]): Promise<boolean> => {
+      if (isReadOnly) return false;
+      return await handleImportHotkeys(data, () => setDirtyState({}));
+    },
+    [handleImportHotkeys, isReadOnly],
+  );
+
   const getGlobalDuplicates = (hotkeyId: string, newKey: string): Hotkey[] => {
     return hotkeys.filter((h: Hotkey) => h.id !== hotkeyId && h.key === newKey);
   };
 
-  // Handle toggling a single hotkey
   const handleToggleHotkey = (hotkeyId: string) => {
-    // Update the hotkey
+    if (isReadOnly) return;
+
     const updatedHotkeys = hotkeys.map((hotkey: Hotkey) => {
       if (hotkey.id === hotkeyId) {
         return { ...hotkey, active: !hotkey.active };
@@ -81,7 +176,6 @@ export const HotkeysManager = () => {
 
     setHotkeys(updatedHotkeys);
 
-    // Mark the section as having changes
     const hotkey = hotkeys.find((h: Hotkey) => h.id === hotkeyId);
     if (hotkey) {
       setDirtyState({
@@ -91,23 +185,40 @@ export const HotkeysManager = () => {
     }
   };
 
-  // Helper function to get section title by ID
   const getSectionTitle = (sectionId: string): string => {
     const section = typedHotkeySections.find((s: Section) => s.id === sectionId);
     return section ? section.title : sectionId;
   };
 
-  // Handle saving an edited hotkey
-  const handleSaveHotkey = (hotkeyId: string, newKey: string) => {
-    // Find the hotkey to update
+  const updateHotkeyKey = (hotkeyId: string, newKey: string) => {
+    if (isReadOnly) return;
+
     const hotkey = hotkeys.find((h: Hotkey) => h.id === hotkeyId);
     if (!hotkey) return;
 
-    // Check for global duplicates
-    const conflictingHotkeys = getGlobalDuplicates(hotkeyId, newKey);
+    const updatedHotkeys = hotkeys.map((h: Hotkey) => {
+      if (h.id === hotkeyId) {
+        return { ...h, key: newKey, mac: newKey };
+      }
+      return h;
+    });
 
+    setHotkeys(updatedHotkeys);
+    setDirtyState({
+      ...dirtyState,
+      [hotkey.section]: true,
+    });
+    setEditingHotkeyId(null);
+  };
+
+  const handleSaveHotkey = (hotkeyId: string, newKey: string) => {
+    if (isReadOnly) return;
+
+    const hotkey = hotkeys.find((h: Hotkey) => h.id === hotkeyId);
+    if (!hotkey) return;
+
+    const conflictingHotkeys = getGlobalDuplicates(hotkeyId, newKey);
     if (conflictingHotkeys.length > 0) {
-      // Show confirmation dialog for duplicates
       setDuplicateConfirmDialog({
         open: true,
         hotkeyId,
@@ -117,55 +228,22 @@ export const HotkeysManager = () => {
       return;
     }
 
-    // No conflicts, proceed with the update
     updateHotkeyKey(hotkeyId, newKey);
   };
 
-  // Function to actually update the hotkey key
-  const updateHotkeyKey = (hotkeyId: string, newKey: string) => {
-    // Find the hotkey to update
-    const hotkey = hotkeys.find((h: Hotkey) => h.id === hotkeyId);
-    if (!hotkey) return;
-
-    // Update the hotkey
-    const updatedHotkeys = hotkeys.map((h: Hotkey) => {
-      if (h.id === hotkeyId) {
-        return { ...h, key: newKey, mac: newKey };
-      }
-      return h;
-    });
-
-    setHotkeys(updatedHotkeys);
-
-    // Mark the section as having changes
-    setDirtyState({
-      ...dirtyState,
-      [hotkey.section]: true,
-    });
-
-    // Exit edit mode
-    setEditingHotkeyId(null);
-  };
-
-  // Handle confirming duplicate hotkey
   const handleConfirmDuplicate = () => {
     const { hotkeyId, newKey } = duplicateConfirmDialog;
-
-    // Close the dialog
     setDuplicateConfirmDialog({
       open: false,
       hotkeyId: null,
       newKey: null,
       conflictingHotkeys: [],
     });
-
-    // Proceed with the update
     if (hotkeyId && newKey) {
       updateHotkeyKey(hotkeyId, newKey);
     }
   };
 
-  // Handle canceling duplicate confirmation
   const handleCancelDuplicate = () => {
     setDuplicateConfirmDialog({
       open: false,
@@ -175,21 +253,15 @@ export const HotkeysManager = () => {
     });
   };
 
-  // Handle canceling edit mode
-  const handleCancelEdit = () => {
-    setEditingHotkeyId(null);
-  };
-
-  // Handle saving a section's hotkeys
   const handleSaveSection = async (sectionId: string) => {
+    if (isReadOnly) return;
+
     setIsLoading(true);
 
     try {
-      // Save ALL modified hotkeys and settings, not just this section
       const result = await saveHotkeysToAPI(hotkeys, {});
 
       if (result.ok) {
-        // Clear the dirty state for this section
         const newDirtyState = { ...dirtyState };
         delete newDirtyState[sectionId];
         setDirtyState(newDirtyState);
@@ -199,17 +271,18 @@ export const HotkeysManager = () => {
 
         if (toast) {
           toast.show({
-            message: `${sectionName} hotkeys saved successfully`,
+            message: getSaveSuccessMessage(
+              sectionName ?? "Hotkeys",
+              scope.kind === "project" ? scope.projectId : undefined,
+            ),
             type: ToastType.info,
           });
         }
-      } else {
-        if (toast) {
-          toast.show({
-            message: `Failed to save: ${result.error || "Unknown error"}`,
-            type: ToastType.error,
-          });
-        }
+      } else if (toast) {
+        toast.show({
+          message: `Failed to save: ${result.error || "Unknown error"}`,
+          type: ToastType.error,
+        });
       }
     } catch (error: unknown) {
       if (toast) {
@@ -224,103 +297,92 @@ export const HotkeysManager = () => {
     }
   };
 
-  // Enhanced import handler that manages dirty state
-  const handleImportHotkeys = async (importedData: ImportData | Hotkey[]) => {
-    try {
-      setIsLoading(true);
-
-      // Handle both old format (just hotkeys array) and new format (with settings)
-      const importedHotkeys = Array.isArray(importedData) ? importedData : importedData.hotkeys || [];
-      const importedSettings = Array.isArray(importedData) ? {} : importedData.settings || {};
-
-      // Update local state
-      setHotkeys(importedHotkeys);
-
-      // Save all imported data to API (including settings)
-      const result = await saveHotkeysToAPI(importedHotkeys, importedSettings);
-
-      if (!result.ok) {
-        throw new Error(result.error || "Failed to save imported hotkeys");
-      }
-
-      // Reset dirty state
-      setDirtyState({});
-
-      if (toast) {
-        toast.show({ message: "Hotkeys imported successfully", type: ToastType.info });
-      }
-    } catch (error: unknown) {
-      if (toast) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        toast.show({ message: `Error importing hotkeys: ${errorMessage}`, type: ToastType.error });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Group hotkeys by section
   const getHotkeysBySection = (sectionId: string): Hotkey[] => {
     return hotkeys.filter((hotkey: Hotkey) => hotkey.section === sectionId);
   };
 
   return (
-    <div id="hotkeys-manager">
-      <div className={styles.sectionContent}>
-        {isLoading && hotkeys.length === 0 ? (
-          <div className="flex flex-col gap-wide">
-            {/* Platform settings skeleton */}
-            <Card>
-              <CardHeader className="pb-tight">
-                <Skeleton className="h-wide w-[16rem]" />
-                <Skeleton className="h-base w-[18rem]" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-5 w-44 mb-tight" />
-                <Skeleton className="h-base w-[16rem]" />
-              </CardContent>
-            </Card>
-
-            {/* Hotkey sections skeleton */}
-            {typedHotkeySections.map((section: Section) => (
-              <Card key={section.id}>
-                <CardHeader className="pb-tight">
-                  <Skeleton className="h-wide w-[16rem]" />
-                  <Skeleton className="h-base w-[18rem]" />
-                </CardHeader>
-                <CardContent>
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
-                      <Skeleton className="h-5 w-44 mb-tight" />
-                      <Skeleton className="h-base w-[16rem]" />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-wide">
-            {/* Hotkey Sections */}
-            {typedHotkeySections.map((section: Section) => (
-              <HotkeySection
-                key={section.id}
-                section={section}
-                hotkeys={getHotkeysBySection(section.id)}
-                editingHotkeyId={editingHotkeyId}
-                onSaveHotkey={handleSaveHotkey}
-                onCancelEdit={handleCancelEdit}
-                onToggleHotkey={handleToggleHotkey}
-                onSaveSection={handleSaveSection}
-                hasChanges={dirtyState[section.id] || false}
-                onEditHotkey={setEditingHotkeyId}
-              />
-            ))}
-          </div>
-        )}
+    <div className="flex flex-col gap-wide">
+      <div className={cnm(styles.flexRow, "justify-end !gap-tight")}>
+        <Button
+          variant="neutral"
+          look="outlined"
+          onClick={() => setImportDialogOpen(true)}
+          disabled={isLoading || isReadOnly}
+        >
+          Import
+        </Button>
+        <Button variant="neutral" look="outlined" onClick={handleExportHotkeys} disabled={isLoading || isReadOnly}>
+          Export
+        </Button>
+        <Button variant="negative" look="outlined" onClick={handleScopedReset} disabled={isLoading || isReadOnly}>
+          Reset to Defaults
+        </Button>
       </div>
 
-      {/* Duplicate Confirmation Dialog */}
+      <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} onImport={handleScopedImport} />
+
+      {hasProjectAccessError && (
+        <Message variant="negative" title="Project unavailable">
+          You no longer have access to this project
+        </Message>
+      )}
+      <fieldset
+        disabled={isReadOnly}
+        aria-readonly={isReadOnly}
+        className={cnm("m-0 min-w-0 border-0 p-0", isReadOnly && "pointer-events-none opacity-60")}
+      >
+        <div className={styles.sectionContent}>
+          {isLoading && hotkeys.length === 0 ? (
+            <div className="flex flex-col gap-wide">
+              <ShadCard>
+                <ShadCardHeader className="pb-tight">
+                  <Skeleton className="h-wide w-[16rem]" />
+                  <Skeleton className="h-base w-[18rem]" />
+                </ShadCardHeader>
+                <ShadCardContent>
+                  <Skeleton className="h-5 w-44 mb-tight" />
+                  <Skeleton className="h-base w-[16rem]" />
+                </ShadCardContent>
+              </ShadCard>
+              {typedHotkeySections.map((section: Section) => (
+                <ShadCard key={section.id}>
+                  <ShadCardHeader className="pb-tight">
+                    <Skeleton className="h-wide w-[16rem]" />
+                    <Skeleton className="h-base w-[18rem]" />
+                  </ShadCardHeader>
+                  <ShadCardContent>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
+                        <Skeleton className="h-5 w-44 mb-tight" />
+                        <Skeleton className="h-base w-[16rem]" />
+                      </div>
+                    ))}
+                  </ShadCardContent>
+                </ShadCard>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-wide">
+              {typedHotkeySections.map((section: Section) => (
+                <HotkeySection
+                  key={section.id}
+                  section={section}
+                  hotkeys={getHotkeysBySection(section.id)}
+                  editingHotkeyId={editingHotkeyId}
+                  onSaveHotkey={handleSaveHotkey}
+                  onCancelEdit={() => setEditingHotkeyId(null)}
+                  onToggleHotkey={handleToggleHotkey}
+                  onSaveSection={handleSaveSection}
+                  hasChanges={dirtyState[section.id] || false}
+                  onEditHotkey={isReadOnly ? () => undefined : setEditingHotkeyId}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </fieldset>
+
       <Dialog open={duplicateConfirmDialog.open} onOpenChange={handleCancelDuplicate}>
         <DialogContent className="bg-neutral-surface">
           <DialogHeader>

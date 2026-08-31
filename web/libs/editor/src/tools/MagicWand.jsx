@@ -290,6 +290,16 @@ const _Tool = types
     }),
 
     keydownEv(e) {
+      // Bail if we're not actively drawing — the listener may have leaked
+      // past the tool's lifetime (e.g. in test environments where the tool
+      // wasn't properly torn down). Without this guard, a stale listener
+      // still calls stopPropagation on Escape and swallows the key for
+      // unrelated consumers (modals, dialogs, etc.).
+      if (self.mode !== "drawing") {
+        window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
+        return;
+      }
+
       const { key } = e;
 
       if (key === "Escape") {
@@ -299,7 +309,11 @@ const _Tool = types
 
         self.mode = "viewing";
         window.removeEventListener("keydown", self.keydownEv, true /* useCapture */);
-        self.overlayCtx.clearRect(0, 0, self.overlay.width, self.overlay.height);
+        // The overlay canvas may have been torn down already — skip the
+        // clear defensively. Canvas isn't on screen anymore in that case.
+        if (self.overlayCtx && self.overlay) {
+          self.overlayCtx.clearRect(0, 0, self.overlay.width, self.overlay.height);
+        }
       }
     },
 

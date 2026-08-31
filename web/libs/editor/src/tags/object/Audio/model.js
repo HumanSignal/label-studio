@@ -114,7 +114,7 @@ const TagAttrs = types.model({
   autocenter: types.optional(types.boolean, true),
   scrollparent: types.optional(types.boolean, true),
   splitchannels: types.optional(types.boolean, false),
-  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio", "none"]), "webaudio"),
+  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio", "none", "wasm-stream"]), "webaudio"),
   player: types.optional(types.enumeration(["html5", "webaudio"]), "html5"),
   spectrogram: types.optional(types.boolean, false),
 });
@@ -490,9 +490,7 @@ export const AudioModel = types.compose(
           const activeStates = self.activeStates();
           const [control, ...rest] = activeStates;
           const labels = { [control.valueType]: control.selectedValues() };
-          const r = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-            ? self.annotation.createResult(wsRegion, labels, control, self, false, rest)
-            : self.annotation.createResult(wsRegion, labels, control, self, false);
+          const r = self.annotation.createResult(wsRegion, labels, control, self, false, rest);
           const updatedRegion = wsRegion.convertToRegion(labels.labels);
 
           r.setWSRegion(updatedRegion);

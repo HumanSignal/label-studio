@@ -1,0 +1,19 @@
+/**
+ * Theme-aware overrides for the antd-fallback Instructions modal (FF_MODAL_WINDOW_APP_CHROME off).
+ * The vendored antd v4 stylesheet hardcodes `.ant-modal-content { background:#fff }` and dark text,
+ * so the dialog always rendered light. Re-point the surfaces at semantic tokens, which flip under
+ * `[data-color-scheme="dark"]`. The `ModalWindow` branch is already theme-aware (BROS-1078).
+ */
+.lsf-instructions-modal .ant-modal-content {
+  background-color: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+}
+
+.lsf-instructions-modal .ant-modal-close {
+  color: var(--color-neutral-content-subtle);
+}
+
+.lsf-instructions-modal .ant-modal-close:hover,
+.lsf-instructions-modal .ant-modal-close:focus {
+  color: var(--color-neutral-content);
+}

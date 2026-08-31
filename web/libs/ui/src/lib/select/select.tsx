@@ -1,5 +1,5 @@
-import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-
+import { isDefined } from "@humansignal/core/lib/utils/helpers";
+import { CaretDownIcon, IconPlus, InfoIcon } from "@humansignal/icons";
 import {
   Command,
   CommandEmpty,
@@ -9,16 +9,19 @@ import {
   CommandList,
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
-import type { SelectOption, OptionProps, SelectProps } from "./types.ts";
-import { Button, Checkbox, Label, Typography } from "@humansignal/ui";
-import { Badge } from "../badge/badge";
-import { isDefined } from "@humansignal/core/lib/utils/helpers";
-import { IconChevron, IconChevronDown } from "@humansignal/icons";
 import clsx from "clsx";
-import styles from "./select.module.css";
-import { cn, cnm } from "../../utils/utils";
+import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
+import { cn, cnm } from "../../utils/utils";
+import { Badge } from "../badge/badge";
+import { Button } from "../button/button";
+import { Checkbox } from "../checkbox/checkbox";
+import { Label } from "../label/label";
+import { Typography } from "../typography/typography";
+import { Tooltip } from "../Tooltip/Tooltip";
+import styles from "./select.module.css";
+import type { OptionProps, SelectOption, SelectProps } from "./types.ts";
 
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
 const VARIABLE_LIST_COUNT_RENDERED = 5;
@@ -45,7 +48,10 @@ function groupOptionsByField(options: any[], groupBy: string): { groupKey: strin
   const rest = order.filter((k) => k !== null);
   const orderedKeys = [...nullFirst, ...rest];
 
-  return orderedKeys.map((groupKey) => ({ groupKey, items: byKey.get(groupKey) ?? [] }));
+  return orderedKeys.map((groupKey) => ({
+    groupKey,
+    items: byKey.get(groupKey) ?? [],
+  }));
 }
 
 /**
@@ -59,6 +65,7 @@ type SelectedItemsGroupProps = {
   onDeselectAll: () => void;
   disabled?: boolean;
   onSelectAllClick?: () => void;
+  selectAllLabel?: string;
 };
 
 /**
@@ -73,6 +80,7 @@ const SelectedItemsGroup = ({
   onDeselectAll,
   disabled,
   onSelectAllClick,
+  selectAllLabel = "Select all rendered items",
 }: SelectedItemsGroupProps) => {
   const handleItemClick = useCallback(
     (option: any) => {
@@ -124,12 +132,10 @@ const SelectedItemsGroup = ({
           style={{ cursor: hasNoItems ? "default" : "pointer" }}
         >
           {/* Caret icon */}
-          <IconChevronDown
-            className={cn(
-              styles.selectedItemsCaret,
-              "transition-transform ease-out duration-200",
-              !expanded && "-rotate-90",
-            )}
+          <CaretDownIcon
+            className={cn(styles.selectedItemsCaret, !expanded && "-rotate-90")}
+            size={16}
+            weight="bold"
             aria-hidden="true"
             style={{ opacity: hasNoItems ? 0.3 : 1 }}
           />
@@ -157,7 +163,7 @@ const SelectedItemsGroup = ({
             type="button"
             onClick={handleSelectAllClick}
             disabled={disabled}
-            aria-label="Select all rendered items"
+            aria-label={selectAllLabel}
             look="string"
             size="smaller"
           >
@@ -244,10 +250,13 @@ export const Select = forwardRef(
       labelProps,
       defaultValue,
       searchable,
+      creatable = false,
+      createOptionLabel = 'Add "{value}"',
       searchPlaceholder,
       defaultSearchValue = "",
       value: externalValue,
       disabled = false,
+      readOnly = false,
       multiple = false,
       isInline = false,
       isLoading = false,
@@ -272,6 +281,8 @@ export const Select = forwardRef(
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
+      selectAllLabel,
+      showGroupActions = false,
       open: controlledOpen,
       ...props
     }: SelectProps<T, A>,
@@ -291,10 +302,16 @@ export const Select = forwardRef(
     const isOpen = controlledOpen !== undefined ? controlledOpen : internalIsOpen;
     const [selectedGroupExpanded, setSelectedGroupExpanded] = useState<boolean>(false);
     const [value, setValue] = useState<any>(initialValue);
+    const [createdOptions, setCreatedOptions] = useState<any[]>([]);
 
     valueRef.current = value;
     useEffect(() => {
-      if (!isDefined(externalValue)) return;
+      if (!isDefined(externalValue)) {
+        const emptyVal = multiple ? [] : undefined;
+        valueRef.current = emptyVal;
+        setValue(emptyVal);
+        return;
+      }
       let val = externalValue?.value ?? externalValue;
       if (multiple && !Array.isArray(val)) {
         val = [val];
@@ -305,9 +322,10 @@ export const Select = forwardRef(
       setValue(val);
     }, [externalValue, multiple]);
 
+    const allOptions = useMemo(() => [...options, ...createdOptions], [options, createdOptions]);
     const flatOptions = useMemo(() => {
-      return options.flatMap((option) => option?.children ?? option);
-    }, [options]);
+      return allOptions.flatMap((option) => option?.children ?? option);
+    }, [allOptions]);
 
     useEffect(() => {
       if (valueRef.current || !selectFirstIfEmpty || !flatOptions?.[0]) return;
@@ -336,9 +354,11 @@ export const Select = forwardRef(
         onSearch?.(defaultSearchValue || "");
       }
     }, [isOpen, defaultSearchValue, onSearch]);
+    const interactionDisabled = disabled || readOnly;
+
     const _onChange = useCallback(
       (val: string, isSelected: boolean) => {
-        if (disabled) return;
+        if (interactionDisabled) return;
 
         if (multiple) {
           valueRef.current = isSelected
@@ -363,7 +383,7 @@ export const Select = forwardRef(
           ref?.current?.dispatchEvent?.(changeEvent);
         }, 0);
       },
-      [props?.onChange, multiple, disabled],
+      [props?.onChange, multiple, interactionDisabled],
     );
 
     const filterHandler = useCallback((option: any, queryString: string) => {
@@ -430,6 +450,43 @@ export const Select = forwardRef(
       return result;
     }, [flatOptions, isSelected, value, multiple]);
 
+    const createValue = query.trim();
+    const canCreate =
+      creatable &&
+      !multiple &&
+      createValue.length > 0 &&
+      !flatOptions.some((option) => {
+        const optionValue = option?.value ?? option;
+        return String(optionValue).toLowerCase() === createValue.toLowerCase();
+      });
+    const [createLabelPrefix, createLabelSuffix = ""] = createOptionLabel.split("{value}");
+
+    const createOption = canCreate ? (
+      <Option
+        value={createValue}
+        label={
+          <>
+            {createLabelPrefix}
+            <strong className="inline-block max-w-[200px] truncate align-bottom">{createValue}</strong>
+            {createLabelSuffix}
+          </>
+        }
+        isOptionSelected={false}
+        multiple={false}
+        leadingIcon={
+          <IconPlus aria-hidden="true" className="!h-4 !w-4 shrink-0 self-center text-neutral-content-subtle" />
+        }
+        highlighted
+        onSelect={() => {
+          setCreatedOptions((previous) => {
+            if (previous.some((option) => option.value === createValue)) return previous;
+            return [...previous, { value: createValue, label: createValue }];
+          });
+          _onChange(createValue, false);
+        }}
+      />
+    ) : null;
+
     const onSearchInputHandler = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -459,8 +516,14 @@ export const Select = forwardRef(
                 const optionValue = option?.value ?? option;
 
                 return (
-                  <span key={`${optionValue}_${index}`} className="truncate only:w-full">
-                    {option?.label ?? optionValue}
+                  <span key={`${optionValue}_${index}`} className="flex min-w-0 items-center gap-2">
+                    <span className="truncate">{option?.label ?? optionValue}</span>
+                    {option?.badge && <Badge size="small">{option.badge}</Badge>}
+                    {option?.description && (
+                      <Tooltip title={option.description}>
+                        <InfoIcon className="h-4 w-4 shrink-0 cursor-help text-neutral-content-subtler" />
+                      </Tooltip>
+                    )}
                   </span>
                 );
               })}
@@ -472,20 +535,46 @@ export const Select = forwardRef(
       );
     }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
 
+    const hasNestedChildren = useMemo(
+      () => !groupedOptions && _options.some((option) => option?.children?.length),
+      [groupedOptions, _options],
+    );
+    const isLazyVirtualList = Boolean(isVirtualList && !groupedOptions && !hasNestedChildren);
+
+    const renderFlatOption = (option: any, index: number) => {
+      const optionValue = option?.value ?? option;
+      const label = option?.label ?? optionValue;
+      const isOptionSelected = isSelected(optionValue);
+
+      return (
+        <Option
+          key={`${optionValue}_${index}`}
+          value={optionValue}
+          label={label}
+          option={option}
+          {...(optionRenderer && {
+            optionRenderer,
+            optionIndex: index,
+          })}
+          isOptionSelected={isOptionSelected}
+          disabled={readOnly || option?.disabled}
+          style={option?.style}
+          multiple={multiple}
+          onSelect={() => {
+            _onChange(optionValue, isOptionSelected);
+          }}
+        />
+      );
+    };
+
     const renderedOptions = useMemo(() => {
+      if (isLazyVirtualList) {
+        return [];
+      }
       if (groupedOptions) {
         let globalIndex = 0;
-        return groupedOptions.flatMap((group, groupIdx) => {
-          const elements: React.ReactNode[] = [];
-          if (group.groupKey !== null) {
-            elements.push(
-              <div key={`group-header-${group.groupKey}-${groupIdx}`} className={styles.groupHeader}>
-                <Typography variant="label" size="smaller">
-                  {group.groupKey}
-                </Typography>
-              </div>,
-            );
-          }
+        return groupedOptions.map((group, groupIdx) => {
+          const itemElements: React.ReactNode[] = [];
           group.items.forEach((item) => {
             const val = typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item;
             const lab =
@@ -495,14 +584,18 @@ export const Select = forwardRef(
             const isOptionSelected = isSelected(val);
             const idx = globalIndex;
             globalIndex += 1;
-            elements.push(
+            itemElements.push(
               <Option
                 key={`${val}_${idx}`}
                 value={val}
                 label={lab}
-                {...(optionRenderer && { optionRenderer, option: item, optionIndex: idx })}
+                option={item}
+                {...(optionRenderer && {
+                  optionRenderer,
+                  optionIndex: idx,
+                })}
                 isOptionSelected={isOptionSelected}
-                disabled={typeof item === "object" && item?.disabled}
+                disabled={readOnly || (typeof item === "object" && item?.disabled)}
                 style={typeof item === "object" ? item?.style : undefined}
                 multiple={multiple}
                 onSelect={() => {
@@ -511,7 +604,33 @@ export const Select = forwardRef(
               />,
             );
           });
-          return elements;
+
+          const hasHeader = group.groupKey !== null;
+          const hasActions = hasHeader && showGroupActions && multiple && !readOnly;
+
+          return (
+            <div
+              key={`group-container-${group.groupKey ?? "__ungrouped__"}-${groupIdx}`}
+              className={hasActions ? styles.groupContainer : undefined}
+            >
+              {hasHeader && (
+                <div className={styles.groupHeader}>
+                  <Typography variant="label" size="smaller">
+                    {group.groupKey}
+                  </Typography>
+                  {hasActions && (
+                    <GroupActions
+                      groupItems={group.items}
+                      valueRef={valueRef}
+                      setValue={setValue}
+                      onChange={props?.onChange}
+                    />
+                  )}
+                </div>
+              )}
+              {itemElements}
+            </div>
+          );
         });
       }
       return _options.map((option, index) => {
@@ -531,6 +650,7 @@ export const Select = forwardRef(
                   label={label}
                   isIndeterminate={!isOptionSelected && isIndeterminate}
                   isOptionSelected={isOptionSelected}
+                  disabled={readOnly}
                   onSelect={() => {
                     children.forEach((child: SelectOption<T>) => {
                       const childVal = child?.value ?? child;
@@ -551,9 +671,13 @@ export const Select = forwardRef(
                       key={`${val}_${i}`}
                       value={val}
                       label={lab}
-                      {...(optionRenderer && { optionRenderer, option: item, optionIndex: i })}
+                      option={item}
+                      {...(optionRenderer && {
+                        optionRenderer,
+                        optionIndex: i,
+                      })}
                       isOptionSelected={isChildOptionSelected}
-                      disabled={item?.disabled}
+                      disabled={readOnly || item?.disabled}
                       style={item?.style}
                       multiple={multiple}
                       onSelect={() => {
@@ -566,23 +690,20 @@ export const Select = forwardRef(
             </CommandGroup>
           );
         }
-        return (
-          <Option
-            key={`${optionValue}_${index}`}
-            value={optionValue}
-            label={label}
-            {...(optionRenderer && { optionRenderer, option, optionIndex: index })}
-            isOptionSelected={isOptionSelected}
-            disabled={option?.disabled}
-            style={option?.style}
-            multiple={multiple}
-            onSelect={() => {
-              _onChange(optionValue, isOptionSelected);
-            }}
-          />
-        );
+        return renderFlatOption(option, index);
       });
-    }, [_options, groupedOptions, multiple, isSelected, _onChange, optionRenderer]);
+    }, [
+      isLazyVirtualList,
+      _options,
+      groupedOptions,
+      multiple,
+      isSelected,
+      _onChange,
+      optionRenderer,
+      showGroupActions,
+      props?.onChange,
+      readOnly,
+    ]);
 
     const combobox = (
       <Popover
@@ -600,28 +721,32 @@ export const Select = forwardRef(
               [styles.isInline]: isInline,
               [styles.isOpen]: isOpen,
               [styles.isDisabled]: disabled,
+              [styles.sizeSmaller]: size === "smaller",
               [styles.sizeSmall]: size === "small",
-              [styles.sizeMedium]: size === "medium",
-              [styles.sizeLarge]: size === "large",
             })}
             type="button"
             data-testid={
               props?.dataTestid ??
+              props?.testId ??
               `select-trigger${props?.name ? `-${props?.name?.replace?.(/\s/g, "-")}` : ""}${value ? `-${value}` : ""}`
             }
             ref={triggerRef}
             data-name={props?.name}
             data-value={value ?? ""}
+            aria-readonly={readOnly || undefined}
             {...triggerProps}
           >
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
-            {isOpen ? (
-              <IconChevron className="h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
-            ) : (
-              <IconChevronDown className="h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
-            )}
+            <CaretDownIcon
+              weight="bold"
+              className={cnm(
+                styles.selectCaret,
+                "shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
+                isOpen && "rotate-180",
+              )}
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
@@ -660,8 +785,9 @@ export const Select = forwardRef(
                         _onChange(val, true);
                       });
                     }}
-                    disabled={disabled}
+                    disabled={interactionDisabled}
                     onSelectAllClick={onSelectAllClick}
+                    selectAllLabel={selectAllLabel}
                   />
                 )}
 
@@ -671,12 +797,12 @@ export const Select = forwardRef(
                   {props.header ? props.header : null}
                   {isVirtualList ? (
                     <InfiniteLoader
-                      itemCount={itemCount ?? renderedOptions.length}
+                      itemCount={itemCount ?? (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       loadMoreItems={() => {
                         loadMore?.();
                         return Promise.resolve();
                       }}
-                      isItemLoaded={(index) => index < renderedOptions.length}
+                      isItemLoaded={(index) => index < (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       threshold={1}
                       minimumBatchSize={pageSize / 2}
                     >
@@ -687,6 +813,7 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
+                        const listItems = isLazyVirtualList ? _options : renderedOptions;
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
                         const maxVisibleItems = virtualListMaxVisible ?? VARIABLE_LIST_COUNT_RENDERED;
 
@@ -702,24 +829,31 @@ export const Select = forwardRef(
                         return (
                           <VariableSizeList
                             key="virtual-list"
-                            itemData={renderedOptions}
+                            itemData={listItems}
                             itemSize={getItemHeight}
-                            itemCount={renderedOptions.length}
+                            itemCount={listItems.length}
                             height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
-                            overscanCount={0}
+                            overscanCount={isLazyVirtualList ? 4 : 0}
                           >
                             {({ index, style }) => {
-                              return <div style={style}>{renderedOptions[index]}</div>;
+                              return (
+                                <div style={style}>
+                                  {isLazyVirtualList ? renderFlatOption(listItems[index], index) : listItems[index]}
+                                </div>
+                              );
                             }}
                           </VariableSizeList>
                         );
                       }}
                     </InfiniteLoader>
                   ) : (
-                    renderedOptions
+                    <>
+                      {renderedOptions}
+                      {createOption}
+                    </>
                   )}
                 </CommandGroup>
                 {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
@@ -729,7 +863,7 @@ export const Select = forwardRef(
         </PopoverContent>
         <select
           name={props?.name}
-          value={selectedOptions.join(",") ?? ""}
+          value={selectedOptions.map((option) => option?.value ?? option).join(",")}
           ref={ref}
           disabled={disabled}
           className={styles.valueInput}
@@ -753,6 +887,56 @@ export const Select = forwardRef(
   },
 );
 
+type GroupActionsProps = {
+  groupItems: any[];
+  valueRef: React.MutableRefObject<any>;
+  setValue: (value: any) => void;
+  onChange?: (value: any) => void;
+};
+
+const GroupActions = ({ groupItems, valueRef, setValue, onChange }: GroupActionsProps) => {
+  const handleSelectAll = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const keys = groupItems
+        .filter((item) => !(typeof item === "object" && item?.disabled))
+        .map((item) => (typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item));
+      const currentSet = new Set(Array.isArray(valueRef.current) ? valueRef.current : []);
+      for (const k of keys) currentSet.add(k);
+      valueRef.current = [...currentSet];
+      setValue(valueRef.current);
+      onChange?.(valueRef.current);
+    },
+    [groupItems, valueRef, setValue, onChange],
+  );
+
+  const handleSelectNone = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const removeSet = new Set(
+        groupItems
+          .filter((item) => !(typeof item === "object" && item?.disabled))
+          .map((item) => (typeof item === "object" && item != null ? (item.value ?? item.key ?? item) : item)),
+      );
+      valueRef.current = (Array.isArray(valueRef.current) ? valueRef.current : []).filter((v) => !removeSet.has(v));
+      setValue(valueRef.current);
+      onChange?.(valueRef.current);
+    },
+    [groupItems, valueRef, setValue, onChange],
+  );
+
+  return (
+    <div className={styles.groupActions}>
+      <Button type="button" look="string" size="smaller" onClick={handleSelectAll}>
+        All
+      </Button>
+      <Button type="button" look="string" size="smaller" onClick={handleSelectNone}>
+        None
+      </Button>
+    </div>
+  );
+};
+
 const Option = ({
   value,
   label,
@@ -766,6 +950,8 @@ const Option = ({
   optionRenderer,
   option,
   optionIndex = 0,
+  leadingIcon,
+  highlighted,
 }: OptionProps) => {
   const keyDownHandler = useCallback(
     (e: any) => {
@@ -794,6 +980,8 @@ const Option = ({
     [onSelect, value],
   );
   const labelContent = optionRenderer && option ? optionRenderer({ option, index: optionIndex }) : (label ?? value);
+  const badge = option?.badge;
+  const description = option?.description;
   return (
     <CommandItem
       value={value}
@@ -841,9 +1029,11 @@ const Option = ({
             "duration-150 ease-out",
           ],
           !multiple && isOptionSelected && ["bg-primary-emphasis"],
+          highlighted && "bg-primary-emphasis-subtle",
         )}
         data-disabled={disabled}
       >
+        {leadingIcon}
         {multiple && (
           <Checkbox
             tabIndex={-1}
@@ -853,8 +1043,14 @@ const Option = ({
             disabled={disabled}
           />
         )}
-        <div data-testid="select-option-label" className="w-full min-w-0 truncate">
-          {labelContent}
+        <div data-testid="select-option-label" className="flex w-full min-w-0 items-center gap-2">
+          <span className="truncate">{labelContent}</span>
+          {badge && <Badge size="small">{badge}</Badge>}
+          {description && (
+            <Tooltip title={description}>
+              <InfoIcon className="h-4 w-4 shrink-0 cursor-help text-neutral-content-subtler" />
+            </Tooltip>
+          )}
         </div>
       </div>
     </CommandItem>

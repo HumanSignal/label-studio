@@ -125,8 +125,8 @@ const Model = types
     };
   })
   .actions((self) => {
-    const lastPointX = -1;
-    const lastPointY = -1;
+    const _lastPointX = -1;
+    const _lastPointY = -1;
     const disposers = [];
 
     return {
@@ -171,11 +171,11 @@ const Model = types
           const context = self.offscreenCanvasRef.getContext("2d");
           const bitmask = self.bitmaskCanvasRef;
           const image = new window.Image();
+          let hasRendered = false;
 
-          image.src = self.imageDataURL;
-
-          try {
-            await image.decode();
+          const renderImage = () => {
+            if (hasRendered || !isAlive(self) || !self.parent) return;
+            hasRendered = true;
             context.canvas.width = image.naturalWidth;
             context.canvas.height = image.naturalHeight;
             bitmask.width = image.naturalWidth;
@@ -184,8 +184,16 @@ const Model = types
             context.drawImage(image, 0, 0);
 
             self.finalizeRegion();
-          } catch (err) {
-            console.log(err);
+          };
+
+          image.onload = renderImage;
+          image.src = self.imageDataURL;
+
+          try {
+            await image.decode();
+            renderImage();
+          } catch {
+            // Chrome can reject decode() for large/concurrent mask loads even when onload still succeeds.
           }
         }
         renderDataURL();
@@ -355,7 +363,7 @@ const Model = types
         annotation.autosave && setTimeout(() => annotation.autosave());
       },
 
-      updateImageSize(wp, hp, sw, sh) {
+      updateImageSize(_wp, _hp, _sw, _sh) {
         if (self.parent.stageWidth > 1 && self.parent.stageHeight > 1) {
           self.finalizeRegion();
 
@@ -390,7 +398,7 @@ const Model = types
        * @param {boolean} [options.fast]
        * @return {BrushRegionResult}
        */
-      serialize(options) {
+      serialize(_options) {
         const value = { imageDataURL: self.imageDataURL };
         return self.parent.createSerializedResult(self, value);
       },
@@ -417,7 +425,7 @@ const HtxBitmaskView = ({ item, setShapeRef }) => {
     return item.canvasSize();
   }, [item.parent?.stageWidth, item.parent?.stageHeight, ent?.naturalWidth, ent?.naturalHeight]);
 
-  const stage = item.parent?.stageRef;
+  const _stage = item.parent?.stageRef;
 
   return (
     <RegionWrapper item={item}>

@@ -1,0 +1,66 @@
+name: Sync
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "label_studio/**"
+      - "!label_studio/feature_flags.json"
+      - "web/**"
+      - "deploy/**"
+      - "tools/**"
+      - "licenses/**"
+      - "LICENSE"
+      - "README.md"
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to sync"
+        required: true
+        type: string
+
+jobs:
+  dispatch:
+    if: github.repository_owner == 'HumanSignal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Dispatch sync runs
+        env:
+          GH_TOKEN: ${{ secrets.GIT_PAT }}
+          TARGET_REPO: ${{ vars.SYNC_REPO }}
+          MANUAL_SHA: ${{ inputs.sha }}
+          # everything we need is in the push payload — no checkout required
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${MANUAL_SHA:-}" ]; then
+            echo "dispatch $MANUAL_SHA (manual)"
+            gh workflow run copybara_sync.yaml -R "$TARGET_REPO" \
+              -f copybara_workflow=lso-push-reverse \
+              -f source_ref="$MANUAL_SHA" \
+              -f copybara_options="--git-origin-fetch-depth 200 --repo-timeout 30m"
+            exit 0
+          fi
+
+          echo "$COMMITS_JSON" | jq -c '.[]' | while read -r c; do
+            sha=$(jq -r '.id' <<<"$c")
+            # exported changes come back with a GitOrigin-RevId trailer
+            if jq -r '.message' <<<"$c" | grep -q '^GitOrigin-RevId:'; then
+              echo "skip $sha: exported change"
+              continue
+            fi
+            # the actions event context omits per-commit file lists — ask the API
+            files=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha" --jq '.files[].filename' || true)
+            if [ -n "$files" ] && ! grep -v '^label_studio/feature_flags\.json$' <<<"$files" | grep -qE '^(label_studio/|web/|deploy/|tools/|licenses/|LICENSE$|README\.md$)'; then
+              echo "skip $sha: no synced paths"
+              continue
+            fi
+            echo "dispatch $sha"
+            gh workflow run copybara_sync.yaml -R "$TARGET_REPO" \
+              -f copybara_workflow=lso-push-reverse \
+              -f source_ref="$sha" \
+              -f copybara_options="--git-origin-fetch-depth 200 --repo-timeout 30m"
+          done

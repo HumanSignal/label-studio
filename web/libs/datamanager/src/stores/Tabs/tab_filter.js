@@ -1,4 +1,4 @@
-import { flow, getParent, getRoot, types } from "mobx-state-tree";
+import { flow, getParent, getRoot, isAlive, types } from "mobx-state-tree";
 import * as CellViews from "../../components/CellViews";
 import { normalizeCellAlias } from "../../components/CellViews";
 import * as Filters from "../../components/Filters/types";
@@ -6,7 +6,83 @@ import { allowedFilterOperations } from "../../components/Filters/types/Utility"
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
-import { resolveFilterTransition } from "./filter_snapshot_utils";
+import {
+  resolveFilterTransition,
+  resolveOperatorValueTransition,
+  sanitizeIntegerUserListValue,
+  fieldAliasFromFilterId,
+  normalizeIntegerUserFilter,
+  recoverReviewIndicatorSnapshot,
+  REVIEW_INDICATOR_CHILD_ALIASES,
+} from "./filter_snapshot_utils";
+import { guidGenerator } from "../../utils/random";
+
+/**
+ * BROS-1203 — operators that strictly require a JSON array on the wire.
+ *
+ * Note: this is intentionally NOT every `valueType: "list"` operator. TaskState's
+ * `contains` / `not_contains` also declare `valueType: "list"`, but their value is
+ * a single state string applied via `state__icontains=<value>` on the BE — coercing
+ * to `[value]` would send an array where the BE expects a scalar, returning zero
+ * rows for the canonical TC1792 scenario.
+ *
+ * Exported so callers (setValue coercion, isValidFilter empty-array guard, and the
+ * recoverFilterSnapshot legacy-view healer) share the same scoping rule.
+ */
+export const LIST_MEMBERSHIP_OPERATORS = new Set(["in_list", "not_in_list"]);
+
+export function isListMembershipOperator(operator) {
+  return LIST_MEMBERSHIP_OPERATORS.has(operator);
+}
+
+export { REVIEW_INDICATOR_CHILD_ALIASES };
+
+/**
+ * BROS-1203 — defensive snapshot recovery on TabFilter rehydration.
+ *
+ * Views persisted before the FilterSerializer rejected non-list values for the
+ * `in_list` / `not_in_list` operators can carry scalar values. Loading such a
+ * view as-is would then 400 every subsequent view-save (PATCH body includes the
+ * full filter group, BE re-validates all items), trapping the user in an
+ * unrecoverable loop. Coerce on load so the view can recover.
+ *
+ * Exported for unit testing — the live MST `preProcessSnapshot` hook delegates here.
+ */
+export function recoverFilterSnapshot(sn) {
+  if (!sn) return sn;
+  let value = sn.value ?? null;
+  if (isListMembershipOperator(sn.operator) && value !== null && !Array.isArray(value)) {
+    value = [value];
+  }
+  const fieldAlias = fieldAliasFromFilterId(sn.filter);
+  const normalized = normalizeIntegerUserFilter({ fieldAlias, operator: sn.operator, value });
+  const { operator } = normalized;
+  value = normalized.value;
+  return recoverReviewIndicatorSnapshot({ ...sn, operator, value });
+}
+
+function normalizeChildFilterSnapshot(sn) {
+  if (!sn) return sn;
+
+  const hasPluralChildren = Object.hasOwn(sn, "child_filters");
+  const hasLegacyChild = Object.hasOwn(sn, "child_filter");
+  const childFilters = hasPluralChildren
+    ? Array.isArray(sn.child_filters)
+      ? sn.child_filters
+      : []
+    : sn.child_filter
+      ? [sn.child_filter]
+      : [];
+  const snapshot = { ...sn };
+
+  delete snapshot.child_filter;
+
+  return {
+    ...snapshot,
+    child_filters: childFilters,
+    apply_legacy_child_filter: !hasPluralChildren && !hasLegacyChild,
+  };
+}
 
 const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
@@ -22,15 +98,21 @@ const getOperatorDefaultValue = (operator) => {
 
 export const TabFilter = types
   .model("TabFilter", {
+    id: types.optional(types.identifier, guidGenerator),
     filter: types.reference(TabFilterType),
     operator: types.maybeNull(Operators),
     value: types.maybeNull(FilterValueType),
 
-    child_filter: types.maybeNull(types.late(() => TabFilter)),
+    child_filters: types.optional(types.array(types.late(() => TabFilter)), []),
+    apply_legacy_child_filter: types.optional(types.boolean, false),
   })
   .views((self) => ({
     get field() {
       return self.filter.field;
+    },
+
+    get child_filter() {
+      return self.child_filters[0] ?? null;
     },
 
     get schema() {
@@ -85,6 +167,18 @@ export const TabFilter = types
       if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
       }
+      // BROS-1203: for `in_list`/`not_in_list` specifically, an empty list is
+      // "syntactically valid" (the BE accepts []) but doesn't represent a useful
+      // filter — treat it as not-yet-valid so we don't PATCH the view on every
+      // keystroke while the user is still composing. Scoped via the shared
+      // `isListMembershipOperator` so other `valueType: "list"` filters (e.g.
+      // TaskState `contains`) aren't wrongly invalidated.
+      if (isListMembershipOperator(self.operator) && Array.isArray(value) && value.length === 0) {
+        return false;
+      }
+      if (self.schema?.multiple && Array.isArray(value) && value.length === 0) {
+        return false;
+      }
 
       return true;
     },
@@ -103,14 +197,30 @@ export const TabFilter = types
 
     get cellView() {
       const col = self.filter.field;
+      const byAlias = CellViews[normalizeCellAlias(col.alias)];
+      const byType = CellViews[col.type];
+      // Prefer alias views that customize operators (e.g. GroundTruth without "is empty").
+      if (byAlias?.customOperators) return byAlias;
+      return byType ?? byAlias;
+    },
 
-      return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
+    get isNestedChildFilter() {
+      try {
+        const parentCollection = getParent(self);
+        const owner = getParent(self, 2);
+        return owner?.child_filters === parentCollection;
+      } catch {
+        return false;
+      }
     },
   }))
   .volatile(() => ({
     wasValid: false,
     saved: false,
     saving: false,
+    // When save() races an in-flight PATCH, schedule one follow-up write after
+    // this flow exits (setTimeout) — no loop, no recursive yield.
+    pendingSave: false,
   }))
   .actions((self) => ({
     afterAttach() {
@@ -121,9 +231,8 @@ export const TabFilter = types
         self.setOperator(self.component[0].key);
       }
 
-      // If this filter's column has child_filter metadata and no child filter exists, create it
-      // This ensures child filters are automatically recreated after navigation
-      if (!self.child_filter && self.filter?.field?.child_filter) {
+      // Legacy column metadata still auto-materializes its one compatibility child.
+      if (self.apply_legacy_child_filter && self.child_filters.length === 0 && self.filter?.field?.child_filter) {
         self.view?.applyChildFilter(self);
       }
     },
@@ -139,11 +248,12 @@ export const TabFilter = types
     setFilter(value, save = true) {
       if (!isDefined(value)) return;
 
-      self.view.clearChildFilter(self);
+      self.view.clearChildFilters(self);
 
       const prevOperator = self.operator;
       const prevValue = self.value;
       const prevType = self.filter.currentType;
+      const prevColumnId = self.filter.id;
 
       self.filter = value;
 
@@ -157,6 +267,8 @@ export const TabFilter = types
         newType: self.filter.currentType,
         newOperators: self.component,
         newSchema: self.filter.schema,
+        prevColumnId,
+        newColumnId: self.filter.id,
       });
 
       self.operator = result.operator;
@@ -184,21 +296,28 @@ export const TabFilter = types
     setFilterFromRecent(filterTypeId, operator, value) {
       if (!isDefined(filterTypeId)) return;
 
-      self.view.clearChildFilter(self);
+      self.view.clearChildFilters(self);
       self.filter = filterTypeId;
       self.view.applyChildFilter(self);
       self.markUnsaved();
 
       const newOperators = self.component;
+      const fieldAlias = self.filter?.field?.alias;
+      const normalized = normalizeIntegerUserFilter({ fieldAlias, operator, value });
 
-      if (operator && newOperators.some((op) => op.key === operator)) {
-        self.operator = operator;
+      if (normalized.operator && newOperators.some((op) => op.key === normalized.operator)) {
+        self.operator = normalized.operator;
       } else {
         self.operator = newOperators[0].key;
       }
 
-      if (value !== undefined && value !== null) {
-        self.setValue(value);
+      const sanitizedValue =
+        normalized.value !== undefined && normalized.value !== null
+          ? sanitizeIntegerUserListValue(normalized.value, { fieldAlias, operator: self.operator })
+          : normalized.value;
+
+      if (sanitizedValue !== undefined && sanitizedValue !== null) {
+        self.setValue(sanitizedValue);
       } else {
         self.setDefaultValue();
       }
@@ -207,14 +326,28 @@ export const TabFilter = types
     },
 
     setOperator(operator) {
+      const previousOperator = self.operator;
       const previousValueType = self.componentValueType;
+      const previousValue = self.value;
 
       if (self.operator !== operator) {
         self.markUnsaved();
         self.operator = operator;
       }
 
-      if (previousValueType !== self.componentValueType) {
+      const nextValueType = self.componentValueType;
+      const transition = resolveOperatorValueTransition({
+        previousOperator,
+        nextOperator: operator,
+        previousValueType,
+        nextValueType,
+        previousValue,
+        isListMembershipOperator,
+      });
+
+      if (transition.action === "set") {
+        self.setValue(transition.value);
+      } else if (transition.action === "default") {
         self.setDefaultValue();
       }
 
@@ -222,6 +355,21 @@ export const TabFilter = types
     },
 
     setValue(newValue) {
+      // BROS-1203: `in_list` / `not_in_list` require a JSON array on the wire.
+      // Coerce defensively so that a debounced forced save from FilterOperation
+      // (`save(true)` bypasses isValidFilter) can never PATCH a non-list value
+      // and trip the FilterSerializer 400 — which the FE error renderer can't
+      // display when nested under `filter_group.filters[i].value`.
+      //
+      // Scoped via the shared `isListMembershipOperator` helper: other
+      // `valueType: "list"` filters (e.g. TaskState `contains`) carry a single
+      // state string and the BE applies it via `state__icontains=<value>` —
+      // coercing to `[value]` was sending an array where the BE expects a scalar,
+      // returning zero rows (TC1792 regression).
+      if (isListMembershipOperator(self.operator) && newValue != null && !Array.isArray(newValue)) {
+        self.value = [newValue];
+        return;
+      }
       self.value = newValue;
     },
 
@@ -230,6 +378,10 @@ export const TabFilter = types
     },
 
     save: flow(function* (force = false) {
+      // Defense in depth: locked tabs must not PATCH. Opening Filters remounts
+      // FilterOperation which may call setOperator→save for hydrated rows
+      // (volatile `saved` starts false) — do not toast; the Filters Message banner
+      // is the inspect UX (FIT-2396).
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -238,18 +390,49 @@ export const TabFilter = types
         if (self.wasValid === false && isValid === false) return;
       }
 
-      if (self.saving) return;
+      if (self.view?.isLockedByManager) {
+        return;
+      }
+
+      // Coalesce races onto the in-flight PATCH. A follow-up is scheduled with
+      // setTimeout (same idea as setValueDelayed) so we neither recurse into
+      // this flow nor yield another save from finally.
+      if (self.saving) {
+        self.pendingSave = true;
+        return;
+      }
 
       self.saving = true;
       self.wasValid = isValid;
       self.markSaved();
       getRoot(self)?.unsetSelection();
       self.view?.clearSelection();
-      yield self.view?.save({ interaction: "filter" });
-      self.saving = false;
+      try {
+        yield self.view?.save({ interaction: "filter" });
+      } finally {
+        if (isAlive(self)) {
+          self.saving = false;
+          if (self.pendingSave) {
+            self.pendingSave = false;
+            self.markUnsaved();
+            setTimeout(() => {
+              if (!isAlive(self)) return;
+              self.save(true);
+            }, 0);
+          }
+        }
+      }
     }),
 
     setDefaultValue() {
+      // Child review indicators use Boolean widgets on Number columns, so they
+      // do not get Boolean defaultValue=false. Default to no so the child is
+      // valid and serialized (otherwise the UI shows "no" while the child is dropped).
+      const alias = self.filter?.field?.alias;
+      if (self.isNestedChildFilter && REVIEW_INDICATOR_CHILD_ALIASES.has(alias)) {
+        self.setValue(false);
+        return;
+      }
       self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 
@@ -267,10 +450,14 @@ export const TabFilter = types
     },
 
     saveDelayed: debounce(() => {
+      if (!isAlive(self)) return;
       self.save();
     }, 300),
   }))
-  .preProcessSnapshot((sn) => {
-    if (!sn) return sn;
-    return { ...sn, value: sn.value ?? null };
+  .preProcessSnapshot((snapshot) => normalizeChildFilterSnapshot(recoverFilterSnapshot(snapshot)))
+  .postProcessSnapshot((snapshot) => {
+    const canonicalSnapshot = { ...snapshot };
+
+    delete canonicalSnapshot.apply_legacy_child_filter;
+    return canonicalSnapshot;
   });

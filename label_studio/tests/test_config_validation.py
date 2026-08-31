@@ -123,7 +123,7 @@ def test_parse_all_configs():
     result = [y for x in os.walk(folder_wildcard) for y in glob.glob(os.path.join(x[0], '*.xml'))]
     for file in result:
         print(f'Parsing config: {file}')
-        with open(file, mode='r') as f:
+        with open(file, mode='r', encoding='utf-8') as f:
             config = f.read()
             assert parse_config(config)
             assert parse_config_to_json(config)
@@ -210,6 +210,29 @@ def test_parse_wrong_xml(business_client, project_id):
 
 
 @pytest.mark.django_db
+def test_validate_label_config_with_xml_encoding_declaration_returns_400(business_client, project_id):
+    """lxml raises ValueError on a str carrying an XML encoding declaration; the validate
+    endpoint must surface that as 400 instead of leaking a 500."""
+    payload = {
+        'label_config': (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<View>'
+            '<Text name="text" value="$text"/>'
+            '<Choices name="sentiment" toName="text">'
+            '<Choice value="Positive"/><Choice value="Negative"/>'
+            '</Choices>'
+            '</View>'
+        )
+    }
+    response = business_client.post(
+        f'/api/projects/{project_id}/validate',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
 def test_label_config_versions(business_client, project_id):
     with io.open(os.path.join(os.path.dirname(__file__), 'test_data/data_for_test_label_config_matrix.yml')) as f:
         test_suites = yaml.safe_load(f)
@@ -222,6 +245,147 @@ def test_label_config_versions(business_client, project_id):
         )
         logger.warning(f'Test: {test_name}')
         assert response.status_code == test_content['status_code']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('saved_result_model', ['annotation', 'draft'])
+def test_separated_video_vector_config_with_existing_result_validates(business_client, project_id, saved_result_model):
+    """Unchanged separated Labels + VideoVector configs must validate after saved results exist.
+
+    VideoVector results store the selected label under the VideoVector control name
+    (``box``), but the label values are declared in the sibling ``Labels`` tag.
+    Project config validation must treat this as compatible instead of showing a
+    false "Please add labels to tag with name=\"box\"" error in the UI preview.
+    """
+    label_config = """
+    <View>
+      <Labels name="labels" toName="video">
+        <Label value="Road"/>
+        <Label value="Boundary" background="gold"/>
+        <Label value="Area51" background="cyan"/>
+      </Labels>
+      <Video name="video" value="$video" framerate="25.0"/>
+      <VideoVector name="box" toName="video"/>
+    </View>
+    """
+
+    response = business_client.patch(
+        f'/api/projects/{project_id}',
+        data=json.dumps({'label_config': label_config}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+
+    project = Project.objects.get(pk=project_id)
+    task = make_task({'data': {'video': '/static/samples/opossum_snow.mp4'}}, project)
+    result = [
+        {
+            'id': 'video-vector-road',
+            'from_name': 'box',
+            'to_name': 'video',
+            'type': 'videovector',
+            'origin': 'manual',
+            'value': {
+                'labels': ['Road'],
+                'sequence': [
+                    {
+                        'frame': 0,
+                        'enabled': True,
+                        'closed': False,
+                        'vertices': [
+                            {'x': 10, 'y': 10, 'id': 'p1'},
+                            {'x': 20, 'y': 20, 'id': 'p2'},
+                            {'x': 30, 'y': 15, 'id': 'p3'},
+                        ],
+                    }
+                ],
+            },
+        }
+    ]
+    if saved_result_model == 'annotation':
+        make_annotation({'result': result}, task.id)
+    else:
+        from tasks.models import AnnotationDraft
+
+        AnnotationDraft.objects.create(task=task, user=project.created_by, result=result)
+
+    response = business_client.post(
+        f'/api/projects/{project_id}/validate',
+        data=json.dumps({'label_config': label_config}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_video_vector_labels_do_not_mask_removed_labels_from_unrelated_controls(business_client, project_id):
+    """VideoVector compatibility labels must be scoped to the current video control.
+
+    Keeping ``Road`` in a sibling VideoVector label tag must not let an unrelated
+    text labeling control remove ``Road`` while existing text annotations still use it.
+    """
+    label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+      <Labels name="text_labels" toName="text">
+        <Label value="Road"/>
+        <Label value="Tree"/>
+      </Labels>
+      <Labels name="video_labels" toName="video">
+        <Label value="Road"/>
+      </Labels>
+      <Video name="video" value="$video" framerate="25.0"/>
+      <VideoVector name="box" toName="video"/>
+    </View>
+    """
+    response = business_client.patch(
+        f'/api/projects/{project_id}',
+        data=json.dumps({'label_config': label_config}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+
+    project = Project.objects.get(pk=project_id)
+    task = make_task({'data': {'text': 'Road ahead', 'video': '/static/samples/opossum_snow.mp4'}}, project)
+    make_annotation(
+        {
+            'result': [
+                {
+                    'id': 'text-road',
+                    'from_name': 'text_labels',
+                    'to_name': 'text',
+                    'type': 'labels',
+                    'origin': 'manual',
+                    'value': {'start': 0, 'end': 4, 'text': 'Road', 'labels': ['Road']},
+                }
+            ]
+        },
+        task.id,
+    )
+
+    updated_label_config = """
+    <View>
+      <Text name="text" value="$text"/>
+      <Labels name="text_labels" toName="text">
+        <Label value="Tree"/>
+      </Labels>
+      <Labels name="video_labels" toName="video">
+        <Label value="Road"/>
+      </Labels>
+      <Video name="video" value="$video" framerate="25.0"/>
+      <VideoVector name="box" toName="video"/>
+    </View>
+    """
+    response = business_client.post(
+        f'/api/projects/{project_id}/validate',
+        data=json.dumps({'label_config': updated_label_config}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == 400
+    assert 'Road' in response.content.decode()
+    assert 'text_labels' in response.content.decode()
 
 
 # Tag attribute validation: validate_label_config calls SDK _tag_attribute_validation

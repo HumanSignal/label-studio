@@ -1,9 +1,12 @@
-import { FF_NEW_STORAGES, FF_THEME_TOGGLE } from "./flags";
+import {
+  FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT,
+  FF_INTERFACES,
+  FF_INTERFACES_AGENT_WORKFLOW,
+  FF_NEW_STORAGES,
+  FF_SEGMENT_ANYTHING_ML_BACKEND,
+  FF_THEME_TOGGLE,
+} from "./flags";
 
-const FEATURE_FLAGS = window.APP_SETTINGS?.feature_flags || {};
-
-// TODO: remove the override + if statement once LSE and LSO start building
-// react the same way and `fflag_fix_front_lsdv_4620_memory_leaks_100723_short` is removed
 const FLAGS_OVERRIDE: Record<string, boolean> = {
   // While it's safe to have overrides living here forever,
   // they could disrupt others' work if left. Keep it clean
@@ -13,18 +16,21 @@ const FLAGS_OVERRIDE: Record<string, boolean> = {
   // [FF_FLAG_NAME]: boolean
   [FF_NEW_STORAGES]: true,
   [FF_THEME_TOGGLE]: true,
+  // Remove before merging — local dev testing for vertical annotations sidebar
+  [FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT]: true,
 };
 
 /**
  * Checks if the Feature Flag is active or not.
  */
 export const isActive = (id: string) => {
+  const flags = window.APP_SETTINGS?.feature_flags || {};
   const defaultValue = window.APP_SETTINGS?.feature_flags_default_value === true;
   const isSentryOSS =
     window?.APP_SETTINGS?.sentry_environment === "opensource" || process.env.NODE_ENV === "development";
 
   if (isSentryOSS && id in FLAGS_OVERRIDE) return FLAGS_OVERRIDE[id];
-  if (id in FEATURE_FLAGS) return FEATURE_FLAGS[id] ?? defaultValue;
+  if (id in flags) return flags[id] ?? defaultValue;
 
   return defaultValue;
 };
@@ -45,12 +51,21 @@ export const isFlagEnabled = (id: string, flagList: Record<string, boolean>, def
  * @deprecated Use `isActive` instead
  */
 export function isFF(id: string) {
-  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
   const override: Record<string, boolean> = FLAGS_OVERRIDE;
   if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
     return override[id];
   }
-  return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
+  return isFlagEnabled(
+    id,
+    window.APP_SETTINGS?.feature_flags || {},
+    window.APP_SETTINGS?.feature_flags_default_value === true,
+  );
 }
+
+/** True when the editor should render the SAM interactive UI. */
+export const isSegmentAnythingEditorEnabled = () => isActive(FF_SEGMENT_ANYTHING_ML_BACKEND);
+
+/** Agent chat/plan flow inside Interfaces; gated separately from the base Interfaces product flag. */
+export const isInterfacesAgentWorkflowEnabled = () => isActive(FF_INTERFACES) && isActive(FF_INTERFACES_AGENT_WORKFLOW);
 
 export * from "./flags";

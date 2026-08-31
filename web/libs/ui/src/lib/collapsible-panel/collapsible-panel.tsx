@@ -1,6 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { CaretDownIcon } from "@humansignal/icons";
+import { type ReactNode, useState } from "react";
 import { cn } from "../../utils/utils";
-import { IconChevronDown } from "@humansignal/icons";
 import { Button } from "../button/button";
 
 export type CollapsiblePanelProps = {
@@ -90,6 +90,7 @@ export const CollapsiblePanel = ({
         data-testid={dataTestId ? `${dataTestId}-header` : undefined}
       >
         <Button
+          type="button"
           variant="neutral"
           look="string"
           size="small"
@@ -103,7 +104,8 @@ export const CollapsiblePanel = ({
           aria-expanded={isExpanded}
           data-testid="collapsible-panel-toggle"
         >
-          <IconChevronDown
+          <CaretDownIcon
+            weight="bold"
             size={16}
             className={cn("transition-transform ease-out duration-200", !isExpanded && "-rotate-90")}
           />

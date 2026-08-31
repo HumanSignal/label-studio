@@ -27,6 +27,9 @@ export const DynamicModel = (name, columns, properties) => {
       case "List":
         propertyType = typeWrapper(CustomJSON);
         break;
+      case "PaymentStatus":
+        propertyType = types.optional(types.maybeNull(types.frozen()), null);
+        break;
       default:
         propertyType = typeWrapper(types.union(types.string, types.number));
         break;

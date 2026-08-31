@@ -19,6 +19,16 @@ from django.views.static import was_modified_since
 from ranged_fileresponse import RangedFileResponse
 
 
+def static_file_content_type_and_encoding(path: str) -> tuple[str, str | None]:
+    """Return Content-Type and optional Content-Encoding for a static file path."""
+    content_type, encoding = mimetypes.guess_type(path)
+    if content_type:
+        return content_type, encoding
+    if path.endswith('.mjs'):
+        return 'text/javascript', encoding
+    return 'application/octet-stream', encoding
+
+
 def serve(request, path, document_root=None, show_indexes=False, manifest_asset_prefix=None):
     """
     Serve static files below a given point in the directory structure.
@@ -63,8 +73,7 @@ def serve(request, path, document_root=None, show_indexes=False, manifest_asset_
     statobj = fullpath.stat()
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), statobj.st_mtime):
         return HttpResponseNotModified()
-    content_type, encoding = mimetypes.guess_type(str(fullpath))
-    content_type = content_type or 'application/octet-stream'
+    content_type, encoding = static_file_content_type_and_encoding(str(fullpath))
 
     response = RangedFileResponse(request, fullpath.open('rb'), content_type=content_type)
     response['Last-Modified'] = http_date(statobj.st_mtime)

@@ -1,5 +1,6 @@
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Checkbox, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { Button, Checkbox } from "@humansignal/ui";
+import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
 import { observer } from "mobx-react";
 import type { PropsWithChildren } from "react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
