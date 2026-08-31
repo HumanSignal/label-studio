@@ -943,6 +943,15 @@ class ProjectAnnotatorsAPI(generics.RetrieveAPIView):
             .values_list('completed_by_id', flat=True)
             .distinct()
         )
-        users = User.objects.filter(id__in=annotator_ids).prefetch_related('om_through').order_by('id')
+        users = (
+            User.objects.filter(
+                id__in=annotator_ids,
+                om_through__organization=project.organization,
+                om_through__deleted_at__isnull=True,
+            )
+            .distinct()
+            .prefetch_related('om_through')
+            .order_by('id')
+        )
         data = UserSimpleSerializer(users, many=True, context={'request': request}).data
         return Response(data)

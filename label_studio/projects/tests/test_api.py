@@ -4,12 +4,14 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from organizations.models import OrganizationMember
 from projects.api import ProjectListAPI
 from projects.models import ProjectManager, ProjectQuerySetWithFSM
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APIClient, APIRequestFactory, APITestCase, force_authenticate
 from tasks.models import Task
-from tasks.tests.factories import PredictionFactory, TaskFactory
+from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestProjectListAPI(APITestCase):
@@ -200,3 +202,26 @@ class TestProjectModelVersionsAPI(APITestCase):
         assert response.json()['static'][1]['count'] == 1
         assert response.json()['static'][2]['model_version'] == 'model_1'
         assert response.json()['static'][2]['count'] == 2
+
+
+class TestProjectAnnotatorsAPI(APITestCase):
+    def test_options_are_project_scoped_and_exclude_deleted_members(self):
+        project = ProjectFactory()
+        visible = UserFactory(active_organization=project.organization)
+        deleted = UserFactory(active_organization=project.organization)
+        other_project = ProjectFactory(organization=project.organization, created_by=project.created_by)
+        other_project_user = UserFactory(active_organization=project.organization)
+        AnnotationFactory(project=project, task=TaskFactory(project=project), completed_by=visible)
+        AnnotationFactory(project=project, task=TaskFactory(project=project), completed_by=deleted)
+        AnnotationFactory(
+            project=other_project,
+            task=TaskFactory(project=other_project),
+            completed_by=other_project_user,
+        )
+        OrganizationMember.objects.get(organization=project.organization, user=deleted).soft_delete()
+        self.client.force_authenticate(user=project.created_by)
+
+        response = self.client.get(f'/api/projects/{project.id}/annotators/')
+
+        assert response.status_code == 200
+        assert [user['id'] for user in response.json()] == [visible.id]
