@@ -147,9 +147,11 @@ def make_sql_migration(
             return
         should_execute = execute_immediately or not settings.ALLOW_SCHEDULED_MIGRATIONS or settings.CI
         if should_execute:
-            # In CI, force synchronous execution so columns exist before tests run
-            force_sync = settings.CI
+            # Force synchronous execution in CI or when execute_immediately is requested
+            force_sync = settings.CI or execute_immediately
             job_kwargs = {}
+            if execute_immediately:
+                job_kwargs['in_seconds'] = 0
             if queue_name is not None:
                 job_kwargs['queue_name'] = queue_name
             start_migration_job(
