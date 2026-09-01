@@ -114,7 +114,12 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
   isVirtualList?: boolean;
-  /** Max visible items in the virtual list before scrolling (default: 5) */
+  /**
+   * When true with `isVirtualList`, size the dropdown from a sample of the first
+   * option labels (not a full longest-label scan). No-op without `isVirtualList`.
+   */
+  withDynamicWidth?: boolean;
+  /** Max visible items in the virtual list before scrolling (default: ~7.5 / 300px). */
   virtualListMaxVisible?: number;
   loadMore?: () => void;
   pageSize?: number;
