@@ -167,12 +167,17 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
 
         request.user = user
 
+        # Authorize BEFORE serving anything. The token is minted for one (user, project)
+        # pair, but permission can be revoked while the token is still valid, so the
+        # bearer's current access to that project has to be re-checked on every request.
+        # This must guard every branch below — the local-upload branch used to run first
+        # and served bytes without ever reaching this check.
+        if not project.has_permission(user):
+            return _add_cors_headers(Response(status=status.HTTP_403_FORBIDDEN))
+
         decoded_fileuri = _decode_fileuri(fileuri)
         if decoded_fileuri.startswith('/data/upload/'):
             return self._serve_local_upload(decoded_fileuri, project)
-
-        if not project.has_permission(user):
-            return _add_cors_headers(Response(status=status.HTTP_403_FORBIDDEN))
 
         # Delegate to the standard resolve path (presigned redirect or proxy depending on
         # storage.presign). The sandbox iframe fetches this endpoint via a parent-window
@@ -196,10 +201,11 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         try:
             from data_import.models import FileUpload
 
-            upload = FileUpload.objects.select_related('project').get(
-                file=normalized,
-                project__organization=project.organization,
-            )
+            # Scope to the exact project the token was minted for. Filtering by
+            # organization instead would let a token for project A read an upload that
+            # belongs to project B in the same organization — a tenancy leak, since
+            # organization membership does not imply access to every project in it.
+            upload = FileUpload.objects.get(file=normalized, project=project)
         except FileUpload.DoesNotExist:
             return _add_cors_headers(HttpResponse(status=404))
         except Exception as exc:
