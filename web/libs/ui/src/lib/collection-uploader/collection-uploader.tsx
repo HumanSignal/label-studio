@@ -11,6 +11,7 @@
 import { type ChangeEvent, type DragEvent, useCallback, useRef, useState } from "react";
 import { Button } from "../button/button";
 import { cn } from "../../utils/utils";
+import { evaluateSubmissionRules, SubmissionRuleBadges, type SubmissionRules } from "./submission-rules";
 
 export type CollectionUploadRowStatus = "pending" | "uploading" | "uploaded" | "failed" | "cancelled";
 
@@ -37,6 +38,9 @@ export interface CollectionUploaderProps {
    * anywhere over a host surface that will forward the drop here, so the user
    * can see there is somewhere for the file to land. */
   dragActive?: boolean;
+  /** Declared validation rules (`x-ls-validation`): shown as neutral badges in
+   * the dropzone so the contributor knows the bar BEFORE picking a file. */
+  rules?: SubmissionRules | null;
 }
 
 function formatSize(bytes: number): string {
@@ -69,6 +73,7 @@ export const CollectionUploader = ({
   hint,
   className,
   dragActive = false,
+  rules = null,
 }: CollectionUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -124,6 +129,9 @@ export const CollectionUploader = ({
       >
         <span className="font-medium text-neutral-content">Drag &amp; drop or click to browse</span>
         {hint ? <span className="text-neutral-content-subtler text-sm">{hint}</span> : null}
+        {rules ? (
+          <SubmissionRuleBadges results={evaluateSubmissionRules(null, rules)} className="justify-center" />
+        ) : null}
         <input
           ref={inputRef}
           type="file"
