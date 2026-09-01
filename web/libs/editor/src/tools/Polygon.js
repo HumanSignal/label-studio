@@ -121,7 +121,7 @@ const _Tool = types
       if (region.type !== "polygonregion" || !region.closed || region.hidden || region.filtered) return false;
       if (region.isDrawing || region.locked || region.readonly) return false;
       if (annotation?.editable === false || annotation?.isDrawing || annotation?.isReadOnly?.()) return false;
-      if (region.isReadOnly?.() !== false) return false;
+      if (region.isReadOnly?.()) return false;
       if (region.annotation !== annotation || region.object !== self.obj || region.control !== self.control)
         return false;
       if (typeof region.replacePoints !== "function" || typeof region.notifyDrawingFinished !== "function")

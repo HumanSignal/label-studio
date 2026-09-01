@@ -16,7 +16,7 @@ Use with the following data types: image.
 
 When the `fflag_feat_front_polygon_freehand` feature flag is enabled, select the Polygon tool and press and drag to draw a contour with a mouse, pen, or primary touch. The contour is simplified when the pointer is released and is saved as one undoable polygon.
 
-To repair part of an existing polygon, select it with the Polygon tool, then drag from one contour edge to another. The traced path replaces the matching section of the contour and is saved as one undoable edit. Start and finish near the edge; releasing away from the contour cancels the repair. Point handles, polygon movement, and a short edge click keep their existing behavior.
+To repair part of an existing polygon, select it with the Polygon tool, then drag from one contour edge to another. The traced path replaces the matching section of the contour and is saved as one undoable edit. Start and finish near the edge; releasing away from the contour cancels the repair. Repair takes precedence near the contour; drag from the polygon interior to move the whole polygon. A short edge click keeps the existing point-insertion behavior.
 
 The flag is off by default; with it disabled, the existing click-to-place and point-editing behaviors are unchanged.
 

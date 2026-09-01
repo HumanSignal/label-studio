@@ -283,6 +283,19 @@ function createFreehandRepairHarness() {
   const borders = { attrs: { name: "borders" }, getParent: () => shapeRef };
   const edge = { attrs: { name: "border_0_1" }, getParent: () => borders };
   const edgeTarget = { getParent: () => edge };
+  const fillTarget = { attrs: { name: "_transformable" }, getParent: () => shapeRef };
+  const anchors = { attrs: { name: "anchors" }, getParent: () => shapeRef };
+  let anchorDraggable = true;
+  const anchorTarget = {
+    attrs: { name: "anchor_4_0" },
+    getParent: () => anchors,
+    draggable: jest.fn(function (...args) {
+      if (args.length === 0) return anchorDraggable;
+      anchorDraggable = args[0];
+      return this;
+    }),
+    stopDrag: jest.fn(),
+  };
   const region = {
     id: "repair-region",
     type: "polygonregion",
@@ -305,7 +318,7 @@ function createFreehandRepairHarness() {
     (candidate) => candidate === region && harness.item.selectedRegions.length === 1,
   );
 
-  return { ...harness, edgeTarget, region, shapeRef };
+  return { ...harness, anchorTarget, edgeTarget, fillTarget, region, shapeRef };
 }
 
 describe("splitRegions", () => {
@@ -1597,9 +1610,10 @@ describe("ImageView with feature flags", () => {
     expect(view().freehandPointerId).toBeNull();
   });
 
-  it("repairs the contour when a drag starts on the selected polygon edge", () => {
+  it("repairs the selected contour when a dense anchor wins the hit test", () => {
     const { isFF } = require("../../../utils/feature-flags");
-    const { commitFreehand, commitFreehandRepair, edgeTarget, region, shapeRef, view } = createFreehandRepairHarness();
+    const { anchorTarget, commitFreehand, commitFreehandRepair, region, shapeRef, view } =
+      createFreehandRepairHarness();
     const preventPointerDown = jest.fn();
     const repairTrace = [
       [35, 6],
@@ -1614,7 +1628,7 @@ describe("ImageView with feature flags", () => {
     isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
     act(() => {
       view().handlePointerDown({
-        target: edgeTarget,
+        target: anchorTarget,
         pointerId: 1,
         isPrimary: true,
         button: 0,
@@ -1642,6 +1656,9 @@ describe("ImageView with feature flags", () => {
     expect(shapeRef.stopDrag).toHaveBeenCalledTimes(1);
     expect(shapeRef.draggable).toHaveBeenCalledWith(false);
     expect(shapeRef.draggable).toHaveBeenLastCalledWith(true);
+    expect(anchorTarget.stopDrag).toHaveBeenCalledTimes(1);
+    expect(anchorTarget.draggable).toHaveBeenCalledWith(false);
+    expect(anchorTarget.draggable).toHaveBeenLastCalledWith(true);
     expect(view().freehandPointerId).toBeNull();
   });
 
@@ -1710,7 +1727,7 @@ describe("ImageView with feature flags", () => {
     expect(shapeRef.draggable).toHaveBeenLastCalledWith(true);
   });
 
-  it("anchors repair to the hit-tested edge when another edge is closer", () => {
+  it("keeps the raw repair start point for release-time contour snapping", () => {
     const { isFF } = require("../../../utils/feature-flags");
     const { edgeTarget, region, view } = createFreehandRepairHarness();
 
@@ -1733,21 +1750,18 @@ describe("ImageView with feature flags", () => {
       });
     });
 
-    expect(view().freehandTrace[0].canvas).toEqual({ x: 30, y: 10 });
+    expect(view().freehandTrace[0].canvas).toEqual({ x: 30, y: 11.5 });
     act(() => view().handlePointerCancel({ pointerId: 1, clientX: 30, clientY: 11.5 }));
   });
 
-  it("does not repair from polygon fill, anchors, or transformer handles", () => {
+  it("starts repair near the contour from polygon fill and anchors, but not elsewhere", () => {
     const { isFF } = require("../../../utils/feature-flags");
-    const { commitFreehandRepair, region, shapeRef, view } = createFreehandRepairHarness();
-    const fill = { attrs: { name: "_transformable" }, getParent: () => shapeRef };
-    const anchors = { attrs: { name: "anchors" }, getParent: () => shapeRef };
-    const anchor = { attrs: { name: "anchor_4_0" }, getParent: () => anchors };
+    const { anchorTarget, commitFreehandRepair, fillTarget, region, view } = createFreehandRepairHarness();
     const transformer = { className: "Transformer", getParent: () => null };
     const transformerHandle = { getParent: () => transformer };
 
     isFF.mockImplementation((flag) => flag === "fflag_feat_front_polygon_freehand");
-    [fill, anchor, transformerHandle].forEach((target, index) => {
+    [fillTarget, anchorTarget].forEach((target, index) => {
       act(() => {
         view().handlePointerDown({
           target,
@@ -1758,11 +1772,33 @@ describe("ImageView with feature flags", () => {
           clientY: 10,
         });
       });
-      expect(view().freehandPointerId).toBeNull();
+      expect(view().freehandMode).toBe("repair");
+      expect(view().freehandRepairRegion).toBe(region);
+      act(() => view().handlePointerCancel({ pointerId: index + 1, clientX: 30, clientY: 10 }));
+    });
+
+    act(() => {
+      view().handlePointerDown({
+        target: fillTarget,
+        pointerId: 3,
+        isPrimary: true,
+        button: 0,
+        clientX: 50,
+        clientY: 50,
+      });
+      view().handlePointerDown({
+        target: transformerHandle,
+        pointerId: 4,
+        isPrimary: true,
+        button: 0,
+        clientX: 30,
+        clientY: 10,
+      });
     });
 
     expect(region.insertPoint).not.toHaveBeenCalled();
     expect(commitFreehandRepair).not.toHaveBeenCalled();
+    expect(view().freehandPointerId).toBeNull();
   });
 
   it("cancels contour repair and restores dragging on pointer cancellation", () => {

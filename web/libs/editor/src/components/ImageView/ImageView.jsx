@@ -30,6 +30,7 @@ import {
   FREEHAND_REPAIR_SNAP_RADIUS,
   FREEHAND_SIMPLIFY_EPSILON,
   buildFreehandRepairContour,
+  findNearestContourPoint,
   isValidFreehandContour,
   simplifyFreehandPoints,
 } from "../../utils/freehand";
@@ -580,7 +581,7 @@ export default observer(
       return tool?.toolName === "PolygonTool" && tool.canStartFreehand && tool.commitFreehand ? tool : null;
     };
 
-    getFreehandRepairTarget = (target, tool, event) => {
+    getFreehandRepairTarget = (target, tool, event, canvasPoint) => {
       if (event?.metaKey || event?.ctrlKey || event?.altKey || event?.shiftKey) return null;
 
       const { item } = this.props;
@@ -607,7 +608,19 @@ export default observer(
         node = node.getParent?.() ?? node.parent ?? null;
       }
 
-      return belongsToRegion && Number.isInteger(edgeIndex) ? { region, edgeIndex } : null;
+      // Dense contours commonly hit an anchor, the fill, or the stage instead of
+      // the invisible edge helper. Resolve the intent from contour geometry while
+      // retaining the normal interaction of unrelated regions and the polygon
+      // interior.
+      if (!belongsToRegion && !this.isToolInteractionTarget(target)) return null;
+      const nearest = findNearestContourPoint(this.getFreehandRepairContour(region), canvasPoint);
+      const zoom = Number.isFinite(item.zoomScale) && item.zoomScale > 0 ? item.zoomScale : 1;
+
+      if (!nearest || nearest.distance > FREEHAND_REPAIR_SNAP_RADIUS / zoom) return null;
+
+      // Keep the hit-tested edge index only for the stock short-click insertion
+      // path; drag endpoints are validated geometrically when committed.
+      return { region, edgeIndex: belongsToRegion && Number.isInteger(edgeIndex) ? edgeIndex : null };
     };
 
     getFreehandRepairContour = (region) =>
@@ -615,20 +628,23 @@ export default observer(
         ({ x, y }) => Number.isFinite(x) && Number.isFinite(y),
       );
 
-    suspendFreehandRepairDragging = (region) => {
-      const node = region?.shapeRef;
+    suspendFreehandRepairDragging = (region, target) => {
+      const nodes = [region?.shapeRef, target].filter(
+        (node, index, candidates) => node?.draggable && candidates.indexOf(node) === index,
+      );
 
-      if (!node?.draggable) return;
-      this.freehandRepairDragState = { node, draggable: node.draggable() };
-      node.stopDrag?.();
-      node.draggable(false);
+      this.freehandRepairDragState = nodes.map((node) => ({ node, draggable: node.draggable() }));
+      this.freehandRepairDragState.forEach(({ node }) => {
+        node.stopDrag?.();
+        node.draggable(false);
+      });
     };
 
     restoreFreehandRepairDragging = () => {
       const dragState = this.freehandRepairDragState;
 
       this.freehandRepairDragState = null;
-      if (dragState?.node?.draggable) dragState.node.draggable(dragState.draggable);
+      dragState?.forEach(({ node, draggable }) => node.draggable?.(draggable));
     };
 
     insertFreehandRepairPoint = (event) => {
@@ -836,35 +852,22 @@ export default observer(
       if (this.freehandPointerId !== null || event.isPrimary === false || (event.button ?? 0) !== 0) return;
 
       const tool = this.getFreehandTool();
-      const repairTarget = this.getFreehandRepairTarget(eventLike.target, tool, event);
-
-      if (!repairTarget && !tool?.canStartFreehand()) return;
-
+      if (!tool) return;
       const { item } = this.props;
 
       item.updateSkipInteractions(eventLike);
       if (item.annotation.isReadOnly()) return;
       if (eventLike.target?.getParent?.()?.className === "Transformer") return;
-      if (!repairTarget && !this.isToolInteractionTarget(eventLike.target)) return;
 
       const point = this.getFreehandPoint(event);
 
       if (!point) return;
+      const repairTarget = this.getFreehandRepairTarget(eventLike.target, tool, event, point.canvas);
 
-      let initialCanvasPoint = point.canvas;
+      if (!repairTarget && !tool?.canStartFreehand()) return;
+      if (!repairTarget && !this.isToolInteractionTarget(eventLike.target)) return;
 
       if (repairTarget) {
-        const contour = this.getFreehandRepairContour(repairTarget.region);
-        const edgeStart = contour[repairTarget.edgeIndex];
-        const edgeEnd = contour[(repairTarget.edgeIndex + 1) % contour.length];
-        const anchor = edgeStart && edgeEnd ? projectPointToEdge(point.canvas, edgeStart, edgeEnd) : null;
-        const zoom = Number.isFinite(item.zoomScale) && item.zoomScale > 0 ? item.zoomScale : 1;
-        const anchorDistanceSquared = anchor
-          ? (anchor.x - point.canvas.x) ** 2 + (anchor.y - point.canvas.y) ** 2
-          : Number.POSITIVE_INFINITY;
-
-        if (!anchor || anchorDistanceSquared > (FREEHAND_REPAIR_SNAP_RADIUS / zoom) ** 2) return;
-        initialCanvasPoint = anchor;
         event.preventDefault?.();
         eventLike.cancelBubble = true;
       }
@@ -877,11 +880,11 @@ export default observer(
       this.freehandRepairEdgeIndex = repairTarget?.edgeIndex ?? null;
       this.freehandTrace = appendFreehandPoint([], {
         ...point.screen,
-        canvas: initialCanvasPoint,
+        canvas: point.canvas,
         internal: point.internal,
       });
-      this.setState({ freehandPoints: [initialCanvasPoint.x, initialCanvasPoint.y] });
-      if (repairTarget) this.suspendFreehandRepairDragging(repairTarget.region);
+      this.setState({ freehandPoints: [point.canvas.x, point.canvas.y] });
+      if (repairTarget) this.suspendFreehandRepairDragging(repairTarget.region, eventLike.target);
 
       const captureTarget = this.props.item.stageRef?.content;
 

@@ -55,15 +55,15 @@ const repairSelectedPolygon = (includeCompatibilityMouseEvents = false) => {
   ImageView.drawingArea.then(($element) => {
     const { width, height } = $element[0].getBoundingClientRect();
     const points = [
-      [width * 0.3, height * 0.2],
-      [width * 0.34, height * 0.17],
-      [width * 0.38, height * 0.15],
-      [width * 0.42, height * 0.14],
-      [width * 0.46, height * 0.13],
-      [width * 0.5, height * 0.14],
-      [width * 0.54, height * 0.15],
-      [width * 0.57, height * 0.17],
-      [width * 0.6, height * 0.2],
+      [width * 0.2, height * 0.2],
+      [width * 0.26, height * 0.16],
+      [width * 0.32, height * 0.13],
+      [width * 0.38, height * 0.11],
+      [width * 0.45, height * 0.1],
+      [width * 0.52, height * 0.11],
+      [width * 0.59, height * 0.13],
+      [width * 0.65, height * 0.16],
+      [width * 0.7, height * 0.2],
     ];
     const pointer = { eventConstructor: "PointerEvent", pointerId: 2, pointerType: "mouse", isPrimary: true };
     let interaction = cy
@@ -167,6 +167,17 @@ describe("Freehand Polygon", () => {
 
     ImageView.clickAtRelative(0.45, 0.45);
     Sidebar.hasSelectedRegions(1);
+    ImageView.toolBar.find('[aria-label="polygon-tool"]').should("have.class", "lsf-tool_active");
+    cy.window().then((win) => {
+      const annotation = win.Htx.annotationStore.selected;
+      const image = annotation.objects.find((object) => object.type === "image");
+      const tool = image.getToolsManager().findSelectedTool();
+      const region = annotation.selectedRegions[0];
+
+      expect(tool.toolName).to.equal("PolygonTool");
+      expect(annotation.selectedRegions).to.have.length(1);
+      expect(tool.canRepairFreehand(region), "repair eligible").to.equal(true);
+    });
 
     LabelStudio.serialize().then((beforeResult) => {
       const before = beforeResult[0];
@@ -178,9 +189,16 @@ describe("Freehand Polygon", () => {
       LabelStudio.serialize().then((afterResult) => {
         const after = afterResult[0];
         const afterPoints = after.value.points.map((point) => [...point]);
+        const retainedBottomVertices = beforePoints
+          .slice(2)
+          .every(([x, y]) =>
+            afterPoints.some(([afterX, afterY]) => Math.abs(afterX - x) < 1e-6 && Math.abs(afterY - y) < 1e-6),
+          );
 
         expect(after.id).to.equal(before.id);
         expect(afterPoints).not.to.deep.equal(beforePoints);
+        expect(afterPoints.length).to.be.greaterThan(beforePoints.length);
+        expect(retainedBottomVertices).to.equal(true);
 
         Hotkeys.undo();
         Sidebar.hasRegions(1);

@@ -225,6 +225,9 @@ describe("Polygon freehand", () => {
 
     expect(context.tool.canRepairFreehand(region)).toBe(true);
 
+    region.isReadOnly.mockReturnValue(undefined);
+    expect(context.tool.canRepairFreehand(region)).toBe(true);
+
     context.annotation.selectedRegions = [region, createRepairRegion(context)];
     expect(context.tool.canRepairFreehand(region)).toBe(false);
 
