@@ -504,9 +504,11 @@ SPECTACULAR_SETTINGS = {
             ('flex', 'Flex'),
             ('viewonly', 'View Only'),
         ),
-        # Membership updates support only the paid upgrade direction. View-Only
-        # creation is exposed separately through the invite contract.
-        'StandardUserTypeEnum': (('standard', 'Standard'),),
+        # Membership updates accept Standard or Flex (View-Only creation stays on invite).
+        'StandardUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('flex', 'Flex'),
+        ),
         'OrganizationPermissionRoleEnum': (
             'OW',
             'AD',
