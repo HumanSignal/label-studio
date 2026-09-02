@@ -14,11 +14,15 @@
  * state what is verified, not guess.
  */
 
+import type React from "react";
+import { Badge } from "../badge/badge";
 import { cn } from "../../utils/utils";
 
 export interface SubmissionRules {
   /** Allowed MIME types, e.g. ["video/mp4", "video/quicktime"]. */
   types?: string[];
+  /** Minimum file size in bytes. */
+  min_bytes?: number;
   /** Maximum file size in bytes. */
   max_bytes?: number;
   /** Minimum media duration in seconds. */
@@ -29,6 +33,8 @@ export interface SubmissionRules {
   orientation?: "portrait" | "landscape";
   /** Minimum resolution: the shorter side, in pixels. */
   min_resolution?: number;
+  /** Maximum resolution: the shorter side, in pixels. */
+  max_resolution?: number;
 }
 
 /** Facts known about a file — pass what is available, omit the rest. */
@@ -95,6 +101,13 @@ export function evaluateSubmissionRules(
       status: m.contentType ? check(rules.types.includes(m.contentType)) : "unknown",
     });
   }
+  if (typeof rules.min_bytes === "number" && rules.min_bytes > 1) {
+    results.push({
+      key: "min_bytes",
+      label: `≥ ${formatBytes(rules.min_bytes)}`,
+      status: typeof m.size === "number" ? check(m.size >= rules.min_bytes) : "unknown",
+    });
+  }
   if (typeof rules.max_bytes === "number" && rules.max_bytes > 0) {
     results.push({
       key: "max_bytes",
@@ -137,13 +150,21 @@ export function evaluateSubmissionRules(
       status: known ? check(Math.min(m.width as number, m.height as number) >= rules.min_resolution) : "unknown",
     });
   }
+  if (typeof rules.max_resolution === "number" && rules.max_resolution > 0) {
+    const known = typeof m.width === "number" && typeof m.height === "number" && m.width > 0 && m.height > 0;
+    results.push({
+      key: "max_resolution",
+      label: `≤ ${rules.max_resolution}px`,
+      status: known ? check(Math.min(m.width as number, m.height as number) <= rules.max_resolution) : "unknown",
+    });
+  }
   return results;
 }
 
-const BADGE_STYLE: Record<SubmissionRuleStatus, string> = {
-  pass: "bg-positive-background text-positive-content",
-  fail: "bg-negative-background text-negative-content",
-  unknown: "bg-neutral-background text-neutral-content-subtle",
+const BADGE_VARIANT: Record<SubmissionRuleStatus, "positive" | "negative" | "neutral"> = {
+  pass: "positive",
+  fail: "negative",
+  unknown: "neutral",
 };
 
 const BADGE_MARK: Record<SubmissionRuleStatus, string> = { pass: "✓", fail: "✕", unknown: "" };
@@ -151,7 +172,8 @@ const BADGE_MARK: Record<SubmissionRuleStatus, string> = { pass: "✓", fail: "�
 /**
  * One badge per declared rule: green when the file satisfies it, red when it
  * does not, neutral while the fact is unknown (nothing picked yet, metadata
- * still loading, or not applicable to this file kind).
+ * still loading, or not applicable to this file kind). Composed from the
+ * design-system Badge so every interface renders the same chips.
  */
 export const SubmissionRuleBadges = ({
   results,
@@ -164,15 +186,40 @@ export const SubmissionRuleBadges = ({
   return (
     <div className={cn("flex flex-wrap gap-tightest", className)} data-testid="submission-rule-badges">
       {results.map((rule) => (
-        <span
+        <Badge
           key={rule.key}
+          variant={BADGE_VARIANT[rule.status]}
+          size="small"
+          shape="rounded"
           data-testid={`submission-rule-${rule.key}-${rule.status}`}
-          className={cn("rounded-small px-tight py-tightest text-xs whitespace-nowrap", BADGE_STYLE[rule.status])}
+          className="whitespace-nowrap"
         >
           {BADGE_MARK[rule.status] ? `${BADGE_MARK[rule.status]} ` : ""}
           {rule.label}
-        </span>
+        </Badge>
       ))}
     </div>
   );
 };
+
+export type SubmissionStatusTone = "positive" | "negative" | "neutral" | "primary";
+
+/**
+ * The submission card's status pill ("Ready to submit", "Submitted",
+ * "Not accepted"…), composed from the design-system Badge so the template and
+ * agent-generated interfaces render one consistent chip instead of hand-styled
+ * pills.
+ */
+export const SubmissionStatusChip = ({
+  tone,
+  children,
+  className,
+}: {
+  tone: SubmissionStatusTone;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <Badge variant={tone} size="small" shape="rounded" data-testid="submission-status-chip" className={className}>
+    {children}
+  </Badge>
+);

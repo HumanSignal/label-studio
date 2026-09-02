@@ -65,6 +65,20 @@ describe("evaluateSubmissionRules", () => {
     expect(evaluateSubmissionRules({ size: 1 }, {} as never)).toEqual([]);
   });
 
+  it("evaluates the size floor and resolution ceiling", () => {
+    const rules = { min_bytes: 5 * 1024 * 1024, max_resolution: 1080 };
+    const small = evaluateSubmissionRules({ size: 1024, width: 4000, height: 3000 }, rules);
+    const byKey = Object.fromEntries(small.map((r) => [r.key, r.status]));
+    expect(byKey).toEqual({ min_bytes: "fail", max_resolution: "fail" });
+
+    const good = evaluateSubmissionRules({ size: 6 * 1024 * 1024, width: 1080, height: 1920 }, rules);
+    expect(good.every((r) => r.status === "pass")).toBe(true);
+
+    const labels = Object.fromEntries(evaluateSubmissionRules(null, rules).map((r) => [r.key, r.label]));
+    expect(labels.min_bytes).toBe("≥ 5.0 MB");
+    expect(labels.max_resolution).toBe("≤ 1080px");
+  });
+
   it("orientation treats a square as valid either way", () => {
     const square = { width: 1000, height: 1000 };
     expect(evaluateSubmissionRules(square, { orientation: "portrait" })[0].status).toBe("pass");
