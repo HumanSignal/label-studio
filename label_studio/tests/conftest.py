@@ -395,6 +395,13 @@ def ml_backend():
         yield m
 
 
+@pytest.fixture
+def mock_gethostbyname():
+    """ML backend hosts in tests are fake, pin them to a public IP so ML_BLOCK_LOCAL_IP validation passes."""
+    with mock.patch('socket.gethostbyname', return_value='121.21.21.21'):
+        yield
+
+
 @pytest.fixture(name='import_from_url')
 def import_from_url():
     with import_from_url_mock() as m:

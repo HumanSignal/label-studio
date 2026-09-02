@@ -224,6 +224,7 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
             assert response_data == response
 
 
+@mock.patch('webhooks.serializers.validate_url_for_ssrf')
 @mock.patch('ml.serializers.validate_upload_url')
 @pytest.mark.parametrize(
     'external_status_code, current_active_ml_backend_url, ml_backend_call_count',
@@ -234,6 +235,7 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
 @pytest.mark.django_db
 def test_creating_activating_new_ml_backend(
     mock_validate_upload_url,
+    mock_validate_webhook_url,
     client_and_token,
     configured_project,
     external_status_code,
@@ -264,7 +266,7 @@ def test_creating_activating_new_ml_backend(
         all_urls = [m.url for m in project.ml_backends.all()]
         connected_ml = [url for url in all_urls if url == current_active_ml_backend_url]
         assert len(connected_ml) == 1, '\n'.join(all_urls)
-        mock_validate_upload_url.assert_called_once_with(my_url, block_local_urls=False)
+        mock_validate_upload_url.assert_called_once_with(my_url, block_local_urls=True)
 
 
 @pytest.mark.django_db

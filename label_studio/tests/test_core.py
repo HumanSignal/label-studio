@@ -1,11 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import types
+from unittest.mock import MagicMock, patch
 
 import pytest
 from core.utils.common import int_from_request
-from core.utils.exceptions import InvalidUploadUrlError, LabelStudioAPIException
-from core.utils.io import validate_upload_url
+from core.utils.exceptions import LabelStudioAPIException, SsrfBlockedUrlError
+from core.utils.io import ssrf_safe_request, validate_upload_url
 from core.utils.params import bool_from_request
 from rest_framework.exceptions import ValidationError
 
@@ -138,27 +139,27 @@ def test_start_browser():
 @pytest.mark.parametrize(
     'url, block_local_urls, raises_exc',
     [
-        ('http://0.0.0.0', True, InvalidUploadUrlError),
+        ('http://0.0.0.0', True, SsrfBlockedUrlError),
         ('http://0.0.0.0', False, None),
-        ('https://0.0.0.0', True, InvalidUploadUrlError),
+        ('https://0.0.0.0', True, SsrfBlockedUrlError),
         ('https://0.0.0.0', False, None),
         # Non-http[s] schemes
-        ('ftp://example.org', True, InvalidUploadUrlError),
-        ('ftp://example.org', False, InvalidUploadUrlError),
-        ('FILE:///etc/passwd', True, InvalidUploadUrlError),
-        ('file:///etc/passwd', False, InvalidUploadUrlError),
+        ('ftp://example.org', True, SsrfBlockedUrlError),
+        ('ftp://example.org', False, SsrfBlockedUrlError),
+        ('FILE:///etc/passwd', True, SsrfBlockedUrlError),
+        ('file:///etc/passwd', False, SsrfBlockedUrlError),
         # Start and end of 127.0.0.0/8
-        ('https://127.0.0.0', True, InvalidUploadUrlError),
-        ('https://127.255.255.255', True, InvalidUploadUrlError),
+        ('https://127.0.0.0', True, SsrfBlockedUrlError),
+        ('https://127.255.255.255', True, SsrfBlockedUrlError),
         # Start and end of 10.0.0.0/8
-        ('http://10.0.0.0', True, InvalidUploadUrlError),
-        ('https://10.255.255.255', True, InvalidUploadUrlError),
+        ('http://10.0.0.0', True, SsrfBlockedUrlError),
+        ('https://10.255.255.255', True, SsrfBlockedUrlError),
         # Start and end of 172.16.0.0/12
-        ('https://172.16.0.0', True, InvalidUploadUrlError),
-        ('https://172.31.255.255', True, InvalidUploadUrlError),
+        ('https://172.16.0.0', True, SsrfBlockedUrlError),
+        ('https://172.31.255.255', True, SsrfBlockedUrlError),
         # Start and end of 192.168.0.0/16
-        ('https://192.168.0.0', True, InvalidUploadUrlError),
-        ('https://192.168.255.255', True, InvalidUploadUrlError),
+        ('https://192.168.0.0', True, SsrfBlockedUrlError),
+        ('https://192.168.255.255', True, SsrfBlockedUrlError),
         # Valid external IPs
         ('https://4.4.4.4', True, None),
         ('https://8.8.8.8', True, None),
@@ -167,12 +168,12 @@ def test_start_browser():
         ('https://example.org', True, None),
         ('http://example.org', False, None),
         # Space prepended to otherwise valid external IP
-        (' http://8.8.8.8', False, InvalidUploadUrlError),
+        (' http://8.8.8.8', False, SsrfBlockedUrlError),
         # Host that doesn't resolve
         ('http://example', False, LabelStudioAPIException),
         ('http://example', True, LabelStudioAPIException),
         # localhost
-        ('http://localhost', True, InvalidUploadUrlError),
+        ('http://localhost', True, SsrfBlockedUrlError),
         ('http://localhost', False, None),
     ],
 )
@@ -185,3 +186,38 @@ def test_core_validate_upload_url(url, block_local_urls, raises_exc):
 
     with pytest.raises(raises_exc):
         validate_upload_url(url, block_local_urls=block_local_urls)
+
+
+def test_core_validate_upload_url_calls_validate_url_for_ssrf():
+    with patch('core.utils.io.validate_url_for_ssrf') as mock_validate:
+        validate_upload_url('https://example.org', block_local_urls=False)
+
+    mock_validate.assert_called_once_with('https://example.org', block_local_urls=False)
+
+
+def test_ssrf_safe_request_validates_and_forwards_request():
+    fake_response = MagicMock()
+    fake_response.raw._connection.sock.getpeername.return_value = ('8.8.8.8', 443)
+
+    with (
+        patch('core.utils.io.validate_url_for_ssrf') as mock_validate_url,
+        patch('core.utils.io.validate_ip') as mock_validate_ip,
+        patch('core.utils.io.requests.request', return_value=fake_response) as mock_request,
+    ):
+        response = ssrf_safe_request(
+            'POST',
+            'https://example.org/webhook',
+            block_local_urls=True,
+            json={'action': 'PROJECT_UPDATED'},
+            timeout=1.0,
+        )
+
+    assert response is fake_response
+    mock_validate_url.assert_called_once_with('https://example.org/webhook', block_local_urls=True)
+    mock_request.assert_called_once_with(
+        'POST',
+        'https://example.org/webhook',
+        json={'action': 'PROJECT_UPDATED'},
+        timeout=1.0,
+    )
+    mock_validate_ip.assert_called_once_with('8.8.8.8')
