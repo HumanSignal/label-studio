@@ -1664,9 +1664,7 @@ class ProjectSummary(models.Model):
     def update_created_annotations_and_labels(self, annotations):
         # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
         # other backends would raise OperationalError on every call
-        if connection.vendor == 'postgresql' and flag_set(
-            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
-        ):
+        if connection.vendor == 'postgresql':
             try:
                 self._atomic_update_created_annotations_and_labels(annotations)
                 return
@@ -1790,9 +1788,7 @@ class ProjectSummary(models.Model):
     def update_created_labels_drafts(self, drafts):
         # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
         # other backends would raise OperationalError on every call
-        if connection.vendor == 'postgresql' and flag_set(
-            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
-        ):
+        if connection.vendor == 'postgresql':
             try:
                 self._atomic_update_created_labels_drafts(drafts)
                 return
