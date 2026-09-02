@@ -266,7 +266,7 @@ def test_creating_activating_new_ml_backend(
         all_urls = [m.url for m in project.ml_backends.all()]
         connected_ml = [url for url in all_urls if url == current_active_ml_backend_url]
         assert len(connected_ml) == 1, '\n'.join(all_urls)
-        mock_validate_upload_url.assert_called_once_with(my_url, block_local_urls=False)
+        mock_validate_upload_url.assert_called_once_with(my_url, block_local_urls=True)
 
 
 @pytest.mark.django_db
