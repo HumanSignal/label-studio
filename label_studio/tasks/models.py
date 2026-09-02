@@ -288,7 +288,13 @@ class Task(TaskMixin, FsmHistoryStateModel):
             if rejected_q:
                 q &= rejected_q
 
-        return q | Q(ground_truth=True)
+        exclude_q = q | Q(ground_truth=True)
+
+        extra_q = self.get_lock_extra_exclude_query()
+        if extra_q:
+            exclude_q |= extra_q
+
+        return exclude_q
 
     def has_lock(self, user=None):
         """

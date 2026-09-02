@@ -3,9 +3,12 @@ class TaskMixin:
         """Called by Task#has_permission"""
         return True
 
+    def get_current_overlap(self) -> int:
+        """Distinct annotators with completed annotations."""
+        return self.completed_annotations.values('completed_by').distinct().count()
+
     def _get_is_labeled_value(self) -> bool:
-        n = self.completed_annotations.values('completed_by').distinct().count()
-        return n >= self.overlap
+        return self.get_current_overlap() >= self.overlap
 
     def update_is_labeled(self, *args, **kwargs) -> None:
         self.is_labeled = self._get_is_labeled_value()
@@ -29,6 +32,10 @@ class TaskMixin:
 
     def get_rejected_query(self):
         pass
+
+    def get_lock_extra_exclude_query(self):
+        """Extra annotations that must not hold lock capacity (ORed in; LSE frees ``redistribute``)."""
+        return None
 
     def can_be_skipped(self) -> bool:
         return True
