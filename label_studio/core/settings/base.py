@@ -464,6 +464,11 @@ SPECTACULAR_SETTINGS = {
             ('COMPLETED', 'Completed'),
             ('FAILED', 'Failed'),
         ),
+        'RejectActionEnum': (
+            ('remove', 'Remove'),
+            ('requeue', 'Requeue'),
+            ('redistribute', 'Redistribute'),
+        ),
         # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
         # FIT-2196), which can appear in responses but is never assignable via role APIs.
         'OrganizationRoleEnum': (

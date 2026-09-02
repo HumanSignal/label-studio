@@ -277,3 +277,8 @@ export const FF_ASK_AI_ANNOTATOR_MODE = "fflag_utc_1233_admin_sees_worker_toggle
  * a slower ordinary answer rather than a broken one.
  */
 export const FF_ASK_AI_AGENT = "fflag_utc_1233_ask_ai_agent";
+
+/**
+ * Configurable reject actions, including requeueing work to another annotator.
+ */
+export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_short";
