@@ -55,7 +55,7 @@ export const loadLiveTipsCollection = () => {
   const abortController = new AbortController();
 
   // Abort the request after MAX_TIMEOUT milliseconds to ensure we won't wait for too long, something might be wrong with the network or it could be an air-gapped instance
-  const abortTimeout = setTimeout(abortController.abort, MAX_TIMEOUT);
+  const abortTimeout = setTimeout(() => abortController.abort(), MAX_TIMEOUT);
 
   // Fetch from github raw liveContent.json proxied through the server
   fetch("/heidi-tips", {
