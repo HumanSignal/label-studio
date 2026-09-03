@@ -361,7 +361,7 @@ const ConfigureColumns = ({ columns, template }) => {
       <h4>Configure data</h4>
       {template.objects.length > 1 && columns?.length > 0 && columns.length < template.objects.length && (
         <p className={configClass.elem("object-error").toClassName()}>
-          This template requires more data then you have for now
+          This template requires more data than you have for now
         </p>
       )}
       {columns?.length === 0 && (
