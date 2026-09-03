@@ -226,6 +226,26 @@
     "description": "Pan around the image"
   },
 
+  "tool:pan-on-zoom-left": {
+    "key": "left",
+    "description": "Pan a zoomed image left"
+  },
+
+  "tool:pan-on-zoom-right": {
+    "key": "right",
+    "description": "Pan a zoomed image right"
+  },
+
+  "tool:pan-on-zoom-up": {
+    "key": "up",
+    "description": "Pan a zoomed image up"
+  },
+
+  "tool:pan-on-zoom-down": {
+    "key": "down",
+    "description": "Pan a zoomed image down"
+  },
+
   "tool:zoom-to-fit": {
     "key": "shift+1",
     "description": "Zoom to fit the full image in view"
