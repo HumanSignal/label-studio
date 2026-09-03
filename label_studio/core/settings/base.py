@@ -410,6 +410,15 @@ RQ_QUEUES = {
     },
 }
 
+# django-rq >= 4 defaults this to True, which mounts an unwrapped stats.json under /admin/
+RQ_SHOW_ADMIN_LINK = False
+
+RQ = {
+    # django-rq >= 4 defaults to 'on_db_commit', which defers the enqueue and returns None
+    # from enqueue() inside an atomic block; callers here rely on the returned job
+    'COMMIT_MODE': 'auto',
+}
+
 # How long to keep failed RQ jobs (in seconds); default is 30 days
 RQ_FAILED_JOB_TTL = int(get_env('RQ_FAILED_JOB_TTL', 30 * 24 * 60 * 60))
 
