@@ -392,11 +392,22 @@ export default types
 
       const entity = self.annotationStore.selected;
 
-      entity?.submissionInProgress();
-
       if (self.hasInterface("review")) {
-        self.rejectAnnotation();
+        const configured = self.customButtons?.get("reject");
+        const rejectButtons = Array.isArray(configured) ? configured : configured ? [configured] : [];
+        const rejectMenuButtons = rejectButtons.filter((button) => typeof button !== "string" && button.menu);
+
+        if (rejectMenuButtons.length > 1) {
+          window.dispatchEvent(new CustomEvent("lsf:open-reject-menu"));
+        } else if (rejectMenuButtons.length === 1) {
+          entity?.submissionInProgress();
+          self.handleCustomButton?.(rejectMenuButtons[0]);
+        } else {
+          entity?.submissionInProgress();
+          self.rejectAnnotation();
+        }
       } else {
+        entity?.submissionInProgress();
         self.skipTask();
       }
     }

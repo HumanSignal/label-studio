@@ -19,8 +19,13 @@ export const CustomButton = types
     look: types.maybe(types.enumeration(["filled", "outlined", "string"])),
     size: types.maybe(types.enumeration(["medium", "small", "smaller"])),
     tooltip: types.maybe(types.string),
+    /** Secondary line rendered under the title when the button is shown as a menu row. */
+    description: types.maybe(types.string),
+    /** Marks the row a split-button trigger commits to in one click, whatever its menu position. */
+    isPrimary: types.maybe(types.boolean),
     ariaLabel: types.maybe(types.string),
     disabled: types.maybe(types.boolean),
+    menu: types.maybe(types.boolean),
     props: types.maybe(types.frozen()),
   })
   .actions((self) => ({
