@@ -16,6 +16,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { InviteLink } from "../Organization/PeoplePage/InviteLink";
 import type { Page } from "../types/Page";
+import { ViewAllProjectsLink } from "./ViewAllProjectsLink";
 import {
   creationDialogOpen,
   invitationOpen,
@@ -169,10 +170,7 @@ export const HomePage: Page = () => {
             title={
               data && data?.count > 0 ? (
                 <>
-                  Recent Projects{" "}
-                  <a href="/projects" className="text-lg font-normal hover:underline">
-                    View All
-                  </a>
+                  Recent Projects <ViewAllProjectsLink />
                 </>
               ) : null
             }
