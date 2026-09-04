@@ -478,7 +478,12 @@ const Model = types
     },
 
     get persistentFingerprint() {
-      return { task: getRoot(self).task?.id };
+      // tag and overviewwidth invalidate the stored view on config change
+      return {
+        task: getRoot(self).task?.id,
+        tag: self.name,
+        overviewwidth: self.overviewwidth,
+      };
     },
 
     states() {
