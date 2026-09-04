@@ -101,18 +101,21 @@ export function evaluateSubmissionRules(
       status: m.contentType ? check(rules.types.includes(m.contentType)) : "unknown",
     });
   }
+  // iOS Safari can report size 0 for camera captures and iCloud-optimized
+  // picks until the blob is actually read — 0 is "unknown", never a verdict.
+  const sizeKnown = typeof m.size === "number" && m.size > 0;
   if (typeof rules.min_bytes === "number" && rules.min_bytes > 1) {
     results.push({
       key: "min_bytes",
       label: `≥ ${formatBytes(rules.min_bytes)}`,
-      status: typeof m.size === "number" ? check(m.size >= rules.min_bytes) : "unknown",
+      status: sizeKnown ? check((m.size as number) >= rules.min_bytes) : "unknown",
     });
   }
   if (typeof rules.max_bytes === "number" && rules.max_bytes > 0) {
     results.push({
       key: "max_bytes",
       label: `≤ ${formatBytes(rules.max_bytes)}`,
-      status: typeof m.size === "number" ? check(m.size <= rules.max_bytes) : "unknown",
+      status: sizeKnown ? check((m.size as number) <= rules.max_bytes) : "unknown",
     });
   }
   const minDur = typeof rules.min_duration === "number" ? rules.min_duration : undefined;
@@ -189,8 +192,7 @@ export const SubmissionRuleBadges = ({
         <Badge
           key={rule.key}
           variant={BADGE_VARIANT[rule.status]}
-          size="small"
-          shape="rounded"
+          shape="squared"
           data-testid={`submission-rule-${rule.key}-${rule.status}`}
           className="whitespace-nowrap"
         >

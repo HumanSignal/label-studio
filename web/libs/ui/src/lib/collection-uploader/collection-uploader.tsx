@@ -9,8 +9,10 @@
  */
 
 import { type ChangeEvent, type DragEvent, useCallback, useRef, useState } from "react";
+import { IconUploadOutline } from "../../assets/icons";
 import { Button } from "../button/button";
 import { cn } from "../../utils/utils";
+import { EmptyState } from "../empty-state/empty-state";
 import { evaluateSubmissionRules, SubmissionRuleBadges, type SubmissionRules } from "./submission-rules";
 
 export type CollectionUploadRowStatus = "pending" | "uploading" | "uploaded" | "failed" | "cancelled";
@@ -127,11 +129,18 @@ export const CollectionUploader = ({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
       >
-        <span className="font-medium text-neutral-content">Drag &amp; drop or click to browse</span>
-        {hint ? <span className="text-neutral-content-subtler text-sm">{hint}</span> : null}
-        {rules ? (
-          <SubmissionRuleBadges results={evaluateSubmissionRules(null, rules)} className="justify-center" />
-        ) : null}
+        <EmptyState
+          size="small"
+          variant={highlighted ? "primary" : "neutral"}
+          icon={<IconUploadOutline />}
+          title="Drag & drop or click to browse"
+          description={hint}
+          additionalContent={
+            rules ? (
+              <SubmissionRuleBadges results={evaluateSubmissionRules(null, rules)} className="justify-center" />
+            ) : null
+          }
+        />
         <input
           ref={inputRef}
           type="file"

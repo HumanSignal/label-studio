@@ -63,3 +63,30 @@ def test_export_fallback_refuses_a_key_outside_the_project():
 
 def test_export_fallback_ignores_non_string_uris():
     assert resolve_own_collection_export_storage({'not': 'a string'}, _project()) is None
+
+
+def test_export_storage_resolves_urls_without_the_import_api():
+    """can_resolve_url on a real export storage, no mocks.
+
+    It used to raise AttributeError (can_resolve_scheme lived on ImportStorage
+    only), which surfaced as an HTTP 500 on every stored-submission preview for
+    projects whose import storages don't cover the submissions bucket.
+    """
+    from io_storages.s3.models import S3ExportStorage
+
+    storage = S3ExportStorage(bucket='shared-export')
+    assert storage.can_resolve_url('s3://shared-export/collection/org-7/project-42/submissions/u.mp4')
+    assert not storage.can_resolve_url('s3://other-bucket/collection/org-7/project-42/submissions/u.mp4')
+    assert not storage.can_resolve_url(None)
+
+
+def test_export_fallback_survives_real_storage_objects():
+    """End-to-end through get_storage_by_url with a real S3ExportStorage."""
+    from io_storages.s3.models import S3ExportStorage
+
+    storage = S3ExportStorage(bucket='shared-export')
+    project = SimpleNamespace(id=42, organization_id=7, get_all_export_storage_objects=[storage])
+    own = 's3://shared-export/collection/org-7/project-42/submissions/task-1/u.mp4'
+    foreign = 's3://shared-export/project-99/annotations/secret.json'
+    assert resolve_own_collection_export_storage(own, project) is storage
+    assert resolve_own_collection_export_storage(foreign, project) is None

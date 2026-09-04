@@ -284,6 +284,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
     # attributes, not model fields: there is nothing per-connection to store or
     # migrate, but an org that requires proxy-only access can still turn
     # presigning off instance-wide via EXPORT_STORAGE_PRESIGN.
+    url_scheme = 's3'
     presign = settings.EXPORT_STORAGE_PRESIGN
     presign_ttl = settings.EXPORT_STORAGE_PRESIGN_TTL_MINUTES
 

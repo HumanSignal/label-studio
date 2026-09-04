@@ -317,6 +317,33 @@ class Storage(StorageInfo):
     def validate_connection(self, client=None):
         raise NotImplementedError('validate_connection is not implemented')
 
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
+        return self.can_resolve_scheme(url)
+
+    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
+        # Lives on Storage, not ImportStorage: export targets also resolve URIs
+        # (Data Collection read-back). A storage class that never declares a
+        # url_scheme resolves nothing.
+        if not url or not self.url_scheme:
+            return False
+        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
+        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        bucket_uri = parse_bucket_uri(url, self)
+
+        # If there is a prefix and the bucket matches the storage's bucket/container/path
+        if prefix == self.url_scheme and bucket_uri:
+            # bucket is used for s3 and gcs
+            if hasattr(self, 'bucket') and bucket_uri.bucket == self.bucket:
+                return True
+            # container is used for azure blob
+            if hasattr(self, 'container') and bucket_uri.bucket == self.container:
+                return True
+            # path is used for redis
+            if hasattr(self, 'path') and bucket_uri.bucket == self.path:
+                return True
+        # if not found any occurrences - this Storage can't resolve url
+        return False
+
     class Meta:
         abstract = True
 
@@ -362,30 +389,6 @@ class ImportStorage(Storage):
             Tuple of (BytesIO stream, content_type)
         """
         raise NotImplementedError
-
-    def can_resolve_url(self, url: Union[str, None]) -> bool:
-        return self.can_resolve_scheme(url)
-
-    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
-        if not url:
-            return False
-        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
-        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
-        bucket_uri = parse_bucket_uri(url, self)
-
-        # If there is a prefix and the bucket matches the storage's bucket/container/path
-        if prefix == self.url_scheme and bucket_uri:
-            # bucket is used for s3 and gcs
-            if hasattr(self, 'bucket') and bucket_uri.bucket == self.bucket:
-                return True
-            # container is used for azure blob
-            if hasattr(self, 'container') and bucket_uri.bucket == self.container:
-                return True
-            # path is used for redis
-            if hasattr(self, 'path') and bucket_uri.bucket == self.path:
-                return True
-        # if not found any occurrences - this Storage can't resolve url
-        return False
 
     def resolve_uri(self, uri, task=None):
         # DEPRECATED: use resolve_uris instead.

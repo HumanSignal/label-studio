@@ -79,6 +79,13 @@ describe("evaluateSubmissionRules", () => {
     expect(labels.max_resolution).toBe("≤ 1080px");
   });
 
+  it("treats a zero size as unknown, never a failure (iOS capture quirk)", () => {
+    const rules = { min_bytes: 1048576, max_bytes: 10485760 };
+    const results = evaluateSubmissionRules({ size: 0 }, rules);
+    const byKey = Object.fromEntries(results.map((r) => [r.key, r.status]));
+    expect(byKey).toEqual({ min_bytes: "unknown", max_bytes: "unknown" });
+  });
+
   it("orientation treats a square as valid either way", () => {
     const square = { width: 1000, height: 1000 };
     expect(evaluateSubmissionRules(square, { orientation: "portrait" })[0].status).toBe("pass");
