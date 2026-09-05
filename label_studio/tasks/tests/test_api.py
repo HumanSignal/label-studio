@@ -4,7 +4,7 @@ from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
-from tasks.models import Task
+from tasks.models import Annotation, Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 from users.tests.factories import UserFactory
 
@@ -128,6 +128,55 @@ class TestTaskAPI(APITestCase):
         response_data = response.json()
         assert response_data['project'] == self.project.id
         assert response_data['data'] == {'text': 'test task'}
+
+
+class TestAnnotationAPIOrganizationIsolation(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        attacker_organization = OrganizationFactory(created_by_active_organization=True)
+        cls.attacker = attacker_organization.created_by
+
+        victim_organization = OrganizationFactory(created_by_active_organization=True)
+        victim_project = ProjectFactory(organization=victim_organization)
+        victim_task = TaskFactory(project=victim_project)
+        cls.annotation = AnnotationFactory(
+            task=victim_task,
+            project=victim_project,
+            completed_by=victim_organization.created_by,
+            result=[],
+            lead_time=1.5,
+        )
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.attacker)
+
+    def test_cannot_retrieve_annotation_from_another_organization(self):
+        response = self.client.get(f'/api/annotations/{self.annotation.id}/')
+
+        assert response.status_code == 404
+
+    def test_cannot_update_annotation_from_another_organization(self):
+        response = self.client.patch(
+            f'/api/annotations/{self.annotation.id}/',
+            data={'lead_time': 10},
+            format='json',
+        )
+
+        assert response.status_code == 404
+        self.annotation.refresh_from_db()
+        assert self.annotation.lead_time == 1.5
+
+    def test_cannot_delete_annotation_from_another_organization(self):
+        response = self.client.delete(f'/api/annotations/{self.annotation.id}/')
+
+        assert response.status_code == 404
+        assert Annotation.objects.filter(pk=self.annotation.id).exists()
+
+    def test_cannot_convert_annotation_from_another_organization(self):
+        response = self.client.post(f'/api/annotations/{self.annotation.id}/convert-to-draft')
+
+        assert response.status_code == 404
+        assert Annotation.objects.filter(pk=self.annotation.id).exists()
 
 
 class TestTaskAPIResolveUri(APITestCase):
