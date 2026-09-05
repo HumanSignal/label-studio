@@ -18,7 +18,12 @@ export const ToolManagerMixin = types.model().actions((self) => {
 
       toolNames.forEach((toolName) => {
         if (toolName in Tools) {
-          const tool = Tools[toolName].create({}, env);
+          const configuredStrokeWidth = Number(self.strokewidth);
+          const toolConfig =
+            toolName === "Brush" && Number.isFinite(configuredStrokeWidth)
+              ? { strokeWidth: configuredStrokeWidth }
+              : {};
+          const tool = Tools[toolName].create(toolConfig, env);
 
           tools[toolName] = tool;
         }
