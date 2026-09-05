@@ -5,9 +5,11 @@ import { types } from "mobx-state-tree";
 import { ToolManagerMixin } from "../ToolManagerMixin";
 import ToolsManager from "../../tools/Manager";
 
+const TEST_OBJECT_NAME = "tool-manager-mixin-test-image";
+
 const ControlModel = types
   .model("ToolManagerMixinTestControl", {
-    toname: types.optional(types.string, "image"),
+    toname: types.optional(types.string, TEST_OBJECT_NAME),
     strokewidth: types.optional(types.string, "15"),
     annotationStore: types.frozen(),
   })
@@ -22,6 +24,11 @@ const RootModel = types.model("ToolManagerMixinTestRoot", {
 });
 
 describe("ToolManagerMixin", () => {
+  beforeEach(() => {
+    ToolsManager.removeAllTools();
+    window.localStorage.removeItem(`selected-tool:${TEST_OBJECT_NAME}`);
+  });
+
   afterEach(() => {
     ToolsManager.removeAllTools();
   });
