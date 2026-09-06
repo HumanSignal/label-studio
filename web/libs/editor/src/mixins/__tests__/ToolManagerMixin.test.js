@@ -43,4 +43,18 @@ describe("ToolManagerMixin", () => {
 
     expect(root.control.tools.Brush.strokeWidth).toBe(42);
   });
+
+  it("falls back to the Brush default for non-positive configured strokeWidth", () => {
+    for (const strokewidth of ["0", "-1", ""]) {
+      ToolsManager.removeAllTools();
+      const root = RootModel.create({
+        control: {
+          strokewidth,
+          annotationStore: { initialized: false },
+        },
+      });
+
+      expect(root.control.tools.Brush.strokeWidth).toBe(15);
+    }
+  });
 });
