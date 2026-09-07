@@ -2,7 +2,7 @@ import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { undo, undoDepth } from "@codemirror/commands";
-import { buildCm6Extensions } from "./cm5-compat-shim";
+import { buildCm6Extensions, createPlaceholderContent } from "./cm5-compat-shim";
 
 describe("buildCm6Extensions XML parity", () => {
   it("includes syntax highlighting and search keymap for all modes", () => {
@@ -35,6 +35,54 @@ describe("buildCm6Extensions XML parity", () => {
     );
 
     expect(largeExtensions.length).toBeLessThan(fullExtensions.length);
+  });
+});
+
+describe("createPlaceholderContent", () => {
+  it("keeps single-line placeholders as plain text", () => {
+    expect(createPlaceholderContent("Insert Plugin")).toBe("Insert Plugin");
+  });
+
+  it("renders multi-line placeholders out of flow with the full text", () => {
+    const text = "// line one\n// line two\n// line three";
+    const content = createPlaceholderContent(text);
+
+    expect(content).toBeInstanceOf(HTMLElement);
+    const element = content as HTMLElement;
+    expect(element.textContent).toBe(text);
+    expect(element.style.position).toBe("absolute");
+    expect(element.style.whiteSpace).toBe("pre-wrap");
+  });
+});
+
+describe("buildCm6Extensions multi-line placeholder", () => {
+  it("does not stretch the empty line box with a multi-line placeholder", () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+
+    const view = new EditorView({
+      parent,
+      state: EditorState.create({
+        doc: "",
+        extensions: buildCm6Extensions({
+          mode: "javascript",
+          lineWrapping: true,
+          placeholder: "// first line\n// second line\n// third line",
+        }),
+      }),
+    });
+
+    try {
+      const placeholderEl = view.dom.querySelector(".cm-placeholder");
+      expect(placeholderEl).not.toBeNull();
+
+      // An in-flow text node with newlines is what inflates the line box (and the caret).
+      expect(placeholderEl?.firstChild?.nodeType).toBe(Node.ELEMENT_NODE);
+      expect((placeholderEl?.firstElementChild as HTMLElement)?.style.position).toBe("absolute");
+    } finally {
+      view.destroy();
+      parent.remove();
+    }
   });
 });
 

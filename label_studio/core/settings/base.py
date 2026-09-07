@@ -410,6 +410,15 @@ RQ_QUEUES = {
     },
 }
 
+# django-rq >= 4 defaults this to True, which mounts an unwrapped stats.json under /admin/
+RQ_SHOW_ADMIN_LINK = False
+
+RQ = {
+    # django-rq >= 4 defaults to 'on_db_commit', which defers the enqueue and returns None
+    # from enqueue() inside an atomic block; callers here rely on the returned job
+    'COMMIT_MODE': 'auto',
+}
+
 # How long to keep failed RQ jobs (in seconds); default is 30 days
 RQ_FAILED_JOB_TTL = int(get_env('RQ_FAILED_JOB_TTL', 30 * 24 * 60 * 60))
 
@@ -464,6 +473,11 @@ SPECTACULAR_SETTINGS = {
             ('COMPLETED', 'Completed'),
             ('FAILED', 'Failed'),
         ),
+        'RejectActionEnum': (
+            ('remove', 'Remove'),
+            ('requeue', 'Requeue'),
+            ('redistribute', 'Redistribute'),
+        ),
         # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
         # FIT-2196), which can appear in responses but is never assignable via role APIs.
         'OrganizationRoleEnum': (
@@ -504,9 +518,11 @@ SPECTACULAR_SETTINGS = {
             ('flex', 'Flex'),
             ('viewonly', 'View Only'),
         ),
-        # Membership updates support only the paid upgrade direction. View-Only
-        # creation is exposed separately through the invite contract.
-        'StandardUserTypeEnum': (('standard', 'Standard'),),
+        # Membership updates accept Standard or Flex (View-Only creation stays on invite).
+        'StandardUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('flex', 'Flex'),
+        ),
         'OrganizationPermissionRoleEnum': (
             'OW',
             'AD',
@@ -615,7 +631,7 @@ MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_second
 # The most time that can elapse between activity with the server before the user is logged out
 MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
-SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', True)
 USE_DEFAULT_BANNED_SUBNETS = get_bool_env('USE_DEFAULT_BANNED_SUBNETS', True)
 USER_ADDITIONAL_BANNED_SUBNETS = get_env_list('USER_ADDITIONAL_BANNED_SUBNETS', default=[])
 
@@ -788,6 +804,7 @@ LSE_PROJECT = None
 GET_TASKS_AGREEMENT_QUERYSET = None
 SHOULD_ATTEMPT_GROUND_TRUTH_FIRST = None
 IS_USER_IN_GT_EVALUATION_WINDOW = None
+ANNOTATE_CURRENT_OVERLAP = None
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
@@ -871,7 +888,7 @@ COLLECT_ANALYTICS = get_bool_env('COLLECT_ANALYTICS', get_bool_env('collect_anal
 # Strip harmful content from SVG files by default
 SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
 
-ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', True)
 
 RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
 
@@ -881,6 +898,16 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+# TTL for presigned reads of export-target objects. Export connections have no
+# per-connection presign settings (nothing to configure on a write target), so
+# previews of project-produced assets sign with this instead. Long enough to
+# scrub a video without re-resolving; short enough to bound a leaked link.
+EXPORT_STORAGE_PRESIGN_TTL_MINUTES = int(get_env('EXPORT_STORAGE_PRESIGN_TTL_MINUTES', 15))
+# Whether reads of export-target objects are presigned. Turning this off keeps
+# an org that requires proxy-only access proxying these objects through Label
+# Studio's own auth, exactly as the presign flag does on import connections.
+EXPORT_STORAGE_PRESIGN = get_bool_env('EXPORT_STORAGE_PRESIGN', default=True)
+
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))

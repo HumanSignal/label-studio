@@ -24,11 +24,6 @@ def ml_backend_for_test_api(ml_backend):
     yield ml_backend
 
 
-@pytest.fixture
-def mock_gethostbyname(mocker):
-    mocker.patch('socket.gethostbyname', return_value='321.21.21.21')
-
-
 @pytest.mark.django_db
 def test_ml_backend_set_for_prelabeling(business_client, ml_backend_for_test_api, mock_gethostbyname):
     project = make_project(
@@ -286,6 +281,30 @@ def test_predictions_score_uses_project_model_version_from_imported_predictions_
     annotated_task = annotate_predictions_score(Task.objects.filter(id=task.id)).values('predictions_score').first()
 
     assert annotated_task['predictions_score'] == pytest.approx(0.89)
+
+
+@pytest.mark.django_db
+def test_ml_backend_local_url_blocked_by_default(business_client, ml_backend_for_test_api):
+    """ML_BLOCK_LOCAL_IP defaults to on, so a backend on a loopback address is rejected."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_local_url',
+        ),
+        user=business_client.user,
+    )
+
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'local_ml_backend',
+            'url': 'http://127.0.0.1:9090',
+        },
+    )
+    assert response.status_code == 403
+    assert 'reserved network address' in response.json()['detail']
 
 
 @pytest.mark.django_db

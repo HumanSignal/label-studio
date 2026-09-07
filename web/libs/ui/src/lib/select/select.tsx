@@ -10,7 +10,16 @@ import {
 } from "@humansignal/shad/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/shad/components/ui/popover";
 import clsx from "clsx";
-import React, { type ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { cn, cnm } from "../../utils/utils";
@@ -24,8 +33,10 @@ import styles from "./select.module.css";
 import type { OptionProps, SelectOption, SelectProps } from "./types.ts";
 
 const VARIABLE_LIST_ITEM_HEIGHT = 40;
-const VARIABLE_LIST_COUNT_RENDERED = 5;
+const VARIABLE_LIST_MAX_HEIGHT = 300;
 const VARIABLE_LIST_PAGE_SIZE = 20;
+const DYNAMIC_WIDTH_SAMPLE_SIZE = 16;
+const SCROLLBAR_GUTTER = 16;
 
 /** Group flat options by a field. Returns [{ groupKey, items }] with ungrouped first, then groups in order of first occurrence. */
 function groupOptionsByField(options: any[], groupBy: string): { groupKey: string | null; items: any[] }[] {
@@ -270,6 +281,7 @@ export const Select = forwardRef(
       selectFirstIfEmpty,
       renderSelected,
       isVirtualList = false,
+      withDynamicWidth = false,
       virtualListMaxVisible,
       loadMore,
       pageSize = VARIABLE_LIST_PAGE_SIZE,
@@ -535,7 +547,58 @@ export const Select = forwardRef(
       );
     }, [selectedOptions, props?.placeholder, selectedValueRenderer]);
 
+    const hasNestedChildren = useMemo(
+      () => !groupedOptions && _options.some((option) => option?.children?.length),
+      [groupedOptions, _options],
+    );
+    const isLazyVirtualList = Boolean(isVirtualList && !groupedOptions && !hasNestedChildren);
+    const shouldMeasureDynamicWidth = Boolean(isVirtualList && withDynamicWidth);
+    const widthSizerRef = useRef<HTMLDivElement>(null);
+    const [dynamicListWidth, setDynamicListWidth] = useState<number | undefined>();
+    // First N items only — good enough for open-state width, and the popover already has a max-width cap.
+    const sampleOptions = useMemo(() => {
+      if (!shouldMeasureDynamicWidth) return [];
+      return _options.slice(0, DYNAMIC_WIDTH_SAMPLE_SIZE);
+    }, [shouldMeasureDynamicWidth, _options]);
+
+    useLayoutEffect(() => {
+      if (!shouldMeasureDynamicWidth || !isOpen) return;
+      const measured = widthSizerRef.current?.scrollWidth ?? 0;
+      const triggerWidth = triggerRef.current?.offsetWidth ?? 0;
+      const width = Math.max(measured, triggerWidth);
+      setDynamicListWidth(width > 0 ? width : undefined);
+    }, [shouldMeasureDynamicWidth, isOpen, sampleOptions]);
+
+    const renderFlatOption = (option: any, index: number) => {
+      const optionValue = option?.value ?? option;
+      const label = option?.label ?? optionValue;
+      const isOptionSelected = isSelected(optionValue);
+
+      return (
+        <Option
+          key={`${optionValue}_${index}`}
+          value={optionValue}
+          label={label}
+          option={option}
+          {...(optionRenderer && {
+            optionRenderer,
+            optionIndex: index,
+          })}
+          isOptionSelected={isOptionSelected}
+          disabled={readOnly || option?.disabled}
+          style={option?.style}
+          multiple={multiple}
+          onSelect={() => {
+            _onChange(optionValue, isOptionSelected);
+          }}
+        />
+      );
+    };
+
     const renderedOptions = useMemo(() => {
+      if (isLazyVirtualList) {
+        return [];
+      }
       if (groupedOptions) {
         let globalIndex = 0;
         return groupedOptions.map((group, groupIdx) => {
@@ -655,27 +718,10 @@ export const Select = forwardRef(
             </CommandGroup>
           );
         }
-        return (
-          <Option
-            key={`${optionValue}_${index}`}
-            value={optionValue}
-            label={label}
-            option={option}
-            {...(optionRenderer && {
-              optionRenderer,
-              optionIndex: index,
-            })}
-            isOptionSelected={isOptionSelected}
-            disabled={readOnly || option?.disabled}
-            style={option?.style}
-            multiple={multiple}
-            onSelect={() => {
-              _onChange(optionValue, isOptionSelected);
-            }}
-          />
-        );
+        return renderFlatOption(option, index);
       });
     }, [
+      isLazyVirtualList,
       _options,
       groupedOptions,
       multiple,
@@ -779,12 +825,12 @@ export const Select = forwardRef(
                   {props.header ? props.header : null}
                   {isVirtualList ? (
                     <InfiniteLoader
-                      itemCount={itemCount ?? renderedOptions.length}
+                      itemCount={itemCount ?? (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       loadMoreItems={() => {
                         loadMore?.();
                         return Promise.resolve();
                       }}
-                      isItemLoaded={(index) => index < renderedOptions.length}
+                      isItemLoaded={(index) => index < (isLazyVirtualList ? _options.length : renderedOptions.length)}
                       threshold={1}
                       minimumBatchSize={pageSize / 2}
                     >
@@ -795,32 +841,46 @@ export const Select = forwardRef(
                         onItemsRendered: (params: any) => void;
                         ref: any;
                       }) => {
+                        const listItems = isLazyVirtualList ? _options : renderedOptions;
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
-                        const maxVisibleItems = virtualListMaxVisible ?? VARIABLE_LIST_COUNT_RENDERED;
+                        const maxListHeight =
+                          virtualListMaxVisible != null
+                            ? virtualListMaxVisible * VARIABLE_LIST_ITEM_HEIGHT
+                            : VARIABLE_LIST_MAX_HEIGHT;
 
                         const getItemHeight = (index: number) =>
                           (_options[index] as any)?.height ?? VARIABLE_LIST_ITEM_HEIGHT;
 
-                        const visibleCount = Math.min(actualItemCount, maxVisibleItems);
-                        let listHeight = 0;
-                        for (let i = 0; i < visibleCount; i++) {
-                          listHeight += getItemHeight(i);
+                        let contentHeight = 0;
+                        for (let i = 0; i < actualItemCount; i++) {
+                          contentHeight += getItemHeight(i);
+                          if (contentHeight > maxListHeight) break;
                         }
+                        const listHeight = Math.min(contentHeight, maxListHeight);
+                        const listWidth =
+                          shouldMeasureDynamicWidth && dynamicListWidth
+                            ? dynamicListWidth + (contentHeight > listHeight ? SCROLLBAR_GUTTER : 0)
+                            : "100%";
 
                         return (
                           <VariableSizeList
                             key="virtual-list"
-                            itemData={renderedOptions}
+                            itemData={listItems}
                             itemSize={getItemHeight}
-                            itemCount={renderedOptions.length}
+                            itemCount={listItems.length}
                             height={listHeight}
-                            // width={VARIABLE_LIST_WIDTH}
+                            width={listWidth}
+                            style={{ maxWidth: "100%" }}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
-                            overscanCount={0}
+                            overscanCount={isLazyVirtualList ? 4 : 0}
                           >
                             {({ index, style }) => {
-                              return <div style={style}>{renderedOptions[index]}</div>;
+                              return (
+                                <div style={style}>
+                                  {isLazyVirtualList ? renderFlatOption(listItems[index], index) : listItems[index]}
+                                </div>
+                              );
                             }}
                           </VariableSizeList>
                         );
@@ -838,6 +898,33 @@ export const Select = forwardRef(
             </Command>
           )}
         </PopoverContent>
+        {shouldMeasureDynamicWidth && isOpen && (
+          <div
+            ref={widthSizerRef}
+            data-testid="virtual-list-width-sizer"
+            aria-hidden
+            className="pointer-events-none invisible absolute h-0 w-max overflow-hidden whitespace-nowrap"
+          >
+            {sampleOptions.map((option, index) => {
+              const optionValue = option?.value ?? option;
+              const label = option?.label ?? optionValue;
+              const labelContent =
+                optionRenderer && option ? optionRenderer({ option, index }) : (label ?? optionValue);
+              return (
+                <div key={`${optionValue}_${index}`} className="p-1">
+                  <div className={cn("flex w-max items-center gap-2 py-1", multiple ? "pl-2 pr-4" : "px-4")}>
+                    {multiple && <Checkbox tabIndex={-1} readOnly aria-hidden />}
+                    <div className="flex w-max items-center gap-2">
+                      <span className="whitespace-nowrap">{labelContent}</span>
+                      {option?.badge && <Badge size="small">{option.badge}</Badge>}
+                      {option?.description && <InfoIcon className="h-4 w-4 shrink-0 text-neutral-content-subtler" />}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <select
           name={props?.name}
           value={selectedOptions.map((option) => option?.value ?? option).join(",")}

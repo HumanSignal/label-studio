@@ -492,7 +492,7 @@ class TestServeLocalUpload:
         mock_project_get.return_value = mock_project
 
         mock_upload = self._upload_mock(content=b'\xff\xd8\xff\xe0', name='upload/25/abc-photo.jpg')
-        mock_file_upload_class.objects.select_related.return_value.get.return_value = mock_upload
+        mock_file_upload_class.objects.get.return_value = mock_upload
 
         user = MagicMock(id=1, active_organization_id=1)
         token, _ = generate_react_code_token(user, project_id=25)
@@ -519,7 +519,7 @@ class TestServeLocalUpload:
         # Wire a proper exception class so the except clause can catch it.
         does_not_exist = type('DoesNotExist', (Exception,), {})
         mock_file_upload_class.DoesNotExist = does_not_exist
-        mock_file_upload_class.objects.select_related.return_value.get.side_effect = does_not_exist
+        mock_file_upload_class.objects.get.side_effect = does_not_exist
 
         user = MagicMock(id=1, active_organization_id=1)
         token, _ = generate_react_code_token(user, project_id=25)
@@ -543,7 +543,7 @@ class TestServeLocalUpload:
 
         does_not_exist = type('DoesNotExist', (Exception,), {})
         mock_file_upload_class.DoesNotExist = does_not_exist
-        mock_file_upload_class.objects.select_related.return_value.get.side_effect = does_not_exist
+        mock_file_upload_class.objects.get.side_effect = does_not_exist
 
         user = MagicMock(id=1, active_organization_id=1)
         token, _ = generate_react_code_token(user, project_id=25)
@@ -584,3 +584,196 @@ class TestServeLocalUpload:
 
         assert response.status_code == 400
         assert response['Access-Control-Allow-Origin'] == '*'
+
+
+@pytest.mark.django_db
+class TestUploadTenancyIsolation:
+    """Real-database checks that the local-upload branch cannot cross a project boundary.
+
+    Purpose:
+        A ReactCode token is minted for exactly one (user, project) pair. Two guarantees
+        make that scope meaningful, and both are pinned here:
+          1. the bearer's *current* permission on that project is re-checked on every
+             request, before any bytes are served;
+          2. an uploaded file is only served when it belongs to that same project.
+
+    Setup:
+        Two projects (A and B) in the SAME organization, each owning one uploaded file,
+        plus a user who is a member of that organization. Real ORM rows are used rather
+        than mocks on purpose: the defect these tests guard against lived in a queryset
+        filter, and a mocked queryset cannot express it.
+
+    Edge cases:
+        Membership revoked while a still-valid token is in flight; a token for project A
+        pointed at project B's upload path.
+    """
+
+    @pytest.fixture
+    def env(self):
+        from data_import.models import FileUpload
+        from django.core.files.base import ContentFile
+        from organizations.tests.factories import OrganizationFactory
+        from projects.tests.factories import ProjectFactory
+
+        organization = OrganizationFactory()
+        user = organization.created_by
+        project_a = ProjectFactory(organization=organization)
+        project_b = ProjectFactory(organization=organization)
+
+        upload_a = FileUpload.objects.create(
+            user=user, project=project_a, file=ContentFile(b'PROJECT-A-OWN-BYTES', name='a-photo.jpg')
+        )
+        upload_b = FileUpload.objects.create(
+            user=user, project=project_b, file=ContentFile(b'PROJECT-B-PRIVATE-BYTES', name='b-photo.jpg')
+        )
+
+        return {
+            'factory': APIRequestFactory(),
+            'view': ReactCodeResolveView.as_view(),
+            'organization': organization,
+            'user': user,
+            'project_a': project_a,
+            'project_b': project_b,
+            'upload_a': upload_a,
+            'upload_b': upload_b,
+        }
+
+    @staticmethod
+    def _request(env, token: str, upload):
+        """Issue a resolve request for `upload` using `token`, via the real URL shape."""
+        from urllib.parse import quote
+
+        url_path = '/data/' + upload.file.name  # /data/upload/{project_id}/{filename}
+        request = env['factory'].get(
+            '/api/react-code/resolve/{}/'.format(token),
+            {'fileuri': quote(url_path, safe='')},
+        )
+        return env['view'](request, token=token)
+
+    @staticmethod
+    def _revoke_membership(user, organization):
+        """Soft-delete the organization membership, which revokes Project.has_permission."""
+        from django.utils import timezone as django_timezone
+        from organizations.models import OrganizationMember
+
+        OrganizationMember.objects.filter(user=user, organization=organization).update(
+            deleted_at=django_timezone.now()
+        )
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    def test_token_serves_its_own_project_upload(self, env):
+        """REGRESSION GUARD: the legitimate case must keep working.
+
+        A token minted for (user, project A) asked for project A's own uploaded file
+        still receives the file, with the right content type.
+        """
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+
+        response = self._request(env, token, env['upload_a'])
+
+        assert response.status_code == 200
+        assert response.content == b'PROJECT-A-OWN-BYTES'
+        assert response['Content-Type'] == 'image/jpeg'
+        assert response['Access-Control-Allow-Origin'] == '*'
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    def test_token_cannot_read_other_project_upload_in_same_organization(self, env):
+        """TENANCY: a token for project A must not resolve project B's upload.
+
+        Both projects live in the same organization and the user has permission on
+        project A, so the only thing that can stop this is scoping the upload lookup to
+        the token's project. Filtering by organization instead serves B's bytes.
+        """
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+
+        response = self._request(env, token, env['upload_b'])
+
+        assert response.status_code == 404
+        assert b'PROJECT-B-PRIVATE-BYTES' not in response.content
+        assert response['Access-Control-Allow-Origin'] == '*'
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    def test_upload_refused_after_permission_is_revoked(self, env):
+        """AUTHORIZATION: a still-valid token stops working once access is revoked.
+
+        The token remains cryptographically valid, but the user's membership is gone, so
+        even the token's own project's upload must be refused rather than served.
+        """
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+        self._revoke_membership(env['user'], env['organization'])
+
+        response = self._request(env, token, env['upload_a'])
+
+        # A DRF 403 Response carries no rendered body; the status alone proves no bytes
+        # were served, since the serving path always returns 200 with the file content.
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response['Access-Control-Allow-Origin'] == '*'
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    def test_other_project_upload_refused_after_permission_is_revoked(self, env):
+        """Both guards at once: revoked access AND a cross-project path are refused."""
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+        self._revoke_membership(env['user'], env['organization'])
+
+        response = self._request(env, token, env['upload_b'])
+
+        assert response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND)
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    @patch('io_storages.react_code_proxy.ResolveStorageUriAPIMixin.resolve')
+    def test_cloud_branch_still_delegates_when_permitted(self, mock_resolve, env):
+        """The cloud-storage branch is unchanged: still delegated to the shared resolver.
+
+        Cloud URIs are bucket-scoped by the storage layer, not per-file scoped; this test
+        only pins that moving the permission check did not divert or break that path.
+        """
+        mock_resolve.return_value = Response(status=status.HTTP_200_OK)
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+        fileuri = base64.urlsafe_b64encode(b's3://bucket/file.xml').decode()
+
+        request = env['factory'].get(f'/api/react-code/resolve/{token}/?fileuri={fileuri}')
+        response = env['view'](request, token=token)
+
+        assert response.status_code == status.HTTP_200_OK
+        mock_resolve.assert_called_once()
+        assert mock_resolve.call_args[0][1] == 's3://bucket/file.xml'
+        assert mock_resolve.call_args[0][2].id == env['project_a'].id
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    @patch('io_storages.react_code_proxy.ResolveStorageUriAPIMixin.resolve')
+    def test_cloud_branch_refused_after_permission_is_revoked(self, mock_resolve, env):
+        """The cloud branch is refused on revoked access without ever reaching the resolver."""
+        mock_resolve.return_value = Response(status=status.HTTP_200_OK)
+        token, _ = generate_react_code_token(env['user'], project_id=env['project_a'].id)
+        self._revoke_membership(env['user'], env['organization'])
+        fileuri = base64.urlsafe_b64encode(b's3://bucket/file.xml').decode()
+
+        request = env['factory'].get(f'/api/react-code/resolve/{token}/?fileuri={fileuri}')
+        response = env['view'](request, token=token)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        mock_resolve.assert_not_called()
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    def test_duplicated_project_resolves_its_own_copied_upload_record(self, env):
+        """Project duplication must keep working, and must resolve the copy, not the original.
+
+        Duplicating a project copies each upload record and re-points it at the new
+        project while keeping the SAME stored path, so two records in one organization
+        legitimately share a path. Scoping by project picks exactly one of them; scoping
+        by organization matches both and cannot resolve the request at all.
+        """
+        from data_import.models import FileUpload
+
+        duplicated = FileUpload.objects.create(
+            user=env['user'], project=env['project_b'], file=env['upload_a'].file.name
+        )
+        assert duplicated.file.name == env['upload_a'].file.name
+
+        for project, upload in ((env['project_a'], env['upload_a']), (env['project_b'], duplicated)):
+            token, _ = generate_react_code_token(env['user'], project_id=project.id)
+
+            response = self._request(env, token, upload)
+
+            assert response.status_code == 200
+            assert response.content == b'PROJECT-A-OWN-BYTES'

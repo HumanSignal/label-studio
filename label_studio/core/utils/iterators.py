@@ -2,6 +2,18 @@ from core.feature_flags import flag_set
 from django.conf import settings
 
 
+def _has_explicit_group_by(queryset):
+    """Return True when the queryset aggregates over explicit grouping expressions.
+
+    A queryset built with ``.values(...).annotate(<aggregate>)`` carries a GROUP BY over
+    the fields passed to ``values()``. ``group_by is True`` instead means "group by every
+    selected field", which is what a plain ``.annotate()`` on a model queryset produces —
+    that still yields one row per object, so it stays compatible with pk chunking.
+    """
+    group_by = getattr(queryset.query, 'group_by', None)
+    return bool(group_by) and group_by is not True
+
+
 def iterate_queryset(queryset, chunk_size=None):
     if chunk_size is None:
         chunk_size = settings.QS_ITERATOR_DEFAULT_CHUNK_SIZE
@@ -9,7 +21,12 @@ def iterate_queryset(queryset, chunk_size=None):
     if chunk_size <= 0:
         raise ValueError(f'chunk_size must be positive, got {chunk_size}')
 
-    if not flag_set('fflag_fix_back_plt_863_remove_iterator_27082025_short', user='auto'):
+    # Re-selecting the primary key below rewrites an explicit GROUP BY to the pk, which
+    # silently collapses the aggregation and yields one row per underlying table row
+    # instead of one row per group. Aggregates therefore have to stream as-is.
+    if not flag_set('fflag_fix_back_plt_863_remove_iterator_27082025_short', user='auto') or _has_explicit_group_by(
+        queryset
+    ):
         for obj in queryset.iterator(chunk_size=chunk_size):
             yield obj
         return

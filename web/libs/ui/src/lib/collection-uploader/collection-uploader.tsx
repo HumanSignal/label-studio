@@ -9,8 +9,11 @@
  */
 
 import { type ChangeEvent, type DragEvent, useCallback, useRef, useState } from "react";
+import { IconUploadOutline } from "../../assets/icons";
 import { Button } from "../button/button";
 import { cn } from "../../utils/utils";
+import { EmptyState } from "../empty-state/empty-state";
+import { evaluateSubmissionRules, SubmissionRuleBadges, type SubmissionRules } from "./submission-rules";
 
 export type CollectionUploadRowStatus = "pending" | "uploading" | "uploaded" | "failed" | "cancelled";
 
@@ -33,6 +36,13 @@ export interface CollectionUploaderProps {
   disabled?: boolean;
   hint?: string;
   className?: string;
+  /** Highlight the dropzone from outside — e.g. while a file is dragged
+   * anywhere over a host surface that will forward the drop here, so the user
+   * can see there is somewhere for the file to land. */
+  dragActive?: boolean;
+  /** Declared validation rules (`x-ls-validation`): shown as neutral badges in
+   * the dropzone so the contributor knows the bar BEFORE picking a file. */
+  rules?: SubmissionRules | null;
 }
 
 function formatSize(bytes: number): string {
@@ -64,9 +74,12 @@ export const CollectionUploader = ({
   disabled = false,
   hint,
   className,
+  dragActive = false,
+  rules = null,
 }: CollectionUploaderProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const highlighted = (dragging || dragActive) && !disabled;
 
   const pick = useCallback(
     (files: FileList | null) => {
@@ -102,7 +115,7 @@ export const CollectionUploader = ({
         data-testid="collection-uploader-dropzone"
         className={cn(
           "flex flex-col items-center justify-center gap-tightest rounded-small border-2 border-dashed p-wide text-center transition-colors",
-          dragging ? "border-primary-border bg-primary-background" : "border-neutral-border bg-neutral-surface",
+          highlighted ? "border-primary-border bg-primary-background" : "border-neutral-border bg-neutral-surface",
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-primary-border",
         )}
         onClick={() => !disabled && inputRef.current?.click()}
@@ -116,8 +129,18 @@ export const CollectionUploader = ({
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
       >
-        <span className="font-medium text-neutral-content">Drag &amp; drop or click to browse</span>
-        {hint ? <span className="text-neutral-content-subtler text-sm">{hint}</span> : null}
+        <EmptyState
+          size="small"
+          variant={highlighted ? "primary" : "neutral"}
+          icon={<IconUploadOutline />}
+          title="Drag & drop or click to browse"
+          description={hint}
+          additionalContent={
+            rules ? (
+              <SubmissionRuleBadges results={evaluateSubmissionRules(null, rules)} className="justify-center" />
+            ) : null
+          }
+        />
         <input
           ref={inputRef}
           type="file"

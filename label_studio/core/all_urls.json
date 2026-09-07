@@ -1884,135 +1884,153 @@
         "decorators": ""
     },
     {
-        "url": "/django-rq/",
-        "module": "django_rq.stats_views.stats",
-        "name": "rq_home",
-        "decorators": ""
-    },
-    {
         "url": "/django-rq/stats.json/",
         "module": "django_rq.stats_views.stats_json",
-        "name": "rq_home_json",
+        "name": "django_rq:home_json",
         "decorators": ""
     },
     {
         "url": "/django-rq/stats.json/<token>/",
         "module": "django_rq.stats_views.stats_json",
-        "name": "rq_home_json",
+        "name": "django_rq:home_json",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/",
+        "url": "/django-rq/",
+        "module": "django_rq.stats_views.stats",
+        "name": "django_rq:home",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<int:queue_index>/",
         "module": "django_rq.views.jobs",
-        "name": "rq_jobs",
+        "name": "django_rq:jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/workers/<queue_index>/",
-        "module": "django_rq.views.workers",
-        "name": "rq_workers",
+        "url": "/django-rq/queues/<int:queue_index>/details/",
+        "module": "django_rq.views.queue_details",
+        "name": "django_rq:queue_details",
         "decorators": ""
     },
     {
-        "url": "/django-rq/workers/<queue_index>/<key>/",
-        "module": "django_rq.views.worker_details",
-        "name": "rq_worker_details",
-        "decorators": ""
-    },
-    {
-        "url": "/django-rq/queues/<queue_index>/finished/",
+        "url": "/django-rq/queues/<int:queue_index>/finished/",
         "module": "django_rq.views.finished_jobs",
-        "name": "rq_finished_jobs",
+        "name": "django_rq:finished_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/failed/",
+        "url": "/django-rq/queues/<int:queue_index>/failed/",
         "module": "django_rq.views.failed_jobs",
-        "name": "rq_failed_jobs",
+        "name": "django_rq:failed_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/failed/clear/",
+        "url": "/django-rq/queues/<int:queue_index>/failed/clear/",
         "module": "django_rq.views.delete_failed_jobs",
-        "name": "rq_delete_failed_jobs",
+        "name": "django_rq:delete_failed_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/scheduled/",
+        "url": "/django-rq/queues/<int:queue_index>/scheduled/",
         "module": "django_rq.views.scheduled_jobs",
-        "name": "rq_scheduled_jobs",
+        "name": "django_rq:scheduled_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/started/",
+        "url": "/django-rq/queues/<int:queue_index>/started/",
         "module": "django_rq.views.started_jobs",
-        "name": "rq_started_jobs",
+        "name": "django_rq:started_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/deferred/",
+        "url": "/django-rq/queues/<int:queue_index>/deferred/",
         "module": "django_rq.views.deferred_jobs",
-        "name": "rq_deferred_jobs",
+        "name": "django_rq:deferred_jobs",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/empty/",
+        "url": "/django-rq/queues/<int:queue_index>/empty/",
         "module": "django_rq.views.clear_queue",
-        "name": "rq_clear",
+        "name": "django_rq:clear",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/requeue-all/",
+        "url": "/django-rq/queues/<int:queue_index>/requeue-all/",
         "module": "django_rq.views.requeue_all",
-        "name": "rq_requeue_all",
+        "name": "django_rq:requeue_all",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/<job_id>/",
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/",
         "module": "django_rq.views.job_detail",
-        "name": "rq_job_detail",
+        "name": "django_rq:job_detail",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/<job_id>/delete/",
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/results/<str:result_id>/",
+        "module": "django_rq.views.result_detail",
+        "name": "django_rq:result_detail",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/delete/",
         "module": "django_rq.views.delete_job",
-        "name": "rq_delete_job",
+        "name": "django_rq:delete_job",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/confirm-action/<queue_index>/",
-        "module": "django_rq.views.confirm_action",
-        "name": "rq_confirm_action",
-        "decorators": ""
-    },
-    {
-        "url": "/django-rq/queues/actions/<queue_index>/",
-        "module": "django_rq.views.actions",
-        "name": "rq_actions",
-        "decorators": ""
-    },
-    {
-        "url": "/django-rq/queues/<queue_index>/<job_id>/requeue/",
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/requeue/",
         "module": "django_rq.views.requeue_job_view",
-        "name": "rq_requeue_job",
+        "name": "django_rq:requeue_job",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/<job_id>/enqueue/",
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/enqueue/",
         "module": "django_rq.views.enqueue_job",
-        "name": "rq_enqueue_job",
+        "name": "django_rq:enqueue_job",
         "decorators": ""
     },
     {
-        "url": "/django-rq/queues/<queue_index>/<job_id>/stop/",
+        "url": "/django-rq/queues/<int:queue_index>/<str:job_id>/stop/",
         "module": "django_rq.views.stop_job",
-        "name": "rq_stop_job",
+        "name": "django_rq:stop_job",
         "decorators": ""
     },
     {
-        "url": "/django-rq/schedulers/<scheduler_index>/",
+        "url": "/django-rq/queues/confirm-action/<int:queue_index>/",
+        "module": "django_rq.views.confirm_action",
+        "name": "django_rq:confirm_action",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/queues/actions/<int:queue_index>/",
+        "module": "django_rq.views.actions",
+        "name": "django_rq:actions",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/workers/<int:queue_index>/",
+        "module": "django_rq.views.workers",
+        "name": "django_rq:workers",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/workers/<int:queue_index>/<str:key>/",
+        "module": "django_rq.views.worker_details",
+        "name": "django_rq:worker_details",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/schedulers/<int:scheduler_index>/",
         "module": "django_rq.views.scheduler_jobs",
-        "name": "rq_scheduler_jobs",
+        "name": "django_rq:scheduler_jobs",
+        "decorators": ""
+    },
+    {
+        "url": "/django-rq/cron-schedulers/<int:connection_index>/<str:scheduler_name>/",
+        "module": "django_rq.cron_views.cron_scheduler_detail",
+        "name": "django_rq:cron_scheduler_detail",
         "decorators": ""
     },
     {
