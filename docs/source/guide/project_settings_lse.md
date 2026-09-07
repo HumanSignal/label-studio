@@ -722,7 +722,7 @@ Note that enforcement only applies when the user submitting the annotation is in
 
 Set limits on how many tasks each individual user can annotate. This can be useful if you are concerned with preventing any potential bias that might arise from a small set of power users completing a majority of project tasks. 
 
-When an annotator reaches their limit, they will see a notification telling them that they have been paused. When paused, an annotator can no longer access the project. 
+When an annotator reaches their limit, they will see a notification telling them that they have been paused. This is a flexible pause: the annotator cannot begin any new annotation work, but they keep access to the project so that they can update annotations that reviewers have rejected. For more information, see [Full and flexible pauses](quality#Full-and-flexible-pauses). 
 
 When **Limit tasks per annotator** is enabled, you will see the following options:
 
@@ -741,9 +741,9 @@ To unpause annotators:
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    Pauses are enforced for users in Annotator and Reviewer roles. 
+    The task limit applies to users in the Annotator and Reviewer roles. 
     
-    So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they can continue reviewing other people's annotations. 
 
     Users in the Manager, Administrator, or Owner role are unaffected by the task limit.
 
@@ -876,14 +876,14 @@ You can see each annotator's evaluation status and who is paused from the **Memb
 
 When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them from the Members pause toggle. They are unpaused automatically if their score recovers. You can also relax the evaluation settings for the project, for example by increasing the minimum sample or changing the score threshold.
 
-If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score.
+If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score. For more information, see [Recover from a flexible pause](quality#Recover-from-a-flexible-pause).
 
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    Pauses are enforced for users in Annotator and Reviewer roles.  
+    Evaluation applies to users in the Annotator and Reviewer roles.  
     
-    So, for example, if a Reviewer is also annotating tasks and they fail evaluation, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they fail evaluation, they can continue reviewing other people's annotations. 
 
     Users in the Manager, Administrator, or Owner role are unaffected by evaluation requirements. 
 

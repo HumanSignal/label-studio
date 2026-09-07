@@ -129,18 +129,32 @@ For example, if you're developing a dataset of OCR images, and 90% of your tasks
 
 For organizations with a large number of annotators, it might prove useful to pause an annotator's progress. This might be helpful for annotators that are performing poorly or exhibiting behavior that might indicate they have automated their work (bot behavior). 
 
+### Full and flexible pauses
+
+How much access a paused user keeps depends on why they were paused: 
+
+| Pause type          | Description    |
+| ------------- | ------------ |
+| **Full pause** | Applies when a user is [paused manually](#Manually-pause-an-annotator) or by a [behavior-based trigger](#Behavior-based-triggers). <br><br />The user loses access to the project entirely. They cannot annotate, review, comment, or make changes to their own existing annotations. |
+| **Flexible pause** | Applies when a user is paused by the [Tasks Per Annotator Limit](project_settings_lse#annotation-limit) or by [Annotator Evaluation](project_settings_lse#annotator-eval). <br><br />The user keeps access to the project so that they can work through the rejected annotations that are returned to them. They cannot begin any new annotation work. For more information, see [Recover from a flexible pause](#Recover-from-a-flexible-pause). |
+
+A pause only restricts the type of work that triggered it. Annotation limits and annotator evaluation both measure annotation work, so a flexible pause stops new annotation work only. If a paused user is also a reviewer, they can continue reviewing. Only a full pause stops a user from reviewing. 
+
+!!! note
+    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) are set to **Remove rejected annotations from labeling queue**. In this case, rejected annotations are never returned to the annotator, so there is nothing for them to recover. 
+
 ### Manually pause an annotator
 
 You can manually pause annotators from the Members dashboard in a project. This action is only available next to users in the Annotator and Reviewer roles:
 
 ![Screenshot of pause](/images/review/pause.png)
 
-When a user is paused, the following occurs:
+Manually pausing a user is always a full pause. When a user is paused, the following occurs:
 
 * They immediately see a message informing them that they have been paused. 
 
     ![Screenshot of message](/images/review/paused-message.png)
-* Their progress within their current task is saved as a draft, but they cannot make any further changes.   
+* Their progress within their current task is saved as a draft, but they cannot make any further changes. This includes annotations they had already submitted, which they can no longer update.   
 * When they click **Go Back**, they are returned to the Projects page. If they attempt to re-enter the project, they are shown the error message above. 
 
 !!! info Tip
@@ -153,17 +167,35 @@ When a user is paused, the following occurs:
 
 #### Annotation Limit settings
 
-You can use **Settings > Quality > Annotation Limit** to set limits on how many tasks an annotator is able to complete before they are paused. For more information, see [Annotation Limit](project_settings_lse#annotation-limit). 
+You can use **Settings > Quality > Annotation Limit** to set limits on how many tasks an annotator is able to complete before they are paused. This is a flexible pause. For more information, see [Annotation Limit](project_settings_lse#annotation-limit). 
 
 #### Annotator Evaluation settings
 
-You can use **Settings > Quality > Annotator Evaluation** to automatically pause annotators who do not meet a ground truth agreement or acceptance score threshold. For more information, see [Annotator Evaluation](project_settings_lse#annotator-eval).
+You can use **Settings > Quality > Annotator Evaluation** to automatically pause annotators who do not meet a ground truth agreement or acceptance score threshold. This is a flexible pause. For more information, see [Annotator Evaluation](project_settings_lse#annotator-eval).
 
 #### Behavior-based triggers
 
-If you have [plugins](plugins) enabled, you can automatically pause an annotator based on certain behaviors and then customize the message that appears on their screen. 
+If you have [plugins](plugins) enabled, you can automatically pause an annotator based on certain behaviors and then customize the message that appears on their screen. This is a full pause. 
 
 For more information, see [Plugins - Spam and Bot Detection](/plugins/pause_annotator).
+
+### Recover from a flexible pause
+
+When a user is under a flexible pause, they keep access to the project so that they can correct the annotations that reviewers have rejected. Getting those annotations accepted is how they work their way out of the pause. 
+
+Users under a flexible pause can do the following:
+
+* Re-enter the project. If the project has **Show Data Manager to annotators** enabled, they can use the Data Manager. Otherwise, they can only use the labeling stream. For more information, see [Annotation Options](project_settings_lse#annotating-options).
+* Update their own rejected annotations. In the labeling stream, they are only served their rejected annotations, and they cannot skip them. 
+* Add comments, so that they can respond to reviewer feedback. 
+* Continue reviewing, if they are a reviewer on the project. 
+
+They cannot begin any new annotation work, and they cannot update annotations that have not been rejected. 
+
+Once they have updated all of their rejected annotations, they see a message telling them that no further tasks are available until more of their work has been reviewed. 
+
+!!! note
+    Updating a rejected annotation does not lift the pause by itself. The pause remains in place until the user meets the project requirements again. For how each pause is lifted, see [Tasks Per Annotator Limit](project_settings_lse#annotation-limit) and [Annotator Evaluation](project_settings_lse#annotator-eval).
 
 
 ## Verify model and annotator performance
