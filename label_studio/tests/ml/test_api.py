@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from ml.models import MLBackend, MLBackendState
 from projects.models import Task
 from rest_framework import status
 
@@ -209,6 +210,26 @@ def test_ml_backend_local_url_blocked_by_default(business_client, ml_backend_for
     )
     assert response.status_code == 403
     assert 'reserved network address' in response.json()['detail']
+
+
+@pytest.mark.django_db
+def test_ml_backend_detail_reports_blocked_url_as_disconnected(business_client):
+    """A backend whose URL is blocked must degrade to DISCONNECTED, not fail the read with 403."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_blocked_detail',
+        ),
+        user=business_client.user,
+    )
+    ml_backend = MLBackend.objects.create(project=project, url='http://127.0.0.1:9090')
+
+    response = business_client.get(f'/api/ml/{ml_backend.id}')
+
+    assert response.status_code == 200
+    ml_backend.refresh_from_db()
+    assert ml_backend.state == MLBackendState.DISCONNECTED
 
 
 @pytest.mark.django_db
