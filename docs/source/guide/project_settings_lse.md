@@ -741,7 +741,7 @@ To unpause annotators:
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    The task limit applies to users in the Annotator and Reviewer roles. 
+    Pauses are enforced for users in Annotator and Reviewer roles. 
     
     Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they can continue reviewing other people's annotations. 
 
@@ -881,7 +881,7 @@ If your project requeues rejected annotations, paused annotators can still recei
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    Evaluation applies to users in the Annotator and Reviewer roles.  
+    Pauses are enforced for users in Annotator and Reviewer roles.  
     
     Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they fail evaluation, they can continue reviewing other people's annotations. 
 
