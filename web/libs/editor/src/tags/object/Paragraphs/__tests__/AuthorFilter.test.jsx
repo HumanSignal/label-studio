@@ -2,6 +2,7 @@ import { render } from "@testing-library/react";
 import { AuthorFilter } from "../AuthorFilter";
 
 mockModule("@humansignal/ui", () => ({
+  ...requireActual("@humansignal/ui"),
   Select: function MockSelect({ options, placeholder, onChange }) {
     return (
       <div data-testid="author-filter-select">

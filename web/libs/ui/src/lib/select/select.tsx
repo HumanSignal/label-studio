@@ -320,6 +320,12 @@ export const Select = forwardRef(
     useEffect(() => {
       if (!isDefined(externalValue)) {
         const emptyVal = multiple ? [] : undefined;
+        if (multiple) {
+          const current = valueRef.current;
+          if (Array.isArray(current) && current.length === 0) return;
+        } else if (valueRef.current === emptyVal) {
+          return;
+        }
         valueRef.current = emptyVal;
         setValue(emptyVal);
         return;
@@ -329,6 +335,16 @@ export const Select = forwardRef(
         val = [val];
       } else if (!multiple && Array.isArray(val)) {
         val = val[0];
+      }
+      // Skip no-op syncs for multi-select arrays — identical contents with a new
+      // reference would otherwise re-render the open cmdk list on every parent paint.
+      if (multiple && Array.isArray(val) && Array.isArray(valueRef.current)) {
+        const prev = valueRef.current as unknown[];
+        if (prev.length === val.length && prev.every((item, index) => item === val[index])) {
+          return;
+        }
+      } else if (!multiple && valueRef.current === val) {
+        return;
       }
       valueRef.current = val;
       setValue(val);

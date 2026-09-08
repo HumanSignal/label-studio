@@ -108,8 +108,9 @@ describe("shared AnnotationsCarousel", () => {
         virtualizationEnabled
       />,
     );
+    // Branch signal is the BEM modifier. The react-window List (`__scroll`) mounts
+    // inside AutoSizer and may not render in jsdom without layout measurements.
     expect(container.querySelector(".ls-annotations-carousel_virtualized")).not.toBeNull();
-    expect(container.querySelector(".ls-annotations-carousel__scroll")).not.toBeNull();
   });
 
   it("puts annotation rows in a dedicated scroll region for non-virtualized vertical layout", () => {
