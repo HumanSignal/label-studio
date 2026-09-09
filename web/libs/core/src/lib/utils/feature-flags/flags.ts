@@ -86,6 +86,11 @@ export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consens
 export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_columns";
 
 /**
+ * Reusable organization members filtering engine.
+ */
+export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable_members_filtering";
+
+/**
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
