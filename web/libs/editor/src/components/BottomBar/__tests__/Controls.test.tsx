@@ -811,6 +811,108 @@ describe("Controls", () => {
     expect(getByTestId("bottombar-reject-button")).toHaveTextContent("Change to Reject");
   });
 
+  test("relabels Flexible Reject without a menu for a live accepted verdict", () => {
+    mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
+    mockStore.customButtons = new Map([
+      [
+        "reject",
+        [
+          {
+            id: "remove",
+            name: "remove",
+            title: "Reject",
+            tooltip: "Remove this annotation from any further processing",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+          },
+          {
+            id: "requeue",
+            name: "requeue",
+            title: "Requeue",
+            tooltip: "Requeue this annotation back to the annotator",
+            variant: "neutral",
+            look: "outlined",
+            disabled: false,
+          },
+        ],
+      ],
+    ]);
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "accepted",
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId, getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Change to Reject");
+    expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accepted");
+    expect(getByLabelText("accept-annotation")).toBeDisabled();
+  });
+
+  test("relabels and disables Flexible Reject without a menu for a live rejected verdict", () => {
+    mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
+    mockStore.customButtons = new Map([
+      [
+        "reject",
+        [
+          {
+            id: "remove",
+            name: "remove",
+            title: "Remove",
+            tooltip: "Remove this annotation from any further processing",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+          },
+          {
+            id: "requeue",
+            name: "requeue",
+            title: "Requeue",
+            tooltip: "Requeue this annotation back to the annotator",
+            variant: "neutral",
+            look: "outlined",
+            disabled: false,
+          },
+        ],
+      ],
+    ]);
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "rejected",
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId, getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Rejected");
+    expect(getByTestId("bottombar-custom-remove-button")).toBeDisabled();
+    expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
+    expect(getByTestId("bottombar-custom-requeue-button")).toBeDisabled();
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Change to Accept");
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
+  });
+
   test("Skip triggers skipTask when allow_skip=false but user is Manager (MA) in LSE", async () => {
     setupAppSettings({ role: "MA", enterprise: true });
     mockStore.hasInterface = (a: string) => a === "skip";

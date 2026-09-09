@@ -109,3 +109,16 @@ export function resolveReviewBarCopy(
     disableAcceptForSameState: !hasChanges && isAcceptedState,
   };
 }
+
+/**
+ * Overlay Change-to / Rejected on the Flexible Reject "remove" button when the verdict is live.
+ * First-time review keeps the host title (`Reject` or `Remove`). Other actions (Requeue) keep their names.
+ */
+export function resolveFlexibleRejectButtonTitle(
+  actionName: string,
+  actionTitle: string,
+  acceptedState: SharedAnnotation["acceptedState"],
+): string {
+  if (actionName !== "remove" || acceptedState == null) return actionTitle;
+  return resolveReviewBarCopy(acceptedState, false).rejectLabel;
+}

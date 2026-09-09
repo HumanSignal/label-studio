@@ -48,5 +48,6 @@ export {
   resolveReviewAcceptedStateFromTaskSource,
   resolveClassicEntityReviewState,
   resolveReviewBarCopy,
+  resolveFlexibleRejectButtonTitle,
 } from "./review-accepted-state";
 export type { ReviewBarCopy } from "./review-accepted-state";

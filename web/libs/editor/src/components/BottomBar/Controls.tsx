@@ -10,7 +10,11 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKe
 
 import { Badge, Button, ButtonGroup, Dropdown, type ButtonProps, Typography, type DropdownRef } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
-import { normalizeReviewAcceptedState, resolveReviewBarCopy } from "@humansignal/core";
+import {
+  normalizeReviewAcceptedState,
+  resolveFlexibleRejectButtonTitle,
+  resolveReviewBarCopy,
+} from "@humansignal/core";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
@@ -235,7 +239,8 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
     if (isReview) {
       const hasChanges = Boolean(history?.canUndo || versions?.draft);
-      const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
+      const reviewState = normalizeReviewAcceptedState(annotation.acceptedState);
+      const reviewCopy = resolveReviewBarCopy(reviewState, hasChanges);
       const rejectDisabled = reviewDisabled || reviewCopy.disableRejectForSameState;
       const customRejectButtons = toArray(customButtons.get("reject"));
       const hasCustomReject = customRejectButtons.length > 0;
@@ -252,21 +257,28 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         };
       };
 
-      const renderRejectAction = (button: CustomButtonType) => (
-        <ControlButton
-          key={button.name}
-          button={{
-            ...button,
-            tooltip: rejectTooltip(
-              button.description ?? button.tooltip ?? button.title,
-              button.name,
-              store.settings.enableTooltips,
-            ),
-          }}
-          disabled={rejectDisabled}
-          onClick={rejectHandler(button)}
-        />
-      );
+      const renderRejectAction = (button: CustomButtonType) => {
+        const title = resolveFlexibleRejectButtonTitle(button.name, button.title, reviewState);
+        const tooltipDescription =
+          reviewState === "rejected"
+            ? "Annotation already rejected"
+            : reviewState && button.name === "remove"
+              ? "Change review to reject"
+              : (button.description ?? button.tooltip ?? button.title);
+
+        return (
+          <ControlButton
+            key={button.name}
+            button={{
+              ...button,
+              title,
+              tooltip: rejectTooltip(tooltipDescription, button.name, store.settings.enableTooltips),
+            }}
+            disabled={rejectDisabled}
+            onClick={rejectHandler(button)}
+          />
+        );
+      };
 
       // Menu rows are plain buttons, not ControlButton: they carry a description and read as a
       // menu, so button styling (and its negative/neutral variants) would fight the red-outlined
