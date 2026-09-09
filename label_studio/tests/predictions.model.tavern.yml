@@ -4,6 +4,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
 stages:
 - id: signup
   type: ref
@@ -155,6 +156,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
 stages:
 - id: signup
   type: ref

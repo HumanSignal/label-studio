@@ -6,9 +6,9 @@
 
 import { observer } from "mobx-react";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
+import { Badge, Button, ButtonGroup, type ButtonProps, Typography } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
 import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
@@ -92,10 +92,17 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const buttons: React.ReactNode[] = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
+    const [rejectMenuVisible, setRejectMenuVisible] = useState(false);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const reviewDisabled = disabled || viewingSubmittedWhileDraftExists;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
+
+    useEffect(() => {
+      const openRejectMenu = () => setRejectMenuVisible(true);
+      window.addEventListener("lsf:open-reject-menu", openRejectMenu);
+      return () => window.removeEventListener("lsf:open-reject-menu", openRejectMenu);
+    }, []);
 
     /** Check all things related to comments and then call the action if all is good */
     const handleActionWithComments = useCallback(
@@ -178,11 +185,12 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         ? customRejectButtons.filter((button) => typeof button !== "string")
         : [originalRejectButton];
 
-      rejectButtons.forEach((button) => {
+      const rejectHandler = (button: CustomButtonType) => {
         const action = hasCustomReject ? () => store.handleCustomButton?.(button) : () => store.rejectAnnotation({});
 
-        const onReject = async (e: React.MouseEvent) => {
+        return async (e: React.MouseEvent) => {
           const selected = store.annotationStore?.selected;
+          setRejectMenuVisible(false);
 
           const runReject = () => {
             const comment = store.commentStore.currentComment[annotation.id];
@@ -202,9 +210,100 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
             runReject();
           }
         };
+      };
 
-        buttons.push(<ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={onReject} />);
-      });
+      const renderRejectAction = (button: CustomButtonType) => (
+        <ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={rejectHandler(button)} />
+      );
+
+      // Menu rows are plain buttons, not ControlButton: they carry a description and read as a
+      // menu, so button styling (and its negative/neutral variants) would fight the red-outlined
+      // trigger that owns the reject affordance.
+      const renderRejectMenuItem = (button: CustomButtonType, isDefault: boolean) => (
+        <button
+          key={button.name}
+          type="button"
+          disabled={button.disabled || reviewDisabled}
+          onClick={rejectHandler(button)}
+          className="flex w-full flex-col items-start gap-tightest rounded-smaller px-tight py-tighter text-left hover:bg-neutral-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label={button.ariaLabel}
+          data-testid={`bottombar-custom-${button.name}-button`}
+        >
+          <div className="flex w-full items-center justify-between gap-tight">
+            <Typography variant="label" size="medium" className="text-neutral-content">
+              {button.title}
+            </Typography>
+            {isDefault && (
+              <Badge
+                variant="neutral"
+                look="outline"
+                shape="rounded"
+                size="small"
+                data-testid="reject-action-default-badge"
+              >
+                Default
+              </Badge>
+            )}
+          </div>
+          {button.description && (
+            <Typography variant="body" size="small" className="text-neutral-content-subtler">
+              {button.description}
+            </Typography>
+          )}
+        </button>
+      );
+
+      const useRejectMenu = hasCustomReject && rejectButtons.length > 1 && rejectButtons.every((button) => button.menu);
+
+      if (useRejectMenu) {
+        // The menu keeps its configured order, so the one-click action is whichever row is
+        // flagged primary rather than whichever happens to be listed first.
+        const primaryRejectButton = rejectButtons.find((button) => button.isPrimary) ?? rejectButtons[0];
+        const rejectMenuContent = (
+          <div className="flex w-[280px] flex-col gap-tightest p-tighter bg-neutral-surface">
+            {rejectButtons.map((button) => renderRejectMenuItem(button, button === primaryRejectButton))}
+          </div>
+        );
+
+        // Split button: the left half commits to the primary action, the caret opens the full menu.
+        buttons.push(
+          <ButtonGroup key="reject-menu">
+            <Button
+              variant="negative"
+              look="outlined"
+              aria-label="reject-annotation"
+              disabled={reviewDisabled}
+              tooltip={primaryRejectButton.description}
+              onClick={rejectHandler(primaryRejectButton)}
+              data-testid="bottombar-reject-button"
+            >
+              Reject
+            </Button>
+            <Dropdown.Trigger
+              alignment="top-right"
+              visible={rejectMenuVisible}
+              onToggle={setRejectMenuVisible}
+              content={rejectMenuContent}
+            >
+              <Button
+                variant="negative"
+                look="outlined"
+                disabled={reviewDisabled}
+                aria-label="More reject options"
+                data-testid="bottombar-reject-menu"
+                leading={
+                  <CaretDownIcon
+                    size={16}
+                    className={`transition-transform ${rejectMenuVisible ? "rotate-180" : ""}`}
+                  />
+                }
+              />
+            </Dropdown.Trigger>
+          </ButtonGroup>,
+        );
+      } else {
+        rejectButtons.forEach((button) => buttons.push(renderRejectAction(button)));
+      }
       buttons.push(<AcceptButton key="review-accept" disabled={reviewDisabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(

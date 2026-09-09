@@ -30,6 +30,7 @@ const mockStore = {
   },
   customButtons: new Map(),
   rejectAnnotation: mock(),
+  handleCustomButton: mock(),
 };
 
 const mockHistory = {
@@ -80,6 +81,7 @@ describe("Controls", () => {
     ));
     (window as any).APP_SETTINGS = undefined;
     mockStore.task = { id: 1, allow_skip: true };
+    mockStore.customButtons = new Map();
   });
 
   test("When skip button is clicked, if there is no currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
@@ -262,6 +264,128 @@ describe("Controls", () => {
 
     expect(getByLabelText("accept-annotation")).toBeDisabled();
     expect(getByLabelText("reject-annotation")).toBeDisabled();
+  });
+
+  test("renders configured reject actions in one menu", async () => {
+    mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
+    mockStore.customButtons = new Map([
+      [
+        "reject",
+        [
+          {
+            id: "remove",
+            name: "remove",
+            title: "No Rework",
+            description: "Reject without sending for rework",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+            menu: true,
+          },
+          {
+            id: "requeue-other",
+            name: "redistribute",
+            title: "Pass to Another Annotator",
+            description: "Reject and send to a different annotator",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+            menu: true,
+          },
+        ],
+      ],
+    ]);
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId, queryByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    fireEvent.click(getByTestId("bottombar-reject-menu"));
+    await waitFor(() => expect(queryByTestId("bottombar-custom-remove-button")).toBeInTheDocument());
+    expect(queryByTestId("bottombar-custom-redistribute-button")).toBeInTheDocument();
+
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Default");
+    expect(getByTestId("bottombar-custom-redistribute-button")).not.toHaveTextContent("Default");
+
+    // Menu rows carry the description inline instead of a tooltip.
+    expect(getByTestId("bottombar-custom-redistribute-button").textContent).toBe(
+      "Pass to Another AnnotatorReject and send to a different annotator",
+    );
+
+    fireEvent.click(getByTestId("bottombar-custom-redistribute-button"));
+    await waitFor(() =>
+      expect(mockStore.handleCustomButton).toHaveBeenCalledWith(expect.objectContaining({ name: "redistribute" })),
+    );
+  });
+
+  test("the Reject trigger commits to the default action, not the first menu row", async () => {
+    mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
+    mockStore.handleCustomButton = mock();
+    mockStore.customButtons = new Map([
+      [
+        "reject",
+        [
+          {
+            id: "requeue",
+            name: "requeue",
+            title: "Return to Annotator",
+            description: "Reject and send back to the original annotator for rework",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+            menu: true,
+          },
+          {
+            id: "remove",
+            name: "remove",
+            title: "No Rework",
+            description: "Reject without sending for rework",
+            variant: "negative",
+            look: "outlined",
+            disabled: false,
+            isPrimary: true,
+            menu: true,
+          },
+        ],
+      ],
+    ]);
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    fireEvent.click(getByTestId("bottombar-reject-button"));
+
+    await waitFor(() =>
+      expect(mockStore.handleCustomButton).toHaveBeenCalledWith(expect.objectContaining({ name: "remove" })),
+    );
+
+    fireEvent.click(getByTestId("bottombar-reject-menu"));
+    await waitFor(() => expect(getByTestId("bottombar-custom-remove-button")).toBeInTheDocument());
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Default");
+    expect(getByTestId("bottombar-custom-requeue-button")).not.toHaveTextContent("Default");
   });
 
   test("keeps Update enabled when viewing submitted while a draft exists (BROS-1477 QA 93973)", () => {

@@ -44,7 +44,7 @@ mockModule("react-window", () => ({
       );
     }
     return (
-      <div data-testid="virtual-list" data-height={props.height}>
+      <div data-testid="virtual-list" data-height={props.height} data-width={props.width}>
         {items}
       </div>
     );
@@ -71,6 +71,41 @@ function getLastVirtualListProps() {
     }
   }
   throw new Error("VariableSizeList was not called with list props");
+}
+
+function restorePrototypeDescriptor(name: "scrollWidth" | "offsetWidth", original?: PropertyDescriptor) {
+  if (original) {
+    Object.defineProperty(HTMLElement.prototype, name, original);
+  } else {
+    // @ts-expect-error - remove the test-only override
+    delete HTMLElement.prototype[name];
+  }
+}
+
+function mockElementWidths({ scrollWidth, triggerWidth }: { scrollWidth: number; triggerWidth: number }) {
+  const originalScrollWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollWidth");
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth");
+
+  Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+    configurable: true,
+    get() {
+      return scrollWidth;
+    },
+  });
+  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+    configurable: true,
+    get() {
+      if ((this as HTMLElement).getAttribute("aria-expanded") != null) {
+        return triggerWidth;
+      }
+      return originalOffsetWidth?.get?.call(this) ?? 0;
+    },
+  });
+
+  return () => {
+    restorePrototypeDescriptor("scrollWidth", originalScrollWidth);
+    restorePrototypeDescriptor("offsetWidth", originalOffsetWidth);
+  };
 }
 
 describe("Select Component", () => {
@@ -118,7 +153,7 @@ describe("Select Component", () => {
 
   describe("Virtual List Height Calculation", () => {
     const ITEM_HEIGHT = 40;
-    const MAX_VISIBLE_ITEMS = 5;
+    const MAX_LIST_HEIGHT = 300;
 
     it("calculates correct height for flat options with virtual list", async () => {
       const flatOptions = ["Option 1", "Option 2", "Option 3"];
@@ -148,9 +183,9 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // With 20 options, height should be capped at 5 * 40 = 200
+      // With 20 options, height should be capped at 300px (CommandList max)
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
+      expect(lastCall.height).toBe(MAX_LIST_HEIGHT);
     });
 
     it("calculates correct height for grouped options using flatOptions count", async () => {
@@ -169,10 +204,10 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // With 6 flattened items (3 + 3), height should be capped at 5 * 40 = 200
+      // With 6 flattened items (3 + 3), height should be 6 * 40 = 240 (under the 300px cap)
       // NOT 2 * 40 = 80 (which would be wrong if using renderedOptions.length)
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
+      expect(lastCall.height).toBe(6 * ITEM_HEIGHT);
     });
 
     it("calculates correct height for single group with few children", async () => {
@@ -333,9 +368,236 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // Height should be based on loaded items (10), capped at 5 visible
+      // Height should be based on loaded items (10 * 40 = 400), capped at 300
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(5 * 40); // 5 * ITEM_HEIGHT
+      expect(lastCall.height).toBe(300);
+    });
+  });
+
+  describe("Virtual List Dynamic Width", () => {
+    it("sizes the virtual list from a sample of option labels when withDynamicWidth is set", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+
+      try {
+        render(
+          <Select
+            options={["Short", "A much longer option label"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.width).toBe(measuredWidth);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("does not render the width sizer while the dropdown is closed", () => {
+      render(
+        <Select
+          options={["Short", "A much longer option label"] as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      expect(screen.queryByTestId("virtual-list-width-sizer")).not.toBeInTheDocument();
+    });
+
+    it("treats withDynamicWidth as a no-op without isVirtualList", async () => {
+      render(
+        <Select
+          options={["Short", "A much longer option label"] as any}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("A much longer option label")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("virtual-list")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("virtual-list-width-sizer")).not.toBeInTheDocument();
+    });
+
+    it("keeps virtual list width at 100% when withDynamicWidth is unset", async () => {
+      render(
+        <Select options={["Short", "A much longer option label"] as any} isVirtualList={true} placeholder="Select" />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(getLastVirtualListProps().width).toBe("100%");
+      });
+    });
+
+    it("adds the scrollbar gutter only when content overflows the height cap", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+      const overflowingOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      try {
+        render(
+          <Select
+            options={overflowingOptions as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(300);
+          expect(lastCall.width).toBe(measuredWidth + 16);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("adds the scrollbar gutter when item heights land exactly on the cap but more items remain", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+      const overflowingOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      try {
+        render(
+          <Select
+            options={overflowingOptions as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            virtualListMaxVisible={3}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(3 * 40);
+          expect(lastCall.width).toBe(measuredWidth + 16);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("does not add the scrollbar gutter when items fill the cap exactly with none remaining", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+
+      try {
+        render(
+          <Select
+            options={["A", "B", "C"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            virtualListMaxVisible={3}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(3 * 40);
+          expect(lastCall.width).toBe(measuredWidth);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("lets virtualListMaxVisible override the 300px height cap", async () => {
+      const manyOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      render(
+        <Select
+          options={manyOptions as any}
+          isVirtualList={true}
+          searchable={true}
+          virtualListMaxVisible={3}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(getLastVirtualListProps().height).toBe(3 * 40);
+      });
+    });
+
+    it("samples only the first 16 options for dynamic width and ignores the rest", async () => {
+      const options = [
+        ...Array.from({ length: 16 }, (_, i) => `Short ${i}`),
+        "This is a much longer option that a sort-by-length scan would have picked",
+      ];
+
+      render(
+        <Select
+          options={options as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const sizer = await screen.findByTestId("virtual-list-width-sizer");
+      expect(sizer.children).toHaveLength(16);
+      expect(sizer).toHaveTextContent("Short 0");
+      expect(sizer).toHaveTextContent("Short 15");
+      expect(sizer).not.toHaveTextContent("This is a much longer option");
+    });
+
+    it("mirrors multiple-option padding, checkbox, and description icon in the width sizer", async () => {
+      render(
+        <Select
+          options={[{ value: "a", label: "Alpha", description: "Help text" }] as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          multiple={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const sizer = await screen.findByTestId("virtual-list-width-sizer");
+      const row = sizer.firstElementChild as HTMLElement;
+      const inner = row.firstElementChild as HTMLElement;
+      expect(row).toHaveClass("p-1");
+      expect(inner).toHaveClass("pl-2", "pr-4");
+      expect(inner).not.toHaveClass("px-4");
+      expect(inner.querySelector('input[type="checkbox"]')).toBeInTheDocument();
+      expect(sizer.querySelector("svg")).toBeInTheDocument();
     });
   });
 

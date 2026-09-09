@@ -18,7 +18,7 @@ import "./MediaPlayer.prefix.css";
 import { MediaSeeker } from "./MediaSeeker";
 import { Duration } from "./Duration";
 
-const mediaDefaultProps = { crossOrigin: "anonymous" };
+const mediaDefaultProps = { crossOrigin: "anonymous", playsInline: true };
 
 const initialState = {
   duration: 0,

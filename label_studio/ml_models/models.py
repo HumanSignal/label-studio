@@ -262,6 +262,16 @@ class ModelRun(models.Model):
         predictions._raw_delete(predictions.db)
         failed_predictions._raw_delete(failed_predictions.db)
 
+        # _raw_delete bypasses Prediction pre_delete, so task.total_predictions is
+        # never decremented by save_predictions_to_project's counterpart. Recount
+        # affected tasks here so callers (ModelRun.delete, ModelVersion.delete,
+        # prompt-version destroy) cannot leave the Data Manager counter stale.
+        if task_ids:
+            from tasks.functions import update_tasks_counters
+            from tasks.models import Task
+
+            update_tasks_counters(Task.objects.filter(id__in=task_ids))
+
         # LSE postprocess (e.g. recompute dimension scores)
         from core.utils.common import load_func
 

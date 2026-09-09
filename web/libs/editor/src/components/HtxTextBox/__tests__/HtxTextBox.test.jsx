@@ -14,6 +14,7 @@ mockModule("@humansignal/icons", () => {
 mockModule("@humansignal/ui", () => {
   const React = require("react");
   return {
+    ...requireActual("@humansignal/ui"),
     Button: ({ children, onClick, "aria-label": ariaLabel, "data-testid": testId, ...props }) =>
       React.createElement(
         "button",

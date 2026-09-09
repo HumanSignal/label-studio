@@ -1,9 +1,11 @@
 import { MediaPlayer } from "../Common/MediaPlayer/MediaPlayer";
 
 /**
- * Data Collection: the file submitted for the task, read from the latest
- * submitted annotation. The serializer sends `{url, content_type, filename}`
- * (or null while nothing has been submitted yet).
+ * Data Collection: the file the contributor submitted for this task. The
+ * column is offered to annotators only and the serializer scopes it to the
+ * requester, so this is always the viewer's own submission — never a gallery
+ * of other contributors' work. Sends `{url, content_type, filename}`, or null
+ * while nothing has been submitted yet.
  */
 export const SubmissionCell = (column) => {
   const value = column.value;
