@@ -16,13 +16,20 @@ logger = logging.getLogger(__name__)
 
 
 class S3StorageSerializerMixin:
-    secure_fields = ['aws_access_key_id', 'aws_secret_access_key']
+    secure_fields = ['aws_access_key_id', 'aws_secret_access_key', 'aws_session_token']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
         for attr in self.secure_fields:
-            result.pop(attr)
+            # tolerate subclasses that narrow Meta.fields/exclude
+            result.pop(attr, None)
         return result
+
+    def validate_s3_endpoint(self, value):
+        # on the mixin: both import and export storages accept s3_endpoint
+        if value and settings.SSRF_PROTECTION_ENABLED:
+            validate_url_for_ssrf(value, block_local_urls=True)
+        return value
 
     def validate_bucket(self, value):
         if not value:
@@ -78,11 +85,6 @@ class S3StorageSerializerMixin:
 class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerializer):
     type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     presign = serializers.BooleanField(required=False, default=True)
-
-    def validate_s3_endpoint(self, value):
-        if value and settings.SSRF_PROTECTION_ENABLED:
-            validate_url_for_ssrf(value, block_local_urls=True)
-        return value
 
     class Meta:
         model = S3ImportStorage
