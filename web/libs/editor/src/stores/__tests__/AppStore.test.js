@@ -1051,5 +1051,20 @@ describe("AppStore", () => {
       await new Promise((r) => setTimeout(r, 300));
       expect(mockInvoke).toHaveBeenCalledWith("updateAnnotation", store, entity, { extra: "data" });
     });
+
+    it("clears acceptedState after a successful update so a prior review is stale", async () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [], accepted_state: "accepted" }] });
+      const entity = store.annotationStore.selected;
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
+      mockInvoke.mockResolvedValue(undefined);
+      expect(entity.acceptedState).toBe("accepted");
+      store.updateAnnotation();
+      await new Promise((r) => setTimeout(r, 300));
+      expect(entity.acceptedState).toBeNull();
+    });
   });
 });

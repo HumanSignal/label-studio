@@ -71,3 +71,41 @@ export function resolveClassicEntityReviewState(
 
   return resolveReviewAcceptedStateFromTaskSource(entity, store?.task?.source);
 }
+
+export type ReviewBarCopy = {
+  rejectLabel: string;
+  acceptLabel: string;
+  disableRejectForSameState: boolean;
+  disableAcceptForSameState: boolean;
+};
+
+/**
+ * Accept/Reject bottom-bar copy and same-state disable flags.
+ *
+ * Labels follow a *live* verdict only (`accepted` / `rejected` / `fixed`). Pass `null` when the
+ * annotator has edited after the review (stale) so the bar is a first-time Reject / Accept pair.
+ * Dirty local edits always win for the accept button (`Fix + Accept`).
+ */
+export function resolveReviewBarCopy(
+  acceptedState: SharedAnnotation["acceptedState"],
+  hasChanges: boolean,
+): ReviewBarCopy {
+  const isAcceptedState = acceptedState === "accepted" || acceptedState === "fixed";
+  const rejectLabel = acceptedState === "rejected" ? "Rejected" : isAcceptedState ? "Change to Reject" : "Reject";
+  const acceptLabel = hasChanges
+    ? "Fix + Accept"
+    : acceptedState === "accepted"
+      ? "Accepted"
+      : acceptedState === "fixed"
+        ? "Fixed"
+        : acceptedState === "rejected"
+          ? "Change to Accept"
+          : "Accept";
+
+  return {
+    rejectLabel,
+    acceptLabel,
+    disableRejectForSameState: acceptedState === "rejected",
+    disableAcceptForSameState: !hasChanges && isAcceptedState,
+  };
+}

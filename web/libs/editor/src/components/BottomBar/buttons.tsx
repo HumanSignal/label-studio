@@ -7,6 +7,7 @@
 import { inject, observer } from "mobx-react";
 import type React from "react";
 import { memo, type ReactElement } from "react";
+import { normalizeReviewAcceptedState, resolveReviewBarCopy } from "@humansignal/core";
 import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
@@ -56,10 +57,17 @@ export const AcceptButton = memo(
   observer(({ disabled, history, store }: AcceptButtonProps) => {
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
-    const hasChanges = history.canUndo || annotation.versions.draft;
+    const hasChanges = Boolean(history.canUndo || annotation.versions.draft);
+    const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
-    const isDisabled = disabled || hasIncompleteRegions;
-    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
+    const isDisabled = disabled || hasIncompleteRegions || reviewCopy.disableAcceptForSameState;
+    const tooltip = hasIncompleteRegions
+      ? INCOMPLETE_ACCEPT_TOOLTIP
+      : !hasChanges && reviewCopy.acceptLabel === "Accepted"
+        ? "Annotation already accepted"
+        : !hasChanges && reviewCopy.acceptLabel === "Fixed"
+          ? "Annotation already fixed and accepted"
+          : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
       <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap max-w-none">
@@ -78,7 +86,7 @@ export const AcceptButton = memo(
           }}
           data-testid="bottombar-accept-button"
         >
-          {hasChanges ? "Fix + Accept" : "Accept"}
+          {reviewCopy.acceptLabel}
         </Button>
       </Tooltip>
     );

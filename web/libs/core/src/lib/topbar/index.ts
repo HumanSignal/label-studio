@@ -47,4 +47,6 @@ export {
   normalizeReviewAcceptedState,
   resolveReviewAcceptedStateFromTaskSource,
   resolveClassicEntityReviewState,
+  resolveReviewBarCopy,
 } from "./review-accepted-state";
+export type { ReviewBarCopy } from "./review-accepted-state";

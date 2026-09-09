@@ -777,6 +777,7 @@ export default types
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         }
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
+        entity.setAcceptedState?.(null);
         self.incrementQueuePosition();
         if (isFF(FF_CUSTOM_SCRIPT)) {
           entity.dropDraft();

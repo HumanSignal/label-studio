@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKe
 
 import { Badge, Button, ButtonGroup, Dropdown, type ButtonProps, Typography, type DropdownRef } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
+import { normalizeReviewAcceptedState, resolveReviewBarCopy } from "@humansignal/core";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
@@ -233,9 +234,12 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     }
 
     if (isReview) {
+      const hasChanges = Boolean(history?.canUndo || versions?.draft);
+      const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
+      const rejectDisabled = reviewDisabled || reviewCopy.disableRejectForSameState;
       const customRejectButtons = toArray(customButtons.get("reject"));
       const hasCustomReject = customRejectButtons.length > 0;
-      const originalRejectButton = RejectButtonDefinition;
+      const originalRejectButton = { ...RejectButtonDefinition, title: reviewCopy.rejectLabel };
 
       // @todo implement reuse of internal buttons later (they are set as strings)
       const rejectButtons: CustomButtonType[] = hasCustomReject
@@ -259,7 +263,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               store.settings.enableTooltips,
             ),
           }}
-          disabled={reviewDisabled}
+          disabled={rejectDisabled}
           onClick={rejectHandler(button)}
         />
       );
@@ -272,7 +276,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           key={button.name}
           type="button"
           role="menuitem"
-          disabled={button.disabled || reviewDisabled}
+          disabled={button.disabled || rejectDisabled}
           onClick={rejectHandler(button)}
           className="flex w-full flex-col items-start gap-tightest rounded-smaller px-tight py-tighter text-left hover:bg-neutral-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={button.ariaLabel}
@@ -337,7 +341,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               variant="negative"
               look="outlined"
               aria-label="reject-annotation"
-              disabled={reviewDisabled}
+              disabled={rejectDisabled}
               tooltip={rejectTooltip(
                 primaryRejectButton.description ?? "",
                 primaryRejectButton.name,
@@ -346,7 +350,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               onClick={rejectHandler(primaryRejectButton)}
               data-testid="bottombar-reject-button"
             >
-              Reject
+              {reviewCopy.rejectLabel}
             </Button>
             <Dropdown.Trigger
               alignment="top-right"
@@ -357,7 +361,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               <Button
                 variant="negative"
                 look="outlined"
-                disabled={reviewDisabled}
+                disabled={rejectDisabled}
                 aria-label="More reject options"
                 data-testid="bottombar-reject-menu"
                 leading={

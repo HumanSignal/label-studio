@@ -3,6 +3,7 @@ import {
   normalizeReviewAcceptedState,
   resolveClassicEntityReviewState,
   resolveReviewAcceptedStateFromTaskSource,
+  resolveReviewBarCopy,
 } from "../review-accepted-state";
 
 describe("isEnterpriseEdition", () => {
@@ -145,5 +146,79 @@ describe("resolveClassicEntityReviewState", () => {
     expect(
       resolveClassicEntityReviewState({ pk: 1, type: "annotation", accepted_state: "fixed_and_accepted" }, null),
     ).toBe("fixed");
+  });
+});
+
+describe("resolveReviewBarCopy", () => {
+  it("shows first-time Reject / Accept when there is no live verdict", () => {
+    expect(resolveReviewBarCopy(null, false)).toEqual({
+      rejectLabel: "Reject",
+      acceptLabel: "Accept",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: false,
+    });
+  });
+
+  it("treats a stale verdict (null after annotator UPDATE) as a new review even when dirty", () => {
+    expect(resolveReviewBarCopy(null, true)).toEqual({
+      rejectLabel: "Reject",
+      acceptLabel: "Fix + Accept",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: false,
+    });
+  });
+
+  it("shows Change to Reject and disables Accept for a live accepted verdict", () => {
+    expect(resolveReviewBarCopy("accepted", false)).toEqual({
+      rejectLabel: "Change to Reject",
+      acceptLabel: "Accepted",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: true,
+    });
+  });
+
+  it("shows Change to Reject and disables Accept for a live fixed verdict", () => {
+    expect(resolveReviewBarCopy("fixed", false)).toEqual({
+      rejectLabel: "Change to Reject",
+      acceptLabel: "Fixed",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: true,
+    });
+  });
+
+  it("shows Change to Accept and disables Reject for a live rejected verdict", () => {
+    expect(resolveReviewBarCopy("rejected", false)).toEqual({
+      rejectLabel: "Rejected",
+      acceptLabel: "Change to Accept",
+      disableRejectForSameState: true,
+      disableAcceptForSameState: false,
+    });
+  });
+
+  it("uses Fix + Accept and keeps Change to Reject when a live accepted annotation is dirty", () => {
+    expect(resolveReviewBarCopy("accepted", true)).toEqual({
+      rejectLabel: "Change to Reject",
+      acceptLabel: "Fix + Accept",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: false,
+    });
+  });
+
+  it("uses Fix + Accept and keeps Change to Reject when a live fixed annotation is dirty", () => {
+    expect(resolveReviewBarCopy("fixed", true)).toEqual({
+      rejectLabel: "Change to Reject",
+      acceptLabel: "Fix + Accept",
+      disableRejectForSameState: false,
+      disableAcceptForSameState: false,
+    });
+  });
+
+  it("keeps Rejected disabled and uses Fix + Accept when a live rejected annotation is dirty", () => {
+    expect(resolveReviewBarCopy("rejected", true)).toEqual({
+      rejectLabel: "Rejected",
+      acceptLabel: "Fix + Accept",
+      disableRejectForSameState: true,
+      disableAcceptForSameState: false,
+    });
   });
 });
