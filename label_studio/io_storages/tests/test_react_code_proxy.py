@@ -24,6 +24,13 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 TEST_SECRET_KEY = 'test-secret-key-for-react-code-proxy'
 
 
+def _response_bytes(response) -> bytes:
+    """Collect body from streaming (RangedFileResponse) or buffered HttpResponse."""
+    if hasattr(response, 'streaming_content'):
+        return b''.join(response.streaming_content)
+    return response.content
+
+
 class TestGenerateReactCodeToken(unittest.TestCase):
     @override_settings(SECRET_KEY=TEST_SECRET_KEY)
     def test_generates_valid_jwt_with_default_ttl(self):
@@ -460,23 +467,22 @@ class TestServeLocalUpload:
         return UserModel, mock_project
 
     def _upload_mock(self, content: bytes = b'\xff\xd8\xff\xe0', name: str = 'upload/25/abc-photo.jpg'):
-        """Return a FileUpload mock that serves the given bytes."""
-        mock_file = MagicMock()
-        mock_file.__enter__ = MagicMock(return_value=mock_file)
-        mock_file.__exit__ = MagicMock(return_value=False)
-        mock_file.read.return_value = content
+        """Return a FileUpload mock with a seekable file handle (needed for Range)."""
+        import io
 
         mock_upload = MagicMock()
         mock_upload.file.name = name
-        mock_upload.file.open.return_value = mock_file
+        # Fresh BytesIO per open() — RangedFileResponse seeks/tells the handle.
+        mock_upload.file.open = MagicMock(side_effect=lambda mode='rb': io.BytesIO(content))
         return mock_upload
 
-    def _get(self, token: str, path: str):
+    def _get(self, token: str, path: str, **headers):
         from urllib.parse import quote
 
         request = self.factory.get(
             f'/api/react-code/resolve/{token}/',
             {'fileuri': quote(path, safe='')},
+            **headers,
         )
         return self.view(request, token=token)
 
@@ -502,7 +508,39 @@ class TestServeLocalUpload:
         assert response.status_code == 200
         assert response['Access-Control-Allow-Origin'] == '*'
         assert response['Content-Type'] == 'image/jpeg'
-        assert response.content == b'\xff\xd8\xff\xe0'
+        assert response.get('Accept-Ranges') == 'bytes'
+        assert _response_bytes(response) == b'\xff\xd8\xff\xe0'
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY)
+    @patch('data_import.models.FileUpload')
+    @patch('io_storages.react_code_proxy.Project.objects.get')
+    @patch('io_storages.react_code_proxy.get_user_model')
+    def test_serves_local_upload_partial_content_for_range(
+        self, mock_get_user_model, mock_project_get, mock_file_upload_class, setup
+    ):
+        """HTML5 video seeking needs HTTP 206 Range (FIT-2776)."""
+        UserModel, mock_project = self._auth_mocks()
+        mock_get_user_model.return_value = UserModel
+        mock_project_get.return_value = mock_project
+
+        payload = b'0123456789abcdef'
+        mock_upload = self._upload_mock(content=payload, name='upload/25/clip.mp4')
+        mock_file_upload_class.objects.get.return_value = mock_upload
+
+        user = MagicMock(id=1, active_organization_id=1)
+        token, _ = generate_react_code_token(user, project_id=25)
+
+        response = self._get(
+            token,
+            '/data/upload/25/clip.mp4',
+            HTTP_RANGE='bytes=0-3',
+        )
+
+        assert response.status_code == 206
+        assert response['Accept-Ranges'] == 'bytes'
+        assert response['Content-Range'] == f'bytes 0-3/{len(payload)}'
+        assert response['Access-Control-Allow-Origin'] == '*'
+        assert _response_bytes(response) == b'0123'
 
     @override_settings(SECRET_KEY=TEST_SECRET_KEY)
     @patch('data_import.models.FileUpload')
@@ -672,7 +710,7 @@ class TestUploadTenancyIsolation:
         response = self._request(env, token, env['upload_a'])
 
         assert response.status_code == 200
-        assert response.content == b'PROJECT-A-OWN-BYTES'
+        assert _response_bytes(response) == b'PROJECT-A-OWN-BYTES'
         assert response['Content-Type'] == 'image/jpeg'
         assert response['Access-Control-Allow-Origin'] == '*'
 
@@ -689,7 +727,7 @@ class TestUploadTenancyIsolation:
         response = self._request(env, token, env['upload_b'])
 
         assert response.status_code == 404
-        assert b'PROJECT-B-PRIVATE-BYTES' not in response.content
+        assert b'PROJECT-B-PRIVATE-BYTES' not in _response_bytes(response)
         assert response['Access-Control-Allow-Origin'] == '*'
 
     @override_settings(SECRET_KEY=TEST_SECRET_KEY)
@@ -776,4 +814,4 @@ class TestUploadTenancyIsolation:
             response = self._request(env, token, upload)
 
             assert response.status_code == 200
-            assert response.content == b'PROJECT-A-OWN-BYTES'
+            assert _response_bytes(response) == b'PROJECT-A-OWN-BYTES'

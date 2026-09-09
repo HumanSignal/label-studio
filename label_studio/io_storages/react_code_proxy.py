@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from projects.models import Project
+from ranged_fileresponse import RangedFileResponse
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -177,7 +178,7 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
 
         decoded_fileuri = _decode_fileuri(fileuri)
         if decoded_fileuri.startswith('/data/upload/'):
-            return self._serve_local_upload(decoded_fileuri, project)
+            return self._serve_local_upload(request, decoded_fileuri, project)
 
         # Delegate to the standard resolve path (presigned redirect or proxy depending on
         # storage.presign). The sandbox iframe fetches this endpoint via a parent-window
@@ -186,8 +187,13 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         response = self.resolve(request, decoded_fileuri, project)
         return _add_cors_headers(response)
 
-    def _serve_local_upload(self, url_path: str, project) -> HttpResponse:
-        """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies."""
+    def _serve_local_upload(self, request, url_path: str, project) -> HttpResponse:
+        """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies.
+
+        Uses RangedFileResponse so HTML5 video/audio can seek (HTTP Range / 206). Without
+        Range support, project Quick View frame navigation breaks after uploads are
+        rewritten through this proxy (FIT-2776); Interface Preview keeps public URLs.
+        """
         # url_path: /data/upload/{project_id}/{filename}  →  storage path: upload/{project_id}/{filename}
         parts = url_path.lstrip('/').split('/')
         if len(parts) < 4 or parts[0] != 'data' or parts[1] != 'upload':
@@ -214,9 +220,15 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
 
         try:
             content_type, _ = mimetypes.guess_type(upload.file.name)
-            with upload.file.open('rb') as f:
-                content = f.read()
-            response = HttpResponse(content, content_type=content_type or 'application/octet-stream')
+            # Do not wrap open() in `with` — RangedFileResponse streams the handle.
+            response = RangedFileResponse(
+                request,
+                upload.file.open(mode='rb'),
+                content_type=content_type or 'application/octet-stream',
+            )
+            # Advertise Range even on full-body 200 so browsers enable seeking
+            # (django-ranged-fileresponse only sets this when HTTP_RANGE is present).
+            response['Accept-Ranges'] = 'bytes'
             return _add_cors_headers(response)
         except Exception as exc:
             logger.error(f'Error serving local upload {url_path}: {exc}')
