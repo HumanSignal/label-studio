@@ -45,7 +45,7 @@ describe("MediaCard", () => {
     expect(screen.queryByText("Remove")).not.toBeInTheDocument();
   });
 
-  it("submitted state offers Replace only; readonly offers nothing", () => {
+  it("submitted offers Replace only; readonly offers nothing", () => {
     const { rerender } = render(
       <MediaCard
         state="submitted"
@@ -58,6 +58,7 @@ describe("MediaCard", () => {
     );
     expect(screen.getByText("Replace…")).toBeInTheDocument();
     expect(screen.queryByText("Remove")).not.toBeInTheDocument();
+    expect(screen.getByText("Submitted")).toBeInTheDocument();
 
     rerender(
       <MediaCard
@@ -70,12 +71,20 @@ describe("MediaCard", () => {
       />,
     );
     expect(screen.queryByText("Replace…")).not.toBeInTheDocument();
+    expect(screen.queryByText("Remove")).not.toBeInTheDocument();
     expect(screen.getByText("Submitted")).toBeInTheDocument();
+  });
+
+  it("uploaded state carries a positive chip and offers Remove", () => {
+    render(<MediaCard state="uploaded" file={FILE} kind="video" previewUrl="u" onRemove={() => undefined} />);
+    expect(screen.getByTestId("media-card-uploaded")).toBeInTheDocument();
+    expect(screen.getByText("Uploaded")).toBeInTheDocument();
+    expect(screen.getByText("Remove")).toBeInTheDocument();
   });
 
   it("video renders a play overlay and reports metadata", () => {
     const onMeta = jest.fn();
-    render(<MediaCard state="ready" file={FILE} kind="video" previewUrl="blob:v" onMediaMetadata={onMeta} />);
+    render(<MediaCard state="uploaded" file={FILE} kind="video" previewUrl="blob:v" onMediaMetadata={onMeta} />);
     expect(screen.getByTestId("media-card-play")).toBeInTheDocument();
     const video = screen.getByTestId("media-card-media").querySelector("video") as HTMLVideoElement;
     Object.defineProperty(video, "duration", { value: 4.2 });
@@ -89,7 +98,7 @@ describe("MediaCard", () => {
     const onMeta = jest.fn();
     render(
       <MediaCard
-        state="ready"
+        state="uploaded"
         file={{ name: "photo.png", contentType: "image/png", size: 1000 }}
         kind="image"
         previewUrl="blob:i"
@@ -107,13 +116,12 @@ describe("MediaCard", () => {
   it("broken preview shows the honest placeholder and a retry", () => {
     render(
       <MediaCard
-        state="stored"
+        state="uploaded"
         file={FILE}
         kind="video"
         previewUrl="u"
         previewBroken
         onRetryPreview={() => undefined}
-        onReplace={() => undefined}
       />,
     );
     expect(screen.getByText(/stored safely/)).toBeInTheDocument();
@@ -121,11 +129,52 @@ describe("MediaCard", () => {
     expect(screen.getByTestId("media-card-media").querySelector("video")).toBeNull();
   });
 
+  it("treats an image that loads with zero intrinsic size as broken (redirect/expired-signature failure)", () => {
+    const onPreviewError = jest.fn();
+    render(
+      <MediaCard
+        state="uploaded"
+        file={{ name: "a.png" }}
+        kind="image"
+        previewUrl="blob:x"
+        onPreviewError={onPreviewError}
+      />,
+    );
+    const img = screen.getByTestId("media-card-media").querySelector("img") as HTMLImageElement;
+    Object.defineProperty(img, "naturalWidth", { value: 0 });
+    fireEvent.load(img);
+    expect(onPreviewError).toHaveBeenCalled();
+    // The card must show its own placeholder from INTERNAL state, without the
+    // parent passing previewBroken back (the parent's URL-keyed flag desyncs).
+    expect(screen.getByText(/stored safely/)).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-media").querySelector("img")).toBeNull();
+  });
+
+  it("flags the preview broken when it never settles within the timeout", () => {
+    jest.useFakeTimers();
+    const onPreviewError = jest.fn();
+    render(
+      <MediaCard
+        state="uploaded"
+        file={{ name: "a.png" }}
+        kind="image"
+        previewUrl="blob:never"
+        onPreviewError={onPreviewError}
+      />,
+    );
+    expect(onPreviewError).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(8000);
+    expect(onPreviewError).toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
   it("survives a missing file (recovered stored submission) with a neutral header", () => {
-    render(<MediaCard state="stored" file={null} kind="video" previewUrl="u" storedHint onReplace={() => undefined} />);
-    expect(screen.getByTestId("media-card-stored")).toBeInTheDocument();
+    render(
+      <MediaCard state="uploaded" file={null} kind="video" previewUrl="u" storedHint onRemove={() => undefined} />,
+    );
+    expect(screen.getByTestId("media-card-uploaded")).toBeInTheDocument();
     expect(screen.getByText("Submission")).toBeInTheDocument();
-    expect(screen.getByText("Stored")).toBeInTheDocument();
+    expect(screen.getByText("Uploaded")).toBeInTheDocument();
   });
 
   it("rejected state carries the metadata row when facts are known", () => {
@@ -136,7 +185,6 @@ describe("MediaCard", () => {
         kind="video"
         previewUrl="u"
         meta={{ durationSec: 17.48, width: 480, height: 360 }}
-        onReplace={() => undefined}
         onRemove={() => undefined}
       />,
     );

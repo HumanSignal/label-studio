@@ -32,7 +32,7 @@ const meta: Meta<typeof MediaCard> = {
   argTypes: {
     state: {
       control: "select",
-      options: ["uploading", "failed", "rejected", "ready", "stored", "submitted", "readonly"],
+      options: ["uploading", "failed", "rejected", "uploaded", "submitted", "readonly"],
     },
     kind: { control: "select", options: ["video", "image", "file"] },
   },
@@ -90,7 +90,7 @@ export const NotAccepted: Story = {
 
 export const ReadyToSubmit: Story = {
   args: {
-    state: "ready",
+    state: "uploaded",
     file: FILE,
     kind: "video",
     previewUrl: PIXEL,
@@ -103,7 +103,7 @@ export const ReadyToSubmit: Story = {
 export const Stored: Story = {
   name: "Stored (recovered on return)",
   args: {
-    state: "stored",
+    state: "uploaded",
     file: FILE,
     kind: "video",
     previewUrl: PIXEL,
@@ -141,7 +141,7 @@ export const ReadOnly: Story = {
 
 export const PreviewUnavailable: Story = {
   args: {
-    state: "stored",
+    state: "uploaded",
     file: FILE,
     kind: "video",
     previewUrl: PIXEL,
@@ -151,9 +151,32 @@ export const PreviewUnavailable: Story = {
   },
 };
 
+export const RowLayout: Story = {
+  name: "Row (list view)",
+  args: {
+    state: "uploaded",
+    file: FILE,
+    kind: "video",
+    previewUrl: PIXEL,
+    layout: "row",
+    storedHint: true,
+    ruleResults: evaluateSubmissionRules(GOOD_META, RULES),
+    meta: GOOD_META,
+    ...handlers,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'layout="row" renders the same card data as a dense horizontal row for the CollectionUploader list view: thumb, filename + facts (first failing check inline in red), progress while uploading, status chip, right-aligned actions. CollectionUploader injects this layout automatically when the header toggle is on list — interfaces never set it by hand.',
+      },
+    },
+  },
+};
+
 export const ImageSubmission: Story = {
   args: {
-    state: "ready",
+    state: "uploaded",
     file: { name: "receipt_photo.png", size: 812_000, contentType: "image/png" },
     kind: "image",
     previewUrl: PIXEL,
