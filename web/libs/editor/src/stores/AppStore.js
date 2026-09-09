@@ -21,6 +21,7 @@ import { emitRegionDeleted } from "../utils/labelingTelemetry";
 import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
+import { REJECT_ACTION_HOTKEY_NAMES } from "../utils/rejectHotkeys";
 
 const hotkeys = Hotkey("AppStore", "Global Hotkeys");
 
@@ -386,6 +387,22 @@ export default types
       }
     }
 
+    /** Reject buttons the host configured for this project, in the order it sent them. */
+    function configuredRejectButtons() {
+      const configured = self.customButtons?.get("reject");
+      const buttons = Array.isArray(configured) ? configured : configured ? [configured] : [];
+
+      return buttons.filter((button) => typeof button !== "string");
+    }
+
+    /**
+     * The bottom bar owns the reject flow (comment gate, in-progress state), so the hotkeys
+     * name an action and let it run, exactly as clicking that option would.
+     */
+    function requestReject(name) {
+      window.dispatchEvent(new CustomEvent("lsf:reject-with-action", { detail: { name } }));
+    }
+
     function handleSkipHotkey() {
       if (!self.hydrated || self.isLoading || self.noTask) return;
       if (self.annotationStore.viewingAll) return;
@@ -393,15 +410,12 @@ export default types
       const entity = self.annotationStore.selected;
 
       if (self.hasInterface("review")) {
-        const configured = self.customButtons?.get("reject");
-        const rejectButtons = Array.isArray(configured) ? configured : configured ? [configured] : [];
-        const rejectMenuButtons = rejectButtons.filter((button) => typeof button !== "string" && button.menu);
+        const buttons = configuredRejectButtons();
+        // Same as clicking the split button: the project's default, never the menu.
+        const primary = buttons.find((button) => button.isPrimary) ?? buttons[0];
 
-        if (rejectMenuButtons.length > 1) {
-          window.dispatchEvent(new CustomEvent("lsf:open-reject-menu"));
-        } else if (rejectMenuButtons.length === 1) {
-          entity?.submissionInProgress();
-          self.handleCustomButton?.(rejectMenuButtons[0]);
+        if (primary) {
+          requestReject(primary.name);
         } else {
           entity?.submissionInProgress();
           self.rejectAnnotation();
@@ -409,6 +423,24 @@ export default types
       } else {
         entity?.submissionInProgress();
         self.skipTask();
+      }
+    }
+
+    /**
+     * One fixed key per allowed reject action, so a key always means the same action whatever
+     * its place in the menu. Actions the project has not configured stay unbound, hence inert.
+     */
+    function attachRejectActionHotkeys() {
+      if (!self.hasInterface("review")) return;
+
+      for (const button of configuredRejectButtons()) {
+        const named = REJECT_ACTION_HOTKEY_NAMES[button.name];
+        if (!named) continue;
+        hotkeys.addNamed(named, () => {
+          if (!self.hydrated || self.isLoading || self.noTask) return;
+          if (self.annotationStore.viewingAll) return;
+          requestReject(button.name);
+        });
       }
     }
 
@@ -429,6 +461,8 @@ export default types
       if (self.hasInterface("skip", "review")) {
         hotkeys.addNamed("annotation:skip", self.handleSkipHotkey);
       }
+
+      attachRejectActionHotkeys();
 
       /**
        * Hotkey for delete
@@ -1163,6 +1197,7 @@ export default types
       setHistory,
       hydrateHistoryItem,
       attachHotkeys,
+      attachRejectActionHotkeys,
       handleSubmitHotkey,
       handleSkipHotkey,
 

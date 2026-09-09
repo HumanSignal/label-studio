@@ -6,11 +6,10 @@
 
 import { observer } from "mobx-react";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
-import { Badge, Button, ButtonGroup, type ButtonProps, Typography } from "@humansignal/ui";
+import { Badge, Button, ButtonGroup, Dropdown, type ButtonProps, Typography, type DropdownRef } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
-import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
@@ -24,6 +23,7 @@ import {
   UnskipButton,
 } from "./buttons";
 import { annotationActionProps, emitLabelingEvent } from "../../utils/labelingTelemetry";
+import { rejectTooltip } from "../../utils/rejectHotkeys";
 
 import "./Controls.prefix.css";
 
@@ -48,6 +48,14 @@ export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
 export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before submitting";
 export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before updating";
 export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before accepting";
+
+/** Arrows move between rows; Escape closes. Enter/Space commit natively on the focused button. */
+function moveRejectMenuFocus(menu: HTMLElement, step: 1 | -1) {
+  const items = [...menu.querySelectorAll<HTMLButtonElement>("[role='menuitem']:not([disabled])")];
+  if (!items.length) return;
+  const current = items.indexOf(document.activeElement as HTMLButtonElement);
+  items[(current + step + items.length) % items.length].focus();
+}
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
@@ -93,15 +101,21 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
     const [isInProgress, setIsInProgress] = useState(false);
     const [rejectMenuVisible, setRejectMenuVisible] = useState(false);
+    const rejectMenuRef = useRef<DropdownRef>(null);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const reviewDisabled = disabled || viewingSubmittedWhileDraftExists;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
 
-    useEffect(() => {
-      const openRejectMenu = () => setRejectMenuVisible(true);
-      window.addEventListener("lsf:open-reject-menu", openRejectMenu);
-      return () => window.removeEventListener("lsf:open-reject-menu", openRejectMenu);
+    // The dropdown mounts its content on open, so the ref callback is the moment to take focus.
+    const focusFirstRejectOption = useCallback((menu: HTMLDivElement | null) => {
+      if (!menu) return;
+      requestAnimationFrame(() => menu.querySelector<HTMLButtonElement>("[role='menuitem']:not([disabled])")?.focus());
+    }, []);
+
+    const closeRejectMenu = useCallback(() => {
+      rejectMenuRef.current?.close();
+      setRejectMenuVisible(false);
     }, []);
 
     /** Check all things related to comments and then call the action if all is good */
@@ -139,6 +153,49 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         isInProgress,
       ],
     );
+
+    const rejectByName = useCallback(
+      (name?: string, event?: { preventDefault?: () => void }) => {
+        const configured = store.customButtons?.get("reject");
+        const listed = toArray(configured).filter((button) => typeof button !== "string");
+        const button = listed.find((item) => item.name === name);
+        const hasCustomReject = listed.length > 0;
+        const selected = store.annotationStore?.selected;
+        closeRejectMenu();
+
+        const runReject = () => {
+          const comment = store.commentStore.currentComment[annotation.id];
+          const commentText = (comment?.text ?? comment)?.trim();
+          if (hasCustomReject && button) store.handleCustomButton?.(button);
+          else store.rejectAnnotation({});
+          emitLabelingEvent(store, "annotation_rejected", {
+            ...annotationActionProps(store, selected),
+            has_comment: Boolean(commentText) || store.commentStore.addedCommentThisSession,
+          });
+        };
+
+        const syntheticEvent = (event ?? { preventDefault() {} }) as React.MouseEvent;
+        if (store.hasInterface("comments:reject")) {
+          handleActionWithComments(syntheticEvent, runReject, "Please enter a comment before rejecting");
+        } else {
+          selected?.submissionInProgress();
+          // commentFormSubmit is a no-op `() => {}` until the host wires it.
+          void Promise.resolve(store.commentStore.commentFormSubmit()).then(runReject);
+        }
+      },
+      [annotation.id, closeRejectMenu, handleActionWithComments, store],
+    );
+
+    // The reject hotkeys live in AppStore but the comment gate and progress state live here,
+    // so they hand the action over instead of duplicating the flow.
+    useEffect(() => {
+      const onReject = (event: Event) => {
+        const name = (event as CustomEvent<{ name?: string }>).detail?.name;
+        rejectByName(name);
+      };
+      window.addEventListener("lsf:reject-with-action", onReject);
+      return () => window.removeEventListener("lsf:reject-with-action", onReject);
+    }, [rejectByName]);
 
     if (annotation.isNonEditableDraft) return <></>;
 
@@ -186,34 +243,25 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         : [originalRejectButton];
 
       const rejectHandler = (button: CustomButtonType) => {
-        const action = hasCustomReject ? () => store.handleCustomButton?.(button) : () => store.rejectAnnotation({});
-
         return async (e: React.MouseEvent) => {
-          const selected = store.annotationStore?.selected;
-          setRejectMenuVisible(false);
-
-          const runReject = () => {
-            const comment = store.commentStore.currentComment[annotation.id];
-            const commentText = (comment?.text ?? comment)?.trim();
-            action();
-            emitLabelingEvent(store, "annotation_rejected", {
-              ...annotationActionProps(store, selected),
-              has_comment: Boolean(commentText) || store.commentStore.addedCommentThisSession,
-            });
-          };
-
-          if (store.hasInterface("comments:reject")) {
-            handleActionWithComments(e, runReject, "Please enter a comment before rejecting");
-          } else {
-            selected?.submissionInProgress();
-            await store.commentStore.commentFormSubmit();
-            runReject();
-          }
+          rejectByName(button.name, e);
         };
       };
 
       const renderRejectAction = (button: CustomButtonType) => (
-        <ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={rejectHandler(button)} />
+        <ControlButton
+          key={button.name}
+          button={{
+            ...button,
+            tooltip: rejectTooltip(
+              button.description ?? button.tooltip ?? button.title,
+              button.name,
+              store.settings.enableTooltips,
+            ),
+          }}
+          disabled={reviewDisabled}
+          onClick={rejectHandler(button)}
+        />
       );
 
       // Menu rows are plain buttons, not ControlButton: they carry a description and read as a
@@ -223,6 +271,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         <button
           key={button.name}
           type="button"
+          role="menuitem"
           disabled={button.disabled || reviewDisabled}
           onClick={rejectHandler(button)}
           className="flex w-full flex-col items-start gap-tightest rounded-smaller px-tight py-tighter text-left hover:bg-neutral-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
@@ -245,11 +294,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               </Badge>
             )}
           </div>
-          {button.description && (
+          {button.description ? (
             <Typography variant="body" size="small" className="text-neutral-content-subtler">
               {button.description}
             </Typography>
-          )}
+          ) : null}
         </button>
       );
 
@@ -260,7 +309,23 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         // flagged primary rather than whichever happens to be listed first.
         const primaryRejectButton = rejectButtons.find((button) => button.isPrimary) ?? rejectButtons[0];
         const rejectMenuContent = (
-          <div className="flex w-[280px] flex-col gap-tightest p-tighter bg-neutral-surface">
+          <div
+            ref={focusFirstRejectOption}
+            role="menu"
+            aria-label="Reject options"
+            className="flex w-[280px] flex-col gap-tightest p-tighter bg-neutral-surface"
+            onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                closeRejectMenu();
+              } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                moveRejectMenuFocus(event.currentTarget, event.key === "ArrowDown" ? 1 : -1);
+              }
+            }}
+            data-testid="reject-action-menu"
+          >
             {rejectButtons.map((button) => renderRejectMenuItem(button, button === primaryRejectButton))}
           </div>
         );
@@ -273,7 +338,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               look="outlined"
               aria-label="reject-annotation"
               disabled={reviewDisabled}
-              tooltip={primaryRejectButton.description}
+              tooltip={rejectTooltip(
+                primaryRejectButton.description ?? "",
+                primaryRejectButton.name,
+                store.settings.enableTooltips,
+              )}
               onClick={rejectHandler(primaryRejectButton)}
               data-testid="bottombar-reject-button"
             >
@@ -281,7 +350,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
             </Button>
             <Dropdown.Trigger
               alignment="top-right"
-              visible={rejectMenuVisible}
+              dropdown={rejectMenuRef}
               onToggle={setRejectMenuVisible}
               content={rejectMenuContent}
             >

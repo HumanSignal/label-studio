@@ -958,6 +958,56 @@ describe("AppStore", () => {
       store.handleSkipHotkey();
       expect(mockInvoke.mock.calls.some(([event]) => event === "skipTask")).toBe(true);
     });
+
+    it("skip hotkey in review applies the primary reject action even when the menu is closed", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [
+              { name: "remove", title: "No Rework", menu: true, isPrimary: true },
+              { name: "requeue", title: "Return to Annotator", menu: true },
+            ],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        const rejectEvent = events.find((event) => event.type === "lsf:reject-with-action");
+        expect(rejectEvent?.detail?.name).toBe("remove");
+        expect(events.some((event) => event.type === "lsf:open-reject-menu")).toBe(false);
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+
+    it("skip hotkey in review uses a single menu:false custom reject instead of generic rejectAnnotation", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [{ name: "redistribute", title: "Pass to Another Annotator", menu: false }],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        expect(events.find((event) => event.type === "lsf:reject-with-action")?.detail?.name).toBe("redistribute");
+        expect(mockInvoke).not.toHaveBeenCalledWith("rejectAnnotation", expect.anything(), expect.anything());
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
   });
 
   describe("submitAnnotation when validate fails", () => {
