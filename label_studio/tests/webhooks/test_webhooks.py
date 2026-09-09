@@ -4,6 +4,7 @@ from unittest import TestCase
 import pytest
 import requests
 import requests_mock
+from django.test import override_settings
 from django.urls import reverse
 from projects.models import Project
 from webhooks.models import Webhook, WebhookAction
@@ -533,3 +534,20 @@ def test_webhook_no_batching_without_feature_flag(configured_project, organizati
             request_data = webhook_requests[0].json()
             assert 'tasks' in request_data
             assert len(request_data['tasks']) == 150
+
+
+@pytest.mark.django_db
+@override_settings(SSRF_PROTECTION_ENABLED=True)
+def test_webhook_api_rejects_local_url_when_ssrf_enabled(configured_project, business_client):
+    payload = {
+        'project': configured_project.id,
+        'url': 'http://127.0.0.1:9000/webhook',
+        'send_payload': True,
+        'send_for_all_actions': True,
+        'headers': {},
+        'is_active': True,
+        'actions': [WebhookAction.PROJECT_UPDATED],
+    }
+
+    response = business_client.post('/api/webhooks/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code in (400, 403)

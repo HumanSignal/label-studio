@@ -87,7 +87,13 @@ class Webhook(models.Model):
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
-        return self.organization.has_user(user)
+        if not self.organization.has_user(user):
+            return False
+        # If this webhook belongs to a project, also enforce project-level access.
+        # In LSE, LseProjectMixin.has_permission checks that Managers are project members.
+        if self.project is not None and not self.project.has_permission(user):
+            return False
+        return True
 
     class Meta:
         db_table = 'webhook'

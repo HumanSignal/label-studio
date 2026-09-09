@@ -70,9 +70,13 @@ class WebhookListAPI(generics.ListCreateAPIView):
         return Webhook.objects.filter(organization=self.request.user.active_organization)
 
     def perform_create(self, serializer):
+        from rest_framework.exceptions import PermissionDenied
+
         project = serializer.validated_data.get('project')
         if project is None or project.organization_id != self.request.user.active_organization.id:
             raise NotFound('Project not found.')
+        if not project.has_permission(self.request.user):
+            raise PermissionDenied('You do not have permission to create webhooks for this project.')
         serializer.save(organization=self.request.user.active_organization)
 
 

@@ -8,6 +8,7 @@ import itertools
 import os
 import shutil
 import socket
+import sys
 from contextlib import contextmanager
 from tempfile import mkdtemp, mkstemp
 
@@ -17,10 +18,15 @@ import yaml
 from appdirs import user_cache_dir, user_config_dir, user_data_dir
 from django.conf import settings
 from django.core.files.temp import NamedTemporaryFile
+from requests.adapters import HTTPAdapter
+from urllib3.connection import HTTPConnection, HTTPSConnection
+from urllib3.connectionpool import HTTPConnectionPool, HTTPSConnectionPool
+from urllib3.exceptions import ConnectTimeoutError, NameResolutionError, NewConnectionError
+from urllib3.util import connection as urllib3_connection
 from urllib3.util import parse_url
 
 # full path import results in unit test failures
-from .exceptions import InvalidUploadUrlError
+from .exceptions import SsrfBlockedUrlError
 
 _DIR_APP_NAME = 'label-studio'
 
@@ -175,9 +181,9 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def validate_upload_url(url, block_local_urls=True):
+def validate_url_for_ssrf(url, block_local_urls=True):
     """Utility function for defending against SSRF attacks. Raises
-        - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
+        - SsrfBlockedUrlError if the url is not HTTP[S], or if block_local_urls is enabled
           and the URL resolves to a local address.
         - LabelStudioApiException if the hostname cannot be resolved
 
@@ -188,7 +194,7 @@ def validate_upload_url(url, block_local_urls=True):
     parsed_url = parse_url(url)
 
     if parsed_url.scheme not in ('http', 'https'):
-        raise InvalidUploadUrlError
+        raise SsrfBlockedUrlError
 
     domain = parsed_url.host
     try:
@@ -200,6 +206,11 @@ def validate_upload_url(url, block_local_urls=True):
 
     if block_local_urls:
         validate_ip(ip)
+
+
+def validate_upload_url(url, block_local_urls=True):
+    """Backward-compatible wrapper around validate_url_for_ssrf."""
+    return validate_url_for_ssrf(url, block_local_urls=block_local_urls)
 
 
 def validate_ip(ip: str) -> None:
@@ -257,17 +268,102 @@ def validate_ip(ip: str) -> None:
 
     for subnet in banned_subnets:
         if ipaddress.ip_address(ip) in ipaddress.ip_network(subnet):
-            raise InvalidUploadUrlError(f'URL resolves to a reserved network address (block: {subnet})')
+            raise SsrfBlockedUrlError(f'URL resolves to a reserved network address (block: {subnet})')
+
+
+class _SsrfGuardedConnectionMixin:
+    """Resolve the host once and connect only to an address that passed validate_ip()."""
+
+    def _new_conn(self) -> socket.socket:
+        # Proxied connections are resolved by the proxy.
+        if getattr(self, 'proxy', None) is not None:
+            return super()._new_conn()
+
+        try:
+            addr_infos = socket.getaddrinfo(self._dns_host, self.port, 0, socket.SOCK_STREAM)
+        except socket.gaierror as e:
+            raise NameResolutionError(self.host, self, e) from e
+
+        # A rebinding host can return several records; reject if any is banned.
+        for addr_info in addr_infos:
+            validate_ip(addr_info[4][0])
+
+        last_error = None
+        for addr_info in addr_infos:
+            try:
+                sock = urllib3_connection.create_connection(
+                    (addr_info[4][0], self.port),
+                    self.timeout,
+                    source_address=self.source_address,
+                    socket_options=self.socket_options,
+                )
+            except socket.timeout as e:
+                raise ConnectTimeoutError(
+                    self, f'Connection to {self.host} timed out. (connect timeout={self.timeout})'
+                ) from e
+            except OSError as e:
+                last_error = e
+                continue
+
+            sys.audit('http.client.connect', self, self.host, self.port)
+            return sock
+
+        raise NewConnectionError(self, f'Failed to establish a new connection: {last_error}')
+
+
+class _SsrfGuardedHTTPConnection(_SsrfGuardedConnectionMixin, HTTPConnection):
+    pass
+
+
+class _SsrfGuardedHTTPSConnection(_SsrfGuardedConnectionMixin, HTTPSConnection):
+    pass
+
+
+class _SsrfGuardedHTTPConnectionPool(HTTPConnectionPool):
+    ConnectionCls = _SsrfGuardedHTTPConnection
+
+
+class _SsrfGuardedHTTPSConnectionPool(HTTPSConnectionPool):
+    ConnectionCls = _SsrfGuardedHTTPSConnection
+
+
+_SSRF_GUARDED_POOL_CLASSES = {
+    'http': _SsrfGuardedHTTPConnectionPool,
+    'https': _SsrfGuardedHTTPSConnectionPool,
+}
+
+
+class SsrfSafeHTTPAdapter(HTTPAdapter):
+    """requests adapter that blocks banned addresses before any bytes are sent."""
+
+    def init_poolmanager(self, *args, **kwargs):
+        super().init_poolmanager(*args, **kwargs)
+        self.poolmanager.pool_classes_by_scheme = _SSRF_GUARDED_POOL_CLASSES
+
+
+def ssrf_safe_session(max_retries=0) -> requests.Session:
+    session = requests.Session()
+    adapter = SsrfSafeHTTPAdapter(max_retries=max_retries)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
+def ssrf_safe_request(method, url, *args, **kwargs):
+    block_local_urls = kwargs.pop('block_local_urls', settings.SSRF_PROTECTION_ENABLED)
+    validate_url_for_ssrf(url, block_local_urls=block_local_urls)
+
+    if not block_local_urls:
+        # Reason for #nosec: caller opted out of address checks.
+        return requests.request(method, url, *args, **kwargs)  # nosec
+
+    with ssrf_safe_session() as session:
+        return session.request(method, url, *args, **kwargs)
 
 
 def ssrf_safe_get(url, *args, **kwargs):
-    validate_upload_url(url, block_local_urls=settings.SSRF_PROTECTION_ENABLED)
-    # Reason for #nosec: url has been validated as SSRF safe by the
-    # validation check above.
-    response = requests.get(url, *args, **kwargs)   # nosec
+    return ssrf_safe_request('GET', url, *args, **kwargs)
 
-    # second check for SSRF for prevent redirect and dns rebinding attacks
-    if settings.SSRF_PROTECTION_ENABLED:
-        response_ip = response.raw._connection.sock.getpeername()[0]
-        validate_ip(response_ip)
-    return response
+
+def ssrf_safe_post(url, *args, **kwargs):
+    return ssrf_safe_request('POST', url, *args, **kwargs)

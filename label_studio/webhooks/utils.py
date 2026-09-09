@@ -1,10 +1,10 @@
 import logging
 from functools import wraps
 
-import requests
 from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
+from core.utils.io import ssrf_safe_post
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -52,13 +52,13 @@ def run_webhook_sync(webhook, action, payload=None):
         data.update(payload)
     try:
         logging.debug('Run webhook %s for action %s', webhook.id, action)
-        return requests.post(
+        return ssrf_safe_post(
             webhook.url,
             headers=webhook.headers,
             json=data,
             timeout=settings.WEBHOOK_TIMEOUT,
         )
-    except requests.RequestException as exc:
+    except Exception as exc:
         logging.error(exc, exc_info=True)
         return
 

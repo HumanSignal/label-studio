@@ -4,7 +4,9 @@ from label_studio_sdk.label_interface import LabelInterface
 
 
 @pytest.mark.django_db
-def test_batch_predictions_single_prediction_per_task(django_live_url, business_client, ml_backend_for_test_predict):
+def test_batch_predictions_single_prediction_per_task(
+    django_live_url, business_client, ml_backend_for_test_predict, mock_gethostbyname
+):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     label_config = LabelInterface.create(
         {
@@ -97,7 +99,7 @@ def test_batch_predictions_single_prediction_per_task(django_live_url, business_
 
 @pytest.mark.django_db
 def test_batch_predictions_multiple_predictions_per_task(
-    django_live_url, business_client, ml_backend_for_test_predict
+    django_live_url, business_client, ml_backend_for_test_predict, mock_gethostbyname
 ):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     li = LabelInterface(
