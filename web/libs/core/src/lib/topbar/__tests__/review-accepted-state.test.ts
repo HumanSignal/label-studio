@@ -155,8 +155,6 @@ describe("resolveReviewBarCopy", () => {
     expect(resolveReviewBarCopy(null, false)).toEqual({
       rejectLabel: "Reject",
       acceptLabel: "Accept",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: false,
     });
   });
 
@@ -164,35 +162,27 @@ describe("resolveReviewBarCopy", () => {
     expect(resolveReviewBarCopy(null, true)).toEqual({
       rejectLabel: "Reject",
       acceptLabel: "Fix + Accept",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: false,
     });
   });
 
-  it("shows Change to Reject and disables Accept for a live accepted verdict", () => {
+  it("shows Change to Reject and leaves both actions available for a live accepted verdict", () => {
     expect(resolveReviewBarCopy("accepted", false)).toEqual({
       rejectLabel: "Change to Reject",
       acceptLabel: "Accepted",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: true,
     });
   });
 
-  it("shows Change to Reject and disables Accept for a live fixed verdict", () => {
+  it("shows Change to Reject and leaves both actions available for a live fixed verdict", () => {
     expect(resolveReviewBarCopy("fixed", false)).toEqual({
       rejectLabel: "Change to Reject",
       acceptLabel: "Fixed",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: true,
     });
   });
 
-  it("shows Change to Accept and disables Reject for a live rejected verdict", () => {
+  it("shows Change to Accept and leaves both actions available for a live rejected verdict", () => {
     expect(resolveReviewBarCopy("rejected", false)).toEqual({
       rejectLabel: "Rejected",
       acceptLabel: "Change to Accept",
-      disableRejectForSameState: true,
-      disableAcceptForSameState: false,
     });
   });
 
@@ -200,8 +190,6 @@ describe("resolveReviewBarCopy", () => {
     expect(resolveReviewBarCopy("accepted", true)).toEqual({
       rejectLabel: "Change to Reject",
       acceptLabel: "Fix + Accept",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: false,
     });
   });
 
@@ -209,17 +197,13 @@ describe("resolveReviewBarCopy", () => {
     expect(resolveReviewBarCopy("fixed", true)).toEqual({
       rejectLabel: "Change to Reject",
       acceptLabel: "Fix + Accept",
-      disableRejectForSameState: false,
-      disableAcceptForSameState: false,
     });
   });
 
-  it("keeps Rejected disabled and uses Fix + Accept when a live rejected annotation is dirty", () => {
+  it("leaves both actions available and uses Fix + Accept when a live rejected annotation is dirty", () => {
     expect(resolveReviewBarCopy("rejected", true)).toEqual({
       rejectLabel: "Rejected",
       acceptLabel: "Fix + Accept",
-      disableRejectForSameState: true,
-      disableAcceptForSameState: false,
     });
   });
 });

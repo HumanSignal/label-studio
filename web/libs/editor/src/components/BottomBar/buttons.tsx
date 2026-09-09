@@ -60,14 +60,8 @@ export const AcceptButton = memo(
     const hasChanges = Boolean(history.canUndo || annotation.versions.draft);
     const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
-    const isDisabled = disabled || hasIncompleteRegions || reviewCopy.disableAcceptForSameState;
-    const tooltip = hasIncompleteRegions
-      ? INCOMPLETE_ACCEPT_TOOLTIP
-      : !hasChanges && reviewCopy.acceptLabel === "Accepted"
-        ? "Annotation already accepted"
-        : !hasChanges && reviewCopy.acceptLabel === "Fixed"
-          ? "Annotation already fixed and accepted"
-          : "Accept annotation: [ Ctrl+Enter ]";
+    const isDisabled = disabled || hasIncompleteRegions;
+    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
       <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap max-w-none">

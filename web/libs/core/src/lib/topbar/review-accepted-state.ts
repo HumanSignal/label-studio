@@ -75,12 +75,10 @@ export function resolveClassicEntityReviewState(
 export type ReviewBarCopy = {
   rejectLabel: string;
   acceptLabel: string;
-  disableRejectForSameState: boolean;
-  disableAcceptForSameState: boolean;
 };
 
 /**
- * Accept/Reject bottom-bar copy and same-state disable flags.
+ * Accept/Reject bottom-bar copy.
  *
  * Labels follow a *live* verdict only (`accepted` / `rejected` / `fixed`). Pass `null` when the
  * annotator has edited after the review (stale) so the bar is a first-time Reject / Accept pair.
@@ -105,8 +103,6 @@ export function resolveReviewBarCopy(
   return {
     rejectLabel,
     acceptLabel,
-    disableRejectForSameState: acceptedState === "rejected",
-    disableAcceptForSameState: !hasChanges && isAcceptedState,
   };
 }
 

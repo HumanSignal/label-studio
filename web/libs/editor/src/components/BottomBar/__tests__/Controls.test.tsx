@@ -640,7 +640,7 @@ describe("Controls", () => {
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
-  test("shows Change to Reject and disables Accept for a live accepted verdict", () => {
+  test("allows Accept again for a live accepted verdict", () => {
     mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
 
     const annotation = {
@@ -659,12 +659,12 @@ describe("Controls", () => {
     );
 
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Accepted");
-    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
     expect(getByLabelText("reject-annotation")).toHaveTextContent("Change to Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
-  test("shows Change to Accept and disables Reject for a live rejected verdict", () => {
+  test("allows Reject again for a live rejected verdict", () => {
     mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
 
     const annotation = {
@@ -683,12 +683,12 @@ describe("Controls", () => {
     );
 
     expect(getByLabelText("reject-annotation")).toHaveTextContent("Rejected");
-    expect(getByLabelText("reject-annotation")).toBeDisabled();
+    expect(getByLabelText("reject-annotation")).not.toBeDisabled();
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Change to Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
-  test("shows Fixed and Change to Reject for a live fixed verdict", () => {
+  test("allows Accept again for a live fixed verdict", () => {
     mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
 
     const annotation = {
@@ -707,7 +707,7 @@ describe("Controls", () => {
     );
 
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Fixed");
-    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
     expect(getByLabelText("reject-annotation")).toHaveTextContent("Change to Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
@@ -811,7 +811,7 @@ describe("Controls", () => {
     expect(getByTestId("bottombar-reject-button")).toHaveTextContent("Change to Reject");
   });
 
-  test("relabels Flexible Reject without a menu for a live accepted verdict", () => {
+  test("relabels Flexible Reject without a menu and allows Accept again for a live accepted verdict", () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.customButtons = new Map([
       [
@@ -858,10 +858,10 @@ describe("Controls", () => {
     expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Change to Reject");
     expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Accepted");
-    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
-  test("relabels and disables Flexible Reject without a menu for a live rejected verdict", () => {
+  test("relabels Flexible Reject and allows Reject again without a menu for a live rejected verdict", () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.customButtons = new Map([
       [
@@ -906,9 +906,9 @@ describe("Controls", () => {
     );
 
     expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Rejected");
-    expect(getByTestId("bottombar-custom-remove-button")).toBeDisabled();
+    expect(getByTestId("bottombar-custom-remove-button")).not.toBeDisabled();
     expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
-    expect(getByTestId("bottombar-custom-requeue-button")).toBeDisabled();
+    expect(getByTestId("bottombar-custom-requeue-button")).not.toBeDisabled();
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Change to Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });

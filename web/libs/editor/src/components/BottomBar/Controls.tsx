@@ -241,7 +241,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       const hasChanges = Boolean(history?.canUndo || versions?.draft);
       const reviewState = normalizeReviewAcceptedState(annotation.acceptedState);
       const reviewCopy = resolveReviewBarCopy(reviewState, hasChanges);
-      const rejectDisabled = reviewDisabled || reviewCopy.disableRejectForSameState;
+      const rejectDisabled = reviewDisabled;
       const customRejectButtons = toArray(customButtons.get("reject"));
       const hasCustomReject = customRejectButtons.length > 0;
       const originalRejectButton = { ...RejectButtonDefinition, title: reviewCopy.rejectLabel };
@@ -260,11 +260,9 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       const renderRejectAction = (button: CustomButtonType) => {
         const title = resolveFlexibleRejectButtonTitle(button.name, button.title, reviewState);
         const tooltipDescription =
-          reviewState === "rejected"
-            ? "Annotation already rejected"
-            : reviewState && button.name === "remove"
-              ? "Change review to reject"
-              : (button.description ?? button.tooltip ?? button.title);
+          reviewState && button.name === "remove"
+            ? "Change review to reject"
+            : (button.description ?? button.tooltip ?? button.title);
 
         return (
           <ControlButton
