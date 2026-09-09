@@ -53,7 +53,8 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
 
     @cached_property
     def is_owner(self):
-        return self.user.id == self.organization.created_by.id
+        # created_by is SET_NULL, so an orphaned organization has no owner
+        return self.organization.created_by_id is not None and self.user_id == self.organization.created_by_id
 
     class Meta:
         ordering = ['pk']
