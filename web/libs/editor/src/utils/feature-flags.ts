@@ -17,6 +17,8 @@ export const FF_DEV_2671 = "ff_front_dev_2671_anchor_rotate_bbox_010722_short";
  */
 export const FF_AUDIO_SPECTROGRAMS = "fflag_feat_optic_2123_audio_spectrograms";
 
+export const FF_AUDIO_FLOAT = "fflag_feat_front_audio_floating_waveform_short";
+
 export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short";
 
 /**

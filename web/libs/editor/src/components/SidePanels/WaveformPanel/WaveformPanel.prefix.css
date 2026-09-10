@@ -1,0 +1,32 @@
+@import "../../../assets/styles/global.prefix.css";
+
+.waveform-panel {
+  height: 100%;
+  position: relative;
+
+  &__full {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    z-index: 2;
+    display: flex;
+    padding: 2px;
+    border: 0;
+    cursor: pointer;
+    background: transparent;
+    color: var(--color-neutral-icon);
+  }
+
+  &__body {
+    height: 100%;
+  }
+
+  &_full {
+    background: var(--color-neutral-background);
+  }
+
+  &_full &__body {
+    display: flex;
+    align-items: center;
+  }
+}

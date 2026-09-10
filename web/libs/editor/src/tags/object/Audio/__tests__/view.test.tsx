@@ -4,7 +4,8 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Audio } from "../view";
-import { FF_AUDIO_SPECTROGRAMS } from "../../../../utils/feature-flags";
+import { FF_AUDIO_FLOAT, FF_AUDIO_SPECTROGRAMS } from "../../../../utils/feature-flags";
+import { slots } from "../float";
 import type { Mock } from "bun:test";
 import * as timelineControlsModule from "../../../../components/Timeline/Controls";
 import * as uiModule from "@humansignal/ui";
@@ -582,6 +583,60 @@ describe("Audio view", () => {
       render(<Audio item={defaultItem as any} />);
       expect(screen.getByTestId("timeline-controls")).toBeInTheDocument();
       (getCurrentTheme as Mock<any>).mockReturnValue("Light");
+    });
+  });
+
+  describe("Audio view floating", () => {
+    const item = { ...defaultItem, name: "audio" } as any;
+
+    afterEach(() => {
+      ff.set({ [FF_AUDIO_SPECTROGRAMS]: true });
+      slots.clear();
+    });
+
+    it("registers no slot while the flag is off", () => {
+      render(<Audio item={item} />);
+      expect(slots.size).toBe(0);
+    });
+
+    it("registers a slot holding the audio body", () => {
+      ff.set({ [FF_AUDIO_SPECTROGRAMS]: true, [FF_AUDIO_FLOAT]: true });
+      render(<Audio item={item} />);
+
+      const slot = slots.get("audio");
+
+      expect(slot).toBeDefined();
+      expect(slot!.host.parentElement).toBe(slot!.home);
+      expect(slot!.host.querySelector(".ls-audio-tag")).toBeTruthy();
+    });
+
+    it("drops the slot when the tag unmounts", () => {
+      ff.set({ [FF_AUDIO_SPECTROGRAMS]: true, [FF_AUDIO_FLOAT]: true });
+      const { unmount } = render(<Audio item={item} />);
+
+      unmount();
+      expect(slots.has("audio")).toBe(false);
+    });
+
+    it("keeps the slot a remounted tag already claimed", () => {
+      ff.set({ [FF_AUDIO_SPECTROGRAMS]: true, [FF_AUDIO_FLOAT]: true });
+      const first = render(<Audio item={item} />);
+      const second = render(<Audio item={item} />);
+      const host = slots.get("audio")!.host;
+
+      first.unmount();
+      expect(slots.get("audio")!.host).toBe(host);
+      expect(second.container.contains(host)).toBe(true);
+    });
+
+    it("keeps one host across re-renders, so the waveform never reloads", () => {
+      ff.set({ [FF_AUDIO_SPECTROGRAMS]: true, [FF_AUDIO_FLOAT]: true });
+      const { rerender } = render(<Audio item={item} />);
+      const first = slots.get("audio")!.host;
+
+      rerender(<Audio item={item} />);
+      expect(slots.get("audio")!.host).toBe(first);
+      expect(mockLoad).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -15,6 +15,7 @@ import {
   stateAddedTab,
   stateRemovedTab,
   stateRemovePanelEmptyViews,
+  restorePanel,
 } from "../utils";
 
 const dummyPanels: Record<string, PanelBBox> = {
@@ -749,5 +750,60 @@ describe("checkCollapsedPanelsHaveData", () => {
     const result = checkCollapsedPanelsHaveData(collapsedSideWithNoData, panelData);
 
     expect(result).toEqual(expected);
+  });
+});
+
+describe("restorePanel waveform tab", () => {
+  const names = (state: Record<string, PanelBBox>) =>
+    Object.values(state).flatMap((panel) => panel.panelViews.map((view) => view.name));
+
+  // another suite swaps window.localStorage for a partial mock and never puts it
+  // back, so give these tests one of their own
+  beforeEach(() => {
+    const store = new Map<string, string>();
+
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, value),
+        removeItem: (key: string) => store.delete(key),
+      },
+      writable: true,
+    });
+  });
+
+  it("omits the waveform tab by default", () => {
+    const { panelData } = restorePanel(true);
+
+    expect(names(panelData)).not.toContain("waveform");
+  });
+
+  it("adds the waveform tab when asked", () => {
+    const { panelData } = restorePanel(true, false, true);
+
+    expect(names(panelData)).toContain("waveform");
+  });
+
+  it("adds it once, not once per call", () => {
+    const { panelData } = restorePanel(true, false, true);
+    window.localStorage.setItem("panelState", JSON.stringify({ panelData }));
+    const again = restorePanel(true, false, true);
+
+    expect(names(again.panelData).filter((name) => name === "waveform")).toHaveLength(1);
+  });
+
+  it("drops a stored waveform tab when the task has no audio", () => {
+    const { panelData } = restorePanel(true, false, true);
+    window.localStorage.setItem("panelState", JSON.stringify({ panelData }));
+    const without = restorePanel(true, false, false);
+
+    expect(names(without.panelData)).not.toContain("waveform");
+  });
+
+  it("keeps every other tab when the waveform tab is added", () => {
+    const base = names(restorePanel(true).panelData);
+    const withWave = names(restorePanel(true, false, true).panelData);
+
+    expect(withWave.filter((name) => name !== "waveform").sort()).toEqual(base.sort());
   });
 });

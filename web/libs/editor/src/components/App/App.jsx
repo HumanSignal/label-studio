@@ -31,6 +31,7 @@ import { isStarterCloudPlan, ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
+import { FF_AUDIO_FLOAT, isFF } from "../../utils/feature-flags";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
 
@@ -60,6 +61,16 @@ import "./App.prefix.css";
  * Used to conditionally show the custom tab in the side panel
  * @returns {boolean|string} - false or the title of the tab that should be rendered in sidebar
  */
+const hasAudio = (annotation) => {
+  if (!annotation?.names) return false;
+  for (const tag of annotation.names.values()) {
+    if (tag.type === "audio") {
+      return true;
+    }
+  }
+  return false;
+};
+
 const hasTagInSidebar = (annotation) => {
   if (!annotation?.names) return false;
   for (const tag of annotation.names.values()) {
@@ -285,6 +296,7 @@ class App extends Component {
           regions={as.selected.regionStore}
           showComments={store.hasInterface("annotations:comments")}
           showCustomTab={hasTagInSidebar(as.selected)}
+          showWaveform={isFF(FF_AUDIO_FLOAT) && hasAudio(as.selected)}
           focusTab={store.commentStore.tooltipMessage ? "comments" : null}
         >
           {mainContent}

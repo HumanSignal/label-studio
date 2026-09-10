@@ -362,4 +362,14 @@ OR
 
 1. Press CTRL button and start drawing bounding box over another one. 
 
+## Waveform panel
+
+When a task contains an `<Audio>` tag, the labeling interface offers a **Waveform** tab alongside **Regions**, **Relations** and **Info**. Click it and the waveform moves out of the page and into that panel.
+
+The panel behaves like the others: drag its header away from the side to float it over the page, drag it back to dock it, and resize it from any edge. A floating waveform stays where you put it while the rest of the page scrolls, which is useful on a config where the waveform would otherwise scroll out of view while you type a transcript.
+
+The button in the top right of the panel expands the waveform to fill the screen. Click it again, or press Esc, to come back. To make the waveform taller, drag the handle in the middle of its lower edge, the same handle you use when it is inline.
+
+To put the waveform back on the page, collapse the panel or switch to another tab in it. Nothing is reloaded when the waveform moves: it is the same player throughout, so playback position, zoom and regions are all preserved, and any region you draw in the floating panel is part of the annotation immediately.
+
 {% insertmd includes/annotation_ids.md %}

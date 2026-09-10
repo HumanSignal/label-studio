@@ -10,6 +10,7 @@ import {
 } from "../constants";
 import { Comments, Custom, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
 import { OutlinerComponent } from "../OutlinerPanel/OutlinerPanel";
+import { WaveformComponent } from "../WaveformPanel/WaveformPanel";
 import type { PanelProps } from "../PanelBase";
 import {
   emptyPanel,
@@ -171,6 +172,7 @@ export const panelComponents: { [key: string]: FC<PanelProps> } = {
   comments: Comments as FC<PanelProps>,
   info: Info as FC<PanelProps>,
   custom: Custom as FC<PanelProps>,
+  waveform: WaveformComponent,
 };
 
 const panelViews = [
@@ -211,10 +213,17 @@ const panelViews = [
     component: panelComponents.custom as FC<PanelProps>,
     active: false,
   },
+  {
+    name: "waveform",
+    title: "Waveform",
+    component: panelComponents.waveform as FC<PanelProps>,
+    active: false,
+  },
 ];
 
 // Custom tab for special tags; will be placed in "regions-relations" panel by default
 const customPanelView = panelViews[5];
+const waveformPanelView = panelViews[6];
 
 export const enterprisePanelDefault: Record<string, PanelBBox> = {
   "info-comments-history": {
@@ -300,7 +309,7 @@ export const partialEmptyBaseProps = {
   setSidePanelCollapsed: () => {},
   dragTop: false,
   dragBottom: false,
-  panelViews: [panelViews[0], panelViews[1], panelViews[2], panelViews[3], panelViews[4]],
+  panelViews: [panelViews[0], panelViews[1], panelViews[2], panelViews[3], panelViews[4], panelViews[6]],
 };
 
 export const resizers = ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "right", "left"];
@@ -320,7 +329,26 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
   return collapsedCopy;
 };
 
-export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab = false): StoredPanelState => {
+const fixWaveformTab = (state: Record<string, PanelBBox>, show: boolean) => {
+  const at = Object.keys(state).find((key) => state[key].panelViews.some((view) => view.name === "waveform"));
+
+  if (show === !!at) return state;
+  if (at) {
+    const kept = state[at].panelViews.filter((view) => view.name !== "waveform");
+
+    return { ...state, [at]: { ...state[at], panelViews: kept } };
+  }
+  const to = state["regions-relations"] ? "regions-relations" : Object.keys(state)[0];
+
+  if (!to) return state;
+  return { ...state, [to]: { ...state[to], panelViews: [...state[to].panelViews, waveformPanelView] } };
+};
+
+export const restorePanel = (
+  showComments: boolean,
+  showCustomTab: ShowCustomTab = false,
+  showWaveform = false,
+): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
@@ -328,7 +356,8 @@ export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab
   const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
   const allTabs = panelData && Object.values(panelData).flatMap((panel) => panel.panelViews);
   // don't use comments and custom tabs anywhere if it's disabled
-  const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1) - (showCustomTab ? 0 : 1);
+  const countOfAllAvailableTabs =
+    panelViews.length - (showComments ? 0 : 1) - (showCustomTab ? 0 : 1) - (showWaveform ? 0 : 1);
 
   // stored state can have less tabs than available, for example if it was stored on old version
   // or if comments were enabled; then return default state
@@ -338,10 +367,12 @@ export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab
       defaultPanel = fixCustomTab(defaultPanel, "regions-relations", showCustomTab);
     }
 
-    return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
+    return { panelData: fixWaveformTab(defaultPanel, showWaveform), collapsedSide: defaultCollapsedSide };
   }
 
-  const fixedPanels = stateRemovePanelEmptyViews(checkForCustomTab(panelData, showCustomTab));
+  const fixedPanels = stateRemovePanelEmptyViews(
+    fixWaveformTab(checkForCustomTab(panelData, showCustomTab), showWaveform),
+  );
   const withActiveDefaults = setActiveDefaults(fixedPanels);
   const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 

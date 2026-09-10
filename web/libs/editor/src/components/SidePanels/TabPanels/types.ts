@@ -28,6 +28,7 @@ export type ShowCustomTab = false | string;
 
 export interface SidePanelsProps {
   panelsHidden: boolean;
+  showWaveform?: boolean;
   store: any;
   currentEntity: any;
   showComments: boolean;

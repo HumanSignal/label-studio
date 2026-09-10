@@ -58,6 +58,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   children,
   showComments,
   showCustomTab,
+  showWaveform,
   focusTab,
 }) => {
   const snapThreshold = 5;
@@ -71,7 +72,10 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const [initialized, setInitialized] = useState(false);
   const rootRef = useRef<HTMLDivElement>();
   const [snap, setSnap] = useState<DropSide | Side | undefined>();
-  const initialState = useMemo(() => restorePanel(showComments, showCustomTab), [showComments, showCustomTab]);
+  const initialState = useMemo(
+    () => restorePanel(showComments, showCustomTab, showWaveform),
+    [showComments, showCustomTab, showWaveform],
+  );
   const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(initialState.panelData);
   const [collapsedSide, setCollapsedSide] = useState(initialState.collapsedSide);
   const [breakPointActiveTab, setBreakPointActiveTab] = useState(0);
@@ -546,11 +550,11 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     const updatedProps = { ...partialEmptyBaseProps };
 
     updatedProps.panelViews = partialEmptyBaseProps.panelViews.filter(
-      (view) => view.name !== "comments" || showComments,
+      (view) => (view.name !== "comments" || showComments) && (view.name !== "waveform" || showWaveform),
     );
 
     return updatedProps;
-  }, [partialEmptyBaseProps, showComments]);
+  }, [partialEmptyBaseProps, showComments, showWaveform]);
 
   const emptyBaseProps = { ...getPartialEmptyBaseProps, ...commonProps, breakPointActiveTab, setBreakPointActiveTab };
 

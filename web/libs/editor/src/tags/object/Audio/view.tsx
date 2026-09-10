@@ -1,5 +1,6 @@
 import { ff } from "@humansignal/core";
 import { observer } from "mobx-react";
+import { createPortal } from "react-dom";
 import { type FC, type ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { usePersistentJSONState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { TimelineContextProvider } from "../../../components/Timeline/Context";
@@ -12,9 +13,10 @@ import type { Region } from "../../../lib/AudioUltra/Regions/Region";
 import type { Segment } from "../../../lib/AudioUltra/Regions/Segment";
 import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
 import { cn } from "../../../utils/bem";
+import { slots } from "./float";
 import { useSpectrogramControls as useSpectrogramControlsHook } from "../../../lib/AudioUltra/hooks/useSpectrogramControls";
 import { getCurrentTheme } from "@humansignal/ui";
-import { FF_AUDIO_SPECTROGRAMS, isFF } from "../../../utils/feature-flags";
+import { FF_AUDIO_FLOAT, FF_AUDIO_SPECTROGRAMS, isFF } from "../../../utils/feature-flags";
 
 import "./view.prefix.css";
 
@@ -36,7 +38,16 @@ interface AudioProps {
 
 const AudioView: FC<AudioProps> = observer(
   ({ item, children, settings = {}, changeSetting = () => {} }: AudioUltraProps) => {
+    const canFloat = isFF(FF_AUDIO_FLOAT);
     const rootRef = useRef<HTMLElement | null>();
+    const homeRef = useRef<HTMLDivElement | null>(null);
+    const hostRef = useRef<HTMLDivElement>();
+
+    if (canFloat && !hostRef.current) {
+      hostRef.current = document.createElement("div");
+      hostRef.current.style.width = "100%";
+    }
+
     const isDarkMode = getCurrentTheme() === "Dark";
 
     const { waveform, ...controls } = useWaveform(rootRef, {
@@ -181,7 +192,22 @@ const AudioView: FC<AudioProps> = observer(
       };
     }, []);
 
-    return (
+    useEffect(() => {
+      const home = homeRef.current;
+      const host = hostRef.current;
+
+      if (!home || !host) return;
+      home.appendChild(host);
+      slots.set(item.name, { host, home });
+      return () => {
+        if (slots.get(item.name)?.host === host) {
+          slots.delete(item.name);
+        }
+      };
+      // a remount registers the new host first, so never drop someone else's entry
+    }, []);
+
+    const body = (
       <div className={cn("audio-tag").toClassName()}>
         {children}
         <div
@@ -243,6 +269,15 @@ const AudioView: FC<AudioProps> = observer(
           layerVisibility={controls.layerVisibility}
         />
       </div>
+    );
+
+    if (!canFloat) return body;
+
+    return (
+      <>
+        <div ref={homeRef} />
+        {createPortal(body, hostRef.current!)}
+      </>
     );
   },
 );
