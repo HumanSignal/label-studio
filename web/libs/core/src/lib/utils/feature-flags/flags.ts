@@ -90,6 +90,9 @@ export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_c
  */
 export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable_members_filtering";
 
+/** Replace the existing table filter bar with FilterShell (UTC-1166). */
+export const FF_UTC_1166_FILTER_SHELL = "fflag_utc_1166_filter_shell";
+
 /**
  * FSM State Fields
  */

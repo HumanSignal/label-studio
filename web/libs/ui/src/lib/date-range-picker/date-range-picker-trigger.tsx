@@ -25,7 +25,15 @@ type DateRangePickerTriggerProps = {
    * Optional class name applied to the clickable trigger surface.
    */
   className?: string;
-} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className">;
+  /**
+   * Optional id on the clickable trigger (FilterShell name-as-label / htmlFor).
+   */
+  id?: string;
+  /**
+   * Props spread onto the clickable trigger surface (same pattern as Select `triggerProps`).
+   */
+  triggerProps?: ComponentPropsWithoutRef<"div">;
+} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className" | "id">;
 
 const dateStrings = (dateRange: DateOrDateTimeRange | null): { fromString: string; toString: string } | null => {
   if (!dateRange) {
@@ -72,6 +80,8 @@ export const DateRangePickerTrigger = ({
   dataTestId,
   inline = false,
   className,
+  id,
+  triggerProps,
   ...dropdownTriggerProps
 }: DateRangePickerTriggerProps) => {
   const appliedDatesString = dateStrings(selected);
@@ -99,6 +109,10 @@ export const DateRangePickerTrigger = ({
   return (
     <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children} inline={inline}>
       <div
+        id={id}
+        tabIndex={disabled ? undefined : 0}
+        role="button"
+        aria-disabled={disabled || undefined}
         className={cnm(
           "flex items-center gap-tight py-tight pl-base pr-tight h-10 border border-neutral-border rounded-smaller cursor-pointer",
           "hover:border-neutral-border-bold",
@@ -106,6 +120,7 @@ export const DateRangePickerTrigger = ({
           className,
         )}
         data-testid={dataTestId}
+        {...triggerProps}
       >
         {label}
         <CalendarBlankIcon size={24} className="text-neutral-content-subtlest shrink-0" />

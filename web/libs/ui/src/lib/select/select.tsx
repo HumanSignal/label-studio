@@ -761,13 +761,18 @@ export const Select = forwardRef(
           <button
             variant="outline"
             aria-expanded={isOpen}
-            className={cnm(triggerClassName ?? "", styles.selectTrigger, {
-              [styles.isInline]: isInline,
-              [styles.isOpen]: isOpen,
-              [styles.isDisabled]: disabled,
-              [styles.sizeSmaller]: size === "smaller",
-              [styles.sizeSmall]: size === "small",
-            })}
+            className={cnm(
+              styles.selectTrigger,
+              {
+                [styles.isInline]: isInline,
+                [styles.isOpen]: isOpen,
+                [styles.isDisabled]: disabled,
+                [styles.sizeSmaller]: size === "smaller",
+                [styles.sizeSmall]: size === "small",
+              },
+              // Last so documented triggerClassName overrides (e.g. FilterShell value half).
+              triggerClassName,
+            )}
             type="button"
             data-testid={
               props?.dataTestid ??

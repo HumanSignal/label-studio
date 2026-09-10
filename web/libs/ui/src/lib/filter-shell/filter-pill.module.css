@@ -1,0 +1,128 @@
+.pill {
+  display: inline-flex;
+  height: var(--filter-pill-height);
+  min-width: 0;
+  align-items: stretch;
+  overflow: visible;
+}
+
+.name {
+  display: inline-flex;
+  max-width: 150px;
+  min-width: 0;
+  align-items: center;
+  gap: var(--spacing-tighter);
+  padding: 0 var(--spacing-tight) 0 calc(var(--spacing-tight) + var(--spacing-tightest));
+  color: var(--color-neutral-content-subtler);
+  background: var(--color-neutral-surface);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-large) 0 0 var(--corner-radius-large);
+}
+
+.nameWithRemove {
+  padding-left: var(--spacing-tighter);
+}
+
+.label {
+  overflow: hidden;
+  font-size: var(--font-size-label-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-label-small);
+  letter-spacing: var(--letter-spacing-wide);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /*
+   * Unset name uses content-subtler on neutral/surface (~5.2:1 in light theme) — meets WCAG 2.1 AA 4.5:1.
+   * If tokens change and contrast drops below 4.5:1, bump .name color to content-subtle.
+   */
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--corner-radius-smallest);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+}
+
+.remove {
+  position: relative;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--corner-radius-smallest);
+
+  &:hover {
+    color: var(--color-neutral-content);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+
+  & svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.control {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+
+  /*
+   * Fallback when the consumer passes a plain button (stories / tests) instead of Select /
+   * DateRangePickerTrigger with filterShellValueTrigger. Select's trigger is also a direct
+   * button child of Popover (no wrapper), so this matches both.
+   */
+  & > :global(button) {
+    min-width: 0;
+    height: var(--filter-pill-height);
+    padding: var(--spacing-tight);
+    /* Unset / placeholder ("Any"): subtler — set state overrides below. */
+    color: var(--color-neutral-content-subtler);
+    background: var(--color-neutral-background);
+    border: 1px solid var(--color-neutral-border);
+    border-left: 0;
+    border-radius: 0 var(--corner-radius-large) var(--corner-radius-large) 0;
+    box-shadow: inset 0 1px 2px 1px rgb(0 0 0 / 6%);
+  }
+}
+
+/* Set only: primary chrome on the name half (Figma filter-pill “set”). Opened is value-half chrome. */
+.pill[data-active="true"] .name {
+  color: var(--color-neutral-content);
+  background: var(--color-primary-background);
+  border-color: var(--color-primary-border-subtler);
+}
+
+/* Set: value half / Select trigger text uses content (not subtler). */
+.pill[data-active="true"] .control > :global(button) {
+  color: var(--color-neutral-content);
+}
+
+.pill:has(.control :focus-visible) {
+  outline: 2px solid var(--color-primary-focus-outline);
+  outline-offset: 1px;
+  border-radius: var(--corner-radius-large);
+}
