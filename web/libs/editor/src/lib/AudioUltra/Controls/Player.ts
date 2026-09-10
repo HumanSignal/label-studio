@@ -6,6 +6,9 @@ import type { Waveform } from "../Waveform";
 
 const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
+export const MIN_SPEED = 0.5;
+export const MAX_SPEED = 2.5;
+
 export abstract class Player extends Destructable {
   protected audio?: WaveformAudio;
   protected wf: Waveform;

@@ -17,6 +17,14 @@
     "key": "alt+d",
     "description": "Go one step forward"
   },
+  "audio:speed-down": {
+    "key": "alt+[",
+    "description": "Decrease playback speed"
+  },
+  "audio:speed-up": {
+    "key": "alt+]",
+    "description": "Increase playback speed"
+  },
   "ts:grow-left": {
     "key": "left",
     "description": "Increase region to the left"

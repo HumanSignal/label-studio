@@ -165,6 +165,7 @@ describe("Audio view", () => {
       const mockWaveform = {
         load: mockLoad,
         on: mockOn,
+        rate: 1,
         getLayer: mockGetLayer,
         seekBackward: mockSeekBackward,
         seekForward: mockSeekForward,
@@ -398,6 +399,55 @@ describe("Audio view", () => {
       expect(deleteAllCb).toBeDefined();
       deleteAllCb?.();
       expect(mockClearSegments).toHaveBeenCalledWith();
+    });
+  });
+
+  describe("hotkey audio:speed-up and audio:speed-down", () => {
+    const renderAndGet = (name: string) => {
+      const { unmount } = render(<Audio item={defaultItem as any} />);
+      const hotkey = getLastHotkeyInstance();
+      const cb = (hotkey?.addNamed as Mock<any>)?.mock?.calls?.find((c: any[]) => c[0] === name)?.[1];
+      const wf = (audioUltraReactModule.useWaveform as Mock<any>).mock.results.at(-1)?.value?.waveform?.current;
+
+      return { cb, wf, unmount };
+    };
+
+    it("audio:speed-up steps the rate up by 0.1", () => {
+      const { cb, wf } = renderAndGet("audio:speed-up");
+
+      expect(cb).toBeDefined();
+      cb?.();
+      expect(wf.rate).toBe(1.1);
+    });
+
+    it("audio:speed-down steps the rate down by 0.1", () => {
+      const { cb, wf } = renderAndGet("audio:speed-down");
+
+      cb?.();
+      expect(wf.rate).toBe(0.9);
+    });
+
+    it("keeps the rate on the 0.1 grid across repeated steps", () => {
+      const { cb, wf } = renderAndGet("audio:speed-down");
+
+      cb?.();
+      cb?.();
+      cb?.();
+      // 1 - 0.1 - 0.1 - 0.1 is 0.7000000000000001 without rounding
+      expect(wf.rate).toBe(0.7);
+    });
+
+    it("clamps at the same bounds as the speed slider", () => {
+      const up = renderAndGet("audio:speed-up");
+
+      for (let i = 0; i < 30; i++) up.cb?.();
+      expect(up.wf.rate).toBe(2.5);
+      up.unmount();
+
+      const down = renderAndGet("audio:speed-down");
+
+      for (let i = 0; i < 30; i++) down.cb?.();
+      expect(down.wf.rate).toBe(0.5);
     });
   });
 

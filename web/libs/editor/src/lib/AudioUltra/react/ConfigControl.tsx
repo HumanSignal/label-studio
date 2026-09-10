@@ -10,10 +10,9 @@ import "./ConfigControl.prefix.css";
 import { SpectrogramConfig } from "./SpectrogramConfig";
 import type { Waveform } from "../Waveform";
 import type { MutableRefObject } from "react";
+import { MAX_SPEED, MIN_SPEED } from "../Controls/Player";
 
-const MAX_SPEED = 2.5;
 const MAX_ZOOM = 150;
-const MIN_SPEED = 0.5;
 const MIN_ZOOM = 1;
 
 export interface ConfigControlProps {

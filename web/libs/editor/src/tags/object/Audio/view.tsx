@@ -7,7 +7,9 @@ import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 import { Controls } from "../../../components/Timeline/Controls";
 import type { TimelineSettings } from "../../../components/Timeline/Types";
 import { Hotkey } from "../../../core/Hotkey";
+import { clamp } from "../../../lib/AudioUltra/Common/Utils";
 import { useWaveform } from "../../../lib/AudioUltra/react";
+import { MAX_SPEED, MIN_SPEED } from "../../../lib/AudioUltra/Controls/Player";
 import type { Region } from "../../../lib/AudioUltra/Regions/Region";
 import type { Segment } from "../../../lib/AudioUltra/Regions/Segment";
 import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
@@ -20,6 +22,7 @@ import "./view.prefix.css";
 
 // Define Defaults
 const NORMALIZED_STEP = 0.1;
+const SPEED_STEP = 0.1;
 
 const isAudioSpectrograms = isFF(FF_AUDIO_SPECTROGRAMS);
 
@@ -175,6 +178,20 @@ const AudioView: FC<AudioProps> = observer(
       hotkeys.addNamed("region:delete-all", () => {
         waveform.current?.regions.clearSegments();
       });
+
+      const changeRate = (delta: number) => {
+        const wf = waveform.current;
+
+        if (!wf) return;
+        // keep the value on the same 0.1 grid the speed slider uses
+        const rate = Math.round((wf.rate + delta) * 10) / 10;
+
+        wf.rate = clamp(rate, MIN_SPEED, MAX_SPEED);
+      };
+
+      hotkeys.addNamed("audio:speed-up", () => changeRate(SPEED_STEP));
+
+      hotkeys.addNamed("audio:speed-down", () => changeRate(-SPEED_STEP));
 
       return () => {
         hotkeys.unbindAll();
