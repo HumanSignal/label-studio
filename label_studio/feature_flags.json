@@ -5928,6 +5928,60 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_utc_1166_filter_shell": {
+      "key": "fflag_utc_1166_filter_shell",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "1d095ee9420544fd95a60339faf04711",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_utc_1206_reuseable_members_filtering": {
+      "key": "fflag_utc_1206_reuseable_members_filtering",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c9c57ecea760466c9bf564cf5833f218",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_utc_1233_admin_sees_worker_toggle_ask_ai": {
       "key": "fflag_utc_1233_admin_sees_worker_toggle_ask_ai",
       "on": false,
