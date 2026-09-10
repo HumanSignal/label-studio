@@ -658,9 +658,9 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accepted");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
-    expect(getByLabelText("reject-annotation")).toHaveTextContent("Change to Reject");
+    expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
@@ -682,9 +682,9 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByLabelText("reject-annotation")).toHaveTextContent("Rejected");
+    expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
-    expect(getByLabelText("accept-annotation")).toHaveTextContent("Change to Accept");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
@@ -706,9 +706,9 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByLabelText("accept-annotation")).toHaveTextContent("Fixed");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
-    expect(getByLabelText("reject-annotation")).toHaveTextContent("Change to Reject");
+    expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
@@ -734,7 +734,7 @@ describe("Controls", () => {
 
     expect(getByLabelText("accept-annotation")).toHaveTextContent("Fix + Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
-    expect(getByLabelText("reject-annotation")).toHaveTextContent("Change to Reject");
+    expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
@@ -762,7 +762,7 @@ describe("Controls", () => {
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
   });
 
-  test("relabels the reject split-button trigger for a live accepted verdict", () => {
+  test("keeps Reject on the reject split-button trigger for a live accepted verdict", () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.customButtons = new Map([
       [
@@ -808,10 +808,10 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByTestId("bottombar-reject-button")).toHaveTextContent("Change to Reject");
+    expect(getByTestId("bottombar-reject-button")).toHaveTextContent("Reject");
   });
 
-  test("relabels Flexible Reject without a menu and allows Accept again for a live accepted verdict", () => {
+  test("keeps Flexible Reject titles and allows Accept again for a live accepted verdict", () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.customButtons = new Map([
       [
@@ -855,13 +855,13 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Change to Reject");
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Reject");
     expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
-    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accepted");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
-  test("relabels Flexible Reject and allows Reject again without a menu for a live rejected verdict", () => {
+  test("keeps Flexible Reject titles and allows Reject again without a menu for a live rejected verdict", () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.customButtons = new Map([
       [
@@ -905,11 +905,11 @@ describe("Controls", () => {
       </Provider>,
     );
 
-    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Rejected");
+    expect(getByTestId("bottombar-custom-remove-button")).toHaveTextContent("Remove");
     expect(getByTestId("bottombar-custom-remove-button")).not.toBeDisabled();
     expect(getByTestId("bottombar-custom-requeue-button")).toHaveTextContent("Requeue");
     expect(getByTestId("bottombar-custom-requeue-button")).not.toBeDisabled();
-    expect(getByLabelText("accept-annotation")).toHaveTextContent("Change to Accept");
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 

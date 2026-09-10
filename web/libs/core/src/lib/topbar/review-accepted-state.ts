@@ -78,43 +78,30 @@ export type ReviewBarCopy = {
 };
 
 /**
- * Accept/Reject bottom-bar copy.
+ * Classic Accept/Reject bottom-bar copy.
  *
- * Labels follow a *live* verdict only (`accepted` / `rejected` / `fixed`). Pass `null` when the
- * annotator has edited after the review (stale) so the bar is a first-time Reject / Accept pair.
- * Dirty local edits always win for the accept button (`Fix + Accept`).
+ * Verdict-aware labels (`Change to …` / `Accepted` / `Fixed` / `Rejected`) confused reviewers once
+ * same-state actions stayed clickable. Keep Reject / Accept, and Fix + Accept when there are local
+ * edits. `acceptedState` is unused and kept so existing call sites do not churn.
  */
 export function resolveReviewBarCopy(
-  acceptedState: SharedAnnotation["acceptedState"],
+  _acceptedState: SharedAnnotation["acceptedState"],
   hasChanges: boolean,
 ): ReviewBarCopy {
-  const isAcceptedState = acceptedState === "accepted" || acceptedState === "fixed";
-  const rejectLabel = acceptedState === "rejected" ? "Rejected" : isAcceptedState ? "Change to Reject" : "Reject";
-  const acceptLabel = hasChanges
-    ? "Fix + Accept"
-    : acceptedState === "accepted"
-      ? "Accepted"
-      : acceptedState === "fixed"
-        ? "Fixed"
-        : acceptedState === "rejected"
-          ? "Change to Accept"
-          : "Accept";
-
   return {
-    rejectLabel,
-    acceptLabel,
+    rejectLabel: "Reject",
+    acceptLabel: hasChanges ? "Fix + Accept" : "Accept",
   };
 }
 
 /**
- * Overlay Change-to / Rejected on the Flexible Reject "remove" button when the verdict is live.
- * First-time review keeps the host title (`Reject` or `Remove`). Other actions (Requeue) keep their names.
+ * Flexible Reject titles stay the host copy (`Reject`, `Remove`, `Requeue`, …).
+ * Verdict is unused; the signature is kept so existing call sites do not churn.
  */
 export function resolveFlexibleRejectButtonTitle(
-  actionName: string,
+  _actionName: string,
   actionTitle: string,
-  acceptedState: SharedAnnotation["acceptedState"],
+  _acceptedState: SharedAnnotation["acceptedState"],
 ): string {
-  if (actionName !== "remove" || acceptedState == null) return actionTitle;
-  return resolveReviewBarCopy(acceptedState, false).rejectLabel;
+  return actionTitle;
 }

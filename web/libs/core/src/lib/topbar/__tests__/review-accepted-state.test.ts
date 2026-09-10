@@ -151,58 +151,26 @@ describe("resolveClassicEntityReviewState", () => {
 });
 
 describe("resolveReviewBarCopy", () => {
-  it("shows first-time Reject / Accept when there is no live verdict", () => {
-    expect(resolveReviewBarCopy(null, false)).toEqual({
+  it.each([
+    null,
+    "accepted",
+    "rejected",
+    "fixed",
+  ] as const)("keeps classic Reject / Accept for verdict %s", (verdict) => {
+    expect(resolveReviewBarCopy(verdict, false)).toEqual({
       rejectLabel: "Reject",
       acceptLabel: "Accept",
     });
   });
 
-  it("treats a stale verdict (null after annotator UPDATE) as a new review even when dirty", () => {
-    expect(resolveReviewBarCopy(null, true)).toEqual({
+  it.each([
+    null,
+    "accepted",
+    "rejected",
+    "fixed",
+  ] as const)("uses Fix + Accept when dirty for verdict %s", (verdict) => {
+    expect(resolveReviewBarCopy(verdict, true)).toEqual({
       rejectLabel: "Reject",
-      acceptLabel: "Fix + Accept",
-    });
-  });
-
-  it("shows Change to Reject and leaves both actions available for a live accepted verdict", () => {
-    expect(resolveReviewBarCopy("accepted", false)).toEqual({
-      rejectLabel: "Change to Reject",
-      acceptLabel: "Accepted",
-    });
-  });
-
-  it("shows Change to Reject and leaves both actions available for a live fixed verdict", () => {
-    expect(resolveReviewBarCopy("fixed", false)).toEqual({
-      rejectLabel: "Change to Reject",
-      acceptLabel: "Fixed",
-    });
-  });
-
-  it("shows Change to Accept and leaves both actions available for a live rejected verdict", () => {
-    expect(resolveReviewBarCopy("rejected", false)).toEqual({
-      rejectLabel: "Rejected",
-      acceptLabel: "Change to Accept",
-    });
-  });
-
-  it("uses Fix + Accept and keeps Change to Reject when a live accepted annotation is dirty", () => {
-    expect(resolveReviewBarCopy("accepted", true)).toEqual({
-      rejectLabel: "Change to Reject",
-      acceptLabel: "Fix + Accept",
-    });
-  });
-
-  it("uses Fix + Accept and keeps Change to Reject when a live fixed annotation is dirty", () => {
-    expect(resolveReviewBarCopy("fixed", true)).toEqual({
-      rejectLabel: "Change to Reject",
-      acceptLabel: "Fix + Accept",
-    });
-  });
-
-  it("leaves both actions available and uses Fix + Accept when a live rejected annotation is dirty", () => {
-    expect(resolveReviewBarCopy("rejected", true)).toEqual({
-      rejectLabel: "Rejected",
       acceptLabel: "Fix + Accept",
     });
   });
@@ -215,15 +183,15 @@ describe("resolveFlexibleRejectButtonTitle", () => {
     expect(resolveFlexibleRejectButtonTitle("requeue", "Requeue", null)).toBe("Requeue");
   });
 
-  it("overlays Change to Reject on the remove button for a live accepted or fixed verdict", () => {
-    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "accepted")).toBe("Change to Reject");
-    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "accepted")).toBe("Change to Reject");
-    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "fixed")).toBe("Change to Reject");
+  it("keeps the host remove title for a live accepted or fixed verdict", () => {
+    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "accepted")).toBe("Reject");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "accepted")).toBe("Remove");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "fixed")).toBe("Remove");
   });
 
-  it("overlays Rejected on the remove button for a live rejected verdict", () => {
-    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "rejected")).toBe("Rejected");
-    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "rejected")).toBe("Rejected");
+  it("keeps the host remove title for a live rejected verdict", () => {
+    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "rejected")).toBe("Reject");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "rejected")).toBe("Remove");
   });
 
   it("leaves Requeue labeled Requeue even when the verdict is live", () => {

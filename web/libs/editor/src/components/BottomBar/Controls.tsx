@@ -259,10 +259,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       const renderRejectAction = (button: CustomButtonType) => {
         const title = resolveFlexibleRejectButtonTitle(button.name, button.title, reviewState);
-        const tooltipDescription =
-          reviewState && button.name === "remove"
-            ? "Change review to reject"
-            : (button.description ?? button.tooltip ?? button.title);
+        const tooltipDescription = button.description ?? button.tooltip ?? title;
 
         return (
           <ControlButton
