@@ -818,7 +818,8 @@ export const Select = forwardRef(
                 label="Select an option"
                 className={cnm({
                   "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-": searchable,
-                  "max-h-none": footer !== undefined || isVirtualList,
+                  // The virtual list sizes itself to virtualListMaxVisible rows.
+                  "max-h-none": isVirtualList,
                 })}
               >
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
@@ -914,8 +915,9 @@ export const Select = forwardRef(
                     </>
                   )}
                 </CommandGroup>
-                {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
               </CommandList>
+              {/* Outside CommandList so it stays pinned while the options scroll. */}
+              {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
             </Command>
           )}
         </PopoverContent>

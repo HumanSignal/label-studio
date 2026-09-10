@@ -618,6 +618,41 @@ describe("Select Component", () => {
         expect(screen.getByText("Custom Footer")).toBeInTheDocument();
       });
     });
+
+    it("keeps the footer outside the scrollable list so a long list cannot push it out of view", async () => {
+      const manyOptions = Array.from({ length: 50 }, (_, index) => `Option ${index}`);
+      render(
+        <Select
+          options={manyOptions as any}
+          placeholder="Select"
+          footer={<div data-testid="custom-footer">Custom Footer</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const footer = await screen.findByTestId("custom-footer");
+      const list = document.querySelector("[data-slot='command-list']");
+      expect(list).not.toBeNull();
+      expect(list?.contains(footer)).toBe(false);
+      expect(list?.className).not.toContain("max-h-none");
+    });
+
+    it("lets the virtual list size itself instead of capping the container", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          isVirtualList={true}
+          footer={<div data-testid="custom-footer">Custom Footer</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await screen.findByTestId("custom-footer");
+      expect(document.querySelector("[data-slot='command-list']")?.className).toContain("max-h-none");
+    });
   });
 
   describe("Select All", () => {
