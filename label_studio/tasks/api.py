@@ -13,7 +13,7 @@ from data_manager.functions import evaluate_predictions
 from data_manager.models import PrepareParams
 from data_manager.serializers import DataManagerTaskSerializer
 from django.db import transaction
-from django.db.models import Prefetch, Q, prefetch_related_objects
+from django.db.models import Prefetch, Q, QuerySet, prefetch_related_objects
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -975,7 +975,10 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     )
 
     serializer_class = AnnotationSerializer
-    queryset = Annotation.objects.all()
+    queryset = Annotation.objects.none()
+
+    def get_queryset(self) -> QuerySet[Annotation]:
+        return Annotation.objects.for_user(self.request.user)
 
     def perform_destroy(self, annotation):
         delete_annotation_with_retry(annotation)
@@ -1412,7 +1415,10 @@ class PredictionAPI(viewsets.ModelViewSet):
 )
 class AnnotationConvertAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(POST=all_permissions.annotations_change)
-    queryset = Annotation.objects.all()
+    queryset = Annotation.objects.none()
+
+    def get_queryset(self) -> QuerySet[Annotation]:
+        return Annotation.objects.for_user(self.request.user)
 
     def process_intermediate_state(self, annotation, draft):
         pass
