@@ -70,6 +70,7 @@ const DropdownContent = memo(
     syncWidth,
     dropdownClassName,
     dropdownStyle,
+    header,
     isChildValid,
     onToggle,
   }: {
@@ -81,6 +82,7 @@ const DropdownContent = memo(
     syncWidth?: boolean;
     dropdownClassName?: string;
     dropdownStyle?: CSSProperties;
+    header?: ReactNode;
     isChildValid?: (element: HTMLElement) => boolean;
     onToggle?: (open: boolean) => void;
   }) => {
@@ -96,6 +98,7 @@ const DropdownContent = memo(
         isChildValid={isChildValid}
         content={
           <div className={cn("multi-tree-select__content").toClassName()}>
+            {header}
             <TreeSearch placeholder={searchPlaceholder} />
             <TreeSelect allLabel={allLabel} />
             {requireApply ? <TreeApplyFooter /> : null}
@@ -136,6 +139,7 @@ export const MultiTreeSelectDropdown = memo(
     syncWidth = true,
     dropdownClassName,
     dropdownStyle,
+    header,
     selectionTrigger,
     growableTrigger,
     isChildValid,
@@ -148,6 +152,7 @@ export const MultiTreeSelectDropdown = memo(
     syncWidth?: boolean;
     dropdownClassName?: string;
     dropdownStyle?: CSSProperties;
+    header?: ReactNode;
     selectionTrigger?: ReactNode;
     /** When true, trigger height expands to fit wrapped chip content. */
     growableTrigger?: boolean;
@@ -184,6 +189,7 @@ export const MultiTreeSelectDropdown = memo(
           syncWidth={syncWidth}
           dropdownClassName={dropdownClassName}
           dropdownStyle={dropdownStyle}
+          header={header}
           isChildValid={isChildValid}
           onToggle={setIsOpen}
         >

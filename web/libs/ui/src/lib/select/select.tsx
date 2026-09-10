@@ -805,6 +805,8 @@ export const Select = forwardRef(
             </span>
           ) : (
             <Command shouldFilter={false}>
+              {/* Pinned above the search input and the selected-items panel, matching FilterShell operator toggles. */}
+              {props.header ? props.header : null}
               {searchable && (
                 <CommandInput
                   placeholder={searchPlaceholder ?? "Search"}
@@ -844,7 +846,6 @@ export const Select = forwardRef(
                 <CommandEmpty>{searchable ? "No results found." : ""}</CommandEmpty>
 
                 <CommandGroup>
-                  {props.header ? props.header : null}
                   {isVirtualList ? (
                     <InfiniteLoader
                       itemCount={itemCount ?? (isLazyVirtualList ? _options.length : renderedOptions.length)}

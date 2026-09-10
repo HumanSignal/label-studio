@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MultiStateToggle } from "../MultiStateToggle/MultiStateToggle";
 import { Select } from "../select/select";
 import { FilterShell } from "./filter-shell";
 import styles from "./filter-shell.module.css";
@@ -298,6 +299,57 @@ describe("FilterShell", () => {
       expect(screen.getByTestId("select-popup")).toBeInTheDocument();
       expect(screen.getByText("Annotator")).toBeInTheDocument();
     });
+  });
+
+  it("renders an accessible operator control inside the Select popover, not on the filter pill", async () => {
+    const onOperatorChange = mock();
+    render(
+      <FilterShell
+        filters={[
+          {
+            id: "labels",
+            label: "Labels",
+            pinned: true,
+            controlId: "filter-shell-labels-control",
+            valueLabel: "Any",
+            control: (
+              <Select
+                options={["Quality", "Priority"] as any}
+                multiple
+                renderSelected={() => "Any"}
+                triggerClassName={styles.filterShellValueTrigger}
+                triggerProps={{ id: "filter-shell-labels-control", "aria-label": "Labels filter" }}
+                header={
+                  <MultiStateToggle
+                    aria-label="Labels operator"
+                    data-testid="labels-operator"
+                    selectedOption="any"
+                    options={[
+                      { value: "any", label: "Any of" },
+                      { value: "all", label: "All of" },
+                      { value: "none", label: "None of" },
+                    ]}
+                    onChange={onOperatorChange}
+                  />
+                }
+                isInline
+              />
+            ),
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByTestId("labels-operator")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Labels filter" }));
+
+    expect(await screen.findByRole("radiogroup", { name: "Labels operator" })).toBeInTheDocument();
+    const anyOption = screen.getByRole("radio", { name: "Any of" });
+    expect(anyOption).toHaveAttribute("aria-checked", "true");
+    fireEvent.keyDown(anyOption, { key: "ArrowRight" });
+    expect(onOperatorChange).toHaveBeenCalledWith("all");
+    expect(screen.getByRole("radio", { name: "All of" })).toHaveFocus();
+    expect(screen.getByTestId("filter-shell-pill-labels")).not.toContainElement(screen.getByTestId("labels-operator"));
   });
 
   it("marks the pill data-active only when the filter is set, not when the value control opens", async () => {

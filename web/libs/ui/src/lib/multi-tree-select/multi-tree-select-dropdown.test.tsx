@@ -94,6 +94,17 @@ describe("MultiTreeSelectDropdown", () => {
     expect(screen.getByRole("textbox", { name: "Search workspaces..." })).toBeInTheDocument();
   });
 
+  it("renders optional header content inside the dropdown", async () => {
+    renderDropdown({
+      header: <div data-testid="tree-select-header">Operator control</div>,
+    });
+
+    expect(screen.queryByTestId("tree-select-header")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+
+    expect(await screen.findByTestId("tree-select-header")).toHaveTextContent("Operator control");
+  });
+
   it("accepts isRadio and preventAutoChildSelection", () => {
     const { container } = renderDropdown({
       isRadio: true,
