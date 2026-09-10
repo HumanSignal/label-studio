@@ -4,6 +4,72 @@
   min-width: 0;
   align-items: stretch;
   overflow: visible;
+
+  /* Resting chrome — both halves read these custom properties. */
+  --filter-pill-name-border-color: var(--color-neutral-border);
+  --filter-pill-value-border-color: var(--color-neutral-border);
+  --filter-pill-value-background: var(--color-neutral-background);
+  --filter-pill-value-shadow-alpha: 6%;
+}
+
+/* Set: primary name border (fill still on .name below). */
+.pill[data-active="true"] {
+  --filter-pill-name-border-color: var(--color-primary-border-subtler);
+}
+
+/* Hover anywhere on the pill: value half gets bold border + hover surface. */
+.pill:hover {
+  --filter-pill-value-border-color: var(--color-neutral-border-bold);
+  --filter-pill-value-background: var(--color-neutral-surface-hover);
+  --filter-pill-value-shadow-alpha: 8%;
+}
+
+.pill:not([data-active="true"]):hover {
+  --filter-pill-name-border-color: var(--color-neutral-border-bold);
+}
+
+.pill[data-active="true"]:hover {
+  --filter-pill-name-border-color: var(--color-primary-border);
+}
+
+/*
+ * Open: bold both halves. Only trigger elements inside .control expose aria-expanded
+ * (Select/Popover and tree panel are portaled; do not pass inline to tree or this breaks).
+ */
+.pill:has(> .control [aria-expanded="true"]) {
+  --filter-pill-value-border-color: var(--color-neutral-border-bold);
+  --filter-pill-value-background: var(--color-neutral-surface);
+  --filter-pill-value-shadow-alpha: 6%;
+}
+
+.pill:hover:has(> .control [aria-expanded="true"]) {
+  --filter-pill-value-background: var(--color-neutral-surface-hover);
+  --filter-pill-value-shadow-alpha: 8%;
+}
+
+.pill:not([data-active="true"]):has(> .control [aria-expanded="true"]) {
+  --filter-pill-name-border-color: var(--color-neutral-border-bold);
+}
+
+.pill[data-active="true"]:has(> .control [aria-expanded="true"]) {
+  --filter-pill-name-border-color: var(--color-primary-border);
+}
+
+/*
+ * Value trigger surfaces only — never inline dropdown descendants (DateRangePicker panel).
+ * .control > button (Select / stories); .control > div > button (TagMultiSelect);
+ * .control > div > [role=button][aria-haspopup] (DateRangePickerTrigger).
+ */
+.pill:hover .control > :global(button),
+.pill:hover .control > :global(div) > :global(button),
+.pill:hover .control > :global(div) > :global([role="button"][aria-haspopup="true"]),
+.pill:has(> .control [aria-expanded="true"]) .control > :global(button),
+.pill:has(> .control [aria-expanded="true"]) .control > :global(div) > :global(button),
+.pill:has(> .control [aria-expanded="true"]) .control > :global(div) > :global([role="button"][aria-haspopup="true"]),
+.pill:has(.control :focus-visible) .control > :global(button),
+.pill:has(.control :focus-visible) .control > :global(div) > :global(button),
+.pill:has(.control :focus-visible) .control > :global(div) > :global([role="button"][aria-haspopup="true"]) {
+  border-left-width: 0;
 }
 
 .name {
@@ -15,8 +81,11 @@
   padding: 0 var(--spacing-tight) 0 calc(var(--spacing-tight) + var(--spacing-tightest));
   color: var(--color-neutral-content-subtler);
   background: var(--color-neutral-surface);
-  border: 1px solid var(--color-neutral-border);
+  border: 1px solid var(--filter-pill-name-border-color);
   border-radius: var(--corner-radius-large) 0 0 var(--corner-radius-large);
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out;
 }
 
 .nameWithRemove {
@@ -46,6 +115,10 @@
 }
 
 .remove {
+  /* Overridden for the set state below so the hover disc reads on primary/background. */
+  --filter-pill-remove-hover-background: var(--color-negative-emphasis);
+  --filter-pill-remove-hover-color: var(--color-negative-icon);
+
   position: relative;
   display: inline-flex;
   width: 20px;
@@ -58,10 +131,14 @@
   cursor: pointer;
   background: transparent;
   border: 0;
-  border-radius: var(--corner-radius-smallest);
+  border-radius: 50%;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
 
   &:hover {
-    color: var(--color-neutral-content);
+    color: var(--filter-pill-remove-hover-color);
+    background: var(--filter-pill-remove-hover-background);
   }
 
   &:focus-visible {
@@ -90,22 +167,35 @@
   min-width: 0;
   align-items: stretch;
 
+  /* Wrappers (e.g. TagMultiSelect) must stretch so the nested trigger fills the pill height. */
+  & > :global(div) {
+    display: flex;
+    min-width: 0;
+    align-items: stretch;
+  }
+
   /*
    * Fallback when the consumer passes a plain button (stories / tests) instead of Select /
-   * DateRangePickerTrigger with filterShellValueTrigger. Select's trigger is also a direct
-   * button child of Popover (no wrapper), so this matches both.
+   * DateRangePickerTrigger with filterShellValueTrigger. Trigger-only selectors — never inline
+   * dropdown descendants (DateRangePicker Apply/Clear/etc.).
    */
-  & > :global(button) {
+  & > :global(button),
+  & > :global(div) > :global(button),
+  & > :global(div) > :global([role="button"][aria-haspopup="true"]) {
     min-width: 0;
     height: var(--filter-pill-height);
     padding: var(--spacing-tight);
     /* Unset / placeholder ("Any"): subtler — set state overrides below. */
     color: var(--color-neutral-content-subtler);
-    background: var(--color-neutral-background);
-    border: 1px solid var(--color-neutral-border);
+    background: var(--filter-pill-value-background);
+    border: 1px solid var(--filter-pill-value-border-color);
     border-left: 0;
     border-radius: 0 var(--corner-radius-large) var(--corner-radius-large) 0;
-    box-shadow: inset 0 1px 2px 1px rgb(0 0 0 / 6%);
+    box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / var(--filter-pill-value-shadow-alpha));
+    transition:
+      border-color 150ms ease-out,
+      background-color 150ms ease-out,
+      box-shadow 150ms ease-out;
   }
 }
 
@@ -113,12 +203,27 @@
 .pill[data-active="true"] .name {
   color: var(--color-neutral-content);
   background: var(--color-primary-background);
-  border-color: var(--color-primary-border-subtler);
 }
 
-/* Set: value half / Select trigger text uses content (not subtler). */
-.pill[data-active="true"] .control > :global(button) {
+/* Set: hover disc keeps the negative/emphasis background and darkens the glyph to negative/content. */
+.pill[data-active="true"] .remove {
+  --filter-pill-remove-hover-background: var(--color-negative-emphasis);
+  --filter-pill-remove-hover-color: var(--color-negative-content);
+}
+
+/* Set: value trigger text uses content (not subtler). Trigger-only — not dropdown panel buttons. */
+.pill[data-active="true"] .control > :global(button),
+.pill[data-active="true"] .control > :global(div) > :global(button),
+.pill[data-active="true"] .control > :global(div) > :global([role="button"][aria-haspopup="true"]) {
   color: var(--color-neutral-content);
+}
+
+/*
+ * MultiTreeSelectDropdown trigger is a div[role=button] (not a <button>), and paints via
+ * --multi-tree-trigger-color. Raise it to content when the pill is set — mirrors the Select rule.
+ */
+.pill[data-active="true"] .control :global(.lsf-multi-tree-select__input) {
+  --multi-tree-trigger-color: var(--color-neutral-content);
 }
 
 .pill:has(.control :focus-visible) {

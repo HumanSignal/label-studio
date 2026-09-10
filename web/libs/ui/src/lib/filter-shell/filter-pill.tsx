@@ -29,19 +29,21 @@ export const FilterPill = ({ id, label, pinned, active, control, controlId, onRe
     <div className={styles.pill} data-active={active ? "true" : undefined} data-testid={`filter-shell-pill-${id}`}>
       <div className={cnm(styles.name, !pinned && styles.nameWithRemove)}>
         {!pinned && (
-          <button
-            type="button"
-            className={styles.remove}
-            aria-label={`Remove ${label} filter`}
-            data-testid={`filter-shell-${id}-remove`}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onRemove?.();
-            }}
-          >
-            <IconClose aria-hidden="true" />
-          </button>
+          <Tooltip title="Remove filter">
+            <button
+              type="button"
+              className={styles.remove}
+              aria-label={`Remove ${label} filter`}
+              data-testid={`filter-shell-${id}-remove`}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onRemove?.();
+              }}
+            >
+              <IconClose aria-hidden="true" />
+            </button>
+          </Tooltip>
         )}
         <Tooltip title={label}>
           <label

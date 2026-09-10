@@ -109,6 +109,42 @@ describe("FilterShell", () => {
     expect(onOpen).not.toHaveBeenCalled();
   });
 
+  it("shows a Remove filter tooltip when the remove control is hovered", async () => {
+    render(
+      <FilterShell
+        filters={[
+          {
+            id: "skills",
+            label: "Skills",
+            controlId: "filter-shell-skills-control",
+            valueLabel: "Human Res... +4",
+            onRemove: mock(),
+            control: (
+              <button type="button" id="filter-shell-skills-control">
+                Human Res... +4
+              </button>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Remove Skills filter" }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("tooltip-body")).toHaveTextContent("Remove filter");
+    });
+  });
+
+  it("paints a circular hover disc behind the remove glyph, negative on set pills", () => {
+    const css = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-pill.module.css"), "utf8");
+    expect(css).toMatch(/\.remove\s*\{[\s\S]*?border-radius:\s*50%/);
+    expect(css).toMatch(/&:hover\s*\{[\s\S]*?background:\s*var\(--filter-pill-remove-hover-background\)/);
+    expect(css).toMatch(
+      /\.pill\[data-active="true"\]\s\.remove\s*\{[\s\S]*?--filter-pill-remove-hover-background:\s*var\(--color-negative-emphasis\)/,
+    );
+  });
+
   it("activates the value control when the filter name is clicked", () => {
     const onOpen = mock();
 
@@ -132,6 +168,34 @@ describe("FilterShell", () => {
     );
 
     fireEvent.click(screen.getByText("Role"));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("activates a wrapped value control when the filter name is clicked (TagMultiSelect shape)", () => {
+    const onOpen = mock();
+
+    render(
+      <FilterShell
+        filters={[
+          {
+            id: "tags",
+            label: "Tags",
+            pinned: true,
+            controlId: "filter-shell-tags-control",
+            valueLabel: "Any",
+            control: (
+              <div>
+                <button type="button" id="filter-shell-tags-control" onClick={onOpen}>
+                  Any
+                </button>
+              </div>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Tags"));
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
@@ -291,9 +355,32 @@ describe("FilterShell", () => {
 
   it("does not paint the name half primary from aria-expanded alone", () => {
     const css = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-pill.module.css"), "utf8");
-    const primaryNameRule = css.match(/\.pill\[data-active="true"\][\s\S]*?\{[\s\S]*?\}/);
+    const primaryNameRule = css.match(/\.pill\[data-active="true"\]\s+\.name\s*\{[\s\S]*?\}/);
     expect(primaryNameRule?.[0]).toContain("--color-primary-background");
-    expect(css).not.toMatch(/aria-expanded[\s\S]{0,80}\.name|\.name[\s\S]{0,80}aria-expanded/);
+
+    const openRules = css.match(/\.pill[^{]*\[aria-expanded="true"\][^{]*\{[\s\S]*?\}/g) ?? [];
+    const openNameRules = openRules.filter((rule) => rule.includes("--filter-pill-name-border-color"));
+    expect(openNameRules.length).toBeGreaterThan(0);
+    for (const rule of openNameRules) {
+      expect(rule).not.toMatch(/--color-primary-background/);
+    }
+  });
+
+  it("drives both pill halves from shared --filter-pill-* chrome variables", () => {
+    const pillCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-pill.module.css"), "utf8");
+    const shellCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-shell.module.css"), "utf8");
+
+    expect(pillCss).toMatch(/\.pill\s*\{[\s\S]*?--filter-pill-name-border-color/);
+    expect(pillCss).toMatch(/\.pill\s*\{[\s\S]*?--filter-pill-value-border-color/);
+    expect(pillCss).toMatch(/\.name[\s\S]*?border:[\s\S]*?var\(--filter-pill-name-border-color\)/);
+    expect(pillCss).toMatch(
+      /\.control[\s\S]*?>\s*:global\(button\)[\s\S]*?border:[\s\S]*?var\(--filter-pill-value-border-color\)/,
+    );
+    expect(pillCss).toMatch(/\.pill:hover \.control > :global\(button\)[\s\S]*?border-left-width:\s*0/);
+    expect(shellCss).toMatch(/\.filterShellValueTrigger[\s\S]*?border:[\s\S]*?var\(--filter-pill-value-border-color/);
+    expect(shellCss).toMatch(
+      /\.filterShellTreeValueTrigger[\s\S]*?--multi-tree-trigger-border:[\s\S]*?var\(--filter-pill-value-border-color/,
+    );
   });
 
   it("uses content for set value text and subtler for unset via data-active", () => {
@@ -301,8 +388,14 @@ describe("FilterShell", () => {
     const shellCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-shell.module.css"), "utf8");
 
     expect(shellCss).toMatch(/\.filterShellValueTrigger[\s\S]*?color:\s*var\(--color-neutral-content-subtler\)/);
+    expect(shellCss).toMatch(
+      /\.filterShellTreeValueTrigger[\s\S]*?--multi-tree-trigger-color:\s*var\(--color-neutral-content-subtler\)/,
+    );
     expect(pillCss).toMatch(
-      /\.pill\[data-active="true"\][\s\S]*?\.control[\s\S]*?button[\s\S]*?color:\s*var\(--color-neutral-content\)/,
+      /\.pill\[data-active="true"\] \.control > :global\(button\)[\s\S]*?color:\s*var\(--color-neutral-content\)/,
+    );
+    expect(pillCss).toMatch(
+      /\.pill\[data-active="true"\][\s\S]*?\.control[\s\S]*?lsf-multi-tree-select__input[\s\S]*?--multi-tree-trigger-color:\s*var\(--color-neutral-content\)/,
     );
     expect(pillCss).toMatch(
       /\.control[\s\S]*?>\s*:global\(button\)[\s\S]*?color:\s*var\(--color-neutral-content-subtler\)/,
@@ -324,7 +417,7 @@ describe("FilterShell", () => {
     expect(`${shellCss}\n${pillCss}`.match(/30px/g)).toHaveLength(1);
 
     expect(pillCss).toMatch(/\.pill\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
-    expect(pillCss).toMatch(/:global\(button\)\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
+    expect(pillCss).toMatch(/>\s*:global\(button\)[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(shellCss).toMatch(/\.addFilterTrigger\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(shellCss).toMatch(/\.filterShellValueTrigger\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(shellCss).toMatch(/\.filters\s\.resetButton\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);

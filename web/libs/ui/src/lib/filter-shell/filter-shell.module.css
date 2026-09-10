@@ -115,23 +115,180 @@
   min-width: 0;
   padding: var(--spacing-tight);
   color: var(--color-neutral-content-subtler);
-  background: var(--color-neutral-background);
-  border: 1px solid var(--color-neutral-border);
+  background: var(--filter-pill-value-background, var(--color-neutral-background));
+  border: 1px solid var(--filter-pill-value-border-color, var(--color-neutral-border));
   border-left: 0;
   border-radius: 0 var(--corner-radius-large) var(--corner-radius-large) 0;
-  box-shadow: inset 0 1px 2px 1px rgb(0 0 0 / 6%);
+  box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / var(--filter-pill-value-shadow-alpha, 6%));
   font-size: var(--font-size-body-small);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body-small);
   letter-spacing: var(--letter-spacing-wider);
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out,
+    box-shadow 150ms ease-out;
 
-  &:hover:not(:disabled),
-  &:focus,
-  &[aria-expanded="true"] {
+  &:hover:not(:disabled) {
+    border-left-width: 0;
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    background: var(--color-neutral-background);
     border: 1px solid var(--color-neutral-border);
     border-left: 0;
-    background: var(--color-neutral-background);
-    box-shadow: inset 0 1px 2px 1px rgb(0 0 0 / 6%);
-    /* Keep unset subtler; set state is applied via .pill[data-active] in filter-pill. */
+    box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / 6%);
+  }
+
+  &[aria-expanded="true"] {
+    border: 1px solid var(--color-neutral-border-bold);
+    border-left: 0;
+    background: var(--filter-pill-value-background, var(--color-neutral-surface));
+    box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / var(--filter-pill-value-shadow-alpha, 6%));
+  }
+
+  &:focus-visible:not(:disabled) {
+    border: 1px solid var(--color-neutral-border-bold);
+    border-left: 0;
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: -2px;
+  }
+}
+
+/**
+ * MultiTreeSelectDropdown counterpart of `.filterShellValueTrigger` — pass as `triggerClassName`
+ * (with `.filterShellTreeWrapper` as `className`). The tree trigger is a div styled by the global
+ * `multi-tree-select.prefix.css`, which ties on specificity with a CSS module class, so the chrome
+ * is set through its `--multi-tree-*` variables instead of redeclaring the properties.
+ */
+.filterShellTreeValueTrigger {
+  /*
+   * Inline caret like Select (flex sibling + gap). Absolute caret + padding-right reserve
+   * let long values paint under the chevron; shrink the value wrapper instead.
+   */
+  gap: var(--spacing-tight);
+  --multi-tree-trigger-caret-box: 16px;
+  --multi-tree-trigger-caret-size: 16px;
+  --multi-tree-trigger-height: var(--filter-pill-height);
+  --multi-tree-trigger-padding: var(--spacing-tight);
+  --multi-tree-trigger-radius: 0 var(--corner-radius-large) var(--corner-radius-large) 0;
+  --multi-tree-trigger-border: 1px solid var(--filter-pill-value-border-color, var(--color-neutral-border));
+  --multi-tree-trigger-border-left: 0;
+  --multi-tree-trigger-border-color-hover: var(--filter-pill-value-border-color, var(--color-neutral-border));
+  --multi-tree-trigger-background: var(--filter-pill-value-background, var(--color-neutral-background));
+  --multi-tree-trigger-shadow: inset 0 1px 2px 1px
+    rgb(var(--color-neutral-shadow-raw) / var(--filter-pill-value-shadow-alpha, 6%));
+
+  &[aria-expanded="true"] {
+    --multi-tree-trigger-background: var(--filter-pill-value-background, var(--color-neutral-surface));
+  }
+  /* Unset / "Any": subtler. Set state raises this via .pill[data-active] in filter-pill.module.css. */
+  --multi-tree-trigger-color: var(--color-neutral-content-subtler);
+  --multi-tree-trigger-font-size: var(--font-size-body-small);
+  --multi-tree-trigger-font-weight: var(--font-weight-regular);
+  --multi-tree-trigger-line-height: var(--line-height-body-small);
+  --multi-tree-trigger-letter-spacing: var(--letter-spacing-wider);
+}
+
+.filterShellTreeValueTrigger > :global(.lsf-multi-tree-select__icon) {
+  position: static;
+  top: auto;
+  right: auto;
+  flex-shrink: 0;
+  transform: none;
+  z-index: auto;
+  background: transparent;
+}
+
+.filterShellTreeValueTrigger > :global(.lsf-multi-tree-select__icon_open) {
+  transform: rotate(180deg);
+}
+
+/** Root wrapper of MultiTreeSelectDropdown: hug the value instead of filling the row. */
+.filterShellTreeWrapper {
+  --multi-tree-width: auto;
+
+  min-width: 0;
+}
+
+/**
+ * Panel for a MultiTreeSelectDropdown in a pill: pass `FILTER_SHELL_TREE_DROPDOWN_CLASS` as
+ * `dropdownClassName` together with `syncWidth={false}`. Dropdown bem `.mix()` prefixes that string
+ * to `lsf-filter-shell-tree-dropdown`, which is the hook below. (CSS-module hashes cannot be used —
+ * mix would prefix them and the stylesheet would never match.)
+ *
+ * The value half hugs its label, so a synced panel would be too narrow to read the tree; size it
+ * from its own content between a readable floor and ceiling instead.
+ *
+ * Search chrome matches Select's CommandInput (Tags filter): 32px field, 24px magnifier, quiet
+ * hover/focus border. A 2px primary focus ring is kept for WCAG 2.4.7 (Tags uses border-color alone).
+ */
+:global(.lsf-filter-shell-tree-dropdown) {
+  /*
+   * Component tokens wrap primitive --spacing-x00 values so call sites never reference the scale
+   * directly (use semantic / component tokens instead).
+   */
+  --filter-shell-tree-search-height: var(--spacing-800);
+  --filter-shell-tree-search-icon-size: var(--spacing-600);
+
+  min-width: 300px;
+  max-width: min(380px, calc(100vw - var(--spacing-wider)));
+
+  :global(.lsf-multi-tree-select__content) {
+    overflow: hidden;
+    max-height: min(600px, calc(90vh - var(--spacing-wider)));
+    padding: 0;
+    gap: 0;
+  }
+
+  :global(.lsf-multi-tree-select__content__search__container) {
+    padding: var(--spacing-tighter);
+    border-bottom: 1px solid var(--color-neutral-border);
+    margin: 0;
+    top: 0;
+
+    & svg {
+      left: calc(var(--spacing-tighter) + var(--spacing-tight));
+      width: var(--filter-shell-tree-search-icon-size);
+      height: var(--filter-shell-tree-search-icon-size);
+      color: var(--color-neutral-content-subtlest);
+    }
+  }
+
+  :global(.lsf-multi-tree-select__content__search) {
+    height: var(--filter-shell-tree-search-height);
+    min-height: var(--filter-shell-tree-search-height);
+    border-radius: var(--corner-radius-smaller);
+    box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / 6%);
+    transition:
+      border-color 0.2s ease-out,
+      background-color 0.2s ease-out,
+      color 0.2s ease-out;
+
+    &:hover {
+      border-color: var(--color-neutral-border-bold);
+    }
+
+    &:focus-visible {
+      border-color: var(--color-neutral-border-bold);
+      outline: 2px solid var(--color-primary-focus-outline);
+      box-shadow: inset 0 1px 2px 1px rgb(var(--color-neutral-shadow-raw) / 6%);
+    }
+  }
+
+  :global(.lsf-multi-tree-select__content__select) {
+    overflow: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--spacing-tighter);
+  }
+
+  /*
+   * Apply footer matches Tags Select: `p-tight border-t border-neutral-border flex`
+   * (Tailwind on the footer node). Keep it pinned under the scrollable tree.
+   */
+  :global(.lsf-multi-tree-select__content__footer) {
+    flex: 0 0 auto;
   }
 }
