@@ -1,0 +1,259 @@
+.markdownEditor {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-neutral-background);
+
+  &__tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-neutral-border);
+    background: var(--color-neutral-surface);
+  }
+
+  &__tabsButtons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__tab {
+    transition: all 0.2s ease;
+
+    &_active {
+      font-weight: 600;
+    }
+  }
+
+  &__viewToggle {
+    // Button styling is handled by the Button component itself
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &__stat {
+    white-space: nowrap;
+  }
+
+  &__statSeparator {
+    color: var(--color-neutral-content-subtler);
+  }
+
+  &__content {
+    flex: 1;
+    min-height: var(--markdown-editor-min-height, 200px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &_split {
+      flex-direction: row;
+      gap: 1px;
+      background: var(--color-neutral-border);
+
+      .markdownEditor__editor,
+      .markdownEditor__preview {
+        flex: 1;
+        width: 50%;
+        border: none;
+      }
+    }
+  }
+
+  &__editor {
+    height: 100%;
+
+    :global(.react-codemirror2) {
+      height: 100%;
+      width: 100%;
+
+      :global(.CodeMirror) {
+        height: 100%;
+        width: 100%;
+        border: none;
+        background: var(--color-neutral-background);
+        color: var(--color-neutral-content-subtle);
+        font-family: var(--font-mono);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      :global(.CodeMirror-lines) {
+        padding: var(--spacing-tight) 0;
+      }
+
+      :global(.CodeMirror-line) {
+        padding: 0 var(--spacing-tight);
+      }
+
+      :global(.CodeMirror-scroll) {
+        min-height: var(--markdown-editor-min-height, 200px);
+      }
+
+      :global(.CodeMirror-cursor) {
+        border-color: var(--color-neutral-content);
+      }
+
+      // Syntax highlighting
+      :global(.cm-attribute),
+      :global(.cm-keyword) {
+        color: var(--color-accent-blueberry-bold);
+      }
+
+      :global(.cm-def) {
+        color: var(--color-accent-grape-bold);
+      }
+
+      :global(.cm-builtin) {
+        color: var(--color-accent-canteloupe-bold);
+      }
+
+      :global(.cm-number) {
+        color: var(--color-accent-kiwi-bold);
+      }
+
+      :global(.cm-tag),
+      :global(.cm-bracket) {
+        color: var(--color-accent-kale-bold);
+      }
+
+      :global(.cm-string) {
+        color: var(--color-accent-persimmon-bold);
+      }
+
+      :global(.cm-comment) {
+        color: var(--color-accent-sand-bold);
+      }
+
+      :global(.cm-header) {
+        color: var(--color-accent-blueberry-bold);
+      }
+
+      :global(.cm-link) {
+        color: var(--color-accent-persimmon-bold);
+      }
+
+      :global(.cm-quote) {
+        color: var(--color-accent-sand-bold);
+      }
+
+      :global(.cm-strong) {
+        color: var(--color-accent-canteloupe-bold);
+      }
+
+      :global(.cm-string-2) {
+        color: var(--color-accent-persimmon-bold);
+      }
+
+      :global(.cm-variable) {
+        color: var(--color-neutral-content);
+      }
+
+      :global(.CodeMirror-gutters) {
+        background-color: var(--color-neutral-surface-inset);
+        color: var(--color-neutral-content-subtlest);
+        border-right: 1px solid var(--color-neutral-border);
+      }
+
+      :global(.CodeMirror-linenumber) {
+        color: var(--color-neutral-content-subtlest);
+      }
+
+      :global(.CodeMirror-placeholder) {
+        color: var(--color-neutral-content-subtler);
+        font-style: italic;
+      }
+    }
+  }
+
+  &__preview {
+    height: 100%;
+    padding: 16px;
+    overflow-y: auto;
+    background: var(--color-neutral-background);
+    min-height: var(--markdown-editor-min-height, 200px);
+
+    > * {
+      max-width: 100%;
+    }
+
+    pre {
+      overflow-x: auto;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  &__preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: var(--markdown-editor-min-height, 200px);
+    color: var(--color-neutral-content-subtler);
+    font-style: italic;
+    text-align: center;
+    padding: 24px;
+  }
+
+  @media (max-width: 768px) {
+    &__tabs {
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    &__tabsButtons {
+      width: 100%;
+      flex-wrap: wrap;
+
+      button {
+        flex: 1;
+      }
+    }
+
+    &__stats {
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    &__content_split {
+      flex-direction: column;
+
+      .markdownEditor__editor,
+      .markdownEditor__preview {
+        width: 100%;
+        min-height: 200px;
+      }
+    }
+  }
+}
+
+// Dark mode: CSS variables handle editor styling automatically
+[data-color-scheme="dark"] {
+  .markdownEditor {
+    background: var(--color-neutral-on-dark-background);
+
+    &__tabs {
+      background: var(--color-neutral-on-dark-surface);
+    }
+
+    &__preview {
+      background: var(--color-neutral-on-dark-background);
+      color: var(--color-neutral-on-dark-content);
+    }
+  }
+}

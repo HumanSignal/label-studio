@@ -100,3 +100,81 @@ export const textareaPerRegionRegionListConfig = `<View>
     placeholder="Recognized Text"
   />
 </View>`;
+
+// ============================================================================
+// Markdown Editor Test Data
+// ============================================================================
+
+/**
+ * Markdown editor enabled with no initial value
+ */
+export const textareaConfigWithMarkdown = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" markdown="true" />
+</View>`;
+
+/**
+ * Markdown editor with pre-filled markdown content
+ */
+export const textareaConfigWithMarkdownAndValue = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" markdown="true" value="**Bold** and *italic* text" />
+</View>`;
+
+/**
+ * Markdown editor with custom placeholder
+ */
+export const textareaConfigWithMarkdownPlaceholder = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" markdown="true" placeholder="Enter markdown here..." />
+</View>`;
+
+/**
+ * Markdown editor with rows attribute
+ */
+export const textareaConfigWithMarkdownAndRows = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" markdown="true" rows="5" />
+</View>`;
+
+/**
+ * Existing result with markdown content for loading tests
+ */
+export const markdownResultExisting = [
+  {
+    id: "result1",
+    type: "textarea",
+    from_name: "desc",
+    to_name: "text",
+    value: {
+      text: ["**Pre-filled bold** and _italic_ content"],
+    },
+  },
+];
+
+/**
+ * Multiple markdown results for per-region testing
+ */
+export const markdownResultsMultiple = [
+  {
+    id: "reg1",
+    type: "labels",
+    from_name: "lbl",
+    to_name: "text",
+    value: {
+      start: 5,
+      end: 9,
+      labels: ["Word"],
+      text: "text",
+    },
+  },
+  {
+    id: "result1",
+    type: "textarea",
+    from_name: "desc",
+    to_name: "text",
+    value: {
+      text: ["First **markdown** entry", "Second *italic* entry"],
+    },
+  },
+];
