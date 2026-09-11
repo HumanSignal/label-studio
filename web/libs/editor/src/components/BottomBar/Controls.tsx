@@ -501,8 +501,10 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         );
       } else if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         const isUpdate = Boolean(isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result);
-        // no changes were made over previously submitted version — no drafts, no pending changes
-        const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
+        // FIT-2742: match review dirty signal — undo stack OR local/persisted draft (draftId may
+        // still be 0 while versions.draft was written by autosave before the server id returns).
+        const hasEditableChanges = Boolean(history?.canUndo || annotation.draftId || versions?.draft);
+        const noChanges = isFF(FF_REVIEWER_FLOW) && !hasEditableChanges;
         const isUpdateDisabled = isDisabled || noChanges;
         const updateTitle = hasIncompleteRegions
           ? INCOMPLETE_UPDATE_TOOLTIP

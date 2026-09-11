@@ -2,6 +2,19 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import * as uiModule from "@humansignal/ui";
 import { Controls } from "../Controls";
+import { FF_REVIEWER_FLOW } from "../../../utils/feature-flags";
+
+const enableReviewerFlow = () => {
+  (window as any).APP_SETTINGS = {
+    ...((window as any).APP_SETTINGS ?? {}),
+    feature_flags: {
+      ...((window as any).APP_SETTINGS?.feature_flags ?? {}),
+      [FF_REVIEWER_FLOW]: true,
+    },
+    feature_flags_default_value: false,
+  };
+};
+
 const mockStore = {
   hasInterface: mock(),
   isSubmitting: false,
@@ -565,6 +578,61 @@ describe("Controls", () => {
     );
 
     expect(getByTestId("bottombar-update-button")).not.toBeDisabled();
+  });
+
+  test("keeps Update enabled after Undo when versions.draft still exists (FIT-2742)", () => {
+    enableReviewerFlow();
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+    mockStore.updateAnnotation = mock();
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+
+    // After multiple edits + Undo, canUndo/draftId may clear while a local draft snapshot remains
+    // (autosave wrote versions.draft before the server draft id landed, or undo returned to baseline).
+    mockHistory.canUndo = false;
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftSelected: true,
+      draftId: 0,
+      versions: { draft: [{ id: "edited" }], result: [{ id: "submitted" }] },
+      submissionInProgress: mock(),
+      history: mockHistory,
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).not.toBeDisabled();
+  });
+
+  test("disables Update when reviewer flow is on and there is no undo and no draft (FIT-2742)", () => {
+    enableReviewerFlow();
+    mockStore.hasInterface = (a: string) => a === "update" || a === "controls";
+
+    mockHistory.canUndo = false;
+    const annotation = {
+      ...mockAnnotation,
+      userGenerate: false,
+      draftId: 0,
+      versions: { result: [{ id: "submitted" }] },
+      submissionInProgress: mock(),
+      history: mockHistory,
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByTestId("bottombar-update-button")).toBeDisabled();
   });
 
   test("disables Update when a non-live history item is selected", () => {

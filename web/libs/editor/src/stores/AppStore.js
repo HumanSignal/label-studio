@@ -360,8 +360,8 @@ export default types
       const areResultsEmpty = entity.results.length === 0;
       const isReview = self.hasInterface("review") || entity.canBeReviewed;
       const isUpdate = !isReview && isDefined(entity.pk);
-      // no changes were made over previously submitted version — no drafts, no pending changes
-      const noChanges = !entity.history.canUndo && !entity.draftId;
+      // FIT-2742: parity with Controls — draft snapshot counts even when draftId is still 0.
+      const noChanges = !entity.history?.canUndo && !entity.draftId && !entity.versions?.draft;
       const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
 
       if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
