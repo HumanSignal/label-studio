@@ -9,6 +9,7 @@ import {
   getSnappedHeights,
   joinPanelColumns,
   redistributeHeights,
+  applyFocusTabToPanels,
   setActive,
   setActiveDefaults,
   splitPanelColumns,
@@ -749,5 +750,51 @@ describe("checkCollapsedPanelsHaveData", () => {
     const result = checkCollapsedPanelsHaveData(collapsedSideWithNoData, panelData);
 
     expect(result).toEqual(expected);
+  });
+});
+
+describe("applyFocusTabToPanels (FIT-2813)", () => {
+  const commentsPanelState: Record<string, PanelBBox> = {
+    "info-comments-history": {
+      order: 1,
+      top: 0,
+      left: 0,
+      relativeLeft: 0,
+      relativeTop: 0,
+      zIndex: 10,
+      width: DEFAULT_PANEL_WIDTH,
+      height: DEFAULT_PANEL_HEIGHT,
+      visible: true,
+      detached: false,
+      alignment: Side.right,
+      maxHeight: 800,
+      panelViews: [
+        { title: "Info", name: "info", component: () => null, active: true },
+        { title: "Comments", name: "comments", component: () => null, active: false },
+        { title: "History", name: "history", component: () => null, active: false },
+      ],
+    },
+  };
+
+  it("expands a collapsed right sidebar and activates the Comments tab", () => {
+    const result = applyFocusTabToPanels(commentsPanelState, { left: false, right: true }, "comments");
+
+    expect(result.collapsedSide.right).toBe(false);
+    expect(result.panelData["info-comments-history"].panelViews.find((v) => v.name === "comments")?.active).toBe(true);
+    expect(result.showPanel).toBeUndefined();
+  });
+
+  it("requests visibility when the Comments panel is individually hidden", () => {
+    const hidden = {
+      ...commentsPanelState,
+      "info-comments-history": {
+        ...commentsPanelState["info-comments-history"],
+        visible: false,
+      },
+    };
+    const result = applyFocusTabToPanels(hidden, { left: false, right: false }, "comments");
+
+    expect(result.showPanel).toBe("info-comments-history");
+    expect(result.panelData["info-comments-history"].panelViews.find((v) => v.name === "comments")?.active).toBe(true);
   });
 });

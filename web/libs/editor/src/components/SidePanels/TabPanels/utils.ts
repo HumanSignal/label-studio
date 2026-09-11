@@ -634,3 +634,35 @@ export const findPanelViewByName = (
     ? { panelName, tab: state[panelName].panelViews[panelViewIndex], panelViewIndex }
     : undefined;
 };
+
+/**
+ * FIT-2813: when reject/skip comment validation fires, expand the collapsed side column,
+ * activate the target tab (usually "comments"), and surface a hidden panel if needed.
+ */
+export const applyFocusTabToPanels = (
+  panelData: Record<string, PanelBBox>,
+  collapsedSide: { left: boolean; right: boolean },
+  focusTab: string,
+): {
+  panelData: Record<string, PanelBBox>;
+  collapsedSide: { left: boolean; right: boolean };
+  showPanel?: string;
+} => {
+  const foundTab = findPanelViewByName(panelData, focusTab);
+
+  if (!foundTab) {
+    return { panelData, collapsedSide };
+  }
+
+  const { panelName, tab, panelViewIndex } = foundTab;
+  const { alignment, detached, visible } = panelData[panelName];
+  const nextData = !tab.active ? setActive(panelData, panelName, panelViewIndex) : panelData;
+  const nextCollapsed =
+    !detached && collapsedSide[alignment] ? { ...collapsedSide, [alignment]: false } : collapsedSide;
+
+  return {
+    panelData: nextData,
+    collapsedSide: nextCollapsed,
+    showPanel: visible ? undefined : panelName,
+  };
+};

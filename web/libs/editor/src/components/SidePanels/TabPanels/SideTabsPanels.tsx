@@ -29,7 +29,7 @@ import {
   type ViewportSize,
 } from "./types";
 import {
-  findPanelViewByName,
+  applyFocusTabToPanels,
   findZIndices,
   getAttachedPerSide,
   getLeftKeys,
@@ -59,6 +59,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   showComments,
   showCustomTab,
   focusTab,
+  focusRequest = 0,
 }) => {
   const snapThreshold = 5;
   const regions = currentEntity.regionStore;
@@ -484,19 +485,16 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   }, [panelData, collapsedSide]);
 
   useEffect(() => {
-    if (focusTab) {
-      const state = { ...panelData };
-      const foundTab = findPanelViewByName(state, focusTab);
+    if (!focusTab) return;
 
-      if (!foundTab) return;
-      const { panelName, tab, panelViewIndex } = foundTab;
-      const { alignment, detached, visible } = state[panelName];
+    const next = applyFocusTabToPanels(panelData, collapsedSide, focusTab);
 
-      if (!tab.active) setPanelData(setActive(state, panelName, panelViewIndex));
-      if (!detached && collapsedSide[alignment]) setCollapsedSide({ ...collapsedSide, [alignment]: false });
-      if (!visible) onVisibilityChange(panelName, true);
-    }
-  }, [focusTab]);
+    if (next.panelData !== panelData) setPanelData(next.panelData);
+    if (next.collapsedSide !== collapsedSide) setCollapsedSide(next.collapsedSide);
+    if (next.showPanel) onVisibilityChange(next.showPanel, true);
+    // focusRequest must re-run after the user re-collapses the sidebar and rejects again
+    // while focusTab stays "comments" (FIT-2813).
+  }, [focusTab, focusRequest]);
 
   useEffect(() => {
     const root = rootRef.current;

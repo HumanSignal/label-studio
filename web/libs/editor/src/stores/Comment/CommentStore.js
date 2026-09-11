@@ -18,6 +18,11 @@ export const CommentStore = types
     inputRef: {},
     tooltipMessage: "",
     /**
+     * FIT-2813: bumped whenever a non-empty validation tooltip is set so SideTabsPanels
+     * re-expands the collapsed Comments sidebar even if focusTab stays "comments".
+     */
+    panelFocusRequest: 0,
+    /**
      * A key that indicates affiliation of the current loaded comment list to the annotation/draft.
      * It's used to check if the current comment list is related to the current opened annotation.
      * It should be removed in case we start to use separate comment stores per annotation.
@@ -163,6 +168,9 @@ export const CommentStore = types
 
     function setTooltipMessage(tooltipMessage) {
       self.tooltipMessage = tooltipMessage;
+      if (tooltipMessage) {
+        self.panelFocusRequest += 1;
+      }
     }
 
     function setAddedCommentThisSession(isAddedCommentThisSession = false) {
