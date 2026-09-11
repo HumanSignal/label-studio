@@ -86,6 +86,7 @@
 
     .headerIcon {
       opacity: 1;
+      position: static;
     }
   }
 }
@@ -106,6 +107,12 @@
 
 .headerIconVisible {
   opacity: 1;
+}
+
+/** Icons visible only on hover, so we need them to not truncate the text. */
+.headerIcon:not(.headerIconVisible) {
+  position: absolute;
+  @apply right-tight;
 }
 
 .headCellResizer {
