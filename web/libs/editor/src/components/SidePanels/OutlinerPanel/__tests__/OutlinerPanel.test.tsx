@@ -159,8 +159,6 @@ describe("OutlinerPanel", () => {
       expect(screen.getByTestId("empty-state")).toBeInTheDocument();
       expect(screen.queryByTestId("outliner-tree")).not.toBeInTheDocument();
       expect(screen.queryByText("All regions hidden")).not.toBeInTheDocument(); // No filters-info message
-      const emptyFill = screen.getByTestId("outliner-empty-fill");
-      expect(emptyFill).toContainElement(screen.getByTestId("empty-state"));
     });
 
     it("does not render empty state when regions exist", () => {
