@@ -242,9 +242,12 @@
 
   &__body {
     z-index: 1;
-    overflow: hidden auto;
+    overflow: hidden; /* FIT-2814: children scroll, not panel chrome */
     height: calc(100% - var(--header-height));
     position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   &__resizer {

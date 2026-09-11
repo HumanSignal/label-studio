@@ -111,20 +111,22 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
 };
 
 const OutlinerEmptyState = () => (
-  <EmptyState
-    icon={<IconLsLabeling width={24} height={24} />}
-    header="Labeled regions will appear here"
-    description={
-      <>
-        <span>
-          Start labeling and track your results
-          <br />
-          using this panel
-        </span>
-      </>
-    }
-    learnMore={{ href: getDocsUrl("guide/labeling"), text: "Learn more", testId: "regions-panel-learn-more" }}
-  />
+  <div className={cn("outliner").elem("fill").toClassName()} data-testid="outliner-empty-fill">
+    <EmptyState
+      icon={<IconLsLabeling width={24} height={24} />}
+      header="Labeled regions will appear here"
+      description={
+        <>
+          <span>
+            Start labeling and track your results
+            <br />
+            using this panel
+          </span>
+        </>
+      }
+      learnMore={{ href: getDocsUrl("guide/labeling"), text: "Learn more", testId: "regions-panel-learn-more" }}
+    />
+  </div>
 );
 
 const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ regions }) => {

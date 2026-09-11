@@ -1,7 +1,11 @@
 .outliner {
   --view-controls-height: 40px;
 
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 
   &.ff_hide_all_regions {
     --view-controls-height: 32px;
@@ -13,8 +17,21 @@
     color: var(--color-neutral-content-subtler);
   }
 
+  /* FIT-2814: empty fill clips instead of scrolling */
+  &__fill {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   &-tree {
-    height: calc(100% - var(--view-controls-height));
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    overflow: auto;
   }
 }
 

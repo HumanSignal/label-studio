@@ -1,3 +1,19 @@
+/* FIT-2814: panel roots clip; inner lists scroll */
+.details,
+.history,
+.relations,
+.info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.comments-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .details,
 .history,
 .relations,
@@ -6,6 +22,9 @@
   --details-section-border-color: var(--color-neutral-border);
 
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
 
   &__section-tab {
     width: 100%;

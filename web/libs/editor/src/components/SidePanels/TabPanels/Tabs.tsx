@@ -276,7 +276,7 @@ export const Tabs = (
           )}
         </div>
         {!props.bottomCollapsed && (
-          <div className={cn("tabs").elem("contents").toClassName()} style={{ overflow: "auto" }}>
+          <div className={cn("tabs").elem("contents").toClassName()} style={{ overflow: "hidden" }}>
             {/* FIT-720: Pass isActive={true} for the active component to enable data fetching */}
             {ActiveComponent && <ActiveComponent {...props} isActive={true} />}
           </div>
