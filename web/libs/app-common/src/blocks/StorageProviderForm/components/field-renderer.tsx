@@ -97,7 +97,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     ghost: false,
     tooltip: "",
     tooltipIcon: null,
-    required: isFieldRequired(field, isEditMode),
+    required: isFieldRequired(field, isEditMode, formData),
     label: field.label,
     description: field.description || "",
     footer: error ? <div className="text-negative-content">{error}</div> : "",
@@ -198,7 +198,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
           onChange={handleCounterChange}
           className=""
           validate=""
-          required={isFieldRequired(field, isEditMode)}
+          required={isFieldRequired(field, isEditMode, formData)}
           skip={false}
           labelProps={{}}
           disabled={isDisabled}
