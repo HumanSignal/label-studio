@@ -298,3 +298,9 @@ export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_
  * frontend checks it with an explicit ``false`` default rather than the app-wide flag default.
  */
 export const FF_MANUAL_BATCHES = "fflag_feat_utc_1260_manual_batches_short";
+
+/**
+ * Azure SPI secretless authentication: auth_mode=workload_identity uses constrained
+ * DefaultAzureCredential (workload identity + managed identity only). Default off.
+ */
+export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_spi_workload_identity_short";
