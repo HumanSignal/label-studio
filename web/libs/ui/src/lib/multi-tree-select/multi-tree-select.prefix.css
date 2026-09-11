@@ -1,27 +1,39 @@
+/**
+ * Trigger chrome is driven by `--multi-tree-*` variables read with inline fallbacks. The fallbacks
+ * are the only source of the defaults — nothing here declares the variables — so a consumer that
+ * declares one on the trigger (or any ancestor) is the sole declaration in the cascade and wins
+ * regardless of where this global stylesheet lands in the bundle. Override these instead of
+ * redeclaring `height` / `border` / `padding`, which tie on specificity with a single class.
+ */
 .multi-tree-select {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: var(--multi-tree-width, 100%);
   box-sizing: border-box;
 
   &__icon {
-    height: 30px;
-    width: 30px;
+    height: var(--multi-tree-trigger-caret-box, 30px);
+    width: var(--multi-tree-trigger-caret-box, 30px);
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: var(--spacing-tighter);
+    right: var(--multi-tree-trigger-caret-offset, var(--spacing-tighter));
     color: var(--color-neutral-content-subtler);
     display: flex;
     border-radius: var(--corner-radius-small);
     align-items: center;
     justify-content: center;
     transition: transform 200ms ease-out;
-    background: var(--color-neutral-background);
+    background: var(--multi-tree-trigger-caret-background, var(--color-neutral-background));
     z-index: 20;
 
     &_open {
       transform: translateY(-50%) rotate(180deg);
+    }
+
+    & svg {
+      height: var(--multi-tree-trigger-caret-size, 18px);
+      width: var(--multi-tree-trigger-caret-size, 18px);
     }
   }
 
@@ -42,22 +54,38 @@
     }
   }
 
+  &__value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   &__input {
     position: relative;
     cursor: pointer;
     max-width: 100%;
-    height: 40px;
-    min-height: 40px;
-    background: var(--color-neutral-background);
-    font-size: 1rem;
-    line-height: 22px;
+    height: var(--multi-tree-trigger-height, 40px);
+    min-height: var(--multi-tree-trigger-height, 40px);
+    background: var(--multi-tree-trigger-background, var(--color-neutral-background));
+    color: var(--multi-tree-trigger-color, inherit);
+    font-size: var(--multi-tree-trigger-font-size, 1rem);
+    font-weight: var(--multi-tree-trigger-font-weight, inherit);
+    line-height: var(--multi-tree-trigger-line-height, 22px);
+    letter-spacing: var(--multi-tree-trigger-letter-spacing, inherit);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    border: 1px solid var(--color-neutral-border);
+    border: var(--multi-tree-trigger-border, 1px solid var(--color-neutral-border));
+    border-left: var(
+      --multi-tree-trigger-border-left,
+      var(--multi-tree-trigger-border, 1px solid var(--color-neutral-border))
+    );
+    box-shadow: var(--multi-tree-trigger-shadow, none);
     box-sizing: border-box;
-    border-radius: 0.25rem;
-    padding: 0 2.5rem 0 1rem;
+    border-radius: var(--multi-tree-trigger-radius, 0.25rem);
+    padding: var(--multi-tree-trigger-padding, 0 2.5rem 0 1rem);
     transition:
       box-shadow 200ms ease-out,
       border-color 200ms ease-out;
@@ -65,13 +93,13 @@
     align-items: center;
 
     &:hover {
-      border-color: var(--color-neutral-border-bold);
+      border-color: var(--multi-tree-trigger-border-color-hover, var(--color-neutral-border-bold));
     }
   }
 
   &__input_growable {
     height: auto;
-    min-height: 40px;
+    min-height: var(--multi-tree-trigger-height, 40px);
     white-space: normal;
     overflow: visible;
     align-items: center;
@@ -84,6 +112,12 @@
     min-width: 0;
     flex-wrap: wrap;
     align-items: center;
+  }
+
+  &__input_growable &__value {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   &__input_growable &__icon {

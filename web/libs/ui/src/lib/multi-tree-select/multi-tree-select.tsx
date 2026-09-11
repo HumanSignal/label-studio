@@ -1,5 +1,6 @@
 import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { memo } from "react";
+import { cnm } from "../../utils/utils";
 import { type MultiTreeSelectProps, MultiTreeSelectProvider, useMultiTreeSelectProvider } from "./tree-context";
 import { TreeSearch } from "./tree-search";
 import { TreeSelect } from "./tree-select";
@@ -9,6 +10,7 @@ import "./multi-tree-select.prefix.css";
 export const MultiTreeSelect = memo(
   ({
     children,
+    className,
     allLabel,
     placeholder,
     RootLevelIcon,
@@ -16,6 +18,7 @@ export const MultiTreeSelect = memo(
     customPlaceholder,
     preventAutoChildSelection,
     isRadio,
+    requireApply,
     hiddenNodeFilter,
     ...props
   }: MultiTreeSelectProps) => {
@@ -25,12 +28,13 @@ export const MultiTreeSelect = memo(
       customPlaceholder,
       preventAutoChildSelection,
       isRadio,
+      requireApply,
       hiddenNodeFilter,
     });
 
     return (
       <MultiTreeSelectProvider {...providerProps}>
-        <div className={cn("multi-tree-select").toClassName()}>
+        <div className={cnm(cn("multi-tree-select").toClassName(), className)}>
           {children ? (
             children
           ) : (

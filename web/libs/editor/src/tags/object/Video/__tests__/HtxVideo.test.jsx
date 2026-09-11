@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { getEnv } from "mobx-state-tree";
 
 async function flushRaf() {
   await act(async () => {
@@ -31,6 +32,7 @@ mockModule("@humansignal/icons", () => ({
 }));
 
 mockModule("@humansignal/ui", () => ({
+  ...requireActual("@humansignal/ui"),
   Button: ({ children, ...props }) => (
     <button type="button" data-testid="ui-button" {...props}>
       {children}
@@ -141,16 +143,15 @@ mockModule("../../../../utils/resize-observer", () => ({
   }),
 }));
 
-mockModule("mobx-state-tree", () => {
-  const actual = requireActual("mobx-state-tree");
-  return {
-    ...actual,
-    getEnv: () => ({
-      messages: {
-        ERR_LOADING_HTTP: ({ attr, url, error }) => `Failed to load ${attr}: ${url} (${error})`,
-      },
-    }),
-  };
+// Override preload's getEnv mock for this file — do NOT mock.module("mobx-state-tree")
+// with a plain getEnv function; that permanently replaces the bun mock and breaks later
+// suites that call getEnv.mockImplementation (Audio model tests).
+beforeEach(() => {
+  getEnv.mockImplementation(() => ({
+    messages: {
+      ERR_LOADING_HTTP: ({ attr, url, error }) => `Failed to load ${attr}: ${url} (${error})`,
+    },
+  }));
 });
 
 const { HtxVideoView } = require("../HtxVideo");

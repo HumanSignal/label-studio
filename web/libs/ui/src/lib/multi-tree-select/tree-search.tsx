@@ -29,6 +29,7 @@ export const TreeSearch = memo(({ placeholder = "Search..." }: { placeholder?: s
         value={query}
         onChange={handleChange}
         placeholder={placeholder}
+        aria-label={placeholder}
       />
     </div>
   );

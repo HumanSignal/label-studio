@@ -958,6 +958,56 @@ describe("AppStore", () => {
       store.handleSkipHotkey();
       expect(mockInvoke.mock.calls.some(([event]) => event === "skipTask")).toBe(true);
     });
+
+    it("skip hotkey in review applies the primary reject action even when the menu is closed", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [
+              { name: "remove", title: "No Rework", menu: true, isPrimary: true },
+              { name: "requeue", title: "Return to Annotator", menu: true },
+            ],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        const rejectEvent = events.find((event) => event.type === "lsf:reject-with-action");
+        expect(rejectEvent?.detail?.name).toBe("remove");
+        expect(events.some((event) => event.type === "lsf:open-reject-menu")).toBe(false);
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+
+    it("skip hotkey in review uses a single menu:false custom reject instead of generic rejectAnnotation", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [{ name: "redistribute", title: "Pass to Another Annotator", menu: false }],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        expect(events.find((event) => event.type === "lsf:reject-with-action")?.detail?.name).toBe("redistribute");
+        expect(mockInvoke).not.toHaveBeenCalledWith("rejectAnnotation", expect.anything(), expect.anything());
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
   });
 
   describe("submitAnnotation when validate fails", () => {
@@ -1000,6 +1050,21 @@ describe("AppStore", () => {
       store.updateAnnotation({ extra: "data" });
       await new Promise((r) => setTimeout(r, 300));
       expect(mockInvoke).toHaveBeenCalledWith("updateAnnotation", store, entity, { extra: "data" });
+    });
+
+    it("clears acceptedState after a successful update so a prior review is stale", async () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [], accepted_state: "accepted" }] });
+      const entity = store.annotationStore.selected;
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
+      mockInvoke.mockResolvedValue(undefined);
+      expect(entity.acceptedState).toBe("accepted");
+      store.updateAnnotation();
+      await new Promise((r) => setTimeout(r, 300));
+      expect(entity.acceptedState).toBeNull();
     });
   });
 });

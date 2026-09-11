@@ -69,7 +69,22 @@
   "annotation:skip": {
     "key": "ctrl+space",
     "mac": "alt+enter",
-    "description": "Skip task"
+    "description": "Skip task / Reject with default option"
+  },
+  "annotation:reject-remove": {
+    "key": "ctrl+shift+1",
+    "mac": "alt+shift+1",
+    "description": "Reject: No Rework"
+  },
+  "annotation:reject-requeue": {
+    "key": "ctrl+shift+2",
+    "mac": "alt+shift+2",
+    "description": "Reject: Return to Annotator"
+  },
+  "annotation:reject-redistribute": {
+    "key": "ctrl+shift+3",
+    "mac": "alt+shift+3",
+    "description": "Reject: Pass to Another Annotator"
   },
   "annotation:undo": {
     "key": "ctrl+z",

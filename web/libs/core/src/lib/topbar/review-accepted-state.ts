@@ -71,3 +71,37 @@ export function resolveClassicEntityReviewState(
 
   return resolveReviewAcceptedStateFromTaskSource(entity, store?.task?.source);
 }
+
+export type ReviewBarCopy = {
+  rejectLabel: string;
+  acceptLabel: string;
+};
+
+/**
+ * Classic Accept/Reject bottom-bar copy.
+ *
+ * Verdict-aware labels (`Change to …` / `Accepted` / `Fixed` / `Rejected`) confused reviewers once
+ * same-state actions stayed clickable. Keep Reject / Accept, and Fix + Accept when there are local
+ * edits. `acceptedState` is unused and kept so existing call sites do not churn.
+ */
+export function resolveReviewBarCopy(
+  _acceptedState: SharedAnnotation["acceptedState"],
+  hasChanges: boolean,
+): ReviewBarCopy {
+  return {
+    rejectLabel: "Reject",
+    acceptLabel: hasChanges ? "Fix + Accept" : "Accept",
+  };
+}
+
+/**
+ * Flexible Reject titles stay the host copy (`Reject`, `Remove`, `Requeue`, …).
+ * Verdict is unused; the signature is kept so existing call sites do not churn.
+ */
+export function resolveFlexibleRejectButtonTitle(
+  _actionName: string,
+  actionTitle: string,
+  _acceptedState: SharedAnnotation["acceptedState"],
+): string {
+  return actionTitle;
+}

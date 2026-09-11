@@ -929,17 +929,26 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
         # argument for recalculate project task stats
         if recalc:
-            self.update_tasks_states(
-                maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
-                overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
-                tasks_number_changed=False,
+            # Capture flags now: on_commit runs after we refresh __maximum_annotations below.
+            maximum_annotations_changed = self.__maximum_annotations != self.maximum_annotations
+            overlap_cohort_percentage_changed = self.__overlap_cohort_percentage != self.overlap_cohort_percentage
+            transaction.on_commit(
+                lambda *, maximum_annotations_changed=maximum_annotations_changed, overlap_cohort_percentage_changed=overlap_cohort_percentage_changed: (
+                    self.update_tasks_states(
+                        maximum_annotations_changed=maximum_annotations_changed,
+                        overlap_cohort_percentage_changed=overlap_cohort_percentage_changed,
+                        tasks_number_changed=False,
+                    )
+                )
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
 
         if self.__skip_queue != self.skip_queue:
-            bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+            transaction.on_commit(
+                lambda: bulk_update_stats_project_tasks(
+                    self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+                )
             )
 
         if hasattr(self, 'summary'):
@@ -955,10 +964,14 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         # Call dimensions postprocess if configured (LSE feature)
         dimensions_postprocess = load_func(settings.PROJECT_SAVE_DIMENSIONS_POSTPROCESS)
         if dimensions_postprocess is not None:
-            dimensions_postprocess(
-                project=self,
-                created=not exists,
-                label_config_has_changed=label_config_has_changed,
+            transaction.on_commit(
+                lambda *, postprocess=dimensions_postprocess, created=not exists, changed=label_config_has_changed: (
+                    postprocess(
+                        project=self,
+                        created=created,
+                        label_config_has_changed=changed,
+                    )
+                )
             )
 
     # ============================================================================

@@ -1,5 +1,5 @@
 import { CalendarBlankIcon } from "@humansignal/icons";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
@@ -25,7 +25,15 @@ type DateRangePickerTriggerProps = {
    * Optional class name applied to the clickable trigger surface.
    */
   className?: string;
-} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className">;
+  /**
+   * Optional id on the clickable trigger (FilterShell name-as-label / htmlFor).
+   */
+  id?: string;
+  /**
+   * Props spread onto the clickable trigger surface (same pattern as Select `triggerProps`).
+   */
+  triggerProps?: ComponentPropsWithoutRef<"div">;
+} & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className" | "id">;
 
 const dateStrings = (dateRange: DateOrDateTimeRange | null): { fromString: string; toString: string } | null => {
   if (!dateRange) {
@@ -72,8 +80,12 @@ export const DateRangePickerTrigger = ({
   dataTestId,
   inline = false,
   className,
+  id,
+  triggerProps,
+  onToggle,
   ...dropdownTriggerProps
 }: DateRangePickerTriggerProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const appliedDatesString = dateStrings(selected);
 
   const defaultLabel = appliedDatesString ? (
@@ -97,8 +109,23 @@ export const DateRangePickerTrigger = ({
   const label = formatLabel ? formatLabel(appliedDatesString) : defaultLabel;
 
   return (
-    <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children} inline={inline}>
+    <DropdownTrigger
+      {...dropdownTriggerProps}
+      disabled={disabled}
+      content={children}
+      inline={inline}
+      onToggle={(open) => {
+        setIsOpen(open);
+        onToggle?.(open);
+      }}
+    >
       <div
+        id={id}
+        tabIndex={disabled ? undefined : 0}
+        role="button"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        aria-disabled={disabled || undefined}
         className={cnm(
           "flex items-center gap-tight py-tight pl-base pr-tight h-10 border border-neutral-border rounded-smaller cursor-pointer",
           "hover:border-neutral-border-bold",
@@ -106,6 +133,7 @@ export const DateRangePickerTrigger = ({
           className,
         )}
         data-testid={dataTestId}
+        {...triggerProps}
       >
         {label}
         <CalendarBlankIcon size={24} className="text-neutral-content-subtlest shrink-0" />

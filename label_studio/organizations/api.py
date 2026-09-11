@@ -78,6 +78,8 @@ class OrganizationListAPI(generics.ListCreateAPIView):
 
     @extend_schema(exclude=True)
     def post(self, request, *args, **kwargs):
+        if not settings.ALLOW_ORGANIZATION_CREATION:
+            raise PermissionDenied('Creating organizations over the API is disabled on this instance')
         return super(OrganizationListAPI, self).post(request, *args, **kwargs)
 
 

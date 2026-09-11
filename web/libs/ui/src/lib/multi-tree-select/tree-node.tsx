@@ -249,6 +249,8 @@ export const TreeNode = memo(({ id, label, children, disabled }: TreeNodeProps) 
               size="small"
               look="string"
               variant="neutral"
+              aria-label={`${isExpanded ? "Collapse" : "Expand"} ${label}`}
+              aria-expanded={isExpanded}
               onClick={() => setExpanded(!isExpanded)}
             >
               <div

@@ -149,6 +149,7 @@ export const IconFileCopy = IconStub;
 export const IconFileDownload = IconStub;
 export const IconFileUpload = IconStub;
 export const IconFilter = IconStub;
+export const FunnelSimpleIcon = IconStub;
 export const IconFolder = IconStub;
 export const IconFolderAdd = IconStub;
 export const IconFolderOpen = IconStub;

@@ -11,14 +11,14 @@
  * task: attempts and replacements mutate it in place; there is never a list.
  */
 
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { IconPlay } from "../../assets/icons";
 import { Button } from "../button/button";
 import { Message } from "../message/message";
 import { cn } from "../../utils/utils";
 import { SubmissionRuleBadges, SubmissionStatusChip, type SubmissionRuleResult } from "./submission-rules";
 
-export type MediaCardState = "uploading" | "failed" | "rejected" | "ready" | "stored" | "submitted" | "readonly";
+export type MediaCardState = "uploading" | "failed" | "rejected" | "uploaded" | "submitted" | "readonly";
 
 export interface MediaCardFile {
   name: string;
@@ -61,6 +61,8 @@ export interface MediaCardProps {
   /** Media metadata became known (duration/dimensions from the element). */
   onMediaMetadata?: (meta: MediaCardMeta) => void;
   onPreviewError?: () => void;
+  /** "row" renders the same data as a dense horizontal row (list view). */
+  layout?: "card" | "row";
   className?: string;
 }
 
@@ -71,8 +73,7 @@ const CHIP: Record<
   uploading: { text: (p) => `Uploading ${Math.round((p || 0) * 100)}%`, tone: "primary" },
   failed: { text: () => "Failed", tone: "negative" },
   rejected: { text: () => "Not accepted", tone: "negative" },
-  ready: { text: () => "Ready to submit", tone: "positive" },
-  stored: { text: () => "Stored", tone: "neutral" },
+  uploaded: { text: () => "Uploaded", tone: "positive" },
   submitted: { text: () => "Submitted", tone: "neutral" },
   readonly: { text: () => "Submitted", tone: "neutral" },
 };
@@ -101,7 +102,7 @@ export const MediaCard = ({
   kind,
   previewUrl,
   posterUrl,
-  previewBroken = false,
+  previewBroken: previewBrokenProp = false,
   progress = 0,
   message,
   ruleResults,
@@ -114,13 +115,59 @@ export const MediaCard = ({
   onRetryPreview,
   onMediaMetadata,
   onPreviewError,
+  layout = "card",
   className,
 }: MediaCardProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
-  const chip = CHIP[state];
+  // Degrade gracefully on an unknown state (e.g. a legacy template snapshot
+  // passing a since-removed value) instead of crashing the interface.
+  const chip = CHIP[state] ?? CHIP.uploaded;
   const editable = state !== "readonly";
   const safeFile: MediaCardFile = file ?? { name: "Submission" };
+
+  // Broken-preview detection must not rely on the <img>/<video> `error` event
+  // alone: the token-proxy resolver answers some failure modes (expired
+  // signature, a service-worker-cached stale redirect) with a response that
+  // never fires `onError` in every browser, leaving a broken glyph on screen.
+  // Treat three signals as "broken" — the error event, a load that settles
+  // with zero intrinsic size, and a resolve that never settles within a
+  // timeout — all funnelled through the caller's onPreviewError so the parent
+  // flips `previewBroken` and this card swaps to the honest placeholder.
+  // Broken state is owned HERE, not round-tripped through the parent: the
+  // resolver URL can change between renders (fresh signing token), so a
+  // parent flag keyed by that URL never matches the URL it is read against
+  // and the placeholder never shows. The component knows its own load
+  // outcome, so it tracks it directly — resetting whenever the previewUrl
+  // changes (a retry cache-busts the URL, which re-arms detection).
+  const onPreviewErrorRef = useRef(onPreviewError);
+  onPreviewErrorRef.current = onPreviewError;
+  const [autoBroken, setAutoBroken] = useState(false);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearPreviewTimer = useCallback(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+  }, []);
+  const markBroken = useCallback(() => {
+    clearPreviewTimer();
+    setAutoBroken(true);
+    onPreviewErrorRef.current?.();
+  }, [clearPreviewTimer]);
+  // Detection must not rely on the media `error` event alone: the token-proxy
+  // resolver answers some failures (expired signature, a service-worker-cached
+  // stale redirect) with a response that never fires `onError` in every
+  // browser. A load that settles with zero intrinsic size, and a resolve that
+  // never settles within a timeout, are the other two signals.
+  useEffect(() => {
+    clearPreviewTimer();
+    setAutoBroken(false);
+    if (!previewUrl || previewBrokenProp || kind === "file") return;
+    previewTimerRef.current = setTimeout(markBroken, 8000);
+    return clearPreviewTimer;
+  }, [previewUrl, previewBrokenProp, kind, clearPreviewTimer, markBroken]);
+  const previewBroken = previewBrokenProp || autoBroken;
 
   const startPlayback = useCallback(() => {
     videoRef.current?.play().catch(() => undefined);
@@ -138,6 +185,86 @@ export const MediaCard = ({
     metaParts.push((meta.height as number) >= (meta.width as number) ? "portrait" : "landscape");
   }
 
+  const rowActions = editable && state !== "readonly" && (
+    <span className="ml-auto flex flex-none items-center gap-tight">
+      {state === "uploading" && onCancel ? (
+        <Button size="small" look="string" variant="negative" onClick={onCancel}>
+          Cancel
+        </Button>
+      ) : null}
+      {state === "failed" && onRetry ? (
+        <Button size="small" onClick={onRetry}>
+          Retry
+        </Button>
+      ) : null}
+      {state !== "uploading" && onReplace ? (
+        <Button size="small" look="outlined" onClick={onReplace}>
+          Replace
+        </Button>
+      ) : null}
+      {state !== "uploading" && state !== "submitted" && onRemove ? (
+        <Button size="small" look="string" variant="negative" onClick={onRemove}>
+          Remove
+        </Button>
+      ) : null}
+    </span>
+  );
+
+  if (layout === "row") {
+    const firstFail = (ruleResults || []).find((r) => r.status === "fail");
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-tight rounded-small border border-neutral-border bg-neutral-surface p-tight",
+          className,
+        )}
+        data-testid={`media-card-${state}`}
+        data-layout="row"
+      >
+        <span className="flex h-8 w-12 flex-none items-center justify-center overflow-hidden rounded-small bg-neutral-emphasis">
+          {previewUrl && !previewBroken && kind === "image" ? (
+            // biome-ignore lint/a11y/useAltText: submission media, filename beside it
+            <img
+              src={previewUrl}
+              alt={safeFile.name}
+              className="h-full w-full object-cover"
+              onLoad={(event) => {
+                if (!event.currentTarget.naturalWidth) markBroken();
+                else clearPreviewTimer();
+              }}
+              onError={markBroken}
+            />
+          ) : (
+            <span className="font-bold text-[8px] text-neutral-content-subtle">
+              {extBadge(safeFile.name, safeFile.contentType)}
+            </span>
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium text-neutral-content text-sm">{safeFile.name}</span>
+          <span className="block truncate text-neutral-content-subtler text-xs">
+            {facts}
+            {metaParts.length ? ` · ${metaParts.join(" · ")}` : ""}
+            {firstFail ? " · " : ""}
+            {firstFail ? <span className="text-negative-content">{firstFail.label} ✕</span> : null}
+          </span>
+        </span>
+        {state === "uploading" ? (
+          <span className="w-16 flex-none">
+            <span className="block h-1 overflow-hidden rounded-small bg-neutral-emphasis">
+              <span
+                className="block h-full bg-primary-surface transition-[width]"
+                style={{ width: `${Math.round(progress * 100)}%` }}
+              />
+            </span>
+          </span>
+        ) : null}
+        <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
+        {rowActions}
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -152,7 +279,7 @@ export const MediaCard = ({
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-medium text-neutral-content text-sm">{safeFile.name}</span>
-          <span className="block text-neutral-content-subtler text-xs">{facts}</span>
+          <span className="block truncate text-neutral-content-subtler text-xs">{facts}</span>
         </span>
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
       </div>
@@ -175,9 +302,14 @@ export const MediaCard = ({
             className="block max-h-80 w-full bg-neutral-emphasis object-contain"
             onLoad={(event) => {
               const img = event.currentTarget;
+              if (!img.naturalWidth) {
+                markBroken();
+                return;
+              }
+              clearPreviewTimer();
               onMediaMetadata?.({ width: img.naturalWidth, height: img.naturalHeight });
             }}
-            onError={onPreviewError}
+            onError={markBroken}
           />
         ) : (
           <>
@@ -194,9 +326,10 @@ export const MediaCard = ({
               onPause={() => setPlaying(false)}
               onLoadedMetadata={(event) => {
                 const media = event.currentTarget;
+                clearPreviewTimer();
                 onMediaMetadata?.({ durationSec: media.duration, width: media.videoWidth, height: media.videoHeight });
               }}
-              onError={onPreviewError}
+              onError={markBroken}
             />
             {!playing ? (
               <button
@@ -229,14 +362,20 @@ export const MediaCard = ({
 
       {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || message ? (
         <div className="flex flex-col gap-tight border-neutral-border-subtle border-t p-tight">
-          {ruleResults && ruleResults.length > 0 ? <SubmissionRuleBadges results={ruleResults} /> : null}
+          {ruleResults && ruleResults.length > 0 ? (
+            <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <SubmissionRuleBadges results={ruleResults} className="w-max flex-nowrap" />
+            </div>
+          ) : null}
           {metaParts.length > 0 ? (
             <div
-              className="flex flex-wrap gap-x-wide gap-y-tightest font-mono text-neutral-content-subtler text-xs"
+              className="flex gap-x-wide overflow-x-auto font-mono text-neutral-content-subtler text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               data-testid="media-card-meta"
             >
               {metaParts.map((part) => (
-                <span key={part}>{part}</span>
+                <span key={part} className="flex-none whitespace-nowrap">
+                  {part}
+                </span>
               ))}
             </div>
           ) : null}
@@ -251,32 +390,34 @@ export const MediaCard = ({
       {editable &&
       (state === "uploading" || onRetry || onReplace || onRemove || (previewBroken && onRetryPreview)) &&
       state !== "readonly" ? (
-        <div className="flex justify-end gap-tight border-neutral-border-subtle border-t p-tight">
-          {state === "uploading" && onCancel ? (
-            <Button size="small" look="string" variant="negative" onClick={onCancel}>
-              Cancel
-            </Button>
-          ) : null}
-          {state === "failed" && onRetry ? (
-            <Button size="small" onClick={onRetry}>
-              Retry
-            </Button>
-          ) : null}
-          {previewBroken && onRetryPreview && state !== "uploading" ? (
-            <Button size="small" look="outlined" onClick={onRetryPreview}>
-              Retry preview
-            </Button>
-          ) : null}
-          {state !== "uploading" && onReplace ? (
-            <Button size="small" look="outlined" onClick={onReplace}>
-              Replace…
-            </Button>
-          ) : null}
-          {state !== "uploading" && state !== "submitted" && onRemove ? (
-            <Button size="small" look="string" variant="negative" onClick={onRemove}>
-              Remove
-            </Button>
-          ) : null}
+        <div className="flex overflow-x-auto border-neutral-border-subtle border-t p-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <span className="ml-auto flex flex-none items-center gap-tight">
+            {state === "uploading" && onCancel ? (
+              <Button size="small" look="string" variant="negative" onClick={onCancel}>
+                Cancel
+              </Button>
+            ) : null}
+            {state === "failed" && onRetry ? (
+              <Button size="small" onClick={onRetry}>
+                Retry
+              </Button>
+            ) : null}
+            {previewBroken && onRetryPreview && state !== "uploading" ? (
+              <Button size="small" look="outlined" onClick={onRetryPreview}>
+                Retry preview
+              </Button>
+            ) : null}
+            {state !== "uploading" && onReplace ? (
+              <Button size="small" look="outlined" onClick={onReplace}>
+                Replace…
+              </Button>
+            ) : null}
+            {state !== "uploading" && state !== "submitted" && onRemove ? (
+              <Button size="small" look="string" variant="negative" onClick={onRemove}>
+                Remove
+              </Button>
+            ) : null}
+          </span>
         </div>
       ) : null}
     </div>

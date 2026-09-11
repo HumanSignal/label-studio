@@ -58,6 +58,17 @@ interface TreeContextProps {
   /** When true: selecting a parent does not select descendants; selecting all children does not select the parent. */
   preventAutoChildSelection?: boolean;
   isRadio?: boolean;
+  /**
+   * When true, checkbox toggles update internal selection only; parent `onChange`
+   * runs on `applySelection` (Tags-style Apply footer).
+   */
+  requireApply?: boolean;
+  /** True when internal selection differs from the last committed/applied value. */
+  hasPendingChanges: boolean;
+  /** Emit current selection via `onChange` and mark it committed. */
+  applySelection: () => void;
+  /** Reset internal selection to the last committed value (e.g. dropdown closed without Apply). */
+  discardPendingSelection: () => void;
   // Reactive search state for components that need to re-render on search
   isSearching: boolean;
   searchResultCount: number;
@@ -87,6 +98,11 @@ export interface MultiTreeSelectProviderProps {
   /** When true: selecting a parent does not select descendants; selecting all children does not select the parent. */
   preventAutoChildSelection?: boolean;
   isRadio?: boolean;
+  /**
+   * When true, selection changes stay pending until `applySelection` (Apply button).
+   * Default false preserves live `onChange` for existing consumers.
+   */
+  requireApply?: boolean;
   hiddenNodeFilter?: (node: any) => boolean;
   onChange?: (data: TreeNodeProps[], selected: string[]) => void;
   onSearch?: (query: string, results: TreeSearchMatch) => void;
@@ -101,6 +117,8 @@ export type MultiTreeSelectProps = Omit<
 > & {
   data: unknown[];
   children?: ReactNode;
+  /** Class for the root wrapper (defaults to `width: 100%` via `--multi-tree-width`). */
+  className?: string;
   placeholder?: string;
   searchPlaceholder?: string;
   allLabel?: string;
@@ -206,6 +224,7 @@ export const MultiTreeSelectProvider = ({
   customPlaceholder,
   preventAutoChildSelection = false,
   isRadio = false,
+  requireApply = false,
   onChange,
   onSearch,
   onExpand,
@@ -225,10 +244,14 @@ export const MultiTreeSelectProvider = ({
   // ``null`` means we have not emitted yet (so the parent's value is purely
   // external and the empty→all expansion should run on first sync).
   const lastEmittedRef = useRef<string[] | null>(null);
+  // Last value the parent (or Apply) committed — used so requireApply can discard
+  // pending checkbox toggles without relying on a fresh props identity.
+  const committedSelectedRef = useRef<string[]>([...(initialSelected ?? [])]);
 
   // Reactive search state - triggers re-renders for components that need it
   const [isSearching, setIsSearching] = useState(false);
   const [searchResultCount, setSearchResultCount] = useState(0);
+  const [hasPendingChanges, setHasPendingChanges] = useState(false);
 
   const subscribe = (path: string | Symbol, callback: Function) => {
     if (!subscribersRef.current.has(path)) {
@@ -249,6 +272,24 @@ export const MultiTreeSelectProvider = ({
     }
   };
 
+  const applySelection = useCallback(() => {
+    lastEmittedRef.current = [...selectedRef.current];
+    committedSelectedRef.current = [...selectedRef.current];
+    onChange?.(dataRef.current, selectedRef.current);
+    setHasPendingChanges(false);
+    dropdownRef?.current?.close?.();
+  }, [onChange, dropdownRef, dataRef]);
+
+  const discardPendingSelection = useCallback(() => {
+    if (sameSelection(selectedRef.current, committedSelectedRef.current)) {
+      setHasPendingChanges(false);
+      return;
+    }
+    selectedRef.current = [...committedSelectedRef.current];
+    notify(RootSymbol, { id: RootSymbol, action: "refresh", value: true });
+    setHasPendingChanges(false);
+  }, []);
+
   // Sync selectedRef when initialSelected changes
   useEffect(() => {
     if (initialSelected == null) return;
@@ -262,6 +303,14 @@ export const MultiTreeSelectProvider = ({
     if (lastEmittedRef.current !== null && sameSelection(initialSelected, lastEmittedRef.current)) {
       return;
     }
+
+    // requireApply: parent still matches our last committed value — leave any
+    // in-dropdown pending edits alone. A parent re-render with a new array
+    // identity for the same keys must not wipe unchecked checkboxes before Apply.
+    if (requireApply && sameSelection(initialSelected, committedSelectedRef.current)) {
+      return;
+    }
+
     // Parent gave us a value that is NOT an echo of our own emit — clear the
     // marker so subsequent user-driven changes restart the round-trip dance
     // from a clean slate.
@@ -284,9 +333,12 @@ export const MultiTreeSelectProvider = ({
       selectedRef.current = [];
     }
 
+    committedSelectedRef.current = [...selectedRef.current];
+    setHasPendingChanges(false);
+
     // Notify all subscribers (TreeSelected, TreeNodes) to update their UI
     notify(RootSymbol, { id: RootSymbol, action: "refresh", value: true });
-  }, [initialSelected, customPlaceholder, isRadio]);
+  }, [initialSelected, customPlaceholder, isRadio, requireApply, disableAllOption]);
 
   // Sync expandedRef when initialExpanded changes
   useEffect(() => {
@@ -339,13 +391,19 @@ export const MultiTreeSelectProvider = ({
       RootSymbol,
       debounce(
         (change: TreeAction) => {
-          if (onChange && change.action === "select") {
-            // Record what we're emitting BEFORE invoking the parent's onChange so
-            // the sync effect can recognise the parent's echo on the next render
-            // and short-circuit instead of resetting our internal state.
-            lastEmittedRef.current = [...selectedRef.current];
-            onChange(dataRef.current, selectedRef.current);
-            if (isRadio && dropdownRef?.current?.close) dropdownRef.current.close();
+          if (change.action === "select") {
+            if (requireApply) {
+              setHasPendingChanges(!sameSelection(selectedRef.current, committedSelectedRef.current));
+              return;
+            }
+            if (onChange) {
+              // Record what we're emitting BEFORE invoking the parent's onChange so
+              // the sync effect can recognise the parent's echo on the next render
+              // and short-circuit instead of resetting our internal state.
+              lastEmittedRef.current = [...selectedRef.current];
+              onChange(dataRef.current, selectedRef.current);
+              if (isRadio && dropdownRef?.current?.close) dropdownRef.current.close();
+            }
           }
           if (onSearch && change.action === "search") onSearch(change.value.query, change.value.results);
           if (onExpand && change.action === "expand") onExpand(change.id, expandedRef.current);
@@ -354,7 +412,7 @@ export const MultiTreeSelectProvider = ({
         false,
       ),
     );
-  }, [onChange, onSearch, onExpand, isRadio, dropdownRef]);
+  }, [onChange, onSearch, onExpand, isRadio, dropdownRef, requireApply]);
 
   useEffect(() => {
     if (searchIndexed && !allNodeIdsRef.current.length) {
@@ -394,6 +452,10 @@ export const MultiTreeSelectProvider = ({
         customPlaceholder,
         preventAutoChildSelection,
         isRadio,
+        requireApply,
+        hasPendingChanges,
+        applySelection,
+        discardPendingSelection,
         isSearching,
         searchResultCount,
       }}
@@ -415,12 +477,14 @@ export const useMultiTreeSelectProvider = ({
   customPlaceholder,
   preventAutoChildSelection,
   isRadio,
+  requireApply,
   hiddenNodeFilter,
   dropdownRef,
 }: MultiTreeSelectProps) => {
   const [searchIndexed, setSearchIndexed] = useState(false);
   const searchIndexRef = useRef<TreeSearchIndex>(new TreeSearchIndex());
   const dataRef = useRef<TreeNodeProps[]>([]);
+  const indexedDataRef = useRef<unknown>(null);
 
   /**
    * Build a search index for the tree data
@@ -514,9 +578,17 @@ export const useMultiTreeSelectProvider = ({
   );
 
   useEffect(() => {
-    // Data index is still valid, no need to rebuild
-    if ((data as IndexedNode)[IndexedSymbol]) return;
+    // Data index is still valid, no need to rebuild.
+    // Track this per instance: `IndexedSymbol` lives on the array, so a different instance (or an
+    // earlier mount of this one, e.g. a filter pill removed and re-added) may have marked it while
+    // holding its own search index. Trusting the marker there would leave `searchIndexed` false and
+    // the tree stuck on its loading spinner.
+    if (indexedDataRef.current === data) return;
+    indexedDataRef.current = data;
 
+    // buildSearchIndex bails on an already-marked array, so clear the marker to re-index into this
+    // instance's search index.
+    delete (data as IndexedNode)[IndexedSymbol];
     dataRef.current = buildSearchIndex(data as unknown[] as TreeNodeProps[]);
     setSearchIndexed(true);
   }, [data]);
@@ -539,6 +611,7 @@ export const useMultiTreeSelectProvider = ({
       customPlaceholder,
       preventAutoChildSelection,
       isRadio,
+      requireApply,
       dropdownRef,
     },
   };

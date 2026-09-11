@@ -3876,6 +3876,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_utc_1260_manual_batches_short": {
+      "key": "fflag_feat_utc_1260_manual_batches_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "b11062ad4e3d4654be6be045f48b94b1",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_utc_161_bulk_queue_total_11072025_short": {
       "key": "fflag_feat_utc_161_bulk_queue_total_11072025_short",
       "on": false,
@@ -5895,6 +5922,60 @@
       },
       "clientSide": false,
       "salt": "ece405af8d6d4f11a5639c670ba6a30b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_utc_1166_filter_shell": {
+      "key": "fflag_utc_1166_filter_shell",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "1d095ee9420544fd95a60339faf04711",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_utc_1206_reuseable_members_filtering": {
+      "key": "fflag_utc_1206_reuseable_members_filtering",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c9c57ecea760466c9bf564cf5833f218",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
