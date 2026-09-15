@@ -296,6 +296,7 @@ export const Select = forwardRef(
       selectAllLabel,
       showGroupActions = false,
       open: controlledOpen,
+      align = "start",
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -798,7 +799,7 @@ export const Select = forwardRef(
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
+        <PopoverContent align={align} data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...
