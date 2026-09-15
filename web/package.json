@@ -192,7 +192,7 @@
     "tailwind-scrollbar": "3",
     "tailwindcss": "3.4.3",
     "tailwindcss-animate": "^1.0.7",
-    "toml": "^3.0.0",
+    "toml": "^4.1.2",
     "truncate-middle": "^1.0.6",
     "tslib": "^2.3.0",
     "typescript": "5.8.3",
