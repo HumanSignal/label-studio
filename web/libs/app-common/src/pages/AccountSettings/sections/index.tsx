@@ -9,6 +9,7 @@ import type { AuthTokenSettings } from "../types";
 import { ABILITY, type AuthPermissions } from "@humansignal/core/providers/AuthProvider";
 import { ff } from "@humansignal/core";
 import { Badge } from "@humansignal/ui";
+import { LanguageDescription, LanguageSectionTitle, LanguageSettings } from "./Language/Language";
 
 export type SectionType = {
   title: string | React.ReactNode;
@@ -34,6 +35,12 @@ export const accountSettingsSections = (
     },
     // Enterprise-injected sections (e.g. workforce "Skills & Expertise") render right after Profile.
     ...extraSections,
+    {
+      title: <LanguageSectionTitle />,
+      id: "language",
+      component: LanguageSettings,
+      description: LanguageDescription,
+    },
     {
       title: (
         <div className="flex items-center gap-tight">
