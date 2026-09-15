@@ -238,10 +238,64 @@ describe("MultiTreeSelectDropdown", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("includes external pending changes in Apply without changing the default path", async () => {
+    const onChange = mock();
+    const onApplyExternal = mock();
+
+    renderDropdown({
+      selected: ["w1"],
+      disableAllOption: true,
+      preventAutoChildSelection: true,
+      requireApply: true,
+      hasExternalPendingChanges: true,
+      onApplyExternal,
+      onChange,
+    });
+
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+    expect(await screen.findByTestId("multi-tree-select-apply")).toBeEnabled();
+
+    fireEvent.click(applyButton());
+    expect(onApplyExternal).toHaveBeenCalledTimes(1);
+    await waitForApplyUnmounted();
+  });
+
+  it("discards external pending changes when closing without Apply", async () => {
+    const onDiscardExternal = mock();
+    renderDropdown({
+      selected: ["w1"],
+      disableAllOption: true,
+      requireApply: true,
+      hasExternalPendingChanges: true,
+      onDiscardExternal,
+    });
+
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+    await screen.findByTestId("multi-tree-select-apply");
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+    await waitForApplyUnmounted();
+    expect(onDiscardExternal).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps Apply disabled when an external operator change has no selection", async () => {
+    renderDropdown({
+      disableAllOption: true,
+      requireApply: true,
+      hasExternalPendingChanges: false,
+    });
+
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+    expect(await screen.findByTestId("multi-tree-select-apply")).toBeDisabled();
+  });
+
   it("without requireApply, does not render an Apply footer", async () => {
-    renderDropdown({ disableAllOption: true });
+    const onChange = mock();
+    renderDropdown({ disableAllOption: true, onChange });
     fireEvent.click(screen.getByTestId("dropdown-trigger"));
     await screen.findByText("Workspace 1");
     expect(screen.queryByTestId("multi-tree-select-apply")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Workspace 1" }));
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
   });
 });

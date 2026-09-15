@@ -65,6 +65,8 @@ interface TreeContextProps {
   requireApply?: boolean;
   /** True when internal selection differs from the last committed/applied value. */
   hasPendingChanges: boolean;
+  /** Consumer-owned pending state, such as an operator change rendered in the dropdown header. */
+  hasExternalPendingChanges: boolean;
   /** Emit current selection via `onChange` and mark it committed. */
   applySelection: () => void;
   /** Reset internal selection to the last committed value (e.g. dropdown closed without Apply). */
@@ -103,6 +105,12 @@ export interface MultiTreeSelectProviderProps {
    * Default false preserves live `onChange` for existing consumers.
    */
   requireApply?: boolean;
+  /** Consumer-owned pending state that should enable the shared Apply footer. */
+  hasExternalPendingChanges?: boolean;
+  /** Commit consumer-owned pending state with the tree selection. */
+  onApplyExternal?: () => void;
+  /** Discard consumer-owned pending state when the dropdown closes without Apply. */
+  onDiscardExternal?: () => void;
   hiddenNodeFilter?: (node: any) => boolean;
   onChange?: (data: TreeNodeProps[], selected: string[]) => void;
   onSearch?: (query: string, results: TreeSearchMatch) => void;
@@ -225,6 +233,9 @@ export const MultiTreeSelectProvider = ({
   preventAutoChildSelection = false,
   isRadio = false,
   requireApply = false,
+  hasExternalPendingChanges = false,
+  onApplyExternal,
+  onDiscardExternal,
   onChange,
   onSearch,
   onExpand,
@@ -247,6 +258,7 @@ export const MultiTreeSelectProvider = ({
   // Last value the parent (or Apply) committed — used so requireApply can discard
   // pending checkbox toggles without relying on a fresh props identity.
   const committedSelectedRef = useRef<string[]>([...(initialSelected ?? [])]);
+  const didApplyRef = useRef(false);
 
   // Reactive search state - triggers re-renders for components that need it
   const [isSearching, setIsSearching] = useState(false);
@@ -273,22 +285,29 @@ export const MultiTreeSelectProvider = ({
   };
 
   const applySelection = useCallback(() => {
-    lastEmittedRef.current = [...selectedRef.current];
-    committedSelectedRef.current = [...selectedRef.current];
-    onChange?.(dataRef.current, selectedRef.current);
+    if (!sameSelection(selectedRef.current, committedSelectedRef.current)) {
+      lastEmittedRef.current = [...selectedRef.current];
+      committedSelectedRef.current = [...selectedRef.current];
+      onChange?.(dataRef.current, selectedRef.current);
+    }
+    didApplyRef.current = true;
     setHasPendingChanges(false);
     dropdownRef?.current?.close?.();
-  }, [onChange, dropdownRef, dataRef]);
+    onApplyExternal?.();
+  }, [dataRef, dropdownRef, onApplyExternal, onChange]);
 
   const discardPendingSelection = useCallback(() => {
-    if (sameSelection(selectedRef.current, committedSelectedRef.current)) {
-      setHasPendingChanges(false);
+    if (didApplyRef.current) {
+      didApplyRef.current = false;
       return;
     }
-    selectedRef.current = [...committedSelectedRef.current];
-    notify(RootSymbol, { id: RootSymbol, action: "refresh", value: true });
+    if (!sameSelection(selectedRef.current, committedSelectedRef.current)) {
+      selectedRef.current = [...committedSelectedRef.current];
+      notify(RootSymbol, { id: RootSymbol, action: "refresh", value: true });
+    }
+    onDiscardExternal?.();
     setHasPendingChanges(false);
-  }, []);
+  }, [onDiscardExternal]);
 
   // Sync selectedRef when initialSelected changes
   useEffect(() => {
@@ -454,6 +473,7 @@ export const MultiTreeSelectProvider = ({
         isRadio,
         requireApply,
         hasPendingChanges,
+        hasExternalPendingChanges,
         applySelection,
         discardPendingSelection,
         isSearching,
@@ -478,6 +498,9 @@ export const useMultiTreeSelectProvider = ({
   preventAutoChildSelection,
   isRadio,
   requireApply,
+  hasExternalPendingChanges,
+  onApplyExternal,
+  onDiscardExternal,
   hiddenNodeFilter,
   dropdownRef,
 }: MultiTreeSelectProps) => {
@@ -612,6 +635,9 @@ export const useMultiTreeSelectProvider = ({
       preventAutoChildSelection,
       isRadio,
       requireApply,
+      hasExternalPendingChanges,
+      onApplyExternal,
+      onDiscardExternal,
       dropdownRef,
     },
   };

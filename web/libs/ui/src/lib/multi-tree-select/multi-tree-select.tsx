@@ -19,6 +19,9 @@ export const MultiTreeSelect = memo(
     preventAutoChildSelection,
     isRadio,
     requireApply,
+    hasExternalPendingChanges,
+    onApplyExternal,
+    onDiscardExternal,
     hiddenNodeFilter,
     ...props
   }: MultiTreeSelectProps) => {
@@ -29,6 +32,9 @@ export const MultiTreeSelect = memo(
       preventAutoChildSelection,
       isRadio,
       requireApply,
+      hasExternalPendingChanges,
+      onApplyExternal,
+      onDiscardExternal,
       hiddenNodeFilter,
     });
 

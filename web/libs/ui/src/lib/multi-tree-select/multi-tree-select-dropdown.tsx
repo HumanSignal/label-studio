@@ -35,7 +35,7 @@ const DropdownIcon = memo(() => {
  * @see TagMultiSelect footer + Select `p-tight border-t border-neutral-border flex`
  */
 const TreeApplyFooter = memo(() => {
-  const { applySelection, hasPendingChanges } = useTreeContext();
+  const { applySelection, hasPendingChanges, hasExternalPendingChanges } = useTreeContext();
 
   return (
     <div
@@ -51,7 +51,8 @@ const TreeApplyFooter = memo(() => {
         look="filled"
         size="small"
         className="flex-1"
-        disabled={!hasPendingChanges}
+        disabled={!hasPendingChanges && !hasExternalPendingChanges}
+        aria-label="Apply tree selection"
         data-testid="multi-tree-select-apply"
       >
         Apply
