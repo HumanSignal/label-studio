@@ -12,7 +12,8 @@
  */
 
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { IconPlay } from "../../assets/icons";
+import { IconPlay, IconSync, IconTrash } from "../../assets/icons";
+import { Tooltip } from "../Tooltip/Tooltip";
 import { Button } from "../button/button";
 import { Message } from "../message/message";
 import { cn } from "../../utils/utils";
@@ -198,14 +199,27 @@ export const MediaCard = ({
         </Button>
       ) : null}
       {state !== "uploading" && onReplace ? (
-        <Button size="small" look="outlined" onClick={onReplace}>
-          Replace
-        </Button>
+        <Tooltip title="Replace this file">
+          <Button
+            size="small"
+            look="outlined"
+            aria-label="Replace this file"
+            leading={<IconSync />}
+            onClick={onReplace}
+          />
+        </Tooltip>
       ) : null}
-      {state !== "uploading" && state !== "submitted" && onRemove ? (
-        <Button size="small" look="string" variant="negative" onClick={onRemove}>
-          Remove
-        </Button>
+      {state !== "uploading" && onRemove ? (
+        <Tooltip title="Remove this file">
+          <Button
+            size="small"
+            look="string"
+            variant="negative"
+            aria-label="Remove this file"
+            leading={<IconTrash />}
+            onClick={onRemove}
+          />
+        </Tooltip>
       ) : null}
     </span>
   );
@@ -408,12 +422,12 @@ export const MediaCard = ({
               </Button>
             ) : null}
             {state !== "uploading" && onReplace ? (
-              <Button size="small" look="outlined" onClick={onReplace}>
+              <Button size="small" look="outlined" leading={<IconSync />} onClick={onReplace}>
                 Replace…
               </Button>
             ) : null}
-            {state !== "uploading" && state !== "submitted" && onRemove ? (
-              <Button size="small" look="string" variant="negative" onClick={onRemove}>
+            {state !== "uploading" && onRemove ? (
+              <Button size="small" look="string" variant="negative" leading={<IconTrash />} onClick={onRemove}>
                 Remove
               </Button>
             ) : null}

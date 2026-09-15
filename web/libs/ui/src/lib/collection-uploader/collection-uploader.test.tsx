@@ -138,7 +138,7 @@ describe("MediaCard row layout", () => {
     expect(card).toHaveAttribute("data-layout", "row");
     expect(screen.getByText("a.png")).toBeInTheDocument();
     expect(screen.getByText("Uploaded")).toBeInTheDocument();
-    expect(screen.getByText("Replace")).toBeInTheDocument();
-    expect(screen.getByText("Remove")).toBeInTheDocument();
+    expect(screen.getByLabelText("Replace this file")).toBeInTheDocument();
+    expect(screen.getByLabelText("Remove this file")).toBeInTheDocument();
   });
 });

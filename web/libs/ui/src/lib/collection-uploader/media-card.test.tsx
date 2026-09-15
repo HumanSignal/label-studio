@@ -45,8 +45,18 @@ describe("MediaCard", () => {
     expect(screen.queryByText("Remove")).not.toBeInTheDocument();
   });
 
-  it("submitted offers Replace only; readonly offers nothing", () => {
+  it("submitted offers Replace, plus Remove only when the host provides it; readonly offers nothing", () => {
     const { rerender } = render(
+      <MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" onReplace={() => undefined} />,
+    );
+    // no onRemove from the hook (within capacity): Replace only
+    expect(screen.getByText("Replace…")).toBeInTheDocument();
+    expect(screen.queryByText("Remove")).not.toBeInTheDocument();
+    expect(screen.getByText("Submitted")).toBeInTheDocument();
+
+    // the hook hands submitted extras an onRemove when the collection is over
+    // a lowered capacity: the card must trust it or trimming is impossible
+    rerender(
       <MediaCard
         state="submitted"
         file={FILE}
@@ -56,9 +66,7 @@ describe("MediaCard", () => {
         onRemove={() => undefined}
       />,
     );
-    expect(screen.getByText("Replace…")).toBeInTheDocument();
-    expect(screen.queryByText("Remove")).not.toBeInTheDocument();
-    expect(screen.getByText("Submitted")).toBeInTheDocument();
+    expect(screen.getByText("Remove")).toBeInTheDocument();
 
     rerender(
       <MediaCard
@@ -191,5 +199,27 @@ describe("MediaCard", () => {
     expect(screen.getByText("Not accepted")).toBeInTheDocument();
     expect(screen.getByTestId("media-card-meta")).toHaveTextContent("17.48s");
     expect(screen.getByTestId("media-card-meta")).toHaveTextContent("landscape");
+  });
+
+  it("row layout renders icon-only Replace and Remove with accessible labels", () => {
+    const onReplace = jest.fn();
+    const onRemove = jest.fn();
+    render(
+      <MediaCard
+        layout="row"
+        state="uploaded"
+        file={FILE}
+        kind="video"
+        previewUrl="u"
+        onReplace={onReplace}
+        onRemove={onRemove}
+      />,
+    );
+    expect(screen.queryByText("Replace…")).not.toBeInTheDocument();
+    expect(screen.queryByText("Remove")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Replace this file"));
+    fireEvent.click(screen.getByLabelText("Remove this file"));
+    expect(onReplace).toHaveBeenCalled();
+    expect(onRemove).toHaveBeenCalled();
   });
 });

@@ -16,6 +16,7 @@ export * from "./lib/collection-uploader/collection-header";
 export * from "./lib/collection-uploader/collection-uploader";
 export * from "./lib/collection-uploader/media-card";
 export * from "./lib/collection-uploader/submission-rules";
+export * from "./lib/collection-uploader/use-collection-submission";
 export * from "./lib/context-menu";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
