@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MediaCard } from "./media-card";
 
 const FILE = { name: "IMG_9180.mov", size: 16_497_221, contentType: "video/quicktime" };
@@ -221,5 +221,50 @@ describe("MediaCard", () => {
     fireEvent.click(screen.getByLabelText("Remove this file"));
     expect(onReplace).toHaveBeenCalled();
     expect(onRemove).toHaveBeenCalled();
+  });
+
+  it("pdf kind renders a pager and pages with the arrows", async () => {
+    const rendered: number[] = [];
+    const pdf = {
+      load: async () => ({
+        pageCount: 3,
+        renderPage: async (page: number) => {
+          rendered.push(page);
+        },
+      }),
+    };
+    render(
+      <MediaCard
+        state="uploaded"
+        file={{ name: "deck.pdf", size: 1000, contentType: "application/pdf" }}
+        kind="pdf"
+        previewUrl="blob:p"
+        pdf={pdf}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId("media-card-pdf-pager")).toBeInTheDocument());
+    expect(screen.getByTestId("media-card-pdf-page")).toHaveTextContent("1 / 3");
+    expect(rendered).toEqual([1]);
+    fireEvent.click(screen.getByLabelText("Next page"));
+    await waitFor(() => expect(screen.getByTestId("media-card-pdf-page")).toHaveTextContent("2 / 3"));
+    await waitFor(() => expect(rendered).toEqual([1, 2]));
+    fireEvent.click(screen.getByLabelText("Previous page"));
+    await waitFor(() => expect(rendered).toEqual([1, 2, 1]));
+    expect((screen.getByLabelText("Previous page") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("a failing pdf source lands in the broken-preview flow", async () => {
+    const pdf = {
+      load: async () => {
+        throw new Error("bad file");
+      },
+    };
+    render(<MediaCard state="uploaded" file={{ name: "deck.pdf" }} kind="pdf" previewUrl="blob:p" pdf={pdf} />);
+    await waitFor(() => expect(screen.getByText(/Preview couldn't be loaded/)).toBeInTheDocument());
+  });
+
+  it("pdf without a host renderer shows the plain placeholder", () => {
+    render(<MediaCard state="uploaded" file={{ name: "deck.pdf" }} kind="pdf" previewUrl="https://x/p.pdf" />);
+    expect(screen.getByText("No preview for this file type.")).toBeInTheDocument();
   });
 });

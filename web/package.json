@@ -179,6 +179,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jsdoc-to-markdown": "8.0.1",
     "jsdom": "~22.1.0",
+    "pdfjs-dist": "4.8.69",
     "pixelmatch": "7.1.0",
     "pngjs": "^7.0.0",
     "postcss": "^8.5.23",

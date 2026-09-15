@@ -188,3 +188,84 @@ export const ImageSubmission: Story = {
     ...handlers,
   },
 };
+
+const fakePdfSource = {
+  load: async () => ({
+    pageCount: 5,
+    async renderPage(pageNumber: number, canvas: HTMLCanvasElement, maxWidth: number) {
+      const width = Math.min(maxWidth, 480);
+      canvas.width = width;
+      canvas.height = Math.round(width * 1.294);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.fillStyle = "#f6f5f2";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#262522";
+      ctx.font = "600 28px system-ui";
+      ctx.fillText(`Slide ${pageNumber}`, 32, 64);
+      ctx.strokeStyle = "#c4bfb3";
+      ctx.strokeRect(24, 24, canvas.width - 48, canvas.height - 48);
+    },
+  }),
+};
+
+export const PdfPager: Story = {
+  name: "PDF (mock pages, pager)",
+  render: () => (
+    <div style={{ width: 420 }}>
+      <MediaCard
+        state="uploaded"
+        file={{ name: "pitch-deck.pdf", size: 482_113, contentType: "application/pdf" }}
+        kind="pdf"
+        previewUrl="mock:pdf"
+        pdf={fakePdfSource}
+        storedHint
+      />
+    </div>
+  ),
+};
+
+// A real 3-page PDF (embedded, ~1.2KB) rendered through pdf.js exactly like the
+// platform hook does it, worker in main-thread mode as in the sandbox.
+const SAMPLE_PDF_BASE64 =
+  "JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUiA0IDAgUiA1IDAgUl0gL0NvdW50IDMgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA5IDAgUiA+PiA+PiAvQ29udGVudHMgNiAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSAxMCAwIFIgPj4gPj4gL0NvbnRlbnRzIDcgMCBSID4+CmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9QYWdlIC9QYXJlbnQgMiAwIFIgL01lZGlhQm94IFswIDAgNjEyIDc5Ml0gL1Jlc291cmNlcyA8PCAvRm9udCA8PCAvRjEgMTEgMCBSID4+ID4+IC9Db250ZW50cyA4IDAgUiA+PgplbmRvYmoKNiAwIG9iago8PCAvTGVuZ3RoIDY0ID4+CnN0cmVhbQpCVCAvRjEgNDggVGYgMTQwIDQwMCBUZCAoU2xpZGUgMSkgVGogRVQKMSB3IDEwMCAxMDAgNDAwIDYwMCByZSBTCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PCAvTGVuZ3RoIDY0ID4+CnN0cmVhbQpCVCAvRjEgNDggVGYgMTQwIDQwMCBUZCAoU2xpZGUgMikgVGogRVQKMSB3IDEwMCAxMDAgNDAwIDYwMCByZSBTCmVuZHN0cmVhbQplbmRvYmoKOCAwIG9iago8PCAvTGVuZ3RoIDY0ID4+CnN0cmVhbQpCVCAvRjEgNDggVGYgMTQwIDQwMCBUZCAoU2xpZGUgMykgVGogRVQKMSB3IDEwMCAxMDAgNDAwIDYwMCByZSBTCmVuZHN0cmVhbQplbmRvYmoKOSAwIG9iago8PCAvVHlwZSAvRm9udCAvU3VidHlwZSAvVHlwZTEgL0Jhc2VGb250IC9IZWx2ZXRpY2EgPj4KZW5kb2JqCnhyZWYKMCAxMAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1OCAwMDAwMCBuIAowMDAwMDAwMTI3IDAwMDAwIG4gCjAwMDAwMDAyNTMgMDAwMDAgbiAKMDAwMDAwMDM4MCAwMDAwMCBuIAowMDAwMDAwNTA3IDAwMDAwIG4gCjAwMDAwMDA2MjEgMDAwMDAgbiAKMDAwMDAwMDczNSAwMDAwMCBuIAowMDAwMDAwODQ5IDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgMTAgL1Jvb3QgMSAwIFIgPj4Kc3RhcnR4cmVmCjkxOQolJUVPRg==";
+
+const realPdfSource = {
+  load: async () => {
+    const pdfjs = await import("pdfjs-dist");
+    const worker = await import("pdfjs-dist/build/pdf.worker.mjs");
+    (globalThis as Record<string, unknown>).pdfjsWorker = { WorkerMessageHandler: worker.WorkerMessageHandler };
+    const raw = atob(SAMPLE_PDF_BASE64);
+    const data = Uint8Array.from(raw, (ch) => ch.charCodeAt(0));
+    const doc = await pdfjs.getDocument({ data }).promise;
+    return {
+      pageCount: doc.numPages,
+      async renderPage(pageNumber: number, canvas: HTMLCanvasElement, maxWidth: number) {
+        const page = await doc.getPage(pageNumber);
+        const base = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: Math.min(3, maxWidth / base.width) });
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+        const canvasContext = canvas.getContext("2d");
+        if (!canvasContext) return;
+        await page.render({ canvasContext, viewport }).promise;
+      },
+    };
+  },
+};
+
+export const PdfRealSample: Story = {
+  name: "PDF (real sample via pdf.js)",
+  render: () => (
+    <div style={{ width: 420 }}>
+      <MediaCard
+        state="uploaded"
+        file={{ name: "sample.pdf", size: 1_183, contentType: "application/pdf" }}
+        kind="pdf"
+        previewUrl="mock:sample"
+        pdf={realPdfSource}
+        storedHint
+      />
+    </div>
+  ),
+};

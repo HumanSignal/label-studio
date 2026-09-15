@@ -12,7 +12,7 @@
  */
 
 import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { IconPlay, IconSync, IconTrash } from "../../assets/icons";
+import { CaretLeftIcon, CaretRightIcon, PlayIcon, SwapIcon, TrashIcon } from "../../assets/icons";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { Button } from "../button/button";
 import { Message } from "../message/message";
@@ -20,6 +20,17 @@ import { cn } from "../../utils/utils";
 import { SubmissionRuleBadges, SubmissionStatusChip, type SubmissionRuleResult } from "./submission-rules";
 
 export type MediaCardState = "uploading" | "failed" | "rejected" | "uploaded" | "submitted" | "readonly";
+
+export interface MediaCardPdfHandle {
+  pageCount: number;
+  renderPage(pageNumber: number, canvas: HTMLCanvasElement, maxWidth: number): Promise<void>;
+}
+
+/** Lazily loaded, host-provided PDF renderer; the cache that created it owns
+ * the document's lifetime, the card only reads pages. */
+export interface MediaCardPdfSource {
+  load(): Promise<MediaCardPdfHandle>;
+}
 
 export interface MediaCardFile {
   name: string;
@@ -38,8 +49,10 @@ export interface MediaCardProps {
   /** Prefer the stored submission's facts when no local File exists; a missing
    * file renders a neutral "Submission" header instead of crashing. */
   file?: MediaCardFile | null;
-  /** "video" | "image" — anything else renders a plain file placeholder. */
-  kind: "video" | "image" | "file";
+  /** "video" | "image" | "pdf" — anything else renders a plain file placeholder. */
+  kind: "video" | "image" | "pdf" | "file";
+  /** PDF members: page renderer; without it a PDF falls back to the placeholder. */
+  pdf?: MediaCardPdfSource;
   /** Playable/viewable source (local blob or resolver URL). */
   previewUrl?: string | null;
   /** Optional poster frame for videos (iOS paints nothing until interaction). */
@@ -101,6 +114,7 @@ export const MediaCard = ({
   state,
   file,
   kind,
+  pdf,
   previewUrl,
   posterUrl,
   previewBroken: previewBrokenProp = false,
@@ -120,6 +134,9 @@ export const MediaCard = ({
   className,
 }: MediaCardProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const pdfCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [pdfHandle, setPdfHandle] = useState<MediaCardPdfHandle | null>(null);
+  const [pdfPage, setPdfPage] = useState(1);
   const [playing, setPlaying] = useState(false);
   // Degrade gracefully on an unknown state (e.g. a legacy template snapshot
   // passing a since-removed value) instead of crashing the interface.
@@ -170,6 +187,42 @@ export const MediaCard = ({
   }, [previewUrl, previewBrokenProp, kind, clearPreviewTimer, markBroken]);
   const previewBroken = previewBrokenProp || autoBroken;
 
+  useEffect(() => {
+    setPdfHandle(null);
+    setPdfPage(1);
+    if (kind !== "pdf" || !pdf || !previewUrl || previewBrokenProp) return;
+    let alive = true;
+    pdf
+      .load()
+      .then((handle) => {
+        if (alive) setPdfHandle(handle);
+      })
+      .catch(() => {
+        if (alive) markBroken();
+      });
+    return () => {
+      alive = false;
+    };
+  }, [kind, pdf, previewUrl, previewBrokenProp, markBroken]);
+
+  useEffect(() => {
+    const canvas = pdfCanvasRef.current;
+    if (!pdfHandle || !canvas) return;
+    let alive = true;
+    const maxWidth = canvas.parentElement?.clientWidth || 480;
+    pdfHandle
+      .renderPage(pdfPage, canvas, maxWidth)
+      .then(() => {
+        if (alive) clearPreviewTimer();
+      })
+      .catch(() => {
+        if (alive) markBroken();
+      });
+    return () => {
+      alive = false;
+    };
+  }, [pdfHandle, pdfPage, clearPreviewTimer, markBroken]);
+
   const startPlayback = useCallback(() => {
     videoRef.current?.play().catch(() => undefined);
   }, []);
@@ -204,7 +257,7 @@ export const MediaCard = ({
             size="small"
             look="outlined"
             aria-label="Replace this file"
-            leading={<IconSync />}
+            leading={<SwapIcon />}
             onClick={onReplace}
           />
         </Tooltip>
@@ -216,7 +269,7 @@ export const MediaCard = ({
             look="string"
             variant="negative"
             aria-label="Remove this file"
-            leading={<IconTrash />}
+            leading={<TrashIcon />}
             onClick={onRemove}
           />
         </Tooltip>
@@ -325,7 +378,58 @@ export const MediaCard = ({
             }}
             onError={markBroken}
           />
-        ) : (
+        ) : kind === "pdf" && pdf ? (
+          <div
+            className="relative bg-neutral-emphasis-subtle"
+            data-testid="media-card-pdf"
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: the group is the arrow-key paging target
+            tabIndex={0}
+            role="group"
+            aria-label={pdfHandle ? `PDF preview, page ${pdfPage} of ${pdfHandle.pageCount}` : "PDF preview loading"}
+            onKeyDown={(event) => {
+              if (!pdfHandle) return;
+              if (event.key === "ArrowLeft") setPdfPage((page) => Math.max(1, page - 1));
+              if (event.key === "ArrowRight") setPdfPage((page) => Math.min(pdfHandle.pageCount, page + 1));
+            }}
+          >
+            <canvas
+              ref={pdfCanvasRef}
+              className="mx-auto block max-h-80 max-w-full"
+              data-testid="media-card-pdf-canvas"
+            />
+            {!pdfHandle ? (
+              <div className="flex h-36 items-center justify-center text-neutral-content-subtler text-xs">
+                Preparing preview…
+              </div>
+            ) : null}
+            {pdfHandle && pdfHandle.pageCount > 1 ? (
+              <div
+                className="-translate-x-1/2 absolute bottom-tight left-1/2 flex items-center gap-tightest rounded-small border border-neutral-border bg-neutral-surface px-tightest shadow-medium"
+                data-testid="media-card-pdf-pager"
+              >
+                <Button
+                  size="small"
+                  look="string"
+                  aria-label="Previous page"
+                  leading={<CaretLeftIcon />}
+                  disabled={pdfPage <= 1}
+                  onClick={() => setPdfPage((page) => Math.max(1, page - 1))}
+                />
+                <span className="text-neutral-content-subtle text-xs tabular-nums" data-testid="media-card-pdf-page">
+                  {pdfPage} / {pdfHandle.pageCount}
+                </span>
+                <Button
+                  size="small"
+                  look="string"
+                  aria-label="Next page"
+                  leading={<CaretRightIcon />}
+                  disabled={pdfPage >= pdfHandle.pageCount}
+                  onClick={() => setPdfPage((page) => Math.min(pdfHandle.pageCount, page + 1))}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : kind === "video" ? (
           <>
             {/* biome-ignore lint/a11y/useMediaCaption: contributor-submitted media has no captions */}
             <video
@@ -354,11 +458,15 @@ export const MediaCard = ({
                 className="absolute inset-0 flex cursor-pointer items-center justify-center border-none bg-transparent"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-surface text-neutral-content shadow-medium">
-                  <IconPlay width={24} height={24} />
+                  <PlayIcon size={24} weight="fill" />
                 </span>
               </button>
             ) : null}
           </>
+        ) : (
+          <div className="flex h-36 items-center justify-center bg-neutral-emphasis-subtle px-wide text-center text-neutral-content-subtler text-xs">
+            No preview for this file type.
+          </div>
         )}
       </div>
 
@@ -422,12 +530,12 @@ export const MediaCard = ({
               </Button>
             ) : null}
             {state !== "uploading" && onReplace ? (
-              <Button size="small" look="outlined" leading={<IconSync />} onClick={onReplace}>
+              <Button size="small" look="outlined" leading={<SwapIcon />} onClick={onReplace}>
                 Replace…
               </Button>
             ) : null}
             {state !== "uploading" && onRemove ? (
-              <Button size="small" look="string" variant="negative" leading={<IconTrash />} onClick={onRemove}>
+              <Button size="small" look="string" variant="negative" leading={<TrashIcon />} onClick={onRemove}>
                 Remove
               </Button>
             ) : null}

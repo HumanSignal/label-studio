@@ -19,7 +19,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { IconUploadOutline } from "../../assets/icons";
+import { CloudArrowUpIcon } from "../../assets/icons";
 import { Button } from "../button/button";
 import { cn } from "../../utils/utils";
 import { EmptyState } from "../empty-state/empty-state";
@@ -253,7 +253,7 @@ export const CollectionUploader = ({
           <EmptyState
             size="small"
             variant={highlighted ? "primary" : "neutral"}
-            icon={<IconUploadOutline />}
+            icon={<CloudArrowUpIcon />}
             title="Drag & drop or click to browse"
             description={hint}
             additionalContent={

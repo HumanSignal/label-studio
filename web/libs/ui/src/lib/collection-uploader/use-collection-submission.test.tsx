@@ -14,6 +14,7 @@ import {
   type CollectionSubmission,
   serializeSubmissionRegions,
   submissionFileBounds,
+  submissionMediaKind,
   submissionRulesFromSchema,
   useCollectionSubmission,
 } from "./use-collection-submission";
@@ -121,10 +122,14 @@ function makeHarness(config: {
   initialResults?: Array<{ value: { upload_id: number } }>;
   outputSchema?: Record<string, unknown> | null;
   validateFile?: (file: File, meta: unknown) => unknown;
+  documentAI?: SubmissionEngineDeps["documentAI"];
 }) {
   const refs: HarnessRefs = { api: null, regions: config.initialRegions || [], setRegions: null, setTaskId: null };
   const deps: SubmissionEngineDeps | null = config.engine
-    ? { collectionUpload: { createEngine: ({ onChange }) => ((config.engine!.onChange = onChange), config.engine!) } }
+    ? {
+        collectionUpload: { createEngine: ({ onChange }) => ((config.engine!.onChange = onChange), config.engine!) },
+        documentAI: config.documentAI,
+      }
     : null;
 
   const Host = () => {
@@ -502,5 +507,65 @@ describe("task navigation", () => {
     });
     expect(refs.api!.rejected).toHaveLength(0);
     expect(engine.rows).toHaveLength(0);
+  });
+});
+
+describe("pdf members", () => {
+  const pdfRegion = (uploadId: number): SubmissionRegion => ({
+    id: `submission-${uploadId}`,
+    type: "submission",
+    _submission: {
+      upload_id: uploadId,
+      bucket: "bkt",
+      key: `intake/${uploadId}.pdf`,
+      filename: "deck.pdf",
+      size: 10,
+      contentType: "application/pdf",
+      index: 0,
+    },
+  });
+
+  it("maps application/pdf to the pdf kind", () => {
+    expect(submissionMediaKind("deck.pdf", "application/pdf")).toBe("pdf");
+    expect(submissionMediaKind("deck.pdf", null)).toBe("pdf");
+    expect(submissionMediaKind("clip.mp4", "video/mp4")).toBe("video");
+  });
+
+  it("exposes one shared pager source per url when the host provides pdf.js", async () => {
+    const getDocument = mock(() => ({
+      promise: Promise.resolve({
+        numPages: 4,
+        getPage: async () => ({
+          getViewport: () => ({ width: 100, height: 140 }),
+          render: () => ({ promise: Promise.resolve() }),
+        }),
+        destroy: () => undefined,
+      }),
+    }));
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [pdfRegion(90)],
+      documentAI: { pdfjsLib: { getDocument } as never },
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(1));
+    expect(refs.api!.members[0].kind).toBe("pdf");
+    const source = refs.api!.members[0].pdf;
+    expect(source).toBeDefined();
+    const handle = await source!.load();
+    expect(handle.pageCount).toBe(4);
+    await refs.api!.members[0].pdf!.load();
+    // the document is loaded once per url, shared across renders
+    expect(getDocument).toHaveBeenCalledTimes(1);
+  });
+
+  it("omits the pager source when the host has no pdf.js", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [pdfRegion(91)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(1));
+    expect(refs.api!.members[0].kind).toBe("pdf");
+    expect(refs.api!.members[0].pdf).toBeUndefined();
   });
 });

@@ -15,6 +15,7 @@
  * only on structural types, so it is unit-testable with a fake engine.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { MediaCardPdfSource } from "./media-card";
 import {
   evaluateSubmissionRules,
   type SubmissionFileMeta,
@@ -62,11 +63,28 @@ export interface SubmissionEngine {
   dispose(): void;
 }
 
+export interface SubmissionPdfDocumentLike {
+  numPages: number;
+  getPage(pageNumber: number): Promise<{
+    getViewport(options: { scale: number }): { width: number; height: number };
+    render(options: Record<string, unknown>): { promise: Promise<unknown> };
+  }>;
+  destroy(): void;
+}
+
+export interface SubmissionPdfjsLike {
+  getDocument(source: string | Record<string, unknown>): { promise: Promise<SubmissionPdfDocumentLike> };
+}
+
 export interface SubmissionEngineDeps {
   collectionUpload?: {
     createEngine(options: { onChange: (rows: SubmissionUploadRow[]) => void }): SubmissionEngine;
   };
+  /** The sandbox bundles pdf.js for Document AI screens; PDF previews reuse it. */
+  documentAI?: { pdfjsLib?: SubmissionPdfjsLike };
 }
+
+export type SubmissionMediaKind = "video" | "image" | "pdf" | "file";
 
 export interface SubmissionRegion {
   id: string;
@@ -103,7 +121,7 @@ export interface CollectionMember {
   key: string;
   state: CollectionMemberState;
   file: { name: string; size?: number | null; contentType?: string | null };
-  kind: "video" | "image" | "file";
+  kind: SubmissionMediaKind;
   previewUrl: string | null;
   previewBroken: boolean;
   progress: number;
@@ -112,6 +130,8 @@ export interface CollectionMember {
   meta: SubmissionFileMeta | null;
   submitted: boolean;
   storedHint: boolean;
+  /** Present for PDF members when the host provides pdf.js: drives the pager. */
+  pdf?: MediaCardPdfSource;
   onReplace?: () => void;
   onRemove?: () => void;
   onRetry?: () => void;
@@ -124,7 +144,7 @@ export interface CollectionMember {
 export interface RejectedMember {
   key: string;
   file: { name: string; size?: number | null; contentType?: string | null };
-  kind: "video" | "image" | "file";
+  kind: SubmissionMediaKind;
   previewUrl: string | null;
   ruleResults: SubmissionRuleResult[];
   meta: SubmissionFileMeta | null;
@@ -201,10 +221,11 @@ export function submissionFileBounds(rules: SubmissionRules): { min: number; max
 // File facts + preview identity
 // ---------------------------------------------------------------------------
 
-export function submissionMediaKind(name?: string | null, contentType?: string | null): "video" | "image" | "file" {
+export function submissionMediaKind(name?: string | null, contentType?: string | null): SubmissionMediaKind {
   const hint = contentType || name || "";
   if (/^video\//.test(hint) || /\.(mp4|mov|webm)$/i.test(hint)) return "video";
   if (/^image\//.test(hint) || /\.(png|jpe?g|webp|gif)$/i.test(hint)) return "image";
+  if (/pdf$/i.test(hint) || /\.pdf$/i.test(hint)) return "pdf";
   return "file";
 }
 
@@ -261,15 +282,55 @@ export function resolveSubmissionFileUrl(
  * a different task revokes every object URL and drains the cache, so a queue
  * session never accumulates blobs across tasks. Entries also drop on Remove. */
 let PREVIEW_CACHE_TASK: number | undefined | null = null;
-let PREVIEW_CACHE: Record<string, { url: string; kind: "video" | "image" | "file" }> = {};
+let PREVIEW_CACHE: Record<string, { url: string; kind: SubmissionMediaKind }> = {};
+
+type PdfSourceEntry = MediaCardPdfSource & { destroySource: () => void };
+let PDF_SOURCES: Record<string, PdfSourceEntry> = {};
 
 function previewCache(taskId: number | undefined | null): typeof PREVIEW_CACHE {
   if (PREVIEW_CACHE_TASK !== taskId) {
     for (const key of Object.keys(PREVIEW_CACHE)) URL.revokeObjectURL(PREVIEW_CACHE[key].url);
     PREVIEW_CACHE = {};
+    for (const key of Object.keys(PDF_SOURCES)) PDF_SOURCES[key].destroySource();
+    PDF_SOURCES = {};
     PREVIEW_CACHE_TASK = taskId;
   }
   return PREVIEW_CACHE;
+}
+
+/** One shared, lazily loaded pdf.js document per URL, task-scoped like the
+ * preview cache. Cards only read pages; the cache owns the handle's lifetime. */
+function pdfSource(taskId: number | undefined | null, pdfjs: SubmissionPdfjsLike, url: string): MediaCardPdfSource {
+  previewCache(taskId);
+  const existing = PDF_SOURCES[url];
+  if (existing) return existing;
+  let docPromise: Promise<SubmissionPdfDocumentLike> | null = null;
+  const entry: PdfSourceEntry = {
+    async load() {
+      if (!docPromise) docPromise = pdfjs.getDocument(url).promise;
+      const doc = await docPromise;
+      return {
+        pageCount: doc.numPages,
+        async renderPage(pageNumber: number, canvas: HTMLCanvasElement, maxWidth: number) {
+          const page = await doc.getPage(pageNumber);
+          const base = page.getViewport({ scale: 1 });
+          const scale = Math.min(3, Math.max(0.1, maxWidth / (base.width || 1)));
+          const viewport = page.getViewport({ scale });
+          canvas.width = Math.ceil(viewport.width);
+          canvas.height = Math.ceil(viewport.height);
+          const canvasContext = canvas.getContext("2d");
+          if (!canvasContext) return;
+          await page.render({ canvasContext, viewport }).promise;
+        },
+      };
+    },
+    destroySource() {
+      docPromise?.then((doc) => doc.destroy()).catch(() => undefined);
+      docPromise = null;
+    },
+  };
+  PDF_SOURCES[url] = entry;
+  return entry;
 }
 
 function uploadErrorMessage(error: unknown): string {
@@ -323,6 +384,13 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
   const regions = useMemo(
     () => (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission),
     [props.visibleRegions],
+  );
+
+  const pdfjsLib = deps?.documentAI?.pdfjsLib;
+  const memberPdf = useCallback(
+    (kind: SubmissionMediaKind, url: string | null | undefined): MediaCardPdfSource | undefined =>
+      kind === "pdf" && url && pdfjsLib ? pdfSource(taskId, pdfjsLib, url) : undefined,
+    [pdfjsLib, taskId],
   );
 
   const isReviewer = !!(props.rpcCapabilities && props.rpcCapabilities.has("reviewAnnotation"));
@@ -829,11 +897,13 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
 
     if (pendingReplace && replaceRow && pendingReplace.regionId === region.id) {
       const failed = replaceRow.status === "failed";
+      const replaceKind = submissionMediaKind(replaceRow.filename, replaceRow.contentType);
       return {
         key: region.id,
         state: failed ? "failed" : "uploading",
         file: { name: replaceRow.filename, size: replaceRow.size, contentType: replaceRow.contentType },
-        kind: submissionMediaKind(replaceRow.filename, replaceRow.contentType),
+        kind: replaceKind,
+        pdf: memberPdf(replaceKind, pendingReplace.url),
         previewUrl: pendingReplace.url || null,
         previewBroken: false,
         progress: replaceRow.progress || 0,
@@ -866,11 +936,13 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     const storedMeta = previewUrl ? mediaMetaByUrl[previewUrl] : null;
     const fileMeta: SubmissionFileMeta = { contentType: sub.contentType, size: sub.size, ...(storedMeta || {}) };
 
+    const storedKind = submissionMediaKind(sub.filename, sub.contentType);
     return {
       key: region.id,
       state: readonly ? "readonly" : submitted ? "submitted" : "uploaded",
       file: { name: sub.filename || "", size: sub.size, contentType: sub.contentType },
-      kind: submissionMediaKind(sub.filename, sub.contentType),
+      kind: storedKind,
+      pdf: memberPdf(storedKind, previewUrl),
       previewUrl,
       previewBroken: !!(previewUrl && brokenPreviewUrls[previewUrl]),
       progress: 0,
@@ -924,11 +996,13 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     .map((row) => {
       const picked = pickedMetaByRef.current[row.clientRef];
       const failed = row.status === "failed";
+      const rowKind = submissionMediaKind(row.filename, row.contentType);
       return {
         key: `row-${row.clientRef}`,
         state: failed ? "failed" : "uploading",
         file: { name: row.filename, size: row.size, contentType: row.contentType },
-        kind: submissionMediaKind(row.filename, row.contentType),
+        kind: rowKind,
+        pdf: memberPdf(rowKind, picked ? picked.url : null),
         previewUrl: picked ? picked.url : null,
         previewBroken: false,
         progress: row.progress || 0,

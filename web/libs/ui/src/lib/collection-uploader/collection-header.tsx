@@ -5,7 +5,7 @@
  * interfaces never compose or restyle it directly.
  */
 
-import { IconGrid, IconList } from "../../assets/icons";
+import { ListIcon, SquaresFourIcon } from "../../assets/icons";
 import { Button } from "../button/button";
 import { Tooltip } from "../Tooltip/Tooltip";
 import { cn } from "../../utils/utils";
@@ -80,7 +80,7 @@ export const CollectionHeader = ({
             aria-label="Grid view"
             aria-pressed={view === "grid"}
             onClick={() => onViewChange("grid")}
-            icon={<IconGrid />}
+            icon={<SquaresFourIcon />}
           />
         </Tooltip>
         <Tooltip title="List view">
@@ -91,7 +91,7 @@ export const CollectionHeader = ({
             aria-label="List view"
             aria-pressed={view === "list"}
             onClick={() => onViewChange("list")}
-            icon={<IconList />}
+            icon={<ListIcon />}
           />
         </Tooltip>
       </span>
