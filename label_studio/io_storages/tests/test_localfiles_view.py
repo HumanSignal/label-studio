@@ -99,6 +99,33 @@ def test_localfiles_data_allows_backslash_paths(
 
 
 @pytest.mark.django_db
+def test_localfiles_data_rejects_sibling_directory_sharing_storage_path_prefix(
+    business_client,
+    project_id,
+    settings,
+    tmp_path,
+):
+    """A storage at <root>/dataset must not authorize files from <root>/dataset-private."""
+    settings.LOCAL_FILES_SERVING_ENABLED = True
+    settings.LOCAL_FILES_DOCUMENT_ROOT = str(tmp_path)
+
+    project = Project.objects.get(pk=project_id)
+    dataset_dir = tmp_path / 'dataset'
+    nested_dir = dataset_dir / 'nested'
+    sibling_dir = tmp_path / 'dataset-private'
+    for directory in (dataset_dir, nested_dir, sibling_dir):
+        directory.mkdir()
+    (nested_dir / 'allowed.txt').write_text('allowed', encoding='utf-8')
+    (sibling_dir / 'secret.txt').write_text('secret', encoding='utf-8')
+    _create_storage(project, str(dataset_dir))
+
+    url = reverse('storages:localfiles_data')
+
+    assert business_client.get(f'{url}?d=dataset-private/secret.txt').status_code == 404
+    assert business_client.get(f'{url}?d=dataset/nested/allowed.txt').status_code == 200
+
+
+@pytest.mark.django_db
 def test_localfiles_data_sets_weak_etag_header(
     business_client,
     project_id,

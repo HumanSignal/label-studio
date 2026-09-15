@@ -35,6 +35,12 @@ def _if_none_match_satisfied(header_value: Optional[str], etag: str) -> bool:
     return '*' in etag_candidates or etag in etag_candidates
 
 
+def _is_within_storage(directory: str, storage_path: str) -> bool:
+    # SQL startswith is a plain string prefix: storage /data/ds would also match /data/ds-private
+    root = storage_path.rstrip(os.sep)
+    return directory == root or directory.startswith(root + os.sep)
+
+
 def build_localfile_response(
     request: HttpRequest,
     full_path: str,
@@ -105,7 +111,10 @@ def localfiles_data(request):
             _full_path=Value(full_path_dir, output_field=CharField())
         ).filter(_full_path__startswith=F('path'))
         if localfiles_storage.exists():
-            user_has_permissions = any(storage.project.has_permission(request.user) for storage in localfiles_storage)
+            user_has_permissions = any(
+                _is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
+                for storage in localfiles_storage
+            )
 
         # Check user permissions for this file and if it exists
         if user_has_permissions and os.path.exists(full_path):
