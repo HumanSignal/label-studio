@@ -179,6 +179,12 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         decoded_fileuri = _decode_fileuri(fileuri)
         if decoded_fileuri.startswith('/data/upload/'):
             return self._serve_local_upload(request, decoded_fileuri, project)
+        # FIT-2832: History / tab Userpics in the sandboxed shell need avatars without
+        # session cookies. Canonical form is /data/avatars/... (also produced from
+        # /storage-data/uploaded/?filepath=avatars/... by the FE URL rewrite).
+        avatar_prefix = f'/data/{settings.AVATAR_PATH}/'
+        if decoded_fileuri.startswith(avatar_prefix):
+            return self._serve_avatar(request, decoded_fileuri, user)
 
         # Delegate to the standard resolve path (presigned redirect or proxy depending on
         # storage.presign). The sandbox iframe fetches this endpoint via a parent-window
@@ -186,6 +192,50 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         # so cloud-storage content never passes through the LS server.
         response = self.resolve(request, decoded_fileuri, project)
         return _add_cors_headers(response)
+
+    def _serve_avatar(self, request, url_path: str, requester) -> HttpResponse:
+        """Serve a user avatar for sandboxed iframes (FIT-2832).
+
+        Mirrors DownloadStorageData's avatar branch: the requester must share an
+        organization with the avatar owner. Avatars are not project-scoped.
+        """
+        parts = url_path.lstrip('/').split('/')
+        # /data/avatars/<filename...>
+        if len(parts) < 3 or parts[0] != 'data' or parts[1] != settings.AVATAR_PATH:
+            return _add_cors_headers(HttpResponse(status=400))
+
+        storage_path = posixpath.join(*parts[1:])  # avatars/<filename>
+        normalized = posixpath.normpath(storage_path)
+        if (
+            normalized.startswith('..')
+            or normalized.startswith('/')
+            or not normalized.startswith(f'{settings.AVATAR_PATH}/')
+        ):
+            return _add_cors_headers(HttpResponse(status=400))
+
+        User = get_user_model()
+        try:
+            owner = User.objects.filter(avatar=normalized).first()
+        except Exception as exc:
+            logger.error(f'Error looking up avatar owner for {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
+
+        org = getattr(requester, 'active_organization', None)
+        if owner is None or org is None or not org.has_user(owner):
+            return _add_cors_headers(HttpResponse(status=403))
+
+        try:
+            content_type, _ = mimetypes.guess_type(owner.avatar.name)
+            response = RangedFileResponse(
+                request,
+                owner.avatar.open(mode='rb'),
+                content_type=content_type or 'application/octet-stream',
+            )
+            response['Accept-Ranges'] = 'bytes'
+            return _add_cors_headers(response)
+        except Exception as exc:
+            logger.error(f'Error serving avatar {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
 
     def _serve_local_upload(self, request, url_path: str, project) -> HttpResponse:
         """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies.

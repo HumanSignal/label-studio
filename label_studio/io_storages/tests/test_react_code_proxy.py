@@ -624,6 +624,102 @@ class TestServeLocalUpload:
         assert response['Access-Control-Allow-Origin'] == '*'
 
 
+class TestServeAvatar:
+    """FIT-2832: sandboxed History Userpics need cookie-less avatar bytes."""
+
+    @pytest.fixture
+    def setup(self):
+        self.factory = APIRequestFactory()
+        self.view = ReactCodeResolveView.as_view()
+
+    def _get(self, token: str, path: str):
+        from urllib.parse import quote
+
+        request = self.factory.get(
+            f'/api/react-code/resolve/{token}/',
+            {'fileuri': quote(path, safe='')},
+        )
+        return self.view(request, token=token)
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY, AVATAR_PATH='avatars')
+    @patch('io_storages.react_code_proxy.Project.objects.get')
+    @patch('io_storages.react_code_proxy.get_user_model')
+    def test_serves_avatar_for_org_member(self, mock_get_user_model, mock_project_get, setup):
+        import io
+
+        UserModel = MagicMock()
+        requester = MagicMock()
+        org = MagicMock()
+        org.has_user.return_value = True
+        requester.active_organization = org
+        UserModel.objects.get.return_value = requester
+
+        owner = MagicMock()
+        owner.avatar.name = 'avatars/uuid-photo.jpg'
+        owner.avatar.open = MagicMock(side_effect=lambda mode='rb': io.BytesIO(b'\xff\xd8\xff\xe0'))
+        UserModel.objects.filter.return_value.first.return_value = owner
+
+        mock_get_user_model.return_value = UserModel
+        mock_project = MagicMock()
+        mock_project.has_permission.return_value = True
+        mock_project_get.return_value = mock_project
+
+        token_user = MagicMock(id=1, active_organization_id=1)
+        token, _ = generate_react_code_token(token_user, project_id=25)
+
+        response = self._get(token, '/data/avatars/uuid-photo.jpg')
+
+        assert response.status_code == 200
+        assert response['Access-Control-Allow-Origin'] == '*'
+        assert response['Content-Type'] == 'image/jpeg'
+        assert _response_bytes(response) == b'\xff\xd8\xff\xe0'
+        UserModel.objects.filter.assert_called_once_with(avatar='avatars/uuid-photo.jpg')
+        org.has_user.assert_called_once_with(owner)
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY, AVATAR_PATH='avatars')
+    @patch('io_storages.react_code_proxy.Project.objects.get')
+    @patch('io_storages.react_code_proxy.get_user_model')
+    def test_forbids_avatar_outside_requester_org(self, mock_get_user_model, mock_project_get, setup):
+        UserModel = MagicMock()
+        requester = MagicMock()
+        org = MagicMock()
+        org.has_user.return_value = False
+        requester.active_organization = org
+        UserModel.objects.get.return_value = requester
+        UserModel.objects.filter.return_value.first.return_value = MagicMock()
+        mock_get_user_model.return_value = UserModel
+        mock_project = MagicMock()
+        mock_project.has_permission.return_value = True
+        mock_project_get.return_value = mock_project
+
+        token_user = MagicMock(id=1, active_organization_id=1)
+        token, _ = generate_react_code_token(token_user, project_id=25)
+
+        response = self._get(token, '/data/avatars/secret.jpg')
+
+        assert response.status_code == 403
+        assert response['Access-Control-Allow-Origin'] == '*'
+
+    @override_settings(SECRET_KEY=TEST_SECRET_KEY, AVATAR_PATH='avatars')
+    @patch('io_storages.react_code_proxy.Project.objects.get')
+    @patch('io_storages.react_code_proxy.get_user_model')
+    def test_rejects_path_traversal_in_avatar_uri(self, mock_get_user_model, mock_project_get, setup):
+        UserModel = MagicMock()
+        UserModel.objects.get.return_value = MagicMock(active_organization=MagicMock())
+        mock_get_user_model.return_value = UserModel
+        mock_project = MagicMock()
+        mock_project.has_permission.return_value = True
+        mock_project_get.return_value = mock_project
+
+        token_user = MagicMock(id=1, active_organization_id=1)
+        token, _ = generate_react_code_token(token_user, project_id=25)
+
+        response = self._get(token, '/data/avatars/../upload/25/x.jpg')
+
+        assert response.status_code == 400
+        UserModel.objects.filter.assert_not_called()
+
+
 @pytest.mark.django_db
 class TestUploadTenancyIsolation:
     """Real-database checks that the local-upload branch cannot cross a project boundary.
