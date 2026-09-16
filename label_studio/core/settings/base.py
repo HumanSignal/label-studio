@@ -1134,3 +1134,9 @@ MIGRATION_JOB_START_DELAY_SECONDS = int(get_env('MIGRATION_JOB_START_DELAY_SECON
 # Delay (seconds) before a migration runner retries when the target import fails (stale worker
 # not yet upgraded during a rolling deploy). Short, since this is a fast retry loop.
 MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS = int(get_env('MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS', 30))
+
+# When an async migration waits on another AsyncMigrationStatus row, retry this often.
+MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS = int(get_env('MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS', 15 * 60))
+
+# Cap how long a dependent job waits (delay * max retries ~= 24 hours at the defaults).
+MIGRATION_DEPENDENCY_MAX_RETRIES = int(get_env('MIGRATION_DEPENDENCY_MAX_RETRIES', 96))

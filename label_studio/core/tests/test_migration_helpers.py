@@ -1,7 +1,15 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from core.migration_helpers import execute_sql_job, make_sql_migration, run_migration_job, start_migration_job
+from core.migration_helpers import (
+    DEPENDENCY_WAIT_ATTEMPTS_META,
+    MigrationDependencyFailed,
+    MigrationDependencyNotReady,
+    execute_sql_job,
+    make_sql_migration,
+    run_migration_job,
+    start_migration_job,
+)
 from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync as real_start_job_async_or_sync
 from django.db import connection
@@ -44,6 +52,18 @@ class TestExecuteSqlJob(TestCase):
         migration = AsyncMigrationStatus.objects.get(name=self.migration_name)
         assert migration.status == AsyncMigrationStatus.STATUS_FINISHED
         mock_cursor.execute.assert_called_once_with(self.sql)
+
+    @patch('core.migration_helpers.connection')
+    def test_runs_each_statement_on_its_own_cursor(self, mock_connection):
+        """A sequence is one execute per statement, each on a fresh cursor."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+
+        execute_sql_job(migration_name=self.migration_name, sql=['SQL A;', 'SQL B;'])
+
+        assert [c.args[0] for c in mock_cursor.execute.call_args_list] == ['SQL A;', 'SQL B;']
+        assert mock_connection.cursor.call_count == 2
 
     @patch('core.migration_helpers.connection')
     def test_skips_if_already_finished(self, mock_connection):
@@ -218,6 +238,26 @@ class TestMakeSqlMigration(TestCase):
         assert kwargs['migration_name'] == self.migration_name
         assert kwargs['sql'] == self.sql_forwards
         assert kwargs['reverse'] is False
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_resolves_callable_sql_and_passes_job_timeout(self, mock_start):
+        """Callables are resolved before enqueue so RQ pickles SQL, not a migration-module function."""
+        forwards, _ = make_sql_migration(
+            lambda: ['SQL A;', 'SQL B;'],
+            lambda: ['SQL C;'],
+            migration_name=self.migration_name,
+            job_timeout=36000,
+        )
+
+        apps = MagicMock()
+        schema_editor = _pg_schema_editor()
+
+        forwards(apps, schema_editor)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['sql'] == ['SQL A;', 'SQL B;']
+        assert kwargs['job_timeout'] == 36000
 
     @override_settings(ALLOW_SCHEDULED_MIGRATIONS=True, CI=False)
     @patch('core.migration_helpers.start_job_async_or_sync')
@@ -549,3 +589,172 @@ class TestRunMigrationJob(TestCase):
         assert kwargs['job_timeout'] == 1800
         assert kwargs['migration_name'] == 'test_mig'
         assert kwargs['custom_param'] == 'hello'
+
+
+class TestAsyncMigrationDependencies(TestCase):
+    """execute_sql_job waits on named AsyncMigrationStatus rows before running SQL."""
+
+    def setUp(self):
+        self.migration_name = 'test.migrations.dependent'
+        self.dep_name = 'test.migrations.prerequisite'
+        self.sql = 'CREATE INDEX test_dep_idx ON test_table (col1);'
+
+    def _run(self, **kwargs):
+        execute_sql_job(
+            migration_name=self.migration_name,
+            sql=self.sql,
+            dependencies=[self.dep_name],
+            **kwargs,
+        )
+
+    @patch('core.migration_helpers.connection')
+    def test_runs_when_dependency_finished(self, mock_connection):
+        """SQL runs only after the named dependency is FINISHED."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+        AsyncMigrationStatus.objects.create(name=self.dep_name, status=AsyncMigrationStatus.STATUS_FINISHED)
+
+        self._run()
+
+        mock_cursor.execute.assert_called_once_with(self.sql)
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.status == AsyncMigrationStatus.STATUS_FINISHED
+        assert row.meta['dependencies'] == [self.dep_name]
+        assert DEPENDENCY_WAIT_ATTEMPTS_META not in (row.meta or {})
+
+    @patch('core.migration_helpers.connection')
+    def test_waits_when_dependency_missing(self, mock_connection):
+        """A missing dependency does not run SQL and records a wait attempt."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+
+        with pytest.raises(MigrationDependencyNotReady, match='waiting'):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.status == AsyncMigrationStatus.STATUS_STARTED
+        assert row.meta[DEPENDENCY_WAIT_ATTEMPTS_META] == 1
+        assert row.meta['dependency_wait_last_statuses'][self.dep_name] is None
+
+    @patch('core.migration_helpers.connection')
+    def test_waits_when_dependency_in_progress(self, mock_connection):
+        """STARTED / IN PROGRESS / SCHEDULED dependencies defer SQL."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+        AsyncMigrationStatus.objects.create(name=self.dep_name, status=AsyncMigrationStatus.STATUS_IN_PROGRESS)
+
+        with pytest.raises(MigrationDependencyNotReady, match=self.dep_name):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.meta['dependency_wait_last_statuses'][self.dep_name] == AsyncMigrationStatus.STATUS_IN_PROGRESS
+
+    @patch('core.migration_helpers.connection')
+    def test_waits_when_dependency_scheduled(self, mock_connection):
+        """SCHEDULED dependencies defer SQL the same way IN PROGRESS does."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+        AsyncMigrationStatus.objects.create(name=self.dep_name, status=AsyncMigrationStatus.STATUS_SCHEDULED)
+
+        with pytest.raises(MigrationDependencyNotReady, match=self.dep_name):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.meta['dependency_wait_last_statuses'][self.dep_name] == AsyncMigrationStatus.STATUS_SCHEDULED
+
+    @override_settings(CI=True, ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.connection')
+    def test_ci_does_not_run_sql_before_dependencies_finish(self, mock_connection):
+        """CI runs jobs in-process, so a missing dependency must still skip SQL."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+
+        with pytest.raises(MigrationDependencyNotReady):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+
+    @patch('core.migration_helpers.connection')
+    def test_errors_immediately_when_dependency_failed(self, mock_connection):
+        """A dependency already in ERROR fails the waiter without running SQL."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+        AsyncMigrationStatus.objects.create(name=self.dep_name, status=AsyncMigrationStatus.STATUS_ERROR)
+
+        with pytest.raises(MigrationDependencyFailed, match='ERROR'):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.status == AsyncMigrationStatus.STATUS_ERROR
+        assert self.dep_name in row.meta['error']
+
+    @override_settings(MIGRATION_DEPENDENCY_MAX_RETRIES=2, MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS=15)
+    @patch('core.migration_helpers.connection')
+    def test_exhausts_wait_budget(self, mock_connection):
+        """After max retries the waiter becomes ERROR with an actionable message."""
+        mock_cursor = MagicMock()
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_connection.vendor = 'postgresql'
+        AsyncMigrationStatus.objects.create(name=self.dep_name, status=AsyncMigrationStatus.STATUS_STARTED)
+
+        with pytest.raises(MigrationDependencyNotReady, match='waiting'):
+            self._run()
+        with pytest.raises(MigrationDependencyNotReady, match='waiting'):
+            self._run()
+        with pytest.raises(MigrationDependencyNotReady, match='gave up waiting after 2 retries'):
+            self._run()
+
+        mock_cursor.execute.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.status == AsyncMigrationStatus.STATUS_ERROR
+        assert 'gave up waiting' in row.meta['error']
+        assert row.meta[DEPENDENCY_WAIT_ATTEMPTS_META] == 2
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=True, CI=False)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_scheduled_path_stores_dependencies_in_meta(self, mock_start):
+        """SaaS SCHEDULED rows copy dependency names into meta for the admin action."""
+        forwards, _ = make_sql_migration(
+            self.sql,
+            'DROP INDEX test_dep_idx;',
+            migration_name=self.migration_name,
+            dependencies=[self.dep_name],
+        )
+        apps = MagicMock()
+        apps.get_model.return_value = AsyncMigrationStatus
+        forwards(apps, _pg_schema_editor())
+
+        mock_start.assert_not_called()
+        row = AsyncMigrationStatus.objects.get(name=self.migration_name)
+        assert row.status == AsyncMigrationStatus.STATUS_SCHEDULED
+        assert row.meta['dependencies'] == [self.dep_name]
+
+    @override_settings(ALLOW_SCHEDULED_MIGRATIONS=False)
+    @patch('core.migration_helpers.start_job_async_or_sync')
+    def test_forwards_passes_dependencies_and_long_retry(self, mock_start):
+        """On-prem enqueue forwards dependency names and the 24h retry policy."""
+        forwards, _ = make_sql_migration(
+            self.sql,
+            'DROP INDEX test_dep_idx;',
+            migration_name=self.migration_name,
+            dependencies=[self.dep_name],
+        )
+        with override_settings(MIGRATION_DEPENDENCY_MAX_RETRIES=96, MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS=900):
+            forwards(MagicMock(), _pg_schema_editor())
+
+        _, kwargs = mock_start.call_args
+        assert kwargs['dependencies'] == [self.dep_name]
+        retry = kwargs['retry']
+        assert isinstance(retry, Retry)
+        assert retry.max == 96
+        assert retry.intervals == [900] * 96
