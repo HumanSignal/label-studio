@@ -34,7 +34,8 @@ Reports that cross one of these boundaries:
 
 - **Unauthenticated to authenticated.** Anything reachable without a valid session or token.
 - **Application to host and network.** SSRF, reading files outside the configured data roots, command
-  execution, or sending credentials to a third-party host.
+  execution, or sending credentials to a third-party host. The exception is the project creator's API
+  token in the ML backend setup request, which is by design (see rules 1 and 2).
 - **Cross-user code execution.** Stored or reflected XSS, and CSRF — running script in another user's
   browser crosses a boundary regardless of rule 2.
 - **Secrets.** Storage credentials, API tokens and passwords must not be readable back through the API.
