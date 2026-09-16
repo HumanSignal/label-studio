@@ -213,6 +213,26 @@ def validate_upload_url(url, block_local_urls=True):
     return validate_url_for_ssrf(url, block_local_urls=block_local_urls)
 
 
+def resolve_host_for_ssrf(host: str, port=None) -> str:
+    """Resolve a host once for non-HTTP clients and return an address that passed validate_ip().
+
+    The caller must connect to the returned address, not to the hostname, so no second
+    DNS lookup can redirect the connection to a banned network.
+    """
+    try:
+        addr_infos = socket.getaddrinfo(host, port, 0, socket.SOCK_STREAM)
+    except socket.gaierror:
+        from core.utils.exceptions import LabelStudioAPIException
+
+        raise LabelStudioAPIException(f"Can't resolve hostname {host}")
+
+    # A rebinding host can return several records; reject if any is banned.
+    for addr_info in addr_infos:
+        validate_ip(addr_info[4][0])
+
+    return addr_infos[0][4][0]
+
+
 def validate_ip(ip: str) -> None:
     """If settings.USE_DEFAULT_BANNED_SUBNETS is True, this function checks
     if an IP is reserved for any of the reasons in
