@@ -377,6 +377,9 @@ class UserHotkeysAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         """Retrieve the current user's hotkeys configuration"""
+        if getattr(request.user, 'is_view_only', False):
+            raise PermissionDenied('View-Only users cannot access hotkeys')
+
         try:
             project = get_hotkey_project(request.user, request.query_params.get('project'))
             if project is None:
@@ -405,6 +408,9 @@ class UserHotkeysAPI(APIView):
 
     def patch(self, request, *args, **kwargs):
         """Update the current user's hotkeys configuration"""
+        if getattr(request.user, 'is_view_only', False):
+            raise PermissionDenied('View-Only users cannot access hotkeys')
+
         serializer = HotkeysSerializer(data=request.data)
 
         if not serializer.is_valid():

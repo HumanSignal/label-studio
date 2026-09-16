@@ -7,7 +7,8 @@ import type React from "react";
 import { PersonalJWTToken } from "./PersonalJWTToken";
 import type { AuthTokenSettings } from "../types";
 import { ABILITY, type AuthPermissions } from "@humansignal/core/providers/AuthProvider";
-import { ff } from "@humansignal/core";
+import { ff, isViewOnlyUser } from "@humansignal/core";
+import type { APIUser } from "@humansignal/core/types/user";
 import { Badge } from "@humansignal/ui";
 
 export type SectionType = {
@@ -22,8 +23,10 @@ export const accountSettingsSections = (
   settings: AuthTokenSettings,
   permissions: AuthPermissions,
   extraSections: SectionType[] = [],
+  user?: APIUser | null,
 ): SectionType[] => {
   const canCreateTokens = permissions.can(ABILITY.can_create_tokens);
+  const isViewOnly = isViewOnlyUser(user);
 
   return [
     {
@@ -34,7 +37,7 @@ export const accountSettingsSections = (
     },
     // Enterprise-injected sections (e.g. workforce "Skills & Expertise") render right after Profile.
     ...extraSections,
-    {
+    !isViewOnly && {
       title: (
         <div className="flex items-center gap-tight">
           <span>Hotkeys</span>

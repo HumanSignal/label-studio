@@ -1,5 +1,5 @@
 import json
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -307,3 +307,19 @@ class ProjectHotkeysAPITestCase(TestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert not ProjectHotkeyPreference.objects.filter(user=self.user, project=self.project).exists()
+
+    def test_view_only_user_cannot_get_hotkeys(self):
+        """View-Only users cannot access hotkeys (GET returns 403 Forbidden)."""
+        with patch.object(User, 'is_view_only', new_callable=PropertyMock, create=True) as mock_is_view_only:
+            mock_is_view_only.return_value = True
+            response = self.client.get(self.url)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_view_only_user_cannot_patch_hotkeys(self):
+        """View-Only users cannot update hotkeys (PATCH returns 403 Forbidden)."""
+        with patch.object(User, 'is_view_only', new_callable=PropertyMock, create=True) as mock_is_view_only:
+            mock_is_view_only.return_value = True
+            response = self.client.patch(self.url, data=self.valid_payload, format='json')
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
