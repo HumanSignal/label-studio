@@ -77,6 +77,17 @@ describe("Helper function html sanitize", () => {
     expect(result).toContain("safe");
   });
 
+  test("strips event handler attributes not covered by an enumerated denylist", () => {
+    // SMIL, animation, transition, focus and pointer/touch handlers all fire without
+    // a click and are not in the fixed list this function used to check against.
+    expect(sanitizeHtml('<svg><animate onbegin="alert(1)" attributeName="x"></animate></svg>')).not.toContain(
+      "onbegin",
+    );
+    expect(sanitizeHtml('<div onanimationstart="alert(1)">x</div>')).not.toContain("onanimationstart");
+    expect(sanitizeHtml('<input onfocusin="alert(1)" autofocus />')).not.toContain("onfocusin");
+    expect(sanitizeHtml('<div onpointerdown="alert(1)">x</div>')).not.toContain("onpointerdown");
+  });
+
   test("strips invalid iframe src (bad URL)", () => {
     expect(sanitizeHtml('<iframe src="not-a-url"></iframe>')).toBe("");
   });
