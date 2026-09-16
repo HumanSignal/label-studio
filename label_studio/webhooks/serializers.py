@@ -1,3 +1,5 @@
+from core.utils.io import validate_url_for_ssrf
+from django.conf import settings
 from rest_framework import serializers
 
 from .models import Webhook, WebhookAction
@@ -25,6 +27,11 @@ class WebhookSerializer(serializers.ModelSerializer):
             'updated_at',
         )
         read_only_fields = ('id', 'organization', 'created_at', 'updated_at')
+
+    def validate_url(self, value):
+        if settings.SSRF_PROTECTION_ENABLED:
+            validate_url_for_ssrf(value, block_local_urls=True)
+        return value
 
     def validate(self, attrs):
         actions = attrs.pop('_actions', [])

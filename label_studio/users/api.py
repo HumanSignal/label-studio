@@ -9,7 +9,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -243,6 +243,15 @@ class UserAPI(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        if instance.has_organization:
+            # created_by is SET_NULL: deleting the owner breaks organization administration irreversibly
+            raise PermissionDenied('The organization owner cannot be deleted')
+        if not self.request.user.own_organization:
+            # Removing a member is owner-only (MemberHasOwnerPermission), hard delete must not be weaker
+            raise PermissionDenied('Only the organization owner can delete users')
+        super(UserAPI, self).perform_destroy(instance)
 
 
 @method_decorator(

@@ -1,8 +1,9 @@
+import socket
 from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from core.utils.io import validate_upload_url
+from core.utils.io import validate_url_for_ssrf
 from data_import.uploader import check_tasks_max_file_size, load_tasks, tasks_from_url
 from django.conf import settings
 from organizations.tests.factories import OrganizationFactory
@@ -38,19 +39,21 @@ class TestUploader:
         return configured_project
 
     class TestLoadTasks:
-        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
+        @mock.patch('core.utils.io.validate_url_for_ssrf', wraps=validate_url_for_ssrf)
         @pytest.mark.parametrize('url', ('file:///etc/passwd', 'ftp://example.org'))
-        def test_raises_for_unsafe_urls(self, validate_upload_url_mock, url, project):
+        def test_raises_for_unsafe_urls(self, validate_url_for_ssrf_mock, url, project):
             request = MockedRequest(url=url)
 
             with pytest.raises(ValidationError) as e:
                 load_tasks(request, project)
                 assert 'The provided URL was not valid.' in e.value
 
-            validate_upload_url_mock.assert_called_once_with(url, block_local_urls=False)
+            validate_url_for_ssrf_mock.assert_called_once_with(url, block_local_urls=False)
 
-        @mock.patch('core.utils.io.validate_upload_url', wraps=validate_upload_url)
-        def test_raises_for_local_urls_with_ssrf_protection_enabled(self, validate_upload_url_mock, project, settings):
+        @mock.patch('core.utils.io.validate_url_for_ssrf', wraps=validate_url_for_ssrf)
+        def test_raises_for_local_urls_with_ssrf_protection_enabled(
+            self, validate_url_for_ssrf_mock, project, settings
+        ):
             settings.SSRF_PROTECTION_ENABLED = True
             request = MockedRequest(url='http://0.0.0.0')
 
@@ -58,72 +61,55 @@ class TestUploader:
                 load_tasks(request, project)
                 assert 'The provided URL was not valid.' in e.value
 
-            validate_upload_url_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
+            validate_url_for_ssrf_mock.assert_called_once_with('http://0.0.0.0', block_local_urls=True)
+
+        # The pre-flight check is patched out so these exercise the connect-time guard alone.
+        def _load_with_resolved_ip(self, project, ip, connect_error=None):
+            request = MockedRequest(url='http://validurl.com')
+            resolved = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (ip, 80))]
+            connect = mock.patch(
+                'core.utils.io.urllib3_connection.create_connection',
+                side_effect=connect_error or OSError('refused'),
+            )
+
+            with (
+                mock.patch('core.utils.io.validate_url_for_ssrf'),
+                mock.patch('core.utils.io.socket.getaddrinfo', return_value=resolved),
+                connect,
+                pytest.raises(ValidationError) as e,
+            ):
+                load_tasks(request, project)
+            return str(e.value)
 
         def test_local_url_after_redirect(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
-            request = MockedRequest(url='http://validurl.com')
 
-            # Mock the necessary parts of the response object
-            mock_response = Mock()
-            mock_response.raw._connection.sock.getpeername.return_value = ('127.0.0.1', 8080)
+            message = self._load_with_resolved_ip(project, '127.0.0.1')
 
-            # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
-                load_tasks(request, project)
-            assert 'URL resolves to a reserved network address (block: 127.0.0.0/8)' in str(e.value)
+            assert 'URL resolves to a reserved network address (block: 127.0.0.0/8)' in message
 
         def test_user_specified_block(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
             settings.USER_ADDITIONAL_BANNED_SUBNETS = ['1.2.3.4']
-            request = MockedRequest(url='http://validurl.com')
 
-            # Mock the necessary parts of the response object
-            mock_response = Mock()
-            mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
+            message = self._load_with_resolved_ip(project, '1.2.3.4')
+            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in message
 
-            # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
-                load_tasks(request, project)
-            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
-
-            mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
-                load_tasks(request, project)
-            assert 'URL resolves to a reserved network address (block: 198.51.100.0/24)' in str(e.value)
+            message = self._load_with_resolved_ip(project, '198.51.100.0')
+            assert 'URL resolves to a reserved network address (block: 198.51.100.0/24)' in message
 
         def test_user_specified_block_without_default(self, project, settings):
             settings.SSRF_PROTECTION_ENABLED = True
             settings.USER_ADDITIONAL_BANNED_SUBNETS = ['1.2.3.4']
             settings.USE_DEFAULT_BANNED_SUBNETS = False
-            request = MockedRequest(url='http://validurl.com')
 
-            # Mock the necessary parts of the response object
-            mock_response = Mock()
-            mock_response.raw._connection.sock.getpeername.return_value = ('1.2.3.4', 8080)
+            message = self._load_with_resolved_ip(project, '1.2.3.4')
+            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in message
 
-            # Patch the requests.get call in the data_import.uploader module
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
-                load_tasks(request, project)
-            assert 'URL resolves to a reserved network address (block: 1.2.3.4)' in str(e.value)
-
-            mock_response.raw._connection.sock.getpeername.return_value = ('198.51.100.0', 8080)
-            with mock.patch('core.utils.io.requests.get', return_value=mock_response), pytest.raises(
-                ValidationError
-            ) as e:
-                load_tasks(request, project)
-            # Verify that the error is NOT an SSRF block (IP validation passed)
-            assert 'URL resolves to a reserved network address' not in str(e.value)
-            # Instead, it should be some other processing error (not SSRF-related)
-            assert len(str(e.value)) > 0  # Some error occurred, but not SSRF
+            # Allowed once the default subnets are off: it fails on the connection instead.
+            message = self._load_with_resolved_ip(project, '198.51.100.0')
+            assert 'URL resolves to a reserved network address' not in message
+            assert len(message) > 0
 
 
 class TestTasksFileChecks:

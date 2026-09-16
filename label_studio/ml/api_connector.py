@@ -7,6 +7,8 @@ import urllib
 import requests
 from core.feature_flags import flag_set
 from core.utils.common import load_func
+from core.utils.exceptions import SsrfBlockedUrlError
+from core.utils.io import SsrfSafeHTTPAdapter
 from core.version import get_git_version
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
@@ -68,8 +70,10 @@ class BaseHTTPAPI(object):
         session = requests.Session()
         session.headers.update(self.HEADERS)
         session.headers.update(self._headers)
-        session.mount('http://', HTTPAdapter(max_retries=self._max_retries))
-        session.mount('https://', HTTPAdapter(max_retries=self._max_retries))
+        # The save-time URL check cannot stop a redirect or a rebound record.
+        adapter_cls = SsrfSafeHTTPAdapter if settings.ML_BLOCK_LOCAL_IP else HTTPAdapter
+        session.mount('http://', adapter_cls(max_retries=self._max_retries))
+        session.mount('https://', adapter_cls(max_retries=self._max_retries))
         return session
 
     def _session_key(self):
@@ -158,7 +162,8 @@ class MLApi(BaseHTTPAPI):
             else:
                 response = self.get(url=url, *args, **kwargs)
             response.raise_for_status()
-        except requests.exceptions.RequestException as e:
+        # A blocked address is a connection failure, not an API error to propagate to the caller.
+        except (requests.exceptions.RequestException, SsrfBlockedUrlError) as e:
             error_string = str(e)
             status_code = response.status_code if response is not None else 0
             return MLApiResult(url, request, {'error': error_string}, headers, 'error', status_code=status_code)

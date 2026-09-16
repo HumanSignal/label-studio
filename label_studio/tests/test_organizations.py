@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import json
+
 import pytest
 from organizations.models import Organization, OrganizationMember
 from tasks.models import Task
@@ -20,6 +22,26 @@ def test_api_list_organizations(business_client):
     response_data = response.json()
     assert len(response_data) == 1
     assert response_data[0]['id'] == business_client.organization.id
+
+
+@pytest.mark.django_db
+def test_api_create_organization_forbidden_by_default(business_client):
+    organizations_before = Organization.objects.count()
+    response = business_client.post(
+        '/api/organizations/', data=json.dumps({'title': 'Second org'}), content_type='application/json'
+    )
+    assert response.status_code == 403
+    assert Organization.objects.count() == organizations_before
+
+
+@pytest.mark.django_db
+def test_api_create_organization_allowed_by_setting(business_client, settings):
+    settings.ALLOW_ORGANIZATION_CREATION = True
+    response = business_client.post(
+        '/api/organizations/', data=json.dumps({'title': 'Second org'}), content_type='application/json'
+    )
+    assert response.status_code == 201
+    assert Organization.objects.filter(title='Second org').exists()
 
 
 @pytest.mark.django_db
