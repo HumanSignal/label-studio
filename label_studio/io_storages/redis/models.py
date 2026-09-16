@@ -4,6 +4,8 @@ import json
 import logging
 
 import redis
+from core.utils.io import resolve_host_for_ssrf
+from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -66,9 +68,11 @@ class RedisStorageMixin(models.Model):
         return r
 
     def get_client(self):
-        redis_config = {}
-        if self.host:
-            redis_config['host'] = self.host
+        # Empty host means localhost for redis-py, so it must pass the same check.
+        host = self.host or 'localhost'
+        if settings.SSRF_PROTECTION_ENABLED:
+            host = resolve_host_for_ssrf(host, self.port or None)
+        redis_config = {'host': host}
         if self.port:
             redis_config['port'] = self.port
         if self.password:
