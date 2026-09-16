@@ -77,6 +77,35 @@ describe("Helper function html sanitize", () => {
     expect(result).toContain("safe");
   });
 
+  test.each([
+    [
+      "<svg><animate attributeName=x dur=1s onbegin=alert(1)></animate></svg>",
+      '<svg><animate attributename="x" dur="1s"></animate></svg>',
+    ],
+    [
+      "<svg><set attributeName=x to=1 onend=alert(1) onrepeat=alert(1)></set></svg>",
+      '<svg><set attributename="x" to="1"></set></svg>',
+    ],
+    ["<div tabindex=1 autofocus onfocusin=alert(1)>x</div>", '<div tabindex="1" autofocus>x</div>'],
+    [
+      '<div style="animation:a 1s" onanimationstart=alert(1) ontransitionend=alert(1)>x</div>',
+      '<div style="animation:a 1s">x</div>',
+    ],
+    ["<b onpointerover=alert(1) ontouchstart=alert(1)>x</b>", "<b>x</b>"],
+    ["<DIV ONPOINTERDOWN=alert(1) OnFocusIn=alert(1)>x</DIV>", "<div>x</div>"],
+    [
+      '<iframe src="https://www.youtube.com/embed/a" onload=alert(1)></iframe>',
+      '<iframe src="https://www.youtube.com/embed/a"></iframe>',
+    ],
+  ])("strips any on* event handler attribute: %s", (input, expected) => {
+    expect(sanitizeHtml(input)).toBe(expected);
+  });
+
+  test("keeps attributes that only contain 'on' outside the name prefix", () => {
+    const input = '<a href="/x" title="one" data-on="1">keep</a>';
+    expect(sanitizeHtml(input)).toBe(input);
+  });
+
   test("strips invalid iframe src (bad URL)", () => {
     expect(sanitizeHtml('<iframe src="not-a-url"></iframe>')).toBe("");
   });
