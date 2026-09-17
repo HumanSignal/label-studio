@@ -2,6 +2,7 @@
 
 import base64
 import fnmatch
+import importlib.metadata
 import logging
 import mimetypes
 import re
@@ -14,6 +15,14 @@ from django.conf import settings
 from tldextract import TLDExtract
 
 logger = logging.getLogger(__name__)
+
+
+def _get_user_agent_extra():
+    try:
+        version = importlib.metadata.version('label-studio')
+    except importlib.metadata.PackageNotFoundError:
+        version = 'dev'
+    return f'label-studio/{version}'
 
 
 def get_client_and_resource(
@@ -37,8 +46,9 @@ def get_client_and_resource(
     s3_endpoint = s3_endpoint or get_env('S3_ENDPOINT')
     if s3_endpoint:
         settings['endpoint_url'] = s3_endpoint
-    client = session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
-    resource = session.resource('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
+    config = boto3.session.Config(signature_version='s3v4', user_agent_extra=_get_user_agent_extra())
+    client = session.client('s3', config=config, **settings)
+    resource = session.resource('s3', config=config, **settings)
     return client, resource
 
 
