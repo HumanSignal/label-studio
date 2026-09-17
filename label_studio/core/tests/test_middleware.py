@@ -1,6 +1,14 @@
+from importlib import import_module
+
 import jwt
 import pytest
-from core.middleware import NoindexUrlMiddleware, XApiKeySupportMiddleware, authorization_header_from_x_api_key
+from core.middleware import (
+    NoindexUrlMiddleware,
+    SetSessionUIDMiddleware,
+    XApiKeySupportMiddleware,
+    authorization_header_from_x_api_key,
+)
+from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, override_settings
 
@@ -127,3 +135,44 @@ def test_x_api_key_middleware_maps_legacy_key_to_token_authorization():
 
     assert request.META['HTTP_AUTHORIZATION'] == 'Token legacy-api-key'
     assert 'HTTP_X_API_KEY' not in request.META
+
+
+class TestSetSessionUIDMiddleware:
+    @staticmethod
+    def _request(with_cookie):
+        request = RequestFactory().get('/api/projects')
+        request.session = import_module(settings.SESSION_ENGINE).SessionStore()
+        if with_cookie:
+            request.COOKIES[settings.SESSION_COOKIE_NAME] = 'existing-session-cookie'
+        return request
+
+    def _process(self, request):
+        SetSessionUIDMiddleware(lambda r: HttpResponse()).process_request(request)
+
+    def test_cookieless_request_does_not_create_a_session(self):
+        """API token clients, health probes and crawlers drop the cookie, so tagging them
+        would persist one session per request for the whole SESSION_COOKIE_AGE."""
+        request = self._request(with_cookie=False)
+
+        self._process(request)
+
+        assert 'uid' not in request.session
+        assert not request.session.modified
+
+    def test_request_with_session_cookie_gets_a_uid(self):
+        request = self._request(with_cookie=True)
+
+        self._process(request)
+
+        assert request.session['uid']
+        assert request.session.modified
+
+    def test_existing_uid_is_preserved(self):
+        request = self._request(with_cookie=True)
+        request.session['uid'] = 'keep-me'
+        request.session.modified = False
+
+        self._process(request)
+
+        assert request.session['uid'] == 'keep-me'
+        assert not request.session.modified
