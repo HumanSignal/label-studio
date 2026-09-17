@@ -29,6 +29,9 @@ export const TimeBox: FC<TimerProps> = ({ sidepanel = false, value, readonly = f
   }, [value]);
 
   const formatTime = useCallback((time: number, input = false): any => {
+    if (!Number.isFinite(time) || time < 0) {
+      return input ? "00:00:00:000" : "00:00:00";
+    }
     const timeDate = new Date(time * 1000).toISOString();
     let formatted = time > 3600 ? timeDate.substr(11, 8) : `00:${timeDate.substr(14, 5)}`;
 
