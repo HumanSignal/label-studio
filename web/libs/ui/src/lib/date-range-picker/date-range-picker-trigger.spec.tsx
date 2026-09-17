@@ -53,4 +53,38 @@ describe("DateRangePickerTrigger", () => {
       expect(onToggle).toHaveBeenCalledWith(true);
     });
   });
+
+  it("keeps standalone h-10 chrome when className is decorative, and drops it only for ownChrome", () => {
+    const { rerender } = render(
+      <DateRangePickerTrigger selected={null} inline dataTestId="date-range-trigger">
+        <div>Picker panel</div>
+      </DateRangePickerTrigger>,
+    );
+
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bh-10\b/);
+
+    rerender(
+      <DateRangePickerTrigger selected={null} inline dataTestId="date-range-trigger" className="custom-trigger">
+        <div>Picker panel</div>
+      </DateRangePickerTrigger>,
+    );
+
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bh-10\b/);
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bcustom-trigger\b/);
+
+    rerender(
+      <DateRangePickerTrigger
+        selected={null}
+        inline
+        dataTestId="date-range-trigger"
+        className="custom-trigger"
+        ownChrome
+      >
+        <div>Picker panel</div>
+      </DateRangePickerTrigger>,
+    );
+
+    expect(screen.getByTestId("date-range-trigger").className).not.toMatch(/\bh-10\b/);
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bcustom-trigger\b/);
+  });
 });

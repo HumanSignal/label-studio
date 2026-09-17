@@ -37,5 +37,12 @@ export type FilterShellProps = {
   addFilter?: FilterShellAddFilter;
   onReset?: () => void;
   resetLabel?: string;
+  /** When true, the shell Reset control is present but not clickable. */
+  resetDisabled?: boolean;
+  /**
+   * Optional end-of-row control (e.g. batch "Apply Filters"). Rendered inside the same
+   * flex-wrap as pills/Reset so it can sit on the last filter line when space allows.
+   */
+  trailing?: ReactNode;
   "aria-label"?: string;
 };

@@ -29,6 +29,10 @@
   height: var(--filter-pill-height);
 }
 
+.filters .trailingAction {
+  height: var(--filter-pill-height);
+}
+
 /**
  * Add Filter leading control — matches the filter row height.
  * CaretDown on Select flips via rotate-180 when open.
@@ -110,6 +114,13 @@
   --select-trigger-line-height: var(--line-height-body-small);
   --select-trigger-caret-size: 16px;
 
+  /*
+   * DateRangePickerTrigger ships Tailwind h-10 / py-tight for standalone use. Own chrome here so
+   * the value half stays vertically centered in the pill (label + calendar icon).
+   */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
   height: var(--filter-pill-height);
   width: auto;
   min-width: 0;
@@ -128,6 +139,12 @@
     border-color 150ms ease-out,
     background-color 150ms ease-out,
     box-shadow 150ms ease-out;
+
+  /* Match Select caret size — CalendarBlankIcon defaults to 24px and overflows the pill. */
+  :global(svg) {
+    width: var(--select-trigger-caret-size);
+    height: var(--select-trigger-caret-size);
+  }
 
   &:hover:not(:disabled) {
     border-left-width: 0;

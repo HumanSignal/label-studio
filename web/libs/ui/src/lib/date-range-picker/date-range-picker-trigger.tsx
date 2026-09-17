@@ -26,11 +26,13 @@ type DateRangePickerTriggerProps = {
    */
   className?: string;
   /**
-   * Optional id on the clickable trigger (FilterShell name-as-label / htmlFor).
+   * When true, the caller owns height/padding (e.g. FilterShell value trigger).
+   * Decorative class names do not imply custom chrome.
    */
-  id?: string;
+  ownChrome?: boolean;
   /**
    * Props spread onto the clickable trigger surface (same pattern as Select `triggerProps`).
+   * Pass `id` here for FilterShell name-as-label / htmlFor wiring.
    */
   triggerProps?: ComponentPropsWithoutRef<"div">;
 } & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className" | "id">;
@@ -80,7 +82,7 @@ export const DateRangePickerTrigger = ({
   dataTestId,
   inline = false,
   className,
-  id,
+  ownChrome = false,
   triggerProps,
   onToggle,
   ...dropdownTriggerProps
@@ -120,23 +122,25 @@ export const DateRangePickerTrigger = ({
       }}
     >
       <div
-        id={id}
         tabIndex={disabled ? undefined : 0}
         role="button"
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-disabled={disabled || undefined}
         className={cnm(
-          "flex items-center gap-tight py-tight pl-base pr-tight h-10 border border-neutral-border rounded-smaller cursor-pointer",
+          "flex items-center gap-tight border border-neutral-border rounded-smaller cursor-pointer",
           "hover:border-neutral-border-bold",
+          // FilterShell supplies its own value-trigger chrome.
+          !ownChrome && "py-tight pl-base pr-tight h-10",
           disabled && "opacity-50 cursor-not-allowed",
           className,
         )}
         data-testid={dataTestId}
         {...triggerProps}
       >
-        {label}
-        <CalendarBlankIcon size={24} className="text-neutral-content-subtlest shrink-0" />
+        <span className="min-w-0 truncate">{label}</span>
+        {/* 16px matches FilterShell --select-trigger-caret-size / Select caret. */}
+        <CalendarBlankIcon size={16} className="text-neutral-content-subtlest shrink-0" />
       </div>
     </DropdownTrigger>
   );

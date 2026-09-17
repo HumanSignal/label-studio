@@ -472,6 +472,11 @@ describe("FilterShell", () => {
     expect(pillCss).toMatch(/>\s*:global\(button\)[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(shellCss).toMatch(/\.addFilterTrigger\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(shellCss).toMatch(/\.filterShellValueTrigger\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
+    expect(shellCss).toMatch(/\.filterShellValueTrigger\s*\{[\s\S]*?display:\s*flex/);
+    expect(shellCss).toMatch(/\.filterShellValueTrigger\s*\{[\s\S]*?align-items:\s*center/);
+    expect(shellCss).toMatch(
+      /\.filterShellValueTrigger[\s\S]*?:global\(svg\)[\s\S]*?width:\s*var\(--select-trigger-caret-size\)/,
+    );
     expect(shellCss).toMatch(/\.filters\s\.resetButton\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
   });
 
@@ -553,11 +558,45 @@ describe("FilterShell", () => {
     expect(screen.getByTestId("filter-shell-add-filter")).toBeDisabled();
   });
 
+  it("renders trailing actions inside the filter wrap after Reset", () => {
+    render(
+      <FilterShell
+        filters={[]}
+        onReset={mock()}
+        trailing={
+          <button type="button" data-testid="filter-shell-trailing">
+            Apply Filters
+          </button>
+        }
+      />,
+    );
+
+    const region = screen.getByRole("region", { name: "Filters" });
+    const reset = screen.getByTestId("filter-shell-reset");
+    const trailing = screen.getByTestId("filter-shell-trailing");
+    const children = [...region.querySelectorAll("[data-testid]")];
+
+    expect(children.indexOf(reset)).toBeLessThan(children.indexOf(trailing));
+    expect(trailing.parentElement).toBe(reset.parentElement);
+  });
+
+  it("does not stretch DateRangePickerTrigger surfaces inside the pill control", () => {
+    const pillCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-pill.module.css"), "utf8");
+
+    expect(pillCss).toMatch(/\.control[\s\S]*?>\s*:global\(div\):not\(\[role="button"\]\)/);
+  });
+
   it("calls onReset", () => {
     const onReset = mock();
 
     render(<FilterShell filters={[]} onReset={onReset} />);
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
     expect(onReset).toHaveBeenCalledTimes(1);
+  });
+
+  it("disables Reset when resetDisabled is set", () => {
+    render(<FilterShell filters={[]} onReset={mock()} resetDisabled />);
+
+    expect(screen.getByTestId("filter-shell-reset")).toBeDisabled();
   });
 });

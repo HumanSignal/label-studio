@@ -167,8 +167,12 @@
   min-width: 0;
   align-items: stretch;
 
-  /* Wrappers (e.g. TagMultiSelect) must stretch so the nested trigger fills the pill height. */
-  & > :global(div) {
+  /*
+   * Wrappers (e.g. TagMultiSelect) must stretch so the nested trigger fills the pill height.
+   * Skip role=button triggers (DateRangePickerTrigger) — stretching them fights
+   * filterShellValueTrigger's align-items:center and offsets the label/icon.
+   */
+  & > :global(div):not([role="button"]) {
     display: flex;
     min-width: 0;
     align-items: stretch;

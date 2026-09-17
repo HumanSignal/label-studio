@@ -10,6 +10,8 @@ export const FilterShell = ({
   addFilter,
   onReset,
   resetLabel = "Reset",
+  resetDisabled = false,
+  trailing,
   "aria-label": ariaLabel = "Filters",
 }: FilterShellProps) => {
   const addFilterOptions =
@@ -55,11 +57,13 @@ export const FilterShell = ({
             size="small"
             data-testid="filter-shell-reset"
             className={styles.resetButton}
+            disabled={resetDisabled}
             onClick={onReset}
           >
             {resetLabel}
           </Button>
         )}
+        {trailing}
       </div>
     </div>
   );

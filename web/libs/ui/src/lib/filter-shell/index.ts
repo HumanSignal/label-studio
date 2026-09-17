@@ -11,9 +11,10 @@ export const FILTER_SHELL_TREE_DROPDOWN_CLASS = "filter-shell-tree-dropdown";
 
 /**
  * CSS module class for Select `triggerClassName` / DateRangePickerTrigger `className`
- * so the control fills the FilterShell pill value half. MultiTreeSelectDropdown uses
- * `filterShellTreeValueTrigger` (`triggerClassName`) plus `filterShellTreeWrapper` (`className`),
- * and `FILTER_SHELL_TREE_DROPDOWN_CLASS` as `dropdownClassName` (with `syncWidth={false}`).
+ * (with `ownChrome`) so the control fills the FilterShell pill value half.
+ * MultiTreeSelectDropdown uses `filterShellTreeValueTrigger` (`triggerClassName`) plus
+ * `filterShellTreeWrapper` (`className`), and `FILTER_SHELL_TREE_DROPDOWN_CLASS` as
+ * `dropdownClassName` (with `syncWidth={false}`).
  *
  * Also exposes `valueOverflowCount` for multi-value `+N` styling when not using
  * `formatFilterOverflowLabel`.
