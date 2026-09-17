@@ -27,13 +27,16 @@ every member can do — read and write every project, task, annotation, draft, u
 connection, change organization settings and the invitation link, and read and edit every other
 member's profile. Per-user filtering in the API is a convenience, not an access control. "Any
 authenticated user can access another user's data" is therefore not a vulnerability on its own.
+A cloud storage connection gives every member read access to the whole bucket or container, as far
+as its credentials allow: `prefix` and the file filter select what sync imports and are not an
+access boundary. Restrict access with the credentials' IAM policy.
 
 ### What is in scope
 
 Reports that cross one of these boundaries:
 
 - **Unauthenticated to authenticated.** Anything reachable without a valid session or token.
-- **Application to host and network.** SSRF, reading files outside the configured data roots, command
+- **Application to host and network.** SSRF, reading host files outside the configured data roots, command
   execution, or sending credentials to a third-party host. The exception is the project creator's API
   token in the ML backend setup request, which is by design (see rules 1 and 2).
 - **Cross-user code execution.** Stored or reflected XSS, and CSRF — running script in another user's
