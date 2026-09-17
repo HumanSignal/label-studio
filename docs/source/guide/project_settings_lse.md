@@ -332,7 +332,7 @@ Enable **Show before reviewing** to display a pop-up message to reviewers when t
 
 Use this section to configure:
 
-* How many annotations need to be accepted/rejected for the task to be considered reviewed (move from the **Needs Review** state to the **Done** state).
+* Which review criterion marks a task as reviewed (and drives the Data Manager **Reviewed** column): at least one **accepted** annotation by default, or an accept/reject verdict on **all** annotations.
 
 * How many annotations need to be submitted for a task to enter the **Needs Review** state.
 
@@ -362,18 +362,18 @@ For more information about states, see [Project states](project_states).
 </td>
 <td>
 
-For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer only needs to accept one annotation to consider the task done. 
+For eligible tasks (tasks that enter the **Needs Review** state), at least one annotation must be **accepted** for the task to meet the review criteria. That is what the Data Manager **Reviewed** column reflects under this setting. A reject alone does not mark the task reviewed.
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Task is reviewed after all annotations are reviewed**
+**Task is reviewed when all annotations are reviewed**
 </td>
 <td>
 
-For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer needs to either accept or reject **all** annotations to consider the task done.
+For eligible tasks (tasks that enter the **Needs Review** state), every annotation needs an accept or reject verdict for the task to meet the review criteria (and for **Reviewed** to become true).
 
 </td>
 </tr>
