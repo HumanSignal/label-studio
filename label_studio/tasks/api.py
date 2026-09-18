@@ -188,16 +188,27 @@ class TaskListAPI(DMTaskListAPI):
         queryset = super().filter_queryset(queryset)
         return queryset.filter(project__organization=self.request.user.active_organization)
 
+    def get_requested_project(self):
+        """Resolve the `project` from the request body and check the caller's access to it."""
+        project_id = self.request.data.get('project')
+        if not project_id:
+            return None
+        if not hasattr(self, '_requested_project'):
+            project = generics.get_object_or_404(Project, pk=project_id)
+            # No parent object on this route, so DRF never runs object permissions by itself
+            self.check_object_permissions(self.request, project)
+            self._requested_project = project
+        return self._requested_project
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        project_id = self.request.data.get('project')
-        if project_id:
-            context['project'] = generics.get_object_or_404(Project, pk=project_id)
+        project = self.get_requested_project()
+        if project:
+            context['project'] = project
         return context
 
     def perform_create(self, serializer):
-        project_id = self.request.data.get('project')
-        project = generics.get_object_or_404(Project, pk=project_id)
+        project = self.get_requested_project()
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]
