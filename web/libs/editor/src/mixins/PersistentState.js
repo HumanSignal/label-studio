@@ -26,7 +26,11 @@ const PersistentStateMixin = types
 
     storeValues() {
       const key = self.persistentValuesKey;
-      const obj = { ...self.persistentFingerprint, values: self.persistentValues };
+      const fingerprint = self.persistentFingerprint;
+
+      // no stable identity (e.g. preview without a task) — don't persist
+      if (!Object.values(fingerprint).every((value) => value !== undefined)) return;
+      const obj = { ...fingerprint, values: self.persistentValues };
 
       localStorage.setItem(key, JSON.stringify(obj));
     },
@@ -35,8 +39,10 @@ const PersistentStateMixin = types
       const stored = JSON.parse(localStorage.getItem(self.persistentValuesKey) || "{}");
 
       if (!stored) return;
-      if (!Object.keys(self.persistentFingerprint).every((key) => stored[key] === self.persistentFingerprint[key]))
-        return;
+      const fingerprint = self.persistentFingerprint;
+
+      if (!Object.values(fingerprint).every((value) => value !== undefined)) return;
+      if (!Object.keys(fingerprint).every((key) => stored[key] === fingerprint[key])) return;
 
       const values = stored.values || {};
 
