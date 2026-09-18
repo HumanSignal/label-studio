@@ -362,7 +362,7 @@ For more information about states, see [Project states](project_states).
 </td>
 <td>
 
-For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer only needs to accept one annotation to consider the task done. A reject alone does not mark the task reviewed.
+For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer only needs to accept one annotation to consider the task done. 
 
 </td>
 </tr>

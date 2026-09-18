@@ -133,9 +133,9 @@ The **In Review** state for tasks (and by extension, the project) only happens w
 * Tasks have multiple annotations (meaning an overlap greater than 1). 
 * The [**Review > Reviewing Options > Task is reviewed when all annotations are reviewed**](project_settings_lse#reviewing-options) setting is enabled. 
 
-By default, the overall task is considered reviewed when at least one of its annotations has been **accepted**. In these situations, the task will move from **Needs Review** to **Done** once an annotation is accepted. A reject alone (including reject and do not require rework) does not mark the task reviewed.
+By default, the overall task is considered reviewed when at least one of its annotations has been **accepted**. In these situations, the task will move from **Needs Review** to **Done** once an annotation is accepted.
 
-If you enable **Task is reviewed when all annotations are reviewed**, the task moves from **Needs Review** to **In Review** after the first review has been submitted, and then **Done** after the final review is submitted.
+If you enable **Task is reviewed when all annotations are reviewed**, the task moves from **Needs Review** to **In Review** after the first review has been submitted, and then **Done** after the final review is submitted. 
 
 ### Task state rollup into project state
 
