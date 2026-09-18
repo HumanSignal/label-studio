@@ -193,7 +193,7 @@ See the following video for a brief overview of automated task assignments:
 Reviewers are the users are reviewing the annotators' submissions for accuracy. 
 
 * **Task is reviewed after at least one accepted annotation** or  
-**Task is reviewed after all annotations are reviewed**
+**Task is reviewed when all annotations are reviewed**
 
     Configure what action determines that a task has been reviewed. By default, the reviewer only needs to accept one annotation for the task. You can change this so that the reviewer must accept or reject submissions from all annotators. 
 
