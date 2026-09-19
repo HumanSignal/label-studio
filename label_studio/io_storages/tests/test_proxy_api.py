@@ -11,11 +11,14 @@ from io_storages.proxy_api import (
     ResolveStorageUriAPIMixin,
     TaskResolveStorageUri,
 )
+from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
+from projects.tests.factories import ProjectFactory
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 from tasks.models import Task
+from tasks.tests.factories import TaskFactory
 
 
 class TestResolveStorageUriAPIMixin(unittest.TestCase):
@@ -633,7 +636,7 @@ class TestTaskResolveStorageUri:
         force_authenticate(request, user=self.user)
         response = self.view(request, task_id=1)
 
-        mock_task_get.assert_called_once_with(pk=1)
+        mock_task_get.assert_called_once_with(pk=1, project__organization=self.user.active_organization)
         # Use any_call instead of assert_called_once_with to handle DRF request vs WSGIRequest
         assert mock_resolve.call_args is not None
         assert mock_resolve.call_args[0][1] == 'test'
@@ -690,9 +693,63 @@ class TestProjectResolveStorageUri:
         force_authenticate(request, user=self.user)
         response = self.view(request, project_id=1)
 
-        mock_project_get.assert_called_once_with(pk=1)
+        mock_project_get.assert_called_once_with(pk=1, organization=self.user.active_organization)
         # Use any_call instead of assert_called_once_with to handle DRF request vs WSGIRequest
         assert mock_resolve.call_args is not None
         assert mock_resolve.call_args[0][1] == 'test'
         assert mock_resolve.call_args[0][2] == self.project
         assert response.status_code == status.HTTP_200_OK
+
+
+class TestResolveStorageUriCrossOrganization:
+    """The resolve endpoints look a task or project up by primary key, so they must be
+    scoped to the requesting user's organization. Without that scope any authenticated
+    user reaches another tenant's storage through a guessable id (#9924)."""
+
+    FILEURI = base64.urlsafe_b64encode(b's3://victim-bucket/secret.jpg').decode()
+    RESOLVE = 'io_storages.proxy_api.ResolveStorageUriAPIMixin.resolve'
+
+    def _get(self, user, url):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        with patch(self.RESOLVE, return_value=Response(status=status.HTTP_200_OK)) as resolve:
+            return client.get(url, {'fileuri': self.FILEURI}), resolve
+
+    @pytest.mark.django_db
+    def test_task_resolve_is_not_reachable_from_another_organization(self):
+        task = TaskFactory(project=ProjectFactory())
+        attacker = OrganizationFactory().created_by
+
+        response, resolve = self._get(attacker, f'/tasks/{task.id}/resolve/')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        resolve.assert_not_called()
+
+    @pytest.mark.django_db
+    def test_project_resolve_is_not_reachable_from_another_organization(self):
+        project = ProjectFactory()
+        attacker = OrganizationFactory().created_by
+
+        response, resolve = self._get(attacker, f'/projects/{project.id}/resolve/')
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        resolve.assert_not_called()
+
+    @pytest.mark.django_db
+    def test_task_resolve_still_reaches_resolution_inside_the_owning_organization(self):
+        project = ProjectFactory()
+        task = TaskFactory(project=project)
+
+        response, resolve = self._get(project.organization.created_by, f'/tasks/{task.id}/resolve/')
+
+        assert response.status_code == status.HTTP_200_OK
+        resolve.assert_called_once()
+
+    @pytest.mark.django_db
+    def test_project_resolve_still_reaches_resolution_inside_the_owning_organization(self):
+        project = ProjectFactory()
+
+        response, resolve = self._get(project.organization.created_by, f'/projects/{project.id}/resolve/')
+
+        assert response.status_code == status.HTTP_200_OK
+        resolve.assert_called_once()
