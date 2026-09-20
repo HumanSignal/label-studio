@@ -103,6 +103,56 @@ export const effectiveHotkeys = {
     return hotkey.active === false ? { ...hotkey, key: null } : { ...hotkey };
   },
 
+  getCustomHotkeys(): CustomHotkeys {
+    if (!bootstrapped) effectiveHotkeys.bootstrap();
+    return cloneCustoms(effectiveMap);
+  },
+
+  getFlatKeymap(): Record<string, string> {
+    if (!bootstrapped) effectiveHotkeys.bootstrap();
+    const flat: Record<string, string> = {};
+
+    // 1. Seed from product defaults / editor_keymap if present
+    const editorKeymap = (window.APP_SETTINGS?.editor_keymap as RuntimeKeymap | undefined) ?? productDefaults;
+    for (const [id, value] of Object.entries(editorKeymap)) {
+      if (value && typeof value === "object" && "key" in value) {
+        const k = (value as { key: string | null }).key;
+        if (typeof k === "string" && k.length > 0) {
+          flat[id] = k;
+          if (id.includes(":")) {
+            const shortKey = id.split(":").slice(1).join(":");
+            if (shortKey) flat[shortKey] = k;
+          }
+        }
+      } else if (typeof value === "string" && value.length > 0) {
+        flat[id] = value;
+        if (id.includes(":")) {
+          const shortKey = id.split(":").slice(1).join(":");
+          if (shortKey) flat[shortKey] = value;
+        }
+      }
+    }
+
+    // 2. Overlay effectiveMap (which contains custom hotkeys, including AudioCanvas:* etc.)
+    for (const [id, hotkey] of Object.entries(effectiveMap)) {
+      if (hotkey.active === false) {
+        flat[id] = "";
+        if (id.includes(":")) {
+          const shortKey = id.split(":").slice(1).join(":");
+          if (shortKey) flat[shortKey] = "";
+        }
+      } else if (hotkey.key) {
+        flat[id] = hotkey.key;
+        if (id.includes(":")) {
+          const shortKey = id.split(":").slice(1).join(":");
+          if (shortKey) flat[shortKey] = hotkey.key;
+        }
+      }
+    }
+
+    return flat;
+  },
+
   /** Monotonic version for useSyncExternalStore snapshot caching. */
   getVersion(): number {
     if (!bootstrapped) effectiveHotkeys.bootstrap();

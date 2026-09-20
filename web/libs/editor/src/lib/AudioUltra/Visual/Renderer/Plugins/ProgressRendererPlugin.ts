@@ -124,10 +124,18 @@ export class ProgressRendererPlugin implements RendererPlugin<ProgressRendererPl
     }
   }
 
+  private lastProgress?: DetailedComputationProgress;
+
   /**
    * Render the progress overlay. Accepts optional progress data.
    */
   public renderProgress(progress?: DetailedComputationProgress) {
+    if (progress !== undefined) {
+      this.lastProgress = progress;
+    } else {
+      progress = this.lastProgress;
+    }
+
     if (
       progress === undefined ||
       progress.overall.overallPercentage === 100 ||
@@ -320,9 +328,17 @@ export class ProgressRendererPlugin implements RendererPlugin<ProgressRendererPl
   }
 
   /**
+   * Reset progress state and hide overlay.
+   */
+  public clear(): void {
+    this.lastProgress = undefined;
+    this._hideProgressOverlay();
+  }
+
+  /**
    * RendererPlugin interface: destroy method.
    */
   public destroy(): void {
-    this._hideProgressOverlay();
+    this.clear();
   }
 }

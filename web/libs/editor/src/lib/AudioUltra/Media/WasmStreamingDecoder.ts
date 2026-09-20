@@ -1,12 +1,134 @@
 import { BaseAudioDecoder } from "./BaseAudioDecoder";
 import { info } from "../Common/Utils";
-import { type AudioDecoderWorker, getAudioDecoderWorker } from "@humansignal/audio-file-decoder";
+import {
+  type AudioDecoderWorker,
+  type WasmAudioStreamConfig,
+  getAudioDecoderWorker,
+} from "@humansignal/audio-file-decoder";
 import decodeAudioWasmUrl from "@humansignal/audio-file-decoder/decode-audio.wasm?url";
+
+/**
+ * Creates an AudioDecoderWorker with an injected XMLHttpRequest header-cache shim
+ * inside the worker. This intercepts the repetitive 2MB range requests (bytes=0-2097151)
+ * triggered by FFmpeg seeking to byte 0 on every chunk decode, serving them from in-worker
+ * memory in 0ms without hitting the network.
+ */
+async function createAudioDecoderWorkerWithHeaderCache(
+  wasmUrl: string,
+  streamSource: string | WasmAudioStreamConfig,
+  options: { stream?: boolean },
+): Promise<AudioDecoderWorker> {
+  const isBrowser =
+    typeof window !== "undefined" &&
+    typeof window.Worker === "function" &&
+    typeof Blob !== "undefined" &&
+    typeof URL !== "undefined" &&
+    typeof URL.createObjectURL === "function";
+
+  if (!isBrowser) {
+    return getAudioDecoderWorker(wasmUrl, streamSource, options);
+  }
+
+  const OrigWorker = window.Worker;
+  let hooked = false;
+
+  const PatchedWorker = function (scriptURL: string | URL, workerOptions?: WorkerOptions) {
+    const urlStr = typeof scriptURL === "string" ? scriptURL : scriptURL.toString();
+    if (urlStr.startsWith("blob:")) {
+      try {
+        const shimCode = `
+(function() {
+  var OrigXHR = self.XMLHttpRequest;
+  if (!OrigXHR) return;
+  var cachedHeader = null;
+  var cachedHeaderUrl = null;
+
+  function WrappedXHR() {
+    var xhr = new OrigXHR();
+    var isHeader = false;
+    var reqUrl = "";
+    var rangeEnd = 0;
+
+    var origOpen = xhr.open;
+    xhr.open = function(method, url) {
+      reqUrl = typeof url === "string" ? url : String(url);
+      return origOpen.apply(xhr, arguments);
+    };
+
+    var origSetHeader = xhr.setRequestHeader;
+    xhr.setRequestHeader = function(header, value) {
+      if (typeof header === "string" && header.toLowerCase() === "range" && typeof value === "string") {
+        var m = /^bytes=0-([0-9]+)$/.exec(value.trim());
+        if (m) {
+          isHeader = true;
+          rangeEnd = parseInt(m[1], 10);
+        }
+      }
+      return origSetHeader.apply(xhr, arguments);
+    };
+
+    var origSend = xhr.send;
+    xhr.send = function(body) {
+      if (isHeader && cachedHeader && cachedHeaderUrl === reqUrl && cachedHeader.byteLength >= rangeEnd + 1) {
+        Object.defineProperty(xhr, "status", { value: 206, writable: true, configurable: true });
+        Object.defineProperty(xhr, "statusText", { value: "Partial Content", writable: true, configurable: true });
+        Object.defineProperty(xhr, "response", { value: cachedHeader.slice(0, rangeEnd + 1), writable: true, configurable: true });
+        Object.defineProperty(xhr, "readyState", { value: 4, writable: true, configurable: true });
+        return;
+      }
+
+      origSend.apply(xhr, arguments);
+
+      if (isHeader && (xhr.status === 200 || xhr.status === 206) && xhr.response) {
+        try {
+          cachedHeader = xhr.response.slice ? xhr.response.slice(0) : new Uint8Array(xhr.response).buffer;
+          cachedHeaderUrl = reqUrl;
+        } catch (_) {}
+      }
+    };
+
+    return xhr;
+  }
+
+  WrappedXHR.prototype = OrigXHR.prototype;
+  WrappedXHR.DONE = OrigXHR.DONE;
+  WrappedXHR.HEADERS_RECEIVED = OrigXHR.HEADERS_RECEIVED;
+  WrappedXHR.LOADING = OrigXHR.LOADING;
+  WrappedXHR.OPENED = OrigXHR.OPENED;
+  WrappedXHR.UNSENT = OrigXHR.UNSENT;
+
+  self.XMLHttpRequest = WrappedXHR;
+})();
+importScripts(${JSON.stringify(urlStr)});
+`;
+        const blob = new Blob([shimCode], { type: "application/javascript" });
+        const wrapperUrl = URL.createObjectURL(blob);
+        return new OrigWorker(wrapperUrl, workerOptions);
+      } catch (err) {
+        console.warn("WasmStreamingDecoder: Failed to inject worker header cache shim", err);
+      }
+    }
+    return new OrigWorker(scriptURL, workerOptions);
+  } as any;
+
+  PatchedWorker.prototype = OrigWorker.prototype;
+
+  try {
+    window.Worker = PatchedWorker;
+    hooked = true;
+    return await getAudioDecoderWorker(wasmUrl, streamSource, options);
+  } finally {
+    if (hooked && window.Worker === PatchedWorker) {
+      window.Worker = OrigWorker;
+    }
+  }
+}
 
 export class WasmStreamingDecoder extends BaseAudioDecoder {
   private worker: AudioDecoderWorker | undefined;
   private rawChunks: (Float32Array | undefined)[][] = [];
   private chunkAccessHistory: number[] = [];
+  private chunkAttempts = new Map<number, number>();
   private MAX_CACHED_CHUNKS = 200;
   samplesPerChunk = 160000;
   private totalChunks = 0;
@@ -104,9 +226,9 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
         const visibleStart = scrollLeft * this._duration;
         const visibleEnd = visibleStart + visibleDuration;
 
-        // Add 30 seconds of padding on both sides to buffer/prefetch ahead/behind
+        // Add 30 seconds behind, 90 seconds forward to buffer/prefetch ahead of playhead/scroll
         const paddedStart = Math.max(0, visibleStart - 30);
-        const paddedEnd = Math.min(this._duration, visibleEnd + 30);
+        const paddedEnd = Math.min(this._duration, visibleEnd + 90);
 
         if (chunkEnd >= paddedStart && chunkStart <= paddedEnd) {
           loaded = true;
@@ -126,8 +248,8 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
   async init(arraybuffer?: ArrayBuffer): Promise<void> {
     if (this.worker) return;
 
-    // Initialize the WASM worker in streaming mode
-    this.worker = await getAudioDecoderWorker(decodeAudioWasmUrl, this.src, { stream: true });
+    // Initialize the WASM worker in streaming mode with header cache
+    this.worker = await createAudioDecoderWorkerWithHeaderCache(decodeAudioWasmUrl, this.src, { stream: true });
 
     this._channelCount = this.worker.channelCount;
     this._sampleRate = this.worker.sampleRate;
@@ -287,7 +409,27 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
 
   private async drainQueue() {
     try {
-      while (!this.isDisposed && this.worker && this.loadQueue.size > 0) {
+      while (!this.isDisposed && this.worker) {
+        if (this.loadQueue.size === 0) {
+          // Self-healing sweep: if any visible chunks remain unloaded and unqueued, enqueue the next batch
+          const vis = this.computeVisibleRange();
+          if (vis) {
+            const startChunk = Math.max(0, Math.floor(vis.start / 10));
+            const endChunk = Math.min(this.totalChunks - 1, Math.ceil(vis.end / 10));
+            for (let c = startChunk; c <= endChunk; c++) {
+              if (!this.rawChunks[0]?.[c] && !this.loadingChunks.has(c) && !this.loadQueue.has(c)) {
+                if (this.shouldLoadChunk(c)) {
+                  this.loadQueue.set(c, false);
+                  if (this.loadQueue.size >= 12) break;
+                }
+              }
+            }
+          }
+          if (this.loadQueue.size === 0) {
+            break;
+          }
+        }
+
         const chunkIndex = this.pickNextChunk();
         if (chunkIndex === undefined) break;
         const isPrefetch = this.loadQueue.get(chunkIndex) ?? false;
@@ -313,7 +455,11 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       this.draining = false;
       // Chunks enqueued during the final await (e.g. prefetch or a view change)
       // get their own ordered pass.
-      if (!this.isDisposed && this.loadQueue.size > 0) this.kickDrain();
+      if (!this.isDisposed && this.worker && this.loadQueue.size > 0) {
+        this.kickDrain();
+      } else if (!this.isDisposed && this.loadingChunks.size === 0) {
+        this.invoke("drained");
+      }
     }
   }
 
@@ -510,6 +656,7 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
       }
 
       this.touchChunk(chunkIndex);
+      this.chunkAttempts.delete(chunkIndex);
 
       this.invoke("progress", [chunkIndex, this.totalChunks]);
       this.invoke("chunkLoaded", [chunkIndex]);
@@ -533,7 +680,28 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
         }
       }
 
-      throw e;
+      // If it is a network/decode error or retry failed, attempt up to 3 times with backoff
+      const currentAttempts = this.chunkAttempts.get(chunkIndex) ?? 0;
+      if (currentAttempts < 3 && !this.isDisposed) {
+        this.chunkAttempts.set(chunkIndex, currentAttempts + 1);
+        const delay = Math.min(2000, 400 * 2 ** currentAttempts);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.fetchChunkData(chunkIndex, isRetry);
+      }
+
+      // If chunk permanently failed after retries, fill with silence to unblock decoding pipeline
+      console.warn(
+        `WasmStreamingDecoder: Chunk ${chunkIndex} failed after ${currentAttempts} attempts, filling silence:`,
+        e,
+      );
+      const samplesInChunk = Math.round(chunkDuration * this._sampleRate);
+      for (let c = 0; c < this._channelCount; c++) {
+        this.rawChunks[c][chunkIndex] = new Float32Array(samplesInChunk);
+      }
+      this.touchChunk(chunkIndex);
+      this.chunkAttempts.delete(chunkIndex);
+      this.invoke("progress", [chunkIndex + 1, this.totalChunks]);
+      this.invoke("chunkLoaded", [chunkIndex]);
     }
   }
 
@@ -551,6 +719,18 @@ export class WasmStreamingDecoder extends BaseAudioDecoder {
     if (prev1 >= 0 && !this.rawChunks[0][prev1]) {
       this.loadChunk(prev1, true);
     }
+  }
+
+  cancel() {
+    // For streaming decoders, cancel clears transient in-flight load queues but keeps
+    // the worker and cache alive so subsequent scrolling, seeks, and playback can continue streaming.
+    this.loadQueue.clear();
+    this.loadingChunks.clear();
+  }
+
+  destroy() {
+    super.removeAllListeners();
+    this.dispose();
   }
 
   protected dispose() {

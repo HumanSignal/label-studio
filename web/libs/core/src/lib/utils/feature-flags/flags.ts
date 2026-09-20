@@ -199,6 +199,11 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
+ * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
+ */
+export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
+
+/**
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
  */
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";

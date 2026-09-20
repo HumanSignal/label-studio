@@ -117,4 +117,37 @@ describe("effectiveHotkeys", () => {
     effectiveHotkeys.apply({ account: {} });
     expect(listener).toHaveBeenCalledTimes(1);
   });
+
+  it("getFlatKeymap provides qualified and unqualified keys from defaults and custom overrides", () => {
+    effectiveHotkeys.bootstrap();
+    effectiveHotkeys.apply({
+      account: {
+        "AudioCanvas:playPause": { key: "p", active: true },
+        "audio:audio:zoom-in": { key: "=", active: true },
+      },
+      project: {
+        "AudioCanvas:deleteRegion": { key: "del", active: true },
+        "audio:audio:playpause": { key: "ctrl+k", active: true },
+      },
+    });
+
+    const customs = effectiveHotkeys.getCustomHotkeys();
+    expect(customs["AudioCanvas:playPause"].key).toBe("p");
+    expect(customs["AudioCanvas:deleteRegion"].key).toBe("del");
+
+    const flat = effectiveHotkeys.getFlatKeymap();
+    // Default from editor_keymap
+    expect(flat["annotation:submit"]).toBe("ctrl+enter");
+    expect(flat["submit"]).toBe("ctrl+enter");
+
+    // Account customs
+    expect(flat["AudioCanvas:playPause"]).toBe("p");
+    expect(flat["playPause"]).toBe("p");
+
+    // Project customs
+    expect(flat["AudioCanvas:deleteRegion"]).toBe("del");
+    expect(flat["deleteRegion"]).toBe("del");
+    expect(flat["audio:audio:playpause"]).toBe("ctrl+k");
+    expect(flat["audio:playpause"]).toBe("ctrl+k");
+  });
 });

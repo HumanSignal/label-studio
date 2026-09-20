@@ -276,6 +276,24 @@ export const DEFAULT_HOTKEYS = [
     description: "Step forward one frame",
     active: true,
   },
+  {
+    id: 2710,
+    section: "audio",
+    element: "audio:zoom-in",
+    label: "Zoom In",
+    key: "=",
+    description: "Increase waveform zoom level",
+    active: true,
+  },
+  {
+    id: 2720,
+    section: "audio",
+    element: "audio:zoom-out",
+    label: "Zoom Out",
+    key: "-",
+    description: "Decrease waveform zoom level",
+    active: true,
+  },
 
   // Editor - Video Controls
   {
@@ -745,6 +763,65 @@ export const HOTKEY_SECTIONS = [
     description: "Shortcuts for navigating phrases and regions in paragraph/dialogue view",
   },
 ];
+
+let dynamicSections = [];
+let dynamicHotkeys = [];
+const dynamicSubscribers = new Set();
+
+let dynamicVersion = 0;
+
+const notifyDynamicSubscribers = () => {
+  dynamicVersion += 1;
+  for (const sub of dynamicSubscribers) {
+    try {
+      sub();
+    } catch (err) {
+      console.error("Error in dynamic hotkey subscriber:", err);
+    }
+  }
+};
+
+export const registerDynamicHotkeySection = (section, hotkeys = []) => {
+  if (!section || !section.id) return;
+  const existingIndex = dynamicSections.findIndex((s) => s.id === section.id);
+  if (existingIndex >= 0) {
+    dynamicSections[existingIndex] = section;
+  } else {
+    dynamicSections.push(section);
+  }
+
+  // Remove existing hotkeys for this section before re-adding
+  dynamicHotkeys = dynamicHotkeys.filter((h) => h.section !== section.id);
+  for (const h of hotkeys) {
+    dynamicHotkeys.push(h);
+  }
+  notifyDynamicSubscribers();
+};
+
+export const unregisterDynamicHotkeySection = (sectionId) => {
+  if (!sectionId) return;
+  dynamicSections = dynamicSections.filter((s) => s.id !== sectionId);
+  dynamicHotkeys = dynamicHotkeys.filter((h) => h.section !== sectionId);
+  notifyDynamicSubscribers();
+};
+
+export const clearDynamicHotkeySections = () => {
+  if (dynamicSections.length === 0 && dynamicHotkeys.length === 0) return;
+  dynamicSections = [];
+  dynamicHotkeys = [];
+  notifyDynamicSubscribers();
+};
+
+export const subscribeDynamicHotkeys = (listener) => {
+  dynamicSubscribers.add(listener);
+  return () => {
+    dynamicSubscribers.delete(listener);
+  };
+};
+
+export const getDynamicVersion = () => dynamicVersion;
+export const getDynamicSections = () => [...dynamicSections];
+export const getDynamicHotkeys = () => [...dynamicHotkeys];
 
 /**
  * URL patterns mapped to their corresponding hotkey sections
