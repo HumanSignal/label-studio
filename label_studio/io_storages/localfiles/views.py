@@ -5,15 +5,14 @@ HTTP views dedicated to LocalFiles storage download operations.
 import logging
 import mimetypes
 import os
-import posixpath
 from pathlib import Path
 from typing import Optional
 
 from django.conf import settings
 from django.db.models import CharField, F, Value
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotModified
-from django.utils._os import safe_join
 from drf_spectacular.utils import extend_schema
+from io_storages.localfiles.functions import build_local_files_path, is_within_storage
 from io_storages.localfiles.models import LocalFilesImportStorage
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.decorators import api_view, permission_classes
@@ -33,12 +32,6 @@ def _if_none_match_satisfied(header_value: Optional[str], etag: str) -> bool:
         return False
     etag_candidates = [candidate.strip() for candidate in header_value.split(',') if candidate.strip()]
     return '*' in etag_candidates or etag in etag_candidates
-
-
-def _is_within_storage(directory: str, storage_path: str) -> bool:
-    # SQL startswith is a plain string prefix: storage /data/ds would also match /data/ds-private
-    root = storage_path.rstrip(os.sep)
-    return directory == root or directory.startswith(root + os.sep)
 
 
 def build_localfile_response(
@@ -97,11 +90,8 @@ def localfiles_data(request):
             'please check docs: https://labelstud.io/guide/storage.html#Local-storage'
         )
 
-    local_serving_document_root = settings.LOCAL_FILES_DOCUMENT_ROOT
     if path and request.user.is_authenticated:
-        # Normalize the incoming relative path so we don't depend on trailing slashes
-        path = posixpath.normpath(path).lstrip('/')
-        full_path = Path(safe_join(local_serving_document_root, path))
+        full_path = Path(build_local_files_path(path))
         user_has_permissions = False
 
         # Storage paths are normalized on save/migration, so prefix matches using the
@@ -112,7 +102,7 @@ def localfiles_data(request):
         ).filter(_full_path__startswith=F('path'))
         if localfiles_storage.exists():
             user_has_permissions = any(
-                _is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
+                is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
                 for storage in localfiles_storage
             )
 
