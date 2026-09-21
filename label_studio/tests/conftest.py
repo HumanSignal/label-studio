@@ -74,8 +74,8 @@ def disable_sentry(settings):
 
 
 @pytest.fixture()
-def debug_modal_exceptions_false(settings):
-    settings.DEBUG_MODAL_EXCEPTIONS = False
+def debug_modal_exceptions_true(settings):
+    settings.DEBUG_MODAL_EXCEPTIONS = True
 
 
 @pytest.fixture(scope='function')
