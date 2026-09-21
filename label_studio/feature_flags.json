@@ -5847,6 +5847,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_interfaces_components": {
+      "key": "fflag_interfaces_components",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c9b57c5b9cf8463a95471e094fb4f8c2",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_root_212_reduce_importstoragelink_counts": {
       "key": "fflag_root_212_reduce_importstoragelink_counts",
       "on": true,
