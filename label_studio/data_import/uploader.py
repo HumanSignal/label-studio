@@ -107,6 +107,7 @@ def allowlist_svg(dirty_xml):
         links=True,
         add_nofollow=False,
         page_structure=True,
+        # on* handlers are stripped by javascript=True regardless; HTML-only safe_attrs would strip SVG geometry
         safe_attrs_only=False,
         remove_unknown_tags=False,
     )
