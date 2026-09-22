@@ -7,6 +7,7 @@
 import { inject, observer } from "mobx-react";
 import type React from "react";
 import { memo, type ReactElement } from "react";
+import { normalizeReviewAcceptedState, resolveReviewBarCopy } from "@humansignal/core";
 import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
@@ -56,7 +57,8 @@ export const AcceptButton = memo(
   observer(({ disabled, history, store }: AcceptButtonProps) => {
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
-    const hasChanges = history.canUndo || annotation.versions.draft;
+    const hasChanges = Boolean(history.canUndo || annotation.versions.draft);
+    const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
     const isDisabled = disabled || hasIncompleteRegions;
     const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
@@ -78,7 +80,7 @@ export const AcceptButton = memo(
           }}
           data-testid="bottombar-accept-button"
         >
-          {hasChanges ? "Fix + Accept" : "Accept"}
+          {reviewCopy.acceptLabel}
         </Button>
       </Tooltip>
     );
@@ -92,7 +94,6 @@ export const RejectButtonDefinition = {
   variant: "negative",
   look: "outlined",
   ariaLabel: "reject-annotation",
-  tooltip: "Reject annotation: [ Ctrl+Space ]",
   // @todo we need this for types compatibility, but better to fix CustomButtonType
   disabled: false,
 };

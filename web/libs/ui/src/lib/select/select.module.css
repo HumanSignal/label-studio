@@ -28,6 +28,7 @@
   background: var(--color-neutral-background);
   transition:
     background 150ms ease-out,
+    color 150ms ease-out,
     border-color 150ms ease-out;
 
   font-size: var(--select-trigger-font-size);
@@ -43,11 +44,12 @@
     border: 1px solid var(--color-neutral-border-bold);
   }
 
-  &:focus {
-    background: var(--color-neutral-surface-hover);
+  &:focus-visible {
+    background-color: var(--color-neutral-surface-hover);
     box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%) inset;
     color: var(--color-neutral-content);
-    outline: none;
+    outline: 2px solid var(--color-primary-focus-outline);
+    border-color: var(--color-neutral-border-bold);
   }
 
   &.isOpen {
@@ -60,7 +62,7 @@
   &.isDisabled {
     color: var(--color-neutral-content-subtlest);
     background: var(--color-neutral-surface);
-    box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%) inset;
+    box-shadow: none;
     filter: none;
     cursor: not-allowed;
   }
@@ -146,7 +148,6 @@
 
     &:focus-visible {
       outline: 2px solid var(--color-primary-border);
-      outline-offset: -2px;
       border-radius: var(--border-radius-medium);
     }
   }

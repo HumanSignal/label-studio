@@ -21,4 +21,5 @@ def test_add_user(django_live_url, business_client):
         }
     )
 
+    assert u.last_activity is None
     assert u.id in [u.id for u in ls.get_users()]

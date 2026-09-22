@@ -55,4 +55,44 @@ describe("accountSettingsSections", () => {
     expect(ids).not.toContain("personal-access-token");
     expect(ids).not.toContain("legacy-token");
   });
+
+  it("includes Hotkeys section for standard users", () => {
+    const sections = accountSettingsSections(settings, permissions, []);
+    const ids = sections.map((section) => section.id);
+
+    expect(ids).toContain("hotkeys");
+  });
+
+  it("hides Hotkeys section when user has View-Only organization membership role", () => {
+    const viewOnlyUser = {
+      organization_membership: { role: "VO" },
+    };
+    const sections = accountSettingsSections(settings, permissions, [], viewOnlyUser as any);
+    const ids = sections.map((section) => section.id);
+
+    expect(ids).not.toContain("hotkeys");
+  });
+
+  it("hides Hotkeys section when user has View-Only user_type", () => {
+    const viewOnlyUser = {
+      user_type: "viewonly",
+    };
+    const sections = accountSettingsSections(settings, permissions, [], viewOnlyUser as any);
+    const ids = sections.map((section) => section.id);
+
+    expect(ids).not.toContain("hotkeys");
+  });
+
+  it("hides Hotkeys section when window.APP_SETTINGS indicates View-Only role", () => {
+    const originalAppSettings = window.APP_SETTINGS;
+    try {
+      (window as any).APP_SETTINGS = { user: { role: "VO" } };
+      const sections = accountSettingsSections(settings, permissions, []);
+      const ids = sections.map((section) => section.id);
+
+      expect(ids).not.toContain("hotkeys");
+    } finally {
+      window.APP_SETTINGS = originalAppSettings;
+    }
+  });
 });

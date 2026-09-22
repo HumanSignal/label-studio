@@ -2,6 +2,7 @@
 
 import os
 
+from core.utils.exceptions import SsrfBlockedUrlError
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework.exceptions import ValidationError
@@ -25,6 +26,8 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
         storage = RedisImportStorage(**data)
         try:
             storage.validate_connection()
+        except SsrfBlockedUrlError:
+            raise
         except:  # noqa: E722
             raise ValidationError("Can't connect to Redis server.")
         return data

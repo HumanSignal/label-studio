@@ -144,7 +144,7 @@ INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
-DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', False)
 
 # Whether to verify SSL certs when making external requests, eg in the uploader
 # ⚠️ Turning this off means assuming risk. ⚠️
@@ -341,6 +341,9 @@ AUTHENTICATION_BACKENDS = [
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
+
+# Creating extra organizations via POST /api/organizations/ is opt-in: most deployments are single-org
+ALLOW_ORGANIZATION_CREATION = get_bool_env('ALLOW_ORGANIZATION_CREATION', False)
 
 # Password validation settings
 AUTH_PASSWORD_MIN_LENGTH = 8
@@ -1131,3 +1134,9 @@ MIGRATION_JOB_START_DELAY_SECONDS = int(get_env('MIGRATION_JOB_START_DELAY_SECON
 # Delay (seconds) before a migration runner retries when the target import fails (stale worker
 # not yet upgraded during a rolling deploy). Short, since this is a fast retry loop.
 MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS = int(get_env('MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS', 30))
+
+# When an async migration waits on another AsyncMigrationStatus row, retry this often.
+MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS = int(get_env('MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS', 15 * 60))
+
+# Cap how long a dependent job waits (delay * max retries ~= 24 hours at the defaults).
+MIGRATION_DEPENDENCY_MAX_RETRIES = int(get_env('MIGRATION_DEPENDENCY_MAX_RETRIES', 96))

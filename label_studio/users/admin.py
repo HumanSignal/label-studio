@@ -90,8 +90,9 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         """
         import importlib
 
-        from core.migration_helpers import execute_sql_job
+        from core.migration_helpers import dependency_retry_policy, execute_sql_job
         from core.redis import start_job_async_or_sync
+        from django.conf import settings
 
         executed_count = 0
         skipped_count = 0
@@ -127,14 +128,21 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
                 self._mark_migration_error(migration, 'sql_forwards not found in migration module')
                 error_count += 1
                 continue
+            if callable(sql_fw):
+                sql_fw = sql_fw()
 
             try:
+                module_deps = getattr(module, 'ASYNC_MIGRATION_DEPENDENCIES', None)
+                dependencies = list((migration.meta or {}).get('dependencies') or module_deps or ())
                 start_job_async_or_sync(
                     execute_sql_job,
                     migration_name=migration.name,
                     sql=sql_fw,
                     reverse=False,
+                    dependencies=dependencies,
                     queue_name='default',
+                    job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
+                    retry=dependency_retry_policy() if dependencies else None,
                 )
                 migration.status = migration.STATUS_STARTED
                 migration.save()

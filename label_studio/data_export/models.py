@@ -16,6 +16,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
 from tasks.models import Annotation
 
@@ -165,6 +166,7 @@ class DataExport(object):
             download_resources=download_resources,
             access_token=project.organization.created_by.auth_token.key,
             hostname=hostname,
+            local_files_resolver=project_local_files_resolver(project),
         )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)

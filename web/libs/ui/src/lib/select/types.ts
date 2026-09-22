@@ -135,6 +135,13 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   selectAllLabel?: string;
   /** When true (requires `multiple` + `groupBy`), shows "All" / "None" bulk-toggle buttons on group header hover. Fires a single `onChange` with the full updated array. */
   showGroupActions?: boolean;
+  /**
+   * Which trigger edge the dropdown is anchored to. Defaults to `"start"` (panel's leading edge on
+   * the trigger's leading edge). Pass `"end"` to anchor the trailing edges instead — useful for a
+   * panel wider than its trigger that would otherwise overflow the viewport, since Radix's `flip`
+   * only flips the *side* (bottom↔top) and never the alignment.
+   */
+  align?: "start" | "center" | "end";
 } & SelectVirtualizedProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
 

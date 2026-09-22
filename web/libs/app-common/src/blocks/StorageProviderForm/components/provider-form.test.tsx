@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ProviderForm } from "./provider-form";
-import type { ProviderConfig } from "../types/provider";
+import type { FieldDefinition } from "../types/common";
+import { coalesceSelectFieldValue, type ProviderConfig } from "../types/provider";
 import { z } from "zod";
 
 /**
@@ -190,5 +191,144 @@ describe("ProviderForm visibleWhen with function values", () => {
     );
 
     expect(screen.queryByText("Advanced Option")).not.toBeInTheDocument();
+  });
+});
+
+describe("ProviderForm message visibleWhen", () => {
+  const createProviderWithMessages = (): ProviderConfig => ({
+    name: "test-provider-messages",
+    title: "Test Provider",
+    description: "Test provider with conditional message banners",
+    fields: [
+      {
+        name: "auth_mode",
+        type: "select",
+        label: "Authentication Method",
+        required: true,
+        defaultValue: "service_principal",
+        options: [
+          { value: "service_principal", label: "Service Principal (client secret)" },
+          { value: "workload_identity", label: "Workload identity / managed identity (no secret)" },
+        ],
+        schema: z.string(),
+      },
+      {
+        name: "info_sp",
+        type: "message",
+        content: <div>Service principal permissions docs</div>,
+        visibleWhen: { field: "auth_mode", value: "service_principal" },
+      },
+      {
+        name: "info_wi",
+        type: "message",
+        content: <div>Cluster identity and Blob RBAC</div>,
+        visibleWhen: { field: "auth_mode", value: "workload_identity" },
+      },
+      {
+        name: "info_always",
+        type: "message",
+        content: <div>Always visible banner</div>,
+      },
+    ],
+    layout: [{ fields: ["auth_mode"] }, { fields: ["info_sp"] }, { fields: ["info_wi"] }, { fields: ["info_always"] }],
+  });
+
+  it("shows the matching message and hides the other when visibleWhen is set", () => {
+    render(
+      <ProviderForm
+        provider={createProviderWithMessages()}
+        formData={{ auth_mode: "service_principal" }}
+        errors={{}}
+        onChange={mock()}
+      />,
+    );
+
+    expect(screen.getByText("Service principal permissions docs")).toBeInTheDocument();
+    expect(screen.queryByText("Cluster identity and Blob RBAC")).not.toBeInTheDocument();
+    expect(screen.getByText("Always visible banner")).toBeInTheDocument();
+  });
+
+  it("swaps message banners when the dependency value changes", () => {
+    render(
+      <ProviderForm
+        provider={createProviderWithMessages()}
+        formData={{ auth_mode: "workload_identity" }}
+        errors={{}}
+        onChange={mock()}
+      />,
+    );
+
+    expect(screen.queryByText("Service principal permissions docs")).not.toBeInTheDocument();
+    expect(screen.getByText("Cluster identity and Blob RBAC")).toBeInTheDocument();
+    expect(screen.getByText("Always visible banner")).toBeInTheDocument();
+  });
+});
+
+describe("ProviderForm legacy null auth_mode edit", () => {
+  const createLegacySpiProvider = (): ProviderConfig => ({
+    name: "azure_spi",
+    title: "Azure SPI",
+    description: "Legacy edit parity",
+    fields: [
+      {
+        name: "auth_mode",
+        type: "select",
+        label: "Authentication Method",
+        required: true,
+        defaultValue: "service_principal",
+        options: [
+          { value: "service_principal", label: "Service Principal (client secret)" },
+          { value: "workload_identity", label: "Workload identity / managed identity (no secret)" },
+        ],
+        schema: z.string(),
+      },
+      {
+        name: "tenant_id",
+        type: "text",
+        label: "Tenant ID",
+        required: true,
+        schema: z.string(),
+        visibleWhen: { field: "auth_mode", value: "service_principal" },
+      },
+      {
+        name: "client_id",
+        type: "text",
+        label: "Client ID",
+        schema: z.string().optional(),
+      },
+    ],
+    layout: [{ fields: ["auth_mode"] }, { fields: ["tenant_id"] }, { fields: ["client_id"] }],
+  });
+
+  it("hides Tenant ID when auth_mode is still null", () => {
+    render(
+      <ProviderForm
+        provider={createLegacySpiProvider()}
+        formData={{ auth_mode: null, tenant_id: "tenant", client_id: "client" }}
+        errors={{}}
+        onChange={mock()}
+      />,
+    );
+
+    expect(screen.queryByText("Tenant ID")).not.toBeInTheDocument();
+    expect(screen.getByText("Client ID")).toBeInTheDocument();
+  });
+
+  it("shows Tenant ID after coalescing null auth_mode to the select default", () => {
+    const provider = createLegacySpiProvider();
+    const authMode = provider.fields.find((field) => field.name === "auth_mode") as FieldDefinition;
+    const coalescedAuthMode = coalesceSelectFieldValue(authMode, null);
+
+    render(
+      <ProviderForm
+        provider={provider}
+        formData={{ auth_mode: coalescedAuthMode, tenant_id: "tenant", client_id: "client" }}
+        errors={{}}
+        onChange={mock()}
+      />,
+    );
+
+    expect(screen.getByText("Tenant ID")).toBeInTheDocument();
+    expect(screen.getByText("Client ID")).toBeInTheDocument();
   });
 });

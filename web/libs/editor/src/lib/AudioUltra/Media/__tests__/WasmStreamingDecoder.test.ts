@@ -305,6 +305,25 @@ describe("WasmStreamingDecoder", () => {
     });
   });
 
+  describe("cancel", () => {
+    it("clears load queues without disposing worker or marking isDisposed", async () => {
+      await decoder.init();
+      (decoder as any).loadQueue.set(1, false);
+      (decoder as any).loadingChunks.add(1);
+
+      decoder.cancel();
+
+      expect((decoder as any).loadQueue.size).toBe(0);
+      expect((decoder as any).loadingChunks.size).toBe(0);
+      expect((decoder as any).isDisposed).toBe(false);
+      expect(mockDispose).not.toHaveBeenCalled();
+
+      decoder.destroy();
+      expect((decoder as any).isDisposed).toBe(true);
+      expect(mockDispose).toHaveBeenCalled();
+    });
+  });
+
   describe("dispose", () => {
     it("calls worker dispose and cleans up pending timers", async () => {
       await decoder.init();

@@ -296,6 +296,7 @@ export const Select = forwardRef(
       selectAllLabel,
       showGroupActions = false,
       open: controlledOpen,
+      align = "start",
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -320,6 +321,12 @@ export const Select = forwardRef(
     useEffect(() => {
       if (!isDefined(externalValue)) {
         const emptyVal = multiple ? [] : undefined;
+        if (multiple) {
+          const current = valueRef.current;
+          if (Array.isArray(current) && current.length === 0) return;
+        } else if (valueRef.current === emptyVal) {
+          return;
+        }
         valueRef.current = emptyVal;
         setValue(emptyVal);
         return;
@@ -329,6 +336,16 @@ export const Select = forwardRef(
         val = [val];
       } else if (!multiple && Array.isArray(val)) {
         val = val[0];
+      }
+      // Skip no-op syncs for multi-select arrays — identical contents with a new
+      // reference would otherwise re-render the open cmdk list on every parent paint.
+      if (multiple && Array.isArray(val) && Array.isArray(valueRef.current)) {
+        const prev = valueRef.current as unknown[];
+        if (prev.length === val.length && prev.every((item, index) => item === val[index])) {
+          return;
+        }
+      } else if (!multiple && valueRef.current === val) {
+        return;
       }
       valueRef.current = val;
       setValue(val);
@@ -745,13 +762,18 @@ export const Select = forwardRef(
           <button
             variant="outline"
             aria-expanded={isOpen}
-            className={cnm(triggerClassName ?? "", styles.selectTrigger, {
-              [styles.isInline]: isInline,
-              [styles.isOpen]: isOpen,
-              [styles.isDisabled]: disabled,
-              [styles.sizeSmaller]: size === "smaller",
-              [styles.sizeSmall]: size === "small",
-            })}
+            className={cnm(
+              styles.selectTrigger,
+              {
+                [styles.isInline]: isInline,
+                [styles.isOpen]: isOpen,
+                [styles.isDisabled]: disabled,
+                [styles.sizeSmaller]: size === "smaller",
+                [styles.sizeSmall]: size === "small",
+              },
+              // Last so documented triggerClassName overrides (e.g. FilterShell value half).
+              triggerClassName,
+            )}
             type="button"
             data-testid={
               props?.dataTestid ??
@@ -777,13 +799,15 @@ export const Select = forwardRef(
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
+        <PopoverContent align={align} data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...
             </span>
           ) : (
             <Command shouldFilter={false}>
+              {/* Pinned above the search input and the selected-items panel, matching FilterShell operator toggles. */}
+              {props.header ? props.header : null}
               {searchable && (
                 <CommandInput
                   placeholder={searchPlaceholder ?? "Search"}
@@ -797,7 +821,8 @@ export const Select = forwardRef(
                 label="Select an option"
                 className={cnm({
                   "shadow-inner shadow-neutral-surface-inset border-t border-neutral-border shadow-": searchable,
-                  "max-h-none": footer !== undefined || isVirtualList,
+                  // The virtual list sizes itself to virtualListMaxVisible rows.
+                  "max-h-none": isVirtualList,
                 })}
               >
                 {/* Selected Items Group - Only for multiple + searchable + virtual lists */}
@@ -822,7 +847,6 @@ export const Select = forwardRef(
                 <CommandEmpty>{searchable ? "No results found." : ""}</CommandEmpty>
 
                 <CommandGroup>
-                  {props.header ? props.header : null}
                   {isVirtualList ? (
                     <InfiniteLoader
                       itemCount={itemCount ?? (isLazyVirtualList ? _options.length : renderedOptions.length)}
@@ -893,8 +917,9 @@ export const Select = forwardRef(
                     </>
                   )}
                 </CommandGroup>
-                {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
               </CommandList>
+              {/* Outside CommandList so it stays pinned while the options scroll. */}
+              {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
             </Command>
           )}
         </PopoverContent>

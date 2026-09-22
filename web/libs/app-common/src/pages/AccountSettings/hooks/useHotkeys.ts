@@ -14,8 +14,6 @@ import {
   type SaveResult,
 } from "../sections/Hotkeys/utils";
 
-const typedDefaultHotkeys: Hotkey[] = getTypedDefaultHotkeys();
-
 interface HotkeyApiResponse extends ApiResponse {
   $meta?: {
     status?: number;
@@ -74,10 +72,13 @@ const updateHotkeysWithCustomSettings = (defaultHotkeys: Hotkey[], customHotkeys
     };
   });
 
-export const computeProjectOverrides = (hotkeys: Hotkey[], accountHotkeys: CustomHotkeys): CustomHotkeys => {
-  const accountEffectiveHotkeys = hotkeysToCustomHotkeys(
-    updateHotkeysWithCustomSettings(typedDefaultHotkeys, accountHotkeys),
-  );
+export const computeProjectOverrides = (
+  hotkeys: Hotkey[],
+  accountHotkeys: CustomHotkeys,
+  baseDefaults?: Hotkey[],
+): CustomHotkeys => {
+  const defaults = baseDefaults ?? getTypedDefaultHotkeys({ includeDynamic: true });
+  const accountEffectiveHotkeys = hotkeysToCustomHotkeys(updateHotkeysWithCustomSettings(defaults, accountHotkeys));
   const currentHotkeys = hotkeysToCustomHotkeys(hotkeys);
 
   return Object.fromEntries(
@@ -145,6 +146,9 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
   const api = useAPI();
   const loadAbortRef = useRef<AbortController | null>(null);
   const projectId = scope.kind === "project" ? scope.projectId : undefined;
+  const isProject = scope.kind === "project";
+
+  const getDefaults = useCallback(() => getTypedDefaultHotkeys({ includeDynamic: isProject }), [isProject]);
 
   const loadHotkeysFromAPI = useCallback(async () => {
     loadAbortRef.current?.abort();
@@ -185,14 +189,14 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         effectiveHotkeys.apply({ account: accountHotkeys });
       }
 
-      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effective));
+      setHotkeys(updateHotkeysWithCustomSettings(getDefaults(), effective));
       setHotkeySettings(accountResponse?.hotkey_settings ?? {});
       setIsReadOnly(false);
     } catch (error) {
       if (controller.signal.aborted) return;
 
       console.error("Error loading hotkeys from API:", error);
-      setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys.getAccountBaseline()));
+      setHotkeys(updateHotkeysWithCustomSettings(getDefaults(), effectiveHotkeys.getAccountBaseline()));
       setHotkeySettings({});
 
       if (projectId !== undefined) {
@@ -209,14 +213,14 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
         setIsLoading(false);
       }
     }
-  }, [api, projectId, toast]);
+  }, [api, getDefaults, projectId, toast]);
 
   const saveHotkeysToAPI = useCallback(
     async (currentHotkeys: Hotkey[], currentSettings: HotkeySettings): Promise<SaveResult> => {
       const customHotkeys =
         projectId === undefined
           ? hotkeysToCustomHotkeys(currentHotkeys)
-          : computeProjectOverrides(currentHotkeys, effectiveHotkeys.getAccountBaseline());
+          : computeProjectOverrides(currentHotkeys, effectiveHotkeys.getAccountBaseline(), getDefaults());
 
       const requestBody = {
         custom_hotkeys: customHotkeys,
@@ -313,7 +317,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
                   type: ToastType.info,
                 });
               }
-              setHotkeys(updateHotkeysWithCustomSettings(typedDefaultHotkeys, effectiveHotkeys.getAccountBaseline()));
+              setHotkeys(updateHotkeysWithCustomSettings(getDefaults(), effectiveHotkeys.getAccountBaseline()));
               onSuccess?.();
             } else if (toast) {
               toast.show({

@@ -286,6 +286,7 @@ class App extends Component {
           showComments={store.hasInterface("annotations:comments")}
           showCustomTab={hasTagInSidebar(as.selected)}
           focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+          focusRequest={store.commentStore.panelFocusRequest}
         >
           {mainContent}
           {store.hasInterface("topbar") && <BottomBar store={store} />}

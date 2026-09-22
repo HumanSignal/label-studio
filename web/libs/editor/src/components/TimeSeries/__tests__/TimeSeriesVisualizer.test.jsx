@@ -2,6 +2,7 @@ import { render, act } from "@testing-library/react";
 import TimeSeriesVisualizer from "../TimeSeriesVisualizer";
 
 mockModule("@humansignal/ui", () => ({
+  ...requireActual("@humansignal/ui"),
   getCurrentTheme: mock(() => "Light"),
 }));
 

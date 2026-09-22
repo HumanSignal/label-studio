@@ -17,7 +17,7 @@ import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { SidebarMenu } from "apps/labelstudio/src/components/SidebarMenu/SidebarMenu";
 
 const AccountSettingsSection = () => {
-  const { permissions } = useAuth();
+  const { permissions, user } = useAuth();
   const { extraSections = [] } = useAccountSettingsExtension();
   const { sectionId } = useParams<{ sectionId: string }>();
   const settings = useAtomValue(settingsAtom);
@@ -27,9 +27,9 @@ const AccountSettingsSection = () => {
 
   const resolvedSections = useMemo(() => {
     return settings.data && !("error" in settings.data)
-      ? accountSettingsSections(settings.data, permissions, extraSections)
+      ? accountSettingsSections(settings.data, permissions, extraSections, user)
       : [];
-  }, [settings.data, permissions, extraSections]);
+  }, [settings.data, permissions, extraSections, user]);
 
   const currentSection = useMemo(
     () => resolvedSections.find((section) => section.id === sectionId),
@@ -94,13 +94,13 @@ const AccountSettingsPage = () => {
   const settings = useAtomValue(settingsAtom);
   const match = useRouteMatch();
   const { sectionId } = useParams<{ sectionId: string }>();
-  const { permissions } = useAuth();
+  const { permissions, user } = useAuth();
   const { extraSections = [] } = useAccountSettingsExtension();
   const resolvedSections = useMemo(() => {
     return settings.data && !("error" in settings.data)
-      ? accountSettingsSections(settings.data, permissions, extraSections)
+      ? accountSettingsSections(settings.data, permissions, extraSections, user)
       : [];
-  }, [settings.data, permissions, extraSections]);
+  }, [settings.data, permissions, extraSections, user]);
 
   const menuItems = useMemo(
     () =>

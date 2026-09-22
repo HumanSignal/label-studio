@@ -86,6 +86,14 @@ export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consens
 export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_columns";
 
 /**
+ * Reusable organization members filtering engine.
+ */
+export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable_members_filtering";
+
+/** Replace the existing table filter bar with FilterShell (UTC-1166). */
+export const FF_UTC_1166_FILTER_SHELL = "fflag_utc_1166_filter_shell";
+
+/**
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
@@ -191,6 +199,11 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
+ * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
+ */
+export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
+
+/**
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
  */
 export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
@@ -290,3 +303,9 @@ export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_
  * frontend checks it with an explicit ``false`` default rather than the app-wide flag default.
  */
 export const FF_MANUAL_BATCHES = "fflag_feat_utc_1260_manual_batches_short";
+
+/**
+ * Azure SPI secretless authentication: auth_mode=workload_identity uses constrained
+ * DefaultAzureCredential (workload identity + managed identity only). Default off.
+ */
+export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_spi_workload_identity_short";

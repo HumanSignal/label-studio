@@ -7,7 +7,7 @@ import { KeyboardKey } from "./Key";
 // @ts-ignore
 import { HOTKEY_SECTIONS, URL_TO_SECTION_MAPPING } from "./defaults";
 import type { Hotkey, Section } from "./utils";
-import { getTypedDefaultHotkeys } from "./utils";
+import { getDynamicSections, getHotkeySections, getTypedDefaultHotkeys, subscribeDynamicHotkeys } from "./utils";
 
 interface UrlMapping {
   regex: RegExp;
@@ -26,11 +26,11 @@ interface HotkeyHelpModalProps {
   sectionsToShow: string[];
 }
 
-const sections = HOTKEY_SECTIONS as Section[];
+const getCurrentSections = (): Section[] => getHotkeySections({ includeDynamic: true });
 const urlMappings = URL_TO_SECTION_MAPPING as UrlMapping[];
 
 const resolveCurrentHotkeys = (): Hotkey[] => {
-  const defaultHotkeys = getTypedDefaultHotkeys();
+  const defaultHotkeys = getTypedDefaultHotkeys({ includeDynamic: true });
 
   return defaultHotkeys.map((hotkey: Hotkey) => {
     const lookupKey = `${hotkey.section}:${hotkey.element}`;
@@ -60,8 +60,20 @@ const getHelpHotkeysSnapshot = (): Hotkey[] => {
   return helpSnapshot;
 };
 
+const subscribeToHotkeyChanges = (listener: () => void): (() => void) => {
+  const unsubEffective = effectiveHotkeys.subscribe(listener);
+  const unsubDynamic = subscribeDynamicHotkeys(() => {
+    helpSnapshot = null;
+    listener();
+  });
+  return () => {
+    unsubEffective();
+    unsubDynamic();
+  };
+};
+
 const useCurrentHotkeys = (): Hotkey[] =>
-  useSyncExternalStore(effectiveHotkeys.subscribe, getHelpHotkeysSnapshot, getHelpHotkeysSnapshot);
+  useSyncExternalStore(subscribeToHotkeyChanges, getHelpHotkeysSnapshot, getHelpHotkeysSnapshot);
 
 const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
   const hotkeys = useCurrentHotkeys();
@@ -79,7 +91,8 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
 
   const renderSection = useCallback(
     (sectionId: string) => {
-      const section = sections.find((s: Section) => s.id === sectionId);
+      const currentSections = getCurrentSections();
+      const section = currentSections.find((s: Section) => s.id === sectionId);
       if (!section) return null;
 
       const sectionHotkeys = hotkeys.filter((h: Hotkey) => h.section === sectionId);
@@ -117,11 +130,11 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                   {subgroup !== "default" && (
                     <div className="mb-3">
                       <div className="text-sm font-medium mb-1 capitalize">
-                        {sections.find((s: Section) => s.id === subgroup)?.title || subgroup}
+                        {currentSections.find((s: Section) => s.id === subgroup)?.title || subgroup}
                       </div>
-                      {sections.find((s: Section) => s.id === subgroup)?.description && (
+                      {currentSections.find((s: Section) => s.id === subgroup)?.description && (
                         <div className="text-xs text-neutral-content-subtler">
-                          {sections.find((s: Section) => s.id === subgroup)?.description}
+                          {currentSections.find((s: Section) => s.id === subgroup)?.description}
                         </div>
                       )}
                     </div>
@@ -214,8 +227,19 @@ const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => 
 
   sectionsToShow = [...new Set(sectionsToShow)];
 
+  // If dynamic sections are active (from an active custom interface project),
+  // append them so project-specific component shortcuts appear in the help modal!
+  const dynamicSections = getDynamicSections();
+  if (dynamicSections.length > 0) {
+    for (const ds of dynamicSections) {
+      if (!sectionsToShow.includes(ds.id)) {
+        sectionsToShow.push(ds.id);
+      }
+    }
+  }
+
   if (sectionsToShow.length === 0) {
-    sectionsToShow = sections.map((section: Section) => section.id);
+    sectionsToShow = getCurrentSections().map((section: Section) => section.id);
   }
 
   return sectionsToShow;

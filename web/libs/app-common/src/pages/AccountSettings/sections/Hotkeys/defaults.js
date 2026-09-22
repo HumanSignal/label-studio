@@ -13,9 +13,36 @@ export const DEFAULT_HOTKEYS = [
     id: 200,
     section: "annotation",
     element: "annotation:skip",
-    label: "Skip Task",
+    label: "Skip Task / Reject (default)",
     key: "ctrl+space",
-    description: "Skip the current task",
+    description: "Skip the current task, or reject with the project's default option",
+    active: true,
+  },
+  {
+    id: 210,
+    section: "annotation",
+    element: "annotation:reject-remove",
+    label: "Reject: No Rework",
+    key: "ctrl+shift+1",
+    description: "Reject without sending for rework",
+    active: true,
+  },
+  {
+    id: 220,
+    section: "annotation",
+    element: "annotation:reject-requeue",
+    label: "Reject: Return to Annotator",
+    key: "ctrl+shift+2",
+    description: "Reject and send back to the original annotator for rework",
+    active: true,
+  },
+  {
+    id: 230,
+    section: "annotation",
+    element: "annotation:reject-redistribute",
+    label: "Reject: Pass to Another Annotator",
+    key: "ctrl+shift+3",
+    description: "Reject and send to a different annotator",
     active: true,
   },
   {
@@ -247,6 +274,24 @@ export const DEFAULT_HOTKEYS = [
     label: "Step Forward",
     key: "alt+d",
     description: "Step forward one frame",
+    active: true,
+  },
+  {
+    id: 2710,
+    section: "audio",
+    element: "audio:zoom-in",
+    label: "Zoom In",
+    key: "=",
+    description: "Increase waveform zoom level",
+    active: true,
+  },
+  {
+    id: 2720,
+    section: "audio",
+    element: "audio:zoom-out",
+    label: "Zoom Out",
+    key: "-",
+    description: "Decrease waveform zoom level",
     active: true,
   },
 
@@ -718,6 +763,65 @@ export const HOTKEY_SECTIONS = [
     description: "Shortcuts for navigating phrases and regions in paragraph/dialogue view",
   },
 ];
+
+let dynamicSections = [];
+let dynamicHotkeys = [];
+const dynamicSubscribers = new Set();
+
+let dynamicVersion = 0;
+
+const notifyDynamicSubscribers = () => {
+  dynamicVersion += 1;
+  for (const sub of dynamicSubscribers) {
+    try {
+      sub();
+    } catch (err) {
+      console.error("Error in dynamic hotkey subscriber:", err);
+    }
+  }
+};
+
+export const registerDynamicHotkeySection = (section, hotkeys = []) => {
+  if (!section || !section.id) return;
+  const existingIndex = dynamicSections.findIndex((s) => s.id === section.id);
+  if (existingIndex >= 0) {
+    dynamicSections[existingIndex] = section;
+  } else {
+    dynamicSections.push(section);
+  }
+
+  // Remove existing hotkeys for this section before re-adding
+  dynamicHotkeys = dynamicHotkeys.filter((h) => h.section !== section.id);
+  for (const h of hotkeys) {
+    dynamicHotkeys.push(h);
+  }
+  notifyDynamicSubscribers();
+};
+
+export const unregisterDynamicHotkeySection = (sectionId) => {
+  if (!sectionId) return;
+  dynamicSections = dynamicSections.filter((s) => s.id !== sectionId);
+  dynamicHotkeys = dynamicHotkeys.filter((h) => h.section !== sectionId);
+  notifyDynamicSubscribers();
+};
+
+export const clearDynamicHotkeySections = () => {
+  if (dynamicSections.length === 0 && dynamicHotkeys.length === 0) return;
+  dynamicSections = [];
+  dynamicHotkeys = [];
+  notifyDynamicSubscribers();
+};
+
+export const subscribeDynamicHotkeys = (listener) => {
+  dynamicSubscribers.add(listener);
+  return () => {
+    dynamicSubscribers.delete(listener);
+  };
+};
+
+export const getDynamicVersion = () => dynamicVersion;
+export const getDynamicSections = () => [...dynamicSections];
+export const getDynamicHotkeys = () => [...dynamicHotkeys];
 
 /**
  * URL patterns mapped to their corresponding hotkey sections

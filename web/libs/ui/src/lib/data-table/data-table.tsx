@@ -982,7 +982,7 @@ export const Header = <T,>({
           group: stretching it lets the label shrink, and since the overflow is clipped from the start of a
           right-aligned string, a long label in a narrow column loses its first words ("ed to pay (est.)").
           An auto margin keeps the label at its content width and pushes it over instead. */}
-      <div className={cn("flex items-center gap-2", align === "right" && "ml-auto")}>
+      <div className={cn("flex items-center gap-2", align === "right" && "ml-auto", enableSorting && "truncate")}>
         {isStringHeader ? (
           <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
             {headerLabel}

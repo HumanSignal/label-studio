@@ -456,3 +456,14 @@ def schedule_activity_sync(force: bool = False) -> bool:
     except Exception as e:
         logger.error('Failed to schedule activity sync: %s', e)
         return False
+
+
+def stamp_last_activity_on_login(sender, user, request=None, **kwargs) -> None:
+    """Write last_activity on login so unused accounts stay NULL until a real session."""
+    if user is None or not getattr(user, 'pk', None):
+        return
+
+    current_time = django_timezone.now()
+    user.last_activity = current_time
+    user.save(update_fields=['last_activity'])
+    set_user_last_activity(user.id, current_time)

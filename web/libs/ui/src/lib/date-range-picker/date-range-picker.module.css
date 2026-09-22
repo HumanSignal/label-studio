@@ -19,6 +19,11 @@
   flex-direction: column;
 }
 
+.mainContentInert {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .calendarsWrapper {
   display: grid;
   grid-template-columns: 312px 312px;

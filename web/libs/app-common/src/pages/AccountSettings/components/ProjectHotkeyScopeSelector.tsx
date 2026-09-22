@@ -3,6 +3,12 @@ import { Message, Select, Typography } from "@humansignal/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
+const syncHotkeys = (proj?: Project | Record<string, unknown> | null) => {
+  import("../sections/Hotkeys/interfaceComponentsRegistry").then(({ syncProjectInterfaceHotkeys }) => {
+    syncProjectInterfaceHotkeys(proj as any);
+  });
+};
+
 const ACCOUNT_VALUE = "account";
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 250;
@@ -11,6 +17,9 @@ interface Project {
   id: number;
   title: string;
   workspace_title?: string | null;
+  use_custom_interface?: boolean;
+  custom_interface_code?: string | null;
+  custom_interface_params?: Record<string, unknown> | null;
 }
 
 interface ProjectsResponse {
@@ -86,6 +95,7 @@ export const ProjectHotkeyScopeSelector = ({
 
   useEffect(() => {
     if (parsedProject.status === "account") {
+      syncHotkeys(null);
       setSelectedProject(null);
       setHasAccessError(false);
       setIsResolving(false);
@@ -93,10 +103,14 @@ export const ProjectHotkeyScopeSelector = ({
       return;
     }
     if (parsedProject.status === "invalid") {
+      syncHotkeys(null);
       setSelectedProject(null);
       setHasAccessError(true);
       setIsResolving(false);
-      onResolutionChange?.({ status: "invalid", projectId: parsedProject.projectId });
+      onResolutionChange?.({
+        status: "invalid",
+        projectId: parsedProject.projectId,
+      });
       return;
     }
 
@@ -125,15 +139,40 @@ export const ProjectHotkeyScopeSelector = ({
         setSelectedProject(project ?? null);
         setHasAccessError(!project);
         setIsResolving(false);
+        if (project) {
+          if (project.use_custom_interface !== undefined) {
+            syncHotkeys(project);
+          } else {
+            void api
+              .callApi<ProjectInterfaceConfig>("project", {
+                params: { pk: projectId },
+                suppressError: true,
+              })
+              .then((fullProject) => {
+                if (requestId !== resolutionRequest.current) return;
+                syncHotkeys(fullProject ?? null);
+              })
+              .catch(() => {
+                syncHotkeys(project);
+              });
+          }
+        } else {
+          syncHotkeys(null);
+        }
         onResolutionChange?.(
           project
-            ? { status: "project", projectId: project.id, projectTitle: project.title }
+            ? {
+                status: "project",
+                projectId: project.id,
+                projectTitle: project.title,
+              }
             : { status: "invalid", projectId },
         );
       })
       .catch((error: unknown) => {
         if (requestId !== resolutionRequest.current || controller.signal.aborted) return;
         console.warn("Failed to resolve project hotkey scope:", error);
+        syncHotkeys(null);
         setSelectedProject(null);
         setHasAccessError(true);
         setIsResolving(false);
@@ -236,7 +275,11 @@ export const ProjectHotkeyScopeSelector = ({
           const projectId = Number(String(value).replace("project:", ""));
           const project = [selectedProject, ...projects].find((item) => item?.id === projectId);
           if (project) {
-            updateUrl({ kind: "project", projectId: project.id, projectTitle: project.title });
+            updateUrl({
+              kind: "project",
+              projectId: project.id,
+              projectTitle: project.title,
+            });
           }
         }}
         footer={

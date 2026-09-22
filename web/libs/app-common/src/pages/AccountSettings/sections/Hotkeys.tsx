@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { Badge, Button, cnm, Message, ToastType, Typography, useToast } from "@humansignal/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
 import { confirm } from "@humansignal/ui/lib/modal";
@@ -23,9 +23,16 @@ import {
 import { HotkeySection } from "./Hotkeys/Section";
 import { ImportDialog } from "./Hotkeys/Import";
 import { KeyboardKey } from "./Hotkeys/Key";
-import type { Hotkey, Section, DirtyState, DuplicateConfirmDialog, ImportData } from "./Hotkeys/utils";
-// @ts-ignore
-import { HOTKEY_SECTIONS } from "./Hotkeys/defaults";
+import {
+  type Hotkey,
+  type Section,
+  type DirtyState,
+  type DuplicateConfirmDialog,
+  type ImportData,
+  clearDynamicHotkeySections,
+  getHotkeySections,
+  subscribeDynamicHotkeys,
+} from "./Hotkeys/utils";
 import styles from "../AccountSettings.module.css";
 import { getSaveSuccessMessage, type HotkeyScope, useHotkeys } from "../hooks/useHotkeys";
 import {
@@ -34,7 +41,14 @@ import {
   type ProjectHotkeyScopeResolution,
 } from "../components/ProjectHotkeyScopeSelector";
 
-const typedHotkeySections = HOTKEY_SECTIONS as Section[];
+export const useHotkeySections = (scope?: HotkeyScope | null): Section[] => {
+  const includeDynamic = scope?.kind === "project";
+  return useSyncExternalStore(
+    subscribeDynamicHotkeys,
+    () => getHotkeySections({ includeDynamic }),
+    () => getHotkeySections({ includeDynamic }),
+  );
+};
 
 export const HotkeysManager = () => {
   const location = useLocation();
@@ -44,6 +58,9 @@ export const HotkeysManager = () => {
   );
 
   const handleResolutionChange = useCallback((nextResolution: ProjectHotkeyScopeResolution) => {
+    if (nextResolution.status === "account") {
+      clearDynamicHotkeySections();
+    }
     setResolution(nextResolution);
   }, []);
 
@@ -119,6 +136,7 @@ interface PropsScopedHotkeysContent {
 }
 
 const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysContent) => {
+  const typedHotkeySections = useHotkeySections(scope);
   const toast = useToast();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editingHotkeyId, setEditingHotkeyId] = useState<string | null>(null);

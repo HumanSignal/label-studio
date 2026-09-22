@@ -110,6 +110,11 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
 class SetSessionUIDMiddleware(CommonMiddleware):
     def process_request(self, request):
+        # Only tag requests that already carry a session cookie. Cookie-less callers (API
+        # token clients, health probes, crawlers) never send it back, so writing here would
+        # persist a fresh session per request for the whole SESSION_COOKIE_AGE.
+        if settings.SESSION_COOKIE_NAME not in request.COOKIES:
+            return
         if 'uid' not in request.session:
             request.session['uid'] = str(uuid4())
 

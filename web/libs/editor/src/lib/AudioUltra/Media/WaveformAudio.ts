@@ -83,7 +83,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     } catch {
       // ignore
     }
-    this.decoder?.cancel();
   }
 
   /**
