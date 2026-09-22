@@ -25,6 +25,39 @@ describe("MediaCard", () => {
     expect(screen.getByText("Remove")).toBeInTheDocument();
   });
 
+  it("the duplicate verdict renders a warning chip in both layouts", () => {
+    const { rerender } = render(
+      <MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" duplicate="exact" />,
+    );
+    expect(screen.getByText("Duplicate")).toBeInTheDocument();
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" duplicate="exact" layout="row" />);
+    expect(screen.getByText("Duplicate")).toBeInTheDocument();
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" layout="row" />);
+    expect(screen.queryByText("Duplicate")).not.toBeInTheDocument();
+  });
+
+  it("grid fit locks the media to a square box from the two-column breakpoint; natural fit does not", () => {
+    const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" fit="grid" />);
+    const media = screen.getByTestId("media-card-media");
+    expect(media.className).toContain("md:aspect-square");
+    expect(media.querySelector("video")?.className).toContain("md:h-full");
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" />);
+    expect(media.className).not.toContain("md:aspect-square");
+    expect(media.querySelector("video")?.className).not.toContain("md:h-full");
+  });
+
+  it("offers Open full size for previewable media and opens the viewer", async () => {
+    render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" />);
+    fireEvent.click(screen.getByRole("button", { name: "Open full size" }));
+    expect(await screen.findByRole("dialog", { name: FILE.name })).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-viewer")).toBeInTheDocument();
+  });
+
+  it("has no Open full size without a preview", () => {
+    render(<MediaCard state="submitted" file={FILE} kind="video" />);
+    expect(screen.queryByRole("button", { name: "Open full size" })).toBeNull();
+  });
+
   it("uploading state shows progress chip and only Cancel", () => {
     render(
       <MediaCard
@@ -251,6 +284,22 @@ describe("MediaCard", () => {
     fireEvent.click(screen.getByLabelText("Previous page"));
     await waitFor(() => expect(rendered).toEqual([1, 2, 1]));
     expect((screen.getByLabelText("Previous page") as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("the full-size viewer renders the current pdf page as soon as it opens", async () => {
+    const rendered: Array<[number, string | undefined]> = [];
+    const pdf = {
+      load: async () => ({
+        pageCount: 2,
+        renderPage: async (page: number, canvas: HTMLCanvasElement) => {
+          rendered.push([page, canvas.dataset.testid]);
+        },
+      }),
+    };
+    render(<MediaCard state="uploaded" file={{ name: "deck.pdf" }} kind="pdf" previewUrl="blob:p" pdf={pdf} />);
+    await waitFor(() => expect(rendered).toEqual([[1, "media-card-pdf-canvas"]]));
+    fireEvent.click(screen.getByRole("button", { name: "Open full size" }));
+    await waitFor(() => expect(rendered).toContainEqual([1, "media-card-viewer-pdf"]));
   });
 
   it("a failing pdf source lands in the broken-preview flow", async () => {
