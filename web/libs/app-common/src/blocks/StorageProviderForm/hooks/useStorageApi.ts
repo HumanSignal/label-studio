@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { isDefined, useAPI } from "@humansignal/core";
 import { getProviderConfig } from "../providers";
+import { omitHiddenProviderFields } from "../types/provider";
 
 interface UseStorageApiProps {
   target?: "import" | "export";
@@ -55,12 +56,10 @@ export const useStorageApi = ({
   // Clean form data for submission
   const cleanFormDataForSubmission = useCallback(
     (data: any) => {
-      if (!isEditMode) return data;
-
-      const cleanedData = { ...data };
-
-      // Get the current provider config to identify access key fields
       const providerConfig = getProviderConfig(data.provider);
+      const cleanedData = omitHiddenProviderFields({ ...data }, providerConfig?.fields);
+
+      if (!isEditMode) return cleanedData;
 
       // Get all field names from the current provider schema
       const validFieldNames = new Set([

@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "js-base64": "^3.7.7",
+    "pako": "^2.1.0"
+  },
   "main": "src/index.ts",
   "files": [
     "src/lib",

@@ -81,6 +81,10 @@ export interface SharedAnnotationsCarouselProps {
   /** When true (vertical layout only), render an add-new row as the first list item. */
   showAddNew?: boolean;
   onAddNew?: () => void;
+  /** Renders the add-new row inert instead of hiding it, so the reason stays discoverable. */
+  addNewDisabled?: boolean;
+  /** Explains why adding is unavailable while {@link addNewDisabled} is true. */
+  addNewDisabledTooltip?: string;
   /** Rendered inside the scroll container after the entity rows (vertical layout only). */
   emptyState?: ReactNode;
 }
@@ -100,33 +104,48 @@ function VirtualizedAnnotationRow({ index, style, data }: ListChildComponentProp
   return <div style={{ ...(style as React.CSSProperties), ...padding }}>{data.renderItem(entity)}</div>;
 }
 
-function AddAnnotationRow({ onAddNew }: { onAddNew: () => void }) {
+function AddAnnotationRow({
+  onAddNew,
+  disabled = false,
+  disabledTooltip,
+}: {
+  onAddNew: () => void;
+  disabled?: boolean;
+  disabledTooltip?: string;
+}) {
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
+      if (disabled) return;
       onAddNew();
     },
-    [onAddNew],
+    [onAddNew, disabled],
   );
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
+        if (disabled) return;
         onAddNew();
       }
     },
-    [onAddNew],
+    [onAddNew, disabled],
   );
+
+  const label = disabled
+    ? (disabledTooltip ?? "Creating annotations is not available here")
+    : "Create a new annotation";
 
   return (
     <div
       role="button"
-      tabIndex={0}
-      aria-label="Create a new annotation"
-      title="Create a new annotation"
+      tabIndex={disabled ? -1 : 0}
+      aria-label={label}
+      aria-disabled={disabled}
+      title={label}
       data-testid="annotations-sidebar-add-new"
-      className={cn("annotations-carousel").elem("addNewRow").toClassName()}
+      className={cn("annotations-carousel").elem("addNewRow").mod({ disabled }).toClassName()}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
@@ -149,6 +168,8 @@ export function AnnotationsCarousel({
   layout = "horizontal",
   showAddNew,
   onAddNew,
+  addNewDisabled = false,
+  addNewDisabledTooltip,
   emptyState,
 }: SharedAnnotationsCarouselProps) {
   const isVertical = layout === "vertical";
@@ -294,7 +315,15 @@ export function AnnotationsCarousel({
     return null;
   }
 
-  const addNewRow = showAddNew && onAddNew ? <AddAnnotationRow key="add-new" onAddNew={onAddNew} /> : null;
+  const addNewRow =
+    showAddNew && onAddNew ? (
+      <AddAnnotationRow
+        key="add-new"
+        onAddNew={onAddNew}
+        disabled={addNewDisabled}
+        disabledTooltip={addNewDisabledTooltip}
+      />
+    ) : null;
   const scrollClassName = cn("annotations-carousel").elem("scroll").toClassName();
   const containerClassName = cn("annotations-carousel").elem("container").toClassName();
   const listScrollClassName = cn("annotations-carousel").elem("listScroll").mix(scrollClassName).toClassName();

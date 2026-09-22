@@ -929,17 +929,26 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
         # argument for recalculate project task stats
         if recalc:
-            self.update_tasks_states(
-                maximum_annotations_changed=self.__maximum_annotations != self.maximum_annotations,
-                overlap_cohort_percentage_changed=self.__overlap_cohort_percentage != self.overlap_cohort_percentage,
-                tasks_number_changed=False,
+            # Capture flags now: on_commit runs after we refresh __maximum_annotations below.
+            maximum_annotations_changed = self.__maximum_annotations != self.maximum_annotations
+            overlap_cohort_percentage_changed = self.__overlap_cohort_percentage != self.overlap_cohort_percentage
+            transaction.on_commit(
+                lambda *, maximum_annotations_changed=maximum_annotations_changed, overlap_cohort_percentage_changed=overlap_cohort_percentage_changed: (
+                    self.update_tasks_states(
+                        maximum_annotations_changed=maximum_annotations_changed,
+                        overlap_cohort_percentage_changed=overlap_cohort_percentage_changed,
+                        tasks_number_changed=False,
+                    )
+                )
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
 
         if self.__skip_queue != self.skip_queue:
-            bulk_update_stats_project_tasks(
-                self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+            transaction.on_commit(
+                lambda: bulk_update_stats_project_tasks(
+                    self.tasks.filter(Q(annotations__isnull=False) & Q(annotations__ground_truth=False))
+                )
             )
 
         if hasattr(self, 'summary'):
@@ -955,10 +964,14 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         # Call dimensions postprocess if configured (LSE feature)
         dimensions_postprocess = load_func(settings.PROJECT_SAVE_DIMENSIONS_POSTPROCESS)
         if dimensions_postprocess is not None:
-            dimensions_postprocess(
-                project=self,
-                created=not exists,
-                label_config_has_changed=label_config_has_changed,
+            transaction.on_commit(
+                lambda *, postprocess=dimensions_postprocess, created=not exists, changed=label_config_has_changed: (
+                    postprocess(
+                        project=self,
+                        created=created,
+                        label_config_has_changed=changed,
+                    )
+                )
             )
 
     # ============================================================================
@@ -1203,10 +1216,14 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         return values
 
     def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
-        from io_storages.functions import get_storage_by_url
+        from io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
 
         storage_objects = self.get_all_import_storage_objects
         storage = get_storage_by_url(url, storage_objects)
+        if not storage:
+            # Project-produced assets (e.g. Data Collection submissions) live in
+            # an export target; import first keeps existing resolution unchanged.
+            storage = resolve_own_collection_export_storage(url, self)
 
         if storage:
             return {
@@ -1660,9 +1677,7 @@ class ProjectSummary(models.Model):
     def update_created_annotations_and_labels(self, annotations):
         # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
         # other backends would raise OperationalError on every call
-        if connection.vendor == 'postgresql' and flag_set(
-            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
-        ):
+        if connection.vendor == 'postgresql':
             try:
                 self._atomic_update_created_annotations_and_labels(annotations)
                 return
@@ -1786,9 +1801,7 @@ class ProjectSummary(models.Model):
     def update_created_labels_drafts(self, drafts):
         # the atomic increment SQL is PostgreSQL-only (jsonb_set, :: casts),
         # other backends would raise OperationalError on every call
-        if connection.vendor == 'postgresql' and flag_set(
-            'fflag_fix_plt_1048_concurrent_project_summary_update_19032026_short', user='auto'
-        ):
+        if connection.vendor == 'postgresql':
             try:
                 self._atomic_update_created_labels_drafts(drafts)
                 return

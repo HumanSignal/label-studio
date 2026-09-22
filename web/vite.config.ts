@@ -113,6 +113,10 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve(__dirname, "libs/ui"),
         },
         {
+          find: "@humansignal/core/telemetry",
+          replacement: path.resolve(__dirname, "libs/core/src/telemetry"),
+        },
+        {
           find: "@humansignal/core/providers",
           replacement: path.resolve(__dirname, "libs/core/src/providers"),
         },

@@ -1,13 +1,17 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import socket
+import threading
 import types
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import MagicMock, patch
 
 import pytest
 from core.utils.common import int_from_request
 from core.utils.exceptions import LabelStudioAPIException, SsrfBlockedUrlError
-from core.utils.io import ssrf_safe_request, validate_upload_url
+from core.utils.io import SsrfSafeHTTPAdapter, ssrf_safe_request, ssrf_safe_session, validate_upload_url
 from core.utils.params import bool_from_request
+from django.test import override_settings
 from rest_framework.exceptions import ValidationError
 
 
@@ -196,12 +200,10 @@ def test_core_validate_upload_url_calls_validate_url_for_ssrf():
 
 def test_ssrf_safe_request_validates_and_forwards_request():
     fake_response = MagicMock()
-    fake_response.raw._connection.sock.getpeername.return_value = ('8.8.8.8', 443)
 
     with (
         patch('core.utils.io.validate_url_for_ssrf') as mock_validate_url,
-        patch('core.utils.io.validate_ip') as mock_validate_ip,
-        patch('core.utils.io.requests.request', return_value=fake_response) as mock_request,
+        patch('core.utils.io.requests.Session.request', return_value=fake_response) as mock_request,
     ):
         response = ssrf_safe_request(
             'POST',
@@ -219,4 +221,88 @@ def test_ssrf_safe_request_validates_and_forwards_request():
         json={'action': 'PROJECT_UPDATED'},
         timeout=1.0,
     )
-    mock_validate_ip.assert_called_once_with('8.8.8.8')
+
+
+def test_ssrf_safe_session_mounts_the_guarded_adapter():
+    session = ssrf_safe_session()
+
+    assert isinstance(session.get_adapter('http://example.org'), SsrfSafeHTTPAdapter)
+    assert isinstance(session.get_adapter('https://example.org'), SsrfSafeHTTPAdapter)
+
+
+class _SsrfTestHandler(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
+    def do_GET(self):
+        if self.path == '/redirect-to-banned':
+            self.send_response(302)
+            self.send_header('Location', f'http://{_BANNED_IP}/ok')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            return
+
+        body = b'{"ok": true}'
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, *args):
+        pass
+
+
+# Loopback must stay reachable here, so ban a subnet the test server never uses.
+_BANNED_IP = '10.11.12.13'
+_ssrf_test_subnets = override_settings(USE_DEFAULT_BANNED_SUBNETS=False, USER_ADDITIONAL_BANNED_SUBNETS=['10.0.0.0/8'])
+
+
+@pytest.fixture
+def ssrf_test_server():
+    server = ThreadingHTTPServer(('127.0.0.1', 0), _SsrfTestHandler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    yield f'http://127.0.0.1:{server.server_address[1]}'
+    server.shutdown()
+    server.server_close()
+
+
+@_ssrf_test_subnets
+def test_ssrf_safe_request_allows_permitted_host(ssrf_test_server):
+    response = ssrf_safe_request('GET', f'{ssrf_test_server}/ok', block_local_urls=True)
+
+    assert response.status_code == 200
+    assert response.json() == {'ok': True}
+
+
+@_ssrf_test_subnets
+def test_ssrf_safe_request_blocks_redirect_to_banned_address(ssrf_test_server):
+    with pytest.raises(SsrfBlockedUrlError):
+        ssrf_safe_request('GET', f'{ssrf_test_server}/redirect-to-banned', block_local_urls=True, timeout=1)
+
+
+@_ssrf_test_subnets
+def test_ssrf_safe_request_blocks_dns_rebinding(ssrf_test_server):
+    rebound = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (_BANNED_IP, 80))]
+
+    with patch('core.utils.io.socket.getaddrinfo', return_value=rebound):
+        with pytest.raises(SsrfBlockedUrlError):
+            ssrf_safe_request('GET', f'{ssrf_test_server}/ok', block_local_urls=True, timeout=1)
+
+
+@_ssrf_test_subnets
+def test_ssrf_safe_request_blocks_when_any_record_is_banned(ssrf_test_server):
+    port = int(ssrf_test_server.rsplit(':', 1)[1])
+    records = [
+        (socket.AF_INET, socket.SOCK_STREAM, 6, '', ('127.0.0.1', port)),
+        (socket.AF_INET, socket.SOCK_STREAM, 6, '', (_BANNED_IP, port)),
+    ]
+
+    with patch('core.utils.io.socket.getaddrinfo', return_value=records):
+        with pytest.raises(SsrfBlockedUrlError):
+            ssrf_safe_request('GET', f'{ssrf_test_server}/ok', block_local_urls=True, timeout=1)
+
+
+def test_ssrf_safe_session_blocks_banned_address_without_streaming():
+    with ssrf_safe_session() as session:
+        with pytest.raises(SsrfBlockedUrlError):
+            session.get(f'http://{_BANNED_IP}/ok', stream=False, timeout=1)

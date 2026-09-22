@@ -26,6 +26,10 @@ export interface SharedTopBarProps {
   viewAllLabel?: string;
   showAddNew: boolean;
   onAddNew: () => void;
+  /** Renders the add-new button inert instead of hiding it, so the reason stays discoverable. */
+  addNewDisabled?: boolean;
+  /** Tooltip shown while {@link addNewDisabled} is true; explains why the action is unavailable. */
+  addNewDisabledTooltip?: string;
   /** Carousel slot — usually the shared AnnotationsCarousel composed by the wrapper. */
   children?: ReactNode;
 }
@@ -38,6 +42,8 @@ export function TopBar({
   viewAllLabel,
   showAddNew,
   onAddNew,
+  addNewDisabled = false,
+  addNewDisabledTooltip,
   children,
 }: SharedTopBarProps) {
   if (!visible) return null;
@@ -54,9 +60,15 @@ export function TopBar({
             variant="neutral"
             size="small"
             look="outlined"
-            tooltip="Create a new annotation"
+            disabled={addNewDisabled}
+            tooltip={
+              addNewDisabled
+                ? (addNewDisabledTooltip ?? "Creating annotations is not available here")
+                : "Create a new annotation"
+            }
             onClick={(event) => {
               event.preventDefault();
+              if (addNewDisabled) return;
               onAddNew();
             }}
           >

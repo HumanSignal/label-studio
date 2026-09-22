@@ -10,6 +10,7 @@ import { isAlive } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { AnnotationsSidebar, resolveClassicEntityReviewState } from "@humansignal/core";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
+import { emitAnnotationTabSelected, emitOverviewOpenedOrClosed } from "../../utils/labelingTelemetry";
 
 function entityToSummary(entity, store) {
   return {
@@ -70,18 +71,33 @@ export const ClassicAnnotationsSidebar = observer(({ store }) => {
   );
 
   const handleToggleViewAll = useCallback(() => {
-    annotationStore.toggleViewingAllAnnotations();
-  }, [annotationStore]);
+    const closing = annotationStore.viewingAll;
+    if (closing) {
+      annotationStore.toggleViewingAllAnnotations();
+      emitOverviewOpenedOrClosed(store, "closed", annotationStore.selected ?? null);
+    } else {
+      emitOverviewOpenedOrClosed(store, "opened");
+      annotationStore.toggleViewingAllAnnotations();
+    }
+  }, [annotationStore, store]);
 
   const handleFirstResultOnFilter = useCallback(
     (entity) => {
+      const previous = annotationStore.selected;
       if (entity.type === "prediction") {
         annotationStore.selectPrediction(entity.id, { exitViewAll: true });
       } else {
         annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
       }
+      const liveEntity =
+        entity.type === "prediction"
+          ? annotationStore.predictions.find((p) => String(p.id) === String(entity.id))
+          : annotationStore.annotations.find((a) => String(a.id) === String(entity.id));
+      if (liveEntity) {
+        emitAnnotationTabSelected(store, liveEntity, previous, { exitViewAll: true });
+      }
     },
-    [annotationStore],
+    [annotationStore, store],
   );
 
   if (!(enableAnnotations || enablePredictions || enableCreateAnnotation)) return null;

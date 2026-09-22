@@ -408,6 +408,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
         onClick: () => {
           copyAnnotationId();
           dropdown?.close();
+          handlers.onCopyAnnotationId?.(annotation);
           toast?.show({
             message: isPrediction ? "Prediction ID copied to clipboard" : "Annotation ID copied to clipboard",
             type: ToastType.info,
@@ -442,6 +443,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
         onClick: () => {
           copyLink();
           dropdown?.close();
+          handlers.onCopyAnnotationLink?.(annotation);
           toast?.show({
             message: isPrediction ? "Prediction link copied to clipboard" : "Annotation link copied to clipboard",
             type: ToastType.info,

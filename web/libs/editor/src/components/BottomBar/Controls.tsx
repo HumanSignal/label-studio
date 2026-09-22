@@ -6,11 +6,15 @@
 
 import { observer } from "mobx-react";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
-import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
+import { Badge, Button, ButtonGroup, Dropdown, type ButtonProps, Typography, type DropdownRef } from "@humansignal/ui";
 import { CaretDownIcon, IconBan, IconChevronDown } from "@humansignal/icons";
-import { Dropdown } from "@humansignal/ui";
+import {
+  normalizeReviewAcceptedState,
+  resolveFlexibleRejectButtonTitle,
+  resolveReviewBarCopy,
+} from "@humansignal/core";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
@@ -23,6 +27,8 @@ import {
   SkipButton,
   UnskipButton,
 } from "./buttons";
+import { annotationActionProps, emitLabelingEvent } from "../../utils/labelingTelemetry";
+import { rejectTooltip } from "../../utils/rejectHotkeys";
 
 import "./Controls.prefix.css";
 
@@ -47,6 +53,14 @@ export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
 export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before submitting";
 export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before updating";
 export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before accepting";
+
+/** Arrows move between rows; Escape closes. Enter/Space commit natively on the focused button. */
+function moveRejectMenuFocus(menu: HTMLElement, step: 1 | -1) {
+  const items = [...menu.querySelectorAll<HTMLButtonElement>("[role='menuitem']:not([disabled])")];
+  if (!items.length) return;
+  const current = items.indexOf(document.activeElement as HTMLButtonElement);
+  items[(current + step + items.length) % items.length].focus();
+}
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
@@ -91,10 +105,23 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const buttons: React.ReactNode[] = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
+    const [rejectMenuVisible, setRejectMenuVisible] = useState(false);
+    const rejectMenuRef = useRef<DropdownRef>(null);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const reviewDisabled = disabled || viewingSubmittedWhileDraftExists;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
+
+    // The dropdown mounts its content on open, so the ref callback is the moment to take focus.
+    const focusFirstRejectOption = useCallback((menu: HTMLDivElement | null) => {
+      if (!menu) return;
+      requestAnimationFrame(() => menu.querySelector<HTMLButtonElement>("[role='menuitem']:not([disabled])")?.focus());
+    }, []);
+
+    const closeRejectMenu = useCallback(() => {
+      rejectMenuRef.current?.close();
+      setRejectMenuVisible(false);
+    }, []);
 
     /** Check all things related to comments and then call the action if all is good */
     const handleActionWithComments = useCallback(
@@ -132,6 +159,49 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       ],
     );
 
+    const rejectByName = useCallback(
+      (name?: string, event?: { preventDefault?: () => void }) => {
+        const configured = store.customButtons?.get("reject");
+        const listed = toArray(configured).filter((button) => typeof button !== "string");
+        const button = listed.find((item) => item.name === name);
+        const hasCustomReject = listed.length > 0;
+        const selected = store.annotationStore?.selected;
+        closeRejectMenu();
+
+        const runReject = () => {
+          const comment = store.commentStore.currentComment[annotation.id];
+          const commentText = (comment?.text ?? comment)?.trim();
+          if (hasCustomReject && button) store.handleCustomButton?.(button);
+          else store.rejectAnnotation({});
+          emitLabelingEvent(store, "annotation_rejected", {
+            ...annotationActionProps(store, selected),
+            has_comment: Boolean(commentText) || store.commentStore.addedCommentThisSession,
+          });
+        };
+
+        const syntheticEvent = (event ?? { preventDefault() {} }) as React.MouseEvent;
+        if (store.hasInterface("comments:reject")) {
+          handleActionWithComments(syntheticEvent, runReject, "Please enter a comment before rejecting");
+        } else {
+          selected?.submissionInProgress();
+          // commentFormSubmit is a no-op `() => {}` until the host wires it.
+          void Promise.resolve(store.commentStore.commentFormSubmit()).then(runReject);
+        }
+      },
+      [annotation.id, closeRejectMenu, handleActionWithComments, store],
+    );
+
+    // The reject hotkeys live in AppStore but the comment gate and progress state live here,
+    // so they hand the action over instead of duplicating the flow.
+    useEffect(() => {
+      const onReject = (event: Event) => {
+        const name = (event as CustomEvent<{ name?: string }>).detail?.name;
+        rejectByName(name);
+      };
+      window.addEventListener("lsf:reject-with-action", onReject);
+      return () => window.removeEventListener("lsf:reject-with-action", onReject);
+    }, [rejectByName]);
+
     if (annotation.isNonEditableDraft) return <></>;
 
     const buttonsBefore = customButtons.get("_before");
@@ -168,32 +238,152 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     }
 
     if (isReview) {
+      const hasChanges = Boolean(history?.canUndo || versions?.draft);
+      const reviewState = normalizeReviewAcceptedState(annotation.acceptedState);
+      const reviewCopy = resolveReviewBarCopy(reviewState, hasChanges);
+      const rejectDisabled = reviewDisabled;
       const customRejectButtons = toArray(customButtons.get("reject"));
       const hasCustomReject = customRejectButtons.length > 0;
-      const originalRejectButton = RejectButtonDefinition;
+      const originalRejectButton = { ...RejectButtonDefinition, title: reviewCopy.rejectLabel };
 
       // @todo implement reuse of internal buttons later (they are set as strings)
       const rejectButtons: CustomButtonType[] = hasCustomReject
         ? customRejectButtons.filter((button) => typeof button !== "string")
         : [originalRejectButton];
 
-      rejectButtons.forEach((button) => {
-        const action = hasCustomReject ? () => store.handleCustomButton?.(button) : () => store.rejectAnnotation({});
-
-        const onReject = async (e: React.MouseEvent) => {
-          const selected = store.annotationStore?.selected;
-
-          if (store.hasInterface("comments:reject")) {
-            handleActionWithComments(e, action, "Please enter a comment before rejecting");
-          } else {
-            selected?.submissionInProgress();
-            await store.commentStore.commentFormSubmit();
-            action();
-          }
+      const rejectHandler = (button: CustomButtonType) => {
+        return async (e: React.MouseEvent) => {
+          rejectByName(button.name, e);
         };
+      };
 
-        buttons.push(<ControlButton key={button.name} button={button} disabled={reviewDisabled} onClick={onReject} />);
-      });
+      const renderRejectAction = (button: CustomButtonType) => {
+        const title = resolveFlexibleRejectButtonTitle(button.name, button.title, reviewState);
+        const tooltipDescription = button.description ?? button.tooltip ?? title;
+
+        return (
+          <ControlButton
+            key={button.name}
+            button={{
+              ...button,
+              title,
+              tooltip: rejectTooltip(tooltipDescription, button.name, store.settings.enableTooltips),
+            }}
+            disabled={rejectDisabled}
+            onClick={rejectHandler(button)}
+          />
+        );
+      };
+
+      // Menu rows are plain buttons, not ControlButton: they carry a description and read as a
+      // menu, so button styling (and its negative/neutral variants) would fight the red-outlined
+      // trigger that owns the reject affordance.
+      const renderRejectMenuItem = (button: CustomButtonType, isDefault: boolean) => (
+        <button
+          key={button.name}
+          type="button"
+          role="menuitem"
+          disabled={button.disabled || rejectDisabled}
+          onClick={rejectHandler(button)}
+          className="flex w-full flex-col items-start gap-tightest rounded-smaller px-tight py-tighter text-left hover:bg-neutral-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label={button.ariaLabel}
+          data-testid={`bottombar-custom-${button.name}-button`}
+        >
+          <div className="flex w-full items-center justify-between gap-tight">
+            <Typography variant="label" size="medium" className="text-neutral-content">
+              {button.title}
+            </Typography>
+            {isDefault && (
+              <Badge
+                variant="neutral"
+                look="outline"
+                shape="rounded"
+                size="small"
+                data-testid="reject-action-default-badge"
+              >
+                Default
+              </Badge>
+            )}
+          </div>
+          {button.description ? (
+            <Typography variant="body" size="small" className="text-neutral-content-subtler">
+              {button.description}
+            </Typography>
+          ) : null}
+        </button>
+      );
+
+      const useRejectMenu = hasCustomReject && rejectButtons.length > 1 && rejectButtons.every((button) => button.menu);
+
+      if (useRejectMenu) {
+        // The menu keeps its configured order, so the one-click action is whichever row is
+        // flagged primary rather than whichever happens to be listed first.
+        const primaryRejectButton = rejectButtons.find((button) => button.isPrimary) ?? rejectButtons[0];
+        const rejectMenuContent = (
+          <div
+            ref={focusFirstRejectOption}
+            role="menu"
+            aria-label="Reject options"
+            className="flex w-[280px] flex-col gap-tightest p-tighter bg-neutral-surface"
+            onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                closeRejectMenu();
+              } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                moveRejectMenuFocus(event.currentTarget, event.key === "ArrowDown" ? 1 : -1);
+              }
+            }}
+            data-testid="reject-action-menu"
+          >
+            {rejectButtons.map((button) => renderRejectMenuItem(button, button === primaryRejectButton))}
+          </div>
+        );
+
+        // Split button: the left half commits to the primary action, the caret opens the full menu.
+        buttons.push(
+          <ButtonGroup key="reject-menu">
+            <Button
+              variant="negative"
+              look="outlined"
+              aria-label="reject-annotation"
+              disabled={rejectDisabled}
+              tooltip={rejectTooltip(
+                primaryRejectButton.description ?? "",
+                primaryRejectButton.name,
+                store.settings.enableTooltips,
+              )}
+              onClick={rejectHandler(primaryRejectButton)}
+              data-testid="bottombar-reject-button"
+            >
+              {reviewCopy.rejectLabel}
+            </Button>
+            <Dropdown.Trigger
+              alignment="top-right"
+              dropdown={rejectMenuRef}
+              onToggle={setRejectMenuVisible}
+              content={rejectMenuContent}
+            >
+              <Button
+                variant="negative"
+                look="outlined"
+                disabled={rejectDisabled}
+                aria-label="More reject options"
+                data-testid="bottombar-reject-menu"
+                leading={
+                  <CaretDownIcon
+                    size={16}
+                    className={`transition-transform ${rejectMenuVisible ? "rotate-180" : ""}`}
+                  />
+                }
+              />
+            </Dropdown.Trigger>
+          </ButtonGroup>,
+        );
+      } else {
+        rejectButtons.forEach((button) => buttons.push(renderRejectAction(button)));
+      }
       buttons.push(<AcceptButton key="review-accept" disabled={reviewDisabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
@@ -243,6 +433,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
                 await store.commentStore.commentFormSubmit();
                 onClickMethod();
+                const selectedAfter = store.annotationStore?.selected;
+                emitLabelingEvent(store, isUpdate ? "annotation_updated" : "annotation_submitted", {
+                  ...annotationActionProps(store, selectedAfter),
+                  and_exit: true,
+                });
               }}
               data-testid={`bottombar-${isUpdate ? "update" : "submit"}-and-exit-button`}
             >
@@ -277,6 +472,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                     selected?.submissionInProgress();
                     await store.commentStore.commentFormSubmit();
                     store.submitAnnotation();
+                    emitLabelingEvent(store, "annotation_submitted", annotationActionProps(store, selected));
                   }}
                   data-testid="bottombar-submit-button"
                 >
@@ -305,8 +501,10 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         );
       } else if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         const isUpdate = Boolean(isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result);
-        // no changes were made over previously submitted version — no drafts, no pending changes
-        const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
+        // FIT-2742: match review dirty signal — undo stack OR local/persisted draft (draftId may
+        // still be 0 while versions.draft was written by autosave before the server id returns).
+        const hasEditableChanges = Boolean(history?.canUndo || annotation.draftId || versions?.draft);
+        const noChanges = isFF(FF_REVIEWER_FLOW) && !hasEditableChanges;
         const isUpdateDisabled = isDisabled || noChanges;
         const updateTitle = hasIncompleteRegions
           ? INCOMPLETE_UPDATE_TOOLTIP
@@ -331,6 +529,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                     selected?.submissionInProgress();
                     await store.commentStore.commentFormSubmit();
                     store.updateAnnotation();
+                    emitLabelingEvent(store, "annotation_updated", annotationActionProps(store, selected));
                   }}
                   data-testid="bottombar-update-button"
                 >

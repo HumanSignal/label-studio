@@ -2,7 +2,9 @@ import {
   isEnterpriseEdition,
   normalizeReviewAcceptedState,
   resolveClassicEntityReviewState,
+  resolveFlexibleRejectButtonTitle,
   resolveReviewAcceptedStateFromTaskSource,
+  resolveReviewBarCopy,
 } from "../review-accepted-state";
 
 describe("isEnterpriseEdition", () => {
@@ -145,5 +147,55 @@ describe("resolveClassicEntityReviewState", () => {
     expect(
       resolveClassicEntityReviewState({ pk: 1, type: "annotation", accepted_state: "fixed_and_accepted" }, null),
     ).toBe("fixed");
+  });
+});
+
+describe("resolveReviewBarCopy", () => {
+  it.each([
+    null,
+    "accepted",
+    "rejected",
+    "fixed",
+  ] as const)("keeps classic Reject / Accept for verdict %s", (verdict) => {
+    expect(resolveReviewBarCopy(verdict, false)).toEqual({
+      rejectLabel: "Reject",
+      acceptLabel: "Accept",
+    });
+  });
+
+  it.each([
+    null,
+    "accepted",
+    "rejected",
+    "fixed",
+  ] as const)("uses Fix + Accept when dirty for verdict %s", (verdict) => {
+    expect(resolveReviewBarCopy(verdict, true)).toEqual({
+      rejectLabel: "Reject",
+      acceptLabel: "Fix + Accept",
+    });
+  });
+});
+
+describe("resolveFlexibleRejectButtonTitle", () => {
+  it("keeps host titles when there is no live verdict", () => {
+    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", null)).toBe("Reject");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", null)).toBe("Remove");
+    expect(resolveFlexibleRejectButtonTitle("requeue", "Requeue", null)).toBe("Requeue");
+  });
+
+  it("keeps the host remove title for a live accepted or fixed verdict", () => {
+    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "accepted")).toBe("Reject");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "accepted")).toBe("Remove");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "fixed")).toBe("Remove");
+  });
+
+  it("keeps the host remove title for a live rejected verdict", () => {
+    expect(resolveFlexibleRejectButtonTitle("remove", "Reject", "rejected")).toBe("Reject");
+    expect(resolveFlexibleRejectButtonTitle("remove", "Remove", "rejected")).toBe("Remove");
+  });
+
+  it("leaves Requeue labeled Requeue even when the verdict is live", () => {
+    expect(resolveFlexibleRejectButtonTitle("requeue", "Requeue", "accepted")).toBe("Requeue");
+    expect(resolveFlexibleRejectButtonTitle("requeue", "Requeue", "rejected")).toBe("Requeue");
   });
 });

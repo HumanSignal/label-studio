@@ -86,6 +86,14 @@ export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consens
 export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_columns";
 
 /**
+ * Reusable organization members filtering engine.
+ */
+export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable_members_filtering";
+
+/** Replace the existing table filter bar with FilterShell (UTC-1166). */
+export const FF_UTC_1166_FILTER_SHELL = "fflag_utc_1166_filter_shell";
+
+/**
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
@@ -139,6 +147,11 @@ export const FF_LSE_PROJECT_DASHBOARDS_V3_MEMBERS = "fflag_feat_lse_project_dash
 export const FF_LSE_PROJECT_DASHBOARDS_V3_DATA_QUALITY = "fflag_feat_lse_project_dashboards_v3_data_quality_short";
 
 /**
+ * Enables filtered Label Distribution reads and their Data Quality filter-state shell.
+ */
+export const FF_FILTERED_LABEL_DISTRIBUTION = "fflag_feat_all_fit_2318_filtered_label_distribution";
+
+/**
  * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
  */
 export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
@@ -184,6 +197,11 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
  * Requires FF_INTERFACES; when off, users can still author interfaces manually in the code editor.
  */
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
+
+/**
+ * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
+ */
+export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
 
 /**
  * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
@@ -253,3 +271,41 @@ export const FF_ANNOTATOR_EVALUATION_METRIC = "fflag_feat_utc_1085_annotator_eva
  * time for a configured coverage percent before rotating to another annotator.
  */
 export const FF_UTC_1079_REVIEW_ORDER_BY_ANNOTATOR = "fflag_feat_utc_1079_review_order_by_annotator";
+
+/**
+ * Ask AI "Annotator mode" (UTC-1233): a switch in the assistant panel that lets somebody running a
+ * project be answered exactly as one of their own annotators would be, so they can see for
+ * themselves what their workforce is told. Experiment gate, off by default, and layered on top of
+ * the workforce rollout flag — with that one off the server refuses every question asked in this
+ * mode, so the switch is not offered either.
+ */
+export const FF_ASK_AI_ANNOTATOR_MODE = "fflag_utc_1233_admin_sees_worker_toggle_ask_ai";
+
+/**
+ * Ask AI "Agent" (UTC-1233): the assistant answers by looking things up for itself — the project,
+ * the task, the annotation, the courses — instead of being handed one fixed bundle of context. The
+ * only thing this flag decides in the browser is whether the "Think longer" control is offered in
+ * the composer; whether a question is actually answered by the agent is decided per organization
+ * on the assistant's own side, so with the flag on but the agent not enabled the control is simply
+ * a slower ordinary answer rather than a broken one.
+ */
+export const FF_ASK_AI_AGENT = "fflag_utc_1233_ask_ai_agent";
+
+/**
+ * Configurable reject actions, including requeueing work to another annotator.
+ */
+export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_short";
+
+/**
+ * Manual payment batches (UTC-1260): an org admin creates, on a Program's Pay runs tab, a batch of
+ * fixed-amount corrections (worker email + amount + note) as a draft, and approves it in a separate,
+ * explicit step. Off everywhere until switched on per organization — an absent flag means OFF, so the
+ * frontend checks it with an explicit ``false`` default rather than the app-wide flag default.
+ */
+export const FF_MANUAL_BATCHES = "fflag_feat_utc_1260_manual_batches_short";
+
+/**
+ * Azure SPI secretless authentication: auth_mode=workload_identity uses constrained
+ * DefaultAzureCredential (workload identity + managed identity only). Default off.
+ */
+export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_spi_workload_identity_short";

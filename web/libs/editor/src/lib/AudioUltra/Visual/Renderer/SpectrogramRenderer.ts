@@ -76,6 +76,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   private handleChunkLoaded = () => {
     this.spectrogramNeedsRedraw = true;
   };
+  private pendingTaskIds = new Set<string>();
   private readonly spectrogram: Layer;
   private readonly progressContainer: HTMLElement;
   private rateLimitedRenderer: RateLimitedRenderer;
@@ -111,7 +112,8 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
       highBatchSize: SPECTROGRAM_HIGH_BATCH_SIZE,
       normalBatchSize: SPECTROGRAM_NORMAL_BATCH_SIZE,
       onCleared: () => {
-        this.renderProgress();
+        this.pendingTaskIds.clear();
+        this.progressRendererPlugin.clear();
         this.onRenderTransfer?.();
       },
       onProgress: (progress: DetailedComputationProgress) => {
@@ -231,13 +233,10 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
         Math.abs(deltaX) >= context.width ||
         cacheLimitExceeded;
 
-      if (needsFullRender || deltaX > 0) {
-        this.computationQueue.cancelBatchesByPriority([TaskPriority.NORMAL, TaskPriority.LOW]);
-      }
-
       if (needsFullRender) {
         if (cacheLimitExceeded) this.forceCachedExcedLimit += 1;
         this.computationQueue.clear();
+        this.pendingTaskIds.clear();
         this.spectrogram.clear();
         const hopSize = this._getCurrentHopSize();
         if (!this.fftProcessor) return;
@@ -290,24 +289,62 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
         this.spectrogramNeedsRedraw = false;
       } else if (Math.abs(deltaX) > 0) {
         const shiftAmount = -deltaX;
-        this.spectrogram.shift(shiftAmount, 0);
-        this.lastSpectrogramRenderedScrollLeftPx = scrollLeftPx;
-        const iStart = Math.floor(clamp(scrollLeftPx * context.samplesPerPx, 0, dataLength));
-        const iEnd = Math.ceil(clamp(iStart + context.width * context.samplesPerPx, 0, dataLength));
-        const sampleDiff = Math.round(deltaX * context.samplesPerPx);
-        let sliceStartSample: number;
-        let sliceEndSample: number;
-        const seamPxSamples = Math.ceil(context.samplesPerPx * SEAM_GAP_FILL);
-        if (deltaX > 0) {
-          sliceStartSample = Math.max(0, iEnd - sampleDiff - seamPxSamples);
-          sliceEndSample = iEnd;
-        } else {
-          sliceStartSample = iStart;
-          sliceEndSample = Math.min(dataLength, iStart - sampleDiff + seamPxSamples);
+        const physicalShift = Math.round(shiftAmount * this.spectrogram.pixelRatio);
+
+        // If subpixel movement rounds to 0 physical pixels, wait for next frame to accumulate
+        if (physicalShift === 0) {
+          return;
         }
-        const bufferSamples = 0;
-        sliceStartSample = Math.floor(clamp(sliceStartSample - bufferSamples, 0, dataLength));
-        sliceEndSample = Math.ceil(clamp(sliceEndSample + bufferSamples, 0, dataLength));
+
+        const actualShiftCss = physicalShift / this.spectrogram.pixelRatio;
+        this.spectrogram.shift(actualShiftCss, 0);
+
+        this.lastSpectrogramRenderedScrollLeftPx -= actualShiftCss;
+        this.lastSpectrogramRenderedWidth = context.width;
+        this.lastSpectrogramRenderedZoom = context.zoom;
+
+        const shiftColumns = Math.ceil(Math.abs(actualShiftCss));
+        const columnsToRender = Math.min(context.width, shiftColumns + SEAM_GAP_FILL);
+
+        let x = 0;
+        let sliceStartSample = 0;
+        let sliceEndSample = 0;
+
+        if (physicalShift < 0) {
+          // Audio playing forward / user scrolling right: new columns on the right edge
+          x = context.width - columnsToRender;
+
+          if (this.spectrogram.context) {
+            const clearX = Math.floor(x * this.spectrogram.pixelRatio);
+            const clearW = this.spectrogram.canvas.width - clearX;
+            this.spectrogram.context.clearRect(clearX, 0, clearW, this.spectrogram.canvas.height);
+          }
+
+          sliceStartSample = Math.max(
+            0,
+            Math.round((this.lastSpectrogramRenderedScrollLeftPx + x) * context.samplesPerPx),
+          );
+          sliceEndSample = Math.min(
+            dataLength,
+            Math.round((this.lastSpectrogramRenderedScrollLeftPx + x + columnsToRender) * context.samplesPerPx),
+          );
+        } else {
+          // User scrolling left: new columns on the left edge. Cancel obsolete forward precache.
+          this.computationQueue.cancelBatchesByPriority([TaskPriority.NORMAL, TaskPriority.LOW]);
+          x = 0;
+
+          if (this.spectrogram.context) {
+            const clearW = Math.ceil(columnsToRender * this.spectrogram.pixelRatio);
+            this.spectrogram.context.clearRect(0, 0, clearW, this.spectrogram.canvas.height);
+          }
+
+          sliceStartSample = Math.max(0, Math.round(this.lastSpectrogramRenderedScrollLeftPx * context.samplesPerPx));
+          sliceEndSample = Math.min(
+            dataLength,
+            Math.round((this.lastSpectrogramRenderedScrollLeftPx + columnsToRender) * context.samplesPerPx),
+          );
+        }
+
         const tasksScheduled = this.schedulePartialSpectrogramComputations(sliceStartSample, sliceEndSample);
         if (tasksScheduled === 0) {
           this.redrawSpectrogramSliceFromCache("all-in-cache", sliceStartSample, sliceEndSample);
@@ -329,6 +366,8 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
 
   destroy(): void {
     this.audio?.off("chunkLoaded", this.handleChunkLoaded);
+    this.computationQueue.clear();
+    this.pendingTaskIds.clear();
     this.fftProcessor?.dispose();
     this.fftProcessor = null;
   }
@@ -423,10 +462,10 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     const pixelStartX = Math.max(0, Math.floor(startX));
     const numSamplesInSlice = iEnd - iStart;
     const sliceWidthInPixels = Math.ceil(numSamplesInSlice / samplesPerPx);
-    const pixelEndX = Math.min(width, pixelStartX + sliceWidthInPixels);
+    const pixelEndX = Math.min(width, Math.ceil(startX + sliceWidthInPixels));
 
     for (let x = pixelStartX; x < pixelEndX; x++) {
-      const centerSample = iStart + (x - pixelStartX + 0.5) * samplesPerPx;
+      const centerSample = iStart + (x - startX + 0.5) * samplesPerPx;
       const hopIndex = Math.max(0, Math.floor((centerSample - fftWindowHalf) / hopSize + 0.5));
       const hopStartSample = hopIndex * hopSize;
       const hopSpectrum = this.getFFTFromCache(channelNumber, hopStartSample);
@@ -459,11 +498,18 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
         const hopStartSample = hopIndex * hopSize;
         if (hopStartSample + fftSize > dataLength || hopStartSample < 0) continue;
         const hopKey = `${channelIndex}:${hopStartSample}`;
-        if (!this.hasFFTInCache(channelIndex, hopStartSample)) {
+        if (!this.hasFFTInCache(channelIndex, hopStartSample) && !this.pendingTaskIds.has(hopKey)) {
+          this.pendingTaskIds.add(hopKey);
           tasks.push({
             id: hopKey,
             priority,
-            taskFn: () => this.calculateHopSpectrum(channelIndex, hopStartSample),
+            taskFn: () => {
+              try {
+                return this.calculateHopSpectrum(channelIndex, hopStartSample);
+              } finally {
+                this.pendingTaskIds.delete(hopKey);
+              }
+            },
           });
         }
       }
@@ -556,7 +602,11 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     const rawChunks = (proxy as any).__rawTarget;
     if (!rawChunks) return true; // Not in streaming mode, no proxy, everything is loaded
 
-    const samplesPerChunk = this.audio.sampleRate * 10;
+    const samplesPerChunk =
+      (this.audio.decoder as any)?.samplesPerChunk ||
+      this.audio.chunks?.[0]?.[0]?.length ||
+      this.audio.sampleRate * 10 ||
+      1;
     const startChunk = Math.floor(startSample / samplesPerChunk);
     const endChunk = Math.floor((endSample - 1) / samplesPerChunk);
 
@@ -625,7 +675,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
 
     try {
       const dataLength = this.lastRenderContext.dataLength;
-      const scrollLeftPx = this.lastRenderContext.scrollLeftPx;
+      const scrollLeftPx = this.lastSpectrogramRenderedScrollLeftPx;
       const samplesPerPx = this.lastRenderContext.samplesPerPx;
       const clampedStart = clamp(startSample, 0, dataLength);
       const clampedEnd = clamp(Math.ceil(endSample), 0, dataLength);
@@ -734,6 +784,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     // Mark for redraw and trigger redraw logic
     this.spectrogramNeedsRedraw = true;
     if (shouldClearCache) {
+      this.pendingTaskIds.clear();
       this.fftCache.clear();
     }
 
@@ -744,6 +795,7 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
   }
 
   public resetRenderState() {
+    this.pendingTaskIds.clear();
     this.lastSpectrogramRenderedWidth = 0;
     this.lastSpectrogramRenderedZoom = 0;
     this.lastSpectrogramRenderedScrollLeftPx = 0;

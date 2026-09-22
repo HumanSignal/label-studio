@@ -35,6 +35,9 @@ export const create = (columns) => {
     annotations: types.optional(types.array(CustomJSON), []),
     predictions: types.optional(types.array(CustomJSON), []),
     drafts: types.frozen(),
+    // Data Collection: the file of the latest submitted annotation, computed
+    // server-side (null until something is submitted).
+    submission: types.frozen(),
     source: types.maybeNull(types.string),
     was_cancelled: false,
     overlap_reached: types.maybeNull(types.boolean),

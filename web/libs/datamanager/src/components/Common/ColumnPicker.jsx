@@ -159,14 +159,22 @@ export function filtersToPickerGroups(availableFilters, recentEntries = []) {
   }
 
   // Ungrouped root filters are labelled "Task" so they have a visible section heading.
+  // Sort within each semantic group A→Z by title. Recent stays in recency order.
   if (rootItems.length) {
-    result.push({ key: "__root__", title: "Task", items: rootItems });
+    result.push({ key: "__root__", title: "Task", items: sortPickerItemsByTitle(rootItems) });
   }
   if (agreementItems.length) {
-    result.push({ key: "__agreement__", title: "Agreement", items: agreementItems });
+    result.push({ key: "__agreement__", title: "Agreement", items: sortPickerItemsByTitle(agreementItems) });
   }
-  result.push(...groups.values());
+  for (const group of groups.values()) {
+    result.push({ ...group, items: sortPickerItemsByTitle(group.items) });
+  }
   return result;
+}
+
+/** Locale-aware A→Z by display title (case-insensitive). */
+function sortPickerItemsByTitle(items) {
+  return [...items].sort((a, b) => (a.title ?? "").localeCompare(b.title ?? "", undefined, { sensitivity: "base" }));
 }
 
 /**

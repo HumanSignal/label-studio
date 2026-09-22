@@ -32,7 +32,9 @@ export interface SidePanelsProps {
   currentEntity: any;
   showComments: boolean;
   showCustomTab: ShowCustomTab;
-  focusTab: string;
+  focusTab: string | null;
+  /** FIT-2813: increments on each comment validation so collapsed sidebar re-expands. */
+  focusRequest?: number;
 }
 
 export interface ViewportSize {

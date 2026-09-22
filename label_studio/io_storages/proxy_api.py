@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
 
-from label_studio.io_storages.functions import get_storage_by_url
+from label_studio.io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
 from label_studio.io_storages.utils import parse_range
 
 logger = logging.getLogger(__name__)
@@ -75,6 +75,11 @@ class ResolveStorageUriAPIMixin:
         project = instance if isinstance(instance, Project) else instance.project
         storage_objects = project.get_all_import_storage_objects
         storage = get_storage_by_url(fileuri, storage_objects)
+        if not storage:
+            # Fall back to the project's own export targets: assets the project
+            # produced (Data Collection submissions) live there and must still
+            # preview. Import first, so existing resolution is unchanged.
+            storage = resolve_own_collection_export_storage(fileuri, project)
         if not storage:
             logger.error(f'Could not find storage for URI {fileuri}')
             return Response(status=status.HTTP_404_NOT_FOUND)

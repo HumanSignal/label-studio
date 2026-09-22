@@ -88,6 +88,28 @@ const markField = StateField.define<DecorationSet>({
 const placeholderCompartment = new Compartment();
 const readOnlyCompartment = new Compartment();
 
+/**
+ * CM6 renders placeholders as an inline-block span, so a multi-line placeholder stretches the
+ * empty document's line box — and the caret drawn against it — to the full placeholder height.
+ * Returning an out-of-flow element keeps the hint visible at normal line height.
+ */
+export function createPlaceholderContent(content: string): string | HTMLElement {
+  if (!content.includes("\n")) return content;
+
+  const element = document.createElement("div");
+  element.className = "cm-multiline-placeholder";
+  element.textContent = content;
+  element.style.position = "absolute";
+  element.style.maxWidth = "100%";
+  element.style.whiteSpace = "pre-wrap";
+  element.style.pointerEvents = "none";
+  return element;
+}
+
+function placeholderExtension(content: string | undefined): Extension {
+  return content ? placeholder(createPlaceholderContent(content)) : [];
+}
+
 export type Cm5EditorShim = Pick<
   Editor,
   | "getValue"
@@ -214,9 +236,7 @@ export function createCm5EditorShim(getView: () => EditorView | undefined | null
       if (key === "placeholder") {
         dynamicOptions.placeholder = typeof value === "string" ? value : undefined;
         view.dispatch({
-          effects: placeholderCompartment.reconfigure(
-            dynamicOptions.placeholder ? placeholder(dynamicOptions.placeholder) : [],
-          ),
+          effects: placeholderCompartment.reconfigure(placeholderExtension(dynamicOptions.placeholder)),
         });
         return;
       }
@@ -328,7 +348,7 @@ export function buildCm6Extensions(
   }
 
   extensions.push(
-    placeholderCompartment.of(options.placeholder ? placeholder(options.placeholder) : []),
+    placeholderCompartment.of(placeholderExtension(options.placeholder)),
     readOnlyCompartment.of(resolveReadOnlyExtension(options.readOnly)),
   );
 

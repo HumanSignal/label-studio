@@ -113,6 +113,28 @@ def get_storage_by_url(url: Union[str, List, Dict], storage_objects: Iterable[Im
                 return storage_object
 
 
+def resolve_own_collection_export_storage(url, project):
+    """An export target that may serve this URI, or None.
+
+    Export connections resolve only the project's own collection folder. They
+    match on bucket name alone and are commonly shared across an organization,
+    so accepting any key in the bucket would let a client-supplied URI read
+    every other project's exported data through a task it happens to can view.
+    """
+    from io_storages.utils import is_own_collection_key, parse_bucket_uri
+
+    if not isinstance(url, str):
+        return None
+    storage = get_storage_by_url(url, project.get_all_export_storage_objects)
+    if storage is None:
+        return None
+    uri = parse_bucket_uri(url, storage)
+    if uri is None or not is_own_collection_key(uri.path, project.organization_id, project.id):
+        logger.warning(f'Refusing export-storage resolution outside project {project.id} own collection folder')
+        return None
+    return storage
+
+
 def get_import_storage_link_prefetches() -> list[Prefetch]:
     from tasks.models import Task
 

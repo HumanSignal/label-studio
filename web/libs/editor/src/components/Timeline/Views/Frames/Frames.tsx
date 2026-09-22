@@ -6,6 +6,7 @@ import { cn } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import type { MSTTimelineRegion, TimelineRegion, TimelineViewProps } from "../../Types";
 import { Keypoints } from "./Keypoints";
+import { computeKeypointsVirtualBounds, DEFAULT_TIMELINE_VIEWPORT_HEIGHT } from "./Utils";
 import "./Frames.prefix.css";
 
 /**
@@ -447,6 +448,7 @@ export const Frames: FC<TimelineViewProps> = ({
             regions={regions}
             scrollTop={currentOffsetY}
             startOffset={timelineStartOffset}
+            viewportHeight={props.height ?? DEFAULT_TIMELINE_VIEWPORT_HEIGHT}
             onSelectRegion={onSelectRegion}
             disabled={regionSelectionDisabled}
           />
@@ -462,22 +464,31 @@ interface KeypointsVirtualProps {
   regions: TimelineRegion[];
   startOffset: number;
   scrollTop: number;
+  viewportHeight: number;
   disabled?: boolean;
   onSelectRegion: TimelineViewProps["onSelectRegion"];
 }
 
-const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scrollTop, disabled, onSelectRegion }) => {
-  const extra = 5;
-  const height = 24;
-  const bounds = useMemo(() => {
-    const sIdx = clamp(Math.ceil(scrollTop / height) - 1, 0, regions.length);
-    const eIdx = clamp(sIdx + (Math.ceil(165 / height) - 1), 0, regions.length);
+const KEYPOINT_ROW_HEIGHT = 24;
 
-    return [clamp(sIdx - extra, 0, regions.length), clamp(eIdx + extra, 0, regions.length)];
-  }, [scrollTop, regions.length]);
+const KeypointsVirtual: FC<KeypointsVirtualProps> = ({
+  regions,
+  startOffset,
+  scrollTop,
+  viewportHeight,
+  disabled,
+  onSelectRegion,
+}) => {
+  const bounds = useMemo(
+    () => computeKeypointsVirtualBounds(scrollTop, regions.length, viewportHeight),
+    [scrollTop, regions.length, viewportHeight],
+  );
 
   return (
-    <div className={cn("timeline-frames").elem("keypoints").toClassName()} style={{ height: regions.length * height }}>
+    <div
+      className={cn("timeline-frames").elem("keypoints").toClassName()}
+      style={{ height: regions.length * KEYPOINT_ROW_HEIGHT }}
+    >
       {regions.map((region, i) => {
         return region.sequence.length > 0 || region.timeline ? (
           <Keypoints

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { generatePath, matchPath, useHistory, useLocation } from "react-router";
+import { parseLocationSearch } from "@humansignal/core";
 import { Pages } from "../pages";
 import { setBreadcrumbs, useBreadcrumbControls } from "../services/breadrumbs";
 import { pageSetToRoutes } from "../utils/routeHelpers";
@@ -125,16 +126,7 @@ export const useParams = () => {
   const currentPath = useCurrentPath();
 
   const match = useMemo(() => {
-    const parsedLocation = location.search
-      .replace(/^\?/, "")
-      .split("&")
-      .map((pair) => {
-        const [key, value] = pair.split("=").map((p) => decodeURIComponent(p));
-        return [key, value];
-      });
-
-    const search = Object.fromEntries(parsedLocation);
-
+    const search = parseLocationSearch(location.search);
     const urlParams = matchPath(location.pathname, currentPath ?? "");
 
     return { ...search, ...(urlParams?.params ?? {}) };

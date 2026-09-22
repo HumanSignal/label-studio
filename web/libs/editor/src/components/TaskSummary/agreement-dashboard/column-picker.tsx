@@ -13,9 +13,14 @@
  *   5. Per-column checkboxes, immediately applied.
  */
 
-import { useCallback, useMemo } from "react";
 import { Checkbox, Select } from "@humansignal/ui";
+import { type SyntheticEvent, startTransition, useCallback, useMemo } from "react";
 import type { DimensionInfo } from "./types";
+
+/** Isolate header clicks from cmdk CommandItem selection (FIT-2761). */
+const stopHeaderPropagation = (event: SyntheticEvent) => {
+  event.stopPropagation();
+};
 
 // ---------------------------------------------------------------------------
 // Props
@@ -81,14 +86,6 @@ export const ColumnPicker = ({
     return visibleColumnIds.every((id) => catSet.has(id));
   }, [visibleColumnIds, categoricalDimensionIds]);
 
-  const handleCategoricalsOnlyToggle = useCallback(() => {
-    if (categoricalsOnlyActive) {
-      onVisibleColumnsChange(allDimensions.map((d) => d.dimensionId));
-    } else {
-      onVisibleColumnsChange(categoricalDimensionIds);
-    }
-  }, [categoricalsOnlyActive, allDimensions, categoricalDimensionIds, onVisibleColumnsChange]);
-
   // "Conflicts Only" is active when visibleColumnIds exactly matches conflictingDimensionIds
   const conflictsOnlyActive = useMemo(() => {
     if (conflictingDimensionIds.length === 0 || visibleColumnIds.length !== conflictingDimensionIds.length)
@@ -97,45 +94,78 @@ export const ColumnPicker = ({
     return visibleColumnIds.every((id) => conflictSet.has(id));
   }, [visibleColumnIds, conflictingDimensionIds]);
 
+  const applyVisibleColumns = useCallback(
+    (ids: number[]) => {
+      // Bulk visibility changes remount the agreement table; keep the Columns
+      // dropdown interactive while React reconciles (FIT-2761 page freeze).
+      startTransition(() => {
+        onVisibleColumnsChange(ids);
+      });
+    },
+    [onVisibleColumnsChange],
+  );
+
+  const handleCategoricalsOnlyToggle = useCallback(
+    (event?: SyntheticEvent) => {
+      if (event) stopHeaderPropagation(event);
+      if (categoricalsOnlyActive) {
+        applyVisibleColumns(allDimensions.map((d) => d.dimensionId));
+      } else {
+        applyVisibleColumns(categoricalDimensionIds);
+      }
+    },
+    [categoricalsOnlyActive, allDimensions, categoricalDimensionIds, applyVisibleColumns],
+  );
+
   const handleChange = useCallback(
     // ASSUMPTION: Select's onChange provides the selected string[] in multi mode,
     // but its TypeScript overload exposes a union with ChangeEvent. Cast is required.
     (selectedValues: string | string[] | unknown) => {
       const values = Array.isArray(selectedValues) ? selectedValues : [String(selectedValues)];
-      onVisibleColumnsChange(values.map(Number));
+      applyVisibleColumns(values.map(Number));
     },
-    [onVisibleColumnsChange],
+    [applyVisibleColumns],
   );
 
-  const handleSelectAllToggle = useCallback(() => {
-    if (allSelected) {
-      onVisibleColumnsChange([]);
-    } else {
-      onVisibleColumnsChange(allDimensions.map((d) => d.dimensionId));
-    }
-  }, [allSelected, allDimensions, onVisibleColumnsChange]);
+  const handleSelectAllToggle = useCallback(
+    (event?: SyntheticEvent) => {
+      if (event) stopHeaderPropagation(event);
+      if (allSelected) {
+        applyVisibleColumns([]);
+      } else {
+        applyVisibleColumns(allDimensions.map((d) => d.dimensionId));
+      }
+    },
+    [allSelected, allDimensions, applyVisibleColumns],
+  );
 
-  const handleConflictsOnlyToggle = useCallback(() => {
-    if (conflictsOnlyActive) {
-      // Uncheck: show all columns
-      onVisibleColumnsChange(allDimensions.map((d) => d.dimensionId));
-    } else {
-      // Check: show only conflicting columns
-      onVisibleColumnsChange(conflictingDimensionIds);
-    }
-  }, [conflictsOnlyActive, allDimensions, conflictingDimensionIds, onVisibleColumnsChange]);
+  const handleConflictsOnlyToggle = useCallback(
+    (event?: SyntheticEvent) => {
+      if (event) stopHeaderPropagation(event);
+      if (conflictsOnlyActive) {
+        // Uncheck: show all columns
+        applyVisibleColumns(allDimensions.map((d) => d.dimensionId));
+      } else {
+        // Check: show only conflicting columns
+        applyVisibleColumns(conflictingDimensionIds);
+      }
+    },
+    [conflictsOnlyActive, allDimensions, conflictingDimensionIds, applyVisibleColumns],
+  );
 
   const selectHeader = useMemo(
     () => (
-      <div className="border-b border-neutral-border">
+      <div
+        className="border-b border-neutral-border"
+        onPointerDown={stopHeaderPropagation}
+        onMouseDown={stopHeaderPropagation}
+      >
         {/* All Columns */}
-        <div
-          className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none cursor-pointer"
-          onClick={handleSelectAllToggle}
-        >
-          <div className="flex gap-2 w-full pl-2 pr-4 py-1 hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
-            <Checkbox tabIndex={-1} checked={allSelected} readOnly />
-            <div className="w-full min-w-0 truncate">All Columns</div>
+        <div className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none">
+          <div className="w-full pl-2 pr-4 py-1 hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
+            <Checkbox checked={allSelected} onChange={() => handleSelectAllToggle()} className="w-full">
+              All Columns
+            </Checkbox>
           </div>
         </div>
 
@@ -172,16 +202,7 @@ export const ColumnPicker = ({
         )} */}
       </div>
     ),
-    [
-      allSelected,
-      handleSelectAllToggle,
-      hasNonCategoricalDimensions,
-      categoricalsOnlyActive,
-      handleCategoricalsOnlyToggle,
-      conflictsOnlyActive,
-      handleConflictsOnlyToggle,
-      conflictingDimensionIds.length,
-    ],
+    [allSelected, handleSelectAllToggle],
   );
 
   return (
@@ -215,6 +236,7 @@ export const ColumnPicker = ({
           header={selectHeader}
           onChange={handleChange}
           placeholder="Select Columns"
+          isVirtualList={options.length > 30}
           renderSelected={() => (
             <span>
               Columns ({shownCount} of {totalDimensionCount})

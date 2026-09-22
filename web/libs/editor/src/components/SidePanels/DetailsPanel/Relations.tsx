@@ -11,6 +11,7 @@ import { Button, Select } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { cn } from "../../../utils/bem";
+import { emitRelationDirectionChanged, emitRelationVisibilityToggled } from "../../../utils/labelingTelemetry";
 import { wrapArray } from "../../../utils/utilities";
 import { RegionItem } from "./RegionItem";
 import "./Relations.prefix.css";
@@ -82,7 +83,19 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
       onMouseLeave={onMouseLeave}
     >
       <div className={cn("relations").elem("content").toClassName()}>
-        <div className={cn("relations").elem("icon").toClassName()} onClick={relation.rotateDirection}>
+        <div
+          className={cn("relations").elem("icon").toClassName()}
+          onClick={() => {
+            const order = ["left", "right", "bi"];
+            const nextDirection = order[(order.indexOf(relation.direction) + 1) % order.length];
+            const annotation = relation.node1?.annotation;
+            emitRelationDirectionChanged(annotation?.store, annotation, {
+              relation_id: relation.id,
+              direction: nextDirection,
+            });
+            relation.rotateDirection();
+          }}
+        >
           <div className={cn("relations").elem("direction").toClassName()}>{directionIcon}</div>
         </div>
         <div className={cn("relations").elem("nodes").toClassName()}>
@@ -110,7 +123,16 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
                 look="string"
                 size="small"
                 tooltip="Toggle Visibility"
-                onClick={relation.toggleVisibility}
+                onClick={() => {
+                  const nextVisible = !relation.visible;
+                  const annotation = relation.node1?.annotation;
+                  emitRelationVisibilityToggled(annotation?.store, annotation, {
+                    relation_id: relation.id,
+                    visible: nextVisible,
+                    scope: "relation",
+                  });
+                  relation.toggleVisibility();
+                }}
                 aria-label={`${relation.visible ? "Hide" : "Show"} Relation`}
               >
                 {relation.visible ? (

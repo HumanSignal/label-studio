@@ -1,11 +1,77 @@
 import { z } from "zod";
-import type { FieldDefinition, MessageDefinition, ProviderConfig } from "./common";
+import type { FieldDefinition, MessageDefinition, ProviderConfig, VisibleWhen } from "./common";
 
 // Re-export ProviderConfig for convenience
 export type { ProviderConfig };
 
+/**
+ * Check if a visibleWhen / requiredWhen condition matches the current form data.
+ */
+export function matchesWhen(when: VisibleWhen | undefined, formData: Record<string, any>): boolean {
+  if (!when) {
+    return true;
+  }
+
+  const { field: dependencyField, value: expectedValue } = when;
+  const currentValue = formData[dependencyField];
+
+  if (typeof expectedValue === "function") {
+    return expectedValue(currentValue, formData);
+  }
+  if (Array.isArray(expectedValue)) {
+    return expectedValue.includes(currentValue);
+  }
+  return currentValue === expectedValue;
+}
+
+/**
+ * Check if a field or message should be visible based on its visibleWhen condition.
+ */
+export function isFieldVisible(field: FieldDefinition | MessageDefinition, formData: Record<string, any>): boolean {
+  return matchesWhen(field.visibleWhen, formData);
+}
+
+/**
+ * Map a null/omitted select value to the field default so edit forms match
+ * backend null-as-default rows (e.g. pre-migration auth_mode).
+ */
+export function coalesceSelectFieldValue(field: FieldDefinition, value: unknown): unknown {
+  if (value !== null && value !== undefined) {
+    return value;
+  }
+  if (Object.hasOwn(field, "defaultValue") && field.defaultValue !== undefined) {
+    return typeof field.defaultValue === "function" ? (field.defaultValue as () => unknown)() : field.defaultValue;
+  }
+  if (!field.required) {
+    return "";
+  }
+  return value;
+}
+
+/** Drop fields hidden by visibleWhen so they are not sent on create/update. */
+export function omitHiddenProviderFields(
+  data: Record<string, any>,
+  fields: (FieldDefinition | MessageDefinition)[] | undefined,
+): Record<string, any> {
+  if (!fields) {
+    return { ...data };
+  }
+  const cleanedData = { ...data };
+  fields.forEach((field) => {
+    if (field.type === "message") return;
+    if (!isFieldVisible(field, data)) {
+      delete cleanedData[field.name];
+    }
+  });
+  return cleanedData;
+}
+
 // Shared function to determine if a field is actually required
-export function isFieldRequired(field: FieldDefinition, isEditMode = false): boolean {
+export function isFieldRequired(
+  field: FieldDefinition,
+  isEditMode = false,
+  formData: Record<string, any> = {},
+): boolean {
   // Access key fields are never required in edit mode (they can be provided via env vars)
   if (field.accessKey && isEditMode) {
     return false;
@@ -13,6 +79,10 @@ export function isFieldRequired(field: FieldDefinition, isEditMode = false): boo
 
   // Check if the field is explicitly marked as required
   if (field.required === true) {
+    return true;
+  }
+
+  if (field.requiredWhen && matchesWhen(field.requiredWhen, formData)) {
     return true;
   }
 
@@ -49,17 +119,18 @@ export function isFieldRequired(field: FieldDefinition, isEditMode = false): boo
 }
 
 // Helper function to assemble the complete schema from field definitions
-export function assembleSchema(fields: FieldDefinition[], isEditMode = false): z.ZodObject<any> {
+export function assembleSchema(fields: FieldDefinition[], isEditMode = false) {
   const schemaObject: Record<string, z.ZodTypeAny> = {};
 
   fields.forEach((field) => {
     let fieldSchema = field.schema;
     const isRequired = isFieldRequired(field, isEditMode);
 
-    // For access keys in edit mode, make them optional and skip validation
+    // For access keys in edit mode, make them optional and skip validation.
+    // Fields with visibleWhen are validated at runtime via superRefine when shown.
     if (field.accessKey && isEditMode) {
       fieldSchema = fieldSchema.optional();
-    } else if (isRequired) {
+    } else if (isRequired && !field.visibleWhen) {
       // For required fields, ensure they have proper validation
       if (fieldSchema instanceof z.ZodString) {
         fieldSchema = fieldSchema.min(1, `${field.label} is required`);
@@ -96,7 +167,21 @@ export function assembleSchema(fields: FieldDefinition[], isEditMode = false): z
     schemaObject[field.name] = fieldSchema;
   });
 
-  return z.object(schemaObject);
+  return z.object(schemaObject).superRefine((data, ctx) => {
+    fields.forEach((field) => {
+      if (field.visibleWhen && !isFieldVisible(field, data)) return;
+      if (!isFieldRequired(field, isEditMode, data)) return;
+
+      const value = data[field.name];
+      if (value === undefined || value === null || value === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${field.label} is required`,
+          path: [field.name],
+        });
+      }
+    });
+  });
 }
 
 // Helper function to extract default values from Zod schemas

@@ -118,7 +118,7 @@ The `apiUrl` must be accessible to Label Studio. You can accomplish this in seve
 
     <div class="admonition note"><p class="admonition-title">note</p><p>Do not sync this storage connection. If you do, you will need to delete the task that is automatically created when syncing the taxonomy.</p></div>
 
-3. When configuring your labeling interface, format your `apiUrl` using the appropriate URL format for your cloud service provider: `gs://`, `s3://`, `azure-blob://`. 
+3. When configuring your labeling interface, format your `apiUrl` using the appropriate URL format for your cloud service provider: `gs://`, `s3://`, `azure-blob://`, or `azure-spi://` for Azure [Service Principal](/guide/storage_azure#Azure-blob-storage-with-Service-Principal) authentication. 
 
 
 !!! warning Note on setting up cloud storage

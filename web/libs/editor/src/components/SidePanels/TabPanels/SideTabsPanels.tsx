@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { emitLabelingEvent } from "../../../utils/labelingTelemetry";
 import { cn } from "../../../utils/bem";
 import { useMedia } from "../../../hooks/useMedia";
 import ResizeObserver from "../../../utils/resize-observer";
@@ -28,7 +29,7 @@ import {
   type ViewportSize,
 } from "./types";
 import {
-  findPanelViewByName,
+  applyFocusTabToPanels,
   findZIndices,
   getAttachedPerSide,
   getLeftKeys,
@@ -58,6 +59,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   showComments,
   showCustomTab,
   focusTab,
+  focusRequest = 0,
 }) => {
   const snapThreshold = 5;
   const regions = currentEntity.regionStore;
@@ -158,8 +160,22 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   );
 
   const setActiveTab = useCallback(
-    (key: string, tabIndex: number) => setPanelData((state) => setActive(state, key, tabIndex)),
-    [panelData],
+    (key: string, tabIndex: number) =>
+      setPanelData((state) => {
+        const previous = state[key]?.panelViews?.find((view) => view.active);
+        const next = setActive(state, key, tabIndex);
+        const selected = next[key]?.panelViews?.[tabIndex];
+
+        if (selected?.name && previous?.name !== selected.name) {
+          emitLabelingEvent(currentEntity?.store, "label_sidebar_tab_selected", {
+            tab: selected.name,
+            panel: key,
+          });
+        }
+
+        return next;
+      }),
+    [currentEntity],
   );
 
   const onVisibilityChange = useCallback(
@@ -469,19 +485,16 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   }, [panelData, collapsedSide]);
 
   useEffect(() => {
-    if (focusTab) {
-      const state = { ...panelData };
-      const foundTab = findPanelViewByName(state, focusTab);
+    if (!focusTab) return;
 
-      if (!foundTab) return;
-      const { panelName, tab, panelViewIndex } = foundTab;
-      const { alignment, detached, visible } = state[panelName];
+    const next = applyFocusTabToPanels(panelData, collapsedSide, focusTab);
 
-      if (!tab.active) setPanelData(setActive(state, panelName, panelViewIndex));
-      if (!detached && collapsedSide[alignment]) setCollapsedSide({ ...collapsedSide, [alignment]: false });
-      if (!visible) onVisibilityChange(panelName, true);
-    }
-  }, [focusTab]);
+    if (next.panelData !== panelData) setPanelData(next.panelData);
+    if (next.collapsedSide !== collapsedSide) setCollapsedSide(next.collapsedSide);
+    if (next.showPanel) onVisibilityChange(next.showPanel, true);
+    // focusRequest must re-run after the user re-collapses the sidebar and rejects again
+    // while focusTab stays "comments" (FIT-2813).
+  }, [focusTab, focusRequest]);
 
   useEffect(() => {
     const root = rootRef.current;

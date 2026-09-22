@@ -27,16 +27,25 @@ jobs:
 
       - name: install
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           arch="$(uname)_$(uname -m)"
           platform=$(echo $arch | tr '[:upper:]' '[:lower:]' )
           echo "PLATFORM=$platform" >> $GITHUB_ENV
           if [[ "${{ inputs.version }}" == "latest" ]]; then
-            echo "GITLEAKS_VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | jq -r .tag_name | sed 's/^v//')" >> $GITHUB_ENV
+            # Authenticated call: unauthenticated api.github.com requests are rate-limited per IP
+            # on shared runners and silently yield `null`, producing a broken download URL.
+            version="$(gh release view --repo gitleaks/gitleaks --json tagName --jq '.tagName' | sed 's/^v//')"
           else
-            echo "GITLEAKS_VERSION=${{ inputs.version }}" >> $GITHUB_ENV
+            version="${{ inputs.version }}"
           fi
+          if [[ -z "$version" || "$version" == "null" ]]; then
+            echo "::error::Failed to resolve gitleaks version (got '${version}')"
+            exit 1
+          fi
+          echo "GITLEAKS_VERSION=$version" >> "$GITHUB_ENV"
 
       - name: Cache gitleaks archive
         id: cache_gitleaks

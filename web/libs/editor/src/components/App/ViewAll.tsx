@@ -1,4 +1,5 @@
 import { usePersistentState, usePersistentJSONState } from "@humansignal/core/lib/hooks/usePersistentState";
+import { emitCompareAllViewSelected } from "../../utils/labelingTelemetry";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui/lib/tabs";
 import { Toggle } from "@humansignal/ui";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
@@ -23,10 +24,16 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
   /** Side-by-side only filters predictions when Agreement V2 toggle is available; V1 always shows them. */
   const effectiveIncludePredictions = !isAgreementV2 || includePredictions;
 
+  const handleCompareViewChange = (value: string) => {
+    const view = value as "summary" | "compare";
+    setTab(view);
+    emitCompareAllViewSelected(annotationStore.store, view);
+  };
+
   if (annotationStore.store.hasInterface("annotations:summary")) {
     return (
       <div className="px-base pt-tighter mt-base">
-        <Tabs variant="default" value={tab} onValueChange={(value) => setTab(value as "summary" | "compare")}>
+        <Tabs variant="default" value={tab} onValueChange={handleCompareViewChange}>
           <div
             className={
               isAgreementV2

@@ -35,6 +35,25 @@ class TestAdminRunScheduledMigrations(TestCase):
         assert kwargs.get('migration_name') == m.name
         assert isinstance(kwargs.get('sql'), str)
         assert kwargs.get('reverse') is False
+        assert kwargs.get('dependencies') == []
+
+    @patch('core.redis.start_job_async_or_sync')
+    def test_passes_dependencies_from_meta(self, mock_start):
+        """Admin forwards meta['dependencies'] into execute_sql_job so the wait still applies."""
+        m = AsyncMigrationStatus.objects.create(
+            name='label_studio.tasks.migrations.0059_task_completion_id_updated_at_idx_async',
+            status=AsyncMigrationStatus.STATUS_SCHEDULED,
+            meta={'dependencies': ['label_studio.tasks.migrations.0058_prerequisite']},
+        )
+
+        qs = AsyncMigrationStatus.objects.filter(pk=m.pk)
+        self.admin.run_scheduled_migrations(self.request, qs)
+
+        _, kwargs = mock_start.call_args
+        assert kwargs.get('dependencies') == ['label_studio.tasks.migrations.0058_prerequisite']
+        retry = kwargs.get('retry')
+        assert retry is not None
+        assert retry.max == 96
 
     @patch('core.redis.start_job_async_or_sync')
     def test_invalid_path_marks_error(self, mock_start):

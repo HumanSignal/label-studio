@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from projects.models import Project
+from ranged_fileresponse import RangedFileResponse
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -167,12 +168,23 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
 
         request.user = user
 
-        decoded_fileuri = _decode_fileuri(fileuri)
-        if decoded_fileuri.startswith('/data/upload/'):
-            return self._serve_local_upload(decoded_fileuri, project)
-
+        # Authorize BEFORE serving anything. The token is minted for one (user, project)
+        # pair, but permission can be revoked while the token is still valid, so the
+        # bearer's current access to that project has to be re-checked on every request.
+        # This must guard every branch below — the local-upload branch used to run first
+        # and served bytes without ever reaching this check.
         if not project.has_permission(user):
             return _add_cors_headers(Response(status=status.HTTP_403_FORBIDDEN))
+
+        decoded_fileuri = _decode_fileuri(fileuri)
+        if decoded_fileuri.startswith('/data/upload/'):
+            return self._serve_local_upload(request, decoded_fileuri, project)
+        # FIT-2832: History / tab Userpics in the sandboxed shell need avatars without
+        # session cookies. Canonical form is /data/avatars/... (also produced from
+        # /storage-data/uploaded/?filepath=avatars/... by the FE URL rewrite).
+        avatar_prefix = f'/data/{settings.AVATAR_PATH}/'
+        if decoded_fileuri.startswith(avatar_prefix):
+            return self._serve_avatar(request, decoded_fileuri, user)
 
         # Delegate to the standard resolve path (presigned redirect or proxy depending on
         # storage.presign). The sandbox iframe fetches this endpoint via a parent-window
@@ -181,8 +193,57 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         response = self.resolve(request, decoded_fileuri, project)
         return _add_cors_headers(response)
 
-    def _serve_local_upload(self, url_path: str, project) -> HttpResponse:
-        """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies."""
+    def _serve_avatar(self, request, url_path: str, requester) -> HttpResponse:
+        """Serve a user avatar for sandboxed iframes (FIT-2832).
+
+        Mirrors DownloadStorageData's avatar branch: the requester must share an
+        organization with the avatar owner. Avatars are not project-scoped.
+        """
+        parts = url_path.lstrip('/').split('/')
+        # /data/avatars/<filename...>
+        if len(parts) < 3 or parts[0] != 'data' or parts[1] != settings.AVATAR_PATH:
+            return _add_cors_headers(HttpResponse(status=400))
+
+        storage_path = posixpath.join(*parts[1:])  # avatars/<filename>
+        normalized = posixpath.normpath(storage_path)
+        if (
+            normalized.startswith('..')
+            or normalized.startswith('/')
+            or not normalized.startswith(f'{settings.AVATAR_PATH}/')
+        ):
+            return _add_cors_headers(HttpResponse(status=400))
+
+        User = get_user_model()
+        try:
+            owner = User.objects.filter(avatar=normalized).first()
+        except Exception as exc:
+            logger.error(f'Error looking up avatar owner for {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
+
+        org = getattr(requester, 'active_organization', None)
+        if owner is None or org is None or not org.has_user(owner):
+            return _add_cors_headers(HttpResponse(status=403))
+
+        try:
+            content_type, _ = mimetypes.guess_type(owner.avatar.name)
+            response = RangedFileResponse(
+                request,
+                owner.avatar.open(mode='rb'),
+                content_type=content_type or 'application/octet-stream',
+            )
+            response['Accept-Ranges'] = 'bytes'
+            return _add_cors_headers(response)
+        except Exception as exc:
+            logger.error(f'Error serving avatar {url_path}: {exc}')
+            return _add_cors_headers(HttpResponse(status=500))
+
+    def _serve_local_upload(self, request, url_path: str, project) -> HttpResponse:
+        """Proxy a locally-uploaded file so sandboxed iframes can load it without session cookies.
+
+        Uses RangedFileResponse so HTML5 video/audio can seek (HTTP Range / 206). Without
+        Range support, project Quick View frame navigation breaks after uploads are
+        rewritten through this proxy (FIT-2776); Interface Preview keeps public URLs.
+        """
         # url_path: /data/upload/{project_id}/{filename}  →  storage path: upload/{project_id}/{filename}
         parts = url_path.lstrip('/').split('/')
         if len(parts) < 4 or parts[0] != 'data' or parts[1] != 'upload':
@@ -196,10 +257,11 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         try:
             from data_import.models import FileUpload
 
-            upload = FileUpload.objects.select_related('project').get(
-                file=normalized,
-                project__organization=project.organization,
-            )
+            # Scope to the exact project the token was minted for. Filtering by
+            # organization instead would let a token for project A read an upload that
+            # belongs to project B in the same organization — a tenancy leak, since
+            # organization membership does not imply access to every project in it.
+            upload = FileUpload.objects.get(file=normalized, project=project)
         except FileUpload.DoesNotExist:
             return _add_cors_headers(HttpResponse(status=404))
         except Exception as exc:
@@ -208,9 +270,15 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
 
         try:
             content_type, _ = mimetypes.guess_type(upload.file.name)
-            with upload.file.open('rb') as f:
-                content = f.read()
-            response = HttpResponse(content, content_type=content_type or 'application/octet-stream')
+            # Do not wrap open() in `with` — RangedFileResponse streams the handle.
+            response = RangedFileResponse(
+                request,
+                upload.file.open(mode='rb'),
+                content_type=content_type or 'application/octet-stream',
+            )
+            # Advertise Range even on full-body 200 so browsers enable seeking
+            # (django-ranged-fileresponse only sets this when HTTP_RANGE is present).
+            response['Accept-Ranges'] = 'bytes'
             return _add_cors_headers(response)
         except Exception as exc:
             logger.error(f'Error serving local upload {url_path}: {exc}')

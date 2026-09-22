@@ -28,13 +28,31 @@ class BucketURI:
 # server-derived reserved key layout. Import sync must never turn them into
 # tasks (each uploaded file would become a phantom task), so key iteration
 # skips them regardless of the connection's own prefix/regex settings.
+# Reserved are the raw submissions and the legacy flat layout that preceded
+# them — NOT the sibling `approved/` folder, which exists precisely to be
+# imported: a downstream annotation project points its source storage there to
+# consume accepted media, and reserving it would skip every object.
 COLLECTION_SUBMISSION_KEY_REGEX = re.compile(
-    r'(^|/)collection/org-\d+/project-\d+/task-\d+-[0-9a-f]{12}\.[a-z0-9]{1,8}$'
+    r'(^|/)collection/org-\d+/project-\d+/(submissions/|task-\d+-[0-9a-f]{12}\.[a-z0-9]{1,8}$)'
 )
 
 
 def is_collection_submission_key(key: str) -> bool:
     return bool(COLLECTION_SUBMISSION_KEY_REGEX.search(key or ''))
+
+
+def is_own_collection_key(key: str, organization_id, project_id) -> bool:
+    """True only for keys under THIS project's own collection folder.
+
+    Storage matching is bucket-wide, so a client-supplied URI that merely names
+    an export bucket must not be enough to read from it: export targets are
+    routinely shared across an organization. Resolution through an export
+    connection is therefore narrowed to the project's own reserved folder.
+    """
+    if organization_id is None or project_id is None:
+        return False
+    pattern = rf'(^|/)collection/org-{int(organization_id)}/project-{int(project_id)}/'
+    return bool(re.search(pattern, key or ''))
 
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:

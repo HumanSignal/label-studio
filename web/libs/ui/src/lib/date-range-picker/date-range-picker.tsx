@@ -52,6 +52,7 @@ const todayFormValues = formatDateByNumbers({
 });
 
 const dateInputIds = ["#start-input", "#end-input"];
+
 let canApply = {
   [Side.start]: { [Field.date]: true, [Field.time]: true },
   [Side.end]: { [Field.date]: true, [Field.time]: true },
@@ -111,6 +112,19 @@ type DateRangePickerProps = {
    * @default true
    */
   hasSelection?: boolean;
+  /**
+   * Optional answer the calendar cannot express (e.g. "Never" for an unset date). It renders under
+   * the range presets and takes the calendar out of reach while selected. Omit to stay range-only.
+   */
+  nullMode?: {
+    label: string;
+    /** Footer copy shown in place of the day count while it is selected. */
+    summary?: string;
+    /** Whether it is the applied answer. */
+    selected?: boolean;
+    /** Called on Apply — `false` when the answer went back to the calendar range. */
+    onChange: (selected: boolean) => void;
+  };
 };
 
 export const DateRangePicker = ({
@@ -122,6 +136,7 @@ export const DateRangePicker = ({
   standalone = false,
   onClear,
   hasSelection = true,
+  nullMode,
 }: DateRangePickerProps) => {
   const initialDatesWithTime = fillTime(initialDates);
   const initialFormDates = formatDateByNumbers(initialDatesWithTime);
@@ -140,8 +155,25 @@ export const DateRangePicker = ({
   const [resetTime, setTimeReset] = useState<boolean>(false);
   const [startOrEnd, setStartOrEnd] = useState<0 | 1 | undefined>();
   const [floatingRangeKey, setFloatingRangeKey] = useState<string | undefined>(initialFloatingRangeKey);
+  const appliedNull = Boolean(nullMode?.selected);
+  const [pendingNull, setPendingNull] = useState(appliedNull);
   const dropdown = useDropdown();
   const inputsRef = useRef<HTMLDivElement>(null);
+  const calendarBodyRef = useRef<HTMLDivElement>(null);
+
+  const rangePending = !pendingNull;
+  const modeChanged = pendingNull !== appliedNull;
+
+  useEffect(() => {
+    setPendingNull(appliedNull);
+  }, [appliedNull]);
+
+  // The calendar cannot answer "Never", so take it out of pointer and tab reach entirely rather
+  // than leaving a range on screen that the filter is not using.
+  useEffect(() => {
+    const body = calendarBodyRef.current as (HTMLDivElement & { inert?: boolean }) | null;
+    if (body) body.inert = pendingNull;
+  }, [pendingNull]);
 
   const updateFocusToggle = (select?: 0 | 1) => {
     const inputs = dateInputIds.map((id) => inputsRef.current?.querySelector(id));
@@ -162,6 +194,7 @@ export const DateRangePicker = ({
   };
 
   const handleDateSelection = (range: DateOrDateTimeRange) => {
+    setPendingNull(false);
     setFormValuesDate({ ...formatDateByNumbers(range as DateTimeRange) });
     const mergedWithExisting = selectedDates
       ? {
@@ -189,7 +222,13 @@ export const DateRangePicker = ({
   };
 
   const handleApply = () => {
+    if (pendingNull) {
+      nullMode?.onChange(true);
+      dropdown?.close();
+      return;
+    }
     if (!selectedDates || !validDates) return;
+    if (modeChanged) nullMode?.onChange(false);
     const { start: startDate, end: endDate } = selectedDates;
     const fromString = formatDateString({ date: startDate, useTime: timeMode, showMeridian: true });
     const toString = formatDateString({ date: endDate, useTime: timeMode, showMeridian: true });
@@ -210,17 +249,18 @@ export const DateRangePicker = ({
   };
 
   useEffect(() => {
-    if (inputsRef.current && startOrEnd === undefined) {
+    if (inputsRef.current && startOrEnd === undefined && rangePending) {
       focusListener();
       return focusListener();
     }
-  }, [inputsRef, startOrEnd]);
+  }, [inputsRef, startOrEnd, rangePending]);
 
   const handleSetCanApply = (side: Side, field: Field, value: boolean) => {
     canApply = { ...canApply, [side]: { ...canApply[side], [field]: value } };
   };
 
   const { value: numberOfDaysValue, text: numberOfDaysText } = getNumberOfDaysBetweenDatesToDisplay(selectedDates);
+  const applyEnabled = rangePending ? (dateChanged || timeModeChanged || modeChanged) && validDates : modeChanged;
 
   return (
     <div className={`${styles.datePickerCalendar} ${standalone ? styles.standalone : ""}`}>
@@ -231,9 +271,13 @@ export const DateRangePicker = ({
             creationDate={creationDate}
             setDates={handleDateFromSidebar}
             selectedDates={selectedDates}
+            nullMode={nullMode ? { label: nullMode.label, selected: pendingNull, onSelect: setPendingNull } : undefined}
           />
         </div>
-        <div className={styles.mainContentWrapper}>
+        <div
+          ref={calendarBodyRef}
+          className={`${styles.mainContentWrapper} ${rangePending ? "" : styles.mainContentInert}`}
+        >
           <div className={styles.inputsWrapper} ref={inputsRef}>
             <DateTimeInput
               timeMode={timeMode}
@@ -297,16 +341,29 @@ export const DateRangePicker = ({
       </div>
       <div className={styles.footer}>
         <div className={styles.daysSelected} data-testid="days-selected">
-          <Typography variant="body" size="medium">
-            {numberOfDaysValue}
-          </Typography>{" "}
-          <Typography variant="body" size="medium" className="text-neutral-content-subtler">
-            {numberOfDaysText}
-          </Typography>
+          {pendingNull ? (
+            <Typography variant="body" size="medium" className="text-neutral-content-subtler">
+              {nullMode?.summary}
+            </Typography>
+          ) : (
+            <>
+              <Typography variant="body" size="medium">
+                {numberOfDaysValue}
+              </Typography>{" "}
+              <Typography variant="body" size="medium" className="text-neutral-content-subtler">
+                {numberOfDaysText}
+              </Typography>
+            </>
+          )}
         </div>
         <Space align="end">
           <div className={styles.timeToggle}>
-            <Toggle data-testid="time-toggle" checked={timeMode} onChange={() => setTimeMode(!timeMode)} />
+            <Toggle
+              data-testid="time-toggle"
+              checked={timeMode}
+              disabled={!rangePending}
+              onChange={() => setTimeMode(!timeMode)}
+            />
             <Typography variant="body" size="medium">
               Include time
             </Typography>
@@ -331,7 +388,7 @@ export const DateRangePicker = ({
             variant="negative"
             look="outlined"
             className="reset"
-            disabled={!dateChanged}
+            disabled={!dateChanged && !modeChanged}
             onClick={() => {
               setTimeReset(true);
               if (initialDates) handleDateSelection(initialDates);
@@ -339,20 +396,25 @@ export const DateRangePicker = ({
                 setSelectedDates(initialDates);
                 setFormValuesDate(todayFormValues);
               }
+              setPendingNull(appliedNull);
             }}
           >
             Reset
           </Button>
-          <Button aria-label="Close date picker" look="outlined" className="cancel" onClick={() => dropdown?.close()}>
+          <Button
+            aria-label="Close date picker"
+            look="outlined"
+            className="cancel"
+            onClick={() => {
+              // The picker stays mounted after the dropdown closes, so drop the uncommitted mode here.
+              setPendingNull(appliedNull);
+              dropdown?.close();
+            }}
+          >
             Cancel
           </Button>
-          <Button
-            aria-label="Apply date"
-            className="apply"
-            disabled={!((dateChanged || timeModeChanged) && validDates)}
-            onClick={handleApply}
-          >
-            Apply Range
+          <Button aria-label="Apply date" className="apply" disabled={!applyEnabled} onClick={handleApply}>
+            {nullMode ? "Apply" : "Apply Range"}
           </Button>
         </Space>
       </div>

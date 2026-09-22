@@ -21,6 +21,7 @@ import { Space } from "../../common/Space/Space";
 import { cn } from "../../utils/bem";
 import { userDisplayName } from "@humansignal/core";
 import { humanDateDiff } from "../../utils/utilities";
+import { emitLabelingEvent, annotationTelemetryIds } from "../../utils/labelingTelemetry";
 import { EmptyState } from "../SidePanels/Components/EmptyState";
 import "./AnnotationHistory.prefix.css";
 
@@ -99,6 +100,12 @@ const DraftState: FC<{
       selected={isSelected}
       hideInfo={infoIsHidden}
       onClick={() => {
+        emitLabelingEvent(annotation.list.store, "annotation_history_selected", {
+          ...annotationTelemetryIds(annotation),
+          history_id: null,
+          action_type: null,
+          is_current: true,
+        });
         store.selectHistory(null);
         annotation.toggleDraft(true);
       }}
@@ -189,7 +196,16 @@ const AnnotationHistoryComponent: FC<any> = ({
                   // wait for draft to be saved before switching to history
                   await when(() => !annotation.isDraftSaving);
                 }
+                const emitHistorySelected = (historyItem: typeof item | null, isCurrent: boolean) => {
+                  emitLabelingEvent(store, "annotation_history_selected", {
+                    ...annotationTelemetryIds(annotation),
+                    history_id: historyItem?.id ?? null,
+                    action_type: historyItem?.actionType ?? null,
+                    is_current: isCurrent,
+                  });
+                };
                 if (isLastItem || isSelected) {
+                  emitHistorySelected(null, true);
                   // last history state and draft are actual annotation, not from history
                   // and if user clicks on already selected item we should switch to last state
                   annotationStore.selectHistory(null);
@@ -210,6 +226,7 @@ const AnnotationHistoryComponent: FC<any> = ({
                     }
                   });
                 } else {
+                  emitHistorySelected(item, false);
                   annotationStore.selectHistory(item);
                 }
               }}

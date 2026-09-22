@@ -1,7 +1,9 @@
 import { CaretDownIcon } from "@humansignal/icons";
 import { cnb as cn } from "@humansignal/core/lib/utils/bem";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from "react";
 import { memo, useEffect, useRef, useState } from "react";
+import { cnm } from "../../utils/utils";
+import { Button } from "../button/button";
 import { Dropdown, type DropdownRef } from "../dropdown/dropdown";
 import { MultiTreeSelect } from "./multi-tree-select";
 import { type MultiTreeSelectProps, RootSymbol, type TreeAction, useTreeContext } from "./tree-context";
@@ -28,6 +30,37 @@ const DropdownIcon = memo(() => {
   );
 });
 
+/**
+ * Matches Tags filter Select footer: primary filled Apply, disabled until pending changes.
+ * @see TagMultiSelect footer + Select `p-tight border-t border-neutral-border flex`
+ */
+const TreeApplyFooter = memo(() => {
+  const { applySelection, hasPendingChanges, hasExternalPendingChanges } = useTreeContext();
+
+  return (
+    <div
+      className={cnm(
+        cn("multi-tree-select__content").elem("footer").toClassName(),
+        "p-tight border-t border-neutral-border flex",
+      )}
+    >
+      <Button
+        type="button"
+        onClick={applySelection}
+        variant="primary"
+        look="filled"
+        size="small"
+        className="flex-1"
+        disabled={!hasPendingChanges && !hasExternalPendingChanges}
+        aria-label="Apply tree selection"
+        data-testid="multi-tree-select-apply"
+      >
+        Apply
+      </Button>
+    </div>
+  );
+});
+
 const DropdownContent = memo(
   ({
     children,
@@ -38,7 +71,9 @@ const DropdownContent = memo(
     syncWidth,
     dropdownClassName,
     dropdownStyle,
+    header,
     isChildValid,
+    onToggle,
   }: {
     children: React.ReactNode;
     allLabel?: string;
@@ -48,9 +83,11 @@ const DropdownContent = memo(
     syncWidth?: boolean;
     dropdownClassName?: string;
     dropdownStyle?: CSSProperties;
+    header?: ReactNode;
     isChildValid?: (element: HTMLElement) => boolean;
+    onToggle?: (open: boolean) => void;
   }) => {
-    const { notify } = useTreeContext();
+    const { notify, requireApply, discardPendingSelection } = useTreeContext();
     return (
       <Dropdown.Trigger
         ref={dropdownRef}
@@ -62,17 +99,23 @@ const DropdownContent = memo(
         isChildValid={isChildValid}
         content={
           <div className={cn("multi-tree-select__content").toClassName()}>
+            {header}
             <TreeSearch placeholder={searchPlaceholder} />
             <TreeSelect allLabel={allLabel} />
+            {requireApply ? <TreeApplyFooter /> : null}
           </div>
         }
-        onToggle={(open) =>
+        onToggle={(open) => {
           notify(`${RootSymbol.toString()}::dropdown`, {
             id: `${RootSymbol.toString()}::dropdown`,
             action: "toggleselect",
             value: open,
-          })
-        }
+          });
+          if (!open && requireApply) {
+            discardPendingSelection();
+          }
+          onToggle?.(open);
+        }}
       >
         {children}
       </Dropdown.Trigger>
@@ -91,14 +134,18 @@ export const MultiTreeSelectDropdown = memo(
     customPlaceholder,
     preventAutoChildSelection,
     hiddenNodeFilter,
+    requireApply,
     inline,
     triggerTestId,
     syncWidth = true,
     dropdownClassName,
     dropdownStyle,
+    header,
     selectionTrigger,
     growableTrigger,
     isChildValid,
+    triggerClassName,
+    triggerProps,
     ...props
   }: MultiTreeSelectProps & {
     inline?: boolean;
@@ -106,13 +153,24 @@ export const MultiTreeSelectDropdown = memo(
     syncWidth?: boolean;
     dropdownClassName?: string;
     dropdownStyle?: CSSProperties;
+    header?: ReactNode;
     selectionTrigger?: ReactNode;
     /** When true, trigger height expands to fit wrapped chip content. */
     growableTrigger?: boolean;
     /** Treat matching elements as inside the dropdown (e.g. portaled chip popovers). */
     isChildValid?: (element: HTMLElement) => boolean;
+    triggerClassName?: string;
+    triggerProps?: HTMLAttributes<HTMLDivElement>;
   }) => {
     const dropdownRef = useRef<DropdownRef | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const handleTriggerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      triggerProps?.onKeyDown?.(event);
+      if (event.defaultPrevented || (event.key !== "Enter" && event.key !== " ")) return;
+      event.preventDefault();
+      dropdownRef.current?.toggle();
+    };
+
     return (
       <MultiTreeSelect
         {...props}
@@ -122,6 +180,7 @@ export const MultiTreeSelectDropdown = memo(
         customPlaceholder={customPlaceholder}
         preventAutoChildSelection={preventAutoChildSelection}
         hiddenNodeFilter={hiddenNodeFilter}
+        requireApply={requireApply}
       >
         <DropdownContent
           allLabel={allLabel}
@@ -131,15 +190,30 @@ export const MultiTreeSelectDropdown = memo(
           syncWidth={syncWidth}
           dropdownClassName={dropdownClassName}
           dropdownStyle={dropdownStyle}
+          header={header}
           isChildValid={isChildValid}
+          onToggle={setIsOpen}
         >
           <div
-            className={cn("multi-tree-select").elem("input").mod({ growable: growableTrigger }).toClassName()}
-            data-testid={triggerTestId}
-          >
-            {selectionTrigger ?? (
-              <TreeSelected placeholder={placeholder} allLabel={allLabel} RootLevelIcon={RootLevelIcon} />
+            {...triggerProps}
+            id={triggerProps?.id}
+            role={triggerProps?.role ?? "button"}
+            tabIndex={triggerProps?.tabIndex ?? 0}
+            aria-expanded={isOpen}
+            aria-haspopup="true"
+            className={cnm(
+              cn("multi-tree-select").elem("input").mod({ growable: growableTrigger }).toClassName(),
+              triggerClassName,
+              triggerProps?.className,
             )}
+            data-testid={triggerTestId ?? triggerProps?.["data-testid"]}
+            onKeyDown={handleTriggerKeyDown}
+          >
+            <span className={cn("multi-tree-select").elem("value").toClassName()}>
+              {selectionTrigger ?? (
+                <TreeSelected placeholder={placeholder} allLabel={allLabel} RootLevelIcon={RootLevelIcon} />
+              )}
+            </span>
             <DropdownIcon />
           </div>
         </DropdownContent>

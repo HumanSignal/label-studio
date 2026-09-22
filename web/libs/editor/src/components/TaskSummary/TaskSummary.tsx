@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isFF } from "../../utils/feature-flags";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
+import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 import { fetchTaskAgreementDistribution } from "./Aggregation";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
@@ -42,10 +43,15 @@ const TaskSummary = observer(({ annotations: all, store: annotationStore }: Task
   const allTags = [...annotationStore.names];
 
   const onSelect = (entity: Annotation) => {
+    const previous = annotationStore.selected;
     if (entity.type === "annotation") {
       annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
     } else {
       annotationStore.selectPrediction(entity.id, { exitViewAll: true });
+    }
+    const liveEntity = all.find((a) => String(a.id) === String(entity.id));
+    if (liveEntity) {
+      emitAnnotationTabSelected(annotationStore.store, liveEntity, previous, { exitViewAll: true });
     }
   };
 

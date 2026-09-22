@@ -226,6 +226,11 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
             task = data.get('task') or self.context.get('task') or getattr(self.instance, 'task', None)
             request = self.context.get('request')
             user = getattr(request, 'user', None) if request is not None else None
+            # Integrity binds to the annotation author, not the acting user:
+            # a reviewer editing a contributor's annotation must validate
+            # against the contributor's uploads.
+            if self.instance is not None:
+                user = getattr(self.instance, 'completed_by', None) or user
             validation_errors = custom_interface_validator(project, data.get('result', []), task=task, user=user)
             if validation_errors:
                 raise ValidationError(f'Error validating annotation: {validation_errors}')

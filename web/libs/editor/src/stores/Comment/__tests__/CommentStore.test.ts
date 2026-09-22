@@ -105,4 +105,31 @@ describe("CommentStore", () => {
 
     expect(isAlive(commentStore)).toBe(false);
   });
+
+  it("increments panelFocusRequest when setTooltipMessage sets a non-empty message (FIT-2813)", () => {
+    const root = DummyRoot.create(
+      {
+        annotationStore: { selected: { id: "ann1", pk: 1, type: "annotation" } },
+        commentStore: { loading: null },
+        user: { id: 1 },
+      },
+      { events: { invoke: mock() } },
+    );
+    const commentStore = root.commentStore;
+
+    expect(commentStore.panelFocusRequest).toBe(0);
+
+    commentStore.setTooltipMessage("Please enter a comment before rejecting");
+    expect(commentStore.panelFocusRequest).toBe(1);
+    expect(commentStore.tooltipMessage).toBe("Please enter a comment before rejecting");
+
+    // Same message again (e.g. reject after re-collapsing the sidebar) must re-bump
+    // so SideTabsPanels can expand again.
+    commentStore.setTooltipMessage("Please enter a comment before rejecting");
+    expect(commentStore.panelFocusRequest).toBe(2);
+
+    commentStore.setTooltipMessage("");
+    expect(commentStore.panelFocusRequest).toBe(2);
+    expect(commentStore.tooltipMessage).toBe("");
+  });
 });

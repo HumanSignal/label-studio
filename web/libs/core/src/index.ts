@@ -5,6 +5,7 @@ export * from "./lib/topbar";
 export * from "./lib/preview";
 export * from "./lib/utils/analytics";
 export * from "./lib/utils/urlJSON";
+export * from "./lib/utils/parseLocationSearch";
 export * from "./lib/utils/helpers";
 export * from "./lib/utils/validation-errors";
 export * from "./lib/utils/string";
@@ -57,3 +58,6 @@ export {
 
 // FIT-720: Lazy annotation stub hydration (editor + datamanager)
 export { annotationNeedsHydration, applyAnnotationHydrationFromApi } from "./lib/utils/annotationLazyHydration";
+
+// FIT-2442: Telemetry SDK & iFrame Relay
+export * from "./telemetry";

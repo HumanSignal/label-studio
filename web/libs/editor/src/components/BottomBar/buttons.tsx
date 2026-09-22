@@ -7,10 +7,12 @@
 import { inject, observer } from "mobx-react";
 import type React from "react";
 import { memo, type ReactElement } from "react";
+import { normalizeReviewAcceptedState, resolveReviewBarCopy } from "@humansignal/core";
 import { Tooltip, Button } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
+import { annotationActionProps, emitLabelingEvent } from "../../utils/labelingTelemetry";
 import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
 
 type MixedInParams = {
@@ -55,7 +57,8 @@ export const AcceptButton = memo(
   observer(({ disabled, history, store }: AcceptButtonProps) => {
     const annotation = store.annotationStore.selected;
     // changes in current sessions or saved draft
-    const hasChanges = history.canUndo || annotation.versions.draft;
+    const hasChanges = Boolean(history.canUndo || annotation.versions.draft);
+    const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
     const isDisabled = disabled || hasIncompleteRegions;
     const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
@@ -70,10 +73,14 @@ export const AcceptButton = memo(
             annotation.submissionInProgress();
             await store.commentStore.commentFormSubmit();
             store.acceptAnnotation();
+            emitLabelingEvent(store, "annotation_accepted", {
+              ...annotationActionProps(store, annotation),
+              is_fix: Boolean(hasChanges),
+            });
           }}
           data-testid="bottombar-accept-button"
         >
-          {hasChanges ? "Fix + Accept" : "Accept"}
+          {reviewCopy.acceptLabel}
         </Button>
       </Tooltip>
     );
@@ -87,7 +94,6 @@ export const RejectButtonDefinition = {
   variant: "negative",
   look: "outlined",
   ariaLabel: "reject-annotation",
-  tooltip: "Reject annotation: [ Ctrl+Space ]",
   // @todo we need this for types compatibility, but better to fix CustomButtonType
   disabled: false,
 };
@@ -140,14 +146,24 @@ export const SkipButton = memo(
           tooltip={tooltip}
           onClick={async (e) => {
             if (!canSkip) return;
-            const action = () => store.skipTask({});
+            const emitSkip = () => {
+              emitLabelingEvent(store, "task_skipped", {
+                project_id: store.project?.id,
+                task_id: store.task?.id,
+                review_mode: Boolean(store.reviewMode),
+              });
+            };
+            const action = () => {
+              store.skipTask({});
+              emitSkip();
+            };
             const selected = store.annotationStore?.selected;
             if (store.hasInterface("comments:skip") ?? true) {
               onSkipWithComment(e, action);
             } else {
               selected?.submissionInProgress();
               await store.commentStore.commentFormSubmit();
-              store.skipTask({});
+              action();
             }
           }}
           data-testid="bottombar-skip-button"

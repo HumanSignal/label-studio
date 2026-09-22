@@ -21,6 +21,7 @@ import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/fe
 import { moveStylesBetweenHeadTags } from "../../utils/html";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 import { applyAnnotationHydrationFromApi } from "@humansignal/core/lib/utils/annotationLazyHydration";
+import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
@@ -218,9 +219,13 @@ const VirtualizedGrid = observer(({ store, annotations, root, includePredictions
 
   const select = useCallback(
     (c) => {
-      c.type === "annotation"
-        ? store.selectAnnotation(c.id, { exitViewAll: true })
-        : store.selectPrediction(c.id, { exitViewAll: true });
+      const previous = store.selected;
+      if (c.type === "annotation") {
+        store.selectAnnotation(c.id, { exitViewAll: true });
+      } else {
+        store.selectPrediction(c.id, { exitViewAll: true });
+      }
+      emitAnnotationTabSelected(store.store, c, previous, { exitViewAll: true });
     },
     [store],
   );
@@ -544,10 +549,12 @@ class GridClassComponent extends Component {
 
   select = (c) => {
     const { store } = this.props;
+    const previous = store.selected;
 
     c.type === "annotation"
       ? store.selectAnnotation(c.id, { exitViewAll: true })
       : store.selectPrediction(c.id, { exitViewAll: true });
+    emitAnnotationTabSelected(store.store, c, previous, { exitViewAll: true });
   };
 
   render() {

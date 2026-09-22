@@ -22,6 +22,7 @@ from django.core.files import temp as tempfile
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
+from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
 from tasks.models import Annotation, AnnotationDraft, Task
 
@@ -392,6 +393,7 @@ class ExportMixin:
                 # for downloading resource we need access to the API
                 access_token=self.project.organization.created_by.auth_token.key,
                 hostname=hostname,
+                local_files_resolver=project_local_files_resolver(self.project),
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name

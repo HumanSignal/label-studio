@@ -325,30 +325,25 @@ def bulk_update_is_labeled_by_overlap(tasks_ids, project):
     if not tasks_ids:
         return
 
-    batch_size = settings.BATCH_SIZE
+    annotate_current_overlap = load_func(settings.ANNOTATE_CURRENT_OVERLAP)
+    if annotate_current_overlap is None:
+        from projects.functions.next_task import annotate_current_overlap
 
-    # Use distinct annotator count for overlap comparison
+    batch_size = settings.BATCH_SIZE
+    if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
+        base = None
+    else:
+        # Match Task.completed_annotations / Q_finished_annotations (and the prefetch path).
+        base = Q(annotations__was_cancelled=False, annotations__result__isnull=False)
+
     for i in range(0, len(tasks_ids), batch_size):
         batch_ids = tasks_ids[i : i + batch_size]
-
-        # Annotate with distinct annotator count
-        if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
-            annotator_count_expr = Count('annotations__completed_by', distinct=True)
-        else:
-            annotator_count_expr = Count(
-                'annotations__completed_by',
-                distinct=True,
-                filter=Q(annotations__was_cancelled=False),
-            )
-
-        tasks_qs = Task.objects.filter(id__in=batch_ids, project=project).annotate(
-            annotator_count=annotator_count_expr
+        tasks_qs = annotate_current_overlap(
+            Task.objects.filter(id__in=batch_ids, project=project),
+            base=base,
         )
+        finished_task_ids = list(tasks_qs.filter(current_overlap__gte=F('overlap')).values_list('id', flat=True))
 
-        # Get IDs of tasks that meet the overlap requirement
-        finished_task_ids = list(tasks_qs.filter(annotator_count__gte=F('overlap')).values_list('id', flat=True))
-
-        # Update is_labeled based on annotator count
         Task.objects.filter(id__in=finished_task_ids, project=project).update(is_labeled=True)
         Task.objects.filter(id__in=batch_ids, project=project).exclude(id__in=finished_task_ids).update(
             is_labeled=False

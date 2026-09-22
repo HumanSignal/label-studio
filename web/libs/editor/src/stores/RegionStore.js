@@ -1,4 +1,4 @@
-import { destroy, detach, getEnv, getParent, onPatch, types } from "mobx-state-tree";
+import { destroy, detach, getEnv, getParent, getRoot, onPatch, types } from "mobx-state-tree";
 
 import { ff } from "@humansignal/core";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
@@ -65,6 +65,8 @@ const SelectionMap = types
         });
       },
       select(region) {
+        const alreadySelected = self.isSelected(region);
+
         self.selected.put(region);
         region.selectRegion && region.selectRegion();
 

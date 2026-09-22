@@ -1,0 +1,10 @@
+<!-- Lightbulb glyph from Lucide (lucide-react v0.479.0), ISC licence: https://lucide.dev - path
+     data scaled to 92% about the centre of the same 24px box, so the bulb carries the same optical
+     weight as the camera and microphone it now sits beside in the Ask AI composer; Lucide draws it
+     to the full 2-22 extent, which read heavier than either of them. Stroke width, caps and viewBox
+     are untouched and still match this icon set. -->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.76 13.84c0.184 -0.92 0.644 -1.564 1.38 -2.3 0.92 -0.828 1.38 -2.024 1.38 -3.22A5.52 5.52 0 0 0 6.48 8.32c0 0.92 0.184 2.024 1.38 3.22 0.644 0.644 1.196 1.38 1.38 2.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M9.24 17.52h5.52" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.16 21.2h3.68" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

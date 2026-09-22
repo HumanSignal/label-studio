@@ -4,6 +4,10 @@
   "license": "MIT",
   "private": true,
   "main": "src/index.ts",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.prefix.css"
+  ],
   "files": [
     "src/tailwind.css",
     "src/shad/components",

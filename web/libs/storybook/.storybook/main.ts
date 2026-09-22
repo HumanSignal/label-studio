@@ -27,12 +27,22 @@ const { postcssPrefixLsfClasses } = requireFromStorybook(path.join(webRoot, "pos
 const tailwindConfig =
   (tailwindConfigModule as { default?: typeof tailwindConfigModule }).default ?? tailwindConfigModule;
 
+const addons = ["@storybook/addon-docs", "../addons/theme-toggle/register"];
+try {
+  requireFromStorybook.resolve("@storybook/addon-a11y");
+  addons.push("@storybook/addon-a11y");
+} catch {}
+
 const config: StorybookConfig = {
-  stories: ["../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))", "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))"],
+  stories: [
+    "../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))",
+    "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))",
+    "../../../../lse/web/libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))",
+  ],
 
   staticDirs: ["../public"],
 
-  addons: ["@storybook/addon-docs", "../addons/theme-toggle/register"],
+  addons,
 
   framework: {
     name: "@storybook/react-vite",

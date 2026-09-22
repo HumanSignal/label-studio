@@ -14,6 +14,51 @@ import "./Modal.prefix.css";
 
 const ModalContext = createContext<Modal | null>(null);
 
+function skipCssTransitionWait(): boolean {
+  if (process.env.NODE_ENV === "test") return true;
+  // LSO bun unit CI sets NODE_ENV=development; bun --dom still uses jsdom, which never emits transitionend.
+  return typeof navigator !== "undefined" && /jsdom/i.test(navigator.userAgent);
+}
+
+/**
+ * Every currently visible modal, in the order it became visible.
+ *
+ * Escape is a document-level listener per modal, so a dialog opened from inside another used to close
+ * both — and since the opener is a portal sibling, not a DOM ancestor, the nested dialog's
+ * `stopPropagation` could not save it. Only one modal may act on an Escape now: the innermost one, and
+ * among equals the one opened last.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const openModals = new Set<Modal<any>>();
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function hasOpenDescendant(modal: Modal<any>): boolean {
+  for (const open of openModals) {
+    if (open === modal) continue;
+    for (let ancestor = open.parentModal; ancestor; ancestor = ancestor.parentModal) {
+      if (ancestor === modal) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The one modal an Escape belongs to.
+ *
+ * Nesting comes first and is read from the modal tree, not from open order: React mounts children
+ * before parents, so a report rendering an already-visible dialog registers *after* it. Dialogs that are
+ * merely siblings (a confirm raised from inside another dialog) have no such relationship, so among
+ * those the most recently opened wins.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function escapeTarget(): Modal<any> | null {
+  let target = null;
+  for (const open of openModals) {
+    if (!hasOpenDescendant(open)) target = open;
+  }
+  return target;
+}
+
 export type ModalProps<BP = unknown> = {
   children?: React.ReactNode;
   visible?: boolean;
@@ -60,8 +105,14 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   static Body = ModalBody;
   static CloseButton = ModalCloseButton;
 
+  static contextType = ModalContext;
+  declare context: React.ContextType<typeof ModalContext>;
+
   modalRef = createRef<HTMLDivElement>();
   mouseDownTarget: HTMLElement | null = null;
+  /** The modal this one was opened from, if any. Read from context, so it survives the body portal. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parentModal: Modal<any> | null = null;
 
   constructor(props: ModalProps<BP>) {
     super(props);
@@ -77,6 +128,9 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
       setTimeout(() => this.show(), 30);
     }
 
+    this.parentModal = this.context ?? null;
+    if (this.state.visible) openModals.add(this);
+
     // with `allowToInterceptEscape` we can prevent closing modal on escape
     // by handling it inside modal, before event will be bubbled here
     document.addEventListener("keydown", this.closeOnEscape, {
@@ -85,6 +139,7 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   }
 
   componentWillUnmount() {
+    openModals.delete(this);
     document.removeEventListener("keydown", this.closeOnEscape, {
       capture: !this.props.allowToInterceptEscape,
     });
@@ -92,6 +147,8 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
 
   componentDidUpdate(prevProps: ModalProps<BP>, prevState: ModalState) {
     if (prevState.visible !== this.state.visible) {
+      if (this.state.visible) openModals.add(this);
+      else openModals.delete(this);
       document.body.style.overflow = this.state.visible ? "hidden" : "";
     }
     if (isDefined(this.props.visible) && prevProps.visible !== this.props.visible) {
@@ -206,6 +263,17 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
     const content = cn("modal-ls").elem("content").closest(elem);
     const close = cn("modal-ls").elem("close").closest(elem);
 
+    // Every modal portals its overlay to document.body, so a modal opened from INSIDE this one is a DOM
+    // sibling rather than a descendant — but React still routes its clicks here through the component
+    // tree. Without this guard a click on the nested dialog's backdrop read as "outside my content" and
+    // closed this modal too, taking the nested one down with it. The overlay is a full-viewport fixed
+    // layer, so a click the user aimed at this modal (backdrop, wrapper, content, or close button) always
+    // lands inside it; anything else came from another portal and is not ours to act on.
+    if (!isInModal) {
+      this.mouseDownTarget = null;
+      return;
+    }
+
     // Don't close if mousedown started inside content (e.g., text selection dragged outside)
     const mouseDownContent = this.mouseDownTarget ? cn("modal-ls").elem("content").closest(this.mouseDownTarget) : null;
     if (mouseDownContent && content === null) {
@@ -223,6 +291,8 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
     if (this.props.allowClose === false) return;
     if (e.key !== "Escape") return;
     if (!this.state.visible) return;
+    // A dialog opened from inside this one is a portal sibling, so its Escape would otherwise close both.
+    if (escapeTarget() !== this) return;
 
     e.stopPropagation();
     e.preventDefault();
@@ -230,8 +300,8 @@ export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   };
 
   transition(type: "visible" | "appear" | "disappear", onFinish: () => void) {
-    if (!this.modalRef.current) return Promise.resolve();
-    if (process.env.NODE_ENV === "test") {
+    if (!this.modalRef.current || skipCssTransitionWait()) {
+      // Without this, hide() waits for a CSS transitionend that jsdom never fires, so onHide never runs.
       onFinish?.();
       return Promise.resolve();
     }

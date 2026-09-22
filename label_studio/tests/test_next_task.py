@@ -1066,7 +1066,7 @@ def test_label_w_drafts_race_with_overlap(configured_project, business_client):
 
 
 @pytest.mark.django_db
-def test_fetch_final_taken_task(business_client):
+def test_fetch_final_taken_task(business_client, django_capture_on_commit_callbacks):
     config = dict(
         title='test_label_races',
         is_published=True,
@@ -1100,9 +1100,12 @@ def test_fetch_final_taken_task(business_client):
     assert r.status_code == 201
 
     # set max annotations
-    r = business_client.patch(
-        f'/api/projects/{project.id}/', data=json.dumps({'maximum_annotations': 2}), content_type='application/json'
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        r = business_client.patch(
+            f'/api/projects/{project.id}/',
+            data=json.dumps({'maximum_annotations': 2}),
+            content_type='application/json',
+        )
     assert r.status_code == 200
 
     print('ann1 takes any task and complete it')
@@ -1247,7 +1250,7 @@ def test_with_bad_annotation_result(business_client):
 @pytest.mark.parametrize('setup_before_upload', (False, True))
 @pytest.mark.parametrize('show_overlap_first', (False, True))
 @pytest.mark.django_db
-def test_overlap_first(business_client, setup_before_upload, show_overlap_first):
+def test_overlap_first(business_client, setup_before_upload, show_overlap_first, django_capture_on_commit_callbacks):
     c = business_client
     config = dict(
         title='test_overlap_first',
@@ -1277,11 +1280,12 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
     # set up tasks overlap
     setup_after_upload = True
     if setup_before_upload:
-        r = c.patch(
-            f'/api/projects/{project.id}/',
-            data=json.dumps({'maximum_annotations': 2, 'overlap_cohort_percentage': overlap_cohort_percentage}),
-            content_type='application/json',
-        )
+        with django_capture_on_commit_callbacks(execute=True):
+            r = c.patch(
+                f'/api/projects/{project.id}/',
+                data=json.dumps({'maximum_annotations': 2, 'overlap_cohort_percentage': overlap_cohort_percentage}),
+                content_type='application/json',
+            )
         assert r.status_code == 200
         setup_after_upload = False
 
@@ -1295,11 +1299,12 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
     assert r.status_code == 201
 
     if setup_after_upload:
-        r = c.patch(
-            f'/api/projects/{project.id}/',
-            data=json.dumps({'maximum_annotations': 2, 'overlap_cohort_percentage': overlap_cohort_percentage}),
-            content_type='application/json',
-        )
+        with django_capture_on_commit_callbacks(execute=True):
+            r = c.patch(
+                f'/api/projects/{project.id}/',
+                data=json.dumps({'maximum_annotations': 2, 'overlap_cohort_percentage': overlap_cohort_percentage}),
+                content_type='application/json',
+            )
         assert r.status_code == 200
 
     expected_tasks_with_overlap = int(overlap_cohort_percentage / 100.0 * num_tasks)

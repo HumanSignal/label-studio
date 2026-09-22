@@ -104,6 +104,18 @@ const TagAttrs = types.model({
   value: types.optional(types.string, ""),
 });
 
+/** Plain-text display label from Choice `html` (tags stripped) or `value`. */
+function taxonomyItemLabel(node) {
+  if (node.html) {
+    const plain = String(node.html)
+      .replace(/<[^>]*>/g, "")
+      .trim();
+
+    if (plain) return plain;
+  }
+  return node.value;
+}
+
 function traverse(root) {
   const visitUnique = (nodes, path = []) => {
     const uniq = new Set();
@@ -119,13 +131,15 @@ function traverse(root) {
   };
 
   const visitNode = (node, parents = []) => {
-    const label = node.value;
+    const value = node.value;
+    const label = taxonomyItemLabel(node);
     const hint = node.hint;
-    const path = [...parents, node.alias ?? label];
+    const path = [...parents, node.alias ?? value];
     const depth = parents.length;
     const obj = { label, path, depth, hint };
 
     if (node.color) obj.color = node.color;
+    if (node.hotkey) obj.hotkey = node.hotkey;
     if (node.children) {
       obj.children = visitUnique(node.children, path);
     }
@@ -283,7 +297,7 @@ const Model = types
         const lastIndex = path.length - 1;
 
         for (let depth = 0; depth < lastIndex; depth++) {
-          current = current.children?.find((item) => item.label === path[depth]);
+          current = current.children?.find((item) => item.path.at(-1) === path[depth]);
           if (!current) break;
         }
 

@@ -166,10 +166,11 @@ def annotations():
 
 
 @pytest.fixture
-def project_with_max_annotations_2(configured_project):
+def project_with_max_annotations_2(configured_project, django_capture_on_commit_callbacks):
     configured_project.maximum_annotations = 2
     # configured_project.agreement_method = Project.SINGLE
-    configured_project.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        configured_project.save()
 
 
 @pytest.mark.parametrize(
