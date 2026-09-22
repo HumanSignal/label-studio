@@ -309,3 +309,10 @@ export const FF_MANUAL_BATCHES = "fflag_feat_utc_1260_manual_batches_short";
  * DefaultAzureCredential (workload identity + managed identity only). Default off.
  */
 export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_spi_workload_identity_short";
+
+/**
+ * Persist Data Manager column drag-order on the shared tab (like visibility) and
+ * disable the personal browser key `dm:columnorder`. Independent of FIT-2808
+ * project defaults (`FF_PROJECT_DM_COLUMN_DEFAULTS`). FIT-2882.
+ */
+export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_order";

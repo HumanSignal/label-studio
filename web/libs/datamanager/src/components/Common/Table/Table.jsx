@@ -15,8 +15,10 @@ import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
+import { FF_DM_SHARED_COLUMN_ORDER, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
 import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
+import { readPersonalColumnOrder, persistPersonalColumnOrderIfNeeded } from "./columnOrderStorage";
 
 const Decorator = (decoration) => {
   return {
@@ -56,9 +58,10 @@ export const Table = observer(
     RowContextMenuComponent,
     ...props
   }) => {
-    const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
-    const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
+    const sharedColumnOrder = isActive(FF_DM_SHARED_COLUMN_ORDER);
+    const [localColOrder, setLocalColOrder] = useState(() => (sharedColumnOrder ? {} : readPersonalColumnOrder()));
+    const colOrder = sharedColumnOrder ? (view?.columnOrderSnapshot ?? {}) : localColOrder;
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
     const { api, type, projectId } = useSDK();
@@ -218,8 +221,9 @@ export const Table = observer(
       });
     }
     useEffect(() => {
-      localStorage.setItem(colOrderKey, JSON.stringify(colOrder));
-    }, [colOrder]);
+      // Personal browser order only when shared-tab order is off (FIT-2882).
+      persistPersonalColumnOrderIfNeeded(sharedColumnOrder, localColOrder);
+    }, [localColOrder, sharedColumnOrder]);
 
     // Store columns in a ref to avoid recreating context-menu open handler
     const columnsRef = useRef(columns);
@@ -355,7 +359,13 @@ export const Table = observer(
           onResize={onColumnResize}
           onReset={onColumnReset}
           extra={headerExtra}
-          onDragEnd={(updatedColOrder) => setColOrder(updatedColOrder)}
+          onDragEnd={(updatedColOrder) => {
+            if (sharedColumnOrder) {
+              view.setColumnOrder(updatedColOrder);
+              return;
+            }
+            setLocalColOrder(updatedColOrder);
+          }}
         />
       ),
       [
@@ -365,6 +375,7 @@ export const Table = observer(
         props.onSetOrder,
         props.onTypeChange,
         stopInteractions,
+        sharedColumnOrder,
         view,
         view.selected.list,
         view.selected.all,

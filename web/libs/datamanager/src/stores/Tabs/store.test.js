@@ -1,7 +1,7 @@
 import { destroy, getSnapshot, isAlive, unprotect } from "mobx-state-tree";
 import { mock, describe, it, expect, afterEach } from "bun:test";
 import { types } from "mobx-state-tree";
-import { TabStore } from "./store";
+import { TabStore, dataCleanup } from "./store";
 import { History } from "../../utils/history";
 import { DataStore, DataStoreItem } from "../../mixins/DataStore";
 
@@ -892,5 +892,61 @@ describe("tab switch loading (FIT-2376)", () => {
     expect(root.dataStore.loading).toBe(true);
 
     await switchPromise;
+  });
+});
+
+describe("dataCleanup columnOrder (FIT-2882)", () => {
+  it("keeps select and show-source while dropping unknown catalog column ids", () => {
+    const columns = [
+      { id: "tasks:id", isAnnotationResultsFilterColumn: false },
+      { id: "tasks:data.text", isAnnotationResultsFilterColumn: false },
+    ];
+    const result = dataCleanup(
+      {
+        id: 1,
+        data: {
+          columnOrder: {
+            select: 0,
+            "tasks:id": 1,
+            "tasks:unknown": 2,
+            "show-source": 3,
+            "tasks:data.text": 4,
+          },
+        },
+      },
+      columns,
+    );
+
+    expect(result.data.columnOrder).toEqual({
+      select: 0,
+      "tasks:id": 1,
+      "show-source": 3,
+      "tasks:data.text": 4,
+    });
+  });
+
+  it("drops annotation-results filter-only columns from columnOrder", () => {
+    const columns = [
+      { id: "tasks:id", isAnnotationResultsFilterColumn: false },
+      { id: "tasks:annotations_results_json", isAnnotationResultsFilterColumn: true },
+    ];
+    const result = dataCleanup(
+      {
+        id: 1,
+        data: {
+          columnOrder: {
+            select: 0,
+            "tasks:id": 1,
+            "tasks:annotations_results_json": 2,
+          },
+        },
+      },
+      columns,
+    );
+
+    expect(result.data.columnOrder).toEqual({
+      select: 0,
+      "tasks:id": 1,
+    });
   });
 });
