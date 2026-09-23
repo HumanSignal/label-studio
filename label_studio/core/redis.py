@@ -9,13 +9,34 @@ from typing import Any
 import django_rq
 import redis
 from core.current_request import CurrentContext
+from core.feature_flags import flag_set
 from django.conf import settings
 from django_rq import get_connection
 from rq.command import send_stop_job_command
 from rq.exceptions import InvalidJobOperation
-from rq.registry import StartedJobRegistry
+from rq.registry import ScheduledJobRegistry, StartedJobRegistry
 
 logger = logging.getLogger(__name__)
+
+JOB_QUOTA_DEFER_V2_FLAG = 'fflag_feat_job_quota_defer_v2'
+QUEUE_ORIGIN_META_KEY = '_queue_origin'
+
+
+def job_quota_defer_v2_enabled() -> bool:
+    return flag_set(JOB_QUOTA_DEFER_V2_FLAG, user='auto')
+
+
+def get_job_organization_id(meta: dict | None):
+    """Resolve canonical and legacy organization metadata."""
+    if not meta:
+        return None
+    return meta.get('organization_id') or meta.get('organization')
+
+
+def get_job_queue_origin(job, fallback='default') -> str:
+    """Return the queue recorded when the job was enqueued."""
+    meta = getattr(job, 'meta', None) or {}
+    return meta.get(QUEUE_ORIGIN_META_KEY) or getattr(job, 'origin', None) or fallback
 
 
 def _truncate_args_for_logging(args, kwargs, max_length=30):
@@ -189,9 +210,19 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         try:
             context_data = _capture_context()
 
-            meta = kwargs.get('meta', {})
-            # Store context data in job meta for worker access
-            meta.update(context_data)
+            caller_meta = kwargs.get('meta', {})
+            if job_quota_defer_v2_enabled():
+                # Captured context supplies defaults; explicit caller metadata is authoritative.
+                meta = {**context_data, **caller_meta}
+                if 'organization_id' not in caller_meta and 'organization' in caller_meta:
+                    meta['organization_id'] = caller_meta['organization']
+                elif 'organization_id' not in meta and 'organization' in meta:
+                    meta['organization_id'] = meta['organization']
+                meta[QUEUE_ORIGIN_META_KEY] = queue_name
+            else:
+                meta = caller_meta
+                # Preserve legacy precedence while the v2 flag is dark.
+                meta.update(context_data)
             kwargs['meta'] = meta
         except Exception:
             logger.info(f'Failed to capture context for job {job.__name__} on queue {queue_name}')
@@ -257,7 +288,14 @@ def is_job_on_worker(job_id, queue_name):
     # crashes when executed outside the interpreter's main thread (e.g., inside WSGI).
     # ZSCORE simply looks up the score of the member in the sorted set: if it returns
     # None, the member/job ID is not present; otherwise it is currently marked as running.
-    return registry.connection.zscore(registry.key, member) is not None
+    if registry.connection.zscore(registry.key, member) is not None:
+        return True
+    if not job_quota_defer_v2_enabled():
+        return False
+
+    # RQ 2 stores active executions as "<job-id>:<execution-id>" members.
+    composite_members = registry.connection.zscan_iter(registry.key, match=f'{job_id}:*', count=1)
+    return next(composite_members, None) is not None
 
 
 def delete_job_by_id(queue, id):
@@ -268,6 +306,11 @@ def delete_job_by_id(queue, id):
     """
     job = queue.fetch_job(id)
     if job is not None:
+        if job_quota_defer_v2_enabled():
+            queue_origin = get_job_queue_origin(job, fallback=queue.name)
+            if queue_origin != queue.name:
+                queue = django_rq.get_queue(queue_origin)
+                job = queue.fetch_job(id) or job
         # stop job if it is in master redis node (in the queue)
         logger.info(f'Stopping job {id} from queue {queue.name}.')
         try:
@@ -295,6 +338,21 @@ def get_jobs_by_meta(queue, func_name, meta):
     :return: Job list
     """
     # get all jobs from Queue
-    jobs = (job for job in queue.get_jobs() if job.func.__name__ == func_name)
-    # return only with same meta data
-    return [job for job in jobs if hasattr(job, 'meta') and job.meta == meta]
+    jobs = [job for job in queue.get_jobs() if job.func.__name__ == func_name]
+    if not job_quota_defer_v2_enabled():
+        return [job for job in jobs if hasattr(job, 'meta') and job.meta == meta]
+
+    # Quota-deferred jobs live in the scheduled registry, not the live queue list.
+    scheduled_ids = ScheduledJobRegistry(queue=queue).get_job_ids(cleanup=False)
+    known_ids = {getattr(job, 'id', None) for job in jobs}
+    for job_id in scheduled_ids:
+        if job_id in known_ids:
+            continue
+        job = queue.fetch_job(job_id)
+        if job is not None and getattr(getattr(job, 'func', None), '__name__', None) == func_name:
+            jobs.append(job)
+
+    # V2 appends queue/concurrency bookkeeping, so caller metadata is a lookup subset.
+    return [
+        job for job in jobs if hasattr(job, 'meta') and all(job.meta.get(key) == value for key, value in meta.items())
+    ]

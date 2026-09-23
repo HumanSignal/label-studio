@@ -126,6 +126,28 @@ export const Submitted: Story = {
   },
 };
 
+export const DuplicateFlag: Story = {
+  name: "Duplicate (reviewer signal)",
+  args: {
+    state: "submitted",
+    file: FILE,
+    kind: "video",
+    previewUrl: PIXEL,
+    duplicate: "exact",
+    ruleResults: evaluateSubmissionRules(GOOD_META, RULES),
+    meta: GOOD_META,
+    ...handlers,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Reviewer signal, never an error: 'Duplicate' means another contributor already submitted the same content - the same bytes, or the same video re-picked from a phone library, which the content fingerprint recognises even when the bytes differ. The submission stands; review decides. A contributor re-submitting their own identical content is refused before the upload starts and never reaches this state.",
+      },
+    },
+  },
+};
+
 export const ReadOnly: Story = {
   name: "Read-only (review / history)",
   args: {

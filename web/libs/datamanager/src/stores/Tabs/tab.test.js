@@ -1,5 +1,5 @@
 import { describe, it, expect, mock, afterEach } from "bun:test";
-import { destroy, types } from "mobx-state-tree";
+import { destroy, types, unprotect } from "mobx-state-tree";
 import { Tab } from "./tab";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 import { raceConditionLockToastMessage } from "./store";
@@ -122,6 +122,111 @@ describe("Tab virtual serialize (FIT-1835)", () => {
     expect(result).toHaveProperty("hiddenColumns");
     expect(result).toHaveProperty("hiddenColumns.explore");
     expect(result).toHaveProperty("hiddenColumns.labeling");
+  });
+
+  it("includes columnOrder in virtual tab serialization (FIT-2882)", () => {
+    tab = Tab.create({
+      id: _tabIdCounter++,
+      virtual: true,
+      columnOrder: { "tasks:id": 0, "tasks:data.text": 1 },
+    });
+    const result = tab.serialize();
+    expect(result.columnOrder).toEqual({ "tasks:id": 0, "tasks:data.text": 1 });
+  });
+
+  it("defaults columnOrder to an empty map on new virtual tabs", () => {
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true });
+    expect(tab.columnOrderSnapshot).toEqual({});
+    expect(tab.serialize().columnOrder).toEqual({});
+  });
+});
+
+describe("Tab setColumnOrder (FIT-2882)", () => {
+  let root;
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  const createRootWithTab = (tabProps = {}) => {
+    root = LockedTabTestRoot.create({
+      views: [{ id: _tabIdCounter++, virtual: true, ...tabProps }],
+    });
+    unprotect(root);
+    const toasts = [];
+    root.setSDK({
+      projectId: 1,
+      apiVersion: 2,
+      invoke: (_event, payload) => {
+        if (payload?.message) toasts.push(payload);
+      },
+    });
+    const view = root.views[0];
+    // Avoid TabStore.saveView / snapshotToUrl — only assert columnOrder mutation.
+    view.save = mock(() => {});
+    return { view, toasts };
+  };
+
+  it("updates columnOrder and includes it in virtual tab serialization", () => {
+    const { view } = createRootWithTab();
+    const order = { select: 0, "tasks:id": 1, "show-source": 2 };
+    view.setColumnOrder(order);
+    expect(view.columnOrderSnapshot).toEqual(order);
+    expect(view.serialize().columnOrder).toEqual(order);
+    expect(view.save).toHaveBeenCalled();
+  });
+
+  it("replaces previous order entirely on each setColumnOrder", () => {
+    const { view } = createRootWithTab({ columnOrder: { "tasks:id": 0, "tasks:old": 1 } });
+    view.setColumnOrder({ "tasks:id": 1, "tasks:new": 0 });
+    expect(view.columnOrderSnapshot).toEqual({ "tasks:id": 1, "tasks:new": 0 });
+  });
+
+  it("includes columnOrder in apiVersion-2 saved-tab serialize data", () => {
+    const SavedRoot = types
+      .model("SavedRoot", {
+        views: types.array(Tab),
+      })
+      .volatile(() => ({ _sdk: null }))
+      .views((self) => ({
+        get SDK() {
+          return self._sdk;
+        },
+        get apiVersion() {
+          return 2;
+        },
+      }))
+      .actions((self) => ({
+        setSDK(sdk) {
+          self._sdk = sdk;
+        },
+      }));
+
+    const savedRoot = SavedRoot.create({
+      views: [{ id: _tabIdCounter++, saved: true, virtual: false, columnOrder: { "tasks:id": 0 } }],
+    });
+    savedRoot.setSDK({ projectId: 42, invoke: () => {} });
+    try {
+      expect(savedRoot.views[0].serialize().data.columnOrder).toEqual({ "tasks:id": 0 });
+    } finally {
+      destroy(savedRoot);
+    }
+  });
+
+  it("does not change columnOrder when the tab is locked by a manager", () => {
+    const { view, toasts } = createRootWithTab({
+      is_locked: true,
+      locked_by: { name: "Manager" },
+      columnOrder: { "tasks:id": 0 },
+    });
+    const result = view.setColumnOrder({ "tasks:id": 1, "tasks:data.text": 0 });
+    expect(result).toBe(false);
+    expect(view.columnOrderSnapshot).toEqual({ "tasks:id": 0 });
+    expect(view.save).not.toHaveBeenCalled();
+    expect(toasts.length).toBeGreaterThan(0);
   });
 });
 

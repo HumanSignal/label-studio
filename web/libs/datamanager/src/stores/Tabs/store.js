@@ -21,7 +21,7 @@ const restoreValue = (name) => {
   return value ? value === "true" : false;
 };
 
-const dataCleanup = (tab, columns) => {
+export const dataCleanup = (tab, columns) => {
   const { data } = tab;
 
   if (!data) return { ...tab };
@@ -40,6 +40,15 @@ const dataCleanup = (tab, columns) => {
       }),
     );
   });
+
+  // Keep synthetic table columns (select / show-source) in drag order; validate catalog ids.
+  data.columnOrder = Object.fromEntries(
+    Object.entries(data.columnOrder ?? {}).filter(([col]) => {
+      if (col === "select" || col === "show-source") return true;
+      const match = columns.find((c) => c.id === col);
+      return !!match && !match.isAnnotationResultsFilterColumn;
+    }),
+  );
 
   // Only compatibility filter columns are pruned from the hidden lists. IDs of columns this
   // session cannot see stay untouched: agreement columns are role-gated and dimension columns
