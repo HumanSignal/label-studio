@@ -64,10 +64,11 @@ class FakeEngine {
     this.emit();
     this.resolvers.get(clientRef)?.({ ...row });
   }
-  failRow(clientRef: string, message: string) {
+  failRow(clientRef: string, message: string, errorCode?: string) {
     const row = this.rows.find((r) => r.clientRef === clientRef)!;
     row.status = "failed";
     row.error = message;
+    if (errorCode) row.errorCode = errorCode;
     this.emit();
     this.resolvers.get(clientRef)?.({ ...row });
   }
@@ -413,6 +414,35 @@ describe("submitted detection & capacity", () => {
     expect(refs.api!.members[0].onRemove).toBeUndefined();
     expect(refs.api!.members[0].onReplace).toBeDefined();
     expect(refs.api!.collection.submitted).toBe(true);
+  });
+
+  it("server duplicate flag surfaces on the stored member", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(97, { duplicate: "exact" }), serverUpload(98)];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97), region(98, 1)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].duplicate).toBe("exact"));
+    expect(refs.api!.members[1].duplicate).toBeUndefined();
+  });
+
+  it("a duplicate-rejected upload keeps Remove but offers no Retry", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    await act(async () => refs.api!.pick([pdf("a.pdf")]));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await act(async () =>
+      engine.failRow(
+        engine.rows[0].clientRef,
+        "You already added this file to another task in this project.",
+        "duplicate_upload",
+      ),
+    );
+    const member = refs.api!.members[0];
+    expect(member.state).toBe("failed");
+    expect(member.message).toContain("already added this file");
+    expect(member.onRetry).toBeUndefined();
+    expect(member.onRemove).toBeDefined();
   });
 
   it("falls back to initialResults only when the upload capability is absent (B2)", async () => {

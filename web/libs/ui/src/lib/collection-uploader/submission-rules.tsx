@@ -204,7 +204,7 @@ export const SubmissionRuleBadges = ({
   );
 };
 
-export type SubmissionStatusTone = "positive" | "negative" | "neutral" | "primary";
+export type SubmissionStatusTone = "positive" | "negative" | "neutral" | "primary" | "warning";
 
 /**
  * The submission card's status pill ("Ready to submit", "Submitted",

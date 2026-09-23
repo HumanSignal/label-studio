@@ -36,6 +36,7 @@ export interface SubmissionUploadRow {
   status: "pending" | "uploading" | "uploaded" | "failed" | "cancelled";
   progress: number;
   error: string | null;
+  errorCode?: string | null;
   bucket: string | null;
   key: string | null;
   etag: string | null;
@@ -50,6 +51,8 @@ export interface SubmissionCurrentUpload {
   size: number | null;
   referenced_by_annotation: boolean;
   referenced_by_history?: boolean;
+  /** Duplicate verdict computed by the server at read time. */
+  duplicate?: "exact" | null;
 }
 
 export interface SubmissionEngine {
@@ -130,6 +133,8 @@ export interface CollectionMember {
   meta: SubmissionFileMeta | null;
   submitted: boolean;
   storedHint: boolean;
+  /** Duplicate verdict — reviewer signal, never an error. */
+  duplicate?: "exact";
   /** Present for PDF members when the host provides pdf.js: drives the pager. */
   pdf?: MediaCardPdfSource;
   onReplace?: () => void;
@@ -917,7 +922,8 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           replacePendingRef.current = null;
           cancelRow(replaceRow.clientRef);
         },
-        onRetry: failed ? () => retryRow(replaceRow.clientRef) : undefined,
+        onRetry:
+          failed && replaceRow.errorCode !== "duplicate_upload" ? () => retryRow(replaceRow.clientRef) : undefined,
         onRemove: failed
           ? () => {
               cancelledReplaceRefs.current.add(replaceRow.clientRef);
@@ -951,6 +957,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       meta: storedMeta || null,
       submitted,
       storedHint: true,
+      duplicate: (server && server.duplicate) || undefined,
       onReplace: readonly
         ? undefined
         : () => {
@@ -1012,7 +1019,8 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         submitted: false,
         storedHint: false,
         onCancel: () => cancelRow(row.clientRef),
-        onRetry: failed ? () => retryRow(row.clientRef) : undefined,
+        // A duplicate rejection is definitive: retrying re-uploads the same bytes.
+        onRetry: failed && row.errorCode !== "duplicate_upload" ? () => retryRow(row.clientRef) : undefined,
         onRemove: failed ? () => cancelRow(row.clientRef) : undefined,
       };
     });

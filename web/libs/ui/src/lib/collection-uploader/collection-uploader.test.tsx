@@ -70,6 +70,7 @@ describe("CollectionUploader (bundle mode)", () => {
     expect(screen.getByTestId("media-card-uploaded")).toHaveAttribute("data-layout", "row");
     fireEvent.click(screen.getByLabelText("Grid view"));
     expect(screen.getByTestId("collection-uploader-grid")).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-media")).toHaveAttribute("data-fit", "grid");
   });
 
   it("count chip turns positive at the minimum", () => {

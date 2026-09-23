@@ -38,6 +38,8 @@ export const Tab = types
     opener: types.optional(types.maybeNull(types.late(() => Tab)), null),
     columnsWidth: types.map(types.maybeNull(types.number)),
     columnsDisplayType: types.map(types.maybeNull(types.string)),
+    /** Drag order map `{ [columnId]: index }` — shared on the tab when FF_DM_SHARED_COLUMN_ORDER is on (FIT-2882). */
+    columnOrder: types.map(types.number),
     gridWidth: 4,
     gridFitImagesToWidth: false,
 
@@ -241,6 +243,10 @@ export const Tab = types
       return getSnapshot(self.hiddenColumns);
     },
 
+    get columnOrderSnapshot() {
+      return self.columnOrder.toPOJO();
+    },
+
     get query() {
       return JSON.stringify({
         filters: self.filterSnapshot,
@@ -259,6 +265,7 @@ export const Tab = types
           hiddenColumns: self.hiddenColumnsSnapshot,
           columnsWidth: self.columnsWidth.toPOJO(),
           columnsDisplayType: self.columnsDisplayType.toPOJO(),
+          columnOrder: self.columnOrderSnapshot,
           gridWidth: self.gridWidth,
           gridFitImagesToWidth: self.gridFitImagesToWidth,
           agreement_selected: self.agreement_selected,
@@ -277,6 +284,7 @@ export const Tab = types
         hiddenColumns: getSnapshot(self.hiddenColumns),
         columnsWidth: self.columnsWidth.toPOJO(),
         columnsDisplayType: self.columnsDisplayType.toPOJO(),
+        columnOrder: self.columnOrderSnapshot,
         gridWidth: self.gridWidth,
         gridFitImagesToWidth: self.gridFitImagesToWidth,
         semantic_search: self.semantic_search?.toJSON() ?? [],
@@ -573,6 +581,22 @@ export const Tab = types
         self.hiddenColumns.remove(column);
       } else {
         self.hiddenColumns.add(column);
+      }
+      self.save();
+    },
+
+    /**
+     * Replace the tab's shared column drag-order map and persist (FIT-2882).
+     * Same lock guard as visibility toggles — locked tabs cannot reorder.
+     * @param {Record<string, number>} orderMap
+     */
+    setColumnOrder(orderMap) {
+      if (self.isLockedByManager) return self.notifyLocked();
+      self.columnOrder.clear();
+      for (const [columnId, index] of Object.entries(orderMap ?? {})) {
+        if (typeof index === "number" && !Number.isNaN(index)) {
+          self.columnOrder.set(columnId, index);
+        }
       }
       self.save();
     },

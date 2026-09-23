@@ -284,8 +284,9 @@ export const CollectionUploader = ({
         >
           {Children.map(children, (child) =>
             isValidElement(child)
-              ? cloneElement(child as React.ReactElement<{ layout?: string }>, {
+              ? cloneElement(child as React.ReactElement<{ layout?: string; fit?: string }>, {
                   layout: bundleMode && view === "list" ? "row" : "card",
+                  fit: bundleMode && view === "grid" ? "grid" : "natural",
                 })
               : child,
           )}
