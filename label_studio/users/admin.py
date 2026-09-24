@@ -143,6 +143,7 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
                     queue_name='default',
                     job_timeout=settings.RQ_LONG_JOB_TIMEOUT,
                     retry=dependency_retry_policy() if dependencies else None,
+                    job_scope='system',
                 )
                 migration.status = migration.STATUS_STARTED
                 migration.save()

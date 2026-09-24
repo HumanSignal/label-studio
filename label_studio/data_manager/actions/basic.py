@@ -47,16 +47,27 @@ def delete_tasks(project, queryset, **kwargs):
     # unlink tasks from project
     queryset = Task.objects.filter(id__in=tasks_ids_list)
     queryset.update(project=None)
+    job_tenant = project.organization_id
     # delete all project tasks
     if count == project_count:
-        start_job_async_or_sync(Task.delete_tasks_without_signals_from_task_ids, tasks_ids_list, queue_name='low')
+        start_job_async_or_sync(
+            Task.delete_tasks_without_signals_from_task_ids,
+            tasks_ids_list,
+            queue_name='low',
+            job_tenant=job_tenant,
+        )
         logger.info(f'calling reset project_id={project.id} delete_tasks()')
         project.summary.reset()
 
     # delete only specific tasks
     else:
         # update project summary and delete tasks
-        start_job_async_or_sync(async_project_summary_recalculation, tasks_ids_list, project.id)
+        start_job_async_or_sync(
+            async_project_summary_recalculation,
+            tasks_ids_list,
+            project.id,
+            job_tenant=job_tenant,
+        )
 
     project.update_tasks_states(
         maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
@@ -159,6 +170,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         request.user.id,
         queue_name='low',
         job_timeout=60 * 60 * 5,
+        job_tenant=project.organization_id,
     )
     if isinstance(job, Job):
         # Skip the automatic Data Manager reload for this async action (FIT-1855): the background
@@ -211,7 +223,11 @@ def delete_tasks_predictions(project, queryset, **kwargs):
 
     count = predictions.count()
     predictions.delete()
-    start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=real_task_ids))
+    start_job_async_or_sync(
+        update_tasks_counters,
+        Task.objects.filter(id__in=real_task_ids),
+        job_tenant=project.organization_id,
+    )
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 

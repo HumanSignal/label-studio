@@ -826,6 +826,8 @@ DELETE_PREDICTIONS_POSTPROCESS = None
 PROJECT_SAVE_DIMENSIONS_POSTPROCESS = None
 FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
 FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION = 'core.feature_flags.utils.get_user_repr_from_organization'
+FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION_ID = 'core.feature_flags.utils.get_user_repr_from_organization_id'
+JOB_TENANCY_ENQUEUED_HOOK = None
 
 # Test factories
 ORGANIZATION_FACTORY = 'organizations.tests.factories.OrganizationFactory'
