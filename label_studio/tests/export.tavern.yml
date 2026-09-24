@@ -238,7 +238,7 @@ stages:
         link: "https://github.com/doclang-project/doclang/blob/main/spec.md#doclang-archive-format"
         tags:
           - "document"
-          - "docling"
+          - "doclang"
         name: "DOCLANG"
         disabled: true
 
