@@ -3,4 +3,25 @@
   & button[data-testid^="select-trigger"] > svg {
     display: none;
   }
+
+  /*
+   * ButtonGroup's `collapsed` variant merges the two halves into a single divider with
+   * `button:not(:first-child)` / `button:last-child`, which only hold while both halves are direct
+   * siblings. While no ordering is set the sort button is disabled, and Tooltip wraps disabled
+   * children in a `display: contents` span — layout is unaffected but the sibling relationship is
+   * not, so both halves kept their own border and rounded corners, doubling the divider.
+   *
+   * Match the halves by testid instead of by position so exactly one divider survives in every
+   * state: the trigger's right border, which keeps following the trigger's own hover/open colour.
+   */
+  & button[data-testid="dm-order-button"] {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+  }
+
+  & button[data-testid^="select-trigger"] {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 }
