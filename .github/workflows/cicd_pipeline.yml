@@ -297,6 +297,7 @@ jobs:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
           DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
         with:
+          github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
             const target_commitish = process.env.TARGET_COMMITISH;
