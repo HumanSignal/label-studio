@@ -55,6 +55,12 @@ logger = logging.getLogger(__name__)
 
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
+# Types a browser renders as a document (and would execute scripts from); mirrored
+# by the $uploaded_file_csp map in deploy/default.conf for the NGINX serving paths.
+SANDBOXED_UPLOAD_CONTENT_TYPES = frozenset(
+    ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'text/xml', 'application/xml']
+)
+
 task_create_response_scheme = {
     201: OpenApiResponse(
         description='Tasks successfully imported or import queued. **For non-Community editions**, the response will be `{"import": <import_id>}` which you can use to poll the import status. **For Community edition**, the response contains task counts and is processed synchronously.',
@@ -1066,6 +1072,11 @@ class DownloadStorageData(APIView):
             response = RangedFileResponse(request, file_obj.open(mode='rb'), content_type=content_type)
             response['Content-Disposition'] = f'inline; filename="{filepath}"'
             response['filename'] = filepath
+            # Served inline from the app origin, so an uploaded document would run its
+            # scripts with the viewer's session; sandbox only the types a browser
+            # renders as a document, to keep the PDF viewer working.
+            if content_type in SANDBOXED_UPLOAD_CONTENT_TYPES:
+                response['Content-Security-Policy'] = 'sandbox'
             return response
 
     def build_streamer_delegation(self, file_obj, filepath):
