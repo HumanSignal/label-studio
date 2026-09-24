@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import copy
 import os
 from typing import Any
 
@@ -12,6 +13,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
+from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
 from projects.models import Project
@@ -931,10 +933,26 @@ class PrepareParamsFilterItemSerializer(PrepareParamsChildFilterItemSerializer):
     )
 
 
-@extend_schema_field(filters_schema, component_name='PrepareParamsFiltersRequest')
 class PrepareParamsFiltersSerializer(serializers.Serializer):
     conjunction = serializers.ChoiceField(choices=['or', 'and'])
     items = PrepareParamsFilterItemSerializer(many=True)
+
+
+class PrepareParamsFiltersSchemaExtension(OpenApiSerializerFieldExtension):
+    """Publish the canonical filters schema as the PrepareParamsFiltersRequest component.
+
+    Unlike extend_schema_field(filters_schema, ...), this hands drf-spectacular a fresh copy on every schema
+    generation: its enum postprocessing hook rewrites component schemas in place, so sharing the module-level dict
+    left a dangling ConjunctionEnum $ref in every schema generated after the first one in a process (FIT-2939).
+    """
+
+    target_class = PrepareParamsFiltersSerializer
+
+    def get_name(self):
+        return 'PrepareParamsFiltersRequest'
+
+    def map_serializer_field(self, auto_schema, direction):
+        return copy.deepcopy(filters_schema)
 
 
 @extend_schema_field(ordering_schema, component_name='PrepareParamsOrderingRequest')
