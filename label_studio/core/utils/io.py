@@ -92,7 +92,7 @@ def get_config_dir():
 
 def get_data_dir():
     data_dir = user_data_dir(appname=_DIR_APP_NAME)
-    os.makedirs(data_dir, exist_ok=True)
+    os.makedirs(data_dir, mode=0o700, exist_ok=True)
     return data_dir
 
 
