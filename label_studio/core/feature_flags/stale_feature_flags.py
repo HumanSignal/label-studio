@@ -1,4 +1,5 @@
 STALE_FEATURE_FLAGS = {
+    'fflag_all_feat_utc_204_users_performance_improvements_in_dm_for_large_orgs': False,
     'fflag_feat_front_optic_66_lazy_chart_evaluation_19092023_short': False,
     'fflag_fix_front_lsdv_4600_lead_time_27072023_short': False,
     'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short': False,
