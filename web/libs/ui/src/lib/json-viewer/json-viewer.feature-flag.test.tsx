@@ -14,9 +14,10 @@ declare global {
 }
 
 describe("JsonViewer feature flag", () => {
-  const originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+  let originalClipboard: PropertyDescriptor | undefined;
 
   beforeEach(() => {
+    originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
     global.__virtualizedJsonViewerProps = undefined;
 
     spyOn(jsonEditReactModule, "JsonEditor").mockImplementation(() => <div data-testid="json-editor" />);
@@ -44,11 +45,7 @@ describe("JsonViewer feature flag", () => {
     if (originalClipboard) {
       Object.defineProperty(navigator, "clipboard", originalClipboard);
     } else {
-      Object.defineProperty(navigator, "clipboard", {
-        value: undefined,
-        configurable: true,
-        writable: true,
-      });
+      delete (navigator as { clipboard?: Clipboard }).clipboard;
     }
   });
 
