@@ -161,7 +161,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DATA_DIR = get_env('BASE_DATA_DIR')
 if BASE_DATA_DIR is None:
     BASE_DATA_DIR = get_data_dir()
-os.makedirs(BASE_DATA_DIR, exist_ok=True)
+os.makedirs(BASE_DATA_DIR, mode=0o700, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # This indicates whether the code is running in a Continuous Integration environment.

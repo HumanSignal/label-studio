@@ -38,11 +38,38 @@ const mockSchema = { id: "id", label: "label", children: "children" };
  * Poll on primitives, never on the node itself: a failing jest-dom matcher serialises the jsdom
  * element into its message, which costs ~300ms per poll here and is what pushed the requireApply
  * test past Bun's 5s timeout.
+ *
+ * Re-query the Apply button inside waitFor. Passing a captured node lets React replace the
+ * element while waitFor keeps polling the stale disabled one until the default 1000ms budget.
+ *
+ * Wait for the panel after opening. CI on PR #2911 timed out looking for the Workspace 1
+ * checkbox while aria-expanded was still false (Apply-then-reopen under load).
  */
+const APPLY_WAIT_MS = 3000;
+const REQUIRE_APPLY_TEST_MS = 10000;
+
 const applyButton = () => screen.getByTestId("multi-tree-select-apply") as HTMLButtonElement;
-const waitForApplyEnabled = (apply: HTMLButtonElement) => waitFor(() => expect(apply.disabled).toBe(false));
+const waitForApplyEnabled = () => waitFor(() => expect(applyButton().disabled).toBe(false), { timeout: APPLY_WAIT_MS });
 const waitForApplyUnmounted = () =>
-  waitFor(() => expect(screen.queryAllByTestId("multi-tree-select-apply").length).toBe(0));
+  waitFor(() => expect(screen.queryAllByTestId("multi-tree-select-apply").length).toBe(0), {
+    timeout: APPLY_WAIT_MS,
+  });
+const openRequireApplyDropdown = async () => {
+  fireEvent.click(screen.getByTestId("dropdown-trigger"));
+  await screen.findByTestId("multi-tree-select-apply", {}, { timeout: APPLY_WAIT_MS });
+};
+const workspace1Checkbox = () =>
+  screen.findByRole("checkbox", { name: "Select Workspace 1" }, { timeout: APPLY_WAIT_MS });
+const clickWorkspace1 = async () => {
+  fireEvent.click(await workspace1Checkbox());
+};
+const waitForWorkspace1Checked = (checked: boolean) =>
+  waitFor(
+    () => {
+      expect((screen.getByRole("checkbox", { name: "Select Workspace 1" }) as HTMLInputElement).checked).toBe(checked);
+    },
+    { timeout: APPLY_WAIT_MS },
+  );
 
 function renderDropdown(props: Record<string, unknown> = {}) {
   return render(
@@ -199,44 +226,103 @@ describe("MultiTreeSelectDropdown", () => {
     expect(screen.getByRole("checkbox", { name: "Select Workspace 1" })).not.toBeChecked();
   });
 
-  it("with requireApply, defers onChange until Apply and discards on close", async () => {
-    const onChange = mock();
-    renderDropdown({
-      disableAllOption: true,
-      preventAutoChildSelection: true,
-      requireApply: true,
-      onChange,
-      placeholder: "Any",
-    });
+  it(
+    "with requireApply, defers onChange until Apply",
+    async () => {
+      const onChange = mock();
+      renderDropdown({
+        disableAllOption: true,
+        preventAutoChildSelection: true,
+        requireApply: true,
+        onChange,
+        placeholder: "Any",
+      });
 
-    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+      await openRequireApplyDropdown();
+      expect(applyButton()).toBeDisabled();
 
-    await screen.findByTestId("multi-tree-select-apply");
-    expect(applyButton()).toBeDisabled();
+      await clickWorkspace1();
 
-    fireEvent.click(await screen.findByRole("checkbox", { name: "Select Workspace 1" }));
+      await waitForApplyEnabled();
+      expect(onChange).not.toHaveBeenCalled();
 
-    await waitForApplyEnabled(applyButton());
-    expect(onChange).not.toHaveBeenCalled();
+      fireEvent.click(applyButton());
 
-    fireEvent.click(applyButton());
+      await waitFor(
+        () => {
+          expect(onChange).toHaveBeenCalledTimes(1);
+        },
+        { timeout: APPLY_WAIT_MS },
+      );
+      const [, selected] = onChange.mock.calls[0];
+      expect(selected).toEqual(["w1"]);
+    },
+    REQUIRE_APPLY_TEST_MS,
+  );
 
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledTimes(1);
-    });
-    const [, selected] = onChange.mock.calls[0];
-    expect(selected).toEqual(["w1"]);
+  it(
+    "with requireApply, discards pending changes on close without Apply",
+    async () => {
+      const onChange = mock();
+      renderDropdown({
+        disableAllOption: true,
+        preventAutoChildSelection: true,
+        requireApply: true,
+        onChange,
+        placeholder: "Any",
+      });
 
-    // Re-open, toggle, close without Apply — parent should not get a second emit
-    onChange.mockClear();
-    fireEvent.click(screen.getByTestId("dropdown-trigger"));
-    fireEvent.click(await screen.findByRole("checkbox", { name: "Select Workspace 1" }));
-    await waitForApplyEnabled(applyButton());
-    // Close by toggling the trigger again
-    fireEvent.click(screen.getByTestId("dropdown-trigger"));
-    await waitForApplyUnmounted();
-    expect(onChange).not.toHaveBeenCalled();
-  });
+      await openRequireApplyDropdown();
+      await clickWorkspace1();
+      await waitForApplyEnabled();
+      fireEvent.click(screen.getByTestId("dropdown-trigger"));
+      await waitForApplyUnmounted();
+      expect(onChange).not.toHaveBeenCalled();
+
+      await openRequireApplyDropdown();
+      await waitForWorkspace1Checked(false);
+    },
+    REQUIRE_APPLY_TEST_MS,
+  );
+
+  it(
+    "with requireApply, discards pending uncheck after Apply",
+    async () => {
+      const onChange = mock();
+      renderDropdown({
+        disableAllOption: true,
+        preventAutoChildSelection: true,
+        requireApply: true,
+        onChange,
+        placeholder: "Any",
+      });
+
+      await openRequireApplyDropdown();
+      await clickWorkspace1();
+      await waitForApplyEnabled();
+      fireEvent.click(applyButton());
+      await waitFor(
+        () => {
+          expect(onChange).toHaveBeenCalledTimes(1);
+        },
+        { timeout: APPLY_WAIT_MS },
+      );
+      await waitForApplyUnmounted();
+
+      onChange.mockClear();
+      await openRequireApplyDropdown();
+      await waitForWorkspace1Checked(true);
+      await clickWorkspace1();
+      await waitForApplyEnabled();
+      fireEvent.click(screen.getByTestId("dropdown-trigger"));
+      await waitForApplyUnmounted();
+      expect(onChange).not.toHaveBeenCalled();
+
+      await openRequireApplyDropdown();
+      await waitForWorkspace1Checked(true);
+    },
+    REQUIRE_APPLY_TEST_MS,
+  );
 
   it("includes external pending changes in Apply without changing the default path", async () => {
     const onChange = mock();

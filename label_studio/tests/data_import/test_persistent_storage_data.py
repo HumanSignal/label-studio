@@ -215,6 +215,44 @@ class TestDownloadStorageData:
         assert response == mock_response_instance
         mock_ranged_response.assert_called_once()
 
+    @pytest.mark.parametrize(
+        'filename,expected_csp',
+        [
+            ('page.html', 'sandbox'),
+            ('image.svg', 'sandbox'),
+            ('doc.xml', 'sandbox'),
+            ('doc.pdf', None),
+            ('photo.png', None),
+        ],
+    )
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', False)
+    @mock.patch('data_import.api.RangedFileResponse')
+    def test_direct_serving_sandboxes_document_types(
+        self,
+        mock_ranged_response,
+        mock_filter,
+        filename,
+        expected_csp,
+        api_factory,
+        user,
+        view,
+        mock_file_upload,
+    ):
+        """Documents render on the app origin, so they are sandboxed; other types are not"""
+        mock_filter.return_value.last.return_value = mock_file_upload
+        headers = {}
+        mock_response_instance = Mock()
+        mock_response_instance.__setitem__ = Mock(side_effect=headers.__setitem__)
+        mock_ranged_response.return_value = mock_response_instance
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/{filename}'})
+        request.user = user
+
+        view.get(request)
+
+        assert headers.get('Content-Security-Policy') == expected_csp
+
     @mock.patch('data_import.api.User.objects.filter')
     @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', True)
     def test_avatar_file_nginx_serving(self, mock_filter, api_factory, user, view):

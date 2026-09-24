@@ -16,10 +16,21 @@ def is_collectstatic() -> bool:
     return False
 
 
+def restrict_env_file_permissions(env_filepath: str) -> None:
+    # Files written by earlier versions were created world-readable
+    if not os.path.exists(env_filepath):
+        return
+    try:
+        os.chmod(env_filepath, 0o600)
+    except OSError as e:
+        logger.warning(f'Warning: failed to restrict permissions of {env_filepath}: {e}')
+
+
 def generate_secret_key_if_missing(data_dir: str) -> str:
     env_key = 'SECRET_KEY'
     env = environ.Env()
     env_filepath = os.path.join(data_dir, '.env')
+    restrict_env_file_permissions(env_filepath)
     environ.Env.read_env(env_filepath)
 
     if existing_secret := env.str(env_key, ''):
@@ -35,7 +46,9 @@ def generate_secret_key_if_missing(data_dir: str) -> str:
         return new_secret
 
     try:
-        with open(env_filepath, 'a') as f:
+        # SECRET_KEY also signs JWTs, so the file must not be readable by other local users
+        fd = os.open(env_filepath, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+        with os.fdopen(fd, 'a') as f:
             f.write(f'\n{env_key}={new_secret}\n')  # nosec
     except Exception as e:
         logger.warning(
