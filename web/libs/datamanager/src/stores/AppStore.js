@@ -3,6 +3,7 @@ import { runInAction } from "mobx";
 import { emitDatamanagerEvent, labelingDisplayViewFromLsf } from "../utils/datamanagerTelemetry";
 import { Modal } from "../components/Common/Modal/Modal";
 import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
 import { Action } from "./Action";
@@ -612,11 +613,22 @@ export const AppStore = types
 
       self.viewsStore.fetchColumns();
 
-      const requests = [self.fetchProject()];
+      const applyProjectDefaultsFirst = isActive(FF_PROJECT_DM_COLUMN_DEFAULTS);
 
-      if (!isLabelStream || (self.project?.show_annotation_history && task)) {
+      // FIT-2846: when project soft defaults are enabled, finish fetchProject before constructing
+      // the first Default / virtual tab so defaults are available. Flag-off keeps parallel fetch.
+      let projectFetched = true;
+      if (applyProjectDefaultsFirst) {
+        projectFetched = yield self.fetchProject();
+      }
+
+      const shouldLoadTabs = !isLabelStream || (self.project?.show_annotation_history && task);
+      const shouldLoadLabelStreamTab = isLabelStream && !!tab;
+      const tabRequests = [];
+
+      if (projectFetched && shouldLoadTabs) {
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
-          requests.push(
+          tabRequests.push(
             self.viewsStore.addView(
               {
                 virtual: true,
@@ -627,7 +639,7 @@ export const AppStore = types
             ),
           );
         } else if (self.SDK.type === "labelops") {
-          requests.push(
+          tabRequests.push(
             self.viewsStore.addView(
               {
                 virtual: false,
@@ -638,15 +650,22 @@ export const AppStore = types
             ),
           );
         } else {
-          requests.push(self.viewsStore.fetchTabs(tab, task, labeling));
+          tabRequests.push(self.viewsStore.fetchTabs(tab, task, labeling));
         }
-      } else if (isLabelStream && !!tab) {
+      } else if (projectFetched && shouldLoadLabelStreamTab) {
         const { selectedItems } = parseDmQueryParam(query);
 
-        requests.push(self.viewsStore.fetchSingleTab(tab, selectedItems ?? {}));
+        tabRequests.push(self.viewsStore.fetchSingleTab(tab, selectedItems ?? {}));
       }
 
-      const [projectFetched] = yield Promise.all(requests);
+      if (applyProjectDefaultsFirst) {
+        if (tabRequests.length) {
+          yield Promise.all(tabRequests);
+        }
+      } else {
+        const requests = [self.fetchProject(), ...tabRequests];
+        [projectFetched] = yield Promise.all(requests);
+      }
 
       if (projectFetched) {
         self.resolveURLParams();

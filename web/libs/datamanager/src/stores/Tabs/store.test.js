@@ -1,9 +1,11 @@
 import { destroy, getSnapshot, isAlive, unprotect } from "mobx-state-tree";
-import { mock, describe, it, expect, afterEach } from "bun:test";
+import { mock, describe, it, expect, afterEach, beforeEach, spyOn } from "bun:test";
 import { types } from "mobx-state-tree";
 import { TabStore, dataCleanup } from "./store";
 import { History } from "../../utils/history";
 import { DataStore, DataStoreItem } from "../../mixins/DataStore";
+import * as coreFf from "@humansignal/core/lib/utils/feature-flags";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS } from "@humansignal/core/lib/utils/feature-flags";
 
 const RootStore = types
   .model({
@@ -948,5 +950,221 @@ describe("dataCleanup columnOrder (FIT-2882)", () => {
       select: 0,
       "tasks:id": 1,
     });
+  });
+});
+
+describe("TabStore project column defaults (FIT-2846)", () => {
+  let root;
+  let isActiveSpy;
+
+  const ProjectRoot = types
+    .model({
+      viewsStore: types.optional(TabStore, {}),
+      apiVersion: 2,
+      project: types.optional(
+        types.model({
+          id: types.number,
+          dm_column_defaults: types.frozen(),
+        }),
+        { id: 1, dm_column_defaults: null },
+      ),
+      SDK: types.optional(types.frozen(), {
+        hasInterface: () => false,
+        invoke: () => {},
+        role: "OWNER",
+      }),
+      dataStore: types.optional(
+        types.model({}).actions(() => ({
+          clear() {},
+          reload() {
+            return Promise.resolve();
+          },
+        })),
+        {},
+      ),
+    })
+    .actions((self) => ({
+      apiCall(_method, _params, _body) {
+        return Promise.resolve(self._apiResult ?? { id: 100, title: "New Tab 2" });
+      },
+      unsetSelection() {},
+    }));
+
+  const columnsRaw = [
+    { id: "id", title: "ID", target: "tasks", type: "Number", visibility_defaults: { explore: true } },
+    {
+      id: "data",
+      title: "Data",
+      target: "tasks",
+      children: ["text"],
+      visibility_defaults: { explore: true },
+    },
+    {
+      id: "text",
+      title: "text",
+      target: "tasks",
+      parent: "data",
+      type: "String",
+      visibility_defaults: { explore: true },
+    },
+    {
+      id: "agreement",
+      title: "Agreement",
+      target: "tasks",
+      type: "Number",
+      visibility_defaults: { explore: false },
+    },
+  ];
+
+  const exploreDefaults = {
+    order: ["data.text", "id", "agreement"],
+    visible: {
+      OW: ["id", "data.text"],
+      AD: ["id", "data.text"],
+      MA: ["id", "data.text"],
+      AN: ["id", "data.text"],
+      RE: ["id", "data.text"],
+    },
+  };
+
+  beforeEach(() => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockImplementation((flag) => flag === FF_PROJECT_DM_COLUMN_DEFAULTS);
+  });
+
+  afterEach(() => {
+    isActiveSpy?.mockRestore();
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  it("createDefaultView seeds hiddenColumns and columnOrder from project defaults", async () => {
+    History.navigate = mock(() => {});
+    root = ProjectRoot.create({
+      project: { id: 42, dm_column_defaults: { explore: exploreDefaults, labeling: { order: [], visible: {} } } },
+      viewsStore: { columnsRaw },
+    });
+    root.viewsStore.fetchColumns();
+
+    await root.viewsStore.createDefaultView();
+
+    const view = root.viewsStore.selected;
+    expect(view.hiddenColumns.explore).toContain("tasks:agreement");
+    expect(view.hiddenColumns.explore).not.toContain("tasks:id");
+    expect(view.columnOrderSnapshot["tasks:data.text"]).toBe(1);
+    expect(view.columnOrderSnapshot["tasks:id"]).toBe(2);
+  });
+
+  it("createSnapshot for a new Manager tab inherits project defaults without customization", () => {
+    root = ProjectRoot.create({
+      project: { id: 42, dm_column_defaults: { explore: exploreDefaults, labeling: { order: [], visible: {} } } },
+      viewsStore: {
+        columnsRaw,
+        views: [{ id: 1, title: "Default", saved: true, key: "default-key", hiddenColumns: { explore: ["tasks:id"] } }],
+      },
+    });
+    root.viewsStore.fetchColumns();
+
+    const snapshot = root.viewsStore.createSnapshot({});
+
+    expect(snapshot.hiddenColumns.explore).toContain("tasks:agreement");
+    expect(snapshot.columnOrder["tasks:data.text"]).toBe(1);
+  });
+
+  it("createSnapshot does not overwrite URL/browser customization", () => {
+    root = ProjectRoot.create({
+      project: { id: 42, dm_column_defaults: { explore: exploreDefaults, labeling: { order: [], visible: {} } } },
+      viewsStore: { columnsRaw },
+    });
+    root.viewsStore.fetchColumns();
+
+    const snapshot = root.viewsStore.createSnapshot({
+      hiddenColumns: { explore: ["tasks:id"], labeling: [] },
+      columnOrder: { "tasks:id": 0 },
+    });
+
+    expect(snapshot.hiddenColumns.explore).toEqual(["tasks:id"]);
+    expect(snapshot.columnOrder).toEqual({ "tasks:id": 0 });
+  });
+
+  it("resetColumnsToProjectDefaults restores soft defaults and is blocked when locked", async () => {
+    History.navigate = mock(() => {});
+    root = ProjectRoot.create({
+      project: { id: 42, dm_column_defaults: { explore: exploreDefaults, labeling: { order: [], visible: {} } } },
+      viewsStore: {
+        columnsRaw,
+        views: [
+          {
+            id: 1,
+            title: "Custom",
+            saved: true,
+            key: "custom",
+            hiddenColumns: { explore: ["tasks:id"], labeling: [] },
+            columnOrder: { "tasks:id": 0 },
+          },
+        ],
+        selected: 1,
+      },
+    });
+    root.viewsStore.fetchColumns();
+    const view = root.viewsStore.selected;
+
+    // Seed personal order with this view's columns plus an unrelated key.
+    const storageData = {
+      "dm:columnorder": JSON.stringify({
+        "tasks:id": 0,
+        "tasks:data.text": 1,
+        "tasks:other_project_col": 9,
+      }),
+    };
+    const storage = {
+      getItem: (key) => (key in storageData ? storageData[key] : null),
+      setItem: (key, value) => {
+        storageData[key] = String(value);
+      },
+      removeItem: (key) => {
+        delete storageData[key];
+      },
+    };
+    const originalLocalStorage = globalThis.localStorage;
+    Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
+
+    try {
+      view.resetColumnsToProjectDefaults();
+      expect(view.hiddenColumns.explore).toContain("tasks:agreement");
+      expect(view.hiddenColumns.explore).not.toContain("tasks:id");
+      expect(view.columnOrderSnapshot["tasks:data.text"]).toBe(1);
+      // Scoped clear: this view's columns removed; unrelated personal prefs kept.
+      expect(JSON.parse(storageData["dm:columnorder"])).toEqual({ "tasks:other_project_col": 9 });
+    } finally {
+      Object.defineProperty(globalThis, "localStorage", { configurable: true, value: originalLocalStorage });
+    }
+
+    const lockedRoot = ProjectRoot.create({
+      project: { id: 42, dm_column_defaults: { explore: exploreDefaults, labeling: { order: [], visible: {} } } },
+      viewsStore: {
+        columnsRaw,
+        views: [
+          {
+            id: 2,
+            title: "Locked",
+            saved: true,
+            key: "locked",
+            is_locked: true,
+            hiddenColumns: { explore: ["tasks:id"], labeling: [] },
+            columnOrder: { "tasks:id": 0 },
+          },
+        ],
+        selected: 2,
+      },
+    });
+    lockedRoot.viewsStore.fetchColumns();
+    const lockedView = lockedRoot.viewsStore.selected;
+    const before = getSnapshot(lockedView.hiddenColumns);
+    const result = lockedView.resetColumnsToProjectDefaults();
+    expect(result).toBe(false);
+    expect(getSnapshot(lockedView.hiddenColumns)).toEqual(before);
+    destroy(lockedRoot);
   });
 });

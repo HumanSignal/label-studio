@@ -1,9 +1,11 @@
 import { EnterpriseBadge, Tooltip } from "@humansignal/ui";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
 import { ColumnPicker } from "./ColumnPicker";
+import { ResetColumnsButton } from "../DataManager/Toolbar/ResetColumnsButton";
 
 const injector = inject(({ store }) => {
   return {
@@ -27,6 +29,7 @@ export const FieldsButton = injector(
     const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
     const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
     const readOnly = view?.isLockedByManager;
+    const showResetFooter = isActive(FF_PROJECT_DM_COLUMN_DEFAULTS);
 
     const handleChange = useCallback(
       (keys) => {
@@ -69,6 +72,7 @@ export const FieldsButton = injector(
             minWidth: 110,
           },
         }}
+        footer={showResetFooter ? <ResetColumnsButton /> : undefined}
       />
     );
 
