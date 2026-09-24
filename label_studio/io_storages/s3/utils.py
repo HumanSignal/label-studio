@@ -8,7 +8,14 @@ import re
 from urllib.parse import urlparse
 
 import boto3
+from botocore.awsrequest import (
+    AWSHTTPConnection,
+    AWSHTTPConnectionPool,
+    AWSHTTPSConnection,
+    AWSHTTPSConnectionPool,
+)
 from botocore.exceptions import ClientError
+from core.utils.io import _SsrfGuardedConnectionMixin, validate_url_for_ssrf
 from core.utils.params import get_env
 from django.conf import settings
 from tldextract import TLDExtract
@@ -33,12 +40,60 @@ def get_client_and_resource(
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token=aws_session_token,
     )
-    settings = {'region_name': region_name or get_env('S3_region') or 'us-east-1'}
-    s3_endpoint = s3_endpoint or get_env('S3_ENDPOINT')
-    if s3_endpoint:
-        settings['endpoint_url'] = s3_endpoint
-    client = session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
-    resource = session.resource('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
+    return create_s3_client_and_resource(session, region_name, s3_endpoint)
+
+
+class _SsrfGuardedAWSHTTPConnection(_SsrfGuardedConnectionMixin, AWSHTTPConnection):
+    pass
+
+
+class _SsrfGuardedAWSHTTPSConnection(_SsrfGuardedConnectionMixin, AWSHTTPSConnection):
+    pass
+
+
+class _SsrfGuardedAWSHTTPConnectionPool(AWSHTTPConnectionPool):
+    ConnectionCls = _SsrfGuardedAWSHTTPConnection
+
+
+class _SsrfGuardedAWSHTTPSConnectionPool(AWSHTTPSConnectionPool):
+    ConnectionCls = _SsrfGuardedAWSHTTPSConnection
+
+
+_SSRF_GUARDED_AWS_POOL_CLASSES = {
+    'http': _SsrfGuardedAWSHTTPConnectionPool,
+    'https': _SsrfGuardedAWSHTTPSConnectionPool,
+}
+
+
+def _guard_client_connections(client):
+    # botocore resolves the endpoint host on every new connection, so a check at save time can be rebound
+    http_session = client._endpoint.http_session
+    http_session._pool_classes_by_scheme = _SSRF_GUARDED_AWS_POOL_CLASSES
+    http_session._manager.pool_classes_by_scheme = _SSRF_GUARDED_AWS_POOL_CLASSES
+
+
+def create_s3_client_and_resource(session, region_name=None, s3_endpoint=None):
+    """Create the S3 client and resource from a boto3 session.
+
+    A user-supplied s3_endpoint is checked for SSRF on every connection; the operator's
+    S3_ENDPOINT env fallback is trusted and may point to an internal host.
+    """
+    client_kwargs = {'region_name': region_name or get_env('S3_region') or 'us-east-1'}
+    endpoint_url = s3_endpoint or get_env('S3_ENDPOINT')
+    if endpoint_url:
+        client_kwargs['endpoint_url'] = endpoint_url
+
+    guard_connections = bool(s3_endpoint) and settings.SSRF_PROTECTION_ENABLED
+    if guard_connections:
+        # storages saved before the serializer check or with SSRF protection off were never validated
+        validate_url_for_ssrf(s3_endpoint, block_local_urls=True)
+
+    config = boto3.session.Config(signature_version='s3v4')
+    client = session.client('s3', config=config, **client_kwargs)
+    resource = session.resource('s3', config=config, **client_kwargs)
+    if guard_connections:
+        _guard_client_connections(client)
+        _guard_client_connections(resource.meta.client)
     return client, resource
 
 
