@@ -109,7 +109,11 @@ export const TreeNode = memo(({ id, label, children, disabled }: TreeNodeProps) 
     }
   };
 
-  const isSelected = (isRoot && allNodeIds.current.length === selected.current.length) || selected.current.includes(id);
+  // Require allNodeIds.length > 0 so an empty tree does not treat 0 === 0 as "All" selected
+  // (that flash made All Annotators look checked while leaves were unchecked).
+  const isSelected =
+    (isRoot && allNodeIds.current.length > 0 && allNodeIds.current.length === selected.current.length) ||
+    selected.current.includes(id);
   const isIndeterminate =
     !isRoot &&
     !isSelected &&

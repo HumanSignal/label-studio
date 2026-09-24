@@ -14,6 +14,8 @@ declare global {
 }
 
 describe("JsonViewer feature flag", () => {
+  const originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+
   beforeEach(() => {
     global.__virtualizedJsonViewerProps = undefined;
 
@@ -36,6 +38,18 @@ describe("JsonViewer feature flag", () => {
     ));
 
     spyOn(tooltipModule, "Tooltip").mockImplementation(({ children }: any) => <>{children}</>);
+  });
+
+  afterEach(() => {
+    if (originalClipboard) {
+      Object.defineProperty(navigator, "clipboard", originalClipboard);
+    } else {
+      Object.defineProperty(navigator, "clipboard", {
+        value: undefined,
+        configurable: true,
+        writable: true,
+      });
+    }
   });
 
   it("renders legacy json-edit-react path when flag is off", () => {
@@ -140,7 +154,12 @@ describe("JsonViewer feature flag", () => {
   it("copy button still copies JSON.stringify(data, null, 2) when flag is on", async () => {
     spyOn(ff, "isActive").mockReturnValue(true);
     const writeText = mock(() => Promise.resolve());
-    Object.assign(navigator, { clipboard: { writeText } });
+    // navigator.clipboard is often a readonly accessor in happy-dom/Bun; Object.assign throws.
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+      writable: true,
+    });
 
     const data = { id: 1, label: "task" };
     render(<JsonViewer data={data} showSearch={false} showFilters={false} />);
