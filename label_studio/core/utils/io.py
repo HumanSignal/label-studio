@@ -21,7 +21,7 @@ from django.core.files.temp import NamedTemporaryFile
 from requests.adapters import HTTPAdapter
 from urllib3.connection import HTTPConnection, HTTPSConnection
 from urllib3.connectionpool import HTTPConnectionPool, HTTPSConnectionPool
-from urllib3.exceptions import ConnectTimeoutError, NameResolutionError, NewConnectionError
+from urllib3.exceptions import ConnectTimeoutError, LocationParseError, NameResolutionError, NewConnectionError
 from urllib3.util import connection as urllib3_connection
 from urllib3.util import parse_url
 
@@ -191,7 +191,10 @@ def validate_url_for_ssrf(url, block_local_urls=True):
     :param block_local_urls: Whether urls that resolve to local/private networks should be allowed.
     """
 
-    parsed_url = parse_url(url)
+    try:
+        parsed_url = parse_url(url)
+    except LocationParseError:
+        raise SsrfBlockedUrlError
 
     if parsed_url.scheme not in ('http', 'https'):
         raise SsrfBlockedUrlError
