@@ -125,3 +125,39 @@ class TestOrganizationMemberListAPI(APITestCase):
                 'title': project_2.title,
             }
         ]
+
+
+class TestOrganizationUpdateAPI(APITestCase):
+    """created_by must not be mass-assignable: it is what gates member removal in LSO."""
+
+    def setUp(self):
+        self.organization = OrganizationFactory()
+        self.owner = self.organization.created_by
+        self.member = UserFactory(active_organization=self.organization)
+
+    def test_member_cannot_take_ownership(self):
+        self.client.force_authenticate(self.member)
+
+        response = self.client.patch(
+            f'/api/organizations/{self.organization.id}',
+            {'created_by': self.member.id},
+            format='json',
+        )
+
+        assert response.status_code == 200
+        self.organization.refresh_from_db()
+        assert self.organization.created_by_id == self.owner.id
+
+    def test_title_and_contact_info_stay_writable(self):
+        self.client.force_authenticate(self.owner)
+
+        response = self.client.patch(
+            f'/api/organizations/{self.organization.id}',
+            {'title': 'Renamed org', 'contact_info': 'owner@example.com'},
+            format='json',
+        )
+
+        assert response.status_code == 200
+        self.organization.refresh_from_db()
+        assert self.organization.title == 'Renamed org'
+        assert self.organization.contact_info == 'owner@example.com'

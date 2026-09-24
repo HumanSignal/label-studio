@@ -3,7 +3,52 @@
 from enum import Enum
 from typing import Any, List, Optional, Union
 
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
+from django.conf import settings
+from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator
+from rest_framework.exceptions import ValidationError as APIValidationError
+
+
+def _strip_dm_column_prefixes(column: str) -> str:
+    """Normalize the way preprocess_field_name() does, so the check sees what the ORM would."""
+    column_copy = column
+    if column_copy.startswith('-'):
+        column_copy = column_copy[1:]
+    for prefix in ('filter:', 'tasks:'):
+        if column_copy.startswith(prefix):
+            column_copy = column_copy[len(prefix) :]
+    if column_copy.startswith('-'):
+        column_copy = column_copy[1:]
+    return column_copy
+
+
+def _reject_fk_traversal(column: str, normalized: str) -> str:
+    """Shared CVE-2023-47117 policy: no `__` outside task.data and the allowlist."""
+    # task.data JSONField lookups are not relation traversals
+    if normalized.startswith('data.'):
+        return column
+    if normalized in settings.DATA_MANAGER_FILTER_ALLOWLIST:
+        return column
+    if '__' in normalized:
+        raise APIValidationError(
+            f'"__" is not generally allowed in filters. Consider asking your administrator to add '
+            f'"{normalized}" to DATA_MANAGER_FILTER_ALLOWLIST, but note that some filter expressions '
+            'may pose a security risk'
+        )
+    return column
+
+
+def validate_filter_column_no_fk_traversal(column: str) -> str:
+    """Guard inline filter columns, where FilterSerializer.validate_column never runs."""
+    # apply_filters() drops every other name before it can become an ORM lookup,
+    # so those must keep being ignored, not 400'd
+    if not column.startswith('filter:tasks:'):
+        return column
+    return _reject_fk_traversal(column, _strip_dm_column_prefixes(column))
+
+
+def validate_ordering_column_no_fk_traversal(column: str) -> str:
+    """Guard inline ordering columns: apply_ordering() feeds every one into F(), no prefix gate."""
+    return _reject_fk_traversal(column, _strip_dm_column_prefixes(column))
 
 
 class FilterIn(BaseModel):
@@ -18,6 +63,12 @@ class Filter(BaseModel):
     operator: str
     type: str
     value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
+
+    @field_validator('filter')
+    @classmethod
+    def check_filter_column_traversal(cls, column: str) -> str:
+        # child_filter is a nested Filter, so pydantic runs this on every level
+        return validate_filter_column_no_fk_traversal(column)
 
 
 class ConjunctionEnum(Enum):
@@ -43,6 +94,13 @@ class PrepareParams(BaseModel):
     filters: Optional[Filters] = None
     data: Optional[dict] = None
     request: Optional[Any] = None
+
+    @field_validator('ordering')
+    @classmethod
+    def check_ordering_traversal(cls, ordering: List[str]) -> List[str]:
+        for column in ordering:
+            validate_ordering_column_no_fk_traversal(column)
+        return ordering
 
     @property
     def projects(self) -> List[int]:

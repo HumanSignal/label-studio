@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from ml.models import MLBackend, MLBackendState
 from projects.models import Task
 from rest_framework import status
 
@@ -19,11 +20,6 @@ def ml_backend_for_test_api(ml_backend):
         setup_model_version='1.0.0',
     )
     yield ml_backend
-
-
-@pytest.fixture
-def mock_gethostbyname(mocker):
-    mocker.patch('socket.gethostbyname', return_value='321.21.21.21')
 
 
 @pytest.mark.django_db
@@ -190,6 +186,50 @@ def test_model_version_on_delete(business_client, ml_backend_for_test_api, mock_
     assert business_client.delete(f'/api/ml/{ml_backend_id}').status_code == 204
     project.refresh_from_db()
     assert project.model_version == ''
+
+
+@pytest.mark.django_db
+def test_ml_backend_local_url_blocked_by_default(business_client, ml_backend_for_test_api):
+    """ML_BLOCK_LOCAL_IP defaults to on, so a backend on a loopback address is rejected."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_local_url',
+        ),
+        user=business_client.user,
+    )
+
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'local_ml_backend',
+            'url': 'http://127.0.0.1:9090',
+        },
+    )
+    assert response.status_code == 403
+    assert 'reserved network address' in response.json()['detail']
+
+
+@pytest.mark.django_db
+def test_ml_backend_detail_reports_blocked_url_as_disconnected(business_client):
+    """A backend whose URL is blocked must degrade to DISCONNECTED, not fail the read with 403."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_blocked_detail',
+        ),
+        user=business_client.user,
+    )
+    ml_backend = MLBackend.objects.create(project=project, url='http://127.0.0.1:9090')
+
+    response = business_client.get(f'/api/ml/{ml_backend.id}')
+
+    assert response.status_code == 200
+    ml_backend.refresh_from_db()
+    assert ml_backend.state == MLBackendState.DISCONNECTED
 
 
 @pytest.mark.django_db
