@@ -436,6 +436,7 @@ class TestStartMigrationJob(TestCase):
         assert args == (job, 1)
         assert kwargs['queue_name'] == 'service'
         assert kwargs['in_seconds'] == 900
+        assert kwargs['job_scope'] == 'system'
 
     @override_settings(MIGRATION_JOB_START_DELAY_SECONDS=900)
     @patch('core.migration_helpers.start_job_async_or_sync')
@@ -447,6 +448,7 @@ class TestStartMigrationJob(TestCase):
 
         _, kwargs = mock_start.call_args
         assert kwargs['in_seconds'] == 0
+        assert kwargs['job_scope'] == 'system'
 
     @override_settings(CI=False, ALLOW_SCHEDULED_MIGRATIONS=False, MIGRATION_JOB_START_DELAY_SECONDS=900)
     @patch('core.migration_helpers.start_job_async_or_sync')
@@ -508,6 +510,7 @@ class TestStartMigrationJob(TestCase):
         assert kwargs['migration_name'] == 'test_mig'
         assert kwargs['queue_name'] == 'service'
         assert kwargs['in_seconds'] == 900
+        assert kwargs['job_scope'] == 'system'
 
 
 class TestExecuteImmediatelyInProcess(TestCase):

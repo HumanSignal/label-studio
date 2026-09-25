@@ -323,10 +323,13 @@ export const MultiTreeSelectProvider = ({
       return;
     }
 
-    // requireApply: parent still matches our last committed value — leave any
-    // in-dropdown pending edits alone. A parent re-render with a new array
-    // identity for the same keys must not wipe unchecked checkboxes before Apply.
-    if (requireApply && sameSelection(initialSelected, committedSelectedRef.current)) {
+    // Parent still matches the last committed value by set-equality — leave any
+    // in-progress checkbox edits alone. Consumers often pass a fresh `[]` (or the
+    // same keys in a new array) on every render; without this guard the sync would
+    // wipe local selection before the debounced onChange round-trip lands.
+    // ``committedSelectedRef`` is updated on Apply and on live emit, so a later
+    // real parent clear still syncs down.
+    if (sameSelection(initialSelected, committedSelectedRef.current)) {
       return;
     }
 
@@ -357,7 +360,7 @@ export const MultiTreeSelectProvider = ({
 
     // Notify all subscribers (TreeSelected, TreeNodes) to update their UI
     notify(RootSymbol, { id: RootSymbol, action: "refresh", value: true });
-  }, [initialSelected, customPlaceholder, isRadio, requireApply, disableAllOption]);
+  }, [initialSelected, customPlaceholder, isRadio, disableAllOption]);
 
   // Sync expandedRef when initialExpanded changes
   useEffect(() => {
@@ -419,7 +422,11 @@ export const MultiTreeSelectProvider = ({
               // Record what we're emitting BEFORE invoking the parent's onChange so
               // the sync effect can recognise the parent's echo on the next render
               // and short-circuit instead of resetting our internal state.
+              // Keep committed in lockstep with lastEmitted: the sync guard skips when
+              // parent still matches committed, so a later real parent clear (e.g. Reset)
+              // must see a non-empty committed value or it would no-op on [].
               lastEmittedRef.current = [...selectedRef.current];
+              committedSelectedRef.current = [...selectedRef.current];
               onChange(dataRef.current, selectedRef.current);
               if (isRadio && dropdownRef?.current?.close) dropdownRef.current.close();
             }

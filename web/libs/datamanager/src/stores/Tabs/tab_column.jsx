@@ -1,16 +1,7 @@
 import { getRoot, getSnapshot, types } from "mobx-state-tree";
-import {
-  IconCommentCheck,
-  IconCommentRed,
-  IconAnnotation,
-  IconBanSquare,
-  IconSparkSquare,
-  IconStarSquare,
-  IconThumbsDown,
-  IconThumbsUp,
-} from "@humansignal/icons";
 import * as CellViews from "../../components/CellViews";
 import { normalizeCellAlias } from "../../components/CellViews";
+import { getColumnIconByAlias } from "../../utils/columnIcons";
 import { all } from "../../utils/utils";
 import { StringOrNumberID } from "../types";
 
@@ -106,7 +97,7 @@ export const TabColumn = types
       if (self.children) {
         return all(self.children, (c) => c.is_hidden);
       }
-      return self.hidden || (self.parentView?.hiddenColumns.hasColumn(self) ?? (self.parent.is_hidden || false));
+      return self.hidden || (self.parentView?.hiddenColumns?.hasColumn(self) ?? (self.parent?.is_hidden || false));
     },
 
     get parentView() {
@@ -185,26 +176,7 @@ export const TabColumn = types
     },
 
     get icon() {
-      switch (self.alias) {
-        case "total_annotations":
-          return <IconAnnotation width="20" height="20" className="text-primary-icon" />;
-        case "cancelled_annotations":
-          return <IconBanSquare width="20" height="20" className="text-negative-icon" />;
-        case "total_predictions":
-          return <IconSparkSquare width="20" height="20" className="text-accent-plum-bold" />;
-        case "reviews_accepted":
-          return <IconThumbsUp width="20" height="20" className="text-positive-icon" />;
-        case "reviews_rejected":
-          return <IconThumbsDown width="20" height="20" className="text-negative-icon" />;
-        case "ground_truth":
-          return <IconStarSquare width="20" height="20" className="text-warning-icon" />;
-        case "comment_count":
-          return <IconCommentCheck width="20" height="20" className="text-warning-icon" />;
-        case "unresolved_comment_count":
-          return <IconCommentRed width="20" height="20" className="text-warning-icon" />;
-        default:
-          return null;
-      }
+      return getColumnIconByAlias(self.alias, { width: 20, height: 20 });
     },
 
     get readableType() {

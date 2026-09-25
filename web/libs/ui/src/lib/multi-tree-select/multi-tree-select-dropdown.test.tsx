@@ -384,4 +384,46 @@ describe("MultiTreeSelectDropdown", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Select Workspace 1" }));
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
   });
+
+  it("preserves in-progress selection across identity-churn, then clears on a real parent reset", async () => {
+    // Live onChange: parent often passes a fresh [] every render before the debounced
+    // emit lands — sync must not wipe the click. After emit + parent echo, a later
+    // real clear (Reset) must still sync down.
+    let selected: string[] = [];
+    const onChange = mock((_data: unknown, next: string[]) => {
+      selected = [...next];
+    });
+    const annotators = [
+      { id: "annotators__1", label: "Ada Lovelace", children: [] },
+      { id: "annotators__2", label: "Grace Hopper", children: [] },
+    ];
+    const schema = { id: "id", label: "label", children: "children" };
+    const shared = {
+      data: annotators,
+      schema,
+      onChange,
+      customPlaceholder: "Any",
+      allLabel: "All Annotators",
+      inline: true,
+      triggerTestId: "dropdown-trigger",
+    };
+
+    const { rerender } = render(<MultiTreeSelectDropdown {...shared} selected={[]} />);
+
+    fireEvent.click(screen.getByTestId("dropdown-trigger"));
+    const ada = await screen.findByRole("checkbox", { name: "Select Ada Lovelace" });
+    fireEvent.click(ada);
+    expect(ada).toBeChecked();
+
+    // Identity churn before parent state catches up
+    rerender(<MultiTreeSelectDropdown {...shared} selected={[]} />);
+    expect(screen.getByRole("checkbox", { name: "Select Ada Lovelace" })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Select Grace Hopper" })).not.toBeChecked();
+
+    await waitFor(() => expect(selected).toEqual(["annotators__1"]));
+    rerender(<MultiTreeSelectDropdown {...shared} selected={["annotators__1"]} />);
+    rerender(<MultiTreeSelectDropdown {...shared} selected={[]} />);
+
+    expect(screen.getByRole("checkbox", { name: "Select Ada Lovelace" })).not.toBeChecked();
+  });
 });

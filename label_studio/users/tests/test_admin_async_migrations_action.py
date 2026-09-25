@@ -36,6 +36,7 @@ class TestAdminRunScheduledMigrations(TestCase):
         assert isinstance(kwargs.get('sql'), str)
         assert kwargs.get('reverse') is False
         assert kwargs.get('dependencies') == []
+        assert kwargs.get('job_scope') == 'system'
 
     @patch('core.redis.start_job_async_or_sync')
     def test_passes_dependencies_from_meta(self, mock_start):

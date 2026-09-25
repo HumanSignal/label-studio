@@ -4,6 +4,9 @@ import {
   readPersonalColumnOrder,
   writePersonalColumnOrder,
   persistPersonalColumnOrderIfNeeded,
+  clearPersonalColumnOrder,
+  onPersonalColumnOrderCleared,
+  resolveEffectiveColumnOrder,
 } from "./columnOrderStorage";
 
 describe("columnOrderStorage (FIT-2882)", () => {
@@ -52,5 +55,111 @@ describe("columnOrderStorage (FIT-2882)", () => {
     const wrote = persistPersonalColumnOrderIfNeeded(false, order, write);
     expect(wrote).toBe(true);
     expect(write).toHaveBeenCalledWith(order);
+  });
+
+  it("clears the full personal order and notifies listeners (FIT-2846 Reset)", () => {
+    writePersonalColumnOrder({ "tasks:id": 1 }, storage);
+    const handler = mock(() => {});
+    const unsubscribe = onPersonalColumnOrderCleared(handler);
+
+    clearPersonalColumnOrder(undefined, storage);
+
+    expect(readPersonalColumnOrder(storage)).toEqual({});
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith({});
+    unsubscribe();
+  });
+
+  it("scopes clear to the given column ids and preserves unrelated prefs", () => {
+    writePersonalColumnOrder(
+      {
+        "tasks:id": 0,
+        "tasks:data.text": 1,
+        "tasks:other_project_col": 2,
+      },
+      storage,
+    );
+    const handler = mock(() => {});
+    const unsubscribe = onPersonalColumnOrderCleared(handler);
+
+    const next = clearPersonalColumnOrder(["tasks:id", "tasks:data.text"], storage);
+
+    expect(next).toEqual({ "tasks:other_project_col": 2 });
+    expect(readPersonalColumnOrder(storage)).toEqual({ "tasks:other_project_col": 2 });
+    expect(handler).toHaveBeenCalledWith({ "tasks:other_project_col": 2 });
+    unsubscribe();
+  });
+
+  it("supports legacy clearPersonalColumnOrder(storage) call shape", () => {
+    writePersonalColumnOrder({ "tasks:id": 1 }, storage);
+    clearPersonalColumnOrder(storage);
+    expect(readPersonalColumnOrder(storage)).toEqual({});
+  });
+});
+
+describe("resolveEffectiveColumnOrder (Table / FIT-2846)", () => {
+  const tabOrder = { "tasks:data.text": 0, "tasks:id": 1 };
+  const personalOrder = { "tasks:id": 0, "tasks:data.text": 1 };
+  const columnIds = ["tasks:id", "tasks:data.text", "tasks:completed_at"];
+
+  it("uses tab order when shared column-order FF is on", () => {
+    expect(
+      resolveEffectiveColumnOrder({
+        sharedColumnOrder: true,
+        projectColumnDefaults: false,
+        personalOrder,
+        tabColumnOrder: tabOrder,
+        columnIds,
+      }),
+    ).toEqual(tabOrder);
+  });
+
+  it("prefers personal order when it touches current view columns", () => {
+    expect(
+      resolveEffectiveColumnOrder({
+        sharedColumnOrder: false,
+        projectColumnDefaults: true,
+        personalOrder,
+        tabColumnOrder: tabOrder,
+        columnIds,
+      }),
+    ).toEqual(personalOrder);
+  });
+
+  it("ignores unrelated personal keys so Reset-scoped clears fall through to tab order", () => {
+    expect(
+      resolveEffectiveColumnOrder({
+        sharedColumnOrder: false,
+        projectColumnDefaults: true,
+        personalOrder: { "tasks:other_project_col": 0 },
+        tabColumnOrder: tabOrder,
+        columnIds,
+      }),
+    ).toEqual(tabOrder);
+  });
+
+  it("uses tab order when project defaults FF is on and personal has no relevant keys", () => {
+    expect(
+      resolveEffectiveColumnOrder({
+        sharedColumnOrder: false,
+        projectColumnDefaults: true,
+        personalOrder: {},
+        tabColumnOrder: tabOrder,
+        columnIds,
+      }),
+    ).toEqual(tabOrder);
+  });
+
+  it("keeps default grid order when both FFs are off even if tab has persisted columnOrder", () => {
+    // Flag-off regression: older tabs may still carry columnOrder from a shared-order era.
+    expect(
+      resolveEffectiveColumnOrder({
+        sharedColumnOrder: false,
+        projectColumnDefaults: false,
+        personalOrder: {},
+        tabColumnOrder: tabOrder,
+        columnIds,
+      }),
+    ).toEqual({});
   });
 });
