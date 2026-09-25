@@ -28,6 +28,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
 
+from .functions import get_export_hostname
 from .models import ConvertedFormat, DataExport, Export
 from .serializers import (
     ExportConvertSerializer,
@@ -246,7 +247,7 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Prepare export files')
 
         export_file, content_type, filename = DataExport.generate_export_file(
-            project, tasks, export_type, download_resources, request.GET, hostname=request.build_absolute_uri('/')
+            project, tasks, export_type, download_resources, request.GET, hostname=get_export_hostname(request)
         )
 
         r = FileResponse(export_file, as_attachment=True, content_type=content_type, filename=filename)
@@ -724,7 +725,7 @@ class ExportConvertAPI(generics.CreateAPIView):
             converted_format.id,
             export_type,
             snapshot.project,
-            request.build_absolute_uri('/'),
+            get_export_hostname(request),
             download_resources=download_resources,
             on_failure=set_convert_background_failure,
         )

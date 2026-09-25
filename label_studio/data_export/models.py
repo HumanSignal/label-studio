@@ -12,6 +12,7 @@ from core import version
 from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
+from data_export.functions import converter_http_session
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
@@ -163,6 +164,7 @@ class DataExport(object):
             download_resources=download_resources,
             access_token=project.organization.created_by.auth_token.key,
             hostname=hostname,
+            http_session=converter_http_session(hostname),
         )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)

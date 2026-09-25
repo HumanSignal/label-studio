@@ -15,6 +15,7 @@ from core.utils.io import (
     get_all_files_from_dir,
     get_temp_dir,
 )
+from data_export.functions import converter_http_session
 from data_manager.models import View
 from django.conf import settings
 from django.core.files import File
@@ -365,6 +366,7 @@ class ExportMixin:
                 # for downloading resource we need access to the API
                 access_token=self.project.organization.created_by.auth_token.key,
                 hostname=hostname,
+                http_session=converter_http_session(hostname),
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name
