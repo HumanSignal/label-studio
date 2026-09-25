@@ -15,10 +15,19 @@ import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
-import { FF_DM_SHARED_COLUMN_ORDER, isActive } from "@humansignal/core/lib/utils/feature-flags";
+import {
+  FF_DM_SHARED_COLUMN_ORDER,
+  FF_PROJECT_DM_COLUMN_DEFAULTS,
+  isActive,
+} from "@humansignal/core/lib/utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
 import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
-import { readPersonalColumnOrder, persistPersonalColumnOrderIfNeeded } from "./columnOrderStorage";
+import {
+  readPersonalColumnOrder,
+  persistPersonalColumnOrderIfNeeded,
+  onPersonalColumnOrderCleared,
+  resolveEffectiveColumnOrder,
+} from "./columnOrderStorage";
 
 const Decorator = (decoration) => {
   return {
@@ -60,8 +69,26 @@ export const Table = observer(
   }) => {
     const tableHead = useRef();
     const sharedColumnOrder = isActive(FF_DM_SHARED_COLUMN_ORDER);
+    const projectColumnDefaults = isActive(FF_PROJECT_DM_COLUMN_DEFAULTS);
     const [localColOrder, setLocalColOrder] = useState(() => (sharedColumnOrder ? {} : readPersonalColumnOrder()));
-    const colOrder = sharedColumnOrder ? (view?.columnOrderSnapshot ?? {}) : localColOrder;
+    // When shared-tab order is off, personal browser prefs win only for columns on this view.
+    // Tab columnOrder fallback is gated on FF_PROJECT_DM_COLUMN_DEFAULTS so older tabs that
+    // already persisted columnOrder (from shared-order era) do not suddenly apply when both
+    // FFs are off (FIT-2846 review).
+    const tabColumnOrder = view?.columnOrderSnapshot ?? {};
+    const columnIds = (view?.columns ?? []).map((c) => c?.id).filter(Boolean);
+    const colOrder = resolveEffectiveColumnOrder({
+      sharedColumnOrder,
+      projectColumnDefaults,
+      personalOrder: localColOrder,
+      tabColumnOrder,
+      columnIds,
+    });
+
+    useEffect(() => {
+      if (sharedColumnOrder) return undefined;
+      return onPersonalColumnOrderCleared((next) => setLocalColOrder(next ?? {}));
+    }, [sharedColumnOrder]);
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
     const { api, type, projectId } = useSDK();

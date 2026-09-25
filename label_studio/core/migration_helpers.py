@@ -161,6 +161,7 @@ def run_migration_job(target_func_path, *args, **kwargs):
             in_seconds=settings.MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS,
             queue_name=queue_name,
             job_timeout=job_timeout,
+            job_scope='system',
             **kwargs,
         )
         return
@@ -181,6 +182,7 @@ def start_migration_job(job, *args, **kwargs):
     reference.
     """
     kwargs.setdefault('in_seconds', settings.MIGRATION_JOB_START_DELAY_SECONDS)
+    kwargs.setdefault('job_scope', 'system')
     if isinstance(job, str):
         return start_job_async_or_sync(run_migration_job, job, *args, **kwargs)
     return start_job_async_or_sync(job, *args, **kwargs)
@@ -338,6 +340,7 @@ def make_sql_migration(
             apply_on_sqlite=apply_on_sqlite,
             reverse=True,
             retry=Retry(max=3, interval=[60, 300, 1800]),
+            job_scope='system',
             **job_kwargs,
         )
 

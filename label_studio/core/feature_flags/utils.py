@@ -30,3 +30,20 @@ def get_user_repr_from_organization(organization):
             'organization_id': organization.id,
         },
     }
+
+
+def get_user_repr_from_organization_id(organization_id):
+    """Build an organization-targeting context without loading its owner.
+
+    Unlike ``get_user_repr_from_organization``, the key is synthetic (``organization:<id>``) and the
+    ``organization`` attribute (owner email) is ``None``: LaunchDarkly rules for flags evaluated through
+    ``flag_set_for_org_id`` must target the ``organization_id`` attribute, not ``organization``. Each organization
+    evaluated this way appears as one new LaunchDarkly context.
+    """
+    return {
+        'key': f'organization:{organization_id}',
+        'custom': {
+            'organization': None,
+            'organization_id': organization_id,
+        },
+    }

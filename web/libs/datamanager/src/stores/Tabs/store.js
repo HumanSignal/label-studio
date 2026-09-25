@@ -8,7 +8,9 @@ import { TabColumn } from "./tab_column";
 import { TabFilterType } from "./tab_filter_type";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { serializeJsonForUrl, deserializeJsonFromUrl } from "@humansignal/core";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { isEmpty } from "../../utils/helpers";
+import { projectDefaultsForNewTab } from "./project_column_defaults";
 
 const storeValue = (name, value) => {
   window.localStorage.setItem(name, value);
@@ -184,6 +186,25 @@ export const TabStore = types
     serialize() {
       return self.views.map((v) => v.serialize());
     },
+
+    /**
+     * Soft project defaults for a newly created tab (FIT-2846).
+     * Never call for existing saved/URL/browser tabs — only when constructing a new snapshot.
+     */
+    projectDefaultsSnapshot(hasCustomization = false) {
+      const root = getRoot(self);
+      const catalogDefaultHidden = self.defaultHidden ? getSnapshot(self.defaultHidden) : { explore: [], labeling: [] };
+
+      return projectDefaultsForNewTab({
+        enabled: isActive(FF_PROJECT_DM_COLUMN_DEFAULTS),
+        defaults: root.project?.dm_column_defaults ?? null,
+        surface: "explore",
+        role: root.SDK?.role ?? null,
+        columns: self.columns ?? [],
+        catalogDefaultHidden,
+        hasCustomization,
+      });
+    },
   }))
   .actions((self) => ({
     setSelected: flow(function* (view, options = {}) {
@@ -272,6 +293,14 @@ export const TabStore = types
       const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
       const newID = nextTempTabId(self.views);
 
+      const hasCustomization = !!(
+        existingTab ||
+        snapshot.hiddenColumns ||
+        (snapshot.columnOrder && Object.keys(snapshot.columnOrder).length > 0)
+      );
+
+      const projectDefaults = self.projectDefaultsSnapshot(hasCustomization);
+
       const defaultHiddenColumns = self.defaultHidden
         ? clone(self.defaultHidden)
         : {
@@ -284,7 +313,8 @@ export const TabStore = types
         id: newID,
         title: newTitle,
         key: snapshot.key ?? guidGenerator(),
-        hiddenColumns: snapshot.hiddenColumns ?? defaultHiddenColumns,
+        hiddenColumns: snapshot.hiddenColumns ?? projectDefaults.hiddenColumns ?? defaultHiddenColumns,
+        ...(projectDefaults.columnOrder && !snapshot.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
       };
     },
 
@@ -330,10 +360,14 @@ export const TabStore = types
     }),
 
     createDefaultView: flow(function* () {
+      const projectDefaults = self.projectDefaultsSnapshot(false);
+      const hiddenColumns = projectDefaults.hiddenColumns ?? self.defaultHidden;
+
       self.views.push({
         id: 0,
         title: "Default",
-        hiddenColumns: self.defaultHidden,
+        hiddenColumns,
+        ...(projectDefaults.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
       });
 
       let defaultView = self.views[self.views.length - 1];

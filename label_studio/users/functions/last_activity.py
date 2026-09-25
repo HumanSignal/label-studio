@@ -447,7 +447,12 @@ def schedule_activity_sync(force: bool = False) -> bool:
 
     try:
         # Schedule the sync job
-        start_job_async_or_sync(sync_user_activities_to_db, queue_name='low', redis=True)
+        start_job_async_or_sync(
+            sync_user_activities_to_db,
+            queue_name='low',
+            redis=True,
+            job_scope='system',
+        )
         reset_activity_counter()  # Reset counter after scheduling
 
         logger.info('Scheduled user activity sync job')

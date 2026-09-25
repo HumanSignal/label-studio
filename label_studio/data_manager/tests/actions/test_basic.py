@@ -101,6 +101,7 @@ class TestDeleteTasksAnnotations(TestCase):
             self.user_1.id,
             queue_name='low',
             job_timeout=60 * 60 * 5,
+            job_tenant=self.project.organization_id,
         )
 
     @patch('projects.mixins.start_job_async_or_sync')

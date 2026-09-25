@@ -228,6 +228,12 @@ export const FF_UTC_950_FIREWALL = "fflag_feat_utc_950_annotator_reviewer_firewa
 export const FF_LSE_PROJECT_INTERNAL_DESCRIPTION = "fflag_feat_lse_project_internal_description_short";
 
 /**
+ * Project Settings: Managers+ default Data Manager column visibility and order
+ * for the main grid (FIT-2808 / FIT-2845).
+ */
+export const FF_PROJECT_DM_COLUMN_DEFAULTS = "fflag_feat_all_fit_2808_project_dm_column_defaults";
+
+/**
  * Vertical annotations sidebar with filtering and resizable column in labeling UI.
  */
 export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";

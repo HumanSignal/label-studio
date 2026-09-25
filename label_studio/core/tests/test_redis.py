@@ -1,7 +1,287 @@
 import threading
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
-from label_studio.core.redis import delete_job_by_id, get_jobs_by_meta, is_job_on_worker, start_job_async_or_sync
+from core.current_request import CurrentContext
+from django.test import override_settings
+
+from label_studio.core.redis import (
+    delete_job_by_id,
+    get_jobs_by_meta,
+    is_job_on_worker,
+    start_job_async_or_sync,
+    system_job_meta,
+)
+
+
+def _tenant_test_job(*args, **kwargs):
+    return args, kwargs
+
+
+def _migration_test_job():
+    return None
+
+
+_migration_test_job.__module__ = 'example.migrations.0001_test'
+
+
+QUOTA_V2 = 'label_studio.core.redis.job_quota_defer_v2_enabled'
+
+
+def _enqueued_meta(mock_get_queue):
+    return mock_get_queue.return_value.enqueue.call_args.kwargs['meta']
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch(QUOTA_V2, return_value=False)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=True)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_stamps_explicit_tenant_under_separate_key(_mock_connected, mock_get_queue, mock_flag, _mock_v2):
+    """An explicit tenant must win for tenancy while the legacy organization_id keeps its context value."""
+    queue = mock_get_queue.return_value
+    queued_job = queue.enqueue.return_value
+    with patch('label_studio.core.redis._capture_context', return_value={'organization_id': 999}):
+        result = start_job_async_or_sync(_tenant_test_job, 7, job_tenant=123)
+
+    assert result is queued_job
+    assert _enqueued_meta(mock_get_queue) == {
+        'organization_id': 999,
+        'tenant_organization_id': 123,
+        'job_scope': 'tenant',
+        'job_func': f'{_tenant_test_job.__module__}.{_tenant_test_job.__qualname__}',
+        'tenant_v2_enrolled': True,
+    }
+    assert 'job_tenant' not in queue.enqueue.call_args.kwargs
+    mock_flag.assert_called_once_with('fflag_feat_org_background_jobs_short', 123, override_system_default=False)
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch(QUOTA_V2, return_value=False)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_dark_path_legacy_meta_is_unchanged_for_organization_alias(_mock_connected, mock_get_queue, _mock_flag, _v2):
+    """With quota v2 dark, meta={'organization': 5} must not gain organization_id (keeps backfills uncounted)."""
+    with patch('label_studio.core.redis._capture_context', return_value={}):
+        start_job_async_or_sync(_tenant_test_job, meta={'organization': 5, 'job_type': 'fsm_backfill'})
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert 'organization_id' not in meta
+    assert meta['organization'] == 5
+    assert meta['tenant_organization_id'] == 5
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch(QUOTA_V2, return_value=False)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_dark_path_keeps_legacy_context_precedence(_mock_connected, mock_get_queue, _mock_flag, _mock_v2):
+    """With quota v2 dark, context still overrides caller meta for organization_id; tenancy uses the caller."""
+    with patch('label_studio.core.redis._capture_context', return_value={'organization_id': 7}):
+        start_job_async_or_sync(_tenant_test_job, meta={'organization_id': 5})
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['organization_id'] == 7
+    assert meta['tenant_organization_id'] == 5
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch(QUOTA_V2, return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_system_job_keeps_request_organization_for_limiter_and_metrics(_mock_connected, mock_get_queue, _mock_v2):
+    """System scope clears only the tenancy key; the request's organization_id still reaches the worker."""
+    with patch('label_studio.core.redis._capture_context', return_value={'organization_id': 7}):
+        start_job_async_or_sync(_tenant_test_job, job_scope='system')
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['organization_id'] == 7
+    assert meta['tenant_organization_id'] is None
+    assert meta['job_scope'] == 'system'
+    assert meta['tenant_v2_enrolled'] is False
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_uses_request_or_worker_context_organization(_mock_connected, mock_get_queue, _mock_flag):
+    """Without an explicit tenant, the organization already carried by CurrentContext is stamped."""
+    CurrentContext.set_organization_id(123)
+    try:
+        start_job_async_or_sync(_tenant_test_job, SimpleNamespace(id=456, organization_id=999))
+    finally:
+        CurrentContext.clear()
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['tenant_organization_id'] == 123
+    assert meta['job_scope'] == 'tenant'
+    assert 'project_id' not in meta
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_chained_job_inherits_tenant_from_worker_context(_mock_connected, mock_get_queue, _mock_flag):
+    """Workers restore job meta into CurrentContext, so a follow-up job keeps the parent's tenant."""
+    CurrentContext.set('tenant_organization_id', 123)
+    try:
+        with patch('label_studio.core.redis._capture_context', return_value={'tenant_organization_id': 123}):
+            start_job_async_or_sync(_tenant_test_job)
+    finally:
+        CurrentContext.clear()
+
+    assert _enqueued_meta(mock_get_queue)['tenant_organization_id'] == 123
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_prefers_caller_meta_then_kwarg_organization(_mock_connected, mock_get_queue, _mock_flag):
+    """Caller meta and an organization_id kwarg outrank ambient context, in that order."""
+    with patch('label_studio.core.redis._capture_context', return_value={'organization_id': 999}):
+        start_job_async_or_sync(_tenant_test_job, organization_id=456, meta={'organization_id': 123})
+        meta_wins = _enqueued_meta(mock_get_queue)
+        start_job_async_or_sync(_tenant_test_job, organization_id=456)
+        kwarg_wins = _enqueued_meta(mock_get_queue)
+
+    assert meta_wins['tenant_organization_id'] == 123
+    assert kwarg_wins['tenant_organization_id'] == 456
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.flag_set_for_org_id', side_effect=RuntimeError('LaunchDarkly unavailable'))
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_fails_open_when_tenant_enrollment_lookup_fails(_mock_connected, mock_get_queue, _mock_flag):
+    """LaunchDarkly failures must preserve enqueue behavior with enrollment disabled."""
+    start_job_async_or_sync(_tenant_test_job, job_tenant=123)
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['tenant_organization_id'] == 123
+    assert meta['tenant_v2_enrolled'] is False
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch(QUOTA_V2, return_value=False)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_tenancy_failure_falls_back_without_touching_caller_meta(_mock_connected, mock_get_queue, _mock_v2):
+    """An invalid explicit tenant enqueues as unknown and leaves the caller's organization_id intact."""
+    with patch('label_studio.core.redis._capture_context', return_value={}):
+        start_job_async_or_sync(_tenant_test_job, job_tenant=(123, 456), meta={'organization_id': 5})
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['organization_id'] == 5
+    assert meta['tenant_organization_id'] is None
+    assert meta['job_scope'] == 'unknown'
+    assert meta['job_func'] == f'{_tenant_test_job.__module__}.{_tenant_test_job.__qualname__}'
+    assert meta['tenant_v2_enrolled'] is False
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_stamps_unknown_scope_without_organization(_mock_connected, mock_get_queue):
+    """Unresolved work must be stamped unknown."""
+    with patch('label_studio.core.redis._capture_context', return_value={}):
+        start_job_async_or_sync(_tenant_test_job)
+
+    meta = _enqueued_meta(mock_get_queue)
+    assert meta['job_scope'] == 'unknown'
+    assert meta['tenant_organization_id'] is None
+    assert meta['tenant_v2_enrolled'] is False
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60)
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_migration_module_is_automatically_stamped_as_system(_mock_connected, mock_get_queue):
+    """Migration functions must be system-scoped without editing every migration."""
+    start_job_async_or_sync(_migration_test_job)
+
+    assert _enqueued_meta(mock_get_queue)['job_scope'] == 'system'
+
+
+def test_system_job_meta_is_public_and_owner_free():
+    """Cron producers use the public helper and get system tenancy metadata only."""
+    assert system_job_meta(_tenant_test_job) == {
+        'tenant_organization_id': None,
+        'job_scope': 'system',
+        'job_func': f'{_tenant_test_job.__module__}.{_tenant_test_job.__qualname__}',
+        'tenant_v2_enrolled': False,
+    }
+
+
+@patch(QUOTA_V2, return_value=False)
+def test_get_jobs_by_meta_dark_path_exact_match_ignores_tenancy_keys(_mock_v2):
+    """With quota v2 dark, exact-match dedup lookups must still find jobs that carry tenancy keys."""
+    job = MagicMock()
+    job.func.__name__ = 'job_func'
+    job.meta = {
+        'job_type': 'fsm_backfill',
+        'organization': 123,
+        'tenant_organization_id': 123,
+        'job_scope': 'tenant',
+        'job_func': 'example.job_func',
+        'tenant_v2_enrolled': False,
+    }
+    extra_job = MagicMock()
+    extra_job.func.__name__ = 'job_func'
+    extra_job.meta = {'job_type': 'fsm_backfill', 'organization': 123, 'extra': True}
+    queue = MagicMock()
+    queue.get_jobs.return_value = [job, extra_job]
+
+    assert get_jobs_by_meta(queue, 'job_func', {'job_type': 'fsm_backfill', 'organization': 123}) == [job]
+
+
+@patch('label_studio.core.redis.ScheduledJobRegistry')
+def test_get_jobs_by_meta_matches_legacy_subset_after_tenant_stamping(mock_scheduled):
+    """Legacy metadata lookups must tolerate the newly added tenant fields."""
+    mock_scheduled.return_value.get_job_ids.return_value = []
+    matching_job = MagicMock()
+    matching_job.func.__name__ = 'job_func'
+    matching_job.meta = {
+        'job_type': 'fsm_backfill',
+        'organization': 123,
+        'organization_id': 123,
+        'job_scope': 'tenant',
+        'job_func': 'example.job_func',
+    }
+    other_job = MagicMock()
+    other_job.func.__name__ = 'job_func'
+    other_job.meta = {'job_type': 'other'}
+    queue = MagicMock()
+    queue.get_jobs.return_value = [matching_job, other_job]
+
+    jobs = get_jobs_by_meta(queue, 'job_func', {'job_type': 'fsm_backfill', 'organization': 123})
+
+    assert jobs == [matching_job]
+
+
+@override_settings(RQ_FAILED_JOB_TTL=60, JOB_TENANCY_ENQUEUED_HOOK='example.record_enqueued')
+@patch('label_studio.core.redis.flag_set_for_org_id', return_value=False)
+@patch('label_studio.core.redis.import_string')
+@patch('label_studio.core.redis.django_rq.get_queue')
+@patch('label_studio.core.redis.redis_connected', return_value=True)
+def test_enqueue_calls_configured_index_hook_after_rq_enqueue(
+    _mock_connected,
+    mock_get_queue,
+    mock_import_string,
+    _mock_flag,
+):
+    """The configured LSE hook must receive the fully enqueued RQ job."""
+    hook = mock_import_string.return_value
+    queued_job = mock_get_queue.return_value.enqueue.return_value
+
+    start_job_async_or_sync(_tenant_test_job, job_tenant=123)
+
+    mock_import_string.assert_called_once_with('example.record_enqueued')
+    hook.assert_called_once_with(queued_job)
 
 
 @patch('label_studio.core.redis.flag_set', return_value=False)
@@ -90,11 +370,10 @@ def test_caller_meta_wins_over_captured_context(mock_get_queue, _mock_flag, _moc
         queue_name='high',
     )
 
-    assert queue.enqueue.call_args.kwargs['meta'] == {
-        'organization_id': 2,
-        'request_id': 'caller',
-        '_queue_origin': 'high',
-    }
+    meta = queue.enqueue.call_args.kwargs['meta']
+    assert meta['organization_id'] == 2
+    assert meta['request_id'] == 'caller'
+    assert meta['_queue_origin'] == 'high'
 
 
 @patch('label_studio.core.redis._capture_context', return_value={'organization_id': 1})

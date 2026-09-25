@@ -16,6 +16,7 @@ const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to chan
 const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
 
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
+import { clearPersonalColumnOrder } from "../../components/Common/Table/columnOrderStorage";
 
 export const Tab = types
   .model("View", {
@@ -599,6 +600,39 @@ export const Tab = types
         }
       }
       self.save();
+    },
+
+    /**
+     * Restore this tab's column visibility + order from project soft defaults (FIT-2846).
+     * Explicit user action — does not affect other tabs. Locked tabs are a no-op.
+     * Also removes this view's column ids from personal localStorage order so Reset is
+     * visible when shared column-order is off (Table otherwise prefers browser prefs
+     * over tab columnOrder). Unrelated personal prefs for other column sets are kept.
+     */
+    resetColumnsToProjectDefaults() {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const defaults = self.parent.projectDefaultsSnapshot(false);
+      const hidden =
+        defaults.hiddenColumns ??
+        (self.parent.defaultHidden ? getSnapshot(self.parent.defaultHidden) : { explore: [], labeling: [] });
+
+      self.hiddenColumns = TabHiddenColumns.create(hidden);
+
+      self.columnOrder.clear();
+      if (defaults.columnOrder) {
+        for (const [columnId, index] of Object.entries(defaults.columnOrder)) {
+          if (typeof index === "number" && !Number.isNaN(index)) {
+            self.columnOrder.set(columnId, index);
+          }
+        }
+      }
+
+      const columnIds = self.columns.map((c) => c.id).filter(Boolean);
+      clearPersonalColumnOrder(columnIds);
+
+      self.save();
+      return true;
     },
 
     setAgreementFilters({

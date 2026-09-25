@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 get_user_repr = load_func(settings.FEATURE_FLAGS_GET_USER_REPR)
 get_user_repr_from_organization = load_func(settings.FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION)
+get_user_repr_from_organization_id = load_func(settings.FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION_ID)
 
 
 def get_feature_file_path():
@@ -70,23 +71,22 @@ else:
     client = ldclient.get()
 
 
-def flag_set(feature_flag, user=None, override_system_default=None, organization=None):
-    """Use this method to check whether this flag is set ON to the current user, to split the logic on backend
-    For example,
-    ```
-    if flag_set('ff-dev-123-some-fixed-issue-231221-short', user):
-        run_new_code()
+def _evaluate_flag(feature_flag, user_dict, override_system_default=None):
+    if feature_flag in STALE_FEATURE_FLAGS:
+        return STALE_FEATURE_FLAGS[feature_flag]
+
+    env_value = get_bool_env(feature_flag, default=None)
+    if env_value is not None:
+        return env_value
+    if override_system_default is not None:
+        system_default = override_system_default
     else:
-        run_old_code()
-    ```
-    `override_default` is used to override any system defaults in place in case no files or LD API flags provided
+        system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
+    return client.variation(feature_flag, user_dict, system_default)
 
-    stale_feature_flags will be checked to confirm if the feature flags are still active
 
-    stale feature flags are considered "deprecated" and should not be changeable in any circumstance.
-    They are an intermediary step before code references to the flag being removed completely.
-    """
-
+def flag_set(feature_flag, user=None, override_system_default=None, organization=None):
+    """Evaluate a feature flag for a user or organization context."""
     if feature_flag in STALE_FEATURE_FLAGS:
         return STALE_FEATURE_FLAGS[feature_flag]
 
@@ -103,14 +103,19 @@ def flag_set(feature_flag, user=None, override_system_default=None, organization
     else:
         user_dict = get_user_repr_from_organization(organization)
 
-    env_value = get_bool_env(feature_flag, default=None)
-    if env_value is not None:
-        return env_value
-    if override_system_default is not None:
-        system_default = override_system_default
-    else:
-        system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
-    return client.variation(feature_flag, user_dict, system_default)
+    return _evaluate_flag(feature_flag, user_dict, override_system_default)
+
+
+def flag_set_for_org_id(feature_flag, organization_id, override_system_default=None):
+    """Evaluate an organization-targeted flag without loading an organization owner.
+
+    Target rollout rules at the ``organization_id`` attribute; see ``get_user_repr_from_organization_id``.
+    """
+    if feature_flag in STALE_FEATURE_FLAGS:
+        return STALE_FEATURE_FLAGS[feature_flag]
+
+    user_dict = get_user_repr_from_organization_id(organization_id)
+    return _evaluate_flag(feature_flag, user_dict, override_system_default)
 
 
 def all_flags(user):
