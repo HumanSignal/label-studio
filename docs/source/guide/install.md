@@ -138,6 +138,12 @@ docker-compose up -d
 
 This starts Label Studio with a PostgreSQL database backend. You can also use a PostgreSQL database without Docker Compose. See [Set up database storage](storedata.html).
 
+### Run with Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and it maintains a one-click deployment template for Label Studio with a bundled PostgreSQL database:
+
+[![Deploy on Easypanel](https://easypanel.io/img/deploy-on-easypanel-40.svg)](https://easypanel.io/templates/labelstudio)
+
 ### Install Label Studio without internet access
 
 Download label-studio docker image (host with internet access and docker):
