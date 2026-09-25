@@ -16,6 +16,42 @@ const DM_USER_CHIP_COUNT_FIELDS = {
   reviewers_count: "reviewers",
   comment_authors_count: "comment_authors",
 };
+const DM_SUMMARY_RESULT_FIELDS = [
+  ["annotations_results", "total_annotations"],
+  ["predictions_results", "total_predictions"],
+];
+
+const isEmptySummaryValue = (value) => value === undefined || value === null || value === "";
+
+/**
+ * #9897: guard rendered summary columns against unevaluated refetch payloads.
+ * The list serializer emits `""` for summary fields the queryset did not
+ * evaluate, and `setList` used to replace rendered values with that `""`
+ * (e.g. returning from the labelling view blanks the Annotation Results
+ * column until an unrelated refetch repopulates it). `total_annotations > 0`
+ * next to `annotations_results === ""` is provably such an artifact — the
+ * counter only counts live annotations, so deletions zero it instead of
+ * leaving it positive. Genuine empties (counter at zero, fresh non-empty
+ * values, no cached value) all pass through untouched.
+ */
+export const preserveUnevaluatedSummaries = (existing, incoming) => {
+  if (!existing) return incoming;
+
+  const out = { ...incoming };
+
+  for (const [summaryField, countField] of DM_SUMMARY_RESULT_FIELDS) {
+    if (
+      isEmptySummaryValue(incoming[summaryField]) &&
+      Number(incoming[countField] ?? 0) > 0 &&
+      !isEmptySummaryValue(existing[summaryField])
+    ) {
+      out[summaryField] = existing[summaryField];
+    }
+  }
+
+  return out;
+};
+
 const fileAttributes = types.model({
   certainty: types.optional(types.maybeNull(types.number), 0),
   distance: types.optional(types.maybeNull(types.number), 0),
@@ -352,6 +388,10 @@ export const create = (columns) => {
         }
 
         return snapshot;
+      },
+
+      mergeListItem(existing, incoming) {
+        return preserveUnevaluatedSummaries(existing ? getSnapshot(existing) : null, incoming);
       },
 
       unsetTask() {

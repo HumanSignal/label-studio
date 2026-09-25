@@ -81,10 +81,18 @@ const MixinBase = types
     },
 
     setList({ list, total, reload, associatedList = [] }) {
-      const newEntity = list.map((t) => ({
-        ...t,
-        source: JSON.stringify(t),
-      }));
+      const newEntity = list.map((t) => {
+        // #9897: let the store preserve previously rendered values when a
+        // refetch returns unevaluated empties for them. Stores without the
+        // hook keep the previous replace behavior.
+        const existing = self.list.find((i) => i.id === t.id);
+        const merged = typeof self.mergeListItem === "function" ? self.mergeListItem(existing, t) : t;
+
+        return {
+          ...merged,
+          source: JSON.stringify(t),
+        };
+      });
 
       self.total = total;
 
