@@ -133,11 +133,12 @@ python label_studio/manage.py runserver
 
 ### Deploy in a cloud instance
 
-You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
+You can deploy Label Studio with one click in Heroku, Microsoft Azure, Google Cloud Platform, or ZopDay: 
 
 <a href="https://www.heroku.com/deploy?template=https://github.com/HumanSignal/label-studio/tree/heroku-persistent-pg"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy" height="30px"></a>
 [<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhumansignal%2Flabel-studio%2Fdevelop%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
+[<img src="https://zop.dev/deploytozopday-inkhard.svg" height="30px">](https://zop.dev/zopday/app/deploy?image=heartexlabs/label-studio:latest&port=8080)
 
 
 #### Apply frontend changes
