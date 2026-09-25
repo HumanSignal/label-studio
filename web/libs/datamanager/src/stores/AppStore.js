@@ -505,6 +505,16 @@ export const AppStore = types
       self.loading = value;
     },
 
+    /**
+     * Shallow-merge fields onto the in-memory project (e.g. after Save as Default).
+     * Prefer this over a full fetchProject when the caller already has the updated payload —
+     * Reset / new tabs read `project.dm_column_defaults` from this store (FIT-2847).
+     */
+    patchProject(fields) {
+      if (!fields || typeof fields !== "object") return;
+      self.project = Object.assign({}, self.project ?? {}, fields);
+    },
+
     fetchProject: flow(function* (options = {}) {
       self.projectFetch = options.force === true;
 

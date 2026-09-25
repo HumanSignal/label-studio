@@ -1167,4 +1167,70 @@ describe("TabStore project column defaults (FIT-2846)", () => {
     expect(getSnapshot(lockedView.hiddenColumns)).toEqual(before);
     destroy(lockedRoot);
   });
+
+  it("resetColumnsToProjectDefaults restores per-dimension agreement columns from soft defaults", () => {
+    History.navigate = mock(() => {});
+    const dimColumnsRaw = [
+      ...columnsRaw,
+      {
+        id: "dimension_agreement_7",
+        title: "label",
+        target: "tasks",
+        type: "Number",
+        visibility_defaults: { explore: true },
+      },
+      {
+        id: "dimension_agreement_9",
+        title: "choices",
+        target: "tasks",
+        type: "Number",
+        visibility_defaults: { explore: true },
+      },
+    ];
+    const dimExploreDefaults = {
+      order: ["id", "dimension_agreement_7", "agreement", "dimension_agreement_9"],
+      visible: {
+        OW: ["id", "dimension_agreement_7"],
+        AD: ["id", "dimension_agreement_7"],
+        MA: ["id", "dimension_agreement_7"],
+        AN: ["id", "dimension_agreement_7"],
+        RE: ["id", "dimension_agreement_7"],
+      },
+    };
+
+    root = ProjectRoot.create({
+      project: {
+        id: 42,
+        dm_column_defaults: { explore: dimExploreDefaults, labeling: { order: [], visible: {} } },
+      },
+      viewsStore: {
+        columnsRaw: dimColumnsRaw,
+        views: [
+          {
+            id: 1,
+            title: "Custom",
+            saved: true,
+            key: "custom",
+            // Opposite of soft defaults: show agreement + dim 9, hide dim 7.
+            hiddenColumns: { explore: ["tasks:dimension_agreement_7"], labeling: [] },
+            columnOrder: { "tasks:agreement": 1, "tasks:id": 2 },
+          },
+        ],
+        selected: 1,
+      },
+    });
+    root.viewsStore.fetchColumns();
+    const view = root.viewsStore.selected;
+
+    expect(view.hiddenColumns.explore).toContain("tasks:dimension_agreement_7");
+    expect(view.hiddenColumns.explore).not.toContain("tasks:dimension_agreement_9");
+
+    view.resetColumnsToProjectDefaults();
+
+    expect(view.hiddenColumns.explore).toContain("tasks:dimension_agreement_9");
+    expect(view.hiddenColumns.explore).toContain("tasks:agreement");
+    expect(view.hiddenColumns.explore).not.toContain("tasks:dimension_agreement_7");
+    expect(view.hiddenColumns.explore).not.toContain("tasks:id");
+    expect(view.columnOrderSnapshot["tasks:dimension_agreement_7"]).toBe(2);
+  });
 });

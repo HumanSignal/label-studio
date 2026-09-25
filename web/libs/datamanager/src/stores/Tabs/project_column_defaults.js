@@ -1,3 +1,10 @@
+import {
+  FF_DM_SHARED_COLUMN_ORDER,
+  FF_PROJECT_DM_COLUMN_DEFAULTS,
+  isActive,
+} from "@humansignal/core/lib/utils/feature-flags";
+import { readPersonalColumnOrder, resolveEffectiveColumnOrder } from "../../components/Common/Table/columnOrderStorage";
+
 /**
  * Resolve project soft Data Manager column defaults (FIT-2846 / FIT-2808).
  *
@@ -178,6 +185,92 @@ export function resolveColumnOrderFromProjectDefaults({ surface, columns } = {})
   });
   orderMap["show-source"] = ordered.length + 1;
   return orderMap;
+}
+
+/**
+ * Leaf columns in the same visual order the grid / Settings use: walk root columns and expand
+ * each group's children at the root's position (`fieldsAsColumns` / `catalogToPickerItems`).
+ * Do not use flat `columns` leaf order — API rows can list a Data child before its group root,
+ * which would put Data first when Save as Default captures (FIT-2847).
+ *
+ * @param {Array<{ id: string, parent?: unknown, children?: unknown, hidden?: boolean }>} columns
+ */
+export function visualOrderedLeafColumns(columns = []) {
+  const list = Array.from(columns ?? []);
+  const byId = new Map(list.map((column) => [column.id, column]));
+  const leaves = [];
+
+  for (const column of list) {
+    if (column.parent) continue;
+    if (column.hidden === true) continue;
+
+    if (Array.isArray(column.children) && column.children.length > 0) {
+      for (const childRef of column.children) {
+        const child = typeof childRef === "string" ? byId.get(childRef) : childRef;
+        if (!child || child.hidden === true) continue;
+        leaves.push(child);
+      }
+    } else {
+      leaves.push(column);
+    }
+  }
+
+  return leaves;
+}
+
+/**
+ * Capture the current tab's main-grid column order + visibility as explore soft-default aliases (FIT-2847).
+ * Matches the Table's effective visual order (shared tab order / personal prefs / catalog expansion).
+ *
+ * @param {{
+ *   columns?: Array<{ id: string, children?: unknown, parent?: unknown, hidden?: boolean, is_hidden?: boolean }>,
+ *   columnOrderSnapshot?: Record<string, number>,
+ * } | null | undefined} view
+ * @param {{
+ *   personalOrder?: Record<string, number>,
+ *   sharedColumnOrder?: boolean,
+ *   projectColumnDefaults?: boolean,
+ * }} [options] - injectable for tests; defaults mirror Table.jsx flag / localStorage reads
+ * @returns {{ order: string[], visibleIds: string[] }}
+ */
+export function captureExploreDefaultsFromTab(view, options = {}) {
+  if (!view) return { order: [], visibleIds: [] };
+
+  const leaves = visualOrderedLeafColumns(view.columns ?? []);
+  const columnIds = leaves.map((leaf) => leaf.id);
+  const orderMap = resolveEffectiveColumnOrder({
+    sharedColumnOrder: options.sharedColumnOrder ?? isActive(FF_DM_SHARED_COLUMN_ORDER),
+    projectColumnDefaults: options.projectColumnDefaults ?? isActive(FF_PROJECT_DM_COLUMN_DEFAULTS),
+    personalOrder: options.personalOrder ?? readPersonalColumnOrder(),
+    tabColumnOrder: view.columnOrderSnapshot ?? {},
+    columnIds,
+  });
+
+  const catalogIndex = new Map(leaves.map((leaf, index) => [leaf.id, index]));
+  const hasAnyOrder = leaves.some((leaf) => typeof orderMap[leaf.id] === "number");
+
+  const sorted = hasAnyOrder
+    ? [...leaves].sort((a, b) => {
+        const ai = orderMap[a.id];
+        const bi = orderMap[b.id];
+        const aIdx = typeof ai === "number" ? ai : Number.POSITIVE_INFINITY;
+        const bIdx = typeof bi === "number" ? bi : Number.POSITIVE_INFINITY;
+        if (aIdx !== bIdx) return aIdx - bIdx;
+        return (catalogIndex.get(a.id) ?? 0) - (catalogIndex.get(b.id) ?? 0);
+      })
+    : leaves;
+
+  const order = sorted.map((col) => runtimeIdToAlias(col.id));
+
+  // Prefer the tab's explore hidden list when present (MST + snapshot). Plain-object fixtures
+  // used in unit tests often only set `is_hidden` — fall back to that flag.
+  const hiddenExploreRaw = view.hiddenColumnsSnapshot?.explore ?? view.hiddenColumns?.explore;
+  const hiddenExplore = Array.isArray(hiddenExploreRaw) ? new Set(hiddenExploreRaw.map(String)) : null;
+  const visibleIds = sorted
+    .filter((col) => (hiddenExplore ? !hiddenExplore.has(col.id) : col.is_hidden !== true))
+    .map((col) => runtimeIdToAlias(col.id));
+
+  return { order, visibleIds };
 }
 
 /**

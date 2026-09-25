@@ -74,7 +74,14 @@ export const instruments = {
   },
   columns: ({ size }) => {
     return (
-      <FieldsButton multiSelect={true} title={"Columns"} size={size} style={style} openUpwardForShortViewport={false} />
+      <FieldsButton
+        multiSelect={true}
+        title={"Columns"}
+        size={size}
+        style={style}
+        openUpwardForShortViewport={false}
+        showProjectDefaultsFooter
+      />
     );
   },
   filters: ({ size }) => {

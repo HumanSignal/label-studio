@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
   aliasToRuntimeId,
+  captureExploreDefaultsFromTab,
   eligibleLeafColumns,
   pickVisibleAliases,
   projectDefaultsForNewTab,
@@ -9,6 +10,7 @@ import {
   resolveRoleCode,
   runtimeIdToAlias,
   surfaceHasProjectDefaults,
+  visualOrderedLeafColumns,
 } from "./project_column_defaults";
 
 const columns = [
@@ -227,6 +229,131 @@ describe("project_column_defaults (FIT-2846)", () => {
       expect(result.hiddenColumns.explore).toEqual(["tasks:agreement"]);
       expect(result.columnOrder["tasks:data.text"]).toBe(1);
       expect(result.columnOrder["tasks:id"]).toBe(2);
+    });
+  });
+
+  describe("captureExploreDefaultsFromTab (FIT-2847)", () => {
+    const captureOpts = {
+      sharedColumnOrder: true,
+      projectColumnDefaults: true,
+      personalOrder: {},
+    };
+
+    it("returns empty lists when view is missing", () => {
+      expect(captureExploreDefaultsFromTab(null)).toEqual({ order: [], visibleIds: [] });
+      expect(captureExploreDefaultsFromTab(undefined)).toEqual({ order: [], visibleIds: [] });
+    });
+
+    it("orders by columnOrderSnapshot and drops hidden leaves from visibleIds", () => {
+      const result = captureExploreDefaultsFromTab(
+        {
+          columns: [
+            { id: "tasks:id", alias: "id", is_hidden: false },
+            { id: "tasks:data", children: ["tasks:data.text"], alias: "data" },
+            { id: "tasks:data.text", alias: "text", parent: "tasks:data", is_hidden: false },
+            { id: "tasks:agreement", alias: "agreement", is_hidden: true },
+            { id: "tasks:annotations_results_json", alias: "annotations_results_json", hidden: true },
+          ],
+          columnOrderSnapshot: {
+            "tasks:data.text": 1,
+            "tasks:id": 2,
+            "tasks:agreement": 3,
+          },
+        },
+        captureOpts,
+      );
+
+      expect(result.order).toEqual(["data.text", "id", "agreement"]);
+      expect(result.visibleIds).toEqual(["data.text", "id"]);
+    });
+
+    it("keeps catalog leaf order when the tab has no columnOrder", () => {
+      const result = captureExploreDefaultsFromTab(
+        {
+          columns: [
+            { id: "tasks:id", is_hidden: false },
+            { id: "tasks:agreement", is_hidden: false },
+            { id: "tasks:data.text", is_hidden: true },
+          ],
+          columnOrderSnapshot: {},
+        },
+        captureOpts,
+      );
+
+      expect(result.order).toEqual(["id", "agreement", "data.text"]);
+      expect(result.visibleIds).toEqual(["id", "agreement"]);
+    });
+
+    it("expands Data at the group root position even when the child appears earlier in the flat list", () => {
+      // Flat API order can list data.text before later roots and before the data parent —
+      // the live grid expands Data at the parent root (last here), not flat leaf order.
+      const columns = [
+        { id: "tasks:data.text", alias: "text", parent: "tasks:data", is_hidden: false },
+        { id: "tasks:id", alias: "id", is_hidden: false },
+        { id: "tasks:agreement", alias: "agreement", is_hidden: false },
+        { id: "tasks:data", children: ["tasks:data.text"], alias: "data" },
+      ];
+
+      expect(visualOrderedLeafColumns(columns).map((c) => c.id)).toEqual([
+        "tasks:id",
+        "tasks:agreement",
+        "tasks:data.text",
+      ]);
+
+      const result = captureExploreDefaultsFromTab({ columns, columnOrderSnapshot: {} }, captureOpts);
+      expect(result.order).toEqual(["id", "agreement", "data.text"]);
+    });
+
+    it("uses personal order when shared tab order is off (parity with Table)", () => {
+      const result = captureExploreDefaultsFromTab(
+        {
+          columns: [
+            { id: "tasks:id", is_hidden: false },
+            { id: "tasks:data", children: ["tasks:data.text"] },
+            { id: "tasks:data.text", parent: "tasks:data", is_hidden: false },
+            { id: "tasks:agreement", is_hidden: false },
+          ],
+          columnOrderSnapshot: { "tasks:id": 1 },
+        },
+        {
+          sharedColumnOrder: false,
+          projectColumnDefaults: true,
+          personalOrder: {
+            "tasks:agreement": 1,
+            "tasks:id": 2,
+            "tasks:data.text": 3,
+          },
+        },
+      );
+
+      expect(result.order).toEqual(["agreement", "id", "data.text"]);
+    });
+
+    it("captures per-dimension agreement columns in order and visibleIds", () => {
+      const result = captureExploreDefaultsFromTab(
+        {
+          columns: [
+            { id: "tasks:id", alias: "id", is_hidden: false },
+            { id: "tasks:agreement", alias: "agreement", is_hidden: false },
+            { id: "tasks:dimension_agreement_7", alias: "dimension_agreement_7", is_hidden: false },
+            { id: "tasks:dimension_agreement_9", alias: "dimension_agreement_9", is_hidden: true },
+          ],
+          columnOrderSnapshot: {
+            "tasks:dimension_agreement_7": 1,
+            "tasks:id": 2,
+            "tasks:agreement": 3,
+            "tasks:dimension_agreement_9": 4,
+          },
+          hiddenColumnsSnapshot: {
+            explore: ["tasks:dimension_agreement_9"],
+            labeling: [],
+          },
+        },
+        captureOpts,
+      );
+
+      expect(result.order).toEqual(["dimension_agreement_7", "id", "agreement", "dimension_agreement_9"]);
+      expect(result.visibleIds).toEqual(["dimension_agreement_7", "id", "agreement"]);
     });
   });
 });
