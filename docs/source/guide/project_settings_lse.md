@@ -332,7 +332,7 @@ Enable **Show before reviewing** to display a pop-up message to reviewers when t
 
 Use this section to configure:
 
-* How many annotations need to be accepted/rejected for the task to be considered reviewed (move from the **Needs Review** state to the **Done** state).
+* How many annotations need to meet the review criteria for the task to be considered reviewed (move from the **Needs Review** state to the **Done** state).
 
 * How many annotations need to be submitted for a task to enter the **Needs Review** state.
 
@@ -369,7 +369,7 @@ For eligible tasks (tasks that enter the **Needs Review** state) in which multip
 <tr>
 <td>
 
-**Task is reviewed after all annotations are reviewed**
+**Task is reviewed when all annotations are reviewed**
 </td>
 <td>
 
