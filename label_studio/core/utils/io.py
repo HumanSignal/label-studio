@@ -11,6 +11,7 @@ import socket
 import sys
 from contextlib import contextmanager
 from tempfile import mkdtemp, mkstemp
+from urllib.parse import urlparse
 
 import requests
 import ujson as json
@@ -361,11 +362,17 @@ class SsrfSafeHTTPAdapter(HTTPAdapter):
         self.poolmanager.pool_classes_by_scheme = _SSRF_GUARDED_POOL_CLASSES
 
 
-def ssrf_safe_session(max_retries=0) -> requests.Session:
+def ssrf_safe_session(max_retries=0, trusted_origin=None) -> requests.Session:
+    """Session whose connections refuse banned addresses, except to ``trusted_origin`` (scheme://host[:port])."""
     session = requests.Session()
     adapter = SsrfSafeHTTPAdapter(max_retries=max_retries)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
+    if trusted_origin:
+        parsed = urlparse(trusted_origin)
+        # Label Studio's own host may resolve to a private address on self-hosted installs;
+        # the trailing slash keeps app.example.com.evil.com from matching the prefix
+        session.mount(f'{parsed.scheme}://{parsed.netloc}/', HTTPAdapter(max_retries=max_retries))
     return session
 
 
