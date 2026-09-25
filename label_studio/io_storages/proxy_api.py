@@ -392,7 +392,7 @@ class TaskResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            task = Task.objects.get(pk=task_id)
+            task = Task.objects.get(pk=task_id, project__organization=request.user.active_organization)
         except Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -420,7 +420,7 @@ class ProjectResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            project = Project.objects.get(pk=project_id)
+            project = Project.objects.get(pk=project_id, organization=request.user.active_organization)
         except Project.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
