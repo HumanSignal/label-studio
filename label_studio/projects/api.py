@@ -905,9 +905,9 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         project = self.get_object()
         model_version = request.data.get('model_version', None)
 
-        if not model_version:
-            raise RestValidationError('model_version param is required')
-
+        if model_version == 'undefined' or model_version == 'null':
+            model_version = None
+        
         count = project.delete_predictions(model_version=model_version)
 
         return Response(data=count)
