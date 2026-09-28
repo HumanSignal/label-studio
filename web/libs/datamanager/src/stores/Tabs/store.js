@@ -11,6 +11,7 @@ import { serializeJsonForUrl, deserializeJsonFromUrl } from "@humansignal/core";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { isEmpty } from "../../utils/helpers";
 import { projectDefaultsForNewTab } from "./project_column_defaults";
+import { resolvePreloaded } from "../../sdk/resolve-preloaded";
 
 const storeValue = (name, value) => {
   window.localStorage.setItem(name, value);
@@ -236,16 +237,25 @@ export const TabStore = types
 
         const root = getRoot(self);
 
-        // Fetch fresh tab config from server so changes made by other users
-        // (e.g., another user locking this tab) are reflected immediately.
+        // Paint tasks from the view-list payload immediately. Refresh the
+        // selected view beside that request so a lock changed by someone else
+        // is still picked up, without sitting in front of the task list.
+        const queryBefore = selected.query;
+        let tasksPromise = selected.reload();
+
         if (selected.saved && selected.id) {
           const latest = yield root.apiCall("tab", { tabId: selected.id });
-          if (!latest?.error && (latest.id == null || latest.id === selected.id)) {
+          if (self.selected === selected && !latest?.error && (latest.id == null || latest.id === selected.id)) {
             applySnapshot(selected, serverViewSnapshot(selected, self.columns, latest));
+            // View-list payload can be stale on later tab switches. If the
+            // single-view refresh changed filters/ordering, fetch tasks again.
+            if (self.selected === selected && selected.query !== queryBefore) {
+              tasksPromise = selected.reload();
+            }
           }
         }
 
-        yield selected.reload();
+        yield tasksPromise;
 
         root.SDK.invoke("tabChanged", selected);
         selected.selected._invokeChangeEvent();
@@ -669,7 +679,10 @@ export const TabStore = types
 
     fetchTabs: flow(function* (tab, taskID, labeling) {
       const tabId = Number.parseInt(tab);
-      const response = yield getRoot(self).apiCall("tabs");
+      const root = getRoot(self);
+      const preloadedViews = root.SDK?.explorerPreload?.views ?? null;
+      if (root.SDK?.explorerPreload) root.SDK.explorerPreload.views = null;
+      const response = yield resolvePreloaded(preloadedViews, () => root.apiCall("tabs"));
       const tabs = response.tabs ?? response ?? [];
 
       const snapshots = tabs.map((t) => {

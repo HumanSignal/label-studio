@@ -1,6 +1,6 @@
-import { mock, describe, it, expect, beforeEach, spyOn } from "bun:test";
+import { mock, describe, it, expect, beforeEach, afterEach, spyOn } from "bun:test";
+import { destroy, types } from "mobx-state-tree";
 import { AppStore } from "./AppStore";
-import { types } from "mobx-state-tree";
 import { History } from "../utils/history";
 
 describe("AppStore setTask annotation matching (FIT-1949)", () => {
@@ -308,5 +308,30 @@ describe("AppStore invokeAction reload handling (UTC-1043)", () => {
 
     expect(mockView.reload).toHaveBeenCalledTimes(1);
     expect(store.needsDataFetch).toBe(true);
+  });
+});
+
+describe("AppStore project timer poll (FIT-2914)", () => {
+  let store;
+
+  afterEach(() => {
+    if (store?._poll) clearTimeout(store._poll);
+    if (store) destroy(store);
+    store = null;
+  });
+
+  it("does not refetch the project in the same turn polling starts", async () => {
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
+
+    store = AppStore.create({ toolbar: "" });
+    document.dispatchEvent(new Event("visibilitychange"));
+    const project = mock(() => Promise.resolve({ id: 1 }));
+    store._sdk = { polling: true, type: "dm", invoke() {}, api: { project } };
+
+    store.startPolling();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(project).not.toHaveBeenCalled();
   });
 });
