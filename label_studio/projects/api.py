@@ -803,6 +803,9 @@ def read_templates_and_groups():
     configs = []
     for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
         config = read_yaml(config_file)
+        # Stable template identity ("<category>/<name>", the template's folder) so clients can
+        # key template-specific behavior on something sturdier than the display title.
+        config.setdefault('slug', config_file.parent.relative_to(annotation_templates_dir).as_posix())
 
         if settings.VERSION_EDITION != 'Community':
             if config.get('group', '').lower() == 'community contributions':

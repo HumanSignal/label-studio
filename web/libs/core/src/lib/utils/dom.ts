@@ -85,10 +85,27 @@ const positioner = (source: HTMLElement, target: HTMLElement) => {
     get horizontalRight() {
       return sourcePosition.left + sourcePosition.width - targetPosition.width;
     },
+    get verticalCenter() {
+      return sourcePosition.top + sourcePosition.height / 2 - targetPosition.height / 2;
+    },
+    get sideLeft() {
+      return sourcePosition.left - targetPosition.width;
+    },
+    get sideRight() {
+      return sourcePosition.left + sourcePosition.width;
+    },
   } as const;
 };
 
-export type Align = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
+export type Align =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+  | "left-center"
+  | "right-center";
 
 export const alignElements = (
   elem: HTMLElement,
@@ -104,6 +121,22 @@ export const alignElements = (
 
   const pos = positioner(elem, target);
   const resultAlign = align.split("-");
+
+  // Side placements (beside the trigger, vertically centred); flip to the other side when out of the viewport.
+  // `pos` is in viewport coordinates, so the flip checks compare against the viewport and the result is shifted by
+  // the scroll offset like every other branch (the target is absolutely positioned in the document).
+  if (align === "left-center" || align === "right-center") {
+    let side = align;
+    let sideLeft = side === "left-center" ? pos.sideLeft - padding : pos.sideRight + padding;
+    if (side === "left-center" && sideLeft < 0) {
+      side = "right-center";
+      sideLeft = pos.sideRight + padding;
+    } else if (side === "right-center" && sideLeft + pos.target.width > window.innerWidth) {
+      side = "left-center";
+      sideLeft = pos.sideLeft - padding;
+    }
+    return { top: pos.verticalCenter + window.scrollY, left: sideLeft + window.scrollX, pos, align: side as Align };
+  }
 
   switch (align) {
     case "top-center":
