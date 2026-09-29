@@ -3,7 +3,7 @@
 from decimal import Decimal
 
 import bleach
-from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
+from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS, SAFE_INSTRUCTION_HTML_TAGS
 from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from fsm.serializer_fields import FSMStateField
@@ -31,6 +31,7 @@ from label_studio_sdk.label_interface.control_tags import (
     TimeSeriesLabelsTag,
     VideoRectangleTag,
 )
+from organizations.models import Organization
 from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectReimport, ProjectSummary
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
@@ -76,6 +77,11 @@ class ControlTagWeightSerializer(serializers.Serializer):
         default=dict,
         help_text='Per-label weights (0.0 to 1.0). Zero excludes the label from agreement.',
     )
+
+
+def sanitize_expert_instruction(html, allow_unsafe_tags):
+    tags = SAFE_HTML_TAGS if allow_unsafe_tags else SAFE_INSTRUCTION_HTML_TAGS
+    return bleach.clean(html, tags=tags, attributes=SAFE_HTML_ATTRIBUTES)
 
 
 class CreatedByFromContext:
@@ -233,11 +239,37 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
 
         if 'expert_instruction' in initial_data:
-            data['expert_instruction'] = bleach.clean(
-                initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES
+            if self.instance is not None:
+                organization_id = self.instance.organization_id
+            else:
+                request = self.context.get('request')
+                organization_id = getattr(getattr(request, 'user', None), 'active_organization_id', None)
+            data['expert_instruction'] = sanitize_expert_instruction(
+                initial_data['expert_instruction'], self._allows_unsafe_instruction_tags(organization_id)
             )
 
         return data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Rows saved before the allowlist was narrowed (or copied past the serializer) must not reach the browser raw
+        instruction = data.get('expert_instruction')
+        if instruction and '<' in instruction:
+            data['expert_instruction'] = sanitize_expert_instruction(
+                instruction, self._allows_unsafe_instruction_tags(getattr(instance, 'organization_id', None))
+            )
+        return data
+
+    def _allows_unsafe_instruction_tags(self, organization_id):
+        if organization_id is None:
+            return False
+        # Shared by every item of a list response, so a page of projects costs one query per organization
+        cache = self.context.setdefault('allow_unsafe_instruction_tags_by_org', {})
+        if organization_id not in cache:
+            cache[organization_id] = Organization.objects.filter(
+                id=organization_id, allow_unsafe_instruction_tags=True
+            ).exists()
+        return cache[organization_id]
 
     def validate_color(self, value):
         # color : "#FF4C25"

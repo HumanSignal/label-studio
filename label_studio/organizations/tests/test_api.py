@@ -148,6 +148,19 @@ class TestOrganizationUpdateAPI(APITestCase):
         self.organization.refresh_from_db()
         assert self.organization.created_by_id == self.owner.id
 
+    def test_member_cannot_allow_unsafe_instruction_tags(self):
+        self.client.force_authenticate(self.member)
+
+        response = self.client.patch(
+            f'/api/organizations/{self.organization.id}',
+            {'allow_unsafe_instruction_tags': True},
+            format='json',
+        )
+
+        assert response.status_code == 200
+        self.organization.refresh_from_db()
+        assert self.organization.allow_unsafe_instruction_tags is False
+
     def test_title_and_contact_info_stay_writable(self):
         self.client.force_authenticate(self.owner)
 

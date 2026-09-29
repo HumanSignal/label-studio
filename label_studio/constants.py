@@ -162,3 +162,23 @@ SAFE_HTML_TAGS = [
     'slot',
     'template',
 ]
+
+# Tags that run script, load active content or restyle the host page when rendered in the app origin
+UNSAFE_HTML_TAGS = [
+    'base',
+    'button',
+    'embed',
+    'form',
+    'iframe',
+    'input',
+    'link',
+    'meta',
+    'noscript',
+    'object',
+    'portal',
+    'script',
+    'style',
+    'svg',
+]
+
+SAFE_INSTRUCTION_HTML_TAGS = [tag for tag in SAFE_HTML_TAGS if tag not in UNSAFE_HTML_TAGS]

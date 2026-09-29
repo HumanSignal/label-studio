@@ -156,3 +156,65 @@ class TestProjectSerializer(TestCase):
         assert queue_total == 4, captured_queries[0]['sql']
         assert 'EXISTS' in captured_queries[0]['sql']
         assert 'DISTINCT' not in captured_queries[0]['sql']
+
+
+class TestProjectSerializerExpertInstruction(TestCase):
+    """Unsafe tags in expert_instruction are kept only for organizations that opted in."""
+
+    PAYLOAD = '<script>alert(1)</script><iframe src="https://docs.google.com/x"></iframe><p>hi</p>'
+    ESCAPED = (
+        '&lt;script&gt;alert(1)&lt;/script&gt;&lt;iframe src="https://docs.google.com/x"&gt;&lt;/iframe&gt;<p>hi</p>'
+    )
+
+    def _write(self, project, value):
+        serializer = ProjectSerializer(instance=project, data={'expert_instruction': value}, partial=True)
+        assert serializer.is_valid(), serializer.errors
+        return serializer.validated_data['expert_instruction']
+
+    def _read(self, project):
+        return ProjectSerializer(project, include=['id', 'expert_instruction']).data['expert_instruction']
+
+    def _allow_unsafe_tags(self, project):
+        project.organization.allow_unsafe_instruction_tags = True
+        project.organization.save(update_fields=['allow_unsafe_instruction_tags'])
+
+    def test_write_escapes_unsafe_tags_by_default(self):
+        project = ProjectFactory()
+        assert self._write(project, self.PAYLOAD) == self.ESCAPED
+
+    def test_write_keeps_unsafe_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, self.PAYLOAD) == self.PAYLOAD
+
+    def test_write_still_strips_event_handlers_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, '<a href="#" onerror=alert(1)>x</a>') == '<a href="#">x</a>'
+
+    def test_read_escapes_unsafe_tags_stored_before_the_fix(self):
+        project = ProjectFactory()
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.ESCAPED
+
+    def test_read_keeps_unsafe_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.PAYLOAD
+
+    def test_read_of_plain_text_does_not_query_organization(self):
+        project = ProjectFactory(expert_instruction='Label all cats')
+        with CaptureQueriesContext(connection) as captured_queries:
+            assert self._read(project) == 'Label all cats'
+        assert len(captured_queries) == 0
+
+    def test_list_read_queries_organization_once(self):
+        organization = ProjectFactory().organization
+        projects = [ProjectFactory(organization=organization, expert_instruction='<p>x</p>') for _ in range(3)]
+        with CaptureQueriesContext(connection) as captured_queries:
+            data = ProjectSerializer(projects, many=True, include=['id', 'expert_instruction']).data
+        assert [item['expert_instruction'] for item in data] == ['<p>x</p>'] * 3
+        assert len(captured_queries) == 1
