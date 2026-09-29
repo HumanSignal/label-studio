@@ -8,6 +8,7 @@ import {
   resolveColumnOrderFromProjectDefaults,
   resolveHiddenColumnsFromProjectDefaults,
   resolveRoleCode,
+  isManagingDmRole,
   runtimeIdToAlias,
   surfaceHasProjectDefaults,
   visualOrderedLeafColumns,
@@ -44,6 +45,18 @@ describe("project_column_defaults (FIT-2846)", () => {
       expect(resolveRoleCode("OW")).toBe("OW");
       expect(resolveRoleCode("ANNOTATOR")).toBe("AN");
       expect(resolveRoleCode("nope")).toBeNull();
+    });
+
+    it("treats only Owner/Admin/Manager as managing DM roles (FIT-2991)", () => {
+      expect(isManagingDmRole("OW")).toBe(true);
+      expect(isManagingDmRole("OWNER")).toBe(true);
+      expect(isManagingDmRole("AD")).toBe(true);
+      expect(isManagingDmRole("MA")).toBe(true);
+      expect(isManagingDmRole("AN")).toBe(false);
+      expect(isManagingDmRole("ANNOTATOR")).toBe(false);
+      expect(isManagingDmRole("RE")).toBe(false);
+      expect(isManagingDmRole("REVIEWER")).toBe(false);
+      expect(isManagingDmRole(null)).toBe(false);
     });
 
     it("converts between catalog aliases and runtime column ids", () => {
