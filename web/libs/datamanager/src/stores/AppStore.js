@@ -138,12 +138,14 @@ export const AppStore = types
       if (self._poll) return;
       if (self.SDK.polling === false) return;
 
-      const poll = async (self) => {
-        if (networkActivity.active) await self.fetchProject({ interaction: "timer" });
-        self._poll = setTimeout(() => poll(self), PROJECTS_FETCH_PERIOD);
+      const poll = async (store) => {
+        if (networkActivity.active) await store.fetchProject({ interaction: "timer" });
+        store._poll = setTimeout(() => poll(store), PROJECTS_FETCH_PERIOD);
       };
 
-      poll(self);
+      // The grid just loaded the project. Wait a full period before the timer
+      // poll so it does not refetch in the same turn.
+      self._poll = setTimeout(() => poll(self), PROJECTS_FETCH_PERIOD);
     },
 
     afterCreate() {

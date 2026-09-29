@@ -30,6 +30,103 @@ const RootStore = types
     unsetSelection() {},
   }));
 
+describe("TabStore setSelected view refresh (FIT-2914)", () => {
+  let root;
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  it("starts the task reload before the selected-view request resolves", async () => {
+    History.navigate = mock(() => {});
+    const order = [];
+    let resolveTab;
+    const tabGate = new Promise((resolve) => {
+      resolveTab = resolve;
+    });
+
+    root = RootStore.create({
+      viewsStore: {
+        views: [{ id: 5, title: "Saved", saved: true, key: "saved-key" }],
+      },
+    });
+    root.apiCall = (method) => {
+      if (method === "tab") {
+        order.push("tab-start");
+        return tabGate.then((value) => {
+          order.push("tab-end");
+          return value;
+        });
+      }
+      return Promise.resolve({});
+    };
+    root.dataStore.reload = () => {
+      order.push("tasks");
+      return Promise.resolve();
+    };
+
+    const pending = root.viewsStore.setSelected(5);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(order[0]).toBe("tasks");
+    expect(order).not.toContain("tab-end");
+
+    resolveTab({ id: 5, title: "Saved" });
+    await pending;
+    expect(order).toEqual(["tasks", "tab-start", "tab-end"]);
+  });
+
+  it("reloads tasks again when the selected-view payload has different filters than the list", async () => {
+    History.navigate = mock(() => {});
+    const reloads = [];
+
+    root = RootStore.create({
+      viewsStore: {
+        columnsRaw: [
+          {
+            id: "id",
+            title: "ID",
+            type: "Number",
+            target: "tasks",
+            visibility_defaults: { filter: true },
+          },
+        ],
+        views: [{ id: 5, title: "Saved", saved: true, key: "saved-key" }],
+      },
+    });
+    root.viewsStore.fetchColumns();
+    root.apiCall = (method) => {
+      if (method === "tab") {
+        return Promise.resolve({
+          id: 5,
+          title: "Saved",
+          data: {
+            filters: {
+              conjunction: "and",
+              items: [{ filter: "filter:tasks:id", operator: "equal", value: 9 }],
+            },
+          },
+        });
+      }
+      return Promise.resolve({});
+    };
+    root.dataStore.reload = () => {
+      reloads.push(root.viewsStore.selected?.query);
+      return Promise.resolve();
+    };
+
+    await root.viewsStore.setSelected(5);
+
+    expect(reloads).toHaveLength(2);
+    expect(reloads[0]).not.toBe(reloads[1]);
+    expect(root.viewsStore.selected.filters).toHaveLength(1);
+  });
+});
+
 describe("TabStore createSnapshot / saveView (BROS-1491)", () => {
   let root;
 
@@ -852,7 +949,7 @@ describe("tab switch loading (FIT-2376)", () => {
         API: types.optional(types.frozen(), { getSettingsByMethodName: () => ({}) }),
         dataStore: types.optional(TasksStore, {}),
       })
-      .actions((self) => ({
+      .actions((_self) => ({
         apiCall(method) {
           if (method === "tab") {
             return Promise.resolve({ id: 2, title: "Tab B", data: {} });

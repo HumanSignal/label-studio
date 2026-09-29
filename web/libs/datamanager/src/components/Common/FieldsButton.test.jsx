@@ -165,16 +165,20 @@ describe("FieldsButton (Columns picker)", () => {
     expect(dimensionIsChecked()).toBe(false);
   });
 
-  describe("project defaults footer (FIT-2847)", () => {
+  describe("project defaults footer (FIT-2847 / FIT-2991)", () => {
     let isActiveSpy;
     let useSDKSpy;
+    let previousAppSettings;
 
     afterEach(() => {
       isActiveSpy?.mockRestore();
       useSDKSpy?.mockRestore();
+      window.APP_SETTINGS = previousAppSettings;
     });
 
     it("hides Reset / Manage Defaults / Save as Default when showProjectDefaultsFooter is off (Quick View)", async () => {
+      previousAppSettings = window.APP_SETTINGS;
+      window.APP_SETTINGS = { ...(previousAppSettings ?? {}), user: { role: "OW" } };
       isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
       useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({
         hasHandler: () => true,
@@ -190,6 +194,8 @@ describe("FieldsButton (Columns picker)", () => {
     });
 
     it("shows the defaults footer on the main-grid Columns picker", async () => {
+      previousAppSettings = window.APP_SETTINGS;
+      window.APP_SETTINGS = { ...(previousAppSettings ?? {}), user: { role: "OW" } };
       isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
       useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({
         hasHandler: () => true,
@@ -202,6 +208,27 @@ describe("FieldsButton (Columns picker)", () => {
       expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
       expect(screen.getByTestId("dm-manage-defaults")).toBeInTheDocument();
       expect(screen.getByTestId("dm-save-as-default")).toBeInTheDocument();
+      expect(document.querySelector(".p-tight.border-t.border-neutral-border.flex")).not.toBeNull();
+    });
+
+    it("hides the defaults footer for Annotators even on the main-grid picker (FIT-2991)", async () => {
+      previousAppSettings = window.APP_SETTINGS;
+      window.APP_SETTINGS = { ...(previousAppSettings ?? {}), user: { role: "AN" } };
+      isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+      useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({
+        hasHandler: () => true,
+        invoke: mock(),
+      });
+
+      renderColumnsPicker({ showProjectDefaultsFooter: true });
+      await openPicker();
+
+      expect(screen.queryByTestId("dm-reset-columns")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("dm-manage-defaults")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
+      // Select mounts bordered footer chrome whenever `footer` is a React element — even null children.
+      // Match the footer shell specifically (search input also uses border-t).
+      expect(document.querySelector(".p-tight.border-t.border-neutral-border.flex")).toBeNull();
     });
   });
 });

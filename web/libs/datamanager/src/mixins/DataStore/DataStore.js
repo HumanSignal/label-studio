@@ -162,6 +162,8 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
     .volatile(() => ({
       requestId: null,
       debouncedFetch: null,
+      // First page of a visit should not sit behind the filter/search debounce.
+      initialFetchDispatched: false,
     }))
     .actions((self) => ({
       updateItem(itemID, patch) {
@@ -301,18 +303,18 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         root.SDK.invoke("dataFetched", self);
       }),
 
-      // Public fetch function that uses debouncing
+      // Public fetch function. The first reload paints the grid immediately.
+      // Later filter and search updates keep the debounce so typing does not
+      // fire a request per keystroke.
       fetch({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
         const params = { id, query, pageNumber, reload, interaction, pageSize };
-        const root = getRoot(self);
-        // Only use debouncing for virtual tabs that use queries (like search/filter tabs)
-        const _currentView = root.viewsStore.selected;
-        // const isVirtualTab = currentView?.virtual && currentView?.query;
 
-        // Initialize debounced function if not already done
+        if (!self.initialFetchDispatched) {
+          self.initialFetchDispatched = true;
+          return self._performFetch(params);
+        }
+
         self.initDebouncedFetch();
-
-        // For virtual tabs with queries, use debounced version
         return self.debouncedFetch(params);
       },
 

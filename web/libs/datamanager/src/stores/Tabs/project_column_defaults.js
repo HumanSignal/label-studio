@@ -16,6 +16,9 @@ import { readPersonalColumnOrder, resolveEffectiveColumnOrder } from "../../comp
 
 export const DM_COLUMN_ROLE_CODES = ["OW", "AD", "MA", "AN", "RE"];
 
+/** Owner / Administrator / Manager — may mutate project column defaults (FIT-2808). */
+export const DM_COLUMN_MANAGING_ROLE_CODES = ["OW", "AD", "MA"];
+
 /** SDK / AuthProvider may pass enum names (`OWNER`) or API codes (`OW`). */
 const ROLE_NAME_TO_CODE = {
   OWNER: "OW",
@@ -34,6 +37,21 @@ export function resolveRoleCode(role) {
   if (!role || typeof role !== "string") return null;
   if (DM_COLUMN_ROLE_CODES.includes(role)) return role;
   return ROLE_NAME_TO_CODE[role] ?? null;
+}
+
+/**
+ * True for Owner / Administrator / Manager (API codes or SDK names).
+ * Annotator and Reviewer must not see Columns picker defaults footer controls (FIT-2991).
+ * @param {string | null | undefined} role
+ */
+export function isManagingDmRole(role) {
+  const code = resolveRoleCode(role);
+  return code != null && DM_COLUMN_MANAGING_ROLE_CODES.includes(code);
+}
+
+/** Current signed-in user from APP_SETTINGS (Data Manager host). */
+export function currentUserIsManagingDmRole() {
+  return isManagingDmRole(window.APP_SETTINGS?.user?.role);
 }
 
 /**
