@@ -6,16 +6,61 @@ used across different parts of the codebase.
 """
 
 import logging
+from typing import Callable, Optional
 
 from core.current_request import CurrentContext
+from core.feature_flags import flag_set
 from core.utils.iterators import iterate_queryset
+from django.conf import settings
+from django.db.models import Exists, OuterRef
 from fsm.state_inference import get_or_infer_state
-from fsm.utils import get_or_initialize_state, is_fsm_enabled
+from fsm.utils import (
+    FF_IMPORT_BULK_TASK_STATES,
+    bulk_initialize_created_task_states,
+    get_or_initialize_state,
+    is_fsm_enabled,
+)
 
 logger = logging.getLogger(__name__)
 
+TASK_STATE_PROGRESS_EVERY = 100
 
-def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
+
+def _bulk_initialize_unannotated_task_states(
+    task_ids: list, user, on_progress: Optional[Callable], initialized: set
+) -> None:
+    """
+    Give CREATED states in bulk to tasks without annotations and without a state record.
+
+    Tasks are visible as soon as each one is committed during storage sync, so a state may already
+    have been created for some of them by a concurrent read; those are left to the per-task path.
+    The filter and the insert are not atomic: a task annotated between them (a window of about a
+    hundred ms per chunk) keeps CREATED as its current state until its next transition. Locking the
+    chunk's task rows would close this, at the cost of blocking annotation writes while it runs.
+
+    The IDs of the tasks that got a state here are added to initialized as each chunk is written.
+    """
+    from fsm.registry import get_state_model
+    from tasks.models import Annotation, Task
+
+    state_model = get_state_model('task')
+    for start in range(0, len(task_ids), settings.BATCH_SIZE):
+        chunk = task_ids[start : start + settings.BATCH_SIZE]
+        tasks = list(
+            Task.objects.filter(id__in=chunk)
+            .exclude(Exists(Annotation.objects.filter(task=OuterRef('pk'))))
+            .exclude(Exists(state_model.objects.filter(task=OuterRef('pk'))))
+            .only('id', 'project_id', 'data')
+        )
+        bulk_initialize_created_task_states(tasks, user=user)
+        initialized.update(task.id for task in tasks)
+        if on_progress:
+            on_progress()
+
+
+def backfill_fsm_states_for_tasks(
+    storage_id, tasks_created, link_class, project=None, on_progress: Optional[Callable] = None
+) -> set:
     """
     Backfill initial FSM states for tasks created during storage sync.
 
@@ -27,6 +72,11 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         storage_id: The ID of the storage that created the tasks
         tasks_created: Number of tasks that were created
         link_class: The link model class (e.g., S3ImportStorageLink) to query tasks
+        project: The storage's project, used for the bulk task states feature flag
+        on_progress: Called periodically so the caller can report that the sync is alive
+
+    Returns:
+        IDs of the tasks whose states were created in bulk, without post-transition hooks
 
     Note:
         - CurrentContext must be available before calling this function
@@ -35,12 +85,13 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         - FSM feature flag is checked before processing
         - Tasks are processed in chunks via iterate_queryset to avoid OOM issues
     """
+    initialized = set()
     if tasks_created <= 0:
-        return
+        return initialized
 
     # Check FSM feature flag - early return if FSM is not enabled
     if not is_fsm_enabled():
-        return
+        return initialized
 
     try:
         from tasks.models import Task
@@ -53,22 +104,29 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         )
 
         if not task_ids:
-            return
+            return initialized
 
         logger.info(f'Storage sync: creating initial FSM states for {len(task_ids)} tasks')
 
-        # Use iterate_queryset to process tasks in chunks, avoiding OOM issues
         user = CurrentContext.get_user()
-        tasks_qs = Task.objects.filter(id__in=task_ids)
+        remaining_ids = task_ids
+        if project is not None and flag_set(FF_IMPORT_BULK_TASK_STATES, user=project.organization.created_by):
+            _bulk_initialize_unannotated_task_states(task_ids, user, on_progress, initialized)
+            remaining_ids = [task_id for task_id in task_ids if task_id not in initialized]
 
-        for task in iterate_queryset(tasks_qs):
+        # Use iterate_queryset to process tasks in chunks, avoiding OOM issues
+        tasks_qs = Task.objects.filter(id__in=remaining_ids)
+        for i, task in enumerate(iterate_queryset(tasks_qs)):
             inferred_state = get_or_infer_state(task)
             get_or_initialize_state(task, user=user, inferred_state=inferred_state)
+            if on_progress and i % TASK_STATE_PROGRESS_EVERY == 0:
+                on_progress()
 
         logger.info(f'Storage sync: FSM states created for {len(task_ids)} tasks')
     except Exception as e:
         # Don't fail storage sync if FSM sync fails
         logger.error(f'FSM sync after storage sync failed: {e}', exc_info=True)
+    return initialized
 
 
 def update_task_state_after_annotation_deletion(task, project):

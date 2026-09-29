@@ -12,7 +12,12 @@ from label_studio_sdk.label_interface import LabelInterface
 from projects.models import ProjectImport, ProjectReimport, ProjectSummary
 from rest_framework.exceptions import ValidationError
 from tasks.models import Task
-from tasks.serializers import FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, sanitize_prediction_import_payload
+from tasks.serializers import (
+    FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY,
+    FF_IMPORT_BULK_TASK_STATES,
+    TaskSerializerBulk,
+    sanitize_prediction_import_payload,
+)
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -286,6 +291,15 @@ def reformat_predictions(tasks, preannotated_from_fields, project=None, raise_er
 post_process_reimport = load_func(settings.POST_PROCESS_REIMPORT)
 
 
+def _counters_set_on_create(project, annotation_count, prediction_count):
+    """Task counters are set on bulk create; they only need recalculation when annotations or predictions were imported"""
+    return (
+        annotation_count == 0
+        and prediction_count == 0
+        and flag_set(FF_IMPORT_BULK_TASK_STATES, user=project.organization.created_by)
+    )
+
+
 def _async_reimport_background_streaming(reimport, project, organization_id, user):
     """Streaming version of reimport that processes tasks in batches to reduce memory usage"""
     try:
@@ -323,7 +337,9 @@ def _async_reimport_background_streaming(reimport, project, organization_id, use
 
                 # Serialize and save batch
                 serializer = ImportApiSerializer(
-                    data=batch_tasks, many=True, context={'project': project, 'user': user}
+                    data=batch_tasks,
+                    many=True,
+                    context={'project': project, 'user': user, 'defer_post_process_custom_callback': True},
                 )
                 serializer.is_valid(raise_exception=True)
                 batch_db_tasks = serializer.save(project_id=project.id)
@@ -379,8 +395,11 @@ def _async_reimport_background_streaming(reimport, project, organization_id, use
                 overlap_cohort_percentage_changed=False,
                 tasks_number_changed=True,
                 recalculate_stats_counts=recalculate_stats_counts,
+                update_counters=not _counters_set_on_create(project, total_annotation_count, total_prediction_count),
             )
             logger.info('Tasks bulk_update finished (async streaming reimport)')
+
+            TaskSerializerBulk.post_process_custom_callback(project.id, user)
 
         # Update reimport with final statistics
         reimport.task_count = total_task_count
@@ -492,7 +511,7 @@ def _async_import_background_streaming(project_import, user):
                     summary = ProjectSummary.objects.select_for_update().get(project=project)
 
                     # BROS-1092: see async_import_background above for rationale.
-                    ctx = {'project': project}
+                    ctx = {'project': project, 'defer_post_process_custom_callback': True}
                     if flag_set(FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=user):
                         ctx['user'] = user
                     serializer = ImportApiSerializer(data=batch_tasks, many=True, context=ctx)
@@ -540,8 +559,11 @@ def _async_import_background_streaming(project_import, user):
                 overlap_cohort_percentage_changed=False,
                 tasks_number_changed=True,
                 recalculate_stats_counts=recalculate_stats_counts,
+                update_counters=not _counters_set_on_create(project, total_annotation_count, total_prediction_count),
             )
             logger.info('Tasks bulk_update finished (async streaming import)')
+
+            TaskSerializerBulk.post_process_custom_callback(project.id, user)
 
         duration = time.time() - start
 

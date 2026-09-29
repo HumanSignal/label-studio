@@ -15,7 +15,12 @@ from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
 from fsm.state_inference import get_or_infer_state
-from fsm.utils import get_or_initialize_state, is_fsm_enabled
+from fsm.utils import (
+    FF_IMPORT_BULK_TASK_STATES,
+    bulk_initialize_created_task_states,
+    get_or_initialize_state,
+    is_fsm_enabled,
+)
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -730,7 +735,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         self.post_process_annotations(user, db_annotations, 'imported')
         self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
-        self.post_process_custom_callback(self.project.id, user)
+        if not self.context.get('defer_post_process_custom_callback'):
+            self.post_process_custom_callback(self.project.id, user)
 
         if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user=ff_user):
             with transaction.atomic():
@@ -747,7 +753,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         # Backfill FSM states for bulk-created tasks
         # bulk_create() bypasses save() so FSM transitions don't fire automatically
         # Do this after all child entities states(annotations, drafts, reviews) have been backfilled
-        self._backfill_fsm_states(self.db_tasks)
+        self._backfill_task_fsm_states_skipping_inference(self.db_tasks, task_annotations, ff_user)
 
         return db_tasks
 
@@ -993,6 +999,24 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
 
         return db_tasks
+
+    def _backfill_task_fsm_states_skipping_inference(self, db_tasks: list, task_annotations: list, ff_user):
+        """
+        Backfill FSM states for bulk-created tasks.
+
+        A just-created task without imported annotations is always CREATED, so its state is
+        inserted in bulk instead of being inferred and initialized one task at a time.
+        """
+        if not flag_set(FF_IMPORT_BULK_TASK_STATES, user=ff_user):
+            self._backfill_fsm_states(db_tasks)
+            return
+
+        unannotated, annotated = [], []
+        for task, annotations in zip(db_tasks, task_annotations):
+            (annotated if annotations else unannotated).append(task)
+
+        bulk_initialize_created_task_states(unannotated, user=CurrentContext.get_user())
+        self._backfill_fsm_states(annotated)
 
     def _backfill_fsm_states(self, entities: list, overwrite_state=False):
         """

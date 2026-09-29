@@ -547,13 +547,14 @@ class Task(TaskMixin, FsmHistoryStateModel):
             return self.annotations.filter(Q_finished_annotations)
 
     def increase_project_summary_counters(self):
-        if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+        # AutoOneToOneField opens a savepoint on every access, even when cached
+        summary = getattr(self.project, 'summary', None)
+        if summary is not None:
             summary.update_data_columns([self])
 
     def decrease_project_summary_counters(self):
-        if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+        summary = getattr(self.project, 'summary', None)
+        if summary is not None:
             summary.remove_data_columns([self])
 
     def ensure_unique_groundtruth(self, annotation_id):
@@ -1412,8 +1413,8 @@ def _task_data_is_not_updated(update_fields):
 @receiver(pre_save, sender=Task)
 def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
     """Before updating task fields - ensure previous info removed from project.summary"""
-    if _task_data_is_not_updated(update_fields):
-        # we don't need to update counters when other than task.data fields are updated
+    if _task_data_is_not_updated(update_fields) or instance.pk is None:
+        # we don't need to update counters when other than task.data fields are updated, or for a new task
         return
     try:
         old_task = sender.objects.get(id=instance.id)

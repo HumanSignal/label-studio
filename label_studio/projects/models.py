@@ -1261,17 +1261,21 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         tasks_number_changed,
         from_scratch=True,
         recalculate_stats_counts: Optional[Mapping[str, int]] = None,
+        update_counters=True,
     ):
         """
         Update tasks counters and update tasks states (rearrange and/or is_labeled)
         :param queryset: Tasks to update queryset
         :param from_scratch: Skip calculated tasks
+        :param update_counters: Recalculate task counters; pass False when they are known to be correct
         :return: Count of updated tasks
         """
         from tasks.functions import update_tasks_counters
 
-        queryset = make_queryset_from_iterable(queryset)
-        objs = update_tasks_counters(queryset, from_scratch)
+        objs = 0
+        if update_counters:
+            queryset = make_queryset_from_iterable(queryset)
+            objs = update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
         if recalculate_all_stats and recalculate_stats_counts:

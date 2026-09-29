@@ -1,14 +1,16 @@
 from unittest.mock import patch
 
 import pytest
-from data_import.functions import _async_import_background_streaming
+from data_import.functions import _async_import_background_streaming, _async_reimport_background_streaming
 from data_import.models import FileUpload
+from data_import.serializers import ImportApiSerializer
 from data_import.uploader import load_tasks_for_async_import_streaming
 from django.core.files.base import ContentFile
 from organizations.tests.factories import OrganizationFactory
-from projects.models import ProjectImport
+from projects.models import ProjectImport, ProjectReimport
 from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
+from tasks.serializers import TaskSerializerBulk
 from users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -191,3 +193,43 @@ class TestAsyncImportBackgroundStreaming:
         assert isinstance(pimport.found_formats, dict)
         assert pimport.found_formats.get('.json')
         assert isinstance(pimport.data_columns, (list, set))
+
+    def test_custom_callback_runs_once_per_import(self, user, project, settings):
+        settings.IMPORT_BATCH_SIZE = 2
+        fu = create_file_upload(
+            user, project, b'[{"text":"A"},{"text":"B"},{"text":"C"},{"text":"D"},{"text":"E"}]', 'a.json'
+        )
+        pimport = ProjectImport.objects.create(project=project, file_upload_ids=[fu.id], commit_to_project=True)
+
+        with patch.object(TaskSerializerBulk, 'post_process_custom_callback') as callback:
+            _async_import_background_streaming(pimport, user)
+
+        pimport.refresh_from_db()
+        assert pimport.status == ProjectImport.Status.COMPLETED
+        assert pimport.task_count == 5
+        callback.assert_called_once_with(project.id, user)
+
+
+class TestAsyncReimportBackgroundStreaming:
+    def test_custom_callback_runs_once_per_reimport(self, user, project, settings):
+        settings.REIMPORT_BATCH_SIZE = 2
+        fu = create_file_upload(
+            user, project, b'[{"text":"A"},{"text":"B"},{"text":"C"},{"text":"D"},{"text":"E"}]', 'a.json'
+        )
+        reimport = ProjectReimport.objects.create(project=project, file_upload_ids=[fu.id])
+
+        with patch.object(TaskSerializerBulk, 'post_process_custom_callback') as callback:
+            _async_reimport_background_streaming(reimport, project, project.organization_id, user)
+
+        assert project.tasks.count() == 5
+        callback.assert_called_once_with(project.id, user)
+
+
+def test_custom_callback_runs_when_not_deferred(user, project):
+    serializer = ImportApiSerializer(data=[{'data': {'text': 'A'}}], many=True, context={'project': project})
+    serializer.is_valid(raise_exception=True)
+
+    with patch.object(TaskSerializerBulk, 'post_process_custom_callback') as callback:
+        serializer.save(project_id=project.id)
+
+    callback.assert_called_once()

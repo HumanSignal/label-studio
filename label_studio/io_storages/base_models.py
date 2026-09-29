@@ -24,12 +24,13 @@ from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import IntegrityError, models, transaction
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from fsm.functions import backfill_fsm_states_for_tasks
+from fsm.utils import FF_IMPORT_BULK_TASK_STATES
 from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
@@ -145,13 +146,14 @@ class StorageInfo(models.Model):
         self.status = self.Status.COMPLETED
         self.last_sync = timezone.now()
         self.last_sync_count = last_sync_count
+        self.traceback = None
 
         time_completed = timezone.now()
 
         self.meta['time_completed'] = str(time_completed)
         self.meta['duration'] = (time_completed - self.time_in_progress).total_seconds()
         self.meta.update(kwargs)
-        self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
+        self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count', 'traceback'])
 
     def info_set_completed_with_errors(self, last_sync_count, validation_errors, **kwargs):
         self.status = self.Status.COMPLETED_WITH_ERRORS
@@ -491,8 +493,17 @@ class ImportStorage(Storage):
 
         raise NotImplementedError
 
+    @staticmethod
+    def is_bare_task_data(task_data) -> bool:
+        """True when a storage object carries no annotations or predictions, so its task can be bulk-created."""
+        return isinstance(task_data, dict) and not (task_data.get('annotations') or task_data.get('predictions'))
+
     @classmethod
-    def add_task(cls, project, maximum_annotations, max_inner_id, storage, link_object: StorageObject, link_class):
+    def _build_task(cls, project, maximum_annotations, max_inner_id, link_object: StorageObject):
+        """Validate a storage object and build its unsaved task.
+
+        Returns (task, link_kwargs, annotations, predictions).
+        """
         link_kwargs = asdict(link_object)
         data = link_kwargs.pop('task_data', None)
 
@@ -526,23 +537,53 @@ class ImportStorage(Storage):
             else:
                 data.pop('data')
 
+        task = Task(
+            data=data,
+            project=project,
+            overlap=maximum_annotations,
+            is_labeled=len(annotations) >= maximum_annotations,
+            total_predictions=len(predictions),
+            total_annotations=len(annotations) - cancelled_annotations,
+            cancelled_annotations=cancelled_annotations,
+            inner_id=max_inner_id,
+            allow_skip=allow_skip,
+        )
+        return task, link_kwargs, annotations, predictions
+
+    @classmethod
+    def add_tasks_bulk(cls, project, storage, pending: list, link_class) -> list:
+        """Insert bare tasks (no annotations or predictions) and their links in one transaction.
+
+        pending is a list of (unsaved task, link_kwargs) pairs from _build_task. bulk_create() skips Task.save()
+        and the Task pre_save/post_save receivers; for a new bare task their only effect is the project summary
+        data-columns update, which is applied here once for the whole batch (and whose own post_save handles
+        the per-project cache invalidation). If a Task or link save hook is ever added, it must be replicated
+        here; lse_data_import/tests/test_bulk_import_hooks.py fails until it is reviewed.
+        """
         with transaction.atomic():
-            # Create task without skip_fsm (it's not a model field)
-            task = Task(
-                data=data,
-                project=project,
-                overlap=maximum_annotations,
-                is_labeled=len(annotations) >= maximum_annotations,
-                total_predictions=len(predictions),
-                total_annotations=len(annotations) - cancelled_annotations,
-                cancelled_annotations=cancelled_annotations,
-                inner_id=max_inner_id,
-                allow_skip=allow_skip,
+            tasks = Task.objects.bulk_create([task for task, _ in pending], batch_size=settings.BATCH_SIZE)
+            link_class.objects.bulk_create(
+                [
+                    link_class(task=task, storage=storage, object_exists=True, **link_kwargs)
+                    for task, (_, link_kwargs) in zip(tasks, pending)
+                ],
+                batch_size=settings.BATCH_SIZE,
             )
+            project.summary.update_data_columns(tasks)
+        return tasks
+
+    @classmethod
+    def add_task(cls, project, maximum_annotations, max_inner_id, storage, link_object: StorageObject, link_class):
+        task, link_kwargs, annotations, predictions = cls._build_task(
+            project, maximum_annotations, max_inner_id, link_object
+        )
+
+        with transaction.atomic():
             # Save with skip_fsm flag to bypass FSM during bulk import
             task.save(skip_fsm=True)
 
-            link_class.create(task, storage=storage, **link_kwargs)
+            # The task is new, so its link cannot exist yet; a plain insert avoids get_or_create's lookup.
+            link_class.objects.create(task=task, storage=storage, object_exists=True, **link_kwargs)
             logger.debug(f'Create {storage.__class__.__name__} link with {link_kwargs} for {task=}')
 
             raise_exception = not flag_set(
@@ -683,9 +724,39 @@ class ImportStorage(Storage):
         )
 
         tasks_for_webhook = []
-        for keys_batch in _batched(
-            self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
-        ):
+        bulk_tasks = connection.features.can_return_rows_from_bulk_insert and flag_set(
+            FF_IMPORT_BULK_TASK_STATES, user=self.project.organization.created_by
+        )
+        pending_bulk = []
+
+        def emit_webhooks_if_full():
+            nonlocal tasks_for_webhook
+            # settings.WEBHOOK_BATCH_SIZE
+            # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
+            # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
+            # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
+            # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
+            # call to ensure all tasks are processed and no task is left unreported in the webhook.
+            if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
+                emit_webhooks_for_instance(
+                    self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+                )
+                tasks_for_webhook = []
+
+        def flush_bulk():
+            nonlocal tasks_created
+            if not pending_bulk:
+                return
+            created = self.add_tasks_bulk(self.project, self, pending_bulk, link_class)
+            pending_bulk.clear()
+            tasks_created += len(created)
+            tasks_for_webhook.extend(task.id for task in created)
+            emit_webhooks_if_full()
+
+        # fflag_root_212_reduce_importstoragelink_counts is always on (pinned in STALE_FEATURE_FLAGS), so bulk task
+        # inserts span keys; with a key batch of 1 they would only batch the objects of a single file.
+        key_batch_size = settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
+        for keys_batch in _batched(self.iter_keys(), key_batch_size):
             deduplicated_keys = list(dict.fromkeys(keys_batch))  # preserve order
             for key in deduplicated_keys:
                 logger.debug(f'Scanning key {key}')
@@ -731,8 +802,22 @@ class ImportStorage(Storage):
                     )
 
                 for link_object in link_objects:
-                    # TODO: batch this loop body with add_task -> add_tasks in a single bulk write.
-                    # See DIA-2062 for prerequisites
+                    if bulk_tasks and self.is_bare_task_data(link_object.task_data):
+                        try:
+                            task, link_kwargs, _, _ = self._build_task(
+                                self.project, maximum_annotations, max_inner_id, link_object
+                            )
+                        except ValidationError as e:
+                            error_message = f'Validation error for task from {link_object.key}: {e}'
+                            logger.error(error_message)
+                            validation_errors.append(error_message)
+                            continue
+                        max_inner_id += 1
+                        pending_bulk.append((task, link_kwargs))
+                        if len(pending_bulk) >= settings.BATCH_SIZE:
+                            flush_bulk()
+                        continue
+
                     try:
                         task = self.add_task(
                             self.project,
@@ -756,27 +841,29 @@ class ImportStorage(Storage):
                         validation_errors.append(error_message)
                         continue
 
-                    # settings.WEBHOOK_BATCH_SIZE
-                    # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
-                    # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
-                    # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
-                    # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
-                    # call to ensure all tasks are processed and no task is left unreported in the webhook.
-                    if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
-                        emit_webhooks_for_instance(
-                            self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
-                        )
-                        tasks_for_webhook = []
+                    emit_webhooks_if_full()
 
                 self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+
+            flush_bulk()
 
         if tasks_for_webhook:
             emit_webhooks_for_instance(
                 self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
             )
 
+        def report_progress():
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+
         # Create initial FSM states for all tasks created during storage sync
-        backfill_fsm_states_for_tasks(self.id, tasks_created, link_class)
+        report_progress()
+        bulk_state_task_ids = backfill_fsm_states_for_tasks(
+            self.id, tasks_created, link_class, project=self.project, on_progress=report_progress
+        )
+        if bulk_state_task_ids:
+            # Bulk-created states skip the per-task post-transition hooks, so run the bulk-import task
+            # post-processing once, as a serializer import does (e.g. LSE review limit recalculation).
+            load_func(settings.TASK_SERIALIZER_BULK).post_process_tasks(self.project.id, list(bulk_state_task_ids))
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
