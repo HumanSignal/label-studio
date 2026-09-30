@@ -31,6 +31,22 @@ from drf_spectacular.utils import extend_schema_field
 from fsm.state_manager import StateManager
 from rest_framework import serializers
 
+FSM_STATE_FIELDS_CONTEXT_KEY = 'fsm_state_fields_enabled'
+
+
+def fsm_state_fields_enabled(context=None):
+    """Whether both FSM flags allow exposing state for the current user.
+
+    Serializers that render many objects (e.g. exports) can resolve this once and put it in their context
+    under FSM_STATE_FIELDS_CONTEXT_KEY; otherwise the flags are evaluated on every call.
+    """
+    if context and FSM_STATE_FIELDS_CONTEXT_KEY in context:
+        return context[FSM_STATE_FIELDS_CONTEXT_KEY]
+    user = CurrentContext.get_user()
+    return flag_set('fflag_feat_fit_568_finite_state_management', user=user) and flag_set(
+        'fflag_feat_fit_710_fsm_state_fields', user=user
+    )
+
 
 @extend_schema_field(OpenApiTypes.STR)
 class FSMStateField(serializers.ReadOnlyField):
@@ -90,11 +106,7 @@ class FSMStateField(serializers.ReadOnlyField):
         # Check both feature flags (works for both core and enterprise)
         # 1. General FSM functionality (background calculations)
         # 2. State field display control (API exposure)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             return None
 
         if instance is None:

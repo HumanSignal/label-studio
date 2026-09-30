@@ -4,7 +4,7 @@ from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
 from django.conf import settings
-from fsm.serializer_fields import FSMStateField
+from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import is_video_object_tracking
 from label_studio_sdk._extensions.label_studio_tools.postprocessing.video import extract_key_frames
 from ml.mixins import InteractiveMixin
@@ -36,17 +36,10 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
 
     def to_representation(self, instance):
         """Override to conditionally exclude FSM state field when feature flags are disabled."""
-        from core.current_request import CurrentContext
-        from core.feature_flags import flag_set
-
         ret = super().to_representation(instance)
 
         # Remove state field from output if either feature flag is disabled
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
 
         return ret
@@ -56,7 +49,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if (
             obj.result
             and self.context.get('interpolate_key_frames', False)
-            and is_video_object_tracking(parsed_config=obj.project.get_parsed_config())
+            and is_video_object_tracking(
+                parsed_config=(self.context.get('project') or obj.project).get_parsed_config()
+            )
         ):
             return extract_key_frames(obj.result)
         return obj.result
@@ -71,9 +66,6 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
-        from core.current_request import CurrentContext
-        from core.feature_flags import flag_set
-
         # avoid long project initializations
         project = getattr(self, '_project', None)
         if project is None:
@@ -91,11 +83,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         ret = super().to_representation(task)
 
         # Remove state field from output if either feature flag is disabled
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
 
         return ret

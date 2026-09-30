@@ -13,7 +13,7 @@ from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
-from fsm.serializer_fields import FSMStateField
+from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from fsm.state_inference import get_or_infer_state
 from fsm.utils import (
     FF_IMPORT_BULK_TASK_STATES,
@@ -1111,11 +1111,7 @@ class AnnotationDraftSerializer(ModelSerializer):
     def to_representation(self, obj):
         """Remove state field if feature flags are disabled"""
         ret = super().to_representation(obj)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
         # Firewall: the `user` field serializes to str(user) (username/email); hide it for others.
         draft_user = getattr(obj, 'user', None)

@@ -106,14 +106,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         """Returns user with cache, this helps to avoid multiple s3/gcs links resolving for avatars"""
 
         uid = instance.id
-        key = 'user_cache'
+        # user serializers with different fields share this context, so cache per shape
+        shape = (type(self), tuple(self.fields))
+        cache = self.context.setdefault('user_cache', {}).setdefault(uid, {})
+        if shape not in cache:
+            cache[shape] = super().to_representation(instance)
 
-        if key not in self.context:
-            self.context[key] = {}
-        if uid not in self.context[key]:
-            self.context[key][uid] = super().to_representation(instance)
-
-        representation = self.context[key][uid]
+        representation = cache[shape]
         is_modified = False
 
         if self._is_deleted(instance):
@@ -138,7 +137,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             is_modified = True
 
         if is_modified:
-            self.context[key][uid] = representation
+            cache[shape] = representation
 
         return representation
 
