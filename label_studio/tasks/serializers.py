@@ -753,7 +753,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         # Backfill FSM states for bulk-created tasks
         # bulk_create() bypasses save() so FSM transitions don't fire automatically
         # Do this after all child entities states(annotations, drafts, reviews) have been backfilled
-        self._backfill_task_fsm_states_skipping_inference(self.db_tasks, task_annotations, ff_user)
+        self._backfill_task_fsm_states_skipping_inference(self.db_tasks, task_annotations)
 
         return db_tasks
 
@@ -1000,14 +1000,14 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         return db_tasks
 
-    def _backfill_task_fsm_states_skipping_inference(self, db_tasks: list, task_annotations: list, ff_user):
+    def _backfill_task_fsm_states_skipping_inference(self, db_tasks: list, task_annotations: list):
         """
         Backfill FSM states for bulk-created tasks.
 
         A just-created task without imported annotations is always CREATED, so its state is
         inserted in bulk instead of being inferred and initialized one task at a time.
         """
-        if not flag_set(FF_IMPORT_BULK_TASK_STATES, user=ff_user):
+        if not flag_set(FF_IMPORT_BULK_TASK_STATES, organization=self.project.organization):
             self._backfill_fsm_states(db_tasks)
             return
 

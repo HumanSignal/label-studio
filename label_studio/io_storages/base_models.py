@@ -725,7 +725,7 @@ class ImportStorage(Storage):
 
         tasks_for_webhook = []
         bulk_tasks = connection.features.can_return_rows_from_bulk_insert and flag_set(
-            FF_IMPORT_BULK_TASK_STATES, user=self.project.organization.created_by
+            FF_IMPORT_BULK_TASK_STATES, organization=self.project.organization
         )
         pending_bulk = []
 

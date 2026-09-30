@@ -296,7 +296,7 @@ def _counters_set_on_create(project, annotation_count, prediction_count):
     return (
         annotation_count == 0
         and prediction_count == 0
-        and flag_set(FF_IMPORT_BULK_TASK_STATES, user=project.organization.created_by)
+        and flag_set(FF_IMPORT_BULK_TASK_STATES, organization=project.organization)
     )
 
 

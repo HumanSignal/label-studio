@@ -110,7 +110,7 @@ def backfill_fsm_states_for_tasks(
 
         user = CurrentContext.get_user()
         remaining_ids = task_ids
-        if project is not None and flag_set(FF_IMPORT_BULK_TASK_STATES, user=project.organization.created_by):
+        if project is not None and flag_set(FF_IMPORT_BULK_TASK_STATES, organization=project.organization):
             _bulk_initialize_unannotated_task_states(task_ids, user, on_progress, initialized)
             remaining_ids = [task_id for task_id in task_ids if task_id not in initialized]
 
