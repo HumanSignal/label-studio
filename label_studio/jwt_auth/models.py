@@ -124,6 +124,7 @@ class TruncatedLSAPIToken(LSAPIToken):
         elif len(parts) < 2:
             raise TokenError('Invalid Label Studio token')
 
-        # Add dummy signature with exactly 43 'x' characters to match expected JWT signature length
-        token = token + '.' + ('x' * 43)
+        # Add dummy signature of 43 'A' characters to match expected JWT signature length;
+        # 'A' encodes zero bits, so it is valid canonical base64url (strict decoding in PyJWT>=2.14 rejects 'x')
+        token = token + '.' + ('A' * 43)
         super().__init__(token, verify=False, *args, **kwargs)
