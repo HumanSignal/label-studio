@@ -2,6 +2,7 @@ import {
   FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT,
   FF_INTERFACES,
   FF_INTERFACES_AGENT_WORKFLOW,
+  FF_INTERFACES_SCENARIOS,
   FF_NEW_STORAGES,
   FF_SEGMENT_ANYTHING_ML_BACKEND,
   FF_THEME_TOGGLE,
@@ -67,5 +68,8 @@ export const isSegmentAnythingEditorEnabled = () => isActive(FF_SEGMENT_ANYTHING
 
 /** Agent chat/plan flow inside Interfaces; gated separately from the base Interfaces product flag. */
 export const isInterfacesAgentWorkflowEnabled = () => isActive(FF_INTERFACES) && isActive(FF_INTERFACES_AGENT_WORKFLOW);
+
+/** Interaction tests (scenarios.js) inside Interfaces; gated separately from the agent workflow. */
+export const isInterfaceScenariosEnabled = () => isActive(FF_INTERFACES) && isActive(FF_INTERFACES_SCENARIOS);
 
 export * from "./flags";

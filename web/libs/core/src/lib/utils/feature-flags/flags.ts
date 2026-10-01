@@ -199,6 +199,12 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
+ * In-browser interface interaction tests (scenarios.js, Tests tab, agent scenario tools).
+ * Requires FF_INTERFACES; when off, the Create Interface agent does not author or run tests.
+ */
+export const FF_INTERFACES_SCENARIOS = "fflag_feat_interfaces_scenarios";
+
+/**
  * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
  */
 export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
