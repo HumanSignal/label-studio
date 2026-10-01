@@ -44,6 +44,10 @@ export interface SubmissionFileMeta {
   durationSec?: number | null;
   width?: number | null;
   height?: number | null;
+  /** The facts came from the server's read of the stored bytes, not from the browser. */
+  verified?: boolean;
+  /** Extra server facts for display ("29.97 fps", "iPhone 15 Pro", "GPS present"). */
+  facts?: string[];
 }
 
 export type SubmissionRuleStatus = "pass" | "fail" | "unknown";
@@ -66,11 +70,19 @@ function formatBytes(bytes: number): string {
   return `${value.toFixed(value >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
 }
 
+const TYPE_SHORT: Record<string, string> = {
+  "video/quicktime": "MOV",
+  "audio/mp4": "M4A",
+  "audio/x-m4a": "M4A",
+  "audio/mpeg": "MP3",
+  "audio/ogg": "OGG",
+  "audio/wav": "WAV",
+  "audio/x-wav": "WAV",
+};
+
 function typeLabel(types: string[]): string {
-  return types
-    .map((t) => (t.includes("/") ? t.split("/").pop() : t))
-    .map((t) => (t === "quicktime" ? "MOV" : (t ?? "").toUpperCase()))
-    .join(" / ");
+  const labels = types.map((t) => TYPE_SHORT[t] ?? (t.includes("/") ? (t.split("/").pop() ?? t) : t).toUpperCase());
+  return Array.from(new Set(labels)).join(" / ");
 }
 
 function durationLabel(min?: number, max?: number): string {
@@ -221,7 +233,7 @@ export const SubmissionStatusChip = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <Badge variant={tone} size="small" shape="rounded" data-testid="submission-status-chip" className={className}>
+  <Badge variant={tone} size="medium" shape="rounded" data-testid="submission-status-chip" className={className}>
     {children}
   </Badge>
 );

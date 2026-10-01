@@ -317,3 +317,34 @@ describe("MediaCard", () => {
     expect(screen.getByText("No preview for this file type.")).toBeInTheDocument();
   });
 });
+
+describe("MediaCard server facts and audio", () => {
+  it("audio kind renders a player with controls", () => {
+    render(
+      <MediaCard
+        state="uploaded"
+        file={{ name: "memo.m4a", size: 1000, contentType: "audio/mp4" }}
+        kind="audio"
+        previewUrl="blob:a"
+      />,
+    );
+    const audio = screen.getByTestId("media-card-media").querySelector("audio") as HTMLAudioElement;
+    expect(audio).toBeInTheDocument();
+    expect(audio).toHaveAttribute("controls");
+  });
+
+  it("verified server facts show in the header and the meta row", () => {
+    const { container } = render(
+      <MediaCard
+        state="submitted"
+        file={FILE}
+        kind="video"
+        previewUrl="u"
+        meta={{ durationSec: 10.5, width: 720, height: 1280, verified: true, facts: ["29.97 fps", "iPhone 15 Pro"] }}
+      />,
+    );
+    expect(container.textContent).toContain("verified");
+    expect(screen.getByTestId("media-card-meta")).toHaveTextContent("29.97 fps");
+    expect(screen.getByTestId("media-card-meta")).toHaveTextContent("iPhone 15 Pro");
+  });
+});

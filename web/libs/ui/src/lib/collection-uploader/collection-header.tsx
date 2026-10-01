@@ -74,7 +74,7 @@ export const CollectionHeader = ({
       <span className="ml-auto flex" data-testid="collection-header-view-toggle">
         <Tooltip title="Grid view">
           <Button
-            size="smaller"
+            size="small"
             look={view === "grid" ? "filled" : "string"}
             variant={view === "grid" ? "primary" : "neutral"}
             aria-label="Grid view"
@@ -85,7 +85,7 @@ export const CollectionHeader = ({
         </Tooltip>
         <Tooltip title="List view">
           <Button
-            size="smaller"
+            size="small"
             look={view === "list" ? "filled" : "string"}
             variant={view === "list" ? "primary" : "neutral"}
             aria-label="List view"

@@ -14,6 +14,7 @@ import {
   type CollectionSubmission,
   serializeSubmissionRegions,
   submissionFileBounds,
+  probeSubmissionFile,
   submissionMediaKind,
   submissionRulesFromSchema,
   useCollectionSubmission,
@@ -597,5 +598,178 @@ describe("pdf members", () => {
     await waitFor(() => expect(refs.api!.members).toHaveLength(1));
     expect(refs.api!.members[0].kind).toBe("pdf");
     expect(refs.api!.members[0].pdf).toBeUndefined();
+  });
+});
+
+describe("server facts", () => {
+  it("audio content types map to the audio kind", () => {
+    expect(submissionMediaKind("memo.m4a", "audio/mp4")).toBe("audio");
+    expect(submissionMediaKind("memo.mp3", null)).toBe("audio");
+    expect(submissionMediaKind("note.ogg", "audio/ogg")).toBe("audio");
+    expect(submissionMediaKind("take.wav", "audio/wav")).toBe("audio");
+  });
+
+  it("server facts drive the stored member's badges and mark them verified", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [
+      serverUpload(97, {
+        filename: "IMG_1.mov",
+        content_type: "video/quicktime",
+        size: 5000,
+        meta: {
+          codec: "hevc",
+          width: 720,
+          height: 1280,
+          duration: 10.5,
+          fps: 29.97,
+          make: "Apple",
+          model: "iPhone 15 Pro",
+          software: "18.1",
+          gps: true,
+        },
+      }),
+    ];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(97)],
+      outputSchema: schemaWith({
+        types: ["video/quicktime"],
+        orientation: "portrait",
+        min_duration: 5,
+        max_files: 3,
+        min_files: 1,
+      }),
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    const member = refs.api!.members[0];
+    const status = Object.fromEntries(member.ruleResults.map((r) => [r.key, r.status]));
+    expect(status.orientation).toBe("pass");
+    expect(status.duration).toBe("pass");
+    expect(member.meta).toMatchObject({ durationSec: 10.5, width: 720, height: 1280 });
+    expect(member.meta?.facts).toEqual(["HEVC", "29.97 fps", "Apple iPhone 15 Pro", "GPS present"]);
+  });
+
+  it("a stored member without server facts is not marked verified", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(97)];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(1));
+    expect(refs.api!.members[0].meta?.verified).toBeFalsy();
+  });
+
+  it("a fresh upload keeps the server facts it completed with after attaching", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    await act(async () => refs.api!.pick([pdf("spec.pdf")]));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    engine.rows[0].meta = { pages: 2 };
+    await act(async () => engine.complete(engine.rows[0].clientRef, 101));
+    await waitFor(() => expect(refs.regions).toHaveLength(1));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].meta?.verified).toBe(true);
+    expect(refs.api!.members[0].meta?.facts).toEqual(["2 pages"]);
+  });
+
+  it("probes an audio pick for its duration", async () => {
+    const created: HTMLAudioElement[] = [];
+    const original = document.createElement.bind(document);
+    spyOn(document, "createElement").mockImplementation(((tag: string) => {
+      const el = original(tag);
+      if (tag === "audio") created.push(el as HTMLAudioElement);
+      return el;
+    }) as typeof document.createElement);
+    const pending = probeSubmissionFile(new File([new Uint8Array(10)], "memo.mp3", { type: "audio/mpeg" }));
+    await waitFor(() => expect(created).toHaveLength(1));
+    Object.defineProperty(created[0], "duration", { value: 12.5 });
+    created[0].onloadedmetadata!(new Event("loadedmetadata"));
+    expect(await pending).toMatchObject({ contentType: "audio/mpeg", durationSec: 12.5 });
+  });
+
+  it("fetches another contributor's upload by id so a manager or reviewer sees its facts", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = []; // the viewer has no uploads of their own on this task
+    engine.current = (uploadId?: number) =>
+      Promise.resolve(
+        uploadId === 97 ? serverUpload(97, { referenced_by_annotation: true, meta: { pages: 3 } }) : null,
+      );
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97)], readOnly: true });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    expect(refs.api!.members[0].meta?.facts).toEqual(["3 pages"]);
+    expect(refs.api!.members[0].submitted).toBe(true);
+  });
+
+  it("reads the shown files in one batched call when the engine supports it", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [];
+    const batches: number[][] = [];
+    (engine as unknown as { currentMany: (ids: number[]) => Promise<SubmissionCurrentUpload[]> }).currentMany = (
+      ids,
+    ) => {
+      batches.push(ids);
+      return Promise.resolve(ids.map((id) => serverUpload(id, { meta: { pages: id } })));
+    };
+    engine.current = () => Promise.reject(new Error("per-id lookups must not run when a batch is available"));
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97), region(98, 1)], readOnly: true });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[1].meta?.verified).toBe(true));
+    expect(batches).toEqual([[97, 98]]);
+    expect(refs.api!.members.map((m) => m.meta?.facts)).toEqual([["97 pages"], ["98 pages"]]);
+  });
+
+  it("asks for each upload id once even when several regions point at the same file", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [];
+    const batches: number[][] = [];
+    (engine as unknown as { currentMany: (ids: number[]) => Promise<SubmissionCurrentUpload[]> }).currentMany = (
+      ids,
+    ) => {
+      batches.push(ids);
+      return Promise.resolve(ids.map((id) => serverUpload(id, { meta: { pages: 1 } })));
+    };
+    const twin = { ...region(97), id: "submission-97-copy" };
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97), twin], readOnly: true });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    expect(batches).toEqual([[97]]);
+  });
+
+  it("falls back to the browser's facts when the server could not read any", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [
+      serverUpload(97, {
+        content_type: "video/mp4",
+        meta: { codec: null, width: null, height: null, duration: null, fps: null, gps: null },
+      }),
+    ];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(97)],
+      outputSchema: schemaWith({ types: ["video/mp4"], orientation: "portrait", max_files: 3, min_files: 1 }),
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(1));
+    await act(async () => refs.api!.members[0].onMediaMetadata?.({ durationSec: 9, width: 720, height: 1280 }));
+    const member = refs.api!.members[0];
+    expect(member.meta?.verified).toBeFalsy();
+    expect(member.meta).toMatchObject({ width: 720, height: 1280 });
+    expect(member.ruleResults.find((r) => r.key === "orientation")?.status).toBe("pass");
+  });
+
+  it("merges server facts over browser facts field by field", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [
+      serverUpload(97, { content_type: "video/mp4", meta: { duration: 10.5, width: null, height: null, fps: 30 } }),
+    ];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(1));
+    await act(async () => refs.api!.members[0].onMediaMetadata?.({ durationSec: 9, width: 720, height: 1280 }));
+    const member = refs.api!.members[0];
+    expect(member.meta).toMatchObject({ durationSec: 10.5, width: 720, height: 1280, verified: true });
+    expect(member.meta?.facts).toEqual(["30 fps"]);
   });
 });

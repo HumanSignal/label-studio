@@ -53,6 +53,8 @@ describe("evaluateSubmissionRules", () => {
   it("labels are human-readable", () => {
     const labels = Object.fromEntries(evaluateSubmissionRules(null, RULES).map((r) => [r.key, r.label]));
     expect(labels.types).toBe("MP4 / MOV");
+    const audio = { types: ["audio/mp4", "audio/x-m4a", "audio/mpeg", "audio/ogg", "audio/wav"] };
+    expect(evaluateSubmissionRules(null, audio).find((r) => r.key === "types")!.label).toBe("M4A / MP3 / OGG / WAV");
     expect(labels.max_bytes).toBe("≤ 500 MB");
     expect(labels.duration).toBe("30–60s");
     expect(labels.orientation).toBe("Portrait");
