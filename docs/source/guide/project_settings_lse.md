@@ -375,6 +375,8 @@ For eligible tasks (tasks that enter the **Needs Review** state) in which multip
 
 For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer needs to either accept or reject **all** annotations to consider the task done.
 
+If a reviewer returns an annotation to its annotator or passes the task to another annotator (see [Reject Options](#reject-options)), the task goes back to the **Annotating** state until the annotation is updated or the new annotation is submitted.
+
 </td>
 </tr>
 <tr>
@@ -543,7 +545,7 @@ This is the default for new projects.
 </td>
 <td>
 
-The annotation is rejected and sent back to the original annotator for rework. The annotator sees the rejected annotation in their labeling stream and can update it. Once updated, the annotation can be reviewed again. 
+The annotation is rejected and sent back to the original annotator for rework. The annotator sees the rejected annotation in their labeling stream and can update it. If the task still needs review, the updated annotation goes back to the review stream. 
 
 </td>
 </tr>
