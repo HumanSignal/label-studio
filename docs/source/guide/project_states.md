@@ -79,6 +79,7 @@ stateDiagram-v2
     ANNOTATION_IN_PROGRESS --> COMPLETED: Annotations complete -<br>review not required
     NEEDS_REVIEW --> REVIEW_IN_PROGRESS: First review started
     REVIEW_IN_PROGRESS --> COMPLETED: All reviews done
+    NEEDS_REVIEW --> ANNOTATION_IN_PROGRESS: Annotation rejected and<br>returned or passed to another annotator
     REVIEW_IN_PROGRESS --> ANNOTATION_IN_PROGRESS: Annotation rejected and<br>returned or passed to another annotator
 
     class CREATED neutral

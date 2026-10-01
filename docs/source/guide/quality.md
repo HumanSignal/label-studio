@@ -159,7 +159,7 @@ How much access a paused user keeps depends on why they were paused:
 A pause only restricts the type of work that triggered it. Annotation limits and annotator evaluation both measure annotation work, so a flexible pause stops new annotation work only. If a paused user is also a reviewer, they can continue reviewing. Only a full pause stops a user from reviewing. 
 
 !!! note
-    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) do not include **Reject and return to annotator** and none of the user's annotations were previously returned to them. In this case, there are no rejected annotations for them to update, so there is nothing for them to recover. 
+    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) do not include **Reject and return to annotator** and the user has no returned annotations still waiting to be updated or re-reviewed. In this case, there is nothing for them to recover. 
 
 ### Manually pause an annotator
 
@@ -199,12 +199,12 @@ For more information, see [Plugins - Spam and Bot Detection](/plugins/pause_anno
 
 ### Recover from a flexible pause
 
-When a user is under a flexible pause, they keep access to the project so that they can correct the annotations that reviewers have rejected. Getting those annotations accepted is how they work their way out of the pause. 
+When a user is under a flexible pause, they keep access to the project so that they can correct the annotations that reviewers have returned to them. Getting those annotations accepted is how they work their way out of the pause. 
 
 Users under a flexible pause can do the following:
 
 * Re-enter the project. If the project has **Show Data Manager to annotators** enabled, they can use the Data Manager. Otherwise, they can only use the labeling stream. For more information, see [Annotation Options](project_settings_lse#annotating-options).
-* Update their own annotations that reviewers returned to them for rework. In the labeling stream, they are only served their rejected annotations, and they cannot skip them. 
+* Update their own annotations that reviewers returned to them for rework. In the labeling stream, they are only served the returned annotations that they have not updated yet, and they cannot skip them. 
 * Add comments, so that they can respond to reviewer feedback. 
 
 They cannot begin any new annotation work, and they cannot update annotations that have not been returned to them. 
