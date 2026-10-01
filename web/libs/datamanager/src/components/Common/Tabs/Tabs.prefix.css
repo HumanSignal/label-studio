@@ -265,6 +265,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+    font-size: var(--font-size-label-small);
   }
 
   &__item-lock {
