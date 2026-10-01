@@ -468,6 +468,10 @@ const Model = types
       return [keys[0], keys[keys.length - 1]];
     },
 
+    get persistentValuesKey() {
+      return `labelStudio:storedValues:timeseries:${self.name}`;
+    },
+
     get persistentValues() {
       return {
         brushRange: self.brushRange,

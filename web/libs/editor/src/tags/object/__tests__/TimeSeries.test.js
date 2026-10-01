@@ -1934,3 +1934,47 @@ describe("TimeSeries isNotReady and _handlePlay cancelAnimationFrame", () => {
 });
 
 ff.reset();
+
+describe("TimeSeries persistent state isolation between instances", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  function createNamed(name) {
+    const model = createTimeSeries(
+      {
+        name,
+        value: `$${name}`,
+        timecolumn: "time",
+        children: [],
+      },
+      mockEnv,
+    );
+    model.setData({ time: [0, 100], value: [1, 2] });
+    return model;
+  }
+
+  it("uses a different storage key per tag name", () => {
+    const ts1 = createNamed("ts1");
+    const ts2 = createNamed("ts2");
+    expect(ts1.persistentValuesKey).not.toBe(ts2.persistentValuesKey);
+  });
+
+  it("restores each instance's own brush range after both stored", () => {
+    const ts1 = createNamed("ts1");
+    const ts2 = createNamed("ts2");
+    ts1.updateTR([10, 20]);
+    ts2.updateTR([60, 90]);
+    ts1.storeValues();
+    ts2.storeValues();
+
+    const restored = createNamed("ts1");
+    restored.restoreValues();
+
+    expect([...restored.brushRange]).toEqual([10, 20]);
+  });
+});
