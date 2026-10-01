@@ -79,7 +79,7 @@ stateDiagram-v2
     ANNOTATION_IN_PROGRESS --> COMPLETED: Annotations complete -<br>review not required
     NEEDS_REVIEW --> REVIEW_IN_PROGRESS: First review started
     REVIEW_IN_PROGRESS --> COMPLETED: All reviews done
-    REVIEW_IN_PROGRESS --> ANNOTATION_IN_PROGRESS: Annotation rejected<br>(requeue mode)
+    REVIEW_IN_PROGRESS --> ANNOTATION_IN_PROGRESS: Annotation rejected and<br>returned or passed to another annotator
 
     class CREATED neutral
     class ANNOTATION_IN_PROGRESS grape
@@ -91,7 +91,7 @@ stateDiagram-v2
 | State | Description | 
 |----------|------------|
 | **Initial** | Task has been created but does not have any annotations yet. |
-| **Annotating** | First annotation has been submitted, or a rejected annotation has been requeued back to the annotator. <br/><br/>Whether the task lingers in this state long enough for it to be reflected in the Data Manager depends on your project settings. See [Additional notes](#Additional-notes) below.|
+| **Annotating** | First annotation has been submitted, or a reviewer rejected an annotation and [returned it to the annotator or passed the task to another annotator](project_settings_lse#reject-options). <br/><br/>Whether the task lingers in this state long enough for it to be reflected in the Data Manager depends on your project settings. See [Additional notes](#Additional-notes) below.|
 | **Needs Review** | The required number of annotations have been completed and the task is ready for review. <br/><br/>Whether the task enters this state depends on your project settings. See [Additional notes](#Additional-notes) below. |
 | **In Review** | First review has been created for any annotation within the task.  <br/><br/>Whether the task enters this state depends on your project settings. See [Additional notes](#Additional-notes) below.|
 | **Done** | All required annotations and reviews have been completed. |

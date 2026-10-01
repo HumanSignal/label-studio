@@ -35,9 +35,27 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
     - If the annotation is correct, click **Accept**. 
     
     - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
-    - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
+    - If the annotation is incorrect, or you don't want to attempt to correct it yourself, click **Reject** to reject the annotation. 
+    
+        Clicking **Reject** applies the project's default reject option. If the project has more than one reject option available, you can open the reject menu to choose how to handle the rejection: 
+        
+        - **No Rework** -- The annotation is rejected and is not sent back for rework. 
+        - **Return to Annotator** -- The annotation is sent back to the original annotator so that they can update it. 
+        - **Pass to Another Annotator** -- The task is sent to a different annotator for a new annotation. The original annotator can no longer update the rejected annotation. 
+        
+        Which options you see depends on the project's [**Reject Options**](project_settings_lse#reject-options) settings. 
 
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
+
+!!! info Tip
+    You can use the following default keyboard shortcuts to reject annotations. To change them, see [Customize hotkeys](hotkeys).
+
+    | Action | Windows/Linux | Mac |
+    | --- | --- | --- |
+    | Reject with the default option | <kbd>Ctrl</kbd>+<kbd>Space</kbd> | <kbd>⌥</kbd>+<kbd>Enter</kbd> |
+    | No Rework | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd> | <kbd>⌥</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd> |
+    | Return to Annotator | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>2</kbd> | <kbd>⌥</kbd>+<kbd>Shift</kbd>+<kbd>2</kbd> |
+    | Pass to Another Annotator | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>3</kbd> | <kbd>⌥</kbd>+<kbd>Shift</kbd>+<kbd>3</kbd> |
 
 !!! info Tip
     If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
@@ -141,7 +159,7 @@ How much access a paused user keeps depends on why they were paused:
 A pause only restricts the type of work that triggered it. Annotation limits and annotator evaluation both measure annotation work, so a flexible pause stops new annotation work only. If a paused user is also a reviewer, they can continue reviewing. Only a full pause stops a user from reviewing. 
 
 !!! note
-    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) are set to **Remove rejected annotations from labeling queue**. In this case, rejected annotations are never returned to the annotator, so there is nothing for them to recover. 
+    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) do not include **Reject and return to annotator** and none of the user's annotations were previously returned to them. In this case, there are no rejected annotations for them to update, so there is nothing for them to recover. 
 
 ### Manually pause an annotator
 
@@ -186,12 +204,12 @@ When a user is under a flexible pause, they keep access to the project so that t
 Users under a flexible pause can do the following:
 
 * Re-enter the project. If the project has **Show Data Manager to annotators** enabled, they can use the Data Manager. Otherwise, they can only use the labeling stream. For more information, see [Annotation Options](project_settings_lse#annotating-options).
-* Update their own rejected annotations. In the labeling stream, they are only served their rejected annotations, and they cannot skip them. 
+* Update their own annotations that reviewers returned to them for rework. In the labeling stream, they are only served their rejected annotations, and they cannot skip them. 
 * Add comments, so that they can respond to reviewer feedback. 
 
-They cannot begin any new annotation work, and they cannot update annotations that have not been rejected. 
+They cannot begin any new annotation work, and they cannot update annotations that have not been returned to them. 
 
-Once they have updated all of their rejected annotations, they see a message telling them that no further tasks are available until more of their work has been reviewed. 
+Once they have updated all of their returned annotations, they see a message telling them that no further tasks are available until more of their work has been reviewed. 
 
 !!! note
     Updating a rejected annotation does not lift the pause by itself. The pause remains in place until the user meets the project requirements again. For how each pause is lifted, see [Tasks Per Annotator Limit](project_settings_lse#annotation-limit) and [Annotator Evaluation](project_settings_lse#annotator-eval).
