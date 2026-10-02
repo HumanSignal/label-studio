@@ -79,8 +79,7 @@ stateDiagram-v2
     ANNOTATION_IN_PROGRESS --> COMPLETED: Annotations complete -<br>review not required
     NEEDS_REVIEW --> REVIEW_IN_PROGRESS: First review started
     REVIEW_IN_PROGRESS --> COMPLETED: All reviews done
-    NEEDS_REVIEW --> ANNOTATION_IN_PROGRESS: Annotation returned to annotator, or<br>passed and a new annotation is needed
-    REVIEW_IN_PROGRESS --> ANNOTATION_IN_PROGRESS: Annotation returned to annotator, or<br>passed and a new annotation is needed
+    REVIEW_IN_PROGRESS --> ANNOTATION_IN_PROGRESS: Annotation rejected<br>(returned or passed)
 
     class CREATED neutral
     class ANNOTATION_IN_PROGRESS grape
@@ -92,7 +91,7 @@ stateDiagram-v2
 | State | Description | 
 |----------|------------|
 | **Initial** | Task has been created but does not have any annotations yet. |
-| **Annotating** | First annotation has been submitted, a reviewer rejected an annotation and [returned it to the annotator](project_settings_lse#reject-options), or a reviewer [passed the task to another annotator](project_settings_lse#reject-options) and the task no longer has enough annotations to meet the overlap. <br/><br/>Whether the task lingers in this state long enough for it to be reflected in the Data Manager depends on your project settings. See [Additional notes](#Additional-notes) below.|
+| **Annotating** | First annotation has been submitted, or a rejected annotation has been [returned to the annotator or passed to another annotator](project_settings_lse#reject-options). <br/><br/>Whether the task lingers in this state long enough for it to be reflected in the Data Manager depends on your project settings. See [Additional notes](#Additional-notes) below.|
 | **Needs Review** | The required number of annotations have been completed and the task is ready for review. <br/><br/>Whether the task enters this state depends on your project settings. See [Additional notes](#Additional-notes) below. |
 | **In Review** | First review has been created for any annotation within the task.  <br/><br/>Whether the task enters this state depends on your project settings. See [Additional notes](#Additional-notes) below.|
 | **Done** | All required annotations and reviews have been completed. |

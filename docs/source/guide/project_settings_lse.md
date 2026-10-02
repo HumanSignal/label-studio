@@ -375,8 +375,6 @@ For eligible tasks (tasks that enter the **Needs Review** state) in which multip
 
 For eligible tasks (tasks that enter the **Needs Review** state) in which multiple annotators submitted annotations, the reviewer needs to either accept or reject **all** annotations to consider the task done.
 
-If a reviewer returns an annotation to its annotator (see [Reject Options](#reject-options)), the task goes back to the **Annotating** state until the annotator updates it. If a reviewer passes the task to another annotator, the task goes back to the **Annotating** state until another annotator submits a new annotation, unless the task already has enough other annotations to meet the [overlap](#overlap).
-
 </td>
 </tr>
 <tr>
@@ -589,11 +587,6 @@ The same options are available when reviewers reject annotations in bulk from th
 
 Changing the available options only affects future rejections. Annotations that were already rejected keep the outcome that the reviewer chose. For example, annotations that were returned to an annotator can still be updated by that annotator after you make **Reject and return to annotator** unavailable. 
 
-!!! note
-    Rejecting an annotation does not mark it as cancelled or skipped. In the API, the option the reviewer chose is stored in the review's `reject_action` field (`remove`, `requeue`, or `redistribute`). The project's options are stored in the `allowed_reject_actions` and `default_reject_action` review settings. 
-
-    Annotations that reviewers removed with the former **Allow reviewer to decide: Remove or Requeue** option may still show `was_cancelled: true`. 
-
 </dd>
 
 <dt id="data-manager">Data Manager</dt>
@@ -753,7 +746,7 @@ Note that enforcement only applies when the user submitting the annotation is in
 
 Set limits on how many tasks each individual user can annotate. This can be useful if you are concerned with preventing any potential bias that might arise from a small set of power users completing a majority of project tasks. 
 
-When an annotator reaches their limit, they will see a notification telling them that they have been paused. This is a flexible pause: the annotator cannot begin any new annotation work, but they keep access to the project so that they can update annotations that reviewers have returned to them for rework. For more information, see [Full and flexible pauses](quality#Full-and-flexible-pauses). 
+When an annotator reaches their limit, they will see a notification telling them that they have been paused. This is a flexible pause: the annotator cannot begin any new annotation work, but they keep access to the project so that they can update annotations that reviewers have rejected. For more information, see [Full and flexible pauses](quality#Full-and-flexible-pauses). 
 
 When **Limit tasks per annotator** is enabled, you will see the following options:
 
@@ -907,7 +900,7 @@ You can see each annotator's evaluation status and who is paused from the **Memb
 
 When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them from the Members pause toggle. They are unpaused automatically if their score recovers. You can also relax the evaluation settings for the project, for example by increasing the minimum sample or changing the score threshold.
 
-If reviewers return rejected annotations to annotators (the [**Reject and return to annotator**](#reject-options) option), paused annotators can still update the annotations that were returned to them. They receive them in the labeling stream, and can also open them from the Data Manager if **Show Data Manager to annotators** is enabled. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score. For more information, see [Recover from a flexible pause](quality#Recover-from-a-flexible-pause).
+If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score. For more information, see [Recover from a flexible pause](quality#Recover-from-a-flexible-pause).
 
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
