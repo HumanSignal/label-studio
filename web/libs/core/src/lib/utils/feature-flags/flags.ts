@@ -328,3 +328,6 @@ export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_sp
  * project defaults (`FF_PROJECT_DM_COLUMN_DEFAULTS`). FIT-2882.
  */
 export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_order";
+
+/** Owner/Administrator "Close account" button in the Organization → Members drawer. UTC-1373. */
+export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
