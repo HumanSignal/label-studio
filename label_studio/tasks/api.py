@@ -16,6 +16,7 @@ from django.db import transaction
 from django.db.models import Prefetch, Q, prefetch_related_objects
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
@@ -1215,21 +1216,26 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
     )
     queryset = AnnotationDraft.objects.all()
 
-    def filter_queryset(self, queryset):
-        task_id = self.kwargs['pk']
-        return queryset.filter(task_id=task_id)
+    @cached_property
+    def task(self):
+        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, task)
+        return task
+
+    def get_queryset(self):
+        return AnnotationDraft.objects.filter(task=self.task)
 
     def perform_create(self, serializer):
-        task_id = self.kwargs['pk']
+        task = self.task
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
-        logger.debug(f'User {user} is going to create draft for task={task_id}, annotation={annotation_id}')
+        logger.debug(f'User {user} is going to create draft for task={task.id}, annotation={annotation_id}')
         # When an annotation_id is supplied in the URL, make sure the annotation still exists before
         # persisting the draft. Otherwise the INSERT violates the annotation_id foreign key (the
         # annotation may have been deleted between the client loading the task and submitting the draft).
-        if annotation_id is not None and not Annotation.objects.filter(pk=annotation_id).exists():
+        if annotation_id is not None and not Annotation.objects.filter(pk=annotation_id, task=task).exists():
             raise NotFound(f'Annotation {annotation_id} does not exist')
-        serializer.save(task_id=self.kwargs['pk'], annotation_id=annotation_id, user=self.request.user)
+        serializer.save(task_id=task.id, annotation_id=annotation_id, user=self.request.user)
 
 
 @extend_schema(exclude=True)
