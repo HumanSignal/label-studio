@@ -31,14 +31,17 @@ from projects.functions.next_task import get_next_task
 from projects.functions.search import search_projects
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
+from projects.import_health import ensure_import_job_statuses, health_check_import_job
 from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
     ProjectCountsSerializer,
+    ProjectImportListSerializer,
     ProjectImportSerializer,
     ProjectLabelConfigSerializer,
     ProjectModelVersionExtendedSerializer,
     ProjectModelVersionParamsSerializer,
+    ProjectReimportListSerializer,
     ProjectReimportSerializer,
     ProjectSerializer,
     ProjectSummarySerializer,
@@ -73,6 +76,12 @@ ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class ProjectImportJobListPagination(PageNumberPagination):
+    page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -615,11 +624,140 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class _ProjectImportJobMixin:
+    """Shared helpers for project-scoped import/reimport status views."""
+
+    project_model = Project
+    # Disable LSE default OrderingFilter — list order is fixed (created_at DESC, -id).
+    filter_backends = []
+
+    def _get_project(self):
+        project_pk = self.kwargs.get('pk')
+        return generics.get_object_or_404(
+            self.project_model.objects.for_user(self.request.user),
+            pk=project_pk,
+        )
+
+    def get_queryset(self):
+        return super().get_queryset().filter(project=self._get_project())
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # health_check_import_job updates the instance in-memory when it marks failed.
+        health_check_import_job(instance)
+        return Response(self.get_serializer(instance).data)
+
+
+class _ProjectImportJobListMixin(_ProjectImportJobMixin):
+    """List views: optional status= filter + health-check before serialize."""
+
+    status_model = None  # ProjectImport or ProjectReimport — set on subclasses
+
+    def _validated_status_filter(self):
+        status_filter = self.request.query_params.get('status')
+        if not status_filter:
+            return None
+        valid = {value for value, _label in self.status_model.Status.choices}
+        if status_filter not in valid:
+            raise RestValidationError(
+                {'status': f'Invalid status "{status_filter}". Choose from: {", ".join(sorted(valid))}.'}
+            )
+        return status_filter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        status_filter = self._validated_status_filter()
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        # Health check may flip in_progress/created → failed. When filtering by status,
+        # rebuild until the page is stable (or a small iteration cap) so count/results
+        # stay consistent and pages are not left short after a second-pass flip.
+        status_filter = self._validated_status_filter()
+        page = None
+        jobs = []
+        for _ in range(5):
+            queryset = self.filter_queryset(self.get_queryset())
+            page = self.paginate_queryset(queryset)
+            jobs = page if page is not None else list(queryset)
+            if not jobs:
+                break
+            ensure_import_job_statuses(jobs)
+            if not status_filter or all(job.status == status_filter for job in jobs):
+                break
+        else:
+            if status_filter:
+                jobs = [job for job in jobs if job.status == status_filter]
+        serializer = self.get_serializer(jobs, many=True)
+        if page is not None:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
+
+
 @method_decorator(
     name='get',
     decorator=extend_schema(
         tags=['Projects'],
-        summary='Get project import status ',
+        summary='List project imports',
+        description=(
+            'List asynchronous import jobs for a project (paginated). '
+            'Optionally filter by `status`. Use `page` / `page_size` query params.'
+        ),
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location='path',
+                description='A unique integer value identifying this project.',
+            ),
+            OpenApiParameter(
+                name='status',
+                type=OpenApiTypes.STR,
+                location='query',
+                description='Filter by import status (created, in_progress, failed, completed).',
+            ),
+            OpenApiParameter(
+                name='page',
+                type=OpenApiTypes.INT,
+                location='query',
+                description='Page number within the paginated result set.',
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=OpenApiTypes.INT,
+                location='query',
+                description='Number of results per page (max 100).',
+            ),
+        ],
+        extensions={
+            'x-fern-sdk-group-name': ['projects', 'imports'],
+            'x-fern-sdk-method-name': 'list',
+            'x-fern-audiences': ['public'],
+            'x-fern-pagination': {
+                'offset': '$request.page',
+                'results': '$response.results',
+            },
+        },
+    ),
+)
+class ProjectImportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectImportListSerializer
+    pagination_class = ProjectImportJobListPagination
+    # nulls_last: defensive for nullable created_at; -id ties / stable pagination.
+    queryset = ProjectImport.objects.all().order_by(F('created_at').desc(nulls_last=True), '-id')
+    status_model = ProjectImport
+
+
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='Get project import status',
         description="""
             Poll the status of an asynchronous project import operation.
             
@@ -630,10 +768,18 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
             4. **Import errors and failures will only be visible in this GET response**, not in the original POST request
             
             This endpoint returns detailed information about the import including task counts, status, and any error messages.
+            While an import is running, `task_count` / annotation / prediction counts update as batches commit.
+            Counts are cumulative so far; there is no expected total, so percent-complete / ETA is not available from this API.
         """,
         parameters=[
             OpenApiParameter(
                 name='id',
+                type=OpenApiTypes.INT,
+                location='path',
+                description='A unique integer value identifying this project.',
+            ),
+            OpenApiParameter(
+                name='import_pk',
                 type=OpenApiTypes.INT,
                 location='path',
                 description='A unique integer value identifying this project import.',
@@ -646,13 +792,72 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
         },
     ),
 )
-class ProjectImportAPI(generics.RetrieveAPIView):
+class ProjectImportAPI(_ProjectImportJobMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser,)
     serializer_class = ProjectImportSerializer
     queryset = ProjectImport.objects.all()
     lookup_url_kwarg = 'import_pk'
+
+
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='List project reimports',
+        description=(
+            'List asynchronous reimport jobs for a project (paginated). '
+            'Optionally filter by `status`. Use `page` / `page_size` query params.'
+        ),
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location='path',
+                description='A unique integer value identifying this project.',
+            ),
+            OpenApiParameter(
+                name='status',
+                type=OpenApiTypes.STR,
+                location='query',
+                description='Filter by reimport status (created, in_progress, failed, completed).',
+            ),
+            OpenApiParameter(
+                name='page',
+                type=OpenApiTypes.INT,
+                location='query',
+                description='Page number within the paginated result set.',
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=OpenApiTypes.INT,
+                location='query',
+                description='Number of results per page (max 100).',
+            ),
+        ],
+        extensions={
+            'x-fern-sdk-group-name': ['projects', 'reimports'],
+            'x-fern-sdk-method-name': 'list',
+            'x-fern-audiences': ['public'],
+            'x-fern-pagination': {
+                'offset': '$request.page',
+                'results': '$response.results',
+            },
+        },
+    ),
+)
+class ProjectReimportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
+    parser_classes = (JSONParser,)
+    serializer_class = ProjectReimportListSerializer
+    pagination_class = ProjectImportJobListPagination
+    # created_at is new on ProjectReimport — pre-migration rows are NULL. Postgres
+    # ORDER BY created_at DESC defaults to NULLS FIRST, which would float historical
+    # reimports above newer ones; nulls_last + -id keeps newest first and is stable.
+    queryset = ProjectReimport.objects.all().order_by(F('created_at').desc(nulls_last=True), '-id')
+    status_model = ProjectReimport
 
 
 @method_decorator(
@@ -670,21 +875,31 @@ class ProjectImportAPI(generics.RetrieveAPIView):
             4. **Reimport errors and failures will only be visible in this GET response**, not in the original POST request
             
             This endpoint returns detailed information about the reimport including task counts, status, and any error messages.
+            While a reimport is running, `task_count` / annotation / prediction counts update as batches commit.
+            Counts are cumulative so far; there is no expected total, so percent-complete / ETA is not available from this API.
         """,
         parameters=[
             OpenApiParameter(
                 name='id',
                 type=OpenApiTypes.INT,
                 location='path',
+                description='A unique integer value identifying this project.',
+            ),
+            OpenApiParameter(
+                name='reimport_pk',
+                type=OpenApiTypes.INT,
+                location='path',
                 description='A unique integer value identifying this project reimport.',
             ),
         ],
         extensions={
-            'x-fern-audiences': ['internal'],
+            'x-fern-sdk-group-name': ['projects', 'reimports'],
+            'x-fern-sdk-method-name': 'get',
+            'x-fern-audiences': ['public'],
         },
     ),
 )
-class ProjectReimportAPI(generics.RetrieveAPIView):
+class ProjectReimportAPI(_ProjectImportJobMixin, generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser,)

@@ -9,6 +9,11 @@ from data_import.uploader import load_tasks_for_async_import_streaming
 from django.conf import settings
 from django.db import transaction
 from label_studio_sdk.label_interface import LabelInterface
+from projects.import_health import (
+    claim_import_job_in_progress,
+    mark_import_job_finished,
+    update_import_job_progress,
+)
 from projects.models import ProjectImport, ProjectReimport, ProjectSummary
 from rest_framework.exceptions import ValidationError
 from tasks.models import Task
@@ -38,11 +43,10 @@ def async_import_background(
         except ProjectImport.DoesNotExist:
             logger.error(f'ProjectImport with id {import_id} not found, import processing failed')
             return
-        if project_import.status != ProjectImport.Status.CREATED:
+        # Claim CREATED, or reclaim a false health-check FAILED so a live worker can run.
+        if not claim_import_job_in_progress(project_import):
             logger.error(f'Processing import with id {import_id} already started')
             return
-        project_import.status = ProjectImport.Status.IN_PROGRESS
-        project_import.save(update_fields=['status'])
 
     user = User.objects.get(id=user_id)
 
@@ -93,9 +97,7 @@ def async_import_background(
                 error_message += f'- {error}\n'
 
             if flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=project.organization.created_by):
-                project_import.error = error_message
-                project_import.status = ProjectImport.Status.FAILED
-                project_import.save(update_fields=['error', 'status'])
+                mark_import_job_finished(project_import, ProjectImport.Status.FAILED, error=error_message)
                 return
             else:
                 logger.error(
@@ -145,10 +147,9 @@ def async_import_background(
                 # TODO: summary.update_created_annotations_and_labels
             except Exception as e:
                 # Handle any other unexpected errors during task creation
-                error_message = f'Error creating tasks: {str(e)}'
-                project_import.error = error_message
-                project_import.status = ProjectImport.Status.FAILED
-                project_import.save(update_fields=['error', 'status'])
+                mark_import_job_finished(
+                    project_import, ProjectImport.Status.FAILED, error=f'Error creating tasks: {str(e)}'
+                )
                 return
     else:
         # Do nothing - just output file upload ids for further use
@@ -158,33 +159,46 @@ def async_import_background(
 
     duration = time.time() - start
 
-    project_import.task_count = task_count or 0
-    project_import.annotation_count = annotation_count or 0
-    project_import.prediction_count = prediction_count or 0
-    project_import.duration = duration
-    project_import.file_upload_ids = file_upload_ids
-    project_import.found_formats = found_formats
-    project_import.data_columns = data_columns
+    finish_kwargs = {
+        'task_count': task_count or 0,
+        'annotation_count': annotation_count or 0,
+        'prediction_count': prediction_count or 0,
+        'file_upload_ids': file_upload_ids,
+        'found_formats': found_formats,
+        'data_columns': data_columns,
+    }
     if project_import.return_task_ids:
-        project_import.task_ids = [task.id for task in tasks]
+        finish_kwargs['task_ids'] = [task.id for task in tasks]
 
-    project_import.status = ProjectImport.Status.COMPLETED
-    project_import.save()
+    # Single conditional UPDATE — avoids a second save that could race with job_id writes.
+    mark_import_job_finished(project_import, ProjectImport.Status.COMPLETED, duration=duration, **finish_kwargs)
 
 
 def set_import_background_failure(job, connection, type, value, _):
     import_id = job.args[0]
-    ProjectImport.objects.filter(id=import_id).update(
-        status=ProjectImport.Status.FAILED, traceback=traceback.format_exc(), error=str(value)
+    try:
+        project_import = ProjectImport.objects.get(id=import_id)
+    except ProjectImport.DoesNotExist:
+        return
+    mark_import_job_finished(
+        project_import,
+        ProjectImport.Status.FAILED,
+        error=str(value),
+        traceback_text=traceback.format_exc(),
     )
 
 
 def set_reimport_background_failure(job, connection, type, value, _):
     reimport_id = job.args[0]
-    ProjectReimport.objects.filter(id=reimport_id).update(
-        status=ProjectReimport.Status.FAILED,
-        traceback=traceback.format_exc(),
+    try:
+        reimport = ProjectReimport.objects.get(id=reimport_id)
+    except ProjectReimport.DoesNotExist:
+        return
+    mark_import_job_finished(
+        reimport,
+        ProjectReimport.Status.FAILED,
         error=str(value),
+        traceback_text=traceback.format_exc(),
     )
 
 
@@ -302,6 +316,7 @@ def _counters_set_on_create(project, annotation_count, prediction_count):
 
 def _async_reimport_background_streaming(reimport, project, organization_id, user):
     """Streaming version of reimport that processes tasks in batches to reduce memory usage"""
+    start = time.time()
     try:
         # Get batch size from settings or use default
         batch_size = settings.REIMPORT_BATCH_SIZE
@@ -367,6 +382,13 @@ def _async_reimport_background_streaming(reimport, project, organization_id, use
                 # Update data columns in summary
                 summary.update_data_columns(batch_db_tasks)
 
+            update_import_job_progress(
+                reimport,
+                task_count=total_task_count,
+                annotation_count=total_annotation_count,
+                prediction_count=total_prediction_count,
+            )
+
             logger.info(
                 f'Batch {batch_number} processed successfully: {batch_task_count} tasks, '
                 f'{batch_annotation_count} annotations, {batch_prediction_count} predictions'
@@ -401,14 +423,17 @@ def _async_reimport_background_streaming(reimport, project, organization_id, use
 
             TaskSerializerBulk.post_process_custom_callback(project.id, user)
 
-        # Update reimport with final statistics
-        reimport.task_count = total_task_count
-        reimport.annotation_count = total_annotation_count
-        reimport.prediction_count = total_prediction_count
-        reimport.found_formats = all_found_formats
-        reimport.data_columns = list(all_data_columns)
-        reimport.status = ProjectReimport.Status.COMPLETED
-        reimport.save()
+        # Update reimport with final statistics in the same terminal UPDATE.
+        mark_import_job_finished(
+            reimport,
+            ProjectReimport.Status.COMPLETED,
+            duration=time.time() - start,
+            task_count=total_task_count,
+            annotation_count=total_annotation_count,
+            prediction_count=total_prediction_count,
+            found_formats=all_found_formats,
+            data_columns=list(all_data_columns),
+        )
 
         logger.info(f'Streaming reimport {reimport.id} completed: {total_task_count} tasks imported')
 
@@ -417,10 +442,12 @@ def _async_reimport_background_streaming(reimport, project, organization_id, use
 
     except Exception as e:
         logger.error(f'Error in streaming reimport {reimport.id}: {str(e)}', exc_info=True)
-        reimport.status = ProjectReimport.Status.FAILED
-        reimport.traceback = traceback.format_exc()
-        reimport.error = str(e)
-        reimport.save()
+        mark_import_job_finished(
+            reimport,
+            ProjectReimport.Status.FAILED,
+            error=str(e),
+            traceback_text=traceback.format_exc(),
+        )
         raise
 
 
@@ -497,9 +524,7 @@ def _async_import_background_streaming(project_import, user):
                     if flag_set(
                         'fflag_feat_utc_210_prediction_validation_15082025', user=project.organization.created_by
                     ):
-                        project_import.error = error_message
-                        project_import.status = ProjectImport.Status.FAILED
-                        project_import.save(update_fields=['error', 'status'])
+                        mark_import_job_finished(project_import, ProjectImport.Status.FAILED, error=error_message)
                         return
                     else:
                         logger.error(
@@ -532,6 +557,13 @@ def _async_import_background_streaming(project_import, user):
 
             else:
                 total_task_count += len(batch_tasks)
+
+            update_import_job_progress(
+                project_import,
+                task_count=total_task_count,
+                annotation_count=total_annotation_count,
+                prediction_count=total_prediction_count,
+            )
 
             logger.info(f'Batch {batch_number} processed successfully: {len(batch_tasks)} tasks')
 
@@ -567,27 +599,29 @@ def _async_import_background_streaming(project_import, user):
 
         duration = time.time() - start
 
-        project_import.task_count = total_task_count or 0
-        project_import.annotation_count = total_annotation_count or 0
-        project_import.prediction_count = total_prediction_count or 0
-        project_import.duration = duration
-        project_import.file_upload_ids = final_file_upload_ids
-        project_import.found_formats = final_found_formats
-        project_import.data_columns = final_data_columns
+        finish_kwargs = {
+            'task_count': total_task_count or 0,
+            'annotation_count': total_annotation_count or 0,
+            'prediction_count': total_prediction_count or 0,
+            'file_upload_ids': final_file_upload_ids,
+            'found_formats': final_found_formats,
+            'data_columns': final_data_columns,
+        }
         if project_import.return_task_ids:
-            project_import.task_ids = all_created_task_ids
+            finish_kwargs['task_ids'] = all_created_task_ids
 
-        project_import.status = ProjectImport.Status.COMPLETED
-        project_import.save()
+        mark_import_job_finished(project_import, ProjectImport.Status.COMPLETED, duration=duration, **finish_kwargs)
 
         logger.info(f'Streaming import {project_import.id} completed: {total_task_count} tasks imported')
 
     except Exception as e:
         logger.error(f'Error in streaming import {project_import.id}: {str(e)}', exc_info=True)
-        project_import.status = ProjectImport.Status.FAILED
-        project_import.traceback = traceback.format_exc()
-        project_import.error = str(e)
-        project_import.save()
+        mark_import_job_finished(
+            project_import,
+            ProjectImport.Status.FAILED,
+            error=str(e),
+            traceback_text=traceback.format_exc(),
+        )
         raise
 
 
@@ -598,13 +632,12 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
         except ProjectReimport.DoesNotExist:
             logger.error(f'ProjectReimport with id {reimport_id} not found, import processing failed')
             return
-        if reimport.status != ProjectReimport.Status.CREATED:
+        if not claim_import_job_in_progress(reimport):
             logger.error(f'Processing reimport with id {reimport_id} already started')
             return
-        reimport.status = ProjectReimport.Status.IN_PROGRESS
-        reimport.save(update_fields=['status'])
 
     project = reimport.project
+    start = time.time()
 
     # Check feature flag for memory improvement
     if flag_set('fflag_fix_back_plt_838_reimport_memory_improvement_05082025_short', user='auto'):
@@ -650,12 +683,15 @@ def async_reimport_background(reimport_id, organization_id, user, **kwargs):
             summary.update_data_columns(tasks)
             # TODO: summary.update_created_annotations_and_labels
 
-        reimport.task_count = task_count
-        reimport.annotation_count = annotation_count
-        reimport.prediction_count = prediction_count
-        reimport.found_formats = found_formats
-        reimport.data_columns = list(data_columns)
-        reimport.status = ProjectReimport.Status.COMPLETED
-        reimport.save()
+        mark_import_job_finished(
+            reimport,
+            ProjectReimport.Status.COMPLETED,
+            duration=time.time() - start,
+            task_count=task_count,
+            annotation_count=annotation_count,
+            prediction_count=prediction_count,
+            found_formats=found_formats,
+            data_columns=list(data_columns),
+        )
 
         post_process_reimport(reimport)

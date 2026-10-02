@@ -180,9 +180,21 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/imports/",
+        "module": "projects.api.ProjectImportListAPI",
+        "name": "projects:api:project-import-list",
+        "decorators": ""
+    },
+    {
         "url": "/api/projects/<int:pk>/imports/<int:import_pk>/",
         "module": "projects.api.ProjectImportAPI",
         "name": "projects:api:project-imports",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/reimports/",
+        "module": "projects.api.ProjectReimportListAPI",
+        "name": "projects:api:project-reimport-list",
         "decorators": ""
     },
     {

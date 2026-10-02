@@ -1906,8 +1906,27 @@ class ProjectImport(models.Model):
     traceback = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(_('created at'), null=True, auto_now_add=True, help_text='Creation time')
-    updated_at = models.DateTimeField(_('updated at'), null=True, auto_now_add=True, help_text='Updated time')
+    # Progress / status clock (not Django auto_now): bumped on batch progress and terminal writes.
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        null=True,
+        blank=True,
+        help_text='Last time import progress or terminal status was updated',
+    )
     finished_at = models.DateTimeField(_('finished at'), help_text='Complete or fail time', null=True, default=None)
+    job_id = models.CharField(
+        _('job id'),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text='RQ job id for async import background work',
+    )
+    # Internal: inferred FAILED from health check may be overwritten by a real COMPLETED.
+    failed_by_health_check = models.BooleanField(
+        default=False,
+        null=True,
+        help_text='True when status was marked failed by stale/dead RQ health check (not a worker failure)',
+    )
     task_count = models.IntegerField(default=0)
     annotation_count = models.IntegerField(default=0)
     prediction_count = models.IntegerField(default=0)
@@ -1918,6 +1937,11 @@ class ProjectImport(models.Model):
     data_columns = models.JSONField(default=list)
     tasks = models.JSONField(blank=True, null=True)
     task_ids = models.JSONField(default=list)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['project', '-created_at'], name='projects_pi_proj_created_idx'),
+        ]
 
     def has_permission(self, user):
         return self.project.has_permission(user)
@@ -1933,6 +1957,28 @@ class ProjectReimport(models.Model):
     project = models.ForeignKey('projects.Project', null=True, related_name='reimports', on_delete=models.CASCADE)
     status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
     error = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(_('created at'), null=True, auto_now_add=True, help_text='Creation time')
+    # Progress / status clock (not Django auto_now): bumped on batch progress and terminal writes.
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        null=True,
+        blank=True,
+        help_text='Last time reimport progress or terminal status was updated',
+    )
+    finished_at = models.DateTimeField(_('finished at'), help_text='Complete or fail time', null=True, default=None)
+    job_id = models.CharField(
+        _('job id'),
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text='RQ job id for async reimport background work',
+    )
+    # Internal: inferred FAILED from health check may be overwritten by a real COMPLETED.
+    failed_by_health_check = models.BooleanField(
+        default=False,
+        null=True,
+        help_text='True when status was marked failed by stale/dead RQ health check (not a worker failure)',
+    )
     task_count = models.IntegerField(default=0)
     annotation_count = models.IntegerField(default=0)
     prediction_count = models.IntegerField(default=0)
@@ -1942,6 +1988,11 @@ class ProjectReimport(models.Model):
     found_formats = models.JSONField(default=list)
     data_columns = models.JSONField(default=list)
     traceback = models.TextField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['project', '-created_at'], name='projects_pr_proj_created_idx'),
+        ]
 
     def has_permission(self, user):
         return self.project.has_permission(user)

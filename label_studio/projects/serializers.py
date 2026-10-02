@@ -438,6 +438,13 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectImportSerializer(serializers.ModelSerializer):
+    """Detail serializer for async project imports.
+
+    Note: ``tasks`` (raw request payload) is intentionally omitted from the public
+    API for payload size and data-exposure safety. Use ``task_ids`` when
+    ``return_task_ids`` was requested on create.
+    """
+
     class Meta:
         model = ProjectImport
         fields = [
@@ -460,8 +467,29 @@ class ProjectImportSerializer(serializers.ModelSerializer):
             'could_be_tasks_list',
             'found_formats',
             'data_columns',
-            'tasks',
             'task_ids',
+        ]
+
+
+class ProjectImportListSerializer(serializers.ModelSerializer):
+    """Slim list serializer — excludes large fields like task_ids."""
+
+    class Meta:
+        model = ProjectImport
+        fields = [
+            'id',
+            'project',
+            'status',
+            'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
+            'task_count',
+            'annotation_count',
+            'prediction_count',
+            'duration',
+            'file_upload_ids',
+            'commit_to_project',
         ]
 
 
@@ -473,6 +501,9 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
             'project',
             'status',
             'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
             'task_count',
             'annotation_count',
             'prediction_count',
@@ -481,6 +512,25 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
             'files_as_tasks_list',
             'found_formats',
             'data_columns',
+        ]
+
+
+class ProjectReimportListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectReimport
+        fields = [
+            'id',
+            'project',
+            'status',
+            'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
+            'task_count',
+            'annotation_count',
+            'prediction_count',
+            'duration',
+            'file_upload_ids',
         ]
 
 

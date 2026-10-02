@@ -914,6 +914,13 @@ EXPORT_STORAGE_PRESIGN_TTL_MINUTES = int(get_env('EXPORT_STORAGE_PRESIGN_TTL_MIN
 EXPORT_STORAGE_PRESIGN = get_bool_env('EXPORT_STORAGE_PRESIGN', default=True)
 
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
+# Absolute wall-clock stale timeout (seconds) for import/reimport when Redis is down
+# or RQ status is finishing/unknown. Keyed off ProjectImport/ProjectReimport.updated_at.
+# Live RQ jobs (queued/started/…) are never failed by this timer — see projects.import_health.
+IMPORT_STALE_TIMEOUT = float(get_env('IMPORT_STALE_TIMEOUT', 300.0))
+# Grace (seconds) before a CREATED row with RQ ``not found`` is marked failed — avoids
+# false fails when status is polled before Redis has registered the just-enqueued job.
+IMPORT_CREATED_NOT_FOUND_GRACE = float(get_env('IMPORT_CREATED_NOT_FOUND_GRACE', 60.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
 STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
