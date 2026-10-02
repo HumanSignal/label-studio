@@ -123,7 +123,7 @@ The Data Manager has several columns to display comment information:
 You can configure the project so that annotators and reviewers are required to leave comments after taking specific actions:
 
 * [**Annotation > Annotating Options > Annotators must leave a comment on skip**](project_settings_lse#Annotation)
-* [**Review > AReviewers must leave a comment on reject**](project_settings_lse#Review)
+* [**Review > Reject Options > Reviewers must leave a comment on reject**](project_settings_lse#reject-options)
 
 ## Comment notifications
 
