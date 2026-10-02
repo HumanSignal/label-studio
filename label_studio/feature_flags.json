@@ -3822,6 +3822,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_utc1373_user_removal_org_page": {
+      "key": "fflag_feat_utc1373_user_removal_org_page",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "507949b7bc89433f9a0d1412779c62ae",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_utc_1064_contributor_opt_in": {
       "key": "fflag_feat_utc_1064_contributor_opt_in",
       "on": false,
