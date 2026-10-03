@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from jwt_auth.models import LSAPIToken
 from rest_framework import status
@@ -5,6 +7,21 @@ from rest_framework.test import APIClient
 from rest_framework_simplejwt.exceptions import TokenError
 from tests.jwt_auth.utils import create_user_with_token_settings
 from tests.utils import mock_feature_flag
+
+
+@mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
+@pytest.mark.django_db
+def test_list_tokens_does_not_use_naive_datetimes():
+    user = create_user_with_token_settings(api_tokens_enabled=True, legacy_api_tokens_enabled=False)
+    client = APIClient()
+    client.force_authenticate(user)
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        response = client.get('/api/token/')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert not [warning for warning in caught if 'received a naive datetime' in str(warning.message)]
 
 
 @mock_feature_flag(flag_name='fflag__feature_develop__prompts__dia_1829_jwt_token_auth', value=True)
