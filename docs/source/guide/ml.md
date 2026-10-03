@@ -69,6 +69,8 @@ Ir you want to write your own model instead, see [Write your own ML backend](ml_
 
 ### Start the model
 
+For a hosted GPU deployment of SAM2, see [Deploy SAM2 on Nebius Serverless](#Deploy-SAM2-on-Nebius-Serverless). For a local deployment, follow the steps below.
+
 1. First, decide which [model](#Example-models) you want to use and check for required parameters (click the link for each model to see a full parameter list). 
 
     Set your parameters in the `docker-compose.yml` file that is located within the model directory. 
@@ -107,6 +109,18 @@ If you see any errors, see [Troubleshooting ML Backends & Predictions](https://s
 `localhost` is a special domain name that loops back directly to your local environment. 
 
 If you are running Label Studio in a Docker container, `localhost` loops back to the container itself, and not the machine that the container is hosted on. Docker provides a special domain as a workaround for this, docker.host.internal. If you're hosting Label Studio and your ML Backend inside of Docker, try using that domain instead of localhost (`http://host.docker.internal:9090`) or the internal IP address. 
+
+### Deploy SAM2 on Nebius Serverless
+
+To run interactive image segmentation on a hosted GPU, use the [SAM2 deployment example for Nebius Serverless](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/deploy/nebius). It runs the SAM2 image ML backend on a GPU Endpoint and returns brush masks from point or bounding-box prompts. Label Studio, its database, and task storage remain on your existing infrastructure.
+
+The example supports one Label Studio project and authenticated images uploaded to Label Studio. You need a reachable HTTPS Label Studio instance, a Nebius project with GPU quota, a container registry, and an external host with HTTPS for the included NGINX proxy.
+
+Follow the deployment guide to build the image, configure credentials, create the Endpoint, and start the proxy. The proxy accepts Basic authentication from Label Studio and uses a separate Bearer token to authenticate to the Nebius Endpoint.
+
+When you [connect the model](#Connect-the-model-to-Label-Studio), use the proxy's HTTPS URL as the **Backend URL**, select **Basic Authentication**, and enter the proxy username and password. Enable **Interactive preannotations** and use the labeling configuration supplied with the example. The Endpoint token is separate from the proxy password.
+
+This example covers synchronous image inference. Training, video, request-driven cold starts, and autoscaling are outside its scope. Follow the guide's validation and teardown steps before using it with your own workload, and remove test resources when finished to avoid ongoing charges.
 
 ### Connect the model to Label Studio
 
