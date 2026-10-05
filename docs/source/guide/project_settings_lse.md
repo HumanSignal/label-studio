@@ -566,9 +566,9 @@ This option is only available when [**Task Assignment**](#distribute-tasks) is s
 
 When only one option is available, reviewers see a single **Reject** button that applies it. When more than one option is available, reviewers can click **Reject** to apply the default option, or open the reject menu to choose another option:
 
-* **No Rework** -- Reject and do not require rework.
-* **Return to Annotator** -- Reject and return to annotator.
-* **Pass to Another Annotator** -- Reject and pass to another annotator.
+* **No Rework** -- Reject without sending for rework.
+* **Return to Annotator** -- Reject and send back to the original annotator for rework.
+* **Pass to Another Annotator** -- Reject and send to a different annotator.
 
 ![Screenshot of the reject menu](/images/review/reject-menu.png)
 
