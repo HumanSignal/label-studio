@@ -79,7 +79,7 @@
   "annotation:reject-requeue": {
     "key": "ctrl+shift+2",
     "mac": "alt+shift+2",
-    "description": "Reject: Return to Annotator"
+    "description": "Reject: Return to Same Annotator"
   },
   "annotation:reject-redistribute": {
     "key": "ctrl+shift+3",
