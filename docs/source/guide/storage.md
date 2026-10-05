@@ -35,7 +35,9 @@ Each source and target storage setup is project-specific. You can connect multip
 
 Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](https://api.labelstud.io/api-reference/introduction/getting-started) and locate the relevant storage connection type. 
 
-With the Files method, Label Studio stores only references to objects in your bucket. Media is loaded through pre-signed URLs or the storage proxy. With the Tasks method, the contents of each JSON, JSONL or Parquet file are imported and stored as tasks in Label Studio. See [Import method](#Import-method) for details.
+Label Studio does not import media files from your source storage. Media stays in your bucket and is loaded through pre-signed URLs or the storage proxy when users open a task.
+
+What Label Studio does store depends on the **Import method**. With **Files**, each task stores only a reference (URI) to an object in your bucket. With **Tasks**, Label Studio reads task files in JSON, JSONL, or Parquet format and saves the task data, such as text or metadata, to its database. See [Import method](#Import-method) for details.
 
 You can also secure access to cloud storage using VPC and IP restrictions for your storage. For details, see [Secure access to cloud storages](security.html#Secure-access-to-cloud-storages).
 
