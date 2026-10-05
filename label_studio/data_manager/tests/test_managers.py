@@ -1431,3 +1431,58 @@ class TestApplyFiltersInvalidRegex(TestCase):
         assert result == 'EMPTY'
         load_func.assert_not_called()
         queryset.none.assert_called_once_with()
+
+
+class TestAnnotateStateProjectScoped(TestCase):
+    """The DM state column reads the latest TaskState through the project-scoped index."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from fsm.state_models import TaskState
+
+        cls.project = ProjectFactory()
+        cls.other_project = ProjectFactory()
+        cls.moved_on = TaskFactory(project=cls.project)
+        cls.single = TaskFactory(project=cls.project)
+        cls.stateless = TaskFactory(project=cls.project)
+        cls.other = TaskFactory(project=cls.other_project)
+        TaskState.objects.filter(task__in=[cls.moved_on, cls.single, cls.stateless, cls.other]).delete()
+
+        def add_state(task, state):
+            TaskState.objects.create(
+                task=task,
+                project_id=task.project_id,
+                organization_id=task.project.organization_id,
+                state=state,
+                transition_name='test',
+            )
+
+        add_state(cls.moved_on, 'CREATED')
+        add_state(cls.moved_on, 'IN_PROGRESS')
+        add_state(cls.moved_on, 'COMPLETED')
+        add_state(cls.single, 'IN_PROGRESS')
+        add_state(cls.other, 'COMPLETED')
+
+    def _states(self, queryset):
+        from data_manager.managers import annotate_state
+
+        with patch('fsm.queryset_mixins.flag_set', return_value=True):
+            annotated = annotate_state(queryset)
+            return annotated, dict(annotated.values_list('id', 'state'))
+
+    def test_latest_state_per_task(self):
+        annotated, states = self._states(Task.objects.filter(project=self.project))
+
+        assert states == {self.moved_on.id: 'COMPLETED', self.single.id: 'IN_PROGRESS', self.stateless.id: None}
+        assert '."project_id" = ("task"."project_id")' in str(annotated.query).split('AS "current_state"')[0]
+
+    def test_filter_and_order_by_state(self):
+        from data_manager.managers import annotate_state
+
+        with patch('fsm.queryset_mixins.flag_set', return_value=True):
+            annotated = annotate_state(Task.objects.filter(project=self.project))
+            completed = list(annotated.filter(state__icontains='complet').values_list('id', flat=True))
+            ordered = list(annotated.exclude(state=None).order_by('state').values_list('id', flat=True))
+
+        assert completed == [self.moved_on.id]
+        assert ordered == [self.moved_on.id, self.single.id]

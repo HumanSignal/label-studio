@@ -20,7 +20,7 @@ from data_manager.serializers import (
     ViewSerializer,
 )
 from django.conf import settings
-from django.db.models import Max, Sum
+from django.db.models import Count, Max, Sum
 from django.db.models.functions import Coalesce
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -290,6 +290,15 @@ class ViewAPI(viewsets.ModelViewSet):
         return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')
 
 
+def _paginator_with_known_count(paginator_class, count):
+    def build(*args, **kwargs):
+        paginator = paginator_class(*args, **kwargs)
+        paginator.count = count
+        return paginator
+
+    return build
+
+
 class TaskPagination(PageNumberPagination):
     """Paginate DM task lists and compute annotation/prediction totals.
 
@@ -308,11 +317,15 @@ class TaskPagination(PageNumberPagination):
 
     def paginate_totals_queryset(self, queryset, request, view=None):
         totals = queryset.values('id').aggregate(
+            total=Count('id'),
             total_annotations=Coalesce(Sum('total_annotations'), 0),
             total_predictions=Coalesce(Sum('total_predictions'), 0),
         )
         self.total_annotations = totals['total_annotations']
         self.total_predictions = totals['total_predictions']
+        # Reuse the count from the totals aggregate: a separate paginator COUNT would re-run every
+        # filter/order annotation (e.g. agreement, completed_at) over the whole filtered set again.
+        self.django_paginator_class = _paginator_with_known_count(type(self).django_paginator_class, totals['total'])
         # Use .only('id') to avoid loading heavy task.data fields during pagination
         # Full task objects are loaded later with proper annotations
         id_only_queryset = queryset.only('id')
@@ -391,7 +404,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             'annotations_ordering': parse_annotations_ordering_request(request),
         }
         if prepare_params is not None:
-            visible_data_keys = get_visible_data_column_keys(prepare_params, request.user)
+            visible_data_keys = get_visible_data_column_keys(prepare_params, request.user, request=request)
             if visible_data_keys is not None:
                 context['dm_visible_data_keys'] = visible_data_keys
         return context
@@ -439,7 +452,7 @@ class TaskListAPI(generics.ListCreateAPIView):
 
         # get request params
         all_fields = 'all' if request.GET.get('fields', None) == 'all' else None
-        fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user)
+        fields_for_evaluation = get_fields_for_evaluation(prepare_params, request.user, request=request)
         review = bool_from_request(self.request.GET, 'review', False)
 
         if review:

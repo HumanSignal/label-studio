@@ -70,7 +70,8 @@ class FSMStateQuerySetMixin:
 
         Adds a `current_state` field to each object containing the current
         state string value. This is done using an efficient subquery that
-        leverages UUID7 natural ordering to prevent N+1 queries.
+        leverages UUID7 natural ordering to prevent N+1 queries. The lookup also
+        matches the state model's ``latest_state_scope_fields``.
 
         Returns:
             QuerySet: The annotated queryset with `current_state` field
@@ -120,9 +121,9 @@ class FSMStateQuerySetMixin:
         # 1. UUID7 provides natural time ordering (latest = highest ID)
         # 2. We only fetch the state column, not the entire record
         # 3. Django optimizes this into a single JOIN or lateral subquery
-        current_state_subquery = Subquery(
-            state_model.objects.filter(**{fk_field: OuterRef('pk')}).order_by('-id').values('state')[:1]
-        )
+        lookup = {fk_field: OuterRef('pk')}
+        lookup.update({field: OuterRef(field) for field in state_model.latest_state_scope_fields})
+        current_state_subquery = Subquery(state_model.objects.filter(**lookup).order_by('-id').values('state')[:1])
 
         # Annotate the queryset with the current state
         return self.annotate(current_state=current_state_subquery)
