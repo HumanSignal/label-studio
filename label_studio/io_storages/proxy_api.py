@@ -32,7 +32,22 @@ logger = logging.getLogger(__name__)
 # data_import/api.py. It is NOT in this set: it has no io_storages row / no
 # storage_id, and the streamer streams it with ambient credentials via its
 # DefaultS3Streamer rather than a storage_id-keyed provider.
-STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s', 'gcs', 'gcs_sa', 'gcswif'}
+STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s', 'gcs', 'gcs_sa', 'gcswif', 'azure', 'azure_spi'}
+
+
+def split_streamer_uri(fileuri: str) -> tuple[str, str]:
+    """Split a storage URI into the (bucket, key) pair the streamer fetches.
+
+    For scheme URIs (s3://, gs://, azure-blob://, azure-spi://) the bucket or
+    container is the netloc. azure_spi also resolves direct blob URLs
+    (https://<account>.blob.core.windows.net/<container>/<blob>), where netloc
+    is the account host and the container is the first path segment.
+    """
+    parsed = urlparse(fileuri, allow_fragments=False)
+    if parsed.scheme in ('http', 'https'):
+        bucket, _, key = parsed.path.lstrip('/').partition('/')
+        return bucket, key
+    return parsed.netloc, parsed.path.lstrip('/')
 
 
 def get_streamer_storage_type(storage):
@@ -136,7 +151,7 @@ class ResolveStorageUriAPIMixin:
         Credentials are intentionally NOT included: the streamer looks them
         up from Postgres directly using (storage_type, storage_id).
         """
-        parsed = urlparse(fileuri, allow_fragments=False)
+        bucket, key = split_streamer_uri(fileuri)
         content_type = mimetypes.guess_type(fileuri)[0] or 'application/octet-stream'
 
         response = JsonResponse(
@@ -145,8 +160,8 @@ class ResolveStorageUriAPIMixin:
                 'storage_type': streamer_type,
                 'storage_id': storage.id,
                 'uri': fileuri,
-                'bucket': parsed.netloc,
-                'key': parsed.path.lstrip('/'),
+                'bucket': bucket,
+                'key': key,
                 'content_type': content_type,
             }
         )
