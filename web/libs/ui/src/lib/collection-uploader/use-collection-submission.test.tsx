@@ -15,6 +15,7 @@ import {
   serializeSubmissionRegions,
   submissionFileBounds,
   probeSubmissionFile,
+  submissionFacts,
   submissionMediaKind,
   submissionRulesFromSchema,
   useCollectionSubmission,
@@ -735,6 +736,70 @@ describe("server facts", () => {
     render(<Host />);
     await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
     expect(batches).toEqual([[97]]);
+  });
+
+  it("shows the software when the file names no device", () => {
+    expect(submissionFacts({ codec: "h264", software: "Android 14", gps: false })).toEqual(["H264", "Android 14"]);
+    expect(submissionFacts({ make: "Apple", model: "iPhone 15 Pro", software: "18.1" })).toEqual([
+      "Apple iPhone 15 Pro",
+    ]);
+  });
+
+  it("evaluates the capture rules from the server facts", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [
+      serverUpload(97, {
+        content_type: "video/mp4",
+        meta: {
+          fps: 24,
+          make: "Apple",
+          model: "iPhone 15 Pro",
+          software: "18.1",
+          gps: false,
+          width: 720,
+          height: 1280,
+        },
+      }),
+    ];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(97)],
+      outputSchema: schemaWith({
+        types: ["video/mp4"],
+        min_fps: 30,
+        require_capture_metadata: true,
+        gps_required: true,
+        max_files: 3,
+        min_files: 1,
+      }),
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    const status = Object.fromEntries(refs.api!.members[0].ruleResults.map((r) => [r.key, r.status]));
+    expect(status).toMatchObject({ fps: "fail", require_capture_metadata: "pass", gps_required: "fail" });
+  });
+
+  it("rejects a completed upload whose server facts fail a rule, like a pick that fails in the browser", async () => {
+    // A PDF pick carries no browser facts, so the server's facts alone decide the duration rule.
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      outputSchema: schemaWith({ types: ["application/pdf"], min_duration: 5, max_files: 3, min_files: 1 }),
+    });
+    render(<Host />);
+    await act(async () => refs.api!.pick([pdf("clip.pdf")]));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    engine.rows[0].meta = { duration: 3 };
+    await act(async () => engine.complete(engine.rows[0].clientRef, 101));
+    await waitFor(() => expect(refs.api!.rejected).toHaveLength(1));
+    const rejected = refs.api!.rejected[0];
+    expect(rejected.message).toBe(
+      "This file doesn't meet the requirements. See the checks above and pick another file.",
+    );
+    expect(rejected.ruleResults.filter((r) => r.status === "fail").map((r) => r.key)).toEqual(["duration"]);
+    expect(refs.regions).toHaveLength(0);
+    expect(engine.discarded).toEqual([101]);
+    expect(refs.api!.members).toHaveLength(0);
   });
 
   it("falls back to the browser's facts when the server could not read any", async () => {

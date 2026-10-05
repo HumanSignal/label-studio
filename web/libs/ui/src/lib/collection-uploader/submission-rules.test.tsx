@@ -112,3 +112,67 @@ describe("SubmissionRuleBadges", () => {
     expect(screen.queryByTestId("submission-rule-badges")).not.toBeInTheDocument();
   });
 });
+
+describe("rules on server-read facts", () => {
+  const CAPTURE = { min_fps: 30, require_capture_metadata: true, gps_required: true };
+
+  it("stays unknown until the server has inspected the file", () => {
+    const byKey = (meta: Parameters<typeof evaluateSubmissionRules>[0]) =>
+      Object.fromEntries(evaluateSubmissionRules(meta, CAPTURE).map((r) => [r.key, r.status]));
+    expect(byKey(null)).toEqual({ fps: "unknown", require_capture_metadata: "unknown", gps_required: "unknown" });
+    // picked in the browser: dimensions known, but nothing the server reads
+    expect(byKey({ contentType: "video/mp4", width: 720, height: 1280 })).toEqual({
+      fps: "unknown",
+      require_capture_metadata: "unknown",
+      gps_required: "unknown",
+    });
+  });
+
+  it("passes and fails on verified facts", () => {
+    const pass = evaluateSubmissionRules(
+      { contentType: "video/mp4", verified: true, fps: 59.94, captureMetadata: true, gps: true },
+      CAPTURE,
+    );
+    expect(pass.every((r) => r.status === "pass")).toBe(true);
+    const fail = evaluateSubmissionRules(
+      { contentType: "video/mp4", verified: true, fps: 24, captureMetadata: false, gps: false },
+      CAPTURE,
+    );
+    expect(fail.every((r) => r.status === "fail")).toBe(true);
+  });
+
+  it("keeps a fact the server could not read unknown even on a verified file", () => {
+    const results = evaluateSubmissionRules({ contentType: "application/pdf", verified: true }, CAPTURE);
+    expect(results.every((r) => r.status === "unknown")).toBe(true);
+  });
+
+  it("accepts NTSC and VFR rates that sit just under the nominal minimum", () => {
+    const at = (fps: number) =>
+      evaluateSubmissionRules({ contentType: "video/mp4", verified: true, fps }, { min_fps: 30 })[0].status;
+    expect(at(29.97)).toBe("pass");
+    expect(at(29.6)).toBe("pass");
+    expect(at(29.5)).toBe("fail");
+    expect(at(24)).toBe("fail");
+  });
+
+  it("ignores a frame rate that did not come from the server", () => {
+    const [result] = evaluateSubmissionRules({ contentType: "video/mp4", fps: 60 }, { min_fps: 30 });
+    expect(result.status).toBe("unknown");
+  });
+
+  it("labels the capture rules", () => {
+    const labels = Object.fromEntries(evaluateSubmissionRules(null, CAPTURE).map((r) => [r.key, r.label]));
+    expect(labels).toEqual({ fps: "≥ 30 fps", require_capture_metadata: "Device info", gps_required: "GPS" });
+    const fps = (rules: Record<string, number>) => evaluateSubmissionRules(null, rules)[0].label;
+    expect(fps({ max_fps: 60 })).toBe("≤ 60 fps");
+    expect(fps({ min_fps: 30, max_fps: 60 })).toBe("30–60 fps");
+  });
+
+  it("tolerates a measured rate just over the maximum but not a different rate", () => {
+    const at = (fps: number) =>
+      evaluateSubmissionRules({ contentType: "video/mp4", verified: true, fps }, { max_fps: 30 })[0].status;
+    expect(at(30.3)).toBe("pass");
+    expect(at(31)).toBe("fail");
+    expect(at(24)).toBe("pass");
+  });
+});

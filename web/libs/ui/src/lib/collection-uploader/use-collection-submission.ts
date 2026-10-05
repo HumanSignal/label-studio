@@ -101,6 +101,13 @@ export function submissionMetaFromServer(
     width: pick(server.width, fallback?.width),
     height: pick(server.height, fallback?.height),
     verified: true,
+    fps: typeof server.fps === "number" ? server.fps : null,
+    // Only file types that carry capture tags report a verdict; for the rest it stays unknown.
+    captureMetadata:
+      "make" in server || "model" in server || "software" in server
+        ? !!(server.make || server.model || server.software)
+        : null,
+    gps: typeof server.gps === "boolean" ? server.gps : null,
     facts: submissionFacts(server),
   };
 }
@@ -118,6 +125,7 @@ export function submissionFacts(server: SubmissionServerMeta): string[] {
   const device =
     make && model && !model.toLowerCase().includes(make.toLowerCase()) ? `${make} ${model}` : model || make;
   if (device) facts.push(device);
+  else if (server.software) facts.push(server.software); // e.g. "Android 14" when the file names no device
   if (server.gps) facts.push("GPS present");
   return facts;
 }
@@ -449,6 +457,7 @@ async function withCustomValidation(
 const EMPTY_RULES: SubmissionRules = {};
 
 let REJECT_SEQ = 0;
+const REJECTION_MESSAGE = "This file doesn't meet the requirements. See the checks above and pick another file.";
 
 export function useCollectionSubmission(options: UseCollectionSubmissionOptions): CollectionSubmission {
   const { deps, props, validateFile } = options;
@@ -608,6 +617,29 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         return;
       }
       if (removedUploadIds.current.has(String(row.uploadId))) return;
+      // Rules the server settles reject at completion the way browser rules
+      // reject at pick: the file never becomes a member and its object is dropped.
+      const picked = pickedMetaByRef.current[row.clientRef];
+      const settled = submissionMetaFromServer(row.meta, row.contentType, row.size, picked ? picked.meta : null);
+      const verdicts = settled ? evaluateSubmissionRules(settled, rules) : [];
+      if (verdicts.some((r) => r.status === "fail")) {
+        removedUploadIds.current.add(String(row.uploadId));
+        const engine = engineRef.current;
+        if (engine) engine.discard(row.uploadId).catch(() => undefined);
+        setRejectedPicks((old) =>
+          old.concat({
+            id: `rejected-${(REJECT_SEQ += 1)}`,
+            name: row.filename,
+            size: row.size,
+            type: row.contentType || null,
+            url: picked ? picked.url : "",
+            meta: settled as SubmissionFileMeta,
+            results: verdicts,
+            message: REJECTION_MESSAGE,
+          }),
+        );
+        return;
+      }
       const live = (visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
       if (live.some((r) => String(r._submission!.upload_id) === String(row.uploadId))) return;
 
@@ -666,12 +698,11 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           index: live.length,
         },
       });
-      const picked = pickedMetaByRef.current[row.clientRef];
       if (picked && row.key) {
         previewCache(taskId)[row.key] = { url: picked.url, kind: submissionMediaKind(row.filename, row.contentType) };
       }
     },
-    [visibleRegions, addRegion, updateRegion, taskId, bounds.max],
+    [visibleRegions, addRegion, updateRegion, taskId, bounds.max, rules],
   );
 
   // Bind the in-flight replace to its engine row once, by clientRef. Name+size
@@ -794,7 +825,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
               url,
               meta,
               results,
-              message: "This file doesn't meet the requirements. See the checks above and pick another file.",
+              message: REJECTION_MESSAGE,
             }),
           );
           return;
