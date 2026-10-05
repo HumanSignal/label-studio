@@ -562,17 +562,6 @@ This option is only available when [**Task Assignment**](#distribute-tasks) is s
 
 </td>
 </tr>
-<tr>
-<td>
-
-**Reviewers must leave a comment on reject**
-</td>
-<td>
-
-Reviewers must add a comment before they can reject an annotation from the review stream. This does not apply to bulk rejections from the Data Manager.  
-
-</td>
-</tr>
 </table>
 
 When only one option is available, reviewers see a single **Reject** button that applies it. When more than one option is available, reviewers can click **Reject** to apply the default option, or open the reject menu to choose another option:
@@ -581,11 +570,15 @@ When only one option is available, reviewers see a single **Reject** button that
 * **Return to Annotator** -- Reject and return to annotator.
 * **Pass to Another Annotator** -- Reject and pass to another annotator.
 
+![Screenshot of the reject menu](/images/review/reject-menu.png)
+
 For example, a reviewer might return an annotation that is nearly correct and only needs a small change. For an annotation with numerous errors, they might pass the task to another annotator instead. 
 
 The same options are available when reviewers reject annotations in bulk from the Data Manager. 
 
 Changing the available options only affects future rejections. Annotations that were already rejected keep the outcome that the reviewer chose. For example, annotations that were returned to an annotator can still be updated by that annotator after you make **Reject and return to annotator** unavailable. 
+
+Separately, you can enable **Reviewers must leave a comment on reject** to require reviewers to add a comment before they can reject an annotation from the review stream. This does not apply to bulk rejections from the Data Manager.
 
 </dd>
 
