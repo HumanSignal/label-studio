@@ -28,6 +28,12 @@ export type TooltipProps = PropsWithChildren<{
   interactive?: boolean;
   theme?: "light" | "dark";
   className?: string;
+  /**
+   * When true, keep the requested ``alignment`` and do not flip to the opposite
+   * vertical side when the viewport has more space there (e.g. force bottom
+   * tooltips to stay below the trigger).
+   */
+  disableAutoFlip?: boolean;
 }>;
 
 const TooltipInner = forwardRef(
@@ -42,6 +48,7 @@ const TooltipInner = forwardRef(
       interactive,
       theme = "dark",
       className,
+      disableAutoFlip = false,
     }: TooltipProps,
     ref,
   ) => {
@@ -65,12 +72,12 @@ const TooltipInner = forwardRef(
       const target = tooltipElement.current as HTMLElement | null;
 
       if (isDefined(parent) && isDefined(target)) {
-        const { left, top, align: resultAlign } = alignElements(parent, target, align, 10);
+        const { left, top, align: resultAlign } = alignElements(parent, target, align, 10, false, !disableAutoFlip);
 
         setOffset({ left, top });
         setAlign(resultAlign);
       }
-    }, [triggerElement.current, tooltipElement.current]);
+    }, [align, disableAutoFlip]);
 
     const performAnimation = useCallback(
       (visible: boolean) => {
