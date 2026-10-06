@@ -36,6 +36,28 @@ describe("MediaCard", () => {
     expect(screen.queryByText("Duplicate")).not.toBeInTheDocument();
   });
 
+  it("server findings render a Flagged chip with the reasons in both layouts", () => {
+    const meta = { verified: true, flags: ["pdf_javascript", "hidden_archive"] };
+    const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} />);
+    expect(screen.getByText("Flagged")).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-flags")).toHaveTextContent("Runs JavaScript · Hides a ZIP archive");
+    rerender(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} layout="row" />);
+    expect(screen.getByText("Flagged")).toBeInTheDocument();
+    expect(screen.getByText("Runs JavaScript · Hides a ZIP archive")).toBeInTheDocument();
+    rerender(
+      <MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={{ verified: true, flags: [] }} />,
+    );
+    expect(screen.queryByText("Flagged")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("media-card-flags")).not.toBeInTheDocument();
+  });
+
+  it("malformed findings render no flag instead of crashing the card", () => {
+    const meta = { verified: true, flags: "pdf_javascript" as unknown as string[] };
+    render(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} />);
+    expect(screen.getByTestId("media-card-submitted")).toBeInTheDocument();
+    expect(screen.queryByText("Flagged")).not.toBeInTheDocument();
+  });
+
   it("grid fit locks the media to a square box from the two-column breakpoint; natural fit does not", () => {
     const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" fit="grid" />);
     const media = screen.getByTestId("media-card-media");

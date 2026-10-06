@@ -18,7 +18,12 @@ import { Button } from "../button/button";
 import { Message } from "../message/message";
 import { ModalWindow } from "../modal-window";
 import { cn } from "../../utils/utils";
-import { SubmissionRuleBadges, SubmissionStatusChip, type SubmissionRuleResult } from "./submission-rules";
+import {
+  SubmissionRuleBadges,
+  SubmissionStatusChip,
+  type SubmissionRuleResult,
+  submissionFlagLabel,
+} from "./submission-rules";
 
 export type MediaCardState = "uploading" | "failed" | "rejected" | "uploaded" | "submitted" | "readonly";
 
@@ -273,6 +278,14 @@ export const MediaCard = ({
     metaParts.push((meta.height as number) >= (meta.width as number) ? "portrait" : "landscape");
   }
   if (meta?.facts?.length) metaParts.push(...meta.facts);
+  const findings = Array.isArray(meta?.flags) ? meta.flags.map(submissionFlagLabel).join(" · ") : "";
+  const flaggedChip = findings ? (
+    <Tooltip title={findings}>
+      <span>
+        <SubmissionStatusChip tone="warning">Flagged</SubmissionStatusChip>
+      </span>
+    </Tooltip>
+  ) : null;
 
   const rowActions = editable && state !== "readonly" && (
     <span className="ml-auto flex flex-none items-center gap-tight">
@@ -349,6 +362,8 @@ export const MediaCard = ({
             {metaParts.length ? ` · ${metaParts.join(" · ")}` : ""}
             {firstFail ? " · " : ""}
             {firstFail ? <span className="text-negative-content">{firstFail.label} ✕</span> : null}
+            {findings ? " · " : ""}
+            {findings ? <span className="text-warning-content">{findings}</span> : null}
           </span>
         </span>
         {state === "uploading" ? (
@@ -361,6 +376,7 @@ export const MediaCard = ({
             </span>
           </span>
         ) : null}
+        {flaggedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
         {rowActions}
@@ -384,6 +400,7 @@ export const MediaCard = ({
           <span className="block truncate font-medium text-neutral-content text-sm">{safeFile.name}</span>
           <span className="block truncate text-neutral-content-subtler text-xs">{facts}</span>
         </span>
+        {flaggedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
       </div>
@@ -577,7 +594,7 @@ export const MediaCard = ({
         </div>
       ) : null}
 
-      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || message ? (
+      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || findings || message ? (
         <div className="flex flex-col gap-tight border-neutral-border-subtle border-t p-tight">
           {ruleResults && ruleResults.length > 0 ? (
             <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -595,6 +612,11 @@ export const MediaCard = ({
                 </span>
               ))}
             </div>
+          ) : null}
+          {findings ? (
+            <Message variant="warning" size="small" data-testid="media-card-flags">
+              {findings}
+            </Message>
           ) : null}
           {message ? (
             <Message variant="negative" size="small" data-testid="media-card-message">

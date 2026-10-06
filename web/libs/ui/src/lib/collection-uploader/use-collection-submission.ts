@@ -58,6 +58,8 @@ export interface SubmissionServerMeta {
   sample_rate?: number | null;
   channels?: number | null;
   pages?: number | null;
+  /** Active-content findings; [] after a clean scan, null when the scan could not finish. */
+  flags?: string[] | null;
 }
 
 export interface SubmissionCurrentUpload {
@@ -109,6 +111,7 @@ export function submissionMetaFromServer(
         : null,
     gps: typeof server.gps === "boolean" ? server.gps : null,
     facts: submissionFacts(server),
+    flags: Array.isArray(server.flags) ? server.flags : undefined,
   };
 }
 

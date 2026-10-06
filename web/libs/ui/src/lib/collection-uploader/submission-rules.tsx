@@ -59,6 +59,25 @@ export interface SubmissionFileMeta {
   gps?: boolean | null;
   /** Extra server facts for display ("29.97 fps", "iPhone 15 Pro", "GPS present"). */
   facts?: string[];
+  /** Server findings about active content (a hidden archive, PDF JavaScript); advisory, for reviewers. */
+  flags?: string[];
+}
+
+const SUBMISSION_FLAG_LABELS: Record<string, string> = {
+  pdf_javascript: "Runs JavaScript",
+  pdf_launch_action: "Launches a program when opened",
+  pdf_embedded_files: "Carries embedded files",
+  pdf_remote_action: "Sends data to or loads from a remote address",
+  pdf_rich_media: "Embeds rich media",
+  hidden_archive: "Hides a ZIP archive",
+  hidden_document: "Hides a PDF document",
+  hidden_markup: "Contains HTML or script markup",
+  hidden_executable: "Hides an executable program",
+};
+
+/** The reviewer-facing reason behind a server finding; a code this build does not know still reads as a flag. */
+export function submissionFlagLabel(code: string): string {
+  return SUBMISSION_FLAG_LABELS[code] ?? "Flagged for review";
 }
 
 export type SubmissionRuleStatus = "pass" | "fail" | "unknown";

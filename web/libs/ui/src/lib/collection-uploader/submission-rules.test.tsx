@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { evaluateSubmissionRules, SubmissionRuleBadges } from "./submission-rules";
+import { evaluateSubmissionRules, SubmissionRuleBadges, submissionFlagLabel } from "./submission-rules";
 
 const RULES = {
   types: ["video/mp4", "video/quicktime"],
@@ -174,5 +174,20 @@ describe("rules on server-read facts", () => {
     expect(at(30.3)).toBe("pass");
     expect(at(31)).toBe("fail");
     expect(at(24)).toBe("pass");
+  });
+});
+
+describe("submissionFlagLabel", () => {
+  it("names every finding the server can report, and falls back for an unknown code", () => {
+    expect(submissionFlagLabel("pdf_javascript")).toBe("Runs JavaScript");
+    expect(submissionFlagLabel("pdf_launch_action")).toBe("Launches a program when opened");
+    expect(submissionFlagLabel("pdf_embedded_files")).toBe("Carries embedded files");
+    expect(submissionFlagLabel("pdf_remote_action")).toBe("Sends data to or loads from a remote address");
+    expect(submissionFlagLabel("pdf_rich_media")).toBe("Embeds rich media");
+    expect(submissionFlagLabel("hidden_archive")).toBe("Hides a ZIP archive");
+    expect(submissionFlagLabel("hidden_document")).toBe("Hides a PDF document");
+    expect(submissionFlagLabel("hidden_markup")).toBe("Contains HTML or script markup");
+    expect(submissionFlagLabel("hidden_executable")).toBe("Hides an executable program");
+    expect(submissionFlagLabel("something_new")).toBe("Flagged for review");
   });
 });

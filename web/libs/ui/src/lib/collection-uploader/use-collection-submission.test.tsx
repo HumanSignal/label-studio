@@ -651,6 +651,25 @@ describe("server facts", () => {
     expect(member.meta?.facts).toEqual(["HEVC", "29.97 fps", "Apple iPhone 15 Pro", "GPS present"]);
   });
 
+  it("server findings ride on the stored member's meta for the card to flag", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(97, { meta: { pages: 3, flags: ["pdf_javascript", "hidden_archive"] } })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    expect(refs.api!.members[0].meta?.flags).toEqual(["pdf_javascript", "hidden_archive"]);
+    expect(refs.api!.members[0].meta?.facts).toEqual(["3 pages"]);
+  });
+
+  it("a clean scan is a verified member without findings", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(97, { meta: { pages: 3, flags: [] } })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta?.verified).toBe(true));
+    expect(refs.api!.members[0].meta?.flags).toEqual([]);
+  });
+
   it("a stored member without server facts is not marked verified", async () => {
     const engine = new FakeEngine(() => undefined);
     engine.currentAllValue = [serverUpload(97)];
