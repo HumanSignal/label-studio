@@ -139,7 +139,12 @@
 [data-color-scheme="dark"] {
   --shadow-intensity: 2;
 
-  & input[type="date"] {
-    color-scheme: dark;
+  /* Native controls (number spinners, date/time pickers, select popups, scrollbars) follow the theme */
+  color-scheme: dark;
+
+  /* An iframe whose document declares no color-scheme gets an opaque light canvas when its
+     color-scheme differs from the embedding element's, so keep iframes on the browser default. */
+  & iframe {
+    color-scheme: normal;
   }
 }
