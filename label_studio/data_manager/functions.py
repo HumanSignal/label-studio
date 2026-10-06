@@ -118,7 +118,7 @@ def get_all_columns(project, *_):
             'title': 'Completed',
             'type': 'Datetime',
             'target': 'tasks',
-            'help': 'Last annotation date',
+            'help': 'Latest annotation time, set once the task has all required annotations',
             'visibility_defaults': {'explore': True, 'labeling': False},
             'project_defined': False,
         },
