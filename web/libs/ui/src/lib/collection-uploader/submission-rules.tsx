@@ -61,6 +61,8 @@ export interface SubmissionFileMeta {
   facts?: string[];
   /** Server findings about active content (a hidden archive, PDF JavaScript); advisory, for reviewers. */
   flags?: string[];
+  /** Why the server thinks the file may not be an original capture; set only when it raised that flag. */
+  modifiedSignals?: string[];
 }
 
 const SUBMISSION_FLAG_LABELS: Record<string, string> = {
@@ -78,6 +80,18 @@ const SUBMISSION_FLAG_LABELS: Record<string, string> = {
 /** The reviewer-facing reason behind a server finding; a code this build does not know still reads as a flag. */
 export function submissionFlagLabel(code: string): string {
   return SUBMISSION_FLAG_LABELS[code] ?? "Flagged for review";
+}
+
+const SUBMISSION_SIGNAL_LABELS: Record<string, string> = {
+  reencoded: "Processed by a video tool after capture",
+  editing_software: "Saved by an editing app",
+  platform_source: "Downloaded from a video or social platform",
+  no_capture_metadata: "No camera make, model or software",
+};
+
+/** A signal behind the server's "possibly modified" flag, as the reviewer reads it. */
+export function submissionSignalLabel(code: string): string {
+  return SUBMISSION_SIGNAL_LABELS[code] ?? "Other signal";
 }
 
 export type SubmissionRuleStatus = "pass" | "fail" | "unknown";

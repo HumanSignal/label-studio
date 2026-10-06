@@ -51,11 +51,28 @@ describe("MediaCard", () => {
     expect(screen.queryByTestId("media-card-flags")).not.toBeInTheDocument();
   });
 
+  it("the modification gate renders a Possibly modified chip with its signals in both layouts", () => {
+    const meta = { verified: true, modifiedSignals: ["reencoded", "platform_source", "no_capture_metadata"] };
+    const reasons =
+      "Processed by a video tool after capture · Downloaded from a video or social platform · No camera make, model or software";
+    const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={meta} />);
+    expect(screen.getByText("Possibly modified")).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-modified")).toHaveTextContent(`Possibly not an original capture: ${reasons}`);
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={meta} layout="row" />);
+    expect(screen.getByText("Possibly modified")).toBeInTheDocument();
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={{ verified: true }} />);
+    expect(screen.queryByText("Possibly modified")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("media-card-modified")).not.toBeInTheDocument();
+  });
+
   it("malformed findings render no flag instead of crashing the card", () => {
     const meta = { verified: true, flags: "pdf_javascript" as unknown as string[] };
     render(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} />);
     expect(screen.getByTestId("media-card-submitted")).toBeInTheDocument();
     expect(screen.queryByText("Flagged")).not.toBeInTheDocument();
+    const modified = { verified: true, modifiedSignals: "reencoded" as unknown as string[] };
+    render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={modified} />);
+    expect(screen.queryByText("Possibly modified")).not.toBeInTheDocument();
   });
 
   it("grid fit locks the media to a square box from the two-column breakpoint; natural fit does not", () => {

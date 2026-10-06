@@ -60,6 +60,9 @@ export interface SubmissionServerMeta {
   pages?: number | null;
   /** Active-content findings; [] after a clean scan, null when the scan could not finish. */
   flags?: string[] | null;
+  /** Signs the file is not the original capture, and the advisory gate they raise. */
+  signals?: string[] | null;
+  modified?: boolean | null;
 }
 
 export interface SubmissionCurrentUpload {
@@ -112,6 +115,7 @@ export function submissionMetaFromServer(
     gps: typeof server.gps === "boolean" ? server.gps : null,
     facts: submissionFacts(server),
     flags: Array.isArray(server.flags) ? server.flags : undefined,
+    modifiedSignals: server.modified === true && Array.isArray(server.signals) ? server.signals : undefined,
   };
 }
 

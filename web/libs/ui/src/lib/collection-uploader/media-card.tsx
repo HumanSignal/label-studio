@@ -23,6 +23,7 @@ import {
   SubmissionStatusChip,
   type SubmissionRuleResult,
   submissionFlagLabel,
+  submissionSignalLabel,
 } from "./submission-rules";
 
 export type MediaCardState = "uploading" | "failed" | "rejected" | "uploaded" | "submitted" | "readonly";
@@ -286,6 +287,16 @@ export const MediaCard = ({
       </span>
     </Tooltip>
   ) : null;
+  const modification = Array.isArray(meta?.modifiedSignals)
+    ? `Possibly not an original capture: ${meta.modifiedSignals.map(submissionSignalLabel).join(" · ")}`
+    : "";
+  const modifiedChip = modification ? (
+    <Tooltip title={modification}>
+      <span>
+        <SubmissionStatusChip tone="warning">Possibly modified</SubmissionStatusChip>
+      </span>
+    </Tooltip>
+  ) : null;
 
   const rowActions = editable && state !== "readonly" && (
     <span className="ml-auto flex flex-none items-center gap-tight">
@@ -377,6 +388,7 @@ export const MediaCard = ({
           </span>
         ) : null}
         {flaggedChip}
+        {modifiedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
         {rowActions}
@@ -401,6 +413,7 @@ export const MediaCard = ({
           <span className="block truncate text-neutral-content-subtler text-xs">{facts}</span>
         </span>
         {flaggedChip}
+        {modifiedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
       </div>
@@ -594,7 +607,7 @@ export const MediaCard = ({
         </div>
       ) : null}
 
-      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || findings || message ? (
+      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || findings || modification || message ? (
         <div className="flex flex-col gap-tight border-neutral-border-subtle border-t p-tight">
           {ruleResults && ruleResults.length > 0 ? (
             <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -616,6 +629,11 @@ export const MediaCard = ({
           {findings ? (
             <Message variant="warning" size="small" data-testid="media-card-flags">
               {findings}
+            </Message>
+          ) : null}
+          {modification ? (
+            <Message variant="warning" size="small" data-testid="media-card-modified">
+              {modification}
             </Message>
           ) : null}
           {message ? (

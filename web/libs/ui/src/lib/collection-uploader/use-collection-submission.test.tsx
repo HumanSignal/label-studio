@@ -661,6 +661,19 @@ describe("server facts", () => {
     expect(refs.api!.members[0].meta?.facts).toEqual(["3 pages"]);
   });
 
+  it("a raised modification gate carries its signals to the card; a lowered one carries nothing", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [
+      serverUpload(97, { meta: { width: 64, signals: ["reencoded", "no_capture_metadata"], modified: true } }),
+      serverUpload(98, { meta: { width: 64, signals: ["no_capture_metadata"], modified: false } }),
+    ];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(97), region(98)] });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[1]?.meta?.verified).toBe(true));
+    expect(refs.api!.members[0].meta?.modifiedSignals).toEqual(["reencoded", "no_capture_metadata"]);
+    expect(refs.api!.members[1].meta?.modifiedSignals).toBeUndefined();
+  });
+
   it("a clean scan is a verified member without findings", async () => {
     const engine = new FakeEngine(() => undefined);
     engine.currentAllValue = [serverUpload(97, { meta: { pages: 3, flags: [] } })];

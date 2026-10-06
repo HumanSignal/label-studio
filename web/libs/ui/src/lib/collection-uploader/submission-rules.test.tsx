@@ -1,5 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { evaluateSubmissionRules, SubmissionRuleBadges, submissionFlagLabel } from "./submission-rules";
+import {
+  evaluateSubmissionRules,
+  SubmissionRuleBadges,
+  submissionFlagLabel,
+  submissionSignalLabel,
+} from "./submission-rules";
 
 const RULES = {
   types: ["video/mp4", "video/quicktime"],
@@ -174,6 +179,16 @@ describe("rules on server-read facts", () => {
     expect(at(30.3)).toBe("pass");
     expect(at(31)).toBe("fail");
     expect(at(24)).toBe("pass");
+  });
+});
+
+describe("submissionSignalLabel", () => {
+  it("names every modification signal the server can report, and falls back for an unknown code", () => {
+    expect(submissionSignalLabel("reencoded")).toBe("Processed by a video tool after capture");
+    expect(submissionSignalLabel("editing_software")).toBe("Saved by an editing app");
+    expect(submissionSignalLabel("platform_source")).toBe("Downloaded from a video or social platform");
+    expect(submissionSignalLabel("no_capture_metadata")).toBe("No camera make, model or software");
+    expect(submissionSignalLabel("something_new")).toBe("Other signal");
   });
 });
 
