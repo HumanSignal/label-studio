@@ -68,28 +68,30 @@ def extract_labels(annotation, control_tag, label_interface_tags=None):
             # scan value for a field with list of strings (eg choices, textareas)
             # or taxonomy (list of string-lists)
             for key in region['value']:
-                if region['value'][key] and isinstance(region['value'][key], list):
-                    if key == 'taxonomy':
-                        showFullPath = 'true'
-                        pathSeparator = '/'
-                        if label_interface_tags is not None and region['from_name'] in label_interface_tags:
-                            # if from_name is not a custom_control tag, then we can try to fetch taxonomy formatting params
-                            label_interface_tag = label_interface_tags[region['from_name']]
-                            showFullPath = label_interface_tag.attr.get('showFullPath', 'false')
-                            pathSeparator = label_interface_tag.attr.get('pathSeparator', '/')
+                if not region['value'][key] or not isinstance(region['value'][key], list):
+                    continue
+                if key == 'taxonomy':
+                    showFullPath = 'true'
+                    pathSeparator = '/'
+                    if label_interface_tags is not None and region['from_name'] in label_interface_tags:
+                        # if from_name is not a custom_control tag, then we can try to fetch taxonomy formatting params
+                        label_interface_tag = label_interface_tags[region['from_name']]
+                        showFullPath = label_interface_tag.attr.get('showFullPath', 'false')
+                        pathSeparator = label_interface_tag.attr.get('pathSeparator', '/')
 
-                        if showFullPath == 'false':
-                            for elems in region['value'][key]:
-                                labels.append(elems[-1])  # just the leaf node of a taxonomy selection
-                        else:
-                            for elems in region['value'][key]:
-                                labels.append(pathSeparator.join(elems))  # the full delimited taxonomy path
-
-                    # other control tag types like Choices & TextAreas
-                    elif isinstance(region['value'][key][0], str):
-                        labels.extend(region['value'][key])
-
+                    if showFullPath == 'false':
+                        for elems in region['value'][key]:
+                            labels.append(elems[-1])  # just the leaf node of a taxonomy selection
+                    else:
+                        for elems in region['value'][key]:
+                            labels.append(pathSeparator.join(elems))  # the full delimited taxonomy path
                     break
+
+                # other control tag types like Choices & TextAreas
+                if isinstance(region['value'][key][0], str):
+                    labels.extend(region['value'][key])
+                    break
+                # non-string lists (rle masks, polygon points, ...) carry no labels; keep scanning
     return labels
 
 
