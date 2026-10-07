@@ -83,6 +83,23 @@ describe("project_column_defaults (FIT-2846)", () => {
       expect(pickVisibleAliases({ visible: { MA: ["id"] } }, "AN")).toEqual(["id"]);
       expect(pickVisibleAliases({ visible: {} }, "OW")).toBeNull();
     });
+
+    it("inherits Reviewer visibility from Managers+ and ignores visible.RE", () => {
+      expect(
+        pickVisibleAliases(
+          {
+            visible: {
+              OW: ["id", "data.text"],
+              AD: ["id", "data.text"],
+              MA: ["id", "data.text"],
+              AN: ["id"],
+              RE: ["agreement"],
+            },
+          },
+          "RE",
+        ),
+      ).toEqual(["id", "data.text"]);
+    });
   });
 
   describe("resolveHiddenColumnsFromProjectDefaults", () => {
@@ -179,6 +196,75 @@ describe("project_column_defaults (FIT-2846)", () => {
       });
 
       expect(result).toEqual(catalogDefaultHidden);
+    });
+
+    it("annotator receives Manager-configured AN visibility and shared order (FIT-2848)", () => {
+      const surface = {
+        order: ["data.text", "id", "agreement"],
+        visible: {
+          OW: ["id", "data.text", "agreement"],
+          AD: ["id", "data.text", "agreement"],
+          MA: ["id", "data.text", "agreement"],
+          AN: ["id", "data.text"],
+          RE: ["agreement"],
+        },
+      };
+
+      expect(pickVisibleAliases(surface, resolveRoleCode("ANNOTATOR"))).toEqual(["id", "data.text"]);
+      expect(pickVisibleAliases(surface, "AN")).toEqual(["id", "data.text"]);
+
+      const hidden = resolveHiddenColumnsFromProjectDefaults({
+        surface,
+        role: "ANNOTATOR",
+        columns,
+        catalogDefaultHidden: { explore: [], labeling: [] },
+      });
+      // Agreement is in shared order but omitted from AN visible → soft-hidden for annotators.
+      expect(hidden.explore).toEqual(["tasks:agreement"]);
+      // Managers still see agreement when their visible list includes it.
+      expect(
+        resolveHiddenColumnsFromProjectDefaults({
+          surface,
+          role: "MANAGER",
+          columns,
+          catalogDefaultHidden: { explore: [], labeling: [] },
+        }).explore,
+      ).toEqual([]);
+
+      const order = resolveColumnOrderFromProjectDefaults({ surface, columns });
+      expect(order["tasks:data.text"]).toBeLessThan(order["tasks:id"]);
+      expect(order["tasks:id"]).toBeLessThan(order["tasks:agreement"]);
+    });
+
+    it("reviewer soft layout matches Managers+ even when visible.RE diverges (FIT-2848)", () => {
+      const surface = {
+        order: ["id", "data.text", "agreement"],
+        visible: {
+          OW: ["id", "data.text"],
+          AD: ["id", "data.text"],
+          MA: ["id", "data.text"],
+          AN: ["id"],
+          RE: ["agreement"],
+        },
+      };
+
+      expect(pickVisibleAliases(surface, resolveRoleCode("REVIEWER"))).toEqual(["id", "data.text"]);
+
+      const hidden = resolveHiddenColumnsFromProjectDefaults({
+        surface,
+        role: "REVIEWER",
+        columns,
+        catalogDefaultHidden: { explore: [], labeling: [] },
+      });
+      expect(hidden.explore).toEqual(["tasks:agreement"]);
+      expect(
+        resolveHiddenColumnsFromProjectDefaults({
+          surface,
+          role: "MANAGER",
+          columns,
+          catalogDefaultHidden: { explore: [], labeling: [] },
+        }).explore,
+      ).toEqual(["tasks:agreement"]);
     });
   });
 

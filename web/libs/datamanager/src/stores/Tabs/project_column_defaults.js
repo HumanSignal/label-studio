@@ -100,8 +100,10 @@ export function surfaceHasProjectDefaults(surface) {
 }
 
 /**
- * Pick the visible-alias list for a role. FIT-2845 writes the same list to every public role,
- * so if the exact role key is missing we fall back to the first populated role list.
+ * Pick the visible-alias list for a role.
+ * Reviewers inherit Managers+ soft visibility (FIT-2848) — `visible.RE` is unused.
+ * Annotators prefer `visible.AN`. If the preferred key is missing, fall back to the first
+ * populated role list so older FIT-2845 projects that wrote one list to every role keep working.
  *
  * @param {{ visible?: Record<string, string[]> } | null | undefined} surface
  * @param {string | null} roleCode
@@ -109,8 +111,9 @@ export function surfaceHasProjectDefaults(surface) {
  */
 export function pickVisibleAliases(surface, roleCode) {
   const visible = surface?.visible ?? {};
-  if (roleCode && Array.isArray(visible[roleCode])) {
-    return visible[roleCode];
+  const preferred = roleCode === "RE" ? DM_COLUMN_MANAGING_ROLE_CODES : roleCode ? [roleCode] : [];
+  for (const code of preferred) {
+    if (Array.isArray(visible[code])) return visible[code];
   }
   for (const code of DM_COLUMN_ROLE_CODES) {
     if (Array.isArray(visible[code])) return visible[code];
