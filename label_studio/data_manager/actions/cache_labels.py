@@ -1,18 +1,26 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import logging
+from collections import defaultdict
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
+from core.utils.iterators import iterate_queryset
 from data_manager.actions import DataManagerAction
+from django.db.models import QuerySet
 from label_studio_sdk.label_interface import LabelInterface
 from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
 
+CACHE_LABELS_BATCH_SIZE = 1000
+# Annotation/prediction results can be large (brush RLE masks are ~1-2 MB each once loaded),
+# so stream them inside a batch instead of loading the whole batch at once
+CACHE_LABELS_SOURCE_CHUNK_SIZE = 20
 
-def cache_labels_job(project, queryset, **kwargs):
+
+def cache_labels_job(project, task_ids, **kwargs):
     request_data = kwargs['request_data']
     source = request_data.get('source', 'annotations').lower()
     assert source in ['annotations', 'predictions'], 'Source must be annotations or predictions'
@@ -34,30 +42,37 @@ def cache_labels_job(project, queryset, **kwargs):
     else:
         column_name = f'{column_name}_{control_tag}'
 
-    tasks = list(queryset.only('data'))
-    logger.info(f'Cache labels for {len(tasks)} tasks and control tag {control_tag}')
+    # Jobs enqueued before task ids were passed still carry a queryset
+    if isinstance(task_ids, QuerySet):
+        task_ids = list(task_ids.values_list('id', flat=True))
+    task_ids = sorted(task_ids)
+    logger.info(f'Cache labels for {len(task_ids)} tasks and control tag {control_tag}')
 
-    for task in tasks:
-        task_labels = []
-        annotations = source_class.objects.filter(task=task).only('result')
-        for annotation in annotations:
-            labels = extract_labels(annotation, control_tag, label_interface_tags)
-            task_labels.extend(labels)
+    for start in range(0, len(task_ids), CACHE_LABELS_BATCH_SIZE):
+        batch_ids = task_ids[start : start + CACHE_LABELS_BATCH_SIZE]
+        tasks = list(Task.objects.filter(id__in=batch_ids).only('id', 'data'))
+        labels_by_task = defaultdict(list)
+        sources = source_class.objects.filter(task_id__in=batch_ids).only('task_id', 'result')
+        for source_obj in iterate_queryset(sources, chunk_size=CACHE_LABELS_SOURCE_CHUNK_SIZE):
+            labels_by_task[source_obj.task_id].extend(extract_labels(source_obj, control_tag, label_interface_tags))
 
-        # cache labels in separate data column
-        # with counters
-        if with_counters:
-            task.data[column_name] = ', '.join(
-                sorted([f'{label}: {task_labels.count(label)}' for label in set(task_labels)])
-            )
-        # no counters
-        else:
-            task.data[column_name] = ', '.join(sorted(list(set(task_labels))))
+        for task in tasks:
+            task_labels = labels_by_task.get(task.id, [])
+            # cache labels in separate data column
+            # with counters
+            if with_counters:
+                task.data[column_name] = ', '.join(
+                    sorted([f'{label}: {task_labels.count(label)}' for label in set(task_labels)])
+                )
+            # no counters
+            else:
+                task.data[column_name] = ', '.join(sorted(list(set(task_labels))))
 
-    Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
-    first_task = Task.objects.get(id=queryset.first().id)
-    project.summary.update_data_columns([first_task])
-    return {'response_code': 200, 'detail': f'Updated {len(tasks)} tasks'}
+        Task.objects.bulk_update(tasks, fields=['data'], batch_size=CACHE_LABELS_BATCH_SIZE)
+
+    if task_ids:
+        project.summary.update_data_columns([Task.objects.get(id=task_ids[0])])
+    return {'response_code': 200, 'detail': f'Updated {len(task_ids)} tasks'}
 
 
 def extract_labels(annotation, control_tag, label_interface_tags=None):
@@ -97,10 +112,12 @@ def extract_labels(annotation, control_tag, label_interface_tags=None):
 
 def cache_labels(project, queryset, request, **kwargs):
     """Cache labels from annotations to a new column in tasks"""
+    # Pass ids, not the queryset: pickling a QuerySet evaluates it in the request
+    task_ids = list(queryset.values_list('id', flat=True))
     start_job_async_or_sync(
         cache_labels_job,
         project,
-        queryset,
+        task_ids,
         organization_id=project.organization_id,
         request_data=request.data,
         job_timeout=60 * 60 * 5,  # max allowed duration is 5 hours
