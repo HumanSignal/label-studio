@@ -53,7 +53,7 @@ export const ResetColumnsButton = injector(
       if (locked || !view || !canSaveAsDefault) return;
       Modal.confirm({
         title: "Save as Default?",
-        body: "This will save the current tab’s column order and visibility as the default for this project. Existing tabs keep their customizations. This does not change who can access columns.",
+        body: "This will save the current tab’s column order and visibility as the default for this project. The saved layout applies to Managers+ only. Existing tabs keep their customizations. This does not change who can access columns.",
         okText: "Save as Default",
         cancelText: "Cancel",
         onOk() {

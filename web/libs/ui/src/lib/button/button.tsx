@@ -116,7 +116,7 @@ export type ButtonProps = {
   /**
    * Adds a tooltip to the button
    */
-  tooltip?: string;
+  tooltip?: ReactNode;
   /** Where the tooltip opens relative to the button (default above) */
   tooltipAlignment?: Align;
   /**
