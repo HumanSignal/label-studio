@@ -7,13 +7,15 @@ export {
   Annotators as UpdatedBy,
   Annotators as CommentAuthors,
   SkippedByAnnotator,
+  SkippedByAnnotator as ReviewsReviewedBy,
 } from "./Annotators/Annotators";
 export { AudioCell as Audio, AudioPlusCell as AudioPlus } from "./AudioCell";
-export { BooleanCell as Boolean, GroundTruth } from "./BooleanCell";
+export { BooleanCell as Boolean, GroundTruth, GroundTruth as ReviewsIsCurrentVerdict } from "./BooleanCell";
 export { DateTimeCell as Date, DateTimeCell as Datetime } from "./DateTimeCell";
 export { ImageCell as Image } from "./ImageCell";
 export { NumberCell as Number } from "./NumberCell";
 export { StringCell as String } from "./StringCell";
+export { ReviewsReviewResult, ReviewsReviewedAt } from "./ReviewFilters";
 export { SubmissionCell as Submission } from "./SubmissionCell";
 export { TimeCell as Time } from "./TimeCell";
 export { StringCell as Text } from "./StringCell";

@@ -1324,8 +1324,8 @@ describe("tab switch loading (FIT-2376)", () => {
 describe("dataCleanup columnOrder (FIT-2882)", () => {
   it("keeps select and show-source while dropping unknown catalog column ids", () => {
     const columns = [
-      { id: "tasks:id", isAnnotationResultsFilterColumn: false },
-      { id: "tasks:data.text", isAnnotationResultsFilterColumn: false },
+      { id: "tasks:id", isFilterOnlyColumn: false },
+      { id: "tasks:data.text", isFilterOnlyColumn: false },
     ];
     const result = dataCleanup(
       {
@@ -1353,8 +1353,8 @@ describe("dataCleanup columnOrder (FIT-2882)", () => {
 
   it("drops annotation-results filter-only columns from columnOrder", () => {
     const columns = [
-      { id: "tasks:id", isAnnotationResultsFilterColumn: false },
-      { id: "tasks:annotations_results_json", isAnnotationResultsFilterColumn: true },
+      { id: "tasks:id", isFilterOnlyColumn: false },
+      { id: "tasks:annotations_results_json", isFilterOnlyColumn: true },
     ];
     const result = dataCleanup(
       {

@@ -1,5 +1,5 @@
 import deepEqual from "deep-equal";
-import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { normalizeFilterValue } from "./filter_utils";
 import { TabFilter } from "./tab_filter";
@@ -15,6 +15,7 @@ const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed
 const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
 const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
 
+import { preferSiblingFilterType } from "./child_filter_types";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 import { clearPersonalColumnOrder } from "../../components/Common/Table/columnOrderStorage";
 import { clearUnavailableVirtualFilters } from "./unavailable_filters";
@@ -108,7 +109,9 @@ export const Tab = types
     },
 
     get availableFilters() {
-      return self.parent.availableFilters.filter((filter) => filter.field.available_for_new_filters);
+      return self.parent.availableFilters.filter(
+        (filter) => isAlive(filter) && filter.field.available_for_new_filters && !filter.field.child_only,
+      );
     },
 
     get dataStore() {
@@ -545,12 +548,15 @@ export const Tab = types
       const filterType =
         typeof filterTypeOrAlias === "object"
           ? filterTypeOrAlias
-          : self.availableFilters.find(
-              (candidate) =>
-                candidate.id === filterTypeOrAlias ||
-                candidate.field.alias === filterTypeOrAlias ||
-                (!filterTypeOrAlias && allowedAliases.includes(candidate.field.alias)),
-            );
+          : (self.parent.availableFilters.find((candidate) => candidate.id === filterTypeOrAlias) ??
+            preferSiblingFilterType(
+              self.parent.availableFilters.filter((candidate) =>
+                filterTypeOrAlias
+                  ? candidate.field.alias === filterTypeOrAlias
+                  : allowedAliases.includes(candidate.field.alias),
+              ),
+              rootFilter.field,
+            ));
 
       if (
         !filterType ||
@@ -701,7 +707,12 @@ export const Tab = types
      */
     importFilters(snapshot) {
       if (self.isLockedByManager) return self.notifyLocked();
-      const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
+      // Check against every column type, not the picker list: a saved read-only line must survive paste and undo.
+      // Child-only columns stay valid as children but not as top-level lines.
+      const validItems = validateFilterSnapshot(
+        snapshot,
+        self.parent.availableFilters.filter((filterType) => !filterType.field.child_only),
+      );
       if (!validItems) return false;
 
       const { conjunction } = snapshot;

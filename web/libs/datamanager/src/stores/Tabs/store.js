@@ -45,7 +45,7 @@ export const dataCleanup = (tab, columns) => {
     data[key] = Object.fromEntries(
       Object.entries(data[key] ?? {}).filter(([col]) => {
         const match = columns.find((c) => c.id === col);
-        return !!match && !match.isAnnotationResultsFilterColumn;
+        return !!match && !match.isFilterOnlyColumn;
       }),
     );
   });
@@ -55,7 +55,7 @@ export const dataCleanup = (tab, columns) => {
     Object.entries(data.columnOrder ?? {}).filter(([col]) => {
       if (col === "select" || col === "show-source") return true;
       const match = columns.find((c) => c.id === col);
-      return !!match && !match.isAnnotationResultsFilterColumn;
+      return !!match && !match.isFilterOnlyColumn;
     }),
   );
 
@@ -70,7 +70,7 @@ export const dataCleanup = (tab, columns) => {
         (list ?? []).filter((columnID) => {
           const match = columns.find((c) => c.id === columnID);
 
-          return !match?.isAnnotationResultsFilterColumn;
+          return !match?.isFilterOnlyColumn;
         }),
       ]),
     );

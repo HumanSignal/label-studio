@@ -1,6 +1,5 @@
 import { getRoot, getSnapshot, types } from "mobx-state-tree";
-import * as CellViews from "../../components/CellViews";
-import { normalizeCellAlias } from "../../components/CellViews";
+import { cellViewFor } from "./cell_view";
 import { getColumnIconByAlias } from "../../utils/columnIcons";
 import { all } from "../../utils/utils";
 import { StringOrNumberID } from "../types";
@@ -84,6 +83,10 @@ export const TabColumn = types
     disabled: types.optional(types.boolean, false),
     // Whether this field can be selected when creating or changing a filter.
     available_for_new_filters: types.optional(types.boolean, true),
+    // Whether the field can only be a child of another filter, never a filter of its own
+    child_only: types.optional(types.boolean, false),
+    // Value a new filter on this column starts with, instead of the type's default
+    filter_default_value: types.frozen(),
     // Whether a persisted filter can currently be evaluated and edited.
     filter_available: types.optional(types.boolean, true),
     unavailable_reason: types.maybeNull(types.string),
@@ -160,7 +163,7 @@ export const TabColumn = types
         const childColumns = [].concat(...self.children.map((subColumn) => subColumn.asField));
 
         result.push(...childColumns);
-      } else if (!self.isAnnotationResultsFilterColumn) {
+      } else if (!self.isFilterOnlyColumn) {
         result.push({
           ...self,
           id: self.key,
@@ -194,11 +197,7 @@ export const TabColumn = types
     },
 
     get filterable() {
-      const byAlias = CellViews[normalizeCellAlias(self.alias)];
-      const byType = CellViews[self.type];
-      const cellView = byAlias?.customOperators ? byAlias : (byType ?? byAlias);
-
-      return cellView?.filterable !== false;
+      return cellViewFor(self)?.filterable !== false;
     },
 
     get isAnnotationResultsFilterColumn() {
@@ -210,6 +209,15 @@ export const TabColumn = types
         "predictions_dimension_results",
       ];
       return hidden_column_ids.some((id) => self.id.includes(`${id}.`) || self.id.endsWith(`:${id}`));
+    },
+
+    get isReviewsFilterColumn() {
+      return self.id === `${self.target}:reviews` || self.id.startsWith(`${self.target}:reviews.`);
+    },
+
+    // Filter-only columns: not shown in the column selector or the table, but available as filters.
+    get isFilterOnlyColumn() {
+      return self.isAnnotationResultsFilterColumn || self.isReviewsFilterColumn;
     },
   }))
   .actions((self) => ({

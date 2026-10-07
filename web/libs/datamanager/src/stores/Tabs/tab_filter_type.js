@@ -82,6 +82,8 @@ export const TabFilterType = types
   })
   .views((self) => ({
     get defaultValue() {
+      if (isDefined(self.field.filter_default_value)) return self.field.filter_default_value;
+
       switch (self.type) {
         case "Boolean":
           return false;

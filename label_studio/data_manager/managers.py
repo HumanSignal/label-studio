@@ -66,7 +66,9 @@ class _Operator(BaseModel):
 
 
 Operator = _Operator()
-USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
+USER_FILTER_FIELDS = frozenset(
+    {'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator', 'reviews.reviewed_by'}
+)
 USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
 # Fields whose root/child hooks implement "is empty". skipped_by_annotator does not (FIT-2435).
 USER_FILTER_EMPTY_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors'})
@@ -76,6 +78,9 @@ LEGACY_USER_FILTER_OPERATORS = {
     Operator.NOT_EQUAL: Operator.NOT_CONTAINS,
     Operator.NOT_IN_LIST: Operator.NOT_CONTAINS,
 }
+NEGATED_PARENT_OPERATORS = frozenset(
+    {Operator.NOT_EQUAL, Operator.NOT_IN, Operator.NOT_IN_LIST, Operator.NOT_CONTAINS}
+)
 
 
 def allowed_user_filter_operators(field_name):
@@ -330,12 +335,18 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
     # apply_filters() casts values in-place (e.g. Datetime strings -> datetime), and reusing those
     # mutated objects in the main filtering pass can trigger type errors.
     #
-    # Child filters are dropped for prefiltering.
+    # Child filters are dropped for prefiltering. A negated line with children is skipped instead:
+    # without its children it no longer matches a superset of tasks, while dropping an AND item does.
     narrowed_items = []
     for _filter in non_agreement_filters:
+        if _filter.child_filters and _filter.operator in NEGATED_PARENT_OPERATORS:
+            continue
         copied_filter = _filter.copy(deep=True)
         copied_filter.child_filters = []
         narrowed_items.append(copied_filter)
+
+    if not narrowed_items:
+        return
 
     if prefilter_annotation_fields:
         queryset = PreparedTaskManager.annotate_queryset(
