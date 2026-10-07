@@ -23,7 +23,11 @@ export const RefreshButton = injector(
         aria-label="Refresh data"
         onClick={async () => {
           await store.fetchProject({ force: true, interaction: "refresh" });
-          await store.currentView?.reload();
+          // Refresh the role column catalog before tasks so denied filters are
+          // stripped from annotator virtual tabs (and chips stay hidden for
+          // shared views) — same graceful path as initial tab apply (FIT-2850).
+          await store.refreshColumns?.();
+          await store.currentView?.reload({ interaction: "refresh" });
         }}
         leading={<ArrowsClockwiseIcon size={20} />}
       />

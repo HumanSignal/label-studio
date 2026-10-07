@@ -517,6 +517,21 @@ export const AppStore = types
       self.project = Object.assign({}, self.project ?? {}, fields);
     },
 
+    /**
+     * Re-fetch /api/dm/columns and rebuild the filter catalog.
+     * Used by the Refresh button so mid-session denials are reflected before
+     * the tasks request (FIT-2850). Does not reload tasks itself.
+     */
+    refreshColumns: flow(function* () {
+      const response = yield self.apiCall("columns");
+      if (!response || response.error) return false;
+
+      const columns = response.columns ?? (Array.isArray(response) ? response : []);
+      self.viewsStore.columnsRaw = columns;
+      self.viewsStore.fetchColumns({ deferSelectedReload: true });
+      return true;
+    }),
+
     fetchProject: flow(function* (options = {}) {
       self.projectFetch = options.force === true;
 

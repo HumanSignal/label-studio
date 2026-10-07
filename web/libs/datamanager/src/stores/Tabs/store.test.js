@@ -147,7 +147,7 @@ describe("TabStore createSnapshot / saveView (BROS-1491)", () => {
       },
     });
 
-    const snapshot = root.viewsStore.createSnapshot({});
+    const { snapshot } = root.viewsStore.createSnapshot({});
 
     expect(snapshot.id).not.toBe(237846);
     expect(snapshot.id).not.toBe(-1);
@@ -173,6 +173,333 @@ describe("TabStore createSnapshot / saveView (BROS-1491)", () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids.filter((id) => id === 237846)).toHaveLength(1);
     expect(root.viewsStore.selected?.id).toBe(237846);
+  });
+
+  it("shows a toast when saving a tab is rejected", async () => {
+    const toasts = [];
+    root = RootStore.create({
+      viewsStore: {
+        views: [{ id: 11, title: "Tab", saved: true, key: "tab-key" }],
+      },
+      SDK: {
+        hasInterface: () => false,
+        invoke: (name, payload) => {
+          if (name === "toast") toasts.push(payload);
+        },
+      },
+    });
+    root.apiCall = mock(async () => ({
+      error: true,
+      response: {
+        detail:
+          "This tab could not be saved because it filters or sorts by a column that is not available for your role.",
+      },
+    }));
+
+    await root.viewsStore.saveView(root.viewsStore.views[0], { reload: false });
+
+    expect(toasts).toEqual([
+      {
+        message:
+          "This tab could not be saved because it filters or sorts by a column that is not available for your role.",
+        type: "error",
+      },
+    ]);
+  });
+
+  it("toasts once when the selected tab sorts by a column that is not in the catalog", () => {
+    const toasts = [];
+    root = RootStore.create({
+      project: { id: 42 },
+      viewsStore: {
+        selected: 77,
+        columnsRaw: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+        views: [{ id: 77, title: "Tab", saved: true, key: "sort-tab", ordering: ["tasks:agreement"] }],
+      },
+      SDK: {
+        projectId: 42,
+        hasInterface: () => false,
+        invoke: (name, payload) => {
+          if (name === "toast") toasts.push(payload);
+        },
+      },
+    });
+
+    root.viewsStore.fetchColumns();
+    root.viewsStore.fetchColumns();
+
+    expect(toasts).toEqual([
+      {
+        message: "This tab is sorted by a column you can't see, so that sort isn't applied.",
+        type: "info",
+      },
+    ]);
+    expect(root.viewsStore.orderingNoticesShown.has("42_77")).toBe(true);
+    expect(root.viewsStore.selected.ordering).toEqual(["tasks:agreement"]);
+    expect(root.viewsStore.selected.currentOrder).toBeNull();
+  });
+
+  it("clears denied filters from a virtual tab and toasts once", async () => {
+    const toasts = [];
+    History.navigate = mock(() => {});
+    root = RootStore.create({
+      project: { id: 42 },
+      viewsStore: {
+        columnsRaw: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+      },
+      SDK: {
+        projectId: 42,
+        hasInterface: () => false,
+        invoke: (name, payload) => {
+          if (name === "toast") toasts.push(payload);
+        },
+      },
+    });
+    root.viewsStore.fetchColumns();
+
+    await root.viewsStore.addView(
+      {
+        virtual: true,
+        projectId: 42,
+        title: "Virtual",
+        filters: {
+          conjunction: "and",
+          items: [
+            { filter: "filter:tasks:id", operator: "equal", value: 1 },
+            { filter: "filter:tasks:agreement", operator: "equal", value: 0.5 },
+          ],
+        },
+      },
+      { autosave: false, autoselect: false },
+    );
+
+    const view = root.viewsStore.views[0];
+    expect(view.virtual).toBe(true);
+    expect(view.filters.map((f) => f.filter.id)).toEqual(["filter:tasks:id"]);
+    expect(toasts).toEqual([
+      {
+        message: "One or more of your filters was removed as it can no longer be applied",
+        type: "info",
+      },
+    ]);
+
+    // Rebuilding the catalog must not re-toast for the same virtual tab.
+    root.viewsStore.fetchColumns();
+    expect(toasts).toHaveLength(1);
+    expect(root.viewsStore.filterNoticesShown.has(`42_${view.id}`)).toBe(true);
+  });
+
+  it("persists a cleared virtual-tab filter so refresh does not toast again", async () => {
+    const storageData = {
+      "virtual-tab-42": JSON.stringify({
+        title: "Virtual",
+        filters: {
+          conjunction: "and",
+          items: [
+            { filter: "filter:tasks:id", operator: "equal", value: 1 },
+            { filter: "filter:tasks:agreement", operator: "equal", value: 0.5 },
+          ],
+        },
+      }),
+    };
+    const storage = {
+      getItem: (key) => (key in storageData ? storageData[key] : null),
+      setItem: (key, value) => {
+        storageData[key] = String(value);
+      },
+      removeItem: (key) => {
+        delete storageData[key];
+      },
+    };
+    const originalLocalStorage = globalThis.localStorage;
+    Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
+
+    const navigated = [];
+    History.navigate = mock((params) => navigated.push(params));
+
+    const createStore = (toasts) => {
+      const store = RootStore.create({
+        project: { id: 42 },
+        viewsStore: {
+          columnsRaw: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+        },
+        SDK: {
+          projectId: 42,
+          hasInterface: () => false,
+          invoke: (name, payload) => {
+            if (name === "toast") toasts.push(payload);
+          },
+        },
+      });
+      store.viewsStore.fetchColumns();
+      return store;
+    };
+
+    const toasts = [];
+    try {
+      root = createStore(toasts);
+      await root.viewsStore.addView({ virtual: true, projectId: 42 }, { autosave: false, autoselect: false });
+
+      const view = root.viewsStore.views[0];
+      expect(view.filters.map((f) => f.filter.id)).toEqual(["filter:tasks:id"]);
+      expect(toasts).toEqual([
+        {
+          message: "One or more of your filters was removed as it can no longer be applied",
+          type: "info",
+        },
+      ]);
+      const storedFilters = JSON.parse(storageData["virtual-tab-42"]).filters.items.map((item) => item.filter);
+      expect(storedFilters).toEqual(["filter:tasks:id"]);
+      expect(navigated.length).toBeGreaterThan(0);
+
+      const refreshedTab = navigated.at(-1).tab;
+      const urlFilters = root.viewsStore.snapshotFromUrl(refreshedTab).filters.items.map((item) => item.filter);
+      expect(urlFilters).toEqual(["filter:tasks:id"]);
+
+      destroy(root);
+      root = null;
+
+      const secondToasts = [];
+      root = createStore(secondToasts);
+      await root.viewsStore.addView(
+        { virtual: true, projectId: 42, tab: refreshedTab },
+        { autosave: false, autoselect: false },
+      );
+
+      expect(secondToasts).toEqual([]);
+      expect(root.viewsStore.views[0].filters.map((f) => f.filter.id)).toEqual(["filter:tasks:id"]);
+    } finally {
+      Object.defineProperty(globalThis, "localStorage", { configurable: true, value: originalLocalStorage });
+    }
+  });
+
+  it("strips denied virtual filters before reload sends the tasks query", async () => {
+    History.navigate = mock(() => {});
+    const toasts = [];
+    const reloadQueries = [];
+    // Unique project id avoids virtual-tab localStorage leftovers from sibling tests.
+    const projectId = 285001;
+    localStorage.removeItem(`virtual-tab-${projectId}`);
+
+    root = RootStore.create({
+      project: { id: projectId },
+      viewsStore: {
+        columnsRaw: [
+          { id: "id", title: "ID", type: "Number", target: "tasks", visibility_defaults: { filter: true } },
+          {
+            id: "total_annotations",
+            title: "Annotations",
+            type: "Number",
+            target: "tasks",
+            visibility_defaults: { filter: true },
+          },
+        ],
+      },
+      SDK: {
+        projectId,
+        hasInterface: () => false,
+        invoke: (name, payload) => {
+          if (name === "toast") toasts.push(payload);
+        },
+      },
+    });
+    root.viewsStore.fetchColumns();
+    expect(root.viewsStore.availableFilters.map((f) => f.id)).toEqual([
+      "filter:tasks:id",
+      "filter:tasks:total_annotations",
+    ]);
+
+    await root.viewsStore.addView(
+      {
+        virtual: true,
+        projectId,
+        title: "Virtual",
+        filters: {
+          conjunction: "and",
+          items: [
+            { filter: "filter:tasks:id", operator: "equal", value: 1 },
+            { filter: "filter:tasks:total_annotations", operator: "equal", value: 2 },
+          ],
+        },
+      },
+      { autosave: false, autoselect: false },
+    );
+
+    const view = root.viewsStore.views[0];
+    expect(view.filters.map((f) => f.filter.id)).toEqual(["filter:tasks:id", "filter:tasks:total_annotations"]);
+
+    // Shrink the role catalog without going through fetchColumns' clear loop so the
+    // denied filter remains on the view until reload (the RefreshButton gap).
+    unprotect(root);
+    const deniedType = root.viewsStore.availableFilters.find((f) => f.id === "filter:tasks:total_annotations");
+    root.viewsStore.availableFilters.remove(deniedType);
+
+    root.dataStore.reload = ({ query } = {}) => {
+      reloadQueries.push(query);
+      return Promise.resolve();
+    };
+
+    await view.reload({ interaction: "refresh" });
+
+    expect(view.filters.map((f) => f.filter.id)).toEqual(["filter:tasks:id"]);
+    expect(reloadQueries).toHaveLength(1);
+    const sent = JSON.parse(reloadQueries[0]);
+    expect(sent.filters.items.map((item) => item.filter)).toEqual(["filter:tasks:id"]);
+    expect(toasts).toEqual([
+      {
+        message: "One or more of your filters was removed as it can no longer be applied",
+        type: "info",
+      },
+    ]);
+  });
+
+  it("hides denied filters from saved-tab client state without a removal toast", () => {
+    const toasts = [];
+    root = RootStore.create({
+      project: { id: 42 },
+      viewsStore: {
+        selected: 77,
+        columnsRaw: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+        views: [
+          {
+            id: 77,
+            title: "Shared",
+            saved: true,
+            key: "shared-tab",
+            filters: [{ filter: "filter:tasks:id", operator: "equal", value: 1 }],
+          },
+        ],
+      },
+      SDK: {
+        projectId: 42,
+        hasInterface: () => false,
+        invoke: (name, payload) => {
+          if (name === "toast") toasts.push(payload);
+        },
+      },
+    });
+
+    root.viewsStore.fetchColumns();
+
+    const cleaned = dataCleanup(
+      {
+        id: 77,
+        data: {
+          filters: {
+            conjunction: "and",
+            items: [
+              { filter: "filter:tasks:id", operator: "equal", value: 1 },
+              { filter: "filter:tasks:agreement", operator: "equal", value: 0.5 },
+            ],
+          },
+        },
+      },
+      root.viewsStore.columns,
+    );
+
+    expect(cleaned.data.filters.items).toEqual([{ filter: "filter:tasks:id", operator: "equal", value: 1 }]);
+    expect(toasts.filter((t) => t.message?.includes("filters was removed"))).toEqual([]);
+    expect(root.viewsStore.selected.filters).toHaveLength(1);
   });
 
   it("addView after persisted and virtual tabs keeps all ids unique", async () => {
@@ -1163,7 +1490,7 @@ describe("TabStore project column defaults (FIT-2846)", () => {
     });
     root.viewsStore.fetchColumns();
 
-    const snapshot = root.viewsStore.createSnapshot({});
+    const { snapshot } = root.viewsStore.createSnapshot({});
 
     expect(snapshot.hiddenColumns.explore).toContain("tasks:agreement");
     expect(snapshot.columnOrder["tasks:data.text"]).toBe(1);
@@ -1176,7 +1503,7 @@ describe("TabStore project column defaults (FIT-2846)", () => {
     });
     root.viewsStore.fetchColumns();
 
-    const snapshot = root.viewsStore.createSnapshot({
+    const { snapshot } = root.viewsStore.createSnapshot({
       hiddenColumns: { explore: ["tasks:id"], labeling: [] },
       columnOrder: { "tasks:id": 0 },
     });

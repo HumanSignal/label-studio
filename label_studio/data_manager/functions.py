@@ -6,7 +6,7 @@ from typing import Any, Iterable, Tuple
 from urllib.parse import unquote
 
 import ujson as json
-from core.utils.common import int_from_request
+from core.utils.common import int_from_request, load_func
 from data_manager.models import View
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
@@ -19,6 +19,30 @@ logger = logging.getLogger(__name__)
 
 class DataManagerException(Exception):
     pass
+
+
+def noop_validate_column_access(project, user, column_refs=None, payload=None, message=None):
+    """OSS no-op for DATA_MANAGER_VALIDATE_COLUMN_ACCESS."""
+    return None
+
+
+def run_column_access_validation(project, user, *, payload=None, column_refs=None, message=None):
+    path = getattr(settings, 'DATA_MANAGER_VALIDATE_COLUMN_ACCESS', None)
+    if not path:
+        return
+    load_func(path)(project, user, column_refs=column_refs, payload=payload, message=message)
+
+
+def noop_sanitize_column_ordering(project, user, ordering):
+    """OSS no-op for DATA_MANAGER_SANITIZE_COLUMN_ORDERING."""
+    return ordering
+
+
+def run_column_ordering_sanitize(project, user, ordering):
+    path = getattr(settings, 'DATA_MANAGER_SANITIZE_COLUMN_ORDERING', None)
+    if not path:
+        return ordering
+    return load_func(path)(project, user, ordering)
 
 
 def get_all_columns(project, *_):
@@ -323,6 +347,10 @@ def get_prepare_params(request, project):
         prepare_params = PrepareParams(
             project=project.id, selectedItems=selected, data=data, filters=filters, ordering=ordering, request=request
         )
+    # Denied-column filters still apply on reads (shared tabs / reviewers). View save
+    # continues to reject them via ViewSerializer. Ordering is stripped for the request only.
+    user = getattr(request, 'user', None)
+    prepare_params.ordering = run_column_ordering_sanitize(project, user, prepare_params.ordering) or []
     return prepare_params
 
 

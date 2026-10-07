@@ -240,6 +240,12 @@ export const FF_LSE_PROJECT_INTERNAL_DESCRIPTION = "fflag_feat_lse_project_inter
 export const FF_PROJECT_DM_COLUMN_DEFAULTS = "fflag_feat_all_fit_2808_project_dm_column_defaults";
 
 /**
+ * Project Settings: Annotator/Reviewer Data Manager column hard access
+ * (Available / Unavailable). FIT-2808 / FIT-2850.
+ */
+export const FF_PROJECT_DM_COLUMN_ACCESS = "fflag_feat_all_fit_2808_dm_column_access";
+
+/**
  * Vertical annotations sidebar with filtering and resizable column in labeling UI.
  */
 export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";

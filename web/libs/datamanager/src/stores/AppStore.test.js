@@ -311,6 +311,36 @@ describe("AppStore invokeAction reload handling (UTC-1043)", () => {
   });
 });
 
+describe("AppStore refreshColumns (FIT-2850)", () => {
+  let store;
+
+  afterEach(() => {
+    if (store) destroy(store);
+    store = null;
+  });
+
+  it("rebuilds the filter catalog from /columns without reloading tasks", async () => {
+    store = AppStore.create({ toolbar: "" });
+    const fetchColumns = mock(() => {});
+    store.viewsStore.fetchColumns = fetchColumns;
+    store.apiCall = mock(async (method) => {
+      if (method === "columns") {
+        return {
+          columns: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+        };
+      }
+      return {};
+    });
+
+    const ok = await store.refreshColumns();
+
+    expect(ok).toBe(true);
+    expect(store.apiCall).toHaveBeenCalledWith("columns");
+    expect(store.viewsStore.columnsRaw).toEqual([{ id: "id", title: "ID", type: "Number", target: "tasks" }]);
+    expect(fetchColumns).toHaveBeenCalledWith({ deferSelectedReload: true });
+  });
+});
+
 describe("AppStore project timer poll (FIT-2914)", () => {
   let store;
 
