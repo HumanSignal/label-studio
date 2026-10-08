@@ -378,3 +378,67 @@ describe("tasks DataStore", () => {
     logSpy.mockRestore();
   });
 });
+
+describe("preserveUnevaluatedSummaries (#9897)", () => {
+  const { preserveUnevaluatedSummaries } = require("../tasks");
+
+  const cached = {
+    id: 1,
+    annotations_results: "choice=positive",
+    total_annotations: 1,
+    predictions_results: "choice=negative",
+    total_predictions: 1,
+  };
+
+  it("preserves cached summaries when a refetch returns unevaluated empties with positive counters", () => {
+    const out = preserveUnevaluatedSummaries(cached, {
+      id: 1,
+      annotations_results: "",
+      total_annotations: 1,
+      predictions_results: "",
+      total_predictions: 1,
+    });
+
+    expect(out.annotations_results).toBe("choice=positive");
+    expect(out.predictions_results).toBe("choice=negative");
+  });
+
+  it("blanks genuinely empty summaries when counters are zero", () => {
+    const out = preserveUnevaluatedSummaries(cached, {
+      id: 1,
+      annotations_results: "",
+      total_annotations: 0,
+      predictions_results: "",
+      total_predictions: 0,
+    });
+
+    expect(out.annotations_results).toBe("");
+    expect(out.predictions_results).toBe("");
+  });
+
+  it("takes fresh non-empty values over cached ones", () => {
+    const out = preserveUnevaluatedSummaries(cached, {
+      id: 1,
+      annotations_results: "choice=neutral",
+      total_annotations: 1,
+      predictions_results: "choice=neutral",
+      total_predictions: 1,
+    });
+
+    expect(out.annotations_results).toBe("choice=neutral");
+    expect(out.predictions_results).toBe("choice=neutral");
+  });
+
+  it("passes lean payloads through when nothing was cached", () => {
+    const incoming = { id: 2, annotations_results: "", total_annotations: 1 };
+
+    expect(preserveUnevaluatedSummaries(null, incoming)).toBe(incoming);
+    expect(preserveUnevaluatedSummaries({ id: 2 }, incoming).annotations_results).toBe("");
+  });
+
+  it("treats missing summary keys as unevaluated", () => {
+    const out = preserveUnevaluatedSummaries(cached, { id: 1, total_annotations: 1 });
+
+    expect(out.annotations_results).toBe("choice=positive");
+  });
+});
