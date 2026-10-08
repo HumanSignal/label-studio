@@ -165,8 +165,8 @@ describe("Sync: Audio Paragraphs", () => {
       cy.get('[data-testid="select-trigger-"]').click();
       cy.get('[data-testid="select-option-Mia Wallace"] [data-testid="select-option-label"]').click();
       cy.get('[data-testid="select-display-value"]').should("contain.text", "Mia Wallace");
-      cy.get("body").click(0, 0);
-      // Dropdown closed; trigger may be clipped by scroll container so assert existence
+      cy.get('[data-testid="select-popup"]').trigger("keydown", { key: "Escape" });
+      cy.get('[data-testid="select-popup"]').should("not.exist");
       // First paragraph should be Mia Wallace
       cy.get('[data-testid="phrase:0"]').should("contain.text", "Dont you hate that?");
     });
@@ -545,6 +545,8 @@ describe("Sync: Audio Paragraphs", () => {
       cy.get('[data-testid="select-trigger-"]').click();
       cy.get('[data-testid="select-option-Mia Wallace"] [data-testid="select-option-label"]').click();
       cy.get('[data-testid="phrase:0"]').should("exist");
+      cy.get('[data-testid="select-popup"]').trigger("keydown", { key: "Escape" });
+      cy.get('[data-testid="select-popup"]').should("not.exist");
       cy.get('[data-testid="select-trigger-Mia Wallace"]').click();
       cy.get('[data-testid="select-option-undefined"] [data-testid="select-option-label"]').click();
       cy.get('[data-testid="phrase:0"]').should("exist").and("contain.text", "Dont you hate that?");

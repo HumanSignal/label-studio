@@ -26,9 +26,11 @@ const injector = inject(({ store }) => {
  * Save as Default (right) captures the current tab layout into the project explore soft default (Managers+).
  * Hidden when the feature flag is off, or when the user is Annotator/Reviewer (FIT-2991).
  * Save / Manage Defaults only when the host registered handlers.
+ * `onBeforeAction` lets the host close the Columns dropdown first: it locks the page while open,
+ * so a confirmation opened on top of it could not be clicked.
  */
 export const ResetColumnsButton = injector(
-  observer(({ view, locked, enabled, enableSaveAsDefault = false }) => {
+  observer(({ view, locked, enabled, enableSaveAsDefault = false, onBeforeAction }) => {
     const sdk = useSDK();
     if (!enabled || !currentUserIsManagingDmRole()) return null;
 
@@ -37,6 +39,7 @@ export const ResetColumnsButton = injector(
 
     const confirmResetTab = () => {
       if (locked || !view) return;
+      onBeforeAction?.();
       Modal.confirm({
         title: "Reset this tab’s columns?",
         body: "This will reset the order and visibility of all columns on this tab to the project defaults.",
@@ -51,6 +54,7 @@ export const ResetColumnsButton = injector(
 
     const confirmSaveAsDefault = () => {
       if (locked || !view || !canSaveAsDefault) return;
+      onBeforeAction?.();
       Modal.confirm({
         title: "Save as Default?",
         body: "This will save the current tab’s column order and visibility as the default for this project. The saved layout applies to Managers+ only. Existing tabs keep their customizations. This does not change who can access columns.",
@@ -91,7 +95,10 @@ export const ResetColumnsButton = injector(
             aria-label="Manage Defaults"
             data-testid="dm-manage-defaults"
             title="Open Data Manager settings to edit project column defaults"
-            onClick={() => sdk.invoke(MANAGE_DEFAULTS_EVENT)}
+            onClick={() => {
+              onBeforeAction?.();
+              sdk.invoke(MANAGE_DEFAULTS_EVENT);
+            }}
           >
             Manage Defaults
           </Button>

@@ -6,6 +6,7 @@ import * as coreFf from "@humansignal/core/lib/utils/feature-flags";
 import { TabStore } from "../../stores/Tabs/store";
 import { FieldsButton } from "./FieldsButton";
 import * as SDKProvider from "../../providers/SDKProvider";
+import * as ModalModule from "./Modal/Modal";
 
 // cmdk scrolls the active item into view on mount; jsdom has no layout.
 Element.prototype.scrollIntoView = mock();
@@ -209,6 +210,31 @@ describe("FieldsButton (Columns picker)", () => {
       expect(screen.getByTestId("dm-manage-defaults")).toBeInTheDocument();
       expect(screen.getByTestId("dm-save-as-default")).toBeInTheDocument();
       expect(document.querySelector(".p-tight.border-t.border-neutral-border.flex")).not.toBeNull();
+    });
+
+    it.each([
+      ["dm-reset-columns"],
+      ["dm-save-as-default"],
+    ])("closes the picker before %s opens its confirmation so the dialog is clickable", async (testId) => {
+      previousAppSettings = window.APP_SETTINGS;
+      window.APP_SETTINGS = { ...(previousAppSettings ?? {}), user: { role: "OW" } };
+      isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+      useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({
+        hasHandler: () => true,
+        invoke: mock(),
+      });
+      const confirmSpy = spyOn(ModalModule.Modal, "confirm").mockImplementation(() => ({ close: mock() }));
+
+      try {
+        renderColumnsPicker({ showProjectDefaultsFooter: true });
+        await openPicker();
+        fireEvent.click(screen.getByTestId(testId));
+
+        expect(confirmSpy).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+      } finally {
+        confirmSpy.mockRestore();
+      }
     });
 
     it("hides the defaults footer for Annotators even on the main-grid picker (FIT-2991)", async () => {

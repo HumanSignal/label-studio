@@ -1,7 +1,7 @@
 import { EnterpriseBadge, Tooltip } from "@humansignal/ui";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { inject, observer } from "mobx-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
 import { currentUserIsManagingDmRole } from "../../stores/Tabs/project_column_defaults";
@@ -46,6 +46,7 @@ export const FieldsButton = injector(
       const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
       const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
       const readOnly = view?.isLockedByManager;
+      const [isPickerOpen, setIsPickerOpen] = useState(false);
       // Do not pass a React element as `footer` for AN/RE — Select treats elements as truthy and
       // still draws the bordered padded shell even when ResetColumnsButton returns null.
       const showDefaultsFooter =
@@ -92,7 +93,14 @@ export const FieldsButton = injector(
               minWidth: 110,
             },
           }}
-          footer={showDefaultsFooter ? <ResetColumnsButton enableSaveAsDefault /> : undefined}
+          open={isPickerOpen}
+          onOpen={() => setIsPickerOpen(true)}
+          onClose={() => setIsPickerOpen(false)}
+          footer={
+            showDefaultsFooter ? (
+              <ResetColumnsButton enableSaveAsDefault onBeforeAction={() => setIsPickerOpen(false)} />
+            ) : undefined
+          }
         />
       );
 

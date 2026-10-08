@@ -39,6 +39,11 @@ class ChoicesHelper {
     this.select.click("right");
   }
 
+  closeSelect() {
+    cy.get("[data-testid=select-popup]").trigger("keydown", { key: "Escape" });
+    cy.get("[data-testid=select-popup]").should("not.exist");
+  }
+
   findOption(text: string) {
     const option = cy.get(`[data-testid*='select-option'][data-value="${text}"] [data-testid=choiceOptionText]`);
     return option;

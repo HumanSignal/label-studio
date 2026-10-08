@@ -149,6 +149,17 @@ describe("Select Component", () => {
         expect(screen.getByText("Carrot")).toBeInTheDocument();
       });
     });
+
+    it("locks outside scrolling while open so the portaled panel cannot drift from its trigger", async () => {
+      render(<Select options={["Apple", "Banana"]} placeholder="Select" />);
+      expect(document.body).not.toHaveAttribute("data-scroll-locked");
+
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(document.body).toHaveAttribute("data-scroll-locked"));
+
+      fireEvent.keyDown(screen.getByTestId("select-popup"), { key: "Escape" });
+      await waitFor(() => expect(document.body).not.toHaveAttribute("data-scroll-locked"));
+    });
   });
 
   describe("Virtual List Height Calculation", () => {
