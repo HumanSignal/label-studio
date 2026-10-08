@@ -4,7 +4,7 @@ from organizations.tests.factories import OrganizationFactory
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
-from tasks.models import Task
+from tasks.models import Annotation, AnnotationDraft, Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 from users.tests.factories import UserFactory
 
@@ -913,3 +913,59 @@ class TestAnnotationDraftCreateWithMissingAnnotation(APITestCase):
         # instead of leaving a dangling reference behind.
         assert not AnnotationDraft.objects.filter(annotation_id=missing_annotation_id).exists()
         assert response.status_code in (400, 404), response.status_code
+
+
+class TestAnnotationConvertToDraftAPI(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.project = ProjectFactory(organization=cls.organization)
+        cls.owner = cls.organization.created_by
+        cls.annotator = UserFactory(active_organization=cls.organization)
+        cls.organization.add_user(cls.annotator)
+        cls.other_annotator = UserFactory(active_organization=cls.organization)
+        cls.organization.add_user(cls.other_annotator)
+        cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
+
+    def _convert(self, user, annotation):
+        self.client.force_authenticate(user=user)
+        return self.client.post(f'/api/annotations/{annotation.id}/convert-to-draft')
+
+    def test_own_skipped_annotation_converts_to_draft(self):
+        annotation = AnnotationFactory(
+            task=self.task, project=self.project, completed_by=self.annotator, was_cancelled=True, result=[]
+        )
+
+        response = self._convert(self.annotator, annotation)
+
+        assert response.status_code == 201, response.content
+        assert not Annotation.objects.filter(id=annotation.id).exists()
+        draft = AnnotationDraft.objects.get(id=response.json()['id'])
+        assert draft.user_id == self.annotator.id
+
+    def test_another_users_skip_converts_to_a_draft_for_the_caller(self):
+        # Open source has no roles, so any member may take over another user's skip.
+        for caller in (self.other_annotator, self.owner):
+            with self.subTest(caller=caller.id):
+                annotation = AnnotationFactory(
+                    task=self.task, project=self.project, completed_by=self.annotator, was_cancelled=True, result=[]
+                )
+
+                response = self._convert(caller, annotation)
+
+                assert response.status_code == 201, response.content
+                assert not Annotation.objects.filter(id=annotation.id).exists()
+                assert AnnotationDraft.objects.get(id=response.json()['id']).user_id == caller.id
+
+    def test_another_users_submitted_annotation_is_not_converted(self):
+        for caller in (self.other_annotator, self.owner):
+            with self.subTest(caller=caller.id):
+                annotation = AnnotationFactory(
+                    task=self.task, project=self.project, completed_by=self.annotator, result=[{'id': 'r1'}]
+                )
+
+                response = self._convert(caller, annotation)
+
+                assert response.status_code == 403, response.content
+                assert Annotation.objects.filter(id=annotation.id).exists()
+                assert not AnnotationDraft.objects.filter(task=self.task, user=caller).exists()

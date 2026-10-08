@@ -1434,8 +1434,15 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
     def process_intermediate_state(self, annotation, draft):
         pass
 
+    def can_convert(self, annotation, user):
+        """The draft is created for the caller and the annotation is deleted, so besides their own
+        annotation a user may only take over another user's skip."""
+        return annotation.completed_by_id == user.id or annotation.was_cancelled
+
     def post(self, request, *args, **kwargs):
         annotation = self.get_object()
+        if not self.can_convert(annotation, request.user):
+            raise PermissionDenied("You cannot convert another user's annotation to a draft")
         organization = annotation.project.organization
         project = annotation.project
 
