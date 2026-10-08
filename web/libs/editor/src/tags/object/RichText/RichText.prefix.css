@@ -87,7 +87,9 @@
   :global(.htx-highlight) {
     /* resize handles around selected region, */
     /* they look like popsicles, normal one at the beginning, upside down one at the end */
-    area {
+    lsf-resize-handle {
+      /* must stay inline: with no top/left, the inline static position keeps the handle at the span's edge */
+      display: inline;
       position: absolute;
       width: 1px;
       height: 1.25em;

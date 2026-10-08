@@ -8,6 +8,7 @@ const HIGHLIGHT_CN = "htx-highlight";
 const HIGHLIGHT_NO_LABEL_CN = "htx-no-label";
 const LABEL_COLOR_ALPHA = 0.3;
 const LABEL_COLOR_ALPHA_ACTIVE = 0.8;
+export const RESIZE_HANDLE_TAG = "lsf-resize-handle";
 
 export const HighlightMixin = types
   .model()
@@ -173,8 +174,8 @@ export const HighlightMixin = types
     },
 
     /**
-     * Attach resize handles to the first and last spans. `area` is used to be less possible to be
-     * in user's document. They are not fully valid inside spans, but they work.
+     * Attach resize handles to the first and last spans. A dedicated custom element is used so it can't
+     * clash with the user's document; `area` used to serve this purpose, but browsers render it `display: none`.
      */
     attachHandles() {
       const classes = [STATE_CLASS_MODS.leftHandle, STATE_CLASS_MODS.rightHandle];
@@ -182,16 +183,15 @@ export const HighlightMixin = types
       const spanEnd = self._spans.at(-1);
 
       classes.forEach((resizeClass, index) => {
-        // html element that can't be encountered in a usual html
-        const handleArea = document.createElement("area");
+        const handle = document.createElement(RESIZE_HANDLE_TAG);
 
-        handleArea.classList.add(resizeClass);
-        index === 0 ? spanStart.prepend(handleArea) : spanEnd.append(handleArea);
+        handle.classList.add(resizeClass);
+        index === 0 ? spanStart.prepend(handle) : spanEnd.append(handle);
       });
     },
 
     detachHandles() {
-      self._spans?.forEach((span) => span.querySelectorAll("area").forEach((area) => area.remove()));
+      self._spans?.forEach((span) => span.querySelectorAll(RESIZE_HANDLE_TAG).forEach((handle) => handle.remove()));
     },
 
     /**

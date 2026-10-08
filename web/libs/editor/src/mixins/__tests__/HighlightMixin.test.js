@@ -39,7 +39,7 @@ mockModule("../../utils", () => ({
   },
 }));
 
-import { HighlightMixin, STATE_CLASS_MODS } from "../HighlightMixin";
+import { HighlightMixin, RESIZE_HANDLE_TAG, STATE_CLASS_MODS } from "../HighlightMixin";
 
 const Base = types
   .model("HighlightTestBase", {
@@ -433,17 +433,32 @@ describe("HighlightMixin", () => {
       expect(first.prepend).toHaveBeenCalled();
       expect(last.append).toHaveBeenCalled();
     });
+
+    it("uses resize handle elements, not `area` which browsers render as display: none", () => {
+      const { model } = getTestTree();
+      const first = mockSpan();
+      const last = mockSpan();
+      model.setSpans([first, last]);
+      model.attachHandles();
+      const left = first.prepend.mock.calls[0][0];
+      const right = last.append.mock.calls[0][0];
+      expect(left.tagName.toLowerCase()).toBe(RESIZE_HANDLE_TAG);
+      expect(right.tagName.toLowerCase()).toBe(RESIZE_HANDLE_TAG);
+      expect(left.classList.contains(STATE_CLASS_MODS.leftHandle)).toBe(true);
+      expect(right.classList.contains(STATE_CLASS_MODS.rightHandle)).toBe(true);
+    });
   });
 
   describe("detachHandles", () => {
-    it("removes area elements from spans", () => {
+    it("removes resize handle elements from spans", () => {
       const { model } = getTestTree();
       const span = mockSpan();
-      const areas = [{ remove: mock() }];
-      span.querySelectorAll = () => areas;
+      const handles = [{ remove: mock() }];
+      span.querySelectorAll = mock(() => handles);
       model.setSpans([span]);
       model.detachHandles();
-      expect(areas[0].remove).toHaveBeenCalled();
+      expect(span.querySelectorAll).toHaveBeenCalledWith(RESIZE_HANDLE_TAG);
+      expect(handles[0].remove).toHaveBeenCalled();
     });
   });
 
