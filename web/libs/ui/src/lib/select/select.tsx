@@ -752,9 +752,6 @@ export const Select = forwardRef(
 
     const combobox = (
       <Popover
-        // The panel is portaled and follows its trigger; locking outside scroll keeps it from drifting
-        // over neighbouring content (e.g. out of a horizontally scrolled table).
-        modal
         open={isOpen}
         onOpenChange={(_isOpen) => {
           setInternalIsOpen(_isOpen);

@@ -40,7 +40,7 @@ describe("Control Tags - Choice", () => {
 
       Choices.toggleSelect();
       Choices.findOption("Choice 2").click();
-      Choices.closeSelect();
+      Choices.toggleSelect();
       LabelStudio.serialize().then((result) => {
         expect(result).to.have.lengthOf(1);
         expect(result[0].value.choices).to.include("Choice 2");

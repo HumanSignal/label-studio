@@ -382,7 +382,7 @@ describe("review indicator child operators (FIT-2480)", () => {
     root = null;
   });
 
-  it("uses Boolean operators and yes/no values for review indicator children", async () => {
+  it("uses Boolean operators and yes/no values for review indicator children", () => {
     const setup = createReviewIndicatorChildFilter("reviews_accepted");
     root = setup.root;
     renderFilterLine(setup.view);
@@ -399,9 +399,8 @@ describe("review indicator child operators (FIT-2480)", () => {
       expect(screen.queryByRole("option", { name: "=" })).not.toBeInTheDocument();
       expect(screen.queryByRole("option", { name: ">" })).not.toBeInTheDocument();
 
-      // Close operator menu before opening the value control; the open Select hides the rest of the page.
-      fireEvent.keyDown(screen.getByTestId("select-popup"), { key: "Escape" });
-      await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+      // Close operator menu before opening the value control.
+      fireEvent.click(within(childOperator).getByRole("button"));
       fireEvent.click(within(childValue).getByRole("button"));
       expect(screen.getByRole("option", { name: "yes" })).toBeInTheDocument();
       expect(screen.getByRole("option", { name: "no" })).toBeInTheDocument();
