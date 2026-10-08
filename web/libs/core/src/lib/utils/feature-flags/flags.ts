@@ -337,3 +337,10 @@ export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_o
 
 /** Owner/Administrator "Close account" button in the Organization → Members drawer. UTC-1373. */
 export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
+
+/**
+ * Analytics → Member Performance "Submitted by Project" / "Reviewed by Project" columns, their export
+ * fields, and the backend user × project KPI segmentation they read. UTC-1389.
+ */
+export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
+  "fflag_feat_utc_1389_analytics_performance_project_breakdown";
