@@ -54,6 +54,25 @@ from webhooks.utils import (
 logger = logging.getLogger(__name__)
 
 
+def _invalid_pk(field, obj):
+    # same payload as for a missing object, so the response doesn't reveal what exists elsewhere
+    return ValidationError({field: [f'Invalid pk "{obj.pk}" - object does not exist.']})
+
+
+def check_annotation_parents(task, validated_data):
+    """Parent annotation and prediction of a new annotation must belong to the same task."""
+    for field in ('parent_annotation', 'parent_prediction'):
+        parent = validated_data.get(field)
+        if parent is not None and parent.task_id != task.id:
+            raise _invalid_pk(field, parent)
+
+
+def check_annotation_author(project, completed_by):
+    """Annotations can only be attributed to members of the project's organization."""
+    if completed_by is not None and not project.organization.has_user(completed_by):
+        raise _invalid_pk('completed_by', completed_by)
+
+
 # TODO: fix after switch to api/tasks from api/dm/tasks
 @method_decorator(
     name='post',
@@ -459,12 +478,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 'all_fields': True,
                 'excluded_fields_for_evaluation': excluded,
             }
-        project = self.request.query_params.get('project') or self.request.data.get('project')
-        if not project:
-            project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request), **kwargs
+                prepare_params=PrepareParams(project=task.project_id, selectedItems=selected, request=self.request),
+                **kwargs,
             ),
             self.request,
         )
@@ -992,6 +1009,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, annotation):
         delete_annotation_with_retry(annotation)
 
+    def perform_update(self, serializer):
+        annotation = serializer.instance
+        completed_by = serializer.validated_data.get('completed_by')
+        # clients resend the current author, who may have left the organization since
+        if completed_by is not None and completed_by.id != annotation.completed_by_id:
+            check_annotation_author(annotation.project, completed_by)
+        super().perform_update(serializer)
+
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
         annotation = self.get_object()
@@ -1138,6 +1163,9 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         task = self.parent_object
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
+
+        check_annotation_parents(task, ser.validated_data)
+        check_annotation_author(task.project, ser.validated_data.get('completed_by'))
 
         # Check if task is being skipped and if it's allowed
         was_cancelled_get = bool_from_request(self.request.GET, 'was_cancelled', False)
@@ -1413,6 +1441,21 @@ class PredictionAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Prediction.objects.filter(project__organization=self.request.user.active_organization)
+
+    def get_serializer(self, *args, **kwargs):
+        serializer = super().get_serializer(*args, **kwargs)
+        if self.action == 'create' and not getattr(self, 'swagger_fake_view', False):
+            # the body is the only source of the task here, so resolve it inside the caller's organization
+            organization = self.request.user.active_organization
+            serializer.fields['task'].queryset = Task.objects.filter(project__organization=organization)
+            serializer.fields['project'].queryset = Project.objects.filter(organization=organization)
+        return serializer
+
+    def perform_create(self, serializer):
+        task = serializer.validated_data['task']
+        if not task.has_permission(self.request.user):
+            raise PermissionDenied(f"You don't have permission for task {task.id}")
+        serializer.save(project=task.project)
 
 
 @method_decorator(name='get', decorator=extend_schema(exclude=True))

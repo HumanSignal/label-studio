@@ -90,7 +90,23 @@ class AnnotationResultField(serializers.JSONField):
     pass
 
 
-class PredictionSerializer(ModelSerializer):
+class ImmutableOnUpdateMixin:
+    # not a docstring: serializers without their own would inherit it as their OpenAPI description
+    # fields listed in `immutable_on_update` are ignored in the request body once the object exists
+    immutable_on_update = ()
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.instance is not None:
+            for name in self.immutable_on_update:
+                if name in fields:
+                    fields[name].read_only = True
+        return fields
+
+
+class PredictionSerializer(ImmutableOnUpdateMixin, ModelSerializer):
+    immutable_on_update = ('task', 'project')
+
     result = PredictionResultField()
     model_version = serializers.CharField(
         allow_blank=True,
@@ -158,13 +174,15 @@ class CompletedByDMSerializer(UserSerializer):
         fields = ['id', 'first_name', 'last_name', 'username', 'last_activity', 'avatar', 'email', 'initials']
 
 
-class AnnotationSerializer(FlexFieldsModelSerializer):
+class AnnotationSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
     """
     Annotation Serializer with FSM state support.
 
     Note: The 'state' field will be populated from the queryset annotation
     if present, preventing N+1 queries. Use .with_state() on your queryset.
     """
+
+    immutable_on_update = ('task', 'project', 'parent_annotation', 'parent_prediction')
 
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     """"""
@@ -347,7 +365,9 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class TaskSimpleSerializer(FlexFieldsModelSerializer):
+class TaskSimpleSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
+    immutable_on_update = ('project',)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
@@ -367,8 +387,10 @@ class TaskSimpleSerializer(FlexFieldsModelSerializer):
         exclude = ('precomputed_agreement', 'allow_skip')
 
 
-class BaseTaskSerializer(FlexFieldsModelSerializer):
+class BaseTaskSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
     """Task Serializer with project scheme configs validation"""
+
+    immutable_on_update = ('project',)
 
     def project(self, task=None):
         """Take the project from context"""
@@ -1071,13 +1093,15 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
         exclude = ()
 
 
-class AnnotationDraftSerializer(ModelSerializer):
+class AnnotationDraftSerializer(ImmutableOnUpdateMixin, ModelSerializer):
     """
     AnnotationDraft Serializer with FSM state support.
 
     Note: The 'state' field will be populated from the queryset annotation
     if present, preventing N+1 queries. Use .with_state() on your queryset.
     """
+
+    immutable_on_update = ('task', 'annotation')
 
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     user = serializers.CharField(default=serializers.CurrentUserDefault())
