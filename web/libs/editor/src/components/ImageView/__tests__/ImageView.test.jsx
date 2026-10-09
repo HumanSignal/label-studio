@@ -133,12 +133,16 @@ mockModule("../../../utils/resize-observer", () => ({
   }),
 }));
 
+const imageHotkeys = {
+  addDescription: mock(),
+  removeDescription: mock(),
+  addNamed: mock(),
+  removeNamed: mock(),
+};
+
 mockModule("../../../core/Hotkey", () => {
   const Hotkey = Object.assign(
-    mock(() => ({
-      addDescription: mock(),
-      removeDescription: mock(),
-    })),
+    mock(() => imageHotkeys),
     {
       setScope: mock(),
       DEFAULT_SCOPE: "all",
@@ -160,6 +164,8 @@ mockModule("../../../core/Hotkey", () => {
 
 import { getRoot, getEnv, isAlive } from "mobx-state-tree";
 beforeEach(() => {
+  imageHotkeys.addNamed.mockClear();
+  imageHotkeys.removeNamed.mockClear();
   getRoot.mockImplementation((node) => {
     try {
       return globalThis.__mstOriginals.getRoot(node);
@@ -454,6 +460,48 @@ describe("ImageView", () => {
     const stage = container.querySelector('[data-testid="konva-stage"]');
     expect(stage).toBeTruthy();
     expect(item.zoom).toBe(true);
+  });
+
+  it("does not register pan-on-zoom hotkeys when no image is zoomed", () => {
+    const store = createStore();
+    const item = createItem({ zoomScale: 1 });
+
+    item.store = store;
+    render(<ImageView item={item} store={store} />);
+
+    expect(imageHotkeys.addNamed).not.toHaveBeenCalledWith("tool:pan-on-zoom-left", expect.any(Function));
+    expect(imageHotkeys.addNamed).not.toHaveBeenCalledWith("tool:pan-on-zoom-right", expect.any(Function));
+    expect(imageHotkeys.addNamed).not.toHaveBeenCalledWith("tool:pan-on-zoom-up", expect.any(Function));
+    expect(imageHotkeys.addNamed).not.toHaveBeenCalledWith("tool:pan-on-zoom-down", expect.any(Function));
+  });
+
+  it("registers directional pan-on-zoom hotkeys and pans the zoomed image", () => {
+    const store = createStore();
+    const item = createItem({ zoomScale: 2, zoomingPositionX: 0, zoomingPositionY: 0 });
+
+    item.store = store;
+    render(<ImageView item={item} store={store} />);
+
+    const registeredNames = imageHotkeys.addNamed.mock.calls.map(([name]) => name);
+    const callback = imageHotkeys.addNamed.mock.calls.find(([name]) => name === "tool:pan-on-zoom-right")?.[1];
+    const event = {
+      preventDefault: mock(),
+      stopPropagation: mock(),
+    };
+
+    expect(registeredNames).toEqual(
+      expect.arrayContaining([
+        "tool:pan-on-zoom-left",
+        "tool:pan-on-zoom-right",
+        "tool:pan-on-zoom-up",
+        "tool:pan-on-zoom-down",
+      ]),
+    );
+    expect(callback).toBeDefined();
+    callback(event);
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(item.setZoomPosition).toHaveBeenCalledWith(-40, 0);
   });
 
   it("handleZoom with ctrlKey calls item.handleZoom when invoked via ref", () => {
