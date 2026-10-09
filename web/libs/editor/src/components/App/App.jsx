@@ -29,7 +29,6 @@ import { Button, EmptyState } from "@humansignal/ui";
 import { IconCheck } from "@humansignal/icons";
 import { isStarterCloudPlan, ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
-import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
@@ -76,10 +75,16 @@ const hasTagInSidebar = (annotation) => {
 class App extends Component {
   relationsRef = React.createRef();
 
+  _scrollFrame = null;
+
   componentDidMount() {
     // Hack to activate app hotkeys
     window.blur();
     document.body.focus();
+  }
+
+  componentWillUnmount() {
+    if (this._scrollFrame) cancelAnimationFrame(this._scrollFrame);
   }
 
   renderSuccess() {
@@ -212,15 +217,10 @@ class App extends Component {
     const store = selectedStore.relationStore;
     const taskData = this.props.store.task?.data;
 
-    return (
-      <RelationsOverlay
-        key={guidGenerator()}
-        store={store}
-        ref={this.relationsRef}
-        tags={selectedStore.names}
-        taskData={taskData}
-      />
-    );
+    // No key here on purpose: the `main-view` wrapper below is already keyed on
+    // the selected annotation, so the overlay still remounts when that changes.
+    // A changing key here remounted the whole overlay on every App render.
+    return <RelationsOverlay store={store} ref={this.relationsRef} tags={selectedStore.names} taskData={taskData} />;
   }
 
   renderCommentsOverlay(selectedAnnotation) {
@@ -341,10 +341,15 @@ class App extends Component {
     );
   }
 
+  // `onScrollCapture` fires for every scroll event of every child, and each
+  // call recomputes the geometry of every relation, so coalesce to one per frame.
   _notifyScroll = () => {
-    if (this.relationsRef.current) {
-      this.relationsRef.current.onResize();
-    }
+    if (this._scrollFrame) return;
+
+    this._scrollFrame = requestAnimationFrame(() => {
+      this._scrollFrame = null;
+      this.relationsRef.current?.onResize();
+    });
   };
 }
 
