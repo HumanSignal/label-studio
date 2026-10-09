@@ -39,6 +39,12 @@ export const Cm6CodeEditor = forwardRef<unknown, Cm6CodeEditorProps>((props, ref
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const onKeyDownRef = useRef(onKeyDown);
   onKeyDownRef.current = onKeyDown;
+  // Callers pass inline callbacks; @uiw reconfigures the whole editor when `onChange` changes identity,
+  // which resets open autocomplete (popup flickers on every parent re-render, e.g. preview updates).
+  const onBeforeChangeRef = useRef(onBeforeChange);
+  onBeforeChangeRef.current = onBeforeChange;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const cm5Options = (options ?? {}) as Cm5EditorOptions;
   const resolvedAutoCloseTags = autoCloseTags ?? cm5Options.autoCloseTags ?? true;
 
@@ -131,11 +137,12 @@ export const Cm6CodeEditor = forwardRef<unknown, Cm6CodeEditorProps>((props, ref
             }
           : undefined,
       }),
+    // Key on schemaInfo, not hintOptions: callers build `hintOptions` inline, so it is a new object every render.
     [
       resolvedAutoCloseTags,
       lightweightMode,
       options?.mode,
-      options?.hintOptions,
+      options?.hintOptions?.schemaInfo,
       options?.lineNumbers,
       options?.lineWrapping,
       options?.readOnly,
@@ -144,23 +151,20 @@ export const Cm6CodeEditor = forwardRef<unknown, Cm6CodeEditorProps>((props, ref
     ],
   );
 
-  const emitToParent = useCallback(
-    (newValue: string) => {
-      const view = editorRef.current?.view;
-      if (!view) return;
+  const emitToParent = useCallback((newValue: string) => {
+    const view = editorRef.current?.view;
+    if (!view) return;
 
-      const current = view.state.doc.toString();
-      if (current !== newValue) return;
+    const current = view.state.doc.toString();
+    if (current !== newValue) return;
 
-      lastEmittedValueRef.current = newValue;
-      editorContentRef.current = newValue;
-      const editor = createCm5EditorShim(() => view);
-      const data = buildCm5ChangeData(view, newValue);
-      onBeforeChange?.(editor as never, data as never, newValue);
-      onChange?.(editor as never, data as never, newValue);
-    },
-    [onBeforeChange, onChange],
-  );
+    lastEmittedValueRef.current = newValue;
+    editorContentRef.current = newValue;
+    const editor = createCm5EditorShim(() => view);
+    const data = buildCm5ChangeData(view, newValue);
+    onBeforeChangeRef.current?.(editor as never, data as never, newValue);
+    onChangeRef.current?.(editor as never, data as never, newValue);
+  }, []);
 
   const acknowledgeValue = useCallback(
     (nextValue: string) => {

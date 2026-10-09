@@ -5,7 +5,7 @@ import { xml } from "@codemirror/lang-xml";
 import { indentUnit } from "@codemirror/language";
 import { searchKeymap } from "@codemirror/search";
 import { history, historyKeymap } from "@codemirror/commands";
-import { Compartment, EditorState, type Extension, StateEffect, StateField } from "@codemirror/state";
+import { Compartment, EditorState, type Extension, Prec, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, type DecorationSet, EditorView, keymap, lineNumbers, placeholder } from "@codemirror/view";
 import type { Editor } from "codemirror";
 import { labelStudioSyntaxHighlighting } from "./cm6-code-editor-highlight";
@@ -353,16 +353,20 @@ export function buildCm6Extensions(
   );
 
   if (handlers?.onKeyDown) {
+    // Must run before keymaps (CM5 fires `keydown` first): a keymap that handles the key, e.g. Escape
+    // closing autocomplete, stops later handlers, so callers could never stopPropagation it.
     extensions.push(
-      EditorView.domEventHandlers({
-        keydown(event, view) {
-          handlers.onKeyDown?.(
-            createCm5EditorShim(() => view),
-            event,
-          );
-          return false;
-        },
-      }),
+      Prec.highest(
+        EditorView.domEventHandlers({
+          keydown(event, view) {
+            handlers.onKeyDown?.(
+              createCm5EditorShim(() => view),
+              event,
+            );
+            return false;
+          },
+        }),
+      ),
     );
   }
 

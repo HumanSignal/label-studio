@@ -15,6 +15,7 @@ type Cm6EditorRef = {
 let mockEditorDoc = "initial";
 let mockHasFocus = true;
 let mockOnChange: ((value: string) => void) | undefined;
+let mockExtensions: unknown[] | undefined;
 let mockLastDispatchInsert: string | undefined;
 
 mock.module("@uiw/react-codemirror", () => {
@@ -35,6 +36,7 @@ mock.module("@uiw/react-codemirror", () => {
       ref: unknown,
     ) => {
       mockOnChange = onChange;
+      mockExtensions = extensions;
 
       const view = {
         hasFocus: mockHasFocus,
@@ -78,6 +80,7 @@ describe("Cm6CodeEditor", () => {
     mockEditorDoc = "initial";
     mockHasFocus = true;
     mockOnChange = undefined;
+    mockExtensions = undefined;
     mockLastDispatchInsert = undefined;
   });
 
@@ -300,6 +303,42 @@ describe("Cm6CodeEditor", () => {
     const wrapper = container.querySelector("[data-testid='cm6-code-editor']");
     expect(wrapper).toBeTruthy();
     expect(wrapper).toHaveAttribute("data-editor-testid", "custom-agreement-metric-code-editor");
+  });
+
+  it("does not reconfigure the editor when the parent re-renders with fresh inline props", () => {
+    const renderEditor = () => (
+      <Cm6CodeEditor
+        value="<View></View>"
+        options={{ mode: "xml", lineNumbers: true, hintOptions: { schemaInfo: tags } }}
+        onChange={() => {}}
+        onKeyDown={() => {}}
+      />
+    );
+    const { rerender } = render(renderEditor());
+    const extensionsBefore = mockExtensions;
+    const onChangeBefore = mockOnChange;
+
+    rerender(renderEditor());
+
+    expect(mockExtensions).toBe(extensionsBefore);
+    expect(mockOnChange).toBe(onChangeBefore);
+  });
+
+  it("emits to the latest parent onChange after re-render", async () => {
+    const staleOnChange = mock();
+    const latestOnChange = mock();
+    const { rerender } = render(<Cm6CodeEditor value="initial" options={{ mode: "xml" }} onChange={staleOnChange} />);
+
+    rerender(<Cm6CodeEditor value="initial" options={{ mode: "xml" }} onChange={latestOnChange} />);
+
+    await act(async () => {
+      mockEditorDoc = "changed-value";
+      mockOnChange?.("changed-value");
+      await new Promise((resolve) => setTimeout(resolve, PARENT_SYNC_DEBOUNCE_MS + 50));
+    });
+
+    expect(staleOnChange).not.toHaveBeenCalled();
+    expect(latestOnChange).toHaveBeenCalledWith(expect.anything(), expect.anything(), "changed-value");
   });
 
   it("rebuilds extensions when hintOptions schema loads after mount", () => {
