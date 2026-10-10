@@ -320,9 +320,13 @@ class MLBackend(models.Model):
                 # ML backend can return single prediction per task or multiple predictions
                 response = [response]
 
+            if not isinstance(response, list):
+                logger.error(f'ML backend returns an incorrect prediction list for task {task["id"]}: {response}')
+                continue
+
             # get all predictions per task
             for r in response:
-                if 'result' not in r:
+                if not isinstance(r, dict) or 'result' not in r:
                     logger.error(
                         f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field: {r}"
                     )
