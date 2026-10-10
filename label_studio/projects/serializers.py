@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-import bleach
+import nh3
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS, SAFE_INSTRUCTION_HTML_TAGS
 from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
@@ -81,7 +81,23 @@ class ControlTagWeightSerializer(serializers.Serializer):
 
 def sanitize_expert_instruction(html, allow_unsafe_tags):
     tags = SAFE_HTML_TAGS if allow_unsafe_tags else SAFE_INSTRUCTION_HTML_TAGS
-    return bleach.clean(html, tags=tags, attributes=SAFE_HTML_ATTRIBUTES)
+    # nh3 (the Python binding for the Rust `ammonia` sanitizer) is the
+    # maintained successor to bleach, which is deprecated upstream. It differs
+    # from bleach in two deliberate, security-first ways:
+    #   1. `script`/`style` elements are always removed - ammonia refuses to
+    #      allow them alongside their content, so even organizations that opt
+    #      in to unsafe instruction tags can no longer render executable
+    #      content (bleach passed script content through untouched).
+    #   2. disallowed elements are removed instead of being shown as escaped
+    #      markup text.
+    # Attribute filtering and link protocols match bleach's previous behavior.
+    return nh3.clean(
+        html,
+        tags=set(tags) - {'script', 'style'},
+        attributes={'*': set(SAFE_HTML_ATTRIBUTES)},
+        link_rel=None,
+        url_schemes={'http', 'https', 'mailto'},
+    )
 
 
 class CreatedByFromContext:
