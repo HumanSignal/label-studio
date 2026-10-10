@@ -159,12 +159,14 @@ class TestProjectSerializer(TestCase):
 
 
 class TestProjectSerializerExpertInstruction(TestCase):
-    """Unsafe tags in expert_instruction are kept only for organizations that opted in."""
+    """Unsafe tags in expert_instruction are removed unless the organization opted in."""
 
     PAYLOAD = '<script>alert(1)</script><iframe src="https://docs.google.com/x"></iframe><p>hi</p>'
-    ESCAPED = (
-        '&lt;script&gt;alert(1)&lt;/script&gt;&lt;iframe src="https://docs.google.com/x"&gt;&lt;/iframe&gt;<p>hi</p>'
-    )
+    # nh3 removes disallowed elements instead of showing them as escaped markup
+    # text: script/style are always dropped, and the remaining HTML is filtered
+    # through the safe allow list.
+    SANITIZED_DEFAULT = '<p>hi</p>'
+    SANITIZED_OPT_IN = '<iframe src="https://docs.google.com/x"></iframe><p>hi</p>'
 
     def _write(self, project, value):
         serializer = ProjectSerializer(instance=project, data={'expert_instruction': value}, partial=True)
@@ -178,32 +180,32 @@ class TestProjectSerializerExpertInstruction(TestCase):
         project.organization.allow_unsafe_instruction_tags = True
         project.organization.save(update_fields=['allow_unsafe_instruction_tags'])
 
-    def test_write_escapes_unsafe_tags_by_default(self):
+    def test_write_removes_unsafe_tags_by_default(self):
         project = ProjectFactory()
-        assert self._write(project, self.PAYLOAD) == self.ESCAPED
+        assert self._write(project, self.PAYLOAD) == self.SANITIZED_DEFAULT
 
-    def test_write_keeps_unsafe_tags_when_organization_allows(self):
+    def test_write_keeps_iframes_but_strips_script_when_organization_allows(self):
         project = ProjectFactory()
         self._allow_unsafe_tags(project)
-        assert self._write(project, self.PAYLOAD) == self.PAYLOAD
+        assert self._write(project, self.PAYLOAD) == self.SANITIZED_OPT_IN
 
     def test_write_still_strips_event_handlers_when_organization_allows(self):
         project = ProjectFactory()
         self._allow_unsafe_tags(project)
         assert self._write(project, '<a href="#" onerror=alert(1)>x</a>') == '<a href="#">x</a>'
 
-    def test_read_escapes_unsafe_tags_stored_before_the_fix(self):
+    def test_read_removes_unsafe_tags_stored_before_the_fix(self):
         project = ProjectFactory()
         type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
         project.refresh_from_db()
-        assert self._read(project) == self.ESCAPED
+        assert self._read(project) == self.SANITIZED_DEFAULT
 
-    def test_read_keeps_unsafe_tags_when_organization_allows(self):
+    def test_read_keeps_iframes_but_strips_script_when_organization_allows(self):
         project = ProjectFactory()
         self._allow_unsafe_tags(project)
         type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
         project.refresh_from_db()
-        assert self._read(project) == self.PAYLOAD
+        assert self._read(project) == self.SANITIZED_OPT_IN
 
     def test_read_of_plain_text_does_not_query_organization(self):
         project = ProjectFactory(expert_instruction='Label all cats')
