@@ -28,7 +28,7 @@ jobs:
       pull-requests: write
     steps:
       - name: "Validate PR's title"
-        uses: thehanimo/pr-title-checker@v1.4.3
+        uses: thehanimo/pr-title-checker@v2.0.0
         with:
           GITHUB_TOKEN: ${{ github.token }}
           pass_on_octokit_error: false
