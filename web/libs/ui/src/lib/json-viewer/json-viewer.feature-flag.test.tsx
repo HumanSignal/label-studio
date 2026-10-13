@@ -158,11 +158,19 @@ describe("JsonViewer feature flag", () => {
       writable: true,
     });
 
-    const data = { id: 1, label: "task" };
-    render(<JsonViewer data={data} showSearch={false} showFilters={false} />);
+    try {
+      const data = { id: 1, label: "task" };
+      render(<JsonViewer data={data} showSearch={false} showFilters={false} />);
 
-    fireEvent.click(screen.getByRole("button"));
+      fireEvent.click(screen.getByRole("button"));
 
-    expect(writeText).toHaveBeenCalledWith(JSON.stringify(data, null, 2));
+      expect(writeText).toHaveBeenCalledWith(JSON.stringify(data, null, 2));
+    } finally {
+      if (originalClipboard) {
+        Object.defineProperty(navigator, "clipboard", originalClipboard);
+      } else {
+        delete (navigator as { clipboard?: Clipboard }).clipboard;
+      }
+    }
   });
 });

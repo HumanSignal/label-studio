@@ -21,8 +21,9 @@ class OrganizationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Organization
         fields = '__all__'
-        # created_by is the only privilege boundary in LSO (member removal), never mass-assignable
-        read_only_fields = ('created_by',)
+        # created_by is the only privilege boundary in LSO (member removal), never mass-assignable;
+        # any member could re-enable script in instructions if the unsafe-tags switch were writable here
+        read_only_fields = ('created_by', 'allow_unsafe_instruction_tags')
 
 
 # =========================================

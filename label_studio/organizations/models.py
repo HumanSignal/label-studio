@@ -116,6 +116,16 @@ class Organization(OrganizationMixin, models.Model):
 
     contact_info = models.EmailField(_('contact info'), blank=True, null=True)
 
+    allow_unsafe_instruction_tags = models.BooleanField(
+        _('allow unsafe tags in instructions'),
+        default=False,
+        # Rows inserted by the previous build during a rollout must still get a value
+        db_default=False,
+        # Nullable per the migration rules; NULL reads as off
+        null=True,
+        help_text='Keep script, iframe, style and other active tags in project instructions',
+    )
+
     def __str__(self):
         return self.title + ', id=' + str(self.pk)
 

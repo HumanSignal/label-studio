@@ -16,6 +16,9 @@ import { readPersonalColumnOrder, resolveEffectiveColumnOrder } from "../../comp
 
 export const DM_COLUMN_ROLE_CODES = ["OW", "AD", "MA", "AN", "RE"];
 
+/** Owner / Administrator / Manager — may mutate project column defaults (FIT-2808). */
+export const DM_COLUMN_MANAGING_ROLE_CODES = ["OW", "AD", "MA"];
+
 /** SDK / AuthProvider may pass enum names (`OWNER`) or API codes (`OW`). */
 const ROLE_NAME_TO_CODE = {
   OWNER: "OW",
@@ -34,6 +37,21 @@ export function resolveRoleCode(role) {
   if (!role || typeof role !== "string") return null;
   if (DM_COLUMN_ROLE_CODES.includes(role)) return role;
   return ROLE_NAME_TO_CODE[role] ?? null;
+}
+
+/**
+ * True for Owner / Administrator / Manager (API codes or SDK names).
+ * Annotator and Reviewer must not see Columns picker defaults footer controls (FIT-2991).
+ * @param {string | null | undefined} role
+ */
+export function isManagingDmRole(role) {
+  const code = resolveRoleCode(role);
+  return code != null && DM_COLUMN_MANAGING_ROLE_CODES.includes(code);
+}
+
+/** Current signed-in user from APP_SETTINGS (Data Manager host). */
+export function currentUserIsManagingDmRole() {
+  return isManagingDmRole(window.APP_SETTINGS?.user?.role);
 }
 
 /**
@@ -82,8 +100,10 @@ export function surfaceHasProjectDefaults(surface) {
 }
 
 /**
- * Pick the visible-alias list for a role. FIT-2845 writes the same list to every public role,
- * so if the exact role key is missing we fall back to the first populated role list.
+ * Pick the visible-alias list for a role.
+ * Reviewers inherit Managers+ soft visibility (FIT-2848) — `visible.RE` is unused.
+ * Annotators prefer `visible.AN`. If the preferred key is missing, fall back to the first
+ * populated role list so older FIT-2845 projects that wrote one list to every role keep working.
  *
  * @param {{ visible?: Record<string, string[]> } | null | undefined} surface
  * @param {string | null} roleCode
@@ -91,8 +111,9 @@ export function surfaceHasProjectDefaults(surface) {
  */
 export function pickVisibleAliases(surface, roleCode) {
   const visible = surface?.visible ?? {};
-  if (roleCode && Array.isArray(visible[roleCode])) {
-    return visible[roleCode];
+  const preferred = roleCode === "RE" ? DM_COLUMN_MANAGING_ROLE_CODES : roleCode ? [roleCode] : [];
+  for (const code of preferred) {
+    if (Array.isArray(visible[code])) return visible[code];
   }
   for (const code of DM_COLUMN_ROLE_CODES) {
     if (Array.isArray(visible[code])) return visible[code];

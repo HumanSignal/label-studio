@@ -489,3 +489,20 @@ def test_get_jobs_by_meta_preserves_legacy_exact_match(_mock_flag):
     queue.get_jobs.return_value = [job]
 
     assert get_jobs_by_meta(queue, 'job_function', {'project': 3}) == []
+
+
+@patch('label_studio.core.redis.redis_connected', return_value=False)
+def test_allow_sync_false_skips_the_job_without_redis(_mock_connected):
+    """Enqueue-or-skip: without Redis the job is not run in the calling process."""
+    job = MagicMock(__name__='background_only_job')
+
+    assert start_job_async_or_sync(job, 1, allow_sync=False) is None
+    job.assert_not_called()
+
+
+@patch('label_studio.core.redis.redis_connected', return_value=False)
+def test_default_still_runs_the_job_synchronously_without_redis(_mock_connected):
+    job = MagicMock(__name__='sync_job', return_value='done')
+
+    assert start_job_async_or_sync(job, 1) == 'done'
+    job.assert_called_once_with(1)

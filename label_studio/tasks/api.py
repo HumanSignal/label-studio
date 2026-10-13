@@ -16,6 +16,7 @@ from django.db import transaction
 from django.db.models import Prefetch, Q, prefetch_related_objects
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
@@ -51,6 +52,25 @@ from webhooks.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _invalid_pk(field, obj):
+    # same payload as for a missing object, so the response doesn't reveal what exists elsewhere
+    return ValidationError({field: [f'Invalid pk "{obj.pk}" - object does not exist.']})
+
+
+def check_annotation_parents(task, validated_data):
+    """Parent annotation and prediction of a new annotation must belong to the same task."""
+    for field in ('parent_annotation', 'parent_prediction'):
+        parent = validated_data.get(field)
+        if parent is not None and parent.task_id != task.id:
+            raise _invalid_pk(field, parent)
+
+
+def check_annotation_author(project, completed_by):
+    """Annotations can only be attributed to members of the project's organization."""
+    if completed_by is not None and not project.organization.has_user(completed_by):
+        raise _invalid_pk('completed_by', completed_by)
 
 
 # TODO: fix after switch to api/tasks from api/dm/tasks
@@ -458,12 +478,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
                 'all_fields': True,
                 'excluded_fields_for_evaluation': excluded,
             }
-        project = self.request.query_params.get('project') or self.request.data.get('project')
-        if not project:
-            project = task.project.id
         return self.prefetch(
             Task.prepared.get_queryset(
-                prepare_params=PrepareParams(project=project, selectedItems=selected, request=self.request), **kwargs
+                prepare_params=PrepareParams(project=task.project_id, selectedItems=selected, request=self.request),
+                **kwargs,
             ),
             self.request,
         )
@@ -991,6 +1009,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, annotation):
         delete_annotation_with_retry(annotation)
 
+    def perform_update(self, serializer):
+        annotation = serializer.instance
+        completed_by = serializer.validated_data.get('completed_by')
+        # clients resend the current author, who may have left the organization since
+        if completed_by is not None and completed_by.id != annotation.completed_by_id:
+            check_annotation_author(annotation.project, completed_by)
+        super().perform_update(serializer)
+
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
         annotation = self.get_object()
@@ -1138,6 +1164,9 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
 
+        check_annotation_parents(task, ser.validated_data)
+        check_annotation_author(task.project, ser.validated_data.get('completed_by'))
+
         # Check if task is being skipped and if it's allowed
         was_cancelled_get = bool_from_request(self.request.GET, 'was_cancelled', False)
         was_cancelled_data = self.request.data.get('was_cancelled', False)
@@ -1215,21 +1244,26 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
     )
     queryset = AnnotationDraft.objects.all()
 
-    def filter_queryset(self, queryset):
-        task_id = self.kwargs['pk']
-        return queryset.filter(task_id=task_id)
+    @cached_property
+    def task(self):
+        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, task)
+        return task
+
+    def get_queryset(self):
+        return AnnotationDraft.objects.filter(task=self.task)
 
     def perform_create(self, serializer):
-        task_id = self.kwargs['pk']
+        task = self.task
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
-        logger.debug(f'User {user} is going to create draft for task={task_id}, annotation={annotation_id}')
+        logger.debug(f'User {user} is going to create draft for task={task.id}, annotation={annotation_id}')
         # When an annotation_id is supplied in the URL, make sure the annotation still exists before
         # persisting the draft. Otherwise the INSERT violates the annotation_id foreign key (the
         # annotation may have been deleted between the client loading the task and submitting the draft).
-        if annotation_id is not None and not Annotation.objects.filter(pk=annotation_id).exists():
+        if annotation_id is not None and not Annotation.objects.filter(pk=annotation_id, task=task).exists():
             raise NotFound(f'Annotation {annotation_id} does not exist')
-        serializer.save(task_id=self.kwargs['pk'], annotation_id=annotation_id, user=self.request.user)
+        serializer.save(task_id=task.id, annotation_id=annotation_id, user=self.request.user)
 
 
 @extend_schema(exclude=True)
@@ -1408,6 +1442,21 @@ class PredictionAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return Prediction.objects.filter(project__organization=self.request.user.active_organization)
 
+    def get_serializer(self, *args, **kwargs):
+        serializer = super().get_serializer(*args, **kwargs)
+        if self.action == 'create' and not getattr(self, 'swagger_fake_view', False):
+            # the body is the only source of the task here, so resolve it inside the caller's organization
+            organization = self.request.user.active_organization
+            serializer.fields['task'].queryset = Task.objects.filter(project__organization=organization)
+            serializer.fields['project'].queryset = Project.objects.filter(organization=organization)
+        return serializer
+
+    def perform_create(self, serializer):
+        task = serializer.validated_data['task']
+        if not task.has_permission(self.request.user):
+            raise PermissionDenied(f"You don't have permission for task {task.id}")
+        serializer.save(project=task.project)
+
 
 @method_decorator(name='get', decorator=extend_schema(exclude=True))
 @method_decorator(
@@ -1428,8 +1477,15 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
     def process_intermediate_state(self, annotation, draft):
         pass
 
+    def can_convert(self, annotation, user):
+        """The draft is created for the caller and the annotation is deleted, so besides their own
+        annotation a user may only take over another user's skip."""
+        return annotation.completed_by_id == user.id or annotation.was_cancelled
+
     def post(self, request, *args, **kwargs):
         annotation = self.get_object()
+        if not self.can_convert(annotation, request.user):
+            raise PermissionDenied("You cannot convert another user's annotation to a draft")
         organization = annotation.project.organization
         project = annotation.project
 

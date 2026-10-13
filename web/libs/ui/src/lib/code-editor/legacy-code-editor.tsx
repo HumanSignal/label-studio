@@ -12,7 +12,7 @@ import "codemirror/addon/search/searchcursor";
 import "codemirror/addon/search/matchesonscrollbar";
 import "codemirror/addon/dialog/dialog";
 import "codemirror/addon/scroll/annotatescrollbar";
-import "./config-hint";
+import { registerConfigHint } from "./config-hint";
 
 import "codemirror/lib/codemirror.css";
 import "codemirror/addon/hint/show-hint.css";
@@ -21,6 +21,8 @@ import "codemirror/addon/search/matchesonscrollbar.css";
 import styles from "./code-editor.module.css";
 import { cn } from "@humansignal/shad/utils";
 import { forwardRef } from "react";
+
+registerConfigHint();
 
 /* eslint-disable-next-line */
 type CodeMirrorType = typeof CodeMirrorUnControlled | typeof CodeMirrorControlled;

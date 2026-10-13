@@ -11,6 +11,13 @@ import { serializeJsonForUrl, deserializeJsonFromUrl } from "@humansignal/core";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { isEmpty } from "../../utils/helpers";
 import { projectDefaultsForNewTab } from "./project_column_defaults";
+import { resolvePreloaded } from "../../sdk/resolve-preloaded";
+import {
+  clearUnavailableVirtualFilters,
+  noticeKeyForView,
+  notifyVirtualFiltersRemoved,
+  stripUnavailableFiltersFromVirtualSnapshot,
+} from "./unavailable_filters";
 
 const storeValue = (name, value) => {
   window.localStorage.setItem(name, value);
@@ -38,7 +45,7 @@ export const dataCleanup = (tab, columns) => {
     data[key] = Object.fromEntries(
       Object.entries(data[key] ?? {}).filter(([col]) => {
         const match = columns.find((c) => c.id === col);
-        return !!match && !match.isAnnotationResultsFilterColumn;
+        return !!match && !match.isFilterOnlyColumn;
       }),
     );
   });
@@ -48,7 +55,7 @@ export const dataCleanup = (tab, columns) => {
     Object.entries(data.columnOrder ?? {}).filter(([col]) => {
       if (col === "select" || col === "show-source") return true;
       const match = columns.find((c) => c.id === col);
-      return !!match && !match.isAnnotationResultsFilterColumn;
+      return !!match && !match.isFilterOnlyColumn;
     }),
   );
 
@@ -63,7 +70,7 @@ export const dataCleanup = (tab, columns) => {
         (list ?? []).filter((columnID) => {
           const match = columns.find((c) => c.id === columnID);
 
-          return !match?.isAnnotationResultsFilterColumn;
+          return !match?.isFilterOnlyColumn;
         }),
       ]),
     );
@@ -140,6 +147,23 @@ const createNameCopy = (name) => {
   return newName;
 };
 
+const ORDERING_NOTICE = "This tab is sorted by a column you can't see, so that sort isn't applied.";
+
+function notifyUnavailableOrdering(view) {
+  if (!view?.ordering?.length) return;
+  const columns = view.columns ?? [];
+  if (!columns.length) return;
+  const hiddenSort = view.ordering.some(
+    (field) => !columns.some((column) => column.id === String(field).replace(/^-/, "")),
+  );
+  if (!hiddenSort) return;
+  const notices = view.root?.viewsStore?.orderingNoticesShown;
+  const noticeKey = noticeKeyForView(view);
+  if (notices?.has(noticeKey)) return;
+  notices?.add(noticeKey);
+  view.root?.SDK?.invoke("toast", { message: ORDERING_NOTICE, type: "info" });
+}
+
 export const TabStore = types
   .model("TabStore", {
     selected: types.maybeNull(types.late(() => types.reference(Tab))),
@@ -152,6 +176,10 @@ export const TabStore = types
   })
   .volatile(() => ({
     defaultHidden: null,
+    // Per TabStore instance, keyed by `${projectId}_${viewId}` so SPA nav across
+    // projects/orgs does not permanently suppress the ordering / filter notices.
+    orderingNoticesShown: new Set(),
+    filterNoticesShown: new Set(),
   }))
   .views((self) => ({
     get all() {
@@ -236,17 +264,28 @@ export const TabStore = types
 
         const root = getRoot(self);
 
-        // Fetch fresh tab config from server so changes made by other users
-        // (e.g., another user locking this tab) are reflected immediately.
+        // Paint tasks from the view-list payload immediately. Refresh the
+        // selected view beside that request so a lock changed by someone else
+        // is still picked up, without sitting in front of the task list.
+        // Virtual-tab reload strips denied filters before the tasks request
+        // (same policy as RefreshButton / initial apply).
+        const queryBefore = selected.query;
+        let tasksPromise = selected.reload();
+
         if (selected.saved && selected.id) {
           const latest = yield root.apiCall("tab", { tabId: selected.id });
-          if (!latest?.error && (latest.id == null || latest.id === selected.id)) {
+          if (self.selected === selected && !latest?.error && (latest.id == null || latest.id === selected.id)) {
             applySnapshot(selected, serverViewSnapshot(selected, self.columns, latest));
+            // View-list payload can be stale on later tab switches. If the
+            // single-view refresh changed filters/ordering, fetch tasks again.
+            if (self.selected === selected && selected.query !== queryBefore) {
+              tasksPromise = selected.reload();
+            }
           }
         }
 
-        yield selected.reload();
-
+        yield tasksPromise;
+        notifyUnavailableOrdering(selected);
         root.SDK.invoke("tabChanged", selected);
         selected.selected._invokeChangeEvent();
       }
@@ -284,12 +323,15 @@ export const TabStore = types
       const urlTabNotEmpty = !isEmpty(existingTabUrlParsed);
       const existingTab = urlTabNotEmpty ? existingTabUrlParsed : existingTabStorageParsed;
       const existingTabKey = urlTabNotEmpty ? viewSnapshot.tab : existingTabStorageParsed?.tab;
-      const snapshot = {
+      let snapshot = {
         ...viewSnapshot,
         key: existingTabKey,
         tab: existingTabKey,
         ...(existingTab ?? viewSnapshot ?? {}),
+        virtual: isVirtual || !!viewSnapshot?.virtual,
       };
+      const stripped = stripUnavailableFiltersFromVirtualSnapshot(snapshot, self.availableFilters);
+      snapshot = stripped.snapshot;
       const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
       const newID = nextTempTabId(self.views);
 
@@ -309,26 +351,37 @@ export const TabStore = types
           };
 
       return {
-        ...snapshot,
-        id: newID,
-        title: newTitle,
-        key: snapshot.key ?? guidGenerator(),
-        hiddenColumns: snapshot.hiddenColumns ?? projectDefaults.hiddenColumns ?? defaultHiddenColumns,
-        ...(projectDefaults.columnOrder && !snapshot.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
+        snapshot: {
+          ...snapshot,
+          id: newID,
+          title: newTitle,
+          key: snapshot.key ?? guidGenerator(),
+          hiddenColumns: snapshot.hiddenColumns ?? projectDefaults.hiddenColumns ?? defaultHiddenColumns,
+          ...(projectDefaults.columnOrder && !snapshot.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
+        },
+        deniedFiltersRemoved: stripped.removed,
       };
     },
 
     addView: flow(function* (viewSnapshot = {}, options) {
       const { autoselect = true, autosave = true, reload = true } = options ?? {};
 
-      const newSnapshot = self.createSnapshot(viewSnapshot);
+      const { snapshot: newSnapshot, deniedFiltersRemoved } = self.createSnapshot(viewSnapshot);
 
       self.views.push(newSnapshot);
       const newView = self.views[self.views.length - 1];
 
+      if (deniedFiltersRemoved) {
+        notifyVirtualFiltersRemoved(newView);
+      }
+
       if (autosave) {
         // with autosave it will be reloaded anyway
         yield newView.save({ reload: !autosave && reload });
+      } else if (deniedFiltersRemoved && newView.virtual) {
+        // Annotator virtual tabs load with autosave off, so nothing else rewrites
+        // localStorage or the URL tab key. Persist the stripped snapshot now.
+        newView.persistVirtual();
       }
 
       if (autoselect) {
@@ -432,6 +485,14 @@ export const TabStore = types
 
       if (result.error) {
         view.unlock();
+        const detail = result?.response?.detail;
+        root.SDK.invoke("toast", {
+          message:
+            typeof detail === "string"
+              ? detail
+              : "This tab could not be saved. Your filters or other changes were not stored.",
+          type: "error",
+        });
         return view;
       }
 
@@ -581,7 +642,7 @@ export const TabStore = types
       self.sidebarVisible = storeValue("sidebarVisible", !self.sidebarVisible);
     },
 
-    fetchColumns() {
+    fetchColumns({ deferSelectedReload = false } = {}) {
       const columns = self.columnsRaw;
       const targets = unique(columns.map((c) => c.target));
       const hiddenColumns = {};
@@ -665,11 +726,28 @@ export const TabStore = types
       });
 
       self.defaultHidden = TabHiddenColumns.create(hiddenColumns);
+
+      for (const view of self.views) {
+        if (view.virtual && clearUnavailableVirtualFilters(view)) {
+          // RefreshButton refetches columns then reloads once; persist without a
+          // nested tasks fetch so denied filters are gone before that reload.
+          if (deferSelectedReload) {
+            view.persistVirtual();
+          } else {
+            view.save({ reload: view === self.selected });
+          }
+        }
+      }
+
+      notifyUnavailableOrdering(self.selected);
     },
 
     fetchTabs: flow(function* (tab, taskID, labeling) {
       const tabId = Number.parseInt(tab);
-      const response = yield getRoot(self).apiCall("tabs");
+      const root = getRoot(self);
+      const preloadedViews = root.SDK?.explorerPreload?.views ?? null;
+      if (root.SDK?.explorerPreload) root.SDK.explorerPreload.views = null;
+      const response = yield resolvePreloaded(preloadedViews, () => root.apiCall("tabs"));
       const tabs = response.tabs ?? response ?? [];
 
       const snapshots = tabs.map((t) => {

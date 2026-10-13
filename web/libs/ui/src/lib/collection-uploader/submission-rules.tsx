@@ -35,6 +35,13 @@ export interface SubmissionRules {
   min_resolution?: number;
   /** Maximum resolution: the shorter side, in pixels. */
   max_resolution?: number;
+  /** Frame rate bounds of a video; read by the server after upload. */
+  min_fps?: number;
+  max_fps?: number;
+  /** The file must carry its camera make, model or software; read by the server after upload. */
+  require_capture_metadata?: boolean;
+  /** The file must carry GPS tags (presence only); read by the server after upload. */
+  gps_required?: boolean;
 }
 
 /** Facts known about a file — pass what is available, omit the rest. */
@@ -44,6 +51,47 @@ export interface SubmissionFileMeta {
   durationSec?: number | null;
   width?: number | null;
   height?: number | null;
+  /** The facts came from the server's read of the stored bytes, not from the browser. */
+  verified?: boolean;
+  /** Server-read facts; null when the server inspected the file but the fact does not apply or was unreadable. */
+  fps?: number | null;
+  captureMetadata?: boolean | null;
+  gps?: boolean | null;
+  /** Extra server facts for display ("29.97 fps", "iPhone 15 Pro", "GPS present"). */
+  facts?: string[];
+  /** Server findings about active content (a hidden archive, PDF JavaScript); advisory, for reviewers. */
+  flags?: string[];
+  /** Why the server thinks the file may not be an original capture; set only when it raised that flag. */
+  modifiedSignals?: string[];
+}
+
+const SUBMISSION_FLAG_LABELS: Record<string, string> = {
+  pdf_javascript: "Runs JavaScript",
+  pdf_launch_action: "Launches a program when opened",
+  pdf_embedded_files: "Carries embedded files",
+  pdf_remote_action: "Sends data to or loads from a remote address",
+  pdf_rich_media: "Embeds rich media",
+  hidden_archive: "Hides a ZIP archive",
+  hidden_document: "Hides a PDF document",
+  hidden_markup: "Contains HTML or script markup",
+  hidden_executable: "Hides an executable program",
+};
+
+/** The reviewer-facing reason behind a server finding; a code this build does not know still reads as a flag. */
+export function submissionFlagLabel(code: string): string {
+  return SUBMISSION_FLAG_LABELS[code] ?? "Flagged for review";
+}
+
+const SUBMISSION_SIGNAL_LABELS: Record<string, string> = {
+  reencoded: "Processed by a video tool after capture",
+  editing_software: "Saved by an editing app",
+  platform_source: "Downloaded from a video or social platform",
+  no_capture_metadata: "No camera make, model or software",
+};
+
+/** A signal behind the server's "possibly modified" flag, as the reviewer reads it. */
+export function submissionSignalLabel(code: string): string {
+  return SUBMISSION_SIGNAL_LABELS[code] ?? "Other signal";
 }
 
 export type SubmissionRuleStatus = "pass" | "fail" | "unknown";
@@ -66,11 +114,19 @@ function formatBytes(bytes: number): string {
   return `${value.toFixed(value >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
 }
 
+const TYPE_SHORT: Record<string, string> = {
+  "video/quicktime": "MOV",
+  "audio/mp4": "M4A",
+  "audio/x-m4a": "M4A",
+  "audio/mpeg": "MP3",
+  "audio/ogg": "OGG",
+  "audio/wav": "WAV",
+  "audio/x-wav": "WAV",
+};
+
 function typeLabel(types: string[]): string {
-  return types
-    .map((t) => (t.includes("/") ? t.split("/").pop() : t))
-    .map((t) => (t === "quicktime" ? "MOV" : (t ?? "").toUpperCase()))
-    .join(" / ");
+  const labels = types.map((t) => TYPE_SHORT[t] ?? (t.includes("/") ? (t.split("/").pop() ?? t) : t).toUpperCase());
+  return Array.from(new Set(labels)).join(" / ");
 }
 
 function durationLabel(min?: number, max?: number): string {
@@ -79,7 +135,14 @@ function durationLabel(min?: number, max?: number): string {
   return `≤ ${max}s`;
 }
 
+function fpsLabel(min?: number, max?: number): string {
+  if (min != null && max != null) return `${min}–${max} fps`;
+  if (min != null) return `≥ ${min} fps`;
+  return `≤ ${max} fps`;
+}
+
 const check = (ok: boolean): SubmissionRuleStatus => (ok ? "pass" : "fail");
+const FPS_TOLERANCE = 0.015;
 
 /**
  * Evaluate the declared rules against what is known about a file.
@@ -161,6 +224,41 @@ export function evaluateSubmissionRules(
       status: known ? check(Math.min(m.width as number, m.height as number) <= rules.max_resolution) : "unknown",
     });
   }
+  // The rules below rest on facts only the server reads, so they stay unknown
+  // until the upload completes; an absent fact on an inspected file is a verdict.
+  const inspected = m.verified === true;
+  const minFps = typeof rules.min_fps === "number" && rules.min_fps > 0 ? rules.min_fps : undefined;
+  const maxFps = typeof rules.max_fps === "number" && rules.max_fps > 0 ? rules.max_fps : undefined;
+  if (minFps != null || maxFps != null) {
+    // Measured rates sit a little off nominal: 29.97 for NTSC timing, a touch
+    // lower for variable-rate phone video. A 1.5% tolerance keeps those green.
+    const fps = inspected && typeof m.fps === "number" && m.fps > 0 ? m.fps : null;
+    results.push({
+      key: "fps",
+      label: fpsLabel(minFps, maxFps),
+      status:
+        fps == null
+          ? "unknown"
+          : check(
+              (minFps == null || fps >= minFps * (1 - FPS_TOLERANCE)) &&
+                (maxFps == null || fps <= maxFps * (1 + FPS_TOLERANCE)),
+            ),
+    });
+  }
+  if (rules.require_capture_metadata === true) {
+    results.push({
+      key: "require_capture_metadata",
+      label: "Device info",
+      status: inspected && typeof m.captureMetadata === "boolean" ? check(m.captureMetadata) : "unknown",
+    });
+  }
+  if (rules.gps_required === true) {
+    results.push({
+      key: "gps_required",
+      label: "GPS",
+      status: inspected && typeof m.gps === "boolean" ? check(m.gps) : "unknown",
+    });
+  }
   return results;
 }
 
@@ -221,7 +319,7 @@ export const SubmissionStatusChip = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <Badge variant={tone} size="small" shape="rounded" data-testid="submission-status-chip" className={className}>
+  <Badge variant={tone} size="medium" shape="rounded" data-testid="submission-status-chip" className={className}>
     {children}
   </Badge>
 );

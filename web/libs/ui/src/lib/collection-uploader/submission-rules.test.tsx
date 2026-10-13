@@ -1,5 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { evaluateSubmissionRules, SubmissionRuleBadges } from "./submission-rules";
+import {
+  evaluateSubmissionRules,
+  SubmissionRuleBadges,
+  submissionFlagLabel,
+  submissionSignalLabel,
+} from "./submission-rules";
 
 const RULES = {
   types: ["video/mp4", "video/quicktime"],
@@ -53,6 +58,8 @@ describe("evaluateSubmissionRules", () => {
   it("labels are human-readable", () => {
     const labels = Object.fromEntries(evaluateSubmissionRules(null, RULES).map((r) => [r.key, r.label]));
     expect(labels.types).toBe("MP4 / MOV");
+    const audio = { types: ["audio/mp4", "audio/x-m4a", "audio/mpeg", "audio/ogg", "audio/wav"] };
+    expect(evaluateSubmissionRules(null, audio).find((r) => r.key === "types")!.label).toBe("M4A / MP3 / OGG / WAV");
     expect(labels.max_bytes).toBe("≤ 500 MB");
     expect(labels.duration).toBe("30–60s");
     expect(labels.orientation).toBe("Portrait");
@@ -108,5 +115,94 @@ describe("SubmissionRuleBadges", () => {
   it("renders nothing without rules", () => {
     render(<SubmissionRuleBadges results={[]} />);
     expect(screen.queryByTestId("submission-rule-badges")).not.toBeInTheDocument();
+  });
+});
+
+describe("rules on server-read facts", () => {
+  const CAPTURE = { min_fps: 30, require_capture_metadata: true, gps_required: true };
+
+  it("stays unknown until the server has inspected the file", () => {
+    const byKey = (meta: Parameters<typeof evaluateSubmissionRules>[0]) =>
+      Object.fromEntries(evaluateSubmissionRules(meta, CAPTURE).map((r) => [r.key, r.status]));
+    expect(byKey(null)).toEqual({ fps: "unknown", require_capture_metadata: "unknown", gps_required: "unknown" });
+    // picked in the browser: dimensions known, but nothing the server reads
+    expect(byKey({ contentType: "video/mp4", width: 720, height: 1280 })).toEqual({
+      fps: "unknown",
+      require_capture_metadata: "unknown",
+      gps_required: "unknown",
+    });
+  });
+
+  it("passes and fails on verified facts", () => {
+    const pass = evaluateSubmissionRules(
+      { contentType: "video/mp4", verified: true, fps: 59.94, captureMetadata: true, gps: true },
+      CAPTURE,
+    );
+    expect(pass.every((r) => r.status === "pass")).toBe(true);
+    const fail = evaluateSubmissionRules(
+      { contentType: "video/mp4", verified: true, fps: 24, captureMetadata: false, gps: false },
+      CAPTURE,
+    );
+    expect(fail.every((r) => r.status === "fail")).toBe(true);
+  });
+
+  it("keeps a fact the server could not read unknown even on a verified file", () => {
+    const results = evaluateSubmissionRules({ contentType: "application/pdf", verified: true }, CAPTURE);
+    expect(results.every((r) => r.status === "unknown")).toBe(true);
+  });
+
+  it("accepts NTSC and VFR rates that sit just under the nominal minimum", () => {
+    const at = (fps: number) =>
+      evaluateSubmissionRules({ contentType: "video/mp4", verified: true, fps }, { min_fps: 30 })[0].status;
+    expect(at(29.97)).toBe("pass");
+    expect(at(29.6)).toBe("pass");
+    expect(at(29.5)).toBe("fail");
+    expect(at(24)).toBe("fail");
+  });
+
+  it("ignores a frame rate that did not come from the server", () => {
+    const [result] = evaluateSubmissionRules({ contentType: "video/mp4", fps: 60 }, { min_fps: 30 });
+    expect(result.status).toBe("unknown");
+  });
+
+  it("labels the capture rules", () => {
+    const labels = Object.fromEntries(evaluateSubmissionRules(null, CAPTURE).map((r) => [r.key, r.label]));
+    expect(labels).toEqual({ fps: "≥ 30 fps", require_capture_metadata: "Device info", gps_required: "GPS" });
+    const fps = (rules: Record<string, number>) => evaluateSubmissionRules(null, rules)[0].label;
+    expect(fps({ max_fps: 60 })).toBe("≤ 60 fps");
+    expect(fps({ min_fps: 30, max_fps: 60 })).toBe("30–60 fps");
+  });
+
+  it("tolerates a measured rate just over the maximum but not a different rate", () => {
+    const at = (fps: number) =>
+      evaluateSubmissionRules({ contentType: "video/mp4", verified: true, fps }, { max_fps: 30 })[0].status;
+    expect(at(30.3)).toBe("pass");
+    expect(at(31)).toBe("fail");
+    expect(at(24)).toBe("pass");
+  });
+});
+
+describe("submissionSignalLabel", () => {
+  it("names every modification signal the server can report, and falls back for an unknown code", () => {
+    expect(submissionSignalLabel("reencoded")).toBe("Processed by a video tool after capture");
+    expect(submissionSignalLabel("editing_software")).toBe("Saved by an editing app");
+    expect(submissionSignalLabel("platform_source")).toBe("Downloaded from a video or social platform");
+    expect(submissionSignalLabel("no_capture_metadata")).toBe("No camera make, model or software");
+    expect(submissionSignalLabel("something_new")).toBe("Other signal");
+  });
+});
+
+describe("submissionFlagLabel", () => {
+  it("names every finding the server can report, and falls back for an unknown code", () => {
+    expect(submissionFlagLabel("pdf_javascript")).toBe("Runs JavaScript");
+    expect(submissionFlagLabel("pdf_launch_action")).toBe("Launches a program when opened");
+    expect(submissionFlagLabel("pdf_embedded_files")).toBe("Carries embedded files");
+    expect(submissionFlagLabel("pdf_remote_action")).toBe("Sends data to or loads from a remote address");
+    expect(submissionFlagLabel("pdf_rich_media")).toBe("Embeds rich media");
+    expect(submissionFlagLabel("hidden_archive")).toBe("Hides a ZIP archive");
+    expect(submissionFlagLabel("hidden_document")).toBe("Hides a PDF document");
+    expect(submissionFlagLabel("hidden_markup")).toBe("Contains HTML or script markup");
+    expect(submissionFlagLabel("hidden_executable")).toBe("Hides an executable program");
+    expect(submissionFlagLabel("something_new")).toBe("Flagged for review");
   });
 });

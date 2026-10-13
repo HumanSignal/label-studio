@@ -36,6 +36,45 @@ describe("MediaCard", () => {
     expect(screen.queryByText("Duplicate")).not.toBeInTheDocument();
   });
 
+  it("server findings render a Flagged chip with the reasons in both layouts", () => {
+    const meta = { verified: true, flags: ["pdf_javascript", "hidden_archive"] };
+    const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} />);
+    expect(screen.getByText("Flagged")).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-flags")).toHaveTextContent("Runs JavaScript · Hides a ZIP archive");
+    rerender(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} layout="row" />);
+    expect(screen.getByText("Flagged")).toBeInTheDocument();
+    expect(screen.getByText("Runs JavaScript · Hides a ZIP archive")).toBeInTheDocument();
+    rerender(
+      <MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={{ verified: true, flags: [] }} />,
+    );
+    expect(screen.queryByText("Flagged")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("media-card-flags")).not.toBeInTheDocument();
+  });
+
+  it("the modification gate renders a Possibly modified chip with its signals in both layouts", () => {
+    const meta = { verified: true, modifiedSignals: ["reencoded", "platform_source", "no_capture_metadata"] };
+    const reasons =
+      "Processed by a video tool after capture · Downloaded from a video or social platform · No camera make, model or software";
+    const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={meta} />);
+    expect(screen.getByText("Possibly modified")).toBeInTheDocument();
+    expect(screen.getByTestId("media-card-modified")).toHaveTextContent(`Possibly not an original capture: ${reasons}`);
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={meta} layout="row" />);
+    expect(screen.getByText("Possibly modified")).toBeInTheDocument();
+    rerender(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={{ verified: true }} />);
+    expect(screen.queryByText("Possibly modified")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("media-card-modified")).not.toBeInTheDocument();
+  });
+
+  it("malformed findings render no flag instead of crashing the card", () => {
+    const meta = { verified: true, flags: "pdf_javascript" as unknown as string[] };
+    render(<MediaCard state="submitted" file={FILE} kind="pdf" previewUrl="u" meta={meta} />);
+    expect(screen.getByTestId("media-card-submitted")).toBeInTheDocument();
+    expect(screen.queryByText("Flagged")).not.toBeInTheDocument();
+    const modified = { verified: true, modifiedSignals: "reencoded" as unknown as string[] };
+    render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" meta={modified} />);
+    expect(screen.queryByText("Possibly modified")).not.toBeInTheDocument();
+  });
+
   it("grid fit locks the media to a square box from the two-column breakpoint; natural fit does not", () => {
     const { rerender } = render(<MediaCard state="submitted" file={FILE} kind="video" previewUrl="u" fit="grid" />);
     const media = screen.getByTestId("media-card-media");
@@ -315,5 +354,36 @@ describe("MediaCard", () => {
   it("pdf without a host renderer shows the plain placeholder", () => {
     render(<MediaCard state="uploaded" file={{ name: "deck.pdf" }} kind="pdf" previewUrl="https://x/p.pdf" />);
     expect(screen.getByText("No preview for this file type.")).toBeInTheDocument();
+  });
+});
+
+describe("MediaCard server facts and audio", () => {
+  it("audio kind renders a player with controls", () => {
+    render(
+      <MediaCard
+        state="uploaded"
+        file={{ name: "memo.m4a", size: 1000, contentType: "audio/mp4" }}
+        kind="audio"
+        previewUrl="blob:a"
+      />,
+    );
+    const audio = screen.getByTestId("media-card-media").querySelector("audio") as HTMLAudioElement;
+    expect(audio).toBeInTheDocument();
+    expect(audio).toHaveAttribute("controls");
+  });
+
+  it("verified server facts show in the header and the meta row", () => {
+    const { container } = render(
+      <MediaCard
+        state="submitted"
+        file={FILE}
+        kind="video"
+        previewUrl="u"
+        meta={{ durationSec: 10.5, width: 720, height: 1280, verified: true, facts: ["29.97 fps", "iPhone 15 Pro"] }}
+      />,
+    );
+    expect(container.textContent).toContain("verified");
+    expect(screen.getByTestId("media-card-meta")).toHaveTextContent("29.97 fps");
+    expect(screen.getByTestId("media-card-meta")).toHaveTextContent("iPhone 15 Pro");
   });
 });

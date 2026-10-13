@@ -11,14 +11,20 @@ import { ResetColumnsButton, SAVE_AS_DEFAULT_EVENT } from "./ResetColumnsButton"
  * Process-wide mock.module("mobx-react" / Modal) leaks across Bun's shared worker and
  * breaks later suites (GridSelectAll Provider, Hotkey Help Modal).
  */
-describe("ResetColumnsButton (FIT-2846 / FIT-2847)", () => {
+describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
   let isActiveSpy;
   let confirmSpy;
   let useSDKSpy;
+  let previousAppSettings;
   const invoke = mock();
   const hasHandler = mock((event) => event === "dataManagerSettingsClicked" || event === SAVE_AS_DEFAULT_EVENT);
 
   beforeEach(() => {
+    previousAppSettings = window.APP_SETTINGS;
+    window.APP_SETTINGS = {
+      ...(previousAppSettings ?? {}),
+      user: { ...(previousAppSettings?.user ?? {}), role: "OW" },
+    };
     confirmSpy = spyOn(ModalModule.Modal, "confirm").mockImplementation((props) => {
       props?.onOk?.();
       return { close: mock() };
@@ -33,6 +39,7 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847)", () => {
     invoke.mockClear();
     hasHandler.mockClear();
     hasHandler.mockImplementation((event) => event === "dataManagerSettingsClicked" || event === SAVE_AS_DEFAULT_EVENT);
+    window.APP_SETTINGS = previousAppSettings;
   });
 
   const renderButton = (viewOverrides = {}, props = {}) => {
@@ -62,6 +69,32 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847)", () => {
       </Provider>,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it.each([
+    "AN",
+    "RE",
+    "ANNOTATOR",
+    "REVIEWER",
+  ])("hides the entire defaults footer for Annotator/Reviewer role %s (FIT-2991)", (role) => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    window.APP_SETTINGS = { user: { role } };
+    const { container } = render(
+      <Provider store={{ currentView: { isLockedByManager: false, columns: [], columnOrderSnapshot: {} } }}>
+        <ResetColumnsButton enableSaveAsDefault />
+      </Provider>,
+    );
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTestId("dm-reset-columns")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dm-manage-defaults")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
+  });
+
+  it.each(["OW", "AD", "MA", "OWNER", "MANAGER"])("shows the footer for managing role %s (FIT-2991)", (role) => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    window.APP_SETTINGS = { user: { role } };
+    renderButton();
+    expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
   });
 
   it("opens a confirmation dialog before resetting the tab", () => {

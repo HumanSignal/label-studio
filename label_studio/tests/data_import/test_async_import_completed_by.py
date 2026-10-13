@@ -146,7 +146,13 @@ class TestAsyncImportFFOff:
         mock_serializers_flag.side_effect = fake_flag_set
 
         fu = _create_upload(importer, project, UNKNOWN_COMPLETED_BY_TASKS)
-        pimport = ProjectImport.objects.create(project=project, file_upload_ids=[fu.id], commit_to_project=True)
+        # Mirror async_import_background: terminal FAILED only applies while in_progress.
+        pimport = ProjectImport.objects.create(
+            project=project,
+            file_upload_ids=[fu.id],
+            commit_to_project=True,
+            status=ProjectImport.Status.IN_PROGRESS,
+        )
 
         with pytest.raises(ValidationError):
             _async_import_background_streaming(pimport, importer)

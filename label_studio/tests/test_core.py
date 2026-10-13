@@ -230,6 +230,15 @@ def test_ssrf_safe_session_mounts_the_guarded_adapter():
     assert isinstance(session.get_adapter('https://example.org'), SsrfSafeHTTPAdapter)
 
 
+def test_ssrf_safe_session_exempts_only_the_trusted_origin():
+    session = ssrf_safe_session(trusted_origin='http://10.0.0.5:8080/')
+
+    assert not isinstance(session.get_adapter('http://10.0.0.5:8080/data/upload/1/a.png'), SsrfSafeHTTPAdapter)
+    assert isinstance(session.get_adapter('http://10.0.0.5:8081/a.png'), SsrfSafeHTTPAdapter)
+    assert isinstance(session.get_adapter('https://10.0.0.5:8080/a.png'), SsrfSafeHTTPAdapter)
+    assert isinstance(session.get_adapter('http://10.0.0.5:8080.evil.com/a.png'), SsrfSafeHTTPAdapter)
+
+
 class _SsrfTestHandler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
 

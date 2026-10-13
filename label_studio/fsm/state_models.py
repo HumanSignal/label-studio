@@ -96,6 +96,10 @@ class BaseState(models.Model):
         help_text='Human-readable timestamp for debugging (UUID7 id contains precise timestamp)',
     )
 
+    # Fields copied from the entity that always equal the entity's own value. with_state() adds them
+    # to the latest-state lookup so a scoped index (e.g. task_project_latest_idx) can serve it.
+    latest_state_scope_fields: tuple = ()
+
     class Meta:
         abstract = True
         # UUID7 provides natural ordering, reducing index requirements
@@ -240,6 +244,9 @@ class TaskState(BaseState):
     project_id = models.PositiveIntegerField(
         db_index=True, help_text='From task.project_id - denormalized for performance'
     )
+
+    # Tasks never change project, so state rows always carry their task's project_id.
+    latest_state_scope_fields = ('project_id',)
 
     class Meta:
         app_label = 'fsm'

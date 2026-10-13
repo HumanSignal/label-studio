@@ -199,6 +199,12 @@ export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
 export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
 
 /**
+ * In-browser interface interaction tests (scenarios.js, Tests tab, agent scenario tools).
+ * Requires FF_INTERFACES; when off, the Create Interface agent does not author or run tests.
+ */
+export const FF_INTERFACES_SCENARIOS = "fflag_feat_interfaces_scenarios";
+
+/**
  * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
  */
 export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
@@ -232,6 +238,12 @@ export const FF_LSE_PROJECT_INTERNAL_DESCRIPTION = "fflag_feat_lse_project_inter
  * for the main grid (FIT-2808 / FIT-2845).
  */
 export const FF_PROJECT_DM_COLUMN_DEFAULTS = "fflag_feat_all_fit_2808_project_dm_column_defaults";
+
+/**
+ * Project Settings: Annotator/Reviewer Data Manager column hard access
+ * (Available / Unavailable). FIT-2808 / FIT-2850.
+ */
+export const FF_PROJECT_DM_COLUMN_ACCESS = "fflag_feat_all_fit_2808_dm_column_access";
 
 /**
  * Vertical annotations sidebar with filtering and resizable column in labeling UI.
@@ -322,3 +334,13 @@ export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_sp
  * project defaults (`FF_PROJECT_DM_COLUMN_DEFAULTS`). FIT-2882.
  */
 export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_order";
+
+/** Owner/Administrator "Close account" button in the Organization → Members drawer. UTC-1373. */
+export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
+
+/**
+ * Analytics → Member Performance "Submitted by Project" / "Reviewed by Project" columns, their export
+ * fields, and the backend user × project KPI segmentation they read. UTC-1389.
+ */
+export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
+  "fflag_feat_utc_1389_analytics_performance_project_breakdown";

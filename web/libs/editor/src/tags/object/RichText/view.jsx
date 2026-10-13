@@ -18,6 +18,7 @@ import {
   trimSelection,
 } from "../../../utils/selection-tools";
 import { isDefined } from "../../../utils/utilities";
+import { RegionResizeHandles } from "./RegionResizeHandles";
 import "./RichText.prefix.css";
 
 const DBLCLICK_TIMEOUT = 450; // ms
@@ -239,9 +240,8 @@ class RichTextPieceView extends Component {
         area.updateXPathsFromGlobalOffsets();
       }
 
-      // recreating spans + attach handles because region stays selected
+      // handles will be reattached to the new spans by RegionResizeHandles, region stays selected
       area.applyHighlight();
-      area.attachHandles();
 
       area.notifyDrawingFinished();
       area.updateHighlightedText({ force: true });
@@ -570,6 +570,7 @@ class RichTextPieceView extends Component {
             dangerouslySetInnerHTML={{ __html: val }}
             {...eventHandlers}
           />
+          <RegionResizeHandles item={item} />
         </ObjectTag>
       );
     }
@@ -591,6 +592,7 @@ class RichTextPieceView extends Component {
           srcDoc={val}
           onLoad={this.onIFrameLoad}
         />
+        <RegionResizeHandles item={item} />
       </ObjectTag>
     );
   }

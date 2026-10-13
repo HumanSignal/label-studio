@@ -31,7 +31,7 @@ export const DEFAULT_HOTKEYS = [
     id: 220,
     section: "annotation",
     element: "annotation:reject-requeue",
-    label: "Reject: Return to Annotator",
+    label: "Reject: Return to Same Annotator",
     key: "ctrl+shift+2",
     description: "Reject and send back to the original annotator for rework",
     active: true,

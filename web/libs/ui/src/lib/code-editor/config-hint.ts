@@ -237,4 +237,10 @@ function getHints(cm: any, options: CMHintOptions) {
   return returnHints();
 }
 
-CM.registerHelper("hint", "xml", getHints);
+/**
+ * `@humansignal/ui` is declared side-effect free (package.json `sideEffects`), so a bare
+ * `import "./config-hint"` is tree-shaken out of production builds. Call this explicitly instead.
+ */
+export function registerConfigHint() {
+  CM.registerHelper("hint", "xml", getHints);
+}

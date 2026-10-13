@@ -1,7 +1,10 @@
 import { inject, observer } from "mobx-react";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { Button } from "@humansignal/ui";
-import { captureExploreDefaultsFromTab } from "../../../stores/Tabs/project_column_defaults";
+import {
+  captureExploreDefaultsFromTab,
+  currentUserIsManagingDmRole,
+} from "../../../stores/Tabs/project_column_defaults";
 import { useSDK } from "../../../providers/SDKProvider";
 import { Modal } from "../../Common/Modal/Modal";
 
@@ -21,12 +24,13 @@ const injector = inject(({ store }) => {
  * Columns dropdown footer — Reset, Manage Defaults, and Save as Default (FIT-2846 / FIT-2847).
  * Reset (left) restores soft project defaults for the current tab only.
  * Save as Default (right) captures the current tab layout into the project explore soft default (Managers+).
- * Hidden when the feature flag is off. Save / Manage Defaults only when the host registered handlers.
+ * Hidden when the feature flag is off, or when the user is Annotator/Reviewer (FIT-2991).
+ * Save / Manage Defaults only when the host registered handlers.
  */
 export const ResetColumnsButton = injector(
   observer(({ view, locked, enabled, enableSaveAsDefault = false }) => {
     const sdk = useSDK();
-    if (!enabled) return null;
+    if (!enabled || !currentUserIsManagingDmRole()) return null;
 
     const canManageDefaults = Boolean(sdk?.hasHandler?.(MANAGE_DEFAULTS_EVENT));
     const canSaveAsDefault = Boolean(enableSaveAsDefault && sdk?.hasHandler?.(SAVE_AS_DEFAULT_EVENT));
@@ -49,7 +53,7 @@ export const ResetColumnsButton = injector(
       if (locked || !view || !canSaveAsDefault) return;
       Modal.confirm({
         title: "Save as Default?",
-        body: "This will save the current tab’s column order and visibility as the default for this project. Existing tabs keep their customizations. This does not change who can access columns.",
+        body: "This will save the current tab’s column order and visibility as the default for this project. The saved layout applies to Managers+ only. Existing tabs keep their customizations. This does not change who can access columns.",
         okText: "Save as Default",
         cancelText: "Cancel",
         onOk() {

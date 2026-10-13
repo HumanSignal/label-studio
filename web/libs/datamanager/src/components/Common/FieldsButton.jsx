@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
+import { currentUserIsManagingDmRole } from "../../stores/Tabs/project_column_defaults";
 import { ColumnPicker } from "./ColumnPicker";
 import { ResetColumnsButton } from "../DataManager/Toolbar/ResetColumnsButton";
 
@@ -20,6 +21,8 @@ const injector = inject(({ store }) => {
  *
  * `showProjectDefaultsFooter` — main-grid Columns only (FIT-2847). Quick View omits the
  * Reset / Manage Defaults / Save as Default footer because defaults apply to explore only.
+ * Annotators/Reviewers also omit the footer slot entirely (FIT-2991) — Select still mounts
+ * the bordered footer chrome when `footer` is a React element, even if children render null.
  */
 
 export const FieldsButton = injector(
@@ -43,7 +46,10 @@ export const FieldsButton = injector(
       const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
       const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
       const readOnly = view?.isLockedByManager;
-      const showDefaultsFooter = showProjectDefaultsFooter && isActive(FF_PROJECT_DM_COLUMN_DEFAULTS);
+      // Do not pass a React element as `footer` for AN/RE — Select treats elements as truthy and
+      // still draws the bordered padded shell even when ResetColumnsButton returns null.
+      const showDefaultsFooter =
+        showProjectDefaultsFooter && isActive(FF_PROJECT_DM_COLUMN_DEFAULTS) && currentUserIsManagingDmRole();
 
       const handleChange = useCallback(
         (keys) => {
