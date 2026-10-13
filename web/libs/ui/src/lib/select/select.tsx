@@ -383,6 +383,22 @@ export const Select = forwardRef(
         onSearch?.(defaultSearchValue || "");
       }
     }, [isOpen, defaultSearchValue, onSearch]);
+
+    // The panel is portaled and follows its trigger, so scrolling a container of the trigger would drag it
+    // over neighbouring content (e.g. out of a horizontally scrolled table). Close it instead. Other scrolls
+    // (the options list, a text input resetting its scroll on blur) leave the trigger in place.
+    useEffect(() => {
+      if (!isOpen) return;
+      const handleScroll = (event: Event) => {
+        const trigger = triggerRef.current;
+        if (!trigger || !(event.target instanceof Node) || !event.target.contains(trigger)) return;
+        setInternalIsOpen(false);
+        onClose?.();
+      };
+      document.addEventListener("scroll", handleScroll, { capture: true, passive: true });
+      return () => document.removeEventListener("scroll", handleScroll, { capture: true });
+    }, [isOpen, onClose]);
+
     const interactionDisabled = disabled || readOnly;
 
     const _onChange = useCallback(

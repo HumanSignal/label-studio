@@ -2,7 +2,7 @@ import { type FormEventHandler, useCallback, useEffect, useRef, useState } from 
 import { format } from "date-fns";
 import { Badge, Button, InputFile, ToastType, Typography, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
-import { useAccountSettingsExtension } from "../extensions";
+import { getAccountSettingsPersonalInfoExtras, useAccountSettingsExtension } from "../extensions";
 import { useReportProfileDirty } from "../ProfileDirtyContext";
 import styles from "../AccountSettings.module.css";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -235,6 +235,9 @@ export const PersonalInfo = () => {
                   value={format(new Date(account.date_joined), "dd MMM yyyy")}
                 />
               </div>
+            ))}
+            {getAccountSettingsPersonalInfoExtras().map((PersonalInfoExtra, index) => (
+              <PersonalInfoExtra key={index} />
             ))}
           </div>
           <div className={styles.formActions}>

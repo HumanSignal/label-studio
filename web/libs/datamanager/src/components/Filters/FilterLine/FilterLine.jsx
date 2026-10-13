@@ -1,13 +1,14 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { cn } from "../../../utils/bem";
-import { Button, Typography } from "@humansignal/ui";
+import { Button, Tooltip, Typography } from "@humansignal/ui";
 import { PlusIcon, XIcon } from "@humansignal/icons";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.prefix.css";
 import { FilterOperation } from "./FilterOperation";
 import { ColumnPicker, ColumnPickerOptionContent, RECENT_COLUMN_PREFIX } from "../../Common/ColumnPicker";
 import { REVIEW_INDICATOR_CHILD_ALIASES } from "../../../stores/Tabs/tab_filter";
+import { findChildFilterType } from "../../../stores/Tabs/child_filter_types";
 
 const RECENTS_AUTOSAVE_DELAY_MS = 500;
 /** Chrome action icons in the Filters pane (remove, add child, pin/unpin). */
@@ -159,11 +160,7 @@ export const FilterLine = observer(
     const canConfigureChildren = filter.field.allowed_child_filters?.length > 0;
     const allFilterTypes = view.parent?.availableFilters ?? view.availableFilters;
     const childFilterTypes = configuredChildAliases
-      .map((alias) =>
-        allFilterTypes.find(
-          (filterType) => filterType.field.alias === alias && filterType.field.target === filter.target,
-        ),
-      )
+      .map((alias) => findChildFilterType(allFilterTypes, filter.field, alias, filter.target))
       .filter(Boolean);
     const childColumnItems = childFilterTypes.map((filterType) => ({
       value: filterType.id,
@@ -279,15 +276,17 @@ export const FilterLine = observer(
                     <ConjunctionLabel>And</ConjunctionLabel>
                   </div>
 
-                  <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
-                    <FilterDropdown
-                      placeholder={childFilter.field.title}
-                      value={childFilter.filter.id}
-                      items={childColumnItems}
-                      disabled={childIsDisabled}
-                      onChange={(filterTypeId) => childFilter.setFilterDelayed(filterTypeId)}
-                    />
-                  </div>
+                  <Tooltip title={childFilter.field.help}>
+                    <div className={cn("filterLine").elem("column").mix("field").toClassName()}>
+                      <FilterDropdown
+                        placeholder={childFilter.field.title}
+                        value={childFilter.filter.id}
+                        items={childColumnItems}
+                        disabled={childIsDisabled}
+                        onChange={(filterTypeId) => childFilter.setFilterDelayed(filterTypeId)}
+                      />
+                    </div>
+                  </Tooltip>
 
                   <FilterOperation
                     filter={childFilter}

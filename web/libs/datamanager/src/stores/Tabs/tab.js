@@ -1,5 +1,5 @@
 import deepEqual from "deep-equal";
-import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { normalizeFilterValue } from "./filter_utils";
 import { TabFilter } from "./tab_filter";
@@ -15,8 +15,10 @@ const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed
 const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
 const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
 
+import { preferSiblingFilterType } from "./child_filter_types";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 import { clearPersonalColumnOrder } from "../../components/Common/Table/columnOrderStorage";
+import { clearUnavailableVirtualFilters } from "./unavailable_filters";
 
 export const Tab = types
   .model("View", {
@@ -107,7 +109,9 @@ export const Tab = types
     },
 
     get availableFilters() {
-      return self.parent.availableFilters.filter((filter) => filter.field.available_for_new_filters);
+      return self.parent.availableFilters.filter(
+        (filter) => isAlive(filter) && filter.field.available_for_new_filters && !filter.field.child_only,
+      );
     },
 
     get dataStore() {
@@ -129,8 +133,13 @@ export const Tab = types
     },
 
     get currentOrder() {
-      return self.ordering.length
-        ? self.ordering.reduce((res, field) => {
+      const columns = self.columns ?? [];
+      const ordering = columns.length
+        ? self.ordering.filter((field) => columns.some((column) => column.id === field.replace(/^-/, "")))
+        : self.ordering;
+
+      return ordering.length
+        ? ordering.reduce((res, field) => {
             const fieldName = field.replace(/^-/, "");
             const desc = field[0] === "-";
 
@@ -139,7 +148,7 @@ export const Tab = types
               [fieldName]: desc,
               desc,
               field: fieldName,
-              column: self.columns.find((c) => c.id === fieldName),
+              column: columns.find((c) => c.id === fieldName),
             };
           }, {})
         : null;
@@ -539,12 +548,15 @@ export const Tab = types
       const filterType =
         typeof filterTypeOrAlias === "object"
           ? filterTypeOrAlias
-          : self.availableFilters.find(
-              (candidate) =>
-                candidate.id === filterTypeOrAlias ||
-                candidate.field.alias === filterTypeOrAlias ||
-                (!filterTypeOrAlias && allowedAliases.includes(candidate.field.alias)),
-            );
+          : (self.parent.availableFilters.find((candidate) => candidate.id === filterTypeOrAlias) ??
+            preferSiblingFilterType(
+              self.parent.availableFilters.filter((candidate) =>
+                filterTypeOrAlias
+                  ? candidate.field.alias === filterTypeOrAlias
+                  : allowedAliases.includes(candidate.field.alias),
+              ),
+              rootFilter.field,
+            ));
 
       if (
         !filterType ||
@@ -655,6 +667,13 @@ export const Tab = types
     },
 
     reload: flow(function* ({ interaction } = {}) {
+      // Annotator virtual tabs: strip denied-column filters before the tasks
+      // request so Refresh / tab apply match the initial-load graceful path
+      // and do not 403 on GET /api/tasks (FIT-2850).
+      if (self.virtual && clearUnavailableVirtualFilters(self)) {
+        self.persistVirtual();
+      }
+
       if (self.saved) {
         yield self.dataStore.reload({ id: self.id, interaction });
       }
@@ -688,7 +707,12 @@ export const Tab = types
      */
     importFilters(snapshot) {
       if (self.isLockedByManager) return self.notifyLocked();
-      const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
+      // Check against every column type, not the picker list: a saved read-only line must survive paste and undo.
+      // Child-only columns stay valid as children but not as top-level lines.
+      const validItems = validateFilterSnapshot(
+        snapshot,
+        self.parent.availableFilters.filter((filterType) => !filterType.field.child_only),
+      );
       if (!validItems) return false;
 
       const { conjunction } = snapshot;
@@ -746,24 +770,33 @@ export const Tab = types
       self.snapshot = self.serialize();
     },
 
+    /**
+     * Write the virtual tab to localStorage and the URL tab key.
+     * Same persistence a normal virtual-tab edit uses, without reloading tasks.
+     */
+    persistVirtual() {
+      if (self.virtual !== true) return;
+      const snapshot = self.serialize();
+
+      self.snapshot = snapshot;
+      self.key = self.parent.snapshotToUrl(snapshot);
+
+      const projectId = self.root.SDK?.projectId;
+
+      if (projectId) {
+        localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
+      }
+
+      History.navigate({ tab: self.key }, true);
+    },
+
     save: flow(function* ({ reload, interaction } = {}) {
       const serialized = self.serialize();
 
       if (!self.saved || !deepEqual(self.snapshot, serialized)) {
         self.snapshot = serialized;
         if (self.virtual === true) {
-          const snapshot = self.serialize();
-
-          self.key = self.parent.snapshotToUrl(snapshot);
-
-          const projectId = self.root.SDK.projectId;
-
-          // Save the virtual tab of the project to local storage to persist between page navigations
-          if (projectId) {
-            localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
-          }
-
-          History.navigate({ tab: self.key }, true);
+          self.persistVirtual();
           self.reload({ interaction });
         } else {
           yield self.parent.saveView(self, { reload, interaction });

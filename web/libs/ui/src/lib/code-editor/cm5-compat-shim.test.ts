@@ -1,6 +1,6 @@
 import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { EditorState } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import { EditorView, keymap } from "@codemirror/view";
 import { undo, undoDepth } from "@codemirror/commands";
 import { buildCm6Extensions, createPlaceholderContent } from "./cm5-compat-shim";
 
@@ -115,6 +115,42 @@ describe("buildCm6Extensions undo history", () => {
 
       undo(view);
       expect(view.state.doc.toString()).toBe("line one\nline two");
+    } finally {
+      view.destroy();
+      parent.remove();
+    }
+  });
+});
+
+describe("buildCm6Extensions onKeyDown", () => {
+  it("runs before keymaps so callers can stop keys a keymap consumes", () => {
+    const parent = document.createElement("div");
+    document.body.appendChild(parent);
+    const parentKeyDown = mock();
+    parent.addEventListener("keydown", parentKeyDown);
+    const onKeyDown = mock((_editor: unknown, event: KeyboardEvent) => {
+      if (event.code === "Escape") event.stopPropagation();
+    });
+
+    const view = new EditorView({
+      parent,
+      state: EditorState.create({
+        doc: "<View></View>",
+        extensions: [
+          buildCm6Extensions({ mode: "xml", hintOptions: { schemaInfo: tags } }, { onKeyDown }),
+          // Stands in for completionKeymap, which consumes Escape while autocomplete is open
+          keymap.of([{ key: "Escape", run: () => true }]),
+        ],
+      }),
+    });
+
+    try {
+      view.contentDOM.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", code: "Escape", keyCode: 27, bubbles: true }),
+      );
+
+      expect(onKeyDown).toHaveBeenCalledTimes(1);
+      expect(parentKeyDown).not.toHaveBeenCalled();
     } finally {
       view.destroy();
       parent.remove();

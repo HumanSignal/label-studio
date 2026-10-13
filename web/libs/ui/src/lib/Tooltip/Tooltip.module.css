@@ -124,6 +124,25 @@
       }
     }
 
+    &_left-center {
+      &::before {
+        left: auto;
+        right: 0;
+        top: 50%;
+        bottom: auto;
+        transform: translate(50%, -50%) rotate(45deg);
+      }
+    }
+
+    &_right-center {
+      &::before {
+        left: 0;
+        top: 50%;
+        bottom: auto;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
+
     &_bottom-right {
       margin-left: calc(var(--offset-x) - (var(--pointer-size) / 2));
 

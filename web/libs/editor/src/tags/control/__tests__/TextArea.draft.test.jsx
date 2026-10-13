@@ -23,10 +23,19 @@ mockModule("keymaster", () => {
 import "../../../tags/visual/View";
 import "../../../tags/object/Image/Image.js";
 import "../../../tags/control/TextArea/TextArea";
+import "../../../tags/control/Label";
+import "../../../tags/control/Labels/Labels";
+import "../../../regions/RectRegion";
 import AppStore from "../../../stores/AppStore";
 
 const TEXTAREA_CONFIG =
   '<View><Image name="img" value="$img"/><TextArea name="notes" toName="img" rows="3" showSubmitButton="true"/></View>';
+
+const PER_REGION_TEXTAREA_CONFIG = `<View>
+  <Image name="img" value="$img"/>
+  <Labels name="labels" toName="img"><Label value="Typo"/></Labels>
+  <TextArea name="notes" toName="img" perRegion="true" maxSubmissions="1"/>
+</View>`;
 
 const createTestEnv = () => ({
   events: {
@@ -38,11 +47,11 @@ const createTestEnv = () => ({
   settings: {},
 });
 
-function createStoreWithTextArea() {
+function createStoreWithTextArea(config = TEXTAREA_CONFIG) {
   const env = createTestEnv();
   const store = AppStore.create(
     {
-      config: TEXTAREA_CONFIG,
+      config,
       task: { id: 1, data: JSON.stringify({ img: "https://example.com/test.jpg" }) },
       interfaces: ["basic"],
     },
@@ -111,5 +120,36 @@ describe("TextArea draft persistence (UTC-945)", () => {
 
     expect(notes.result.meta?.textAreaPendingInput).toBeUndefined();
     expect(notes.regions.map((r) => r._value)).toEqual(["will commit"]);
+  });
+});
+
+describe("per-region TextArea draft autosave (FIT-2829)", () => {
+  it("does not create an empty per-object result for uncommitted per-region input", async () => {
+    const { annotation, notes, img, store } = createStoreWithTextArea(PER_REGION_TEXTAREA_CONFIG);
+    store.submitDraft = mock().mockResolvedValue({ id: 1 });
+    const labels = annotation.names.get("labels");
+
+    const area = annotation.createResult(
+      { x: 10, y: 10, width: 20, height: 20, rotation: 0 },
+      { labels: ["Typo"] },
+      labels,
+      img,
+    );
+    annotation.selectArea(area);
+
+    notes.setValue("rectext", { skipDraftSave: true });
+    await annotation.saveDraft();
+
+    const textareaResultsBeforeCommit = annotation
+      .serializeAnnotation({ fast: true })
+      .filter((r) => r.from_name === "notes");
+    expect(textareaResultsBeforeCommit).toEqual([]);
+
+    notes.addText(notes._value);
+
+    const textareaResults = annotation.serializeAnnotation({ fast: true }).filter((r) => r.from_name === "notes");
+    expect(textareaResults).toHaveLength(1);
+    expect(textareaResults[0].id).toBe(area.cleanId);
+    expect(textareaResults[0].value.text).toEqual(["rectext"]);
   });
 });

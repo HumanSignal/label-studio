@@ -872,6 +872,47 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByText("Apple"));
       await waitFor(() => expect(onClose).toHaveBeenCalled());
     });
+
+    it("closes when an outside container scrolls so the panel cannot drift from its trigger", async () => {
+      const onClose = mock();
+      render(
+        <div data-testid="scroller">
+          <Select options={["Apple", "Banana"] as any} placeholder="Select" onClose={onClose} />
+        </div>,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByTestId("scroller"));
+
+      await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it("stays open when the options list itself scrolls", async () => {
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByText("Apple"));
+
+      expect(screen.getByTestId("select-popup")).toBeInTheDocument();
+    });
+
+    it("stays open when an element that does not contain the trigger scrolls", async () => {
+      render(
+        <>
+          <input data-testid="search" />
+          <Select options={["Apple", "Banana"] as any} placeholder="Select" />
+        </>,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByTestId("search"));
+
+      expect(screen.getByTestId("select-popup")).toBeInTheDocument();
+    });
   });
 
   describe("renderSelected and selectFirstIfEmpty", () => {

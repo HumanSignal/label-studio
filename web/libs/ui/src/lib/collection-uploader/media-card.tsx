@@ -18,7 +18,13 @@ import { Button } from "../button/button";
 import { Message } from "../message/message";
 import { ModalWindow } from "../modal-window";
 import { cn } from "../../utils/utils";
-import { SubmissionRuleBadges, SubmissionStatusChip, type SubmissionRuleResult } from "./submission-rules";
+import {
+  SubmissionRuleBadges,
+  SubmissionStatusChip,
+  type SubmissionRuleResult,
+  submissionFlagLabel,
+  submissionSignalLabel,
+} from "./submission-rules";
 
 export type MediaCardState = "uploading" | "failed" | "rejected" | "uploaded" | "submitted" | "readonly";
 
@@ -43,6 +49,10 @@ export interface MediaCardMeta {
   durationSec?: number | null;
   width?: number | null;
   height?: number | null;
+  /** Facts were read by the server from the stored bytes. */
+  verified?: boolean;
+  /** Extra server facts shown in the meta row ("29.97 fps", "iPhone 15 Pro"). */
+  facts?: string[];
 }
 
 export interface MediaCardProps {
@@ -50,8 +60,8 @@ export interface MediaCardProps {
   /** Prefer the stored submission's facts when no local File exists; a missing
    * file renders a neutral "Submission" header instead of crashing. */
   file?: MediaCardFile | null;
-  /** "video" | "image" | "pdf" — anything else renders a plain file placeholder. */
-  kind: "video" | "image" | "pdf" | "file";
+  /** "video" | "image" | "audio" | "pdf" — anything else renders a plain file placeholder. */
+  kind: "video" | "image" | "audio" | "pdf" | "file";
   /** PDF members: page renderer; without it a PDF falls back to the placeholder. */
   pdf?: MediaCardPdfSource;
   /** Playable/viewable source (local blob or resolver URL). */
@@ -196,7 +206,7 @@ export const MediaCard = ({
     return clearPreviewTimer;
   }, [previewUrl, previewBrokenProp, kind, clearPreviewTimer, markBroken]);
   const previewBroken = previewBrokenProp || autoBroken;
-  const canExpand = !!previewUrl && !previewBroken && kind !== "file";
+  const canExpand = !!previewUrl && !previewBroken && kind !== "file" && kind !== "audio";
   const gridFit = fit === "grid";
   const fill = gridFit ? "md:h-full" : "";
 
@@ -252,7 +262,12 @@ export const MediaCard = ({
     videoRef.current?.play().catch(() => undefined);
   }, []);
 
-  const facts = [safeFile.contentType || "unknown type", formatSize(safeFile.size), storedHint ? "stored" : ""]
+  const facts = [
+    safeFile.contentType || "unknown type",
+    formatSize(safeFile.size),
+    storedHint ? "stored" : "",
+    meta?.verified ? "verified" : "",
+  ]
     .filter(Boolean)
     .join(" · ");
 
@@ -263,6 +278,25 @@ export const MediaCard = ({
     metaParts.push(`${meta.width} × ${meta.height}`);
     metaParts.push((meta.height as number) >= (meta.width as number) ? "portrait" : "landscape");
   }
+  if (meta?.facts?.length) metaParts.push(...meta.facts);
+  const findings = Array.isArray(meta?.flags) ? meta.flags.map(submissionFlagLabel).join(" · ") : "";
+  const flaggedChip = findings ? (
+    <Tooltip title={findings}>
+      <span>
+        <SubmissionStatusChip tone="warning">Flagged</SubmissionStatusChip>
+      </span>
+    </Tooltip>
+  ) : null;
+  const modification = Array.isArray(meta?.modifiedSignals)
+    ? `Possibly not an original capture: ${meta.modifiedSignals.map(submissionSignalLabel).join(" · ")}`
+    : "";
+  const modifiedChip = modification ? (
+    <Tooltip title={modification}>
+      <span>
+        <SubmissionStatusChip tone="warning">Possibly modified</SubmissionStatusChip>
+      </span>
+    </Tooltip>
+  ) : null;
 
   const rowActions = editable && state !== "readonly" && (
     <span className="ml-auto flex flex-none items-center gap-tight">
@@ -339,6 +373,8 @@ export const MediaCard = ({
             {metaParts.length ? ` · ${metaParts.join(" · ")}` : ""}
             {firstFail ? " · " : ""}
             {firstFail ? <span className="text-negative-content">{firstFail.label} ✕</span> : null}
+            {findings ? " · " : ""}
+            {findings ? <span className="text-warning-content">{findings}</span> : null}
           </span>
         </span>
         {state === "uploading" ? (
@@ -351,6 +387,8 @@ export const MediaCard = ({
             </span>
           </span>
         ) : null}
+        {flaggedChip}
+        {modifiedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
         {rowActions}
@@ -374,6 +412,8 @@ export const MediaCard = ({
           <span className="block truncate font-medium text-neutral-content text-sm">{safeFile.name}</span>
           <span className="block truncate text-neutral-content-subtler text-xs">{facts}</span>
         </span>
+        {flaggedChip}
+        {modifiedChip}
         {duplicate ? <SubmissionStatusChip tone="warning">Duplicate</SubmissionStatusChip> : null}
         <SubmissionStatusChip tone={chip.tone}>{chip.text(progress)}</SubmissionStatusChip>
       </div>
@@ -481,6 +521,23 @@ export const MediaCard = ({
               </button>
             ) : null}
           </>
+        ) : kind === "audio" ? (
+          <div
+            className={cn("flex h-[320px] w-full items-center justify-center bg-neutral-emphasis-subtle px-wide", fill)}
+          >
+            {/* biome-ignore lint/a11y/useMediaCaption: contributor-submitted media has no captions */}
+            <audio
+              src={previewUrl}
+              controls
+              preload="metadata"
+              className="w-full"
+              onLoadedMetadata={(event) => {
+                clearPreviewTimer();
+                onMediaMetadata?.({ durationSec: event.currentTarget.duration });
+              }}
+              onError={markBroken}
+            />
+          </div>
         ) : (
           <div
             className={cn(
@@ -550,7 +607,7 @@ export const MediaCard = ({
         </div>
       ) : null}
 
-      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || message ? (
+      {(ruleResults && ruleResults.length > 0) || metaParts.length > 0 || findings || modification || message ? (
         <div className="flex flex-col gap-tight border-neutral-border-subtle border-t p-tight">
           {ruleResults && ruleResults.length > 0 ? (
             <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -568,6 +625,16 @@ export const MediaCard = ({
                 </span>
               ))}
             </div>
+          ) : null}
+          {findings ? (
+            <Message variant="warning" size="small" data-testid="media-card-flags">
+              {findings}
+            </Message>
+          ) : null}
+          {modification ? (
+            <Message variant="warning" size="small" data-testid="media-card-modified">
+              {modification}
+            </Message>
           ) : null}
           {message ? (
             <Message variant="negative" size="small" data-testid="media-card-message">

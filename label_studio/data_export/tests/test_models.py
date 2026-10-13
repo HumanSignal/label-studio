@@ -2,6 +2,8 @@ from types import SimpleNamespace
 
 import pytest
 from data_export.models import DataExport, Export
+from projects.tests.factories import ProjectFactory
+from tasks.tests.factories import TaskFactory
 
 STORED_BASENAME = 'project-198575-at-2026-01-23-16-16-48a6bac9.json'
 STORED_PATH = f'198575/{STORED_BASENAME}'
@@ -116,3 +118,15 @@ def test_doclang_export_format_applicability_for_empty_configs(use_custom_interf
     doclang = next(format_info for format_info in formats if format_info['name'] == 'DOCLANG')
 
     assert doclang.get('disabled', False) is disabled
+
+
+@pytest.mark.django_db
+def test_get_export_data_limits_tasks_to_task_ids():
+    # `task_ids` is an internal filter option: the export holds exactly those tasks.
+    project = ProjectFactory()
+    first, _, third = [TaskFactory(project=project) for _ in range(3)]
+    export = Export.objects.create(project=project)
+
+    exported = list(export.get_export_data(task_filter_options={'task_ids': [first.id, third.id]}))
+
+    assert [task['id'] for task in exported] == [first.id, third.id]

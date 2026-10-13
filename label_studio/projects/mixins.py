@@ -41,6 +41,7 @@ class ProjectMixin:
         tasks_number_changed,
         from_scratch=True,
         recalculate_stats_counts: Optional[Mapping[str, int]] = None,
+        update_counters=True,
     ):
         """
         Async start updating tasks counters and than rearrange
@@ -49,9 +50,11 @@ class ProjectMixin:
         :param overlap_cohort_percentage_changed: If cohort_percentage param changed
         :param tasks_number_changed: If tasks number changed in project
         :param from_scratch: Skip calculated tasks
+        :param update_counters: Recalculate task counters; pass False when they are known to be correct.
+            The job still runs to update task states and stats, so it is scheduled either way.
         """
         # get only id from queryset to decrease data size in job
-        task_ids = get_unique_ids_list(tasks_queryset)
+        task_ids = get_unique_ids_list(tasks_queryset) if update_counters else []
         start_job_async_or_sync(
             self._update_tasks_counters_and_task_states,
             task_ids,
@@ -60,6 +63,7 @@ class ProjectMixin:
             tasks_number_changed,
             from_scratch=from_scratch,
             recalculate_stats_counts=recalculate_stats_counts,
+            update_counters=update_counters,
         )
 
     def update_tasks_states(

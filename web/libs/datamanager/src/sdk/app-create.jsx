@@ -4,6 +4,7 @@ import { AppStore } from "../stores/AppStore";
 import * as DataStores from "../stores/DataStores";
 import { DynamicModel, registerModel } from "../stores/DynamicModel";
 import { types } from "mobx-state-tree";
+import { resolvePreloaded } from "./resolve-preloaded";
 
 const createDynamicModels = (columns) => {
   const grouppedColumns = columns.reduce((res, column) => {
@@ -35,7 +36,9 @@ const createDynamicModels = (columns) => {
 export const createApp = async (rootNode, datamanager) => {
   const isLabelStream = datamanager.mode === "labelstream";
 
-  const response = await datamanager.api.columns();
+  const preloadedColumns = datamanager.explorerPreload?.columns ?? null;
+  if (datamanager.explorerPreload) datamanager.explorerPreload.columns = null;
+  const response = await resolvePreloaded(preloadedColumns, () => datamanager.api.columns());
 
   if (!response || response.error) {
     const message = `

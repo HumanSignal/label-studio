@@ -4,17 +4,22 @@ This file tests TaskPagination: .only('id') during pagination and the
 single-Sum totals path (FIT-2416) used by the live DM list endpoint.
 """
 
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from data_manager.api import TaskPagination
 from data_manager.managers import apply_filters
-from data_manager.prepare_params import Filter, Filters
+from data_manager.prepare_params import Filter, Filters, PrepareParams
+from django.core.paginator import Paginator
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from organizations.tests.factories import OrganizationFactory
 from projects.models import ProjectMember
 from projects.tests.factories import ProjectFactory
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.test import APITestCase
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory, APITestCase
 from tasks.models import Annotation, Task
 from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 from users.tests.factories import UserFactory
@@ -48,6 +53,7 @@ class TestTaskPaginationMemoryOptimization(TestCase):
         mock_id_only_queryset = MagicMock()
         mock_queryset.only.return_value = mock_id_only_queryset
         mock_queryset.values.return_value.aggregate.return_value = {
+            'total': 4,
             'total_annotations': 7,
             'total_predictions': 3,
         }
@@ -115,6 +121,54 @@ class TestTaskPaginationTotalsIntegration(APITestCase):
         assert body['total_predictions'] == expected_predictions
         assert len(body['tasks']) == 2
 
+    def test_dm_list_total_reuses_totals_aggregate_instead_of_separate_count(self):
+        self.client.force_authenticate(self.owner)
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get('/api/tasks/', {'project': self.project.id, 'page_size': 2, 'page': 1})
+
+        assert response.status_code == 200
+        assert response.json()['total'] == 4
+        assert [q['sql'] for q in queries if '"__count"' in q['sql'] and 'FROM "task"' in q['sql']] == []
+
+    def test_dm_list_page_past_last_page_is_not_found(self):
+        self.client.force_authenticate(self.owner)
+
+        response = self.client.get('/api/tasks/', {'project': self.project.id, 'page_size': 2, 'page': 3})
+
+        assert response.status_code == 404
+
+    def test_total_matches_paginator_count_for_filtered_querysets(self):
+        cases = {
+            'no_filters': [],
+            'data_contains': [
+                {'filter': 'filter:tasks:data.text', 'operator': 'contains', 'type': 'String', 'value': 't1'}
+            ],
+            'total_annotations': [
+                {'filter': 'filter:tasks:total_annotations', 'operator': 'greater', 'type': 'Number', 'value': 0}
+            ],
+            'annotators_join': [
+                {'filter': 'filter:tasks:annotators', 'operator': 'contains', 'type': 'List', 'value': [self.owner.id]}
+            ],
+        }
+        api_request = Request(APIRequestFactory().get('/api/tasks/', {'page': 1, 'page_size': 2}))
+
+        for name, items in cases.items():
+            with self.subTest(name=name):
+                prepare_params = PrepareParams(
+                    project=self.project.id,
+                    filters={'conjunction': 'and', 'items': items},
+                    ordering=['-tasks:total_annotations'],
+                    data={},
+                    request=SimpleNamespace(user=self.owner, GET={}, data={}),
+                )
+                queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+                pagination = TaskPagination()
+
+                pagination.paginate_queryset(queryset, api_request)
+
+                assert pagination.page.paginator.count == Paginator(queryset.only('id'), 2).count
+
 
 class TestTaskListVisibleDataPayload(APITestCase):
     """FIT-2416: DM list omits task.data keys hidden in both explore and labeling."""
@@ -157,6 +211,33 @@ class TestTaskListVisibleDataPayload(APITestCase):
         task_payload = next(t for t in response.json()['tasks'] if t['id'] == task.id)
         assert task_payload['data'] == {'keep': 'yes'}
         assert 'drop' not in task_payload['data']
+
+    def test_all_columns_computed_once_per_request(self):
+        from data_manager.functions import get_all_columns
+        from data_manager.models import View
+
+        project = ProjectFactory()
+        TaskFactory(project=project, data={'keep': 'yes', 'drop': 'no'})
+        view = View.objects.create(
+            project=project,
+            data={'hiddenColumns': {'explore': ['tasks:data.drop'], 'labeling': ['tasks:data.drop']}},
+        )
+        from django.conf import settings
+
+        from label_studio.core.utils.common import load_func
+
+        get_all_columns_spy = MagicMock(wraps=get_all_columns)
+
+        def load_func_with_spy(path):
+            return get_all_columns_spy if path == settings.DATA_MANAGER_GET_ALL_COLUMNS else load_func(path)
+
+        self.client.force_authenticate(project.created_by)
+        with patch('data_manager.managers.load_func', side_effect=load_func_with_spy):
+            first = self.client.get('/api/tasks/', {'project': project.id, 'view': view.id, 'page_size': 10})
+            second = self.client.get('/api/tasks/', {'project': project.id, 'view': view.id, 'page_size': 10})
+
+        assert first.status_code == second.status_code == 200
+        assert get_all_columns_spy.call_count == 2
 
 
 class TestTaskListUnqueryableDataColumnFilter(APITestCase):

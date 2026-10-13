@@ -40,6 +40,29 @@ export interface SubmissionUploadRow {
   bucket: string | null;
   key: string | null;
   etag: string | null;
+  /** Facts the server read from the stored bytes when the upload completed. */
+  meta?: SubmissionServerMeta | null;
+}
+
+/** What the server learned from the stored object. Keys depend on the file type; absent means unknown. */
+export interface SubmissionServerMeta {
+  codec?: string | null;
+  width?: number | null;
+  height?: number | null;
+  duration?: number | null;
+  fps?: number | null;
+  make?: string | null;
+  model?: string | null;
+  software?: string | null;
+  gps?: boolean | null;
+  sample_rate?: number | null;
+  channels?: number | null;
+  pages?: number | null;
+  /** Active-content findings; [] after a clean scan, null when the scan could not finish. */
+  flags?: string[] | null;
+  /** Signs the file is not the original capture, and the advisory gate they raise. */
+  signals?: string[] | null;
+  modified?: boolean | null;
 }
 
 export interface SubmissionCurrentUpload {
@@ -53,6 +76,65 @@ export interface SubmissionCurrentUpload {
   referenced_by_history?: boolean;
   /** Duplicate verdict computed by the server at read time. */
   duplicate?: "exact" | null;
+  meta?: SubmissionServerMeta | null;
+}
+
+/** Server rejections that retrying the same bytes can never fix. */
+const DEFINITIVE_REJECTIONS = new Set(["duplicate_upload", "unreadable"]);
+
+/**
+ * Server facts as the evaluator's meta, merged field by field over what the
+ * browser could read: a fact the server has wins, a fact it could not reach
+ * (null) keeps the browser's. With nothing read at all (the probe gave up),
+ * the browser's meta stands alone and nothing is marked verified.
+ */
+export function submissionMetaFromServer(
+  server: SubmissionServerMeta | null | undefined,
+  contentType?: string | null,
+  size?: number | null,
+  fallback?: SubmissionFileMeta | null,
+): SubmissionFileMeta | null {
+  if (!server || typeof server !== "object") return fallback ?? null;
+  const known = Object.values(server).some((value) => value !== null && value !== undefined);
+  if (!known) return fallback ?? null;
+  const pick = (value: number | null | undefined, theirs: number | null | undefined) =>
+    typeof value === "number" ? value : (theirs ?? null);
+  return {
+    contentType,
+    size,
+    durationSec: pick(server.duration, fallback?.durationSec),
+    width: pick(server.width, fallback?.width),
+    height: pick(server.height, fallback?.height),
+    verified: true,
+    fps: typeof server.fps === "number" ? server.fps : null,
+    // Only file types that carry capture tags report a verdict; for the rest it stays unknown.
+    captureMetadata:
+      "make" in server || "model" in server || "software" in server
+        ? !!(server.make || server.model || server.software)
+        : null,
+    gps: typeof server.gps === "boolean" ? server.gps : null,
+    facts: submissionFacts(server),
+    flags: Array.isArray(server.flags) ? server.flags : undefined,
+    modifiedSignals: server.modified === true && Array.isArray(server.signals) ? server.signals : undefined,
+  };
+}
+
+export function submissionFacts(server: SubmissionServerMeta): string[] {
+  const facts: string[] = [];
+  if (server.codec) facts.push(server.codec.toUpperCase());
+  if (typeof server.fps === "number") facts.push(`${server.fps} fps`);
+  if (typeof server.sample_rate === "number") facts.push(`${server.sample_rate / 1000} kHz`);
+  if (typeof server.channels === "number")
+    facts.push(server.channels === 1 ? "mono" : server.channels === 2 ? "stereo" : `${server.channels} ch`);
+  if (typeof server.pages === "number") facts.push(`${server.pages} ${server.pages === 1 ? "page" : "pages"}`);
+  const make = server.make || "";
+  const model = server.model || "";
+  const device =
+    make && model && !model.toLowerCase().includes(make.toLowerCase()) ? `${make} ${model}` : model || make;
+  if (device) facts.push(device);
+  else if (server.software) facts.push(server.software); // e.g. "Android 14" when the file names no device
+  if (server.gps) facts.push("GPS present");
+  return facts;
 }
 
 export interface SubmissionEngine {
@@ -62,6 +144,8 @@ export interface SubmissionEngine {
   cancel(clientRef: string): void;
   discard(uploadId: number): Promise<void>;
   current(uploadId?: number): Promise<SubmissionCurrentUpload | null>;
+  /** Several stored files in one round trip; engines that predate it fall back to `current` per id. */
+  currentMany?(uploadIds: number[]): Promise<SubmissionCurrentUpload[]>;
   currentAll?(): Promise<SubmissionCurrentUpload[]>;
   dispose(): void;
 }
@@ -87,7 +171,7 @@ export interface SubmissionEngineDeps {
   documentAI?: { pdfjsLib?: SubmissionPdfjsLike };
 }
 
-export type SubmissionMediaKind = "video" | "image" | "pdf" | "file";
+export type SubmissionMediaKind = "video" | "image" | "audio" | "pdf" | "file";
 
 export interface SubmissionRegion {
   id: string;
@@ -230,6 +314,7 @@ export function submissionMediaKind(name?: string | null, contentType?: string |
   const hint = contentType || name || "";
   if (/^video\//.test(hint) || /\.(mp4|mov|webm)$/i.test(hint)) return "video";
   if (/^image\//.test(hint) || /\.(png|jpe?g|webp|gif)$/i.test(hint)) return "image";
+  if (/^audio\//.test(hint) || /\.(m4a|mp3|ogg|opus|wav)$/i.test(hint)) return "audio";
   if (/pdf$/i.test(hint) || /\.pdf$/i.test(hint)) return "pdf";
   return "file";
 }
@@ -243,7 +328,7 @@ export function probeSubmissionFile(file: File): Promise<SubmissionFileMeta> {
       size: file.size > 0 ? file.size : undefined,
     };
     const kind = submissionMediaKind(file.name, file.type);
-    if (kind !== "video" && kind !== "image") return resolve(base);
+    if (kind !== "video" && kind !== "image" && kind !== "audio") return resolve(base);
     const url = URL.createObjectURL(file);
     const done = (extra: Partial<SubmissionFileMeta>) => {
       URL.revokeObjectURL(url);
@@ -254,6 +339,12 @@ export function probeSubmissionFile(file: File): Promise<SubmissionFileMeta> {
       probe.preload = "metadata";
       probe.onloadedmetadata = () =>
         done({ durationSec: probe.duration, width: probe.videoWidth, height: probe.videoHeight });
+      probe.onerror = () => done({});
+      probe.src = url;
+    } else if (kind === "audio") {
+      const probe = document.createElement("audio");
+      probe.preload = "metadata";
+      probe.onloadedmetadata = () => done({ durationSec: probe.duration });
       probe.onerror = () => done({});
       probe.src = url;
     } else {
@@ -373,6 +464,7 @@ async function withCustomValidation(
 const EMPTY_RULES: SubmissionRules = {};
 
 let REJECT_SEQ = 0;
+const REJECTION_MESSAGE = "This file doesn't meet the requirements. See the checks above and pick another file.";
 
 export function useCollectionSubmission(options: UseCollectionSubmissionOptions): CollectionSubmission {
   const { deps, props, validateFile } = options;
@@ -532,6 +624,29 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         return;
       }
       if (removedUploadIds.current.has(String(row.uploadId))) return;
+      // Rules the server settles reject at completion the way browser rules
+      // reject at pick: the file never becomes a member and its object is dropped.
+      const picked = pickedMetaByRef.current[row.clientRef];
+      const settled = submissionMetaFromServer(row.meta, row.contentType, row.size, picked ? picked.meta : null);
+      const verdicts = settled ? evaluateSubmissionRules(settled, rules) : [];
+      if (verdicts.some((r) => r.status === "fail")) {
+        removedUploadIds.current.add(String(row.uploadId));
+        const engine = engineRef.current;
+        if (engine) engine.discard(row.uploadId).catch(() => undefined);
+        setRejectedPicks((old) =>
+          old.concat({
+            id: `rejected-${(REJECT_SEQ += 1)}`,
+            name: row.filename,
+            size: row.size,
+            type: row.contentType || null,
+            url: picked ? picked.url : "",
+            meta: settled as SubmissionFileMeta,
+            results: verdicts,
+            message: REJECTION_MESSAGE,
+          }),
+        );
+        return;
+      }
       const live = (visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
       if (live.some((r) => String(r._submission!.upload_id) === String(row.uploadId))) return;
 
@@ -590,12 +705,11 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           index: live.length,
         },
       });
-      const picked = pickedMetaByRef.current[row.clientRef];
       if (picked && row.key) {
         previewCache(taskId)[row.key] = { url: picked.url, kind: submissionMediaKind(row.filename, row.contentType) };
       }
     },
-    [visibleRegions, addRegion, updateRegion, taskId, bounds.max],
+    [visibleRegions, addRegion, updateRegion, taskId, bounds.max, rules],
   );
 
   // Bind the in-flight replace to its engine row once, by clientRef. Name+size
@@ -635,15 +749,31 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     if (!engine || typeof engine.currentAll !== "function") return;
     engine
       .currentAll()
-      .then((uploads) => {
+      .then(async (uploads) => {
         if (cancelled || !Array.isArray(uploads)) return;
         const byId: Record<string, SubmissionCurrentUpload> = {};
         uploads.forEach((u) => {
           byId[String(u.upload_id)] = u;
         });
+        const live = (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
+        // The list holds the viewer's own uploads. A manager or reviewer opening
+        // another contributor's task reads each shown file by id instead, so its
+        // submitted state and server facts still arrive.
+        const missing = Array.from(new Set(live.map((r) => r._submission!.upload_id))).filter(
+          (id) => !byId[String(id)],
+        );
+        if (missing.length) {
+          const fetched =
+            typeof engine.currentMany === "function"
+              ? await engine.currentMany(missing).catch(() => [] as SubmissionCurrentUpload[])
+              : await Promise.all(missing.map((id) => engine.current(id).catch(() => null)));
+          if (cancelled) return;
+          fetched.forEach((u) => {
+            if (u) byId[String(u.upload_id)] = u;
+          });
+        }
         setServerByUploadId(byId);
         if (readonly || typeof props.addRegion !== "function") return;
-        const live = (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
         const liveIds = new Set(live.map((r) => String(r._submission!.upload_id)));
         uploads
           .filter(
@@ -702,7 +832,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
               url,
               meta,
               results,
-              message: "This file doesn't meet the requirements. See the checks above and pick another file.",
+              message: REJECTION_MESSAGE,
             }),
           );
           return;
@@ -939,7 +1069,16 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     let resolvedUrl = resolveSubmissionFileUrl(props.fileResolverTemplate, sub.bucket, sub.key);
     if (resolvedUrl && nonce) resolvedUrl += (resolvedUrl.indexOf("?") === -1 ? "?" : "&") + "cb=" + nonce;
     const previewUrl = cached ? cached.url : resolvedUrl;
-    const storedMeta = previewUrl ? mediaMetaByUrl[previewUrl] : null;
+    // Server facts win over what the media element reported: they come from the
+    // stored bytes. A just-completed upload carries them on its engine row until
+    // the next server read.
+    const completedRow = rows.find((r) => r.uploadId === sub.upload_id);
+    const storedMeta = submissionMetaFromServer(
+      server?.meta ?? completedRow?.meta,
+      sub.contentType,
+      sub.size,
+      previewUrl ? mediaMetaByUrl[previewUrl] : null,
+    );
     const fileMeta: SubmissionFileMeta = { contentType: sub.contentType, size: sub.size, ...(storedMeta || {}) };
 
     const storedKind = submissionMediaKind(sub.filename, sub.contentType);
@@ -1004,6 +1143,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       const picked = pickedMetaByRef.current[row.clientRef];
       const failed = row.status === "failed";
       const rowKind = submissionMediaKind(row.filename, row.contentType);
+      const rowMeta = submissionMetaFromServer(row.meta, row.contentType, row.size, picked ? picked.meta : null);
       return {
         key: `row-${row.clientRef}`,
         state: failed ? "failed" : "uploading",
@@ -1014,13 +1154,13 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         previewBroken: false,
         progress: row.progress || 0,
         message: failed ? row.error || "Upload failed. Use Retry to try again" : null,
-        ruleResults: picked ? evaluateSubmissionRules(picked.meta, rules) : [],
-        meta: picked ? picked.meta : null,
+        ruleResults: rowMeta ? evaluateSubmissionRules(rowMeta, rules) : [],
+        meta: rowMeta,
         submitted: false,
         storedHint: false,
         onCancel: () => cancelRow(row.clientRef),
-        // A duplicate rejection is definitive: retrying re-uploads the same bytes.
-        onRetry: failed && row.errorCode !== "duplicate_upload" ? () => retryRow(row.clientRef) : undefined,
+        // A definitive rejection (duplicate, unreadable) never changes on retry: same bytes.
+        onRetry: failed && !DEFINITIVE_REJECTIONS.has(row.errorCode || "") ? () => retryRow(row.clientRef) : undefined,
         onRemove: failed ? () => cancelRow(row.clientRef) : undefined,
       };
     });

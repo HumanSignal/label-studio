@@ -1,6 +1,5 @@
 import { flow, getParent, getRoot, isAlive, types } from "mobx-state-tree";
-import * as CellViews from "../../components/CellViews";
-import { normalizeCellAlias } from "../../components/CellViews";
+import { cellViewFor } from "./cell_view";
 import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
@@ -196,12 +195,7 @@ export const TabFilter = types
     },
 
     get cellView() {
-      const col = self.filter.field;
-      const byAlias = CellViews[normalizeCellAlias(col.alias)];
-      const byType = CellViews[col.type];
-      // Prefer alias views that customize operators (e.g. GroundTruth without "is empty").
-      if (byAlias?.customOperators) return byAlias;
-      return byType ?? byAlias;
+      return cellViewFor(self.filter.field);
     },
 
     get isNestedChildFilter() {

@@ -25,6 +25,7 @@ from django.db.models import (
     Exists,
     F,
     FloatField,
+    Func,
     OuterRef,
     Q,
     Subquery,
@@ -65,7 +66,9 @@ class _Operator(BaseModel):
 
 
 Operator = _Operator()
-USER_FILTER_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator'})
+USER_FILTER_FIELDS = frozenset(
+    {'annotators', 'updated_by', 'reviewers', 'comment_authors', 'skipped_by_annotator', 'reviews.reviewed_by'}
+)
 USER_FILTER_VALUE_OPERATORS = frozenset({Operator.CONTAINS, Operator.NOT_CONTAINS})
 # Fields whose root/child hooks implement "is empty". skipped_by_annotator does not (FIT-2435).
 USER_FILTER_EMPTY_FIELDS = frozenset({'annotators', 'updated_by', 'reviewers', 'comment_authors'})
@@ -75,6 +78,9 @@ LEGACY_USER_FILTER_OPERATORS = {
     Operator.NOT_EQUAL: Operator.NOT_CONTAINS,
     Operator.NOT_IN_LIST: Operator.NOT_CONTAINS,
 }
+NEGATED_PARENT_OPERATORS = frozenset(
+    {Operator.NOT_EQUAL, Operator.NOT_IN, Operator.NOT_IN_LIST, Operator.NOT_CONTAINS}
+)
 
 
 def allowed_user_filter_operators(field_name):
@@ -329,12 +335,18 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
     # apply_filters() casts values in-place (e.g. Datetime strings -> datetime), and reusing those
     # mutated objects in the main filtering pass can trigger type errors.
     #
-    # Child filters are dropped for prefiltering.
+    # Child filters are dropped for prefiltering. A negated line with children is skipped instead:
+    # without its children it no longer matches a superset of tasks, while dropping an AND item does.
     narrowed_items = []
     for _filter in non_agreement_filters:
+        if _filter.child_filters and _filter.operator in NEGATED_PARENT_OPERATORS:
+            continue
         copied_filter = _filter.copy(deep=True)
         copied_filter.child_filters = []
         narrowed_items.append(copied_filter)
+
+    if not narrowed_items:
+        return
 
     if prefilter_annotation_fields:
         queryset = PreparedTaskManager.annotate_queryset(
@@ -358,14 +370,35 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
     request._dm_prefilter_task_ids = tuple(narrowed_queryset.values_list('id', flat=True))
 
 
-def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
+def _get_all_project_columns(project_id, user, request=None):
+    """GET_ALL_COLUMNS for one project, computed at most once per request.
+
+    GET_ALL_COLUMNS can be expensive (LSE parses the label config and checks Dimension caches),
+    and a task list request needs it for both field evaluation and visible data keys.
+    """
+    cache = getattr(request, '_dm_all_columns', None) if request is not None else None
+    if cache is not None and project_id in cache:
+        return cache[project_id]
+
+    from projects.models import Project
+
+    GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
+    all_columns = GET_ALL_COLUMNS(Project.objects.get(id=project_id), user)
+    if request is not None:
+        if cache is None:
+            cache = request._dm_all_columns = {}
+        cache[project_id] = all_columns
+    return all_columns
+
+
+def get_fields_for_evaluation(prepare_params, user, skip_regular=True, request=None):
     """Collecting field names to annotate them
 
     :param prepare_params: structure with filters and ordering
     :param user: user
+    :param request: optional request used to share GET_ALL_COLUMNS with other calls in the same request
     :return: list of field names
     """
-    from projects.models import Project
     from tasks.models import Task
 
     result = []
@@ -376,8 +409,7 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     if fields:
         from label_studio.data_manager.functions import TASKS
 
-        GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
-        all_columns = GET_ALL_COLUMNS(Project.objects.get(id=prepare_params.project), user)
+        all_columns = _get_all_project_columns(prepare_params.project, user, request)
         all_columns = set(
             [TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id'] for c in all_columns['columns']]
         )
@@ -399,7 +431,7 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
     return result
 
 
-def get_visible_data_column_keys(prepare_params, user):
+def get_visible_data_column_keys(prepare_params, user, request=None):
     """Return task.data keys that are visible in the current DM view, or None if unrestricted.
 
     When ``hiddenColumns`` is present, keys hidden in both explore and labeling modes are
@@ -413,13 +445,9 @@ def get_visible_data_column_keys(prepare_params, user):
     if not hidden_columns:
         return None
 
-    from projects.models import Project
-
     from label_studio.data_manager.functions import TASKS
 
-    GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
-    project = Project.objects.get(id=prepare_params.project)
-    all_columns = GET_ALL_COLUMNS(project, user)['columns']
+    all_columns = _get_all_project_columns(prepare_params.project, user, request)['columns']
     data_column_ids = {c['id'] for c in all_columns if c.get('parent') == 'data'}
     if not data_column_ids:
         return frozenset()
@@ -1098,6 +1126,22 @@ def newest_annotation_subquery() -> Subquery:
     return Subquery(newest_annotations.values('created_at'))
 
 
+class FirstArrayElement(Func):
+    template = '(%(expressions)s)[1]'
+
+
+def newest_annotation_created_at_from_join() -> FirstArrayElement:
+    """Same value as newest_annotation_subquery(), read from the task's joined annotation rows.
+
+    Only valid while the annotations join is unrestricted: a filter on annotations__* applied
+    before this annotation would narrow the aggregated rows and change "newest".
+    """
+    return FirstArrayElement(
+        ArrayAgg('annotations__created_at', order_by='-annotations__id'),
+        output_field=DateTimeField(),
+    )
+
+
 def base_annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
     return queryset.annotate(completed_at=Case(When(is_labeled=True, then=newest_annotation_subquery())))
 
@@ -1151,7 +1195,8 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
                 Q(_agreement__gte=agreement_threshold)
                 | Q(annotator_count__gte=(F('overlap') + max_additional_annotators_assignable))
             ),
-            then=newest_annotation_subquery(),
+            # get_tasks_agreement_queryset already groups by task over the annotations join.
+            then=newest_annotation_created_at_from_join(),
         ),
         default=Value(None),
         output_field=DateTimeField(),

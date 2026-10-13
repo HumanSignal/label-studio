@@ -22,6 +22,7 @@ const EMPTY_EXTENSION: AccountSettingsExtension = {};
 
 let extensionHook: ExtensionHook | null = null;
 const profileExtras: FC[] = [];
+const personalInfoExtras: FC[] = [];
 
 /** Register a hook that supplies dynamic extension data (extra sections, required fields). */
 export const registerAccountSettingsExtension = (hook: ExtensionHook): void => {
@@ -34,6 +35,16 @@ export const registerAccountSettingsProfileExtra = (component: FC): void => {
 };
 
 export const getAccountSettingsProfileExtras = (): FC[] => profileExtras;
+
+/**
+ * Register a field rendered inside the Account Details form, after the personal info inputs.
+ * Use this for read-only identity fields that should sit with email and phone, not in their own card.
+ */
+export const registerAccountSettingsPersonalInfoExtra = (component: FC): void => {
+  personalInfoExtras.push(component);
+};
+
+export const getAccountSettingsPersonalInfoExtras = (): FC[] => personalInfoExtras;
 
 /** Hook consumed by app-common AccountSettings/PersonalInfo. Returns defaults when nothing registered. */
 export const useAccountSettingsExtension = (): AccountSettingsExtension =>

@@ -329,7 +329,7 @@ stages:
     response:
       status_code: 200
       json:
-        expert_instruction: '<iframe src="somepath"></iframe>'
+        expert_instruction: '&lt;iframe src="somepath"&gt;&lt;/iframe&gt;'
   - name: embed
     request:
       url: "{django_live_url}/api/projects/{project_pk}"
@@ -341,7 +341,7 @@ stages:
     response:
       status_code: 200
       json:
-        expert_instruction: '<embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200">'
+        expert_instruction: '&lt;embed type="video/webm" src="/media/cc0-videos/flower.mp4" width="250" height="200"&gt;'
 
 ---
 

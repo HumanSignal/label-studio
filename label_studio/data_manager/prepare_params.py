@@ -189,7 +189,7 @@ class Column(Enum):
         'Number of cancelled or skipped annotations for the task',
     )
     TOTAL_ANNOTATIONS = 'total_annotations', 'Number', 'Total number of annotations on a task'
-    COMPLETED_AT = 'completed_at', 'Datetime', 'Time when a task was fully annotated'
+    COMPLETED_AT = 'completed_at', 'Datetime', 'Latest annotation time, set once the task has all required annotations'
     AGREEMENT = 'agreement', 'Number', 'Agreement for annotation results for a specific task (Enterprise only)'
     REVIEWERS = (
         'reviewers',

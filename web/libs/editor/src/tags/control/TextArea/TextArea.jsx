@@ -241,7 +241,9 @@ const Model = types
         const pending = self.getPendingDraftInput();
 
         if (pending) {
-          if (!self.result) {
+          // per-region/per-item results are scoped to a region/item, so a per-object result
+          // created here would never be found by `self.result` and would be submitted empty
+          if (!self.result && !self.perregion && !self.peritem) {
             self.createPerObjectResult();
           }
           self.result?.setMetaValue(TEXTAREA_PENDING_DRAFT_META_KEY, pending);

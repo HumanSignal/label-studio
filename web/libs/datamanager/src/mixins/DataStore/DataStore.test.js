@@ -56,3 +56,62 @@ describe("DataStore.clear (FIT-2376)", () => {
     expect(dataStore.loading).toBe(true);
   });
 });
+
+describe("DataStore.fetch debounce (FIT-2914)", () => {
+  let root;
+  let calls;
+
+  const FetchRoot = types
+    .model({
+      dataStore: types.optional(TestStore, {}),
+      viewsStore: types.optional(
+        types.model({
+          selected: types.maybeNull(types.frozen()),
+        }),
+        {},
+      ),
+      SDK: types.optional(types.frozen(), {
+        type: "dm",
+        invoke() {},
+      }),
+      API: types.optional(types.frozen(), {
+        getSettingsByMethodName() {
+          return undefined;
+        },
+      }),
+    })
+    .actions(() => ({
+      apiCall() {
+        calls.push(Date.now());
+        return Promise.resolve({ total: 0, tasks: [] });
+      },
+    }));
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  it("starts the first task fetch immediately and debounces a later filter refresh", async () => {
+    calls = [];
+    root = FetchRoot.create({});
+
+    const first = root.dataStore.fetch({ id: 7, reload: true });
+    await Promise.resolve();
+    expect(calls).toHaveLength(1);
+
+    const secondStarted = Date.now();
+    const second = root.dataStore.fetch({ id: 7, reload: true, interaction: "filter" });
+    await Promise.resolve();
+    expect(calls).toHaveLength(1);
+
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    await second;
+    await first;
+
+    expect(calls).toHaveLength(2);
+    expect(calls[1] - secondStarted).toBeGreaterThanOrEqual(140);
+  });
+});

@@ -35,9 +35,11 @@ _api_urlpatterns = [
         api.ProjectSummaryResetAPI.as_view(),
         name='project-summary-reset',
     ),
-    # Project import
+    # Project import status (list + detail)
+    path('<int:pk>/imports/', api.ProjectImportListAPI.as_view(), name='project-import-list'),
     path('<int:pk>/imports/<int:import_pk>/', api.ProjectImportAPI.as_view(), name='project-imports'),
-    # Project reimport
+    # Project reimport status (list + detail)
+    path('<int:pk>/reimports/', api.ProjectReimportListAPI.as_view(), name='project-reimport-list'),
     path('<int:pk>/reimports/<int:reimport_pk>/', api.ProjectReimportAPI.as_view(), name='project-reimports'),
     # Tasks list for the project: get and destroy
     path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),

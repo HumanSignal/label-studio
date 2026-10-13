@@ -8,6 +8,7 @@ const HIGHLIGHT_CN = "htx-highlight";
 const HIGHLIGHT_NO_LABEL_CN = "htx-no-label";
 const LABEL_COLOR_ALPHA = 0.3;
 const LABEL_COLOR_ALPHA_ACTIVE = 0.8;
+export const RESIZE_HANDLE_TAG = "lsf-resize-handle";
 
 export const HighlightMixin = types
   .model()
@@ -128,6 +129,8 @@ export const HighlightMixin = types
      * Removes current highlights
      */
     removeHighlight() {
+      // spans are unwrapped on removal, so handles left inside would end up in the text
+      self.detachHandles();
       if (self.globalOffsets) {
         self.parent?.removeSpansInGlobalOffsets(self._spans, self.globalOffsets);
       }
@@ -173,25 +176,30 @@ export const HighlightMixin = types
     },
 
     /**
-     * Attach resize handles to the first and last spans. `area` is used to be less possible to be
-     * in user's document. They are not fully valid inside spans, but they work.
+     * Attach resize handles to the first and last spans. A dedicated custom element is used so it can't
+     * clash with the user's document; `area` used to serve this purpose, but browsers render it `display: none`.
+     * Handles are managed by `RegionResizeHandles` in RichText view, depending on the region's state.
+     * @param {HTMLElement[]} spans spans to attach handles to, current region's spans by default
+     * @returns {() => void} removes exactly the attached handles, even if spans were recreated since then
      */
-    attachHandles() {
+    attachHandles(spans = self._spans) {
       const classes = [STATE_CLASS_MODS.leftHandle, STATE_CLASS_MODS.rightHandle];
-      const spanStart = self._spans[0];
-      const spanEnd = self._spans.at(-1);
+      const spanStart = spans[0];
+      const spanEnd = spans.at(-1);
 
-      classes.forEach((resizeClass, index) => {
-        // html element that can't be encountered in a usual html
-        const handleArea = document.createElement("area");
+      const handles = classes.map((resizeClass, index) => {
+        const handle = document.createElement(RESIZE_HANDLE_TAG);
 
-        handleArea.classList.add(resizeClass);
-        index === 0 ? spanStart.prepend(handleArea) : spanEnd.append(handleArea);
+        handle.classList.add(resizeClass);
+        index === 0 ? spanStart.prepend(handle) : spanEnd.append(handle);
+        return handle;
       });
+
+      return () => handles.forEach((handle) => handle.remove());
     },
 
     detachHandles() {
-      self._spans?.forEach((span) => span.querySelectorAll("area").forEach((area) => area.remove()));
+      self._spans?.forEach((span) => span.querySelectorAll(RESIZE_HANDLE_TAG).forEach((handle) => handle.remove()));
     },
 
     /**
@@ -206,10 +214,6 @@ export const HighlightMixin = types
 
       if (!first) return;
 
-      if (self.parent?.canResizeSpans && !self.isReadOnly?.()) {
-        self.attachHandles();
-      }
-
       if (first.scrollIntoViewIfNeeded) {
         first.scrollIntoViewIfNeeded();
       } else {
@@ -222,10 +226,6 @@ export const HighlightMixin = types
      */
     afterUnselectRegion() {
       self.removeClass(STATE_CLASS_MODS.active);
-
-      if (self.parent?.canResizeSpans) {
-        self.detachHandles();
-      }
     },
 
     /**

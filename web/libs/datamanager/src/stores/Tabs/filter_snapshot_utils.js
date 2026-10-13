@@ -14,6 +14,8 @@ export const INTEGER_USER_LIST_ALIASES = new Set([
   "comment_authors",
   "skipped_by_annotator",
 ]);
+/** Review authors sit under the `reviews` parent, so their filter alias is dotted. */
+const INTEGER_USER_LIST_REVIEW_ALIASES = new Set(["reviews.reviewed_by"]);
 const USER_FILTER_VALUE_OPERATORS = new Set(["contains", "not_contains"]);
 const LEGACY_USER_FILTER_OPERATORS = new Map([
   ["equal", "contains"],
@@ -29,7 +31,7 @@ export function fieldAliasFromFilterId(filterId) {
 }
 
 export function isIntegerUserListField(fieldAlias) {
-  return INTEGER_USER_LIST_ALIASES.has(fieldAlias);
+  return INTEGER_USER_LIST_ALIASES.has(fieldAlias) || INTEGER_USER_LIST_REVIEW_ALIASES.has(fieldAlias);
 }
 
 export function normalizeIntegerUserListOperator(operator, fieldAlias) {
