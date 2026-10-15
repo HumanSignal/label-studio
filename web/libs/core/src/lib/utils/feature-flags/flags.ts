@@ -344,3 +344,9 @@ export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_remova
  */
 export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
   "fflag_feat_utc_1389_analytics_performance_project_breakdown";
+
+/**
+ * Verified Skills and Onboarding (workforce organizations only): skill assessments that test
+ * contributors, onboarding projects and verified skill statuses.
+ */
+export const FF_VERIFIED_SKILLS_AND_ONBOARDING = "fflag_feat_utc_1407_verified_skills_and_onboarding";
