@@ -328,3 +328,62 @@ def test_sample_task_enhanced_generation_fallback_does_not_log_error(caplog):
     assert response.status_code == 200
     assert response.json()['sample_task']['text']
     assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+IMAGE_CONFIG = '<View><Image name="image" value="$image"/></View>\n'
+SAMPLE_IMAGE = '/static/samples/user-provided.jpg'
+
+
+def _post_sample_task(project, label_config):
+    client = APIClient()
+    client.force_authenticate(user=project.created_by)
+    url = reverse('projects:api:project-sample-task', kwargs={'pk': project.id})
+    response = client.post(url, data=json.dumps({'label_config': label_config}), content_type='application/json')
+    assert response.status_code == 200
+    return response.json()['sample_task']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'comment',
+    [
+        pytest.param('<!-- {"image": "%s"} -->' % SAMPLE_IMAGE, id='legacy'),
+        pytest.param('<!--{"image": "%s"}-->' % SAMPLE_IMAGE, id='legacy-no-space'),
+        pytest.param('<!-- Sample task:\n{"image": "%s"}\n-->' % SAMPLE_IMAGE, id='sample-task-label'),
+        pytest.param('<!--sample task {"image": "%s"} -->' % SAMPLE_IMAGE, id='sample-task-label-no-colon'),
+        pytest.param('<!--\n  {"image": "%s"}\n-->' % SAMPLE_IMAGE, id='newline-after-open'),
+        pytest.param(
+            '<!-- Sample task: {"data": {"image": "%s"}, "predictions": []} -->' % SAMPLE_IMAGE, id='wrapper'
+        ),
+        pytest.param(
+            '<!-- Labeling guide: draw boxes around cars -->\n<!-- Sample task:\n{"image": "%s"}\n-->' % SAMPLE_IMAGE,
+            id='after-unrelated-comment',
+        ),
+    ],
+)
+def test_sample_task_uses_task_from_config_comment(comment):
+    """The preview renders the sample task embedded in a config comment, including the AI-generated format."""
+    sample_task = _post_sample_task(ProjectFactory(), IMAGE_CONFIG + comment)
+
+    assert sample_task['image'] == SAMPLE_IMAGE
+
+
+@pytest.mark.django_db
+def test_sample_task_keeps_nested_json_from_config_comment():
+    """Nested objects in the embedded task are parsed whole, not cut at the first closing brace."""
+    comment = '<!-- Sample task:\n{"data": {"image": "%s", "meta": {"source": {"camera": "a"}}}}\n-->' % SAMPLE_IMAGE
+
+    sample_task = _post_sample_task(ProjectFactory(), IMAGE_CONFIG + comment)
+
+    assert sample_task['image'] == SAMPLE_IMAGE
+    assert sample_task['meta'] == {'source': {'camera': 'a'}}
+
+
+@pytest.mark.django_db
+def test_sample_task_ignores_unrelated_comments():
+    """Comments that are not a sample task fall back to the generated sample data."""
+    comment = '<!-- Note: {"image": "/not/a/task.jpg"} -->\n<!-- TODO: add labels -->'
+
+    sample_task = _post_sample_task(ProjectFactory(), IMAGE_CONFIG + comment)
+
+    assert sample_task['image'] != '/not/a/task.jpg'
