@@ -44,6 +44,10 @@ const MinimalControl = t
     valueType: t.optional(t.string, "labels"),
     allowempty: t.optional(t.boolean, false),
     perregion: t.optional(t.boolean, false),
+    peritem: t.optional(t.boolean, false),
+    // visibility on the current item vs per item (see isVisibleForItem)
+    visible: t.optional(t.boolean, true),
+    hiddenItems: t.optional(t.array(t.number), []),
     visiblewhen: t.optional(t.string, ""),
     whenlabelvalue: t.optional(t.string, ""),
     whenchoicevalue: t.optional(t.string, ""),
@@ -64,7 +68,10 @@ const MinimalControl = t
       return () => false;
     },
     get isVisible() {
-      return true;
+      return self.visible;
+    },
+    isVisibleForItem(idx) {
+      return !self.hiddenItems.includes(idx);
     },
     getRegionElement() {
       return undefined;
@@ -141,7 +148,10 @@ const AnnotationStore = types.model("AnnotationStore", {
 });
 
 const Root = types.model("Root", {
+  // stands in for a wrapping <View visibleWhen> of the control
+  visiblewhen: types.optional(types.string, ""),
   control: MinimalControl,
+  gate: types.maybeNull(MinimalControl),
   object: MinimalObject,
   annotationStore: types.optional(AnnotationStore, { selected: null }),
 });
@@ -335,6 +345,68 @@ describe("Result", () => {
       const root = createTreeWithControl({ visiblewhen: "choice-unselected" });
       const result = root.annotationStore.selected.areas[0].results[0];
       expect(result.canBeSubmitted).toBe(true);
+    });
+  });
+
+  describe("canBeSubmitted (perItem)", () => {
+    // perItem control gated by perItem choices "gate"; `gateItems` are the items where the gate choice is set
+    function createPerItemTree({ gateItems, resultItem, control = {}, root = {} }) {
+      const gateAreas = gateItems.map((idx) => ({
+        id: `gate_${idx}`,
+        item_index: idx,
+        results: [{ from_name: "gate", to_name: "o1", type: "choices", value: { choices: ["Yes"] }, meta: {} }],
+      }));
+      const tree = Root.create({
+        ...root,
+        control: {
+          id: "c1",
+          name: "c1",
+          valueType: "text",
+          peritem: true,
+          visiblewhen: "choice-selected",
+          whentagname: "gate",
+          ...control,
+        },
+        gate: { id: "gate", name: "gate", valueType: "choices", peritem: true },
+        object: { id: "o1" },
+        annotationStore: {
+          selected: {
+            areas: [
+              ...gateAreas,
+              {
+                id: "comment",
+                item_index: resultItem,
+                results: [{ from_name: "c1", to_name: "o1", type: "textarea", value: { text: ["why"] }, meta: {} }],
+              },
+            ],
+          },
+        },
+      });
+      return tree.annotationStore.selected.areas.at(-1).results[0];
+    }
+
+    it("matches the gating choice on the same item_index as the result", () => {
+      expect(createPerItemTree({ gateItems: [0], resultItem: 1 }).canBeSubmitted).toBe(false);
+      expect(createPerItemTree({ gateItems: [0, 1], resultItem: 1 }).canBeSubmitted).toBe(true);
+    });
+
+    it("keeps a result whose item is visible even when the current item hides the control", () => {
+      const result = createPerItemTree({ gateItems: [0], resultItem: 0, control: { visible: false } });
+      expect(result.canBeSubmitted).toBe(true);
+    });
+
+    it("drops a result whose item hides the control through a choice-unselected ancestor", () => {
+      const params = { gateItems: [], resultItem: 0, root: { visiblewhen: "choice-unselected" } };
+
+      expect(createPerItemTree({ ...params, control: { visiblewhen: "", hiddenItems: [0] } }).canBeSubmitted).toBe(
+        false,
+      );
+      expect(createPerItemTree({ ...params, control: { visiblewhen: "" } }).canBeSubmitted).toBe(true);
+    });
+
+    it("drops a result whose own item hides the control", () => {
+      const result = createPerItemTree({ gateItems: [0], resultItem: 0, control: { hiddenItems: [0] } });
+      expect(result.canBeSubmitted).toBe(false);
     });
   });
 

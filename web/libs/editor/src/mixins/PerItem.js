@@ -22,6 +22,16 @@ const PerItemMixin = types
         return r.from_name === self && r.area.item_index === self.toNameTag.currentItemIndex;
       });
     },
+    /**
+     * Values of this control on the given item, unlike `selectedValues()` which only sees the current item.
+     * @param {number} itemIndex
+     * @returns {Array}
+     */
+    selectedValuesForItem(itemIndex) {
+      const result = self.annotation.results.find((r) => r.from_name === self && r.area.item_index === itemIndex);
+
+      return result?.mainValue ?? [];
+    },
   }))
   .actions((self) => ({
     /**
