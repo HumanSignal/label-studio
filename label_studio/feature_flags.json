@@ -4065,6 +4065,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_utc_1182_wallet_funds_email_short": {
+      "key": "fflag_feat_utc_1182_wallet_funds_email_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7182df241fc546b8b4d94b3a0bc0bf58",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_utc_1260_manual_batches_short": {
       "key": "fflag_feat_utc_1260_manual_batches_short",
       "on": true,
@@ -4167,6 +4194,33 @@
       },
       "clientSide": false,
       "salt": "f95484d49ff5485492794d1254a58333",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_utc_1423_create_project_from_tasks": {
+      "key": "fflag_feat_utc_1423_create_project_from_tasks",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "44153cc3c30c4a64849bc2f8a56fa469",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,

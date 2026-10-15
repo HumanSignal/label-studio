@@ -343,6 +343,20 @@ describe("HighlightMixin", () => {
       expect(model._spans).toBeNull();
     });
 
+    it("detaches handles before removing spans so they don't stay in the text", () => {
+      const { model } = getTestTree();
+      const span = mockSpan();
+      const handles = [{ remove: mock() }];
+      span.querySelectorAll = mock(() => handles);
+      model.setSpans([span]);
+      model.parent.removeSpansInGlobalOffsets.mockImplementation(() => {
+        expect(handles[0].remove).toHaveBeenCalled();
+      });
+      model.removeHighlight();
+      expect(span.querySelectorAll).toHaveBeenCalledWith(RESIZE_HANDLE_TAG);
+      expect(model.parent.removeSpansInGlobalOffsets).toHaveBeenCalled();
+    });
+
     it("still removes styles when globalOffsets is null", () => {
       const { model } = getTestTree();
       model.setGlobalOffsets(null);
@@ -447,6 +461,33 @@ describe("HighlightMixin", () => {
       expect(left.classList.contains(STATE_CLASS_MODS.leftHandle)).toBe(true);
       expect(right.classList.contains(STATE_CLASS_MODS.rightHandle)).toBe(true);
     });
+
+    it("attaches handles to the given spans instead of current ones", () => {
+      const { model } = getTestTree();
+      const current = mockSpan();
+      const first = mockSpan();
+      const last = mockSpan();
+      model.setSpans([current]);
+      model.attachHandles([first, last]);
+      expect(current.prepend).not.toHaveBeenCalled();
+      expect(first.prepend).toHaveBeenCalled();
+      expect(last.append).toHaveBeenCalled();
+    });
+
+    it("returns a disposer removing exactly the attached handles", () => {
+      const { model } = getTestTree();
+      const first = document.createElement("span");
+      const last = document.createElement("span");
+      model.setSpans([first, last]);
+      const dispose = model.attachHandles();
+      expect(first.querySelector(RESIZE_HANDLE_TAG)).not.toBeNull();
+      expect(last.querySelector(RESIZE_HANDLE_TAG)).not.toBeNull();
+      // spans are unwrapped on region removal, handles should be removed wherever they ended up
+      const parent = document.createElement("div");
+      parent.append(...first.childNodes, ...last.childNodes);
+      dispose();
+      expect(parent.querySelector(RESIZE_HANDLE_TAG)).toBeNull();
+    });
   });
 
   describe("detachHandles", () => {
@@ -472,22 +513,12 @@ describe("HighlightMixin", () => {
       expect(spans[0].classList.add).toHaveBeenCalledWith(STATE_CLASS_MODS.active);
     });
 
-    it("attaches handles when parent.canResizeSpans", () => {
-      const { model } = getTestTree();
-      const first = mockSpan();
-      model.setSpans([first, mockSpan()]);
-      model.setParent({ canResizeSpans: true });
-      model.selectRegion();
-      expect(first.prepend).toHaveBeenCalled();
-    });
-
-    it("does not attach handles when the selected region is read-only", () => {
+    it("does not attach handles itself, they depend on region's state and managed by the view", () => {
       const { model } = getTestTree();
       const first = mockSpan();
       const last = mockSpan();
       model.setSpans([first, last]);
       model.setParent({ canResizeSpans: true });
-      model.setReadOnly(true);
       model.selectRegion();
       expect(first.prepend).not.toHaveBeenCalled();
       expect(last.append).not.toHaveBeenCalled();
@@ -513,7 +544,7 @@ describe("HighlightMixin", () => {
   });
 
   describe("afterUnselectRegion", () => {
-    it("removes active class and detaches handles when canResizeSpans", () => {
+    it("removes active class", () => {
       const { model } = getTestTree();
       const spans = [mockSpan(), mockSpan()];
       model.setSpans(spans);

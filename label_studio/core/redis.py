@@ -270,6 +270,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     :param args: Function arguments
     :param in_seconds: Job will be delayed for in_seconds
     :param retry: RQ Retry object or int (max retries). Only used in async mode.
+    :param allow_sync: False = never run the job synchronously; without Redis it is skipped and None returned.
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
@@ -298,6 +299,9 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     on_failure = kwargs.pop('on_failure', None)
     job_tenant = kwargs.pop('job_tenant', None)
     job_scope = kwargs.pop('job_scope', None)
+    # ``allow_sync=False``: enqueue-or-skip. Without Redis the job is NOT run in the calling process (for
+    # best-effort background work whose synchronous run would block the caller); returns None instead.
+    allow_sync = kwargs.pop('allow_sync', True)
 
     if redis:
         # Snapshot before the legacy block below mutates the caller's dict in place.
@@ -352,6 +356,9 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         )
         _run_job_enqueued_hook(job)
         return job
+    elif not allow_sync:
+        logger.warning(f'Redis is not available; job {job.__name__} on queue {queue_name} skipped (allow_sync=False).')
+        return None
     else:
         try:
             result = job(*args, **kwargs)

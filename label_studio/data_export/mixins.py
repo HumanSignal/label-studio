@@ -96,10 +96,13 @@ class ExportMixin:
             skipped: optional None or str:("include|exclude")
             finished: optional None or str:("include|exclude")
             annotated: optional None or str:("include|exclude")
+            task_ids: optional list of task ids, internal use only (not exposed by the export API)
         })
         """
         if not isinstance(task_filter_options, dict):
             return tasks
+        if 'task_ids' in task_filter_options:
+            tasks = tasks.filter(id__in=task_filter_options['task_ids'])
         if 'view' in task_filter_options:
             try:
                 value = int(task_filter_options['view'])
