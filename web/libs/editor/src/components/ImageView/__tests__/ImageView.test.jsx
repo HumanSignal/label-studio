@@ -111,10 +111,18 @@ mockModule("../../Toolbar/Toolbar", () => ({
   Toolbar: () => <div data-testid="toolbar">Toolbar</div>,
 }));
 
+// LSO's preload never restores module mocks, so put the real Image back afterwards;
+// otherwise Image.test.jsx gets this stub when it runs later in the same Bun process.
+const actualImageModule = { ...requireActual("../Image") };
+
 mockModule("../Image", () => ({
   __esModule: true,
   Image: () => <div data-testid="image">Image</div>,
 }));
+
+afterAll(() => {
+  mockModule("../Image", () => ({ ...actualImageModule, __skipMerge: true }));
+});
 
 mockModule("../../../common/Pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages }) => (
