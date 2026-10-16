@@ -339,6 +339,13 @@ export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_o
 export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
 
 /**
+ * Interface workspaces (UTC-1367): Personal Sandbox interfaces private to their owner, the
+ * interface Workspace control and move confirmation modal, `can_edit` gating, and the workspace
+ * delete guard for workspaces that still hold interfaces. Ships with the backend flag of the same name.
+ */
+export const FF_UTC_1367_INTERFACE_WORKSPACES = "fflag_feat_utc_1367_interface_workspaces";
+
+/**
  * Analytics → Member Performance "Submitted by Project" / "Reviewed by Project" columns, their export
  * fields, and the backend user × project KPI segmentation they read. UTC-1389.
  */
