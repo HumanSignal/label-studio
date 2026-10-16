@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, afterEach } from "bun:test";
 import { destroy, types, unprotect } from "mobx-state-tree";
-import { Tab } from "./tab";
+import { Tab, VIRTUAL_QUERY_COMPACT_THRESHOLD } from "./tab";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
 import { raceConditionLockToastMessage } from "./store";
 
@@ -342,5 +342,48 @@ describe("raceConditionLockToastMessage", () => {
     expect(raceConditionLockToastMessage({ is_locked: true, locked_by: null }, true)).toBe(
       "This tab was locked. Your changes could not be saved.",
     );
+  });
+});
+
+describe("Tab virtual query hiddenColumns (FIT-3167)", () => {
+  let tab;
+
+  afterEach(() => {
+    if (tab) {
+      destroy(tab);
+      tab = null;
+    }
+  });
+
+  const hiddenColumns = {
+    explore: ["tasks:data.image", "tasks:agreement", "tasks:annotators"],
+    labeling: ["tasks:annotators", "tasks:data.image", "tasks:total_annotations"],
+  };
+
+  // Enough default-hidden prediction columns (listed in both modes) to push the dict past the threshold
+  const largeHiddenColumns = () => {
+    const ids = Array.from({ length: 200 }, (_, i) => `tasks:predictions_results:field_with_a_realistic_name_${i}`);
+    return { explore: [...ids, "tasks:agreement"], labeling: [...ids, "tasks:annotators"] };
+  };
+
+  it("keeps the explore/labeling dict for small queries so every backend version can read them", () => {
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true, hiddenColumns });
+    expect(encodeURIComponent(tab.query).length).toBeLessThanOrEqual(VIRTUAL_QUERY_COMPACT_THRESHOLD);
+    expect(JSON.parse(tab.query).hiddenColumns).toEqual(hiddenColumns);
+  });
+
+  it("sends only columns hidden in both modes, once, when the dict would make the GET URL too long", () => {
+    const large = largeHiddenColumns();
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true, hiddenColumns: large });
+    const query = JSON.parse(tab.query);
+
+    expect(query.hiddenColumns).toEqual(large.explore.slice(0, -1));
+    // Roughly half the size of sending both lists
+    expect(encodeURIComponent(tab.query).length).toBeLessThan(encodeURIComponent(JSON.stringify(large)).length * 0.6);
+  });
+
+  it("keeps the full explore/labeling lists in serialize() for annotator column persistence", () => {
+    tab = Tab.create({ id: _tabIdCounter++, virtual: true, hiddenColumns });
+    expect(tab.serialize().hiddenColumns).toEqual(hiddenColumns);
   });
 });

@@ -391,6 +391,23 @@ def _get_all_project_columns(project_id, user, request=None):
     return all_columns
 
 
+def _has_hidden_columns(hidden_columns):
+    """An empty list still means "nothing hidden in both modes", unlike a missing value."""
+    return isinstance(hidden_columns, list) or bool(hidden_columns)
+
+
+def _hidden_in_all_modes(hidden_columns):
+    """Column ids hidden in both explore and labeling modes.
+
+    ``hiddenColumns`` is ``{'explore': [...], 'labeling': [...]}`` in saved views. Virtual-tab
+    GET queries send only the ids hidden in both modes as a flat list, which keeps the URL
+    under load balancer limits for large labeling configs (FIT-3167).
+    """
+    if isinstance(hidden_columns, list):
+        return set(hidden_columns)
+    return set(hidden_columns.get('explore', [])) & set(hidden_columns.get('labeling', []))
+
+
 def get_fields_for_evaluation(prepare_params, user, skip_regular=True, request=None):
     """Collecting field names to annotate them
 
@@ -406,14 +423,14 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True, request=N
 
     # visible fields calculation
     fields = prepare_params.data.get('hiddenColumns', None)
-    if fields:
+    if _has_hidden_columns(fields):
         from label_studio.data_manager.functions import TASKS
 
         all_columns = _get_all_project_columns(prepare_params.project, user, request)
         all_columns = set(
             [TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id'] for c in all_columns['columns']]
         )
-        hidden = set(fields['explore']) & set(fields['labeling'])
+        hidden = _hidden_in_all_modes(fields)
         shown = all_columns - hidden
         shown = {c[len(TASKS) :] for c in shown} - {'data'}  # remove tasks:
         result = set(result) | shown
@@ -442,7 +459,7 @@ def get_visible_data_column_keys(prepare_params, user, request=None):
         return None
     data = getattr(prepare_params, 'data', None) or {}
     hidden_columns = data.get('hiddenColumns')
-    if not hidden_columns:
+    if not _has_hidden_columns(hidden_columns):
         return None
 
     from label_studio.data_manager.functions import TASKS
@@ -452,7 +469,7 @@ def get_visible_data_column_keys(prepare_params, user, request=None):
     if not data_column_ids:
         return frozenset()
 
-    hidden = set(hidden_columns.get('explore', [])) & set(hidden_columns.get('labeling', []))
+    hidden = _hidden_in_all_modes(hidden_columns)
     # hiddenColumns store ids as ``tasks:data.<key>`` or ``tasks:<id>`` for non-data.
     hidden_data_keys = set()
     prefix = f'{TASKS}data.'

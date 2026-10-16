@@ -1486,3 +1486,57 @@ class TestAnnotateStateProjectScoped(TestCase):
 
         assert completed == [self.moved_on.id]
         assert ordered == [self.moved_on.id, self.single.id]
+
+
+class TestHiddenColumnsListForm(TestCase):
+    """Virtual-tab queries send hiddenColumns as one list to keep the GET URL short (FIT-3167).
+
+    The backend only ever uses columns hidden in both explore and labeling modes, so a flat
+    list of those columns must yield the same fields and visible data keys as the dict form.
+    """
+
+    COLUMNS = {
+        'columns': [
+            {'id': 'agreement'},
+            {'id': 'annotators'},
+            {'id': 'total_annotations'},
+            {'id': 'image', 'parent': 'data'},
+            {'id': 'text', 'parent': 'data'},
+            {'id': 'data'},
+        ]
+    }
+    DICT_FORM = {
+        'explore': ['tasks:agreement', 'tasks:data.image', 'tasks:total_annotations'],
+        'labeling': ['tasks:agreement', 'tasks:data.image', 'tasks:annotators'],
+    }
+    LIST_FORM = ['tasks:agreement', 'tasks:data.image']
+
+    def _evaluate(self, hidden_columns):
+        from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
+
+        params = PrepareParams(project=1, data={'hiddenColumns': hidden_columns})
+        with patch('data_manager.managers._get_all_project_columns', return_value=self.COLUMNS):
+            fields = get_fields_for_evaluation(params, user=None)
+            visible_data_keys = get_visible_data_column_keys(params, user=None)
+        return set(fields), visible_data_keys
+
+    def test_list_form_matches_dict_form(self):
+        """A flat list of columns hidden in both modes is evaluated like the equivalent dict."""
+        dict_fields, dict_keys = self._evaluate(self.DICT_FORM)
+        list_fields, list_keys = self._evaluate(self.LIST_FORM)
+
+        # total_annotations is a regular Task field, so it is never annotated
+        self.assertEqual(dict_fields, {'annotators'})
+        self.assertEqual(list_fields, dict_fields)
+        self.assertEqual(dict_keys, frozenset({'text'}))
+        self.assertEqual(list_keys, dict_keys)
+
+    def test_empty_list_shows_every_column(self):
+        """Nothing hidden in both modes ([]) still evaluates every column, like the empty dict."""
+        dict_fields, dict_keys = self._evaluate({'explore': [], 'labeling': []})
+        list_fields, list_keys = self._evaluate([])
+
+        self.assertEqual(dict_fields, {'agreement', 'annotators'})
+        self.assertEqual(list_fields, dict_fields)
+        self.assertEqual(dict_keys, frozenset({'image', 'text'}))
+        self.assertEqual(list_keys, dict_keys)
