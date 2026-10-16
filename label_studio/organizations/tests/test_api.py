@@ -1,5 +1,9 @@
+from datetime import timedelta
 from urllib.parse import urlencode
 
+from django.test import override_settings
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
@@ -174,3 +178,55 @@ class TestOrganizationUpdateAPI(APITestCase):
         self.organization.refresh_from_db()
         assert self.organization.title == 'Renamed org'
         assert self.organization.contact_info == 'owner@example.com'
+
+
+@override_settings(ORG_INVITE_EXPIRATION_DAYS=30)
+class TestOrganizationInviteExpirationAPI(APITestCase):
+    """FIT-2685: invite endpoints report expiry; only an explicit reset issues a new link."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.owner = cls.organization.created_by
+
+    def _expire_token(self):
+        self.organization.token_expires_at = timezone.now() - timedelta(days=1)
+        self.organization.save(update_fields=['token_expires_at'])
+
+    def test_get_invite_returns_expiry(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.get('/api/invite')
+
+        assert response.status_code == 200
+        self.organization.refresh_from_db()
+        assert response.json()['token'] == self.organization.token
+        assert parse_datetime(response.json()['expires_at']) == self.organization.token_expires_at
+        assert response.json()['expired'] is False
+
+    def test_get_invite_does_not_rotate_expired_token(self):
+        self._expire_token()
+        old_token = self.organization.token
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.get('/api/invite')
+
+        assert response.status_code == 200
+        self.organization.refresh_from_db()
+        assert self.organization.token == old_token
+        assert response.json()['token'] == old_token
+        assert response.json()['expired'] is True
+
+    def test_reset_token_returns_fresh_expiry(self):
+        self._expire_token()
+        old_token = self.organization.token
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post('/api/invite/reset-token')
+
+        assert response.status_code == 201
+        self.organization.refresh_from_db()
+        assert self.organization.token != old_token
+        assert response.json()['token'] == self.organization.token
+        assert parse_datetime(response.json()['expires_at']) == self.organization.token_expires_at
+        assert response.json()['expired'] is False
