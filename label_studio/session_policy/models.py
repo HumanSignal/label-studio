@@ -28,3 +28,6 @@ class SessionTimeoutPolicy(models.Model):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    def has_permission(self, user):
+        return self.organization_id == user.active_organization_id
