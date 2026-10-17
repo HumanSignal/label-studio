@@ -27,6 +27,11 @@ export class RelationShape {
   };
 
   destroy() {
+    // Drop the callback first, so an in-flight debounced update is a no-op,
+    // then release the watcher itself. Without this the MutationObserver or the
+    // MobX observers it registered stay live for the lifetime of the page.
     this.onUpdated = null;
+    this._watcher?.destroy?.();
+    this._watcher = null;
   }
 }

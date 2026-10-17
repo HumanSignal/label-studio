@@ -86,6 +86,11 @@ describe("RelationShape", () => {
   });
 
   describe("destroy", () => {
+    const makeWatcherClass = (destroySpy) =>
+      class {
+        destroy = destroySpy;
+      };
+
     it("clears onUpdated", () => {
       const shape = new RelationShape({ element: mockElement });
       const callback = mock();
@@ -95,6 +100,40 @@ describe("RelationShape", () => {
       shape.onChanged();
 
       expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("destroys the watcher it created", () => {
+      const watcherDestroy = mock();
+      const shape = new RelationShape({
+        root: document.body,
+        element: mockElement,
+        watcher: makeWatcherClass(watcherDestroy),
+      });
+
+      shape.destroy();
+
+      expect(watcherDestroy).toHaveBeenCalledTimes(1);
+      expect(shape._watcher).toBeNull();
+    });
+
+    it("is idempotent", () => {
+      const watcherDestroy = mock();
+      const shape = new RelationShape({
+        root: document.body,
+        element: mockElement,
+        watcher: makeWatcherClass(watcherDestroy),
+      });
+
+      shape.destroy();
+      shape.destroy();
+
+      expect(watcherDestroy).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not throw when there is no watcher", () => {
+      const shape = new RelationShape({ element: mockElement });
+
+      expect(() => shape.destroy()).not.toThrow();
     });
   });
 });
