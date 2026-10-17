@@ -25,8 +25,13 @@ import { FF_DEV_1442, FF_LSDV_4930, isFF } from "../../utils/feature-flags";
 import { InteractiveActionsBar } from "../../ml-interactive/InteractiveActionsBar";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
+import { installTolerantHitDetection } from "../../utils/konva-hit-tolerance";
 
 Konva.showWarnings = false;
+
+// Fix for when some GPU canvas implementations round getImageData by ±1, breaking Konva's
+// exact color-key hit detection (most visibly the Transformer resize handles).
+installTolerantHitDetection(Konva);
 
 const hotkeys = Hotkey("Image");
 const imgDefaultProps = { crossOrigin: "anonymous" };
