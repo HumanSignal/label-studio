@@ -1,4 +1,12 @@
-import { LabelStudio, ImageView, Textarea, ToolBar, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import {
+  LabelStudio,
+  ImageView,
+  Choices,
+  Textarea,
+  ToolBar,
+  Modals,
+  Sidebar,
+} from "@humansignal/frontend-test/helpers/LSF";
 import {
   simpleImageTextareaConfig,
   simpleImageData,
@@ -14,6 +22,7 @@ import {
   perItemMIGTextareaConfig,
   perItemTextareaResult,
   requiredPerItemMIGTextareaConfig,
+  requiredPerItemVisibleWhenMIGTextareaConfig,
 } from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
@@ -332,5 +341,41 @@ describe("Control Tags - MIG perItem - Textarea", () => {
 
     ToolBar.updateBtn.click();
     Modals.hasNoWarnings();
+  });
+
+  describe("inside a View with visibleWhen", () => {
+    const fillFirstItemOnly = () => {
+      LabelStudio.params()
+        .config(requiredPerItemVisibleWhenMIGTextareaConfig)
+        .data(simpleMIGData)
+        .withResult(perRegionRegionsResult)
+        .init();
+
+      ImageView.waitForImage();
+
+      Choices.findChoice("Important").click();
+      Textarea.type("Text 1{enter}");
+    };
+
+    it("should not require result on items where the View is hidden", () => {
+      fillFirstItemOnly();
+
+      ToolBar.updateBtn.click();
+      Modals.hasNoWarnings();
+    });
+
+    it("should keep result of a visible item while another item is shown", () => {
+      fillFirstItemOnly();
+
+      ImageView.paginationNextBtn.click();
+      ImageView.waitForImage();
+
+      LabelStudio.serialize().then((result) => {
+        const textarea = result.find((r) => r.from_name === "textarea");
+
+        expect(textarea).to.include({ item_index: 0 });
+        expect(textarea.value.text).to.be.deep.eq(["Text 1"]);
+      });
+    });
   });
 });

@@ -56,11 +56,14 @@ def user_signup(request):
     # make a new user
     if request.method == 'POST':
         organization = Organization.objects.first()
+        token_is_valid = bool(
+            token and organization and token == organization.token and not organization.is_invite_token_expired
+        )
         if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
-            if not (token and organization and token == organization.token):
+            if not token_is_valid:
                 raise PermissionDenied()
         else:
-            if token and organization and token != organization.token:
+            if token and organization and not token_is_valid:
                 raise PermissionDenied()
 
         user_form = forms.UserSignupForm(request.POST)

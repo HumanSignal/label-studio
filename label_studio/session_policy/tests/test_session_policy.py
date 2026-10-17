@@ -71,3 +71,12 @@ def test_session_policy_api():
     data = response.json()
     assert data['max_session_age'] == new_policy['max_session_age']
     assert data['max_time_between_activity'] == new_policy['max_time_between_activity']
+
+
+@pytest.mark.django_db
+def test_session_policy_permission_is_scoped_to_its_organization():
+    policy = SessionTimeoutPolicy.objects.create(organization=OrganizationFactory())
+    other_organization_user = OrganizationFactory().created_by
+
+    assert policy.has_permission(policy.organization.created_by)
+    assert not policy.has_permission(other_organization_user)

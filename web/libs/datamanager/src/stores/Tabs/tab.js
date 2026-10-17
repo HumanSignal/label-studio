@@ -14,6 +14,9 @@ const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
 const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed.";
 const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
 const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
+// Encoded virtual-tab query length above which hiddenColumns is sent as a compact list.
+// Matches common proxy request-line buffers (e.g. nginx's 8k default).
+export const VIRTUAL_QUERY_COMPACT_THRESHOLD = 8 * 1024;
 
 import { preferSiblingFilterType } from "./child_filter_types";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
@@ -257,13 +260,28 @@ export const Tab = types
       return self.columnOrder.toPOJO();
     },
 
+    // Columns hidden in both modes, the only ones the tasks API uses.
+    get hiddenColumnsInAllModes() {
+      const { explore, labeling } = self.hiddenColumnsSnapshot;
+      const hiddenInLabeling = new Set(labeling);
+
+      return [...new Set(explore)].filter((id) => hiddenInLabeling.has(id));
+    },
+
     get query() {
-      return JSON.stringify({
-        filters: self.filterSnapshot,
-        ordering: self.ordering.toJSON(),
-        hiddenColumns: self.hiddenColumnsSnapshot,
-        agreement_selected: self.agreement_selected,
-      });
+      const build = (hiddenColumns) =>
+        JSON.stringify({
+          filters: self.filterSnapshot,
+          ordering: self.ordering.toJSON(),
+          hiddenColumns,
+          agreement_selected: self.agreement_selected,
+        });
+      const query = build(self.hiddenColumnsSnapshot);
+
+      // Large configs push the virtual-tab GET URL past load balancer limits (FIT-3167). Only then
+      // send the compact flat list, so smaller queries stay readable by backends without list support.
+      if (encodeURIComponent(query).length <= VIRTUAL_QUERY_COMPACT_THRESHOLD) return query;
+      return build(self.hiddenColumnsInAllModes);
     },
 
     serialize() {

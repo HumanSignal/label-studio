@@ -2,7 +2,7 @@
  * Unit tests for VisibilityMixin (mixins/Visibility.js)
  */
 import { types } from "mobx-state-tree";
-import VisibilityMixin from "../Visibility";
+import VisibilityMixin, { isNodeVisibleForItem } from "../Visibility";
 
 const WithAnnotation = types
   .model("WithAnnotation", {})
@@ -337,6 +337,101 @@ describe("VisibilityMixin", () => {
         }),
       );
       expect(tree.middle.node.isVisible).toBe(false);
+    });
+  });
+
+  describe("isVisibleForItem (perItem gating tag)", () => {
+    // perItem Choices with "A" selected on item 0 only; the current item (1) has nothing selected
+    const perItemChoices = (overrides = {}) => ({
+      type: "choices",
+      peritem: true,
+      selectedValues: () => [],
+      selectedValuesForItem: (idx) => (idx === 0 ? ["A"] : []),
+      selectedChoicesMatch: (a, b) => a === b,
+      hasChoiceSelection: () => false,
+      isVisibleForItem: () => true,
+      ...overrides,
+    });
+
+    it("uses the gating choice on the given item, not the current one", () => {
+      const tree = createTree({ visiblewhen: "choice-selected", whentagname: "ch", whenchoicevalue: "A" });
+      tree.middle.node.setAnnotation(createAnnotation({ names: new Map([["ch", perItemChoices()]]) }));
+
+      expect(tree.middle.node.isVisible).toBe(false);
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(true);
+      expect(tree.middle.node.isVisibleForItem(1)).toBe(false);
+    });
+
+    it("treats any selection on the item as a match when whenchoicevalue is unset", () => {
+      const tree = createTree({ visiblewhen: "choice-selected", whentagname: "ch" });
+      tree.middle.node.setAnnotation(createAnnotation({ names: new Map([["ch", perItemChoices()]]) }));
+
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(true);
+      expect(tree.middle.node.isVisibleForItem(2)).toBe(false);
+    });
+
+    it("inverts per item for choice-unselected", () => {
+      const tree = createTree({ visiblewhen: "choice-unselected", whentagname: "ch", whenchoicevalue: "A" });
+      tree.middle.node.setAnnotation(createAnnotation({ names: new Map([["ch", perItemChoices()]]) }));
+
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(false);
+      expect(tree.middle.node.isVisibleForItem(1)).toBe(true);
+    });
+
+    it("is hidden when the gating tag is itself hidden on that item", () => {
+      const tree = createTree({ visiblewhen: "choice-selected", whentagname: "ch", whenchoicevalue: "A" });
+      const ch = perItemChoices({ isVisibleForItem: () => false });
+      tree.middle.node.setAnnotation(createAnnotation({ names: new Map([["ch", ch]]) }));
+
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(false);
+    });
+
+    it("is hidden when the parent is hidden", () => {
+      const tree = createTree({}, false);
+      tree.middle.node.setAnnotation(createAnnotation());
+
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(false);
+    });
+
+    it("matches isVisible when the gating tag is not perItem", () => {
+      const tree = createTree({ visiblewhen: "choice-selected", whentagname: "ch", whenchoicevalue: "A" });
+      const ch = {
+        type: "choices",
+        hasChoiceSelection: (vals, selected) => vals.some((v) => selected.includes(v)),
+        selectedValues: () => ["A"],
+      };
+      tree.middle.node.setAnnotation(createAnnotation({ names: new Map([["ch", ch]]) }));
+
+      expect(tree.middle.node.isVisibleForItem(0)).toBe(true);
+      expect(tree.middle.node.isVisibleForItem(1)).toBe(true);
+    });
+  });
+
+  describe("isNodeVisibleForItem", () => {
+    // Number/DateTime/Rating have no VisibilityMixin and inherit visibility from their parent View
+    const Parent = types
+      .model("Parent", {
+        hiddenItems: types.array(types.number),
+        middle: types.model("Middle", { node: types.model("Plain", {}) }),
+      })
+      .views((self) => ({
+        isVisibleForItem(idx) {
+          return !self.hiddenItems.includes(idx);
+        },
+      }));
+
+    it("defers to the parent's per-item visibility for nodes without the mixin", () => {
+      const tree = Parent.create({ hiddenItems: [1], middle: { node: {} } });
+
+      expect(isNodeVisibleForItem(tree.middle.node, 0)).toBe(true);
+      expect(isNodeVisibleForItem(tree.middle.node, 1)).toBe(false);
+    });
+
+    it("uses the node's own isVisibleForItem when present", () => {
+      const tree = createTree({}, false);
+      tree.middle.node.setAnnotation(createAnnotation());
+
+      expect(isNodeVisibleForItem(tree.middle.node, 0)).toBe(false);
     });
   });
 

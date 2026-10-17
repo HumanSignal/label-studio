@@ -8,7 +8,7 @@ from typing import Union
 from urllib.parse import urlparse
 
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
+from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
@@ -31,7 +31,7 @@ from io_storages.utils import (
 )
 from tasks.models import Annotation
 
-from label_studio.io_storages.azure_blob.utils import AZURE
+from label_studio.io_storages.azure_blob.utils import AZURE, get_blob_service_client
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
@@ -64,14 +64,7 @@ class AzureBlobStorageMixin(models.Model):
                 'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
                 'or account_name and account_key fields.'
             )
-        connection_string = (
-            'DefaultEndpointsProtocol=https;AccountName='
-            + account_name
-            + ';AccountKey='
-            + account_key
-            + ';EndpointSuffix=core.windows.net'
-        )
-        client = BlobServiceClient.from_connection_string(conn_str=connection_string)
+        client = get_blob_service_client(account_name, account_key)
         container = client.get_container_client(str(self.container))
         return client, container
 
