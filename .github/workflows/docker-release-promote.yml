@@ -137,11 +137,6 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Create version_.py
-        run: |
-          python3 $(pwd)/label_studio/core/version.py
-          cat $(pwd)/label_studio/core/version_.py
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
 
@@ -165,6 +160,13 @@ jobs:
         run: |
           set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
 
+          RELEASE_VERSION="${VERSION_OVERRIDE#v}"
+          export VERSION_OVERRIDE="$RELEASE_VERSION"
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
+
+          python3 "$(pwd)/label_studio/core/version.py"
+          cat "$(pwd)/label_studio/core/version_.py"
+
           release_dir=release_${{ inputs.release_tag }}
           echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
           
@@ -175,7 +177,13 @@ jobs:
 
           cat <<EOF > "${{ env.RELEASE_DOCKERFILE }}"
           FROM ${{ env.IMAGE_NAME }}:${{ steps.get_info.outputs.image_version }}
+          ARG RELEASE_VERSION=$RELEASE_VERSION
           COPY --chown=54546:0 version_.py /label-studio/label_studio/core/version_.py
+          RUN --mount=from=ghcr.io/astral-sh/uv:0.12.3,source=/uv,target=/uv \\
+              /uv --no-cache version --frozen "\$RELEASE_VERSION" && \\
+              PIP_NO_CACHE_DIR=1 /usr/local/bin/python -m pip \\
+                --python /label-studio/.venv/bin/python \\
+                install --no-deps --editable /label-studio
           EOF
 
       - name: Extract Docker metadata
@@ -201,9 +209,13 @@ jobs:
 
       - name: Export digest
         run: |
+          DIGEST="${{ steps.docker_build.outputs.digest }}"
+          docker run --rm --entrypoint python3 "$IMAGE_NAME@$DIGEST" \
+            -c 'import label_studio,sys; assert label_studio.__version__ == sys.argv[1]' \
+            "$RELEASE_VERSION"
+
           mkdir -p ${{ runner.temp }}/digests
-          digest="${{ steps.docker_build.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+          touch "${{ runner.temp }}/digests/${DIGEST#sha256:}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v7
