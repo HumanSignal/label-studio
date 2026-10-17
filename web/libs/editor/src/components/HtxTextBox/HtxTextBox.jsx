@@ -3,6 +3,7 @@ import { IconPencil, IconTrashAlt, IconCheck } from "@humansignal/icons";
 import { Button, Tooltip, Typography } from "@humansignal/ui";
 import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { cn } from "../../utils/bem";
+import { Markdown } from "../Markdown/Markdown";
 
 // used for correct auto-height calculation
 const BORDER_WIDTH = 1;
@@ -177,6 +178,7 @@ export class HtxTextBox extends React.Component {
       isEditable,
       isDeleteable,
       text,
+      markdown,
 
       // don't pass non-DOM props to Paragraph
       ignoreShortcuts: _,
@@ -188,17 +190,23 @@ export class HtxTextBox extends React.Component {
     return (
       <div className={cn("textarea").elem("region").toClassName()} data-testid="htx-textbox-view">
         <div className={this.inputClassName} id={props.id} name={props.name} data-testid="htx-textbox-content">
-          <Typography ref={this.textRef} size="small">
-            {text.split("\n").map((line, index, array) => {
-              const isLastLine = index === array.length - 1;
-              return (
-                <React.Fragment key={index}>
-                  {line}
-                  {!isLastLine && <br />}
-                </React.Fragment>
-              );
-            })}
-          </Typography>
+          {markdown ? (
+            <div ref={this.textRef}>
+              <Markdown text={text} allowHtml={false} />
+            </div>
+          ) : (
+            <Typography ref={this.textRef} size="small">
+              {text.split("\n").map((line, index, array) => {
+                const isLastLine = index === array.length - 1;
+                return (
+                  <React.Fragment key={index}>
+                    {line}
+                    {!isLastLine && <br />}
+                  </React.Fragment>
+                );
+              })}
+            </Typography>
+          )}
         </div>
         <div className={cn("textarea").elem("actions").toClassName()} data-testid="htx-textbox-actions">
           {isEditable && onChange && (
