@@ -96,6 +96,7 @@ mockModule("../../components/Infomodal/Infomodal", () => ({
   },
 }));
 
+import { reaction } from "mobx";
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
 import "../../tags/object/Image/Image.js";
@@ -798,6 +799,43 @@ describe("AppStore", () => {
       expect(store.onDemandCourses).toEqual([]);
       expect(store.hideInstructionsForCourses).toBe(false);
       expect(store.interfaces).not.toContain("learning:on-demand");
+    });
+  });
+
+  describe("setCommentHeaderExtra (UTC-1446 experiment)", () => {
+    const HeaderExtra = () => null;
+
+    it("defaults to null", () => {
+      expect(createStore().commentHeaderExtra).toBeNull();
+    });
+
+    it("stores the component as-is and clears it with null or undefined", () => {
+      const store = createStore();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      expect(store.commentHeaderExtra).toBe(HeaderExtra);
+
+      store.setCommentHeaderExtra(null);
+      expect(store.commentHeaderExtra).toBeNull();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(undefined);
+      expect(store.commentHeaderExtra).toBeNull();
+    });
+
+    it("is observable, so mounted comment items re-render when the host sets it later", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.commentHeaderExtra,
+        (value) => seen.push(value),
+      );
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(null);
+      dispose();
+
+      expect(seen).toEqual([HeaderExtra, null]);
     });
   });
 

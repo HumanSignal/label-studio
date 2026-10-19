@@ -357,3 +357,10 @@ export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
  * contributors, onboarding projects and verified skill statuses.
  */
 export const FF_VERIFIED_SKILLS_AND_ONBOARDING = "fflag_feat_utc_1407_verified_skills_and_onboarding";
+
+/**
+ * UTC-1446 experiment: the "Ask AI" pill in the labeling editor's comment headers, which prefills Ask AI
+ * with the comment. Also needs the per-project switch in Django admin. Checked as an explicit `true` only,
+ * never the installation default (which is `true` on-prem). Remove with the AskAIInComments folder.
+ */
+export const FF_UTC_1446_ASK_AI_IN_COMMENTS = "fflag_feat_utc_1446_ask_ai_in_comments";

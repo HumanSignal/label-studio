@@ -46,6 +46,7 @@ interface CommentItemProps {
     isHighlighted: boolean;
     setHighlighted: (value: boolean) => {};
     _commentRef: React.Ref<HTMLElement>;
+    commentsStore?: any;
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
   classificationsItems: any;
@@ -82,6 +83,9 @@ export const CommentItem: FC<CommentItemProps> = observer(
     const infoIsHidden = comment.commentsStore?.store?.hasInterface("annotations:hide-info");
     const hiddenUser = infoIsHidden ? { email: isCreator ? "Me" : "User" } : null;
     const [text, setText] = useState(initialText);
+    // Optional host-provided header control (AppStore.setCommentHeaderExtra, UTC-1446 experiment).
+    // Read during render so this observer re-renders when the host sets it after comments are shown.
+    const HeaderExtra = comment.commentsStore?.store?.commentHeaderExtra;
 
     const [linkingComment, setLinkingComment] = useState();
     const region = regionRef?.region;
@@ -180,6 +184,8 @@ export const CommentItem: FC<CommentItemProps> = observer(
             <span className={cn("comment-item").elem("name").toClassName()}>
               {userDisplayName(hiddenUser ?? createdBy)}
             </span>
+            {/* `text` (not comment.text): it is what this item shows, and is newer right after an edit */}
+            {HeaderExtra && <HeaderExtra comment={comment} text={text} />}
           </Space>
 
           <Space size="small">
