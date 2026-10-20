@@ -85,10 +85,33 @@ class LabelListSerializer(serializers.ListSerializer):
         return result
 
 
+class OrganizationProjectField(serializers.PrimaryKeyRelatedField):
+    """Project of the requesting user's active organization that the user can access"""
+
+    # unscoped base queryset: the OpenAPI generator reads the target model from it
+    queryset = Project.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organization=self.context['request'].user.active_organization)
+
+    def to_internal_value(self, data):
+        project = super().to_internal_value(data)
+        if not project.has_permission(self.context['request'].user):
+            self.fail('does_not_exist', pk_value=data)
+        return project
+
+
+class OrganizationLabelField(serializers.PrimaryKeyRelatedField):
+    queryset = Label.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organization=self.context['request'].user.active_organization)
+
+
 class LabelCreateSerializer(serializers.ModelSerializer):
     created_by = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     organization = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects)
+    project = OrganizationProjectField()
     from_name = serializers.CharField()
 
     class Meta:
@@ -99,6 +122,8 @@ class LabelCreateSerializer(serializers.ModelSerializer):
 
 class LabelLinkSerializer(FlexFieldsModelSerializer):
     annotations_count = serializers.IntegerField(read_only=True)
+    project = OrganizationProjectField()
+    label = OrganizationLabelField()
 
     class Meta:
         model = LabelLink
@@ -112,6 +137,7 @@ class LabelSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Label
         fields = '__all__'
+        read_only_fields = ('organization', 'created_by')
         expandable_fields = {'links': ('labels_manager.serializers.LabelLinkSerializer', {'many': True})}
 
 
