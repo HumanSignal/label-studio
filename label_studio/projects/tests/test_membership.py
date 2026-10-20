@@ -1,8 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+from datetime import timedelta
+from unittest.mock import patch
+
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from organizations.models import OrganizationMember
+from organizations.tests.factories import OrganizationFactory
 from projects.membership import grant_project_member, revoke_project_member
 from projects.models import ProjectMember
 from projects.tests.access_setup import make_access_world
@@ -43,6 +48,47 @@ class TestProjectMembership(TestCase):
             grant_project_member(project=world.project_1, actor=world.creator, target=world.owner)
         self.assertEqual(granted_owner.exception.detail, IMPLICIT_MANAGER)
         self.assertFalse(ProjectMember.objects.filter(project=world.project_1, user=world.owner).exists())
+
+    def test_implicit_manager_is_rejected_when_active_organization_differs(self):
+        world = make_access_world()
+        world.creator.active_organization = OrganizationFactory()
+        world.creator.save(update_fields=['active_organization'])
+        before = self._creator_rows(world)
+
+        with self.assertRaises(ValidationError) as revoked:
+            revoke_project_member(project=world.project_1, actor=world.owner, target=world.creator)
+        self.assertEqual(revoked.exception.detail, IMPLICIT_MANAGER)
+        with self.assertRaises(ValidationError) as granted:
+            grant_project_member(project=world.project_1, actor=world.owner, target=world.creator)
+        self.assertEqual(granted.exception.detail, IMPLICIT_MANAGER)
+
+        self.assertEqual(self._creator_rows(world), before)
+        self.assertFalse(ProjectMember.objects.filter(project=world.project_1, user=world.creator).exists())
+
+    def test_revoke_moves_updated_at_forward(self):
+        world = make_access_world()
+        membership = ProjectMember.objects.get(project=world.project_1, user=world.member_a)
+        past = timezone.now() - timedelta(days=1)
+        ProjectMember.objects.filter(pk=membership.pk).update(updated_at=past)
+
+        revoke_project_member(project=world.project_1, actor=world.creator, target=world.member_a)
+
+        membership.refresh_from_db()
+        self.assertFalse(membership.enabled)
+        self.assertGreater(membership.updated_at, past)
+
+    def test_unique_constraint_retry_reenables_and_moves_updated_at(self):
+        world = make_access_world()
+        membership = ProjectMember.objects.get(project=world.project_1, user=world.unassigned)
+        past = timezone.now() - timedelta(days=1)
+        ProjectMember.objects.filter(pk=membership.pk).update(updated_at=past, enabled=False)
+
+        with patch.object(ProjectMember.objects, 'update_or_create', side_effect=IntegrityError):
+            restored = grant_project_member(project=world.project_1, actor=world.creator, target=world.unassigned)
+
+        self.assertEqual(restored.id, membership.id)
+        self.assertTrue(restored.enabled)
+        self.assertGreater(restored.updated_at, past)
 
     def test_revoke_missing_row_does_not_create_one(self):
         world = make_access_world()
@@ -103,3 +149,10 @@ class TestProjectMembership(TestCase):
 
     def _membership_rows(self):
         return list(ProjectMember.objects.order_by('id').values_list('id', 'project_id', 'user_id', 'enabled'))
+
+    def _creator_rows(self, world):
+        return list(
+            ProjectMember.objects.filter(project=world.project_1, user=world.creator)
+            .order_by('id')
+            .values_list('id', 'enabled', 'updated_at')
+        )
