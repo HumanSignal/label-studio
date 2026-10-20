@@ -46,6 +46,9 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 
 Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade.
 
+!!! warning "Upgrading from 2.36.0"
+    Do not upgrade directly from 2.36.0 to 2.37.0 or 2.37.1. Those versions do not include the database migration repair added in [2.36.1](#2361md), and the upgrade fails with `django.db.migrations.exceptions.InconsistentMigrationHistory: Migration lse_projects.0049_ensure_custom_interface_columns is applied before its dependency`. Upgrade to 2.36.1 or a later 2.36.x release, or to [2.37.2](#2372md) or later. If you already upgraded from 2.36.0 to 2.37.0 or 2.37.1 and see this error, deploy 2.37.2 or later to repair your instance.
+
 !!! attention "Release support lifecycle"
     Each Label Studio Enterprise on-premises release version is supported for up to 12 months from its release date. After this period, please contact your HumanSignal representative to upgrade to a currently supported release.
 
