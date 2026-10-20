@@ -1053,6 +1053,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         return Annotation.objects.for_user(self.request.user)
 
     def _ensure_can_write(self, annotation):
+        """Allow this write when the project is visible and the caller may modify the annotation.
+
+        Responsibility: the caller may write when the project is visible and
+        ``can_modify_annotation`` is true.
+
+        Boundary: no project access is ``NotFound``. Access without authorship or
+        management is ``PermissionDenied``. Does not call ``ensure_project_manage``.
+        """
         ensure_project_visible(self.request.user, annotation.project)
         if not can_modify_annotation(self.request.user, annotation):
             raise PermissionDenied()
