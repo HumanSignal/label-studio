@@ -107,20 +107,27 @@ def _requested_project_ids(request):
 
 
 def projects_visible_on_request(request):
-    """Return projects this user can see.
-
-    When ``ids`` names a project outside that queryset, raise ``NotFound`` before pagination
-    so a mixed id list cannot be narrowed to the visible page.
-    """
+    """Return projects this user can see. Does not interpret the ``ids`` query parameter."""
     from projects.access import visible_projects
 
     visible = visible_projects(request.user)
-    requested = _requested_project_ids(request)
-    if requested:
-        found = set(visible.filter(id__in=requested).values_list('id', flat=True))
-        if any(project_id not in found for project_id in requested):
-            raise NotFound()
     return Project.objects.filter(id__in=visible.values('pk'))
+
+
+def reject_hidden_project_ids(request, projects):
+    """404 the whole list when any explicit ``ids`` value is not visible.
+
+    Only the project list and the project counts list filter on ``ids``. Detail routes
+    must not call this, so a visible project stays reachable when the query string
+    also names a hidden id.
+    """
+    requested = _requested_project_ids(request)
+    if not requested:
+        return projects
+    found = set(projects.filter(id__in=requested).values_list('id', flat=True))
+    if any(project_id not in found for project_id in requested):
+        raise NotFound()
+    return projects
 
 
 @method_decorator(
@@ -209,7 +216,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         fields = self.get_requested_fields(serializer)
         sparse_fields = self.get_sparse_fields()
         filter = serializer.validated_data.get('filter')
-        projects = projects_visible_on_request(self.request).order_by(
+        projects = reject_hidden_project_ids(self.request, projects_visible_on_request(self.request)).order_by(
             F('pinned_at').desc(nulls_last=True), '-created_at'
         )
         search = serializer.validated_data.get('search')
@@ -317,7 +324,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
         projects = ProjectManager.with_counts_annotate(
-            projects_visible_on_request(self.request), fields=fields
+            reject_hidden_project_ids(self.request, projects_visible_on_request(self.request)), fields=fields
         ).order_by(F('pinned_at').desc(nulls_last=True), '-created_at')
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled

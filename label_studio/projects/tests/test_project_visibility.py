@@ -114,3 +114,18 @@ class ProjectVisibilityTests(APITestCase):
             {world.project_1.id},
         )
         self.assertCountEqual(list(world.project_1.all_members), [world.owner, world.creator, world.member_a])
+
+    def test_detail_ignores_ids_that_would_404_the_list(self):
+        world = make_access_world()
+        self.client.force_authenticate(world.member_a)
+        detail = self.client.get(
+            reverse('projects:api:project-detail', kwargs={'pk': world.project_1.id}),
+            {'ids': world.project_2.id},
+        )
+        self.assertEqual(detail.status_code, 200)
+        self.assertEqual(detail.json()['id'], world.project_1.id)
+        listed = self.client.get(
+            reverse('projects:api:project-list'),
+            {'ids': f'{world.project_1.id},{world.project_2.id}'},
+        )
+        self.assertEqual(listed.status_code, 404)
