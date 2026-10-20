@@ -212,6 +212,11 @@ export default types
     onDemandCourses: [],
     hideInstructionsForCourses: false,
     onOpenOnDemandCourse: null,
+    // Optional host-provided React component rendered in every comment header, right after the
+    // author name, with props { comment, text }. Lets the host app add its own per-comment control
+    // without forking the comment UI. Volatile (never serialized); null means nothing is rendered.
+    // Added for the UTC-1446 experiment.
+    commentHeaderExtra: null,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))
@@ -325,6 +330,15 @@ export default types
       self.onOpenOnDemandCourse = onOpenOnDemandCourse;
       toggleInterface("learning:on-demand", courses.length > 0);
       toggleInterface("instruction", false);
+    }
+
+    /**
+     * Set or clear (null) the host component rendered in each comment header.
+     * Volatile fields are observable, so comments already on screen pick up the change.
+     * @param {import("react").ComponentType<{ comment: object, text: string }> | null} component
+     */
+    function setCommentHeaderExtra(component) {
+      self.commentHeaderExtra = component ?? null;
     }
 
     function setDescription(value) {
@@ -1187,6 +1201,7 @@ export default types
       hasInterface,
       toggleInterface,
       setCourseBottomBar,
+      setCommentHeaderExtra,
       setDescription,
 
       afterCreate,
