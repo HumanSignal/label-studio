@@ -217,6 +217,15 @@ export default types
     // without forking the comment UI. Volatile (never serialized); null means nothing is rendered.
     // Added for the UTC-1446 experiment.
     commentHeaderExtra: null,
+    // Optional host-provided side-panel tab (one), set with setHostPanel. Volatile (never serialized).
+    // { title, shown, badge, onElement(el | null), onAvailability(available) }. While it is set, the side
+    // panels tell the host through onAvailability whether they are on screen as columns. While `shown`,
+    // a tab named `title` sits in the panel holding Info (or wherever the user dragged it), its empty
+    // body element is handed to onElement while the tab is open (null once it closes) so the host can
+    // render into it through a portal, and `badge` puts a dot on its label. Added for UTC-1446.
+    hostPanel: null,
+    // Bumped by focusHostPanel; the side panels then bring the host tab forward.
+    hostPanelFocusRequest: 0,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))
@@ -339,6 +348,20 @@ export default types
      */
     function setCommentHeaderExtra(component) {
       self.commentHeaderExtra = component ?? null;
+    }
+
+    /**
+     * Register, update or clear (null) the host-provided side-panel tab — see `hostPanel`.
+     * @param {{ title: string, shown: boolean, badge?: boolean, onElement?: (el: HTMLElement | null) => void,
+     *   onAvailability?: (available: boolean) => void } | null} config
+     */
+    function setHostPanel(config) {
+      self.hostPanel = config ?? null;
+    }
+
+    /** Bring the host tab forward: make it active, expand its collapsed side, show or raise its panel. */
+    function focusHostPanel() {
+      self.hostPanelFocusRequest += 1;
     }
 
     function setDescription(value) {
@@ -1202,6 +1225,8 @@ export default types
       toggleInterface,
       setCourseBottomBar,
       setCommentHeaderExtra,
+      setHostPanel,
+      focusHostPanel,
       setDescription,
 
       afterCreate,

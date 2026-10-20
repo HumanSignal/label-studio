@@ -1,6 +1,7 @@
 import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_WIDTH } from "../../constants";
 import { JoinOrder, type PanelBBox, Side } from "../types";
 import {
+  applyHostPanel,
   checkCollapsedPanelsHaveData,
   determineDroppableArea,
   determineLeftOrRight,
@@ -16,6 +17,10 @@ import {
   stateAddedTab,
   stateRemovedTab,
   stateRemovePanelEmptyViews,
+  HOST_VIEW_NAME,
+  panelComponents,
+  restorePanel,
+  syncHostView,
 } from "../utils";
 
 const dummyPanels: Record<string, PanelBBox> = {
@@ -796,5 +801,265 @@ describe("applyFocusTabToPanels (FIT-2813)", () => {
 
     expect(result.showPanel).toBe("info-comments-history");
     expect(result.panelData["info-comments-history"].panelViews.find((v) => v.name === "comments")?.active).toBe(true);
+  });
+});
+
+/**
+ * UTC-1446: the one tab a host app fills itself. What matters to users is that its coming and going never resets
+ * the layout they arranged, that it lands next to Info the first time, and stays wherever they dragged it.
+ */
+describe("host panel tab", () => {
+  const view = (name: string, active = false) => ({ name, title: name, component: () => null, active });
+  const panel = (panelViews: ReturnType<typeof view>[], overrides: Partial<PanelBBox> = {}): PanelBBox => ({
+    order: 1,
+    top: 0,
+    left: 0,
+    relativeLeft: 0,
+    relativeTop: 0,
+    zIndex: 10,
+    width: 410,
+    height: 500,
+    visible: true,
+    detached: false,
+    alignment: Side.right,
+    maxHeight: 800,
+    panelViews,
+    ...overrides,
+  });
+  /** A layout a user arranged by hand: Info dragged in with Regions, History torn off into a floating panel. */
+  const arranged = (): Record<string, PanelBBox> => ({
+    "regions-relations-info-comments": panel([
+      view("regions", true),
+      view("relations"),
+      view("info"),
+      view("comments"),
+    ]),
+    history: panel([view("history", true)], { detached: true, width: 333, zIndex: 12, top: 40, left: 70 }),
+  });
+  const names = (state: Record<string, PanelBBox>, key: string) => state[key].panelViews.map((v) => v.name);
+  const save = (panelData: Record<string, PanelBBox>, collapsedSide = { left: false, right: false }) =>
+    window.localStorage.setItem("panelState", JSON.stringify({ panelData, collapsedSide }));
+
+  afterEach(() => window.localStorage.removeItem("panelState"));
+
+  describe("restorePanel", () => {
+    it("adds the tab to the panel holding Info without resetting a layout saved before it existed", () => {
+      save(arranged(), { left: false, right: true });
+
+      const { panelData, collapsedSide } = restorePanel(true, false, "Helper");
+
+      expect(Object.keys(panelData)).toEqual(["regions-relations-info-comments-host", "history"]);
+      expect(names(panelData, "regions-relations-info-comments-host")).toEqual([
+        "regions",
+        "relations",
+        "info",
+        "comments",
+        HOST_VIEW_NAME,
+      ]);
+      const host = panelData["regions-relations-info-comments-host"].panelViews[4];
+      expect(host.title).toBe("Helper");
+      expect(host.active).toBe(false);
+      expect(host.component === panelComponents[HOST_VIEW_NAME]).toBe(true);
+      // Nothing else moved: the floating History panel and the collapsed right side are as the user left them.
+      expect(panelData.history.width).toBe(333);
+      expect(panelData.history.detached).toBe(true);
+      expect(collapsedSide.right).toBe(true);
+    });
+
+    it("restores a saved layout that has the tab as saved, wherever it was dragged", () => {
+      save({
+        ...arranged(),
+        host: panel([{ ...view(HOST_VIEW_NAME, true), title: "Helper" }], { detached: true, width: 360, top: 90 }),
+      });
+
+      const { panelData } = restorePanel(true, false, "Helper");
+
+      expect(Object.keys(panelData)).toEqual(["regions-relations-info-comments", "history", "host"]);
+      expect(panelData.host.width).toBe(360);
+      expect(panelData.host.top).toBe(90);
+      expect(panelData.host.panelViews[0].active).toBe(true);
+    });
+
+    it("drops the tab when it is not offered, keeping the rest of the layout and an active tab in its panel", () => {
+      const withHost = arranged();
+      withHost["regions-relations-info-comments"].panelViews = [
+        view("regions"),
+        view("relations"),
+        view("info"),
+        view("comments"),
+        { ...view(HOST_VIEW_NAME, true), title: "Helper" },
+      ];
+      save({
+        "regions-relations-info-comments-host": withHost["regions-relations-info-comments"],
+        history: withHost.history,
+      });
+
+      const { panelData } = restorePanel(true, false, false);
+
+      expect(Object.keys(panelData)).toEqual(["regions-relations-info-comments", "history"]);
+      expect(panelData["regions-relations-info-comments"].panelViews.map((v) => [v.name, v.active])).toEqual([
+        ["regions", true],
+        ["relations", false],
+        ["info", false],
+        ["comments", false],
+      ]);
+      expect(panelData.history.width).toBe(333);
+    });
+
+    it("removes a floating panel that held only the tab", () => {
+      save({ ...arranged(), host: panel([{ ...view(HOST_VIEW_NAME, true), title: "Helper" }], { detached: true }) });
+
+      const { panelData } = restorePanel(true, false, false);
+
+      expect(Object.keys(panelData)).toEqual(["regions-relations-info-comments", "history"]);
+    });
+
+    it("survives the flag going off and on again with the user's own layout intact", () => {
+      save(arranged(), { left: false, right: true });
+      const geometry = (state: Record<string, PanelBBox>) =>
+        Object.values(state).map(({ width, height, top, left, detached, alignment, zIndex }) => ({
+          width,
+          height,
+          top,
+          left,
+          detached,
+          alignment,
+          zIndex,
+        }));
+      const before = geometry(restorePanel(true, false, false).panelData);
+
+      let restored = restorePanel(true, false, "Helper");
+      save(restored.panelData, restored.collapsedSide);
+      restored = restorePanel(true, false, false);
+      save(restored.panelData, restored.collapsedSide);
+      restored = restorePanel(true, false, "Helper");
+
+      expect(geometry(restored.panelData)).toEqual(before);
+      expect(restored.collapsedSide.right).toBe(true);
+      expect(names(restored.panelData, "regions-relations-info-comments-host")).toContain(HOST_VIEW_NAME);
+    });
+
+    it("still resets a layout that is missing a native tab, and then adds the tab to the default Info panel", () => {
+      save({ "info-comments": panel([view("info", true), view("comments")]) });
+
+      const { panelData } = restorePanel(true, false, "Helper");
+
+      expect(Object.keys(panelData)).toEqual(["info-comments-history-host", "regions-relations"]);
+    });
+
+    it("leaves an active tab in every panel when it falls back to the defaults after the tab was brought forward", () => {
+      // No saved layout: the defaults are used, and the host's tab is brought forward in them.
+      const first = restorePanel(true, false, "Helper");
+      applyHostPanel(first.panelData, first.collapsedSide, "Helper", true, 800);
+
+      // A project whose config adds the custom tab: the tab count changed, so the defaults are used again.
+      const { panelData } = restorePanel(true, "Custom", "Helper");
+
+      expect(Object.values(panelData).map((p) => p.panelViews.filter((v) => v.active).length)).toEqual([1, 1]);
+    });
+  });
+
+  describe("syncHostView", () => {
+    it("is idempotent: syncing again returns the very same layout", () => {
+      const added = syncHostView(arranged(), "Helper");
+      const removed = syncHostView(added, false);
+
+      expect(syncHostView(added, "Helper") === added).toBe(true);
+      expect(syncHostView(removed, false) === removed).toBe(true);
+    });
+
+    it("retitles the tab in place", () => {
+      const added = syncHostView(arranged(), "Helper");
+      const retitled = syncHostView(added, "Assistant");
+
+      expect(Object.keys(retitled)).toEqual(Object.keys(added));
+      expect(retitled["regions-relations-info-comments-host"].panelViews[4].title).toBe("Assistant");
+    });
+
+    it("falls back to the first panel when no panel holds Info", () => {
+      const added = syncHostView({ "regions-relations": panel([view("regions", true), view("relations")]) }, "Helper");
+
+      expect(Object.keys(added)).toEqual(["regions-relations-host"]);
+    });
+
+    it("renames only the panel it changed: the custom tab still finds its panel by key", () => {
+      const state = {
+        "info-comments-history": panel([view("info", true), view("comments"), view("history")]),
+        "regions-relations": panel([view("regions", true), view("relations"), view("custom")]),
+      };
+
+      expect(Object.keys(syncHostView(state, "Helper"))).toEqual(["info-comments-history-host", "regions-relations"]);
+    });
+  });
+
+  describe("applyHostPanel", () => {
+    const columns = () => ({
+      "info-comments-history": panel([view("info", true), view("comments"), view("history")], { height: 400 }),
+      "regions-relations": panel([view("regions", true), view("relations")], { order: 2, height: 400 }),
+    });
+    const open = { left: false, right: false };
+
+    it("shows and brings forward the tab in one go: added, then made active", () => {
+      const { panelData } = applyHostPanel(columns(), open, "Helper", true, 800);
+      const views = panelData["info-comments-history-host"].panelViews;
+
+      expect(views.find((v) => v.name === HOST_VIEW_NAME)?.active).toBe(true);
+      expect(views.find((v) => v.name === "info")?.active).toBe(false);
+    });
+
+    it("expands the collapsed side the tab is on", () => {
+      const { collapsedSide } = applyHostPanel(columns(), { left: false, right: true }, "Helper", true, 800);
+
+      expect(collapsedSide.right).toBe(false);
+    });
+
+    it("shows its panel when that panel was minimized", () => {
+      const state = columns();
+      state["info-comments-history"].visible = false;
+
+      const { panelData } = applyHostPanel(state, open, "Helper", true, 800);
+
+      expect(panelData["info-comments-history-host"].visible).toBe(true);
+    });
+
+    it("raises a floating panel holding the tab above the other floating panels", () => {
+      const state = {
+        ...columns(),
+        host: panel([{ ...view(HOST_VIEW_NAME), title: "Helper" }], { detached: true, zIndex: 12 }),
+        relations: panel([view("relations", true)], { detached: true, zIndex: 13 }),
+      };
+      state["regions-relations"].panelViews = [view("regions", true)];
+
+      const { panelData } = applyHostPanel(state, open, "Helper", true, 800);
+
+      expect(panelData.host.zIndex).toBeGreaterThan(panelData.relations.zIndex);
+    });
+
+    it("changes nothing without a request or a change of registration", () => {
+      const state = syncHostView(columns(), "Helper");
+      const result = applyHostPanel(state, open, "Helper", false, 800);
+
+      expect(result.panelData === state).toBe(true);
+      expect(result.collapsedSide === open).toBe(true);
+    });
+
+    it("ignores a focus request when no tab is shown", () => {
+      const state = columns();
+      const result = applyHostPanel(state, open, false, true, 800);
+
+      expect(result.panelData === state).toBe(true);
+    });
+
+    it("un-collapses a side that is left empty once the tab goes", () => {
+      const state = {
+        ...columns(),
+        host: panel([{ ...view(HOST_VIEW_NAME, true), title: "Helper" }], { alignment: Side.left }),
+      };
+
+      const { panelData, collapsedSide } = applyHostPanel(state, { left: true, right: false }, false, false, 800);
+
+      expect(panelData.host).toBeUndefined();
+      expect(collapsedSide.left).toBe(false);
+    });
   });
 });

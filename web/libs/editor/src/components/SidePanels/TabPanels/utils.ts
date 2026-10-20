@@ -8,7 +8,7 @@ import {
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
-import { Comments, Custom, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
+import { Comments, Custom, History, Host, Info, Relations } from "../DetailsPanel/DetailsPanel";
 import { OutlinerComponent } from "../OutlinerPanel/OutlinerPanel";
 import type { PanelProps } from "../PanelBase";
 import {
@@ -164,6 +164,13 @@ const checkForCustomTab = (state: Record<string, PanelBBox>, showCustomTab: Show
   return state;
 };
 
+/**
+ * The one tab a host app can add to the side panels (UTC-1446) — see `hostPanel` in AppStore. Its view is never
+ * one of `panelViews` below and is left out of the saved-layout check in restorePanel, so offering the tab or not
+ * never resets anybody's layout. Always registered, so a saved layout that has it can always be restored.
+ */
+export const HOST_VIEW_NAME = "host";
+
 export const panelComponents: { [key: string]: FC<PanelProps> } = {
   regions: OutlinerComponent as FC<PanelProps>,
   history: History as FC<PanelProps>,
@@ -171,6 +178,7 @@ export const panelComponents: { [key: string]: FC<PanelProps> } = {
   comments: Comments as FC<PanelProps>,
   info: Info as FC<PanelProps>,
   custom: Custom as FC<PanelProps>,
+  [HOST_VIEW_NAME]: Host as FC<PanelProps>,
 };
 
 const panelViews = [
@@ -320,13 +328,22 @@ export const checkCollapsedPanelsHaveData = (collapsedSide: PanelsCollapsed, pan
   return collapsedCopy;
 };
 
-export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab = false): StoredPanelState => {
+export const restorePanel = (
+  showComments: boolean,
+  showCustomTab: ShowCustomTab = false,
+  hostTitle: string | false = false,
+): StoredPanelState => {
   const previousState = window.localStorage.getItem("panelState");
   const parsed: StoredPanelState | null = previousState && JSON.parse(previousState);
   const panelData = parsed && parsed.panelData;
   const defaultCollapsedSide = { [Side.left]: false, [Side.right]: false };
   const collapsedSide = parsed?.collapsedSide ?? defaultCollapsedSide;
-  const allTabs = panelData && Object.values(panelData).flatMap((panel) => panel.panelViews);
+  // The host tab is not counted: whether a host offers it says nothing about how old the saved layout is.
+  const allTabs =
+    panelData &&
+    Object.values(panelData)
+      .flatMap((panel) => panel.panelViews)
+      .filter((view) => view.name !== HOST_VIEW_NAME);
   // don't use comments and custom tabs anywhere if it's disabled
   const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1) - (showCustomTab ? 0 : 1);
 
@@ -338,10 +355,12 @@ export const restorePanel = (showComments: boolean, showCustomTab: ShowCustomTab
       defaultPanel = fixCustomTab(defaultPanel, "regions-relations", showCustomTab);
     }
 
-    return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };
+    // The defaults share their view objects with every earlier layout, and switching tabs flips `active` on them in
+    // place: after the host tab (a view of its own) was brought forward, none of the shared ones is active any more.
+    return { panelData: setActiveDefaults(syncHostView(defaultPanel, hostTitle)), collapsedSide: defaultCollapsedSide };
   }
 
-  const fixedPanels = stateRemovePanelEmptyViews(checkForCustomTab(panelData, showCustomTab));
+  const fixedPanels = syncHostView(stateRemovePanelEmptyViews(checkForCustomTab(panelData, showCustomTab)), hostTitle);
   const withActiveDefaults = setActiveDefaults(fixedPanels);
   const safeCollapsedSide = checkCollapsedPanelsHaveData(collapsedSide, withActiveDefaults);
 
@@ -665,4 +684,108 @@ export const applyFocusTabToPanels = (
     collapsedSide: nextCollapsed,
     showPanel: visible ? undefined : panelName,
   };
+};
+
+/** Rename one panel after its views changed, keeping its place and leaving every other key as it is. */
+const renamePanelKey = (state: Record<string, PanelBBox>, key: string) => {
+  const newKey = state[key].panelViews.map((view) => view.name).join("-");
+
+  if (newKey === key) return state;
+  return Object.fromEntries(
+    Object.entries(state).map(([panelKey, panel]) => [panelKey === key ? newKey : panelKey, panel]),
+  );
+};
+
+/**
+ * Make the host view (HOST_VIEW_NAME) match what the host offers: `hostTitle`, or false for nothing.
+ *
+ * Missing and offered: appended, inactive, to the panel holding Info (searched by view, since keys change after
+ * drags), else to the first panel. Present: kept wherever the user dragged it, retitled if needed. Not offered:
+ * removed, with a panel left empty by that (a detached host-only panel) and a panel left without an active tab
+ * normalized. Only the changed panel is renamed: the custom tab still finds "regions-relations" by its key.
+ * Returns the same object when nothing changes.
+ */
+export const syncHostView = (state: Record<string, PanelBBox>, hostTitle: string | false) => {
+  const holder = Object.keys(state).find((key) => state[key].panelViews.some((view) => view.name === HOST_VIEW_NAME));
+
+  if (!hostTitle) {
+    if (!holder) return state;
+    const stripped = {
+      ...state,
+      [holder]: {
+        ...state[holder],
+        panelViews: state[holder].panelViews.filter((view) => view.name !== HOST_VIEW_NAME),
+      },
+    };
+    const withoutEmpty = stateRemovePanelEmptyViews(stripped);
+
+    return setActiveDefaults(withoutEmpty[holder] ? renamePanelKey(withoutEmpty, holder) : withoutEmpty);
+  }
+
+  if (holder) {
+    const views = state[holder].panelViews;
+
+    if (views.every((view) => view.name !== HOST_VIEW_NAME || view.title === hostTitle)) return state;
+    return {
+      ...state,
+      [holder]: {
+        ...state[holder],
+        panelViews: views.map((view) => (view.name === HOST_VIEW_NAME ? { ...view, title: hostTitle } : view)),
+      },
+    };
+  }
+
+  const target =
+    Object.keys(state).find((key) => state[key].panelViews.some((view) => view.name === "info")) ??
+    Object.keys(state)[0];
+
+  if (!target) return state;
+  const hostView = {
+    name: HOST_VIEW_NAME,
+    title: hostTitle,
+    component: panelComponents[HOST_VIEW_NAME],
+    active: false,
+  };
+
+  return renamePanelKey(
+    { ...state, [target]: { ...state[target], panelViews: [...state[target].panelViews, hostView] } },
+    target,
+  );
+};
+
+/**
+ * The layout after the host changed its registration or asked for its tab (`focus`). The view is synced first,
+ * so a focus asked for together with the tab finds it. Focusing reuses the FIT-2813 path — activate the tab,
+ * expand its collapsed side, show its hidden panel — and raises a detached panel above the others.
+ * Unchanged parts come back as the same objects, so callers can skip no-op updates.
+ */
+export const applyHostPanel = (
+  panelData: Record<string, PanelBBox>,
+  collapsedSide: PanelsCollapsed,
+  hostTitle: string | false,
+  focus: boolean,
+  totalHeight: number,
+): { panelData: Record<string, PanelBBox>; collapsedSide: PanelsCollapsed } => {
+  const synced = syncHostView(panelData, hostTitle);
+  // Removing the host tab can leave a collapsed side with nothing on it.
+  const checked = checkCollapsedPanelsHaveData(collapsedSide, synced);
+  const sides = checked.left === collapsedSide.left && checked.right === collapsedSide.right ? collapsedSide : checked;
+  const found = focus && hostTitle ? findPanelViewByName(synced, HOST_VIEW_NAME) : undefined;
+
+  if (!found) return { panelData: synced, collapsedSide: sides };
+
+  const focused = applyFocusTabToPanels(synced, sides, HOST_VIEW_NAME);
+  const { panelName } = found;
+  let next = focused.panelData;
+
+  if (focused.showPanel) {
+    next = redistributeHeights(
+      { ...next, [panelName]: { ...next[panelName], visible: true } },
+      totalHeight,
+      next[panelName].alignment,
+    );
+  }
+  if (next[panelName].detached) next = findZIndices(next, panelName);
+
+  return { panelData: next, collapsedSide: focused.collapsedSide };
 };

@@ -30,6 +30,7 @@ import {
 } from "./types";
 import {
   applyFocusTabToPanels,
+  applyHostPanel,
   findZIndices,
   getAttachedPerSide,
   getLeftKeys,
@@ -60,6 +61,8 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   showCustomTab,
   focusTab,
   focusRequest = 0,
+  hostPanel,
+  hostPanelFocusRequest = 0,
 }) => {
   const snapThreshold = 5;
   const regions = currentEntity.regionStore;
@@ -72,7 +75,12 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
   const [initialized, setInitialized] = useState(false);
   const rootRef = useRef<HTMLDivElement>();
   const [snap, setSnap] = useState<DropSide | Side | undefined>();
-  const initialState = useMemo(() => restorePanel(showComments, showCustomTab), [showComments, showCustomTab]);
+  // The tab a host app fills itself, if it shows one now (see `hostPanel` in AppStore).
+  const hostTitle = hostPanel?.shown ? hostPanel.title : false;
+  const initialState = useMemo(
+    () => restorePanel(showComments, showCustomTab, hostTitle),
+    [showComments, showCustomTab, hostTitle],
+  );
   const [panelData, setPanelData] = useState<Record<string, PanelBBox>>(initialState.panelData);
   const [collapsedSide, setCollapsedSide] = useState(initialState.collapsedSide);
   const [breakPointActiveTab, setBreakPointActiveTab] = useState(0);
@@ -457,6 +465,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
         attachedKeys,
         lockPanelContents,
         breakPointActiveTab,
+        hostBadge: !!hostPanel?.badge,
         sidePanelCollapsed: collapsedSide,
         setSidePanelCollapsed: setCollapsedSide,
         dragTop: alignment === Side.left ? snap === DropSide.topLeft : snap === DropSide.topRight,
@@ -478,6 +487,7 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     panelMaxWidth,
     collapsedSide,
     snap,
+    hostPanel?.badge,
   ]);
 
   useEffect(() => {
@@ -495,6 +505,32 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
     // focusRequest must re-run after the user re-collapses the sidebar and rejects again
     // while focusTab stays "comments" (FIT-2813).
   }, [focusTab, focusRequest]);
+
+  // The host tab follows the registration while the editor is open — added when the host shows it, removed when
+  // it stops — and comes forward on request. One effect, so a focus asked for together with showing the tab is
+  // applied to a layout that already has it. Requests made while these panels were not mounted are not replayed.
+  const handledHostFocus = useRef(hostPanelFocusRequest);
+  useEffect(() => {
+    const focus = hostPanelFocusRequest !== handledHostFocus.current;
+
+    handledHostFocus.current = hostPanelFocusRequest;
+    const next = applyHostPanel(panelData, collapsedSide, hostTitle, focus, viewportSize.current.height);
+
+    if (next.panelData !== panelData) setPanelData(next.panelData);
+    if (next.collapsedSide !== collapsedSide) setCollapsedSide(next.collapsedSide);
+  }, [hostTitle, hostPanelFocusRequest]);
+
+  // Tell a registered host whether its tab can be on screen: these panels are up as columns (the bottom panel has a
+  // fixed list of tabs) and not hidden by Compare All. Measured first, so a narrow editor never reports a column.
+  const hostPanelRef = useRef(hostPanel);
+  hostPanelRef.current = hostPanel;
+  const isHostPanelAvailable = initialized && !panelBreakPoint && !panelsHidden;
+  const isHostRegistered = !!hostPanel;
+
+  useEffect(() => {
+    hostPanelRef.current?.onAvailability?.(isHostPanelAvailable);
+  }, [isHostPanelAvailable, isHostRegistered]);
+  useEffect(() => () => hostPanelRef.current?.onAvailability?.(false), []);
 
   useEffect(() => {
     const root = rootRef.current;

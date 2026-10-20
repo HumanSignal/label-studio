@@ -1,5 +1,5 @@
 import { inject, observer } from "mobx-react";
-import type { FC } from "react";
+import { type FC, useCallback, useRef } from "react";
 import { cn } from "../../../utils/bem";
 import { Comments as CommentsComponent } from "../../Comments/Comments";
 import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
@@ -164,6 +164,31 @@ const CustomTab: FC<any> = function CustomTab(): JSX.Element {
   );
 };
 
+/**
+ * Host panel - an empty element the host app renders into through a portal (see `hostPanel` in AppStore).
+ * Only the real tab body hands its element over: while the tab is dragged, a second copy renders in the drag
+ * ghost with isActive={false} (FIT-720), and that copy must neither take the host's content nor clear it.
+ */
+const HostTab: FC<any> = inject("store")(function HostTab({ store, isActive }: any): JSX.Element {
+  // Told about the element on mount, so it is the one told it is gone, even if the host re-registered since.
+  const reportedTo = useRef<((element: HTMLElement | null) => void) | null>(null);
+  const report = useCallback(
+    (element: HTMLDivElement | null) => {
+      if (!isActive) return;
+      if (element) {
+        reportedTo.current = store.hostPanel?.onElement ?? null;
+        reportedTo.current?.(element);
+      } else {
+        reportedTo.current?.(null);
+        reportedTo.current = null;
+      }
+    },
+    [isActive, store],
+  );
+
+  return <div ref={report} className={cn("host-panel").toClassName()} />;
+});
+
 const GeneralPanel: FC<any> = inject("store")(
   observer(function GeneralPanel({ store, currentEntity }: any): JSX.Element {
     const { relationStore } = currentEntity;
@@ -225,5 +250,6 @@ export const History = HistoryTab;
 export const Relations = RelationsTab;
 export const Info = InfoTab;
 export const Custom = CustomTab;
+export const Host = HostTab;
 export const Details = observer(DetailsComponent);
 export const DetailsPanel = observer(DetailsPanelComponent);

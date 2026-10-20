@@ -22,6 +22,24 @@
     }
   }
 
+  /*
+   * Four or more tabs in one strip (a host's tab next to Info, Comments and History, or tabs dragged together) do
+   * not fit the default 320 px panel: every tab keeps 24 px on both sides, the left ones for the drag handle shown
+   * on hover, so the titles were cut to "I…" and "Com…". Such a strip gets 12 px sides and no handle — the whole
+   * title still drags — so every title reads in full. Strips of up to three tabs keep their look.
+   */
+  &__tabs-row_crowded .panel-tabs__tab {
+    padding-inline: 12px;
+  }
+
+  &__tabs-row_crowded .panel-tabs__tab:hover svg {
+    display: none;
+  }
+
+  &__tabs-row_crowded .panel-tabs__badge {
+    right: 3px;
+  }
+
   &__contents {
     background: var(--color-neutral-background);
     height: calc(100% - var(--tab-row-height));
@@ -113,6 +131,19 @@
     &:hover svg {
       display: block;
     }
+  }
+
+  /* A dot after the host tab's title, while the host asks for one (see `hostPanel` in AppStore). */
+  &__badge {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-negative-surface);
+    box-shadow: 0 0 0 2px var(--color-neutral-surface);
+    pointer-events: none;
   }
 
   &__ghost-tab {

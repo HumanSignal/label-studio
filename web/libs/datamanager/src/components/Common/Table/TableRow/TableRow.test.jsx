@@ -28,7 +28,14 @@ mockModule("../utils", () => ({
   getStyle: mock(() => ({})),
 }));
 
-// Mock BEM utility
+// Mock BEM utility. Module mocks outlive this file in Bun's shared process, so the real one is put back afterwards:
+// a later file spying on its class-name helper would otherwise spy on this stub, and the spy would never come off.
+const actualBemModule = { ...requireActual("../../../../utils/bem") };
+
+afterAll(() => {
+  mockModule("../../../../utils/bem", () => ({ ...actualBemModule, __skipMerge: true }));
+});
+
 mockModule("../../../../utils/bem", () => ({
   cn: mock((name) => {
     const createCN = (fullName, mods = {}) => {

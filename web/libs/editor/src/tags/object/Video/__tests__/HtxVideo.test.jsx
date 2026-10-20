@@ -124,6 +124,14 @@ mockModule("../../../../hooks/useToggle", () => {
   };
 });
 
+// Module mocks outlive this file in Bun's shared process: put the real observer back afterwards. This stub stamps an
+// 800 px width on whatever it observes, so a later labeling editor would think its window is narrow.
+const actualResizeObserverModule = { ...requireActual("../../../../utils/resize-observer") };
+
+afterAll(() => {
+  mockModule("../../../../utils/resize-observer", () => ({ ...actualResizeObserverModule, __skipMerge: true }));
+});
+
 mockModule("../../../../utils/resize-observer", () => ({
   __esModule: true,
   default: mock().mockImplementation(function (callback) {

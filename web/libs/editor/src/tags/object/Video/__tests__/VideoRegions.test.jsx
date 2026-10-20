@@ -7,6 +7,14 @@ import ToolsManager from "../../../../tools/Manager";
 let VideoRegions;
 let MIN_SIZE;
 
+// Module mocks outlive this file in Bun's shared process: put the real colour library back afterwards, or every later
+// file gets this stub (no chroma.random(), so any user picture rendered later throws).
+const actualChroma = requireActual("chroma-js");
+
+afterAll(() => {
+  mockModule("chroma-js", () => ({ ...actualChroma, default: actualChroma, __skipMerge: true }));
+});
+
 mockModule("chroma-js", () => ({
   __esModule: true,
   default: () => ({

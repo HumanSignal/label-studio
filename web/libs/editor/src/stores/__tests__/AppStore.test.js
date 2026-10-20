@@ -839,6 +839,48 @@ describe("AppStore", () => {
     });
   });
 
+  describe("host panel (UTC-1446)", () => {
+    const config = { title: "Helper", shown: true, onElement: () => {}, onAvailability: () => {} };
+
+    it("is not registered by default", () => {
+      const store = createStore();
+      expect(store.hostPanel).toBeNull();
+      expect(store.hostPanelFocusRequest).toBe(0);
+    });
+
+    it("keeps the registration as given, observably, and clears it with null or undefined", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanel,
+        (value) => seen.push(value),
+      );
+
+      store.setHostPanel(config);
+      store.setHostPanel(null);
+      store.setHostPanel(config);
+      store.setHostPanel(undefined);
+      dispose();
+
+      expect(seen).toEqual([config, null, config, null]);
+    });
+
+    it("counts focus requests, so the same request made twice is seen twice", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanelFocusRequest,
+        (value) => seen.push(value),
+      );
+
+      store.focusHostPanel();
+      store.focusHostPanel();
+      dispose();
+
+      expect(seen).toEqual([1, 2]);
+    });
+  });
+
   describe("setDescription", () => {
     it("sets description to a string value", () => {
       const store = createStore();
