@@ -2,7 +2,7 @@
 
 from django.urls import include, path
 
-from . import api, views
+from . import api, member_api, views
 
 app_name = 'projects'
 
@@ -49,6 +49,10 @@ _api_urlpatterns = [
     path('<int:pk>/model-versions/', api.ProjectModelVersions.as_view(), name='project-model-versions'),
     # List all annotators for project
     path('<int:pk>/annotators/', api.ProjectAnnotatorsAPI.as_view(), name='project-annotators'),
+    # Project members
+    path('<int:pk>/members/', member_api.ProjectMemberListAPI.as_view(), name='project-member-list'),
+    path('<int:pk>/members/available/', member_api.ProjectMemberAvailableAPI.as_view(), name='project-member-available'),
+    path('<int:pk>/members/<int:user_id>/', member_api.ProjectMemberAPI.as_view(), name='project-member'),
 ]
 
 _api_urlpatterns_templates = [
