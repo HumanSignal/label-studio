@@ -685,6 +685,7 @@ function AnnotationButtonImpl(
   }, []);
 
   const userpicUser = capabilities.showUserInfo ? annotation.user : { email: "User" };
+  const lastUpdatedDate = annotation.updatedDate || annotation.createdDate;
 
   return (
     <div
@@ -728,8 +729,8 @@ function AnnotationButtonImpl(
           </div>
           {capabilities.showUserInfo && (
             <div className={cn("annotation-button").elem("info").toClassName()}>
-              <span className={cn("annotation-button").elem("date").toClassName()} title={annotation.createdDate}>
-                {formatAnnotationDate(annotation.createdDate)}
+              <span className={cn("annotation-button").elem("date").toClassName()} title={lastUpdatedDate}>
+                {formatAnnotationDate(lastUpdatedDate)}
               </span>
               {isPrediction && isDefined(annotation.score) && (
                 <span title={`Prediction score = ${annotation.score}`}>
@@ -782,7 +783,7 @@ function AnnotationButtonImpl(
           isGroundTruth={isGroundTruth}
           acceptedState={annotation.acceptedState}
           predictionScore={isPrediction ? annotation.score : null}
-          lastUpdated={annotation.createdDate}
+          lastUpdated={lastUpdatedDate}
           annotationId={formatTooltipAnnotationId(annotation.pk ?? annotation.id, {
             draftId: annotation.draftId,
             pk: annotation.pk,

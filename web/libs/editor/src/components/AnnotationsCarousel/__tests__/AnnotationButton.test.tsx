@@ -147,6 +147,18 @@ describe("AnnotationButton", () => {
     expect(screen.getByText("Test User")).toBeInTheDocument();
   });
 
+  it("shows the last updated time instead of the created time (FIT-3185)", () => {
+    const entity = createEntity({
+      createdDate: new Date(Date.now() - 20 * 3_600_000).toISOString(),
+      updatedDate: new Date(Date.now() - 5 * 60_000).toISOString(),
+    });
+    renderWithProviders(
+      <AnnotationButton entity={entity} capabilities={defaultCapabilities} annotationStore={defaultAnnotationStore} />,
+    );
+    expect(screen.getByText("5m ago")).toBeInTheDocument();
+    expect(screen.queryByText("20h ago")).toBeNull();
+  });
+
   it("renders with long person name truncated", () => {
     const entity = createEntity({
       createdBy: "Alice Beatrice Catherine Davidson",

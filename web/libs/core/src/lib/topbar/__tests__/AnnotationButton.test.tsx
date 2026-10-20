@@ -1,5 +1,6 @@
 import { createRef } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { format } from "date-fns";
 import { AnnotationButton, formatTooltipAnnotationId } from "../AnnotationButton";
 import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation } from "../types";
 
@@ -339,6 +340,50 @@ describe("shared AnnotationButton", () => {
       fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
       expect(screen.queryByTestId("annotation-button-menu-copy-id")).toBeNull();
       expect(screen.queryByTestId("annotation-button-menu-copy-link")).toBeNull();
+    });
+  });
+
+  describe("last updated time (FIT-3185)", () => {
+    const HOUR = 3_600_000;
+
+    function getDateElement(container: HTMLElement) {
+      return container.querySelector(".ls-annotation-button__date") as HTMLElement;
+    }
+
+    async function hoverAndGetLastUpdated(container: HTMLElement) {
+      fireEvent.mouseEnter(container.querySelector("[data-annotation-id]")!);
+      const label = await screen.findByText("Last Updated");
+      return label.nextElementSibling?.textContent;
+    }
+
+    it("shows the updated time on the tab and in the tooltip after the annotation was updated", async () => {
+      const createdDate = new Date(Date.now() - 20 * HOUR).toISOString();
+      const updatedDate = new Date(Date.now() - 5 * 60_000).toISOString();
+      const { container } = render(
+        <AnnotationButton
+          annotation={makeAnnotation({ createdDate, updatedDate })}
+          capabilities={fullCapabilities}
+          handlers={makeHandlers()}
+        />,
+      );
+
+      expect(getDateElement(container).textContent).toBe("5m ago");
+      expect(getDateElement(container).getAttribute("title")).toBe(updatedDate);
+      expect(await hoverAndGetLastUpdated(container)).toBe(format(new Date(updatedDate), "MMM dd yyyy, HH:mm:ss"));
+    });
+
+    it("falls back to the created time when the annotation has no updated time", async () => {
+      const createdDate = new Date(Date.now() - 20 * HOUR).toISOString();
+      const { container } = render(
+        <AnnotationButton
+          annotation={makeAnnotation({ createdDate })}
+          capabilities={fullCapabilities}
+          handlers={makeHandlers()}
+        />,
+      );
+
+      expect(getDateElement(container).textContent).toBe("20h ago");
+      expect(await hoverAndGetLastUpdated(container)).toBe(format(new Date(createdDate), "MMM dd yyyy, HH:mm:ss"));
     });
   });
 });

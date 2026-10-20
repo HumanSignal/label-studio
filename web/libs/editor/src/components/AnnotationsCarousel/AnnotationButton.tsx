@@ -96,6 +96,7 @@ function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: bool
     selected: Boolean(entity.selected),
     createdBy: entity.createdBy ?? "",
     createdDate: entity.createdDate ?? "",
+    updatedDate: entity.draftSaved ?? entity.updatedDate ?? entity.createdDate ?? "",
     user,
     groundTruth: Boolean(entity.ground_truth),
     skipped: Boolean(entity.skipped),
