@@ -10,13 +10,14 @@ from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
 from data_manager.prepare_params import filters_schema, ordering_schema, selected_items_schema
 from django.conf import settings
-from django.db import transaction
+from django.db import OperationalError, connection, transaction
 from django.db.models import Max
 from django.utils import timezone
 from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
 from projects.models import Project
+from psycopg import errors as pg_errors
 from rest_framework import serializers, status
 from rest_framework.exceptions import APIException, PermissionDenied
 from tasks.models import Task
@@ -45,6 +46,15 @@ class LockedViewError(APIException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = LOCKED_VIEW_MESSAGE
     default_code = 'view_locked'
+
+
+VIEW_SAVE_LOCK_TIMEOUT = '2s'
+
+
+class ViewSaveConflictError(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = 'This tab is being saved by another request. Please try again.'
+    default_code = 'view_save_conflict'
 
 
 def view_lock_project(instance_or_data):
@@ -423,19 +433,35 @@ class ViewSerializer(serializers.ModelSerializer):
         Root and child indexes preserve the order of their respective wire lists.
         """
 
+        roots = []
+        children_by_root = []
         for root_index, data in enumerate(filters_data):
             child_filters = data.pop('child_filters', [])
             data['index'] = root_index
-            root = Filter.objects.create(parent=None, **data)
-            filter_group.filters.add(root)
+            roots.append(Filter(parent=None, **data))
 
+            children = []
             for child_index, child_data in enumerate(child_filters):
                 if child_data.pop('child_filters', []):
                     raise serializers.ValidationError('Child filters cannot contain nested child filters.')
                 child_data.pop('parent', None)
                 child_data['index'] = child_index
-                child = Filter.objects.create(parent=root, **child_data)
-                filter_group.filters.add(child)
+                children.append(Filter(**child_data))
+            children_by_root.append(children)
+
+        # Bulk inserts keep the query count constant regardless of how many filters a tab has.
+        Filter.objects.bulk_create(roots)
+        children = []
+        for root, root_children in zip(roots, children_by_root):
+            for child in root_children:
+                child.parent = root
+                children.append(child)
+        Filter.objects.bulk_create(children)
+
+        through = FilterGroup.filters.through
+        through.objects.bulk_create(
+            [through(filtergroup_id=filter_group.id, filter_id=f.id) for f in [*roots, *children]]
+        )
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -492,7 +518,16 @@ class ViewSerializer(serializers.ModelSerializer):
             is_locked = validated_data.pop('is_locked', serializers.empty)
             filter_group_data = validated_data.pop('filter_group', None)
 
-            instance = self.Meta.model.objects.select_for_update().get(pk=instance.pk)
+            if connection.vendor == 'postgresql':
+                # Bound the wait so overlapping saves of one tab serialize without parking workers indefinitely.
+                with connection.cursor() as cursor:
+                    cursor.execute(f"SET LOCAL lock_timeout = '{VIEW_SAVE_LOCK_TIMEOUT}'")
+            try:
+                instance = self.Meta.model.objects.select_for_update().get(pk=instance.pk)
+            except OperationalError as e:
+                if isinstance(e.__cause__, pg_errors.LockNotAvailable):
+                    raise ViewSaveConflictError()
+                raise
 
             if is_locked is not serializers.empty and bool(is_locked) != bool(instance.is_locked):
                 if not user_can_manage_view_lock(user, view_lock_project(instance)):
@@ -528,9 +563,8 @@ class ViewSerializer(serializers.ModelSerializer):
             if filter_group_data:
                 filters_data = filter_group_data.pop('filters', [])
 
-                # BROS-1324: serialize concurrent view-saves. The Data Manager fires a
-                # burst of un-cancelled save requests during tab load/edit; without a
-                # row lock the filter replacement below (delete + recreate) interleaves
+                # BROS-1324: the Data Manager fires bursts of un-cancelled saves; without the
+                # row lock above the filter replacement below (delete + recreate) interleaves
                 # across requests and leaves duplicate root filters in the group's M2M,
                 # which the user sees as filters multiplying on every reload.
                 filter_group = instance.filter_group

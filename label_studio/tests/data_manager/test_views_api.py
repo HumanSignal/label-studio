@@ -1048,3 +1048,103 @@ def test_create_view_with_filters_uses_max_order_not_count(business_client, proj
     )
     assert response.status_code == status.HTTP_201_CREATED, response.content
     assert response.json()['order'] == 6, 'order must be Max+1 (6), not count() (2)'
+
+
+def _create_view_with_filters(business_client, project_id, items):
+    payload = {'project': project_id, 'data': {'filters': {'conjunction': 'or', 'items': items}}}
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    return response.json()['id']
+
+
+def _patch_view_filters(business_client, view_id, project_id, conjunction, items):
+    payload = {'project': project_id, 'data': {'filters': {'conjunction': conjunction, 'items': items}}}
+    return business_client.patch(
+        f'/api/dm/views/{view_id}/', data=json.dumps(payload), content_type='application/json'
+    )
+
+
+def _filters_with_children(count):
+    items = []
+    for i in range(count):
+        item = {'filter': 'filter:tasks:id', 'operator': 'equal', 'type': 'Number', 'value': i}
+        if i % 3 == 0:
+            item['child_filters'] = [_wire_filter(f'child-{i}-a'), _wire_filter(f'child-{i}-b')]
+        items.append(item)
+    return items
+
+
+def test_view_update_query_count_does_not_grow_with_filters(business_client, project_id):
+    """Saving a tab with 1,200 filters runs a bounded number of queries and round-trips them unchanged."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    view_id = _create_view_with_filters(business_client, project_id, [_wire_filter('initial')])
+
+    query_counts = {}
+    for count in (3, 1200):
+        items = _filters_with_children(count)
+        with CaptureQueriesContext(connection) as ctx:
+            response = _patch_view_filters(business_client, view_id, project_id, 'and', items)
+        assert response.status_code == status.HTTP_200_OK, response.content
+        query_counts[count] = len(ctx.captured_queries)
+
+        response = business_client.get(f'/api/dm/views/{view_id}/')
+        assert response.status_code == status.HTTP_200_OK, response.content
+        filters = response.json()['data']['filters']
+        assert filters['conjunction'] == 'and'
+        assert filters['items'] == [{**item, 'child_filters': item.get('child_filters', [])} for item in items]
+
+    # Two queries per filter would be ~4,000 here; SQLite may still split bulk statements into a few batches.
+    assert query_counts[1200] - query_counts[3] < 30, query_counts
+    view = View.objects.get(pk=view_id)
+    assert view.filter_group.filters.count() == 1200 + 2 * 400
+
+
+def test_view_update_returns_409_when_the_row_lock_wait_times_out(business_client, project_id):
+    """A save that times out waiting for another save of the same tab gets 409 and leaves the stored filters untouched."""
+    from django.db import OperationalError
+    from django.db.models.query import QuerySet
+    from psycopg import errors as pg_errors
+
+    items = [_wire_filter('kept')]
+    view_id = _create_view_with_filters(business_client, project_id, items)
+
+    original_select_for_update = QuerySet.select_for_update
+
+    def locked_select_for_update(self, *args, **kwargs):
+        if self.model is View:
+            error = OperationalError('could not obtain lock on row in relation "data_manager_view"')
+            error.__cause__ = pg_errors.LockNotAvailable()
+            raise error
+        return original_select_for_update(self, *args, **kwargs)
+
+    with patch.object(QuerySet, 'select_for_update', locked_select_for_update):
+        response = _patch_view_filters(business_client, view_id, project_id, 'and', [_wire_filter('lost')])
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.content
+    assert response.json()['detail'] == 'This tab is being saved by another request. Please try again.'
+
+    response = business_client.get(f'/api/dm/views/{view_id}/')
+    filters = response.json()['data']['filters']
+    assert filters['conjunction'] == 'or'
+    assert [item['value'] for item in filters['items']] == ['kept']
+
+
+def test_view_update_reraises_other_operational_errors(business_client, project_id):
+    """Only a lock conflict maps to 409; other database errors still surface as server errors."""
+    from django.db import OperationalError
+    from django.db.models.query import QuerySet
+
+    view_id = _create_view_with_filters(business_client, project_id, [_wire_filter('kept')])
+    original_select_for_update = QuerySet.select_for_update
+
+    def failing_select_for_update(self, *args, **kwargs):
+        if self.model is View:
+            raise OperationalError('canceling statement due to statement timeout')
+        return original_select_for_update(self, *args, **kwargs)
+
+    with patch.object(QuerySet, 'select_for_update', failing_select_for_update):
+        response = _patch_view_filters(business_client, view_id, project_id, 'and', [_wire_filter('lost')])
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, response.content

@@ -1658,3 +1658,84 @@ describe("TabStore project column defaults (FIT-2846)", () => {
     expect(view.columnOrderSnapshot["tasks:dimension_agreement_7"]).toBe(2);
   });
 });
+
+describe("TabStore saveView conflict (PLT-1699)", () => {
+  let root;
+
+  afterEach(() => {
+    if (root) {
+      destroy(root);
+      root = null;
+    }
+  });
+
+  const conflict = {
+    error: true,
+    status: 409,
+    response: {
+      status_code: 409,
+      detail: "This tab is being saved by another request. Please try again.",
+    },
+  };
+
+  const createSavedView = (updateTabResult) => {
+    const toasts = [];
+    const calls = [];
+
+    root = RootStore.create({
+      SDK: {
+        hasInterface: () => false,
+        invoke: (event, payload) => event === "toast" && toasts.push(payload),
+      },
+    });
+    unprotect(root);
+    root.apiCall = mock(async (method, _params, _body, options) => {
+      calls.push({ method, options });
+      if (method === "updateTab") return updateTabResult();
+      return { id: 1, title: "Saved", data: { filters: { conjunction: "and", items: [] } } };
+    });
+    root.viewsStore.views.push({ id: 1, title: "Saved", saved: true, key: "saved", conjunction: "and" });
+    root.viewsStore.selected = 1;
+
+    return { view: root.viewsStore.views[0], toasts, calls };
+  };
+
+  it("keeps local filters and does not refetch the tab when a concurrent save holds the lock", async () => {
+    const { view, toasts, calls } = createSavedView(() => conflict);
+
+    view.conjunction = "or";
+    await root.viewsStore.saveView(view, { interaction: "filter" });
+
+    expect(view.conjunction).toBe("or");
+    expect(calls.map((call) => call.method)).toEqual(["updateTab"]);
+    expect(calls[0].options.errorHandler(conflict)).toBe(true);
+    expect(toasts).toEqual([{ message: conflict.response.detail, type: "error" }]);
+  });
+
+  it("sends the unchanged local filters again on the next save after a conflict", async () => {
+    let attempt = 0;
+    const bodies = [];
+    const { view, calls } = createSavedView(() => {
+      attempt += 1;
+      return attempt === 1 ? conflict : { id: 1, title: "Saved", is_locked: false };
+    });
+    const apiCall = root.apiCall;
+    root.apiCall = mock(async (method, params, body, options) => {
+      if (method === "updateTab") bodies.push(body.body);
+      return apiCall(method, params, body, options);
+    });
+
+    view.conjunction = "or";
+    await view.save({ reload: false, interaction: "filter" });
+    await view.save({ reload: false, interaction: "filter" });
+
+    expect(calls.filter((call) => call.method === "updateTab")).toHaveLength(2);
+    expect(bodies[1].data.filters.conjunction).toBe("or");
+    expect(view.conjunction).toBe("or");
+
+    // Once stored, an unchanged tab is deduped again.
+    await view.save({ reload: false, interaction: "filter" });
+
+    expect(calls.filter((call) => call.method === "updateTab")).toHaveLength(2);
+  });
+});

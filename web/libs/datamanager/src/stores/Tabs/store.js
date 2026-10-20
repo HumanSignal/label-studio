@@ -92,7 +92,15 @@ const nextTempTabId = (views) => {
   return candidate;
 };
 
+// Must match ViewSaveConflictError.default_detail in data_manager/serializers.py.
+const VIEW_SAVE_CONFLICT_MESSAGE = "This tab is being saved by another request. Please try again.";
+
+/** 409 when another save of the same tab holds the row lock: keep local edits so the next save stores them. */
+const isViewSaveConflict = (result) => result?.response?.detail === VIEW_SAVE_CONFLICT_MESSAGE;
+
 const lockedViewResponseMessage = (result) => {
+  if (isViewSaveConflict(result)) return null;
+
   const status = result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
   const code = result?.response?.code;
   const detail = result?.response?.detail;
@@ -463,7 +471,10 @@ export const TabStore = types
       const root = getRoot(self);
       const apiMethod = !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
 
-      const result = yield root.apiCall(apiMethod, params, body, { allowToCancel: root.SDK.type === "DE" });
+      const result = yield root.apiCall(apiMethod, params, body, {
+        allowToCancel: root.SDK.type === "DE",
+        errorHandler: isViewSaveConflict,
+      });
 
       if (result.isCanceled) {
         return view;
@@ -485,6 +496,8 @@ export const TabStore = types
 
       if (result.error) {
         view.unlock();
+        // Nothing was stored, so the next tab.save() must not be deduped against this snapshot.
+        view.snapshot = null;
         const detail = result?.response?.detail;
         root.SDK.invoke("toast", {
           message:
