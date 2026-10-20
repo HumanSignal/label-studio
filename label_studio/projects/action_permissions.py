@@ -200,19 +200,21 @@ def ensure_org_owner(user, organization) -> None:
     Responsibility: organization-level administration, including webhooks that
     are not bound to a project.
 
-    Boundary: another organization, a missing organization, or an inactive
-    account is ``NotFound``. A live member of this organization who did not
-    create it is ``PermissionDenied``. Does not call ``user.has_perm``.
+    Boundary: an inactive account, a missing organization, a mismatched
+    ``active_organization``, or a missing non-deleted ``OrganizationMember``
+    is ``NotFound``. ``active_organization`` is not membership. A live member
+    who is not ``organization.created_by`` is ``PermissionDenied``. Does not
+    call ``user.has_perm``.
     """
     org_id = getattr(organization, 'pk', None)
-    active_id = getattr(user, 'active_organization_id', None)
-    if org_id is None or active_id != org_id or not user_is_active_account(user):
+    if org_id is None or not user_is_active_account(user):
         raise NotFound()
-    if can_create_project(user):
-        return
+    if not _has_live_organization_membership(user, org_id):
+        raise NotFound()
+    if getattr(user, 'active_organization_id', None) != org_id:
+        raise NotFound()
     if getattr(organization, 'created_by_id', None) != getattr(user, 'id', None):
         raise PermissionDenied()
-    raise NotFound()
 
 
 class ProjectActionPermission(BasePermission):
@@ -238,6 +240,9 @@ class ProjectActionPermission(BasePermission):
             return can_create_project(getattr(request, 'user', None))
         if action is Action.ORG_OWNER:
             user = getattr(request, 'user', None)
+            # Unauthenticated requests stay False so the auth class can return 401.
+            if not getattr(user, 'is_authenticated', False):
+                return False
             ensure_org_owner(user, getattr(user, 'active_organization', None))
         return True
 
@@ -344,7 +349,26 @@ def _project_of(obj):
     project = getattr(obj, 'project', None)
     if isinstance(project, Project):
         return project
+    task = getattr(obj, 'task', None)
+    if task is not None:
+        project = getattr(task, 'project', None)
+        if isinstance(project, Project):
+            return project
     return None
+
+
+def _has_live_organization_membership(user, organization_id) -> bool:
+    """True when this user still has a non-deleted membership on the organization."""
+    from organizations.models import OrganizationMember
+
+    user_id = getattr(user, 'id', None)
+    if not user_id or organization_id is None:
+        return False
+    return OrganizationMember.objects.filter(
+        user_id=user_id,
+        organization_id=organization_id,
+        deleted_at__isnull=True,
+    ).exists()
 
 
 def _organization_of(obj):
@@ -361,18 +385,20 @@ def _organization_of(obj):
 def _enforce(user, action, obj) -> None:
     if action is Action.ACCESS:
         project = _project_of(obj)
-        if project is not None:
-            ensure_project_visible(user, project)
+        if project is None:
+            raise NotFound()
+        ensure_project_visible(user, project)
         return
     if action is Action.MANAGE:
         project = _project_of(obj)
-        if project is not None:
-            ensure_project_manage(user, project)
+        if project is None:
+            raise NotFound()
+        ensure_project_manage(user, project)
         return
     if action is Action.ORG_OWNER:
         organization = _organization_of(obj)
         if organization is None:
-            organization = getattr(user, 'active_organization', None)
+            raise NotFound()
         ensure_org_owner(user, organization)
         return
     if action is Action.CREATE_PROJECT:
@@ -381,9 +407,11 @@ def _enforce(user, action, obj) -> None:
     if action is Action.ANNOTATION_WRITE:
         from tasks.models import Annotation
 
-        if isinstance(obj, Annotation):
-            _enforce_annotation_write(user, obj)
+        if not isinstance(obj, Annotation):
+            raise NotFound()
+        _enforce_annotation_write(user, obj)
         return
+    raise NotFound()
 
 
 def _enforce_annotation_write(user, annotation) -> None:

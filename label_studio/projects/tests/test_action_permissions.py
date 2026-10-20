@@ -6,6 +6,8 @@ from core.permissions import ViewClassPermission
 from data_manager.api import ProjectActionsAPI
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
+from django.utils import timezone
+from organizations.models import OrganizationMember
 from projects.action_permissions import (
     PERMISSION_ACTIONS,
     PUBLIC_VIEWS,
@@ -24,7 +26,7 @@ from projects.tests.access_setup import make_access_world
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.viewsets import ViewSet
-from tasks.tests.factories import AnnotationFactory, TaskFactory
+from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, TaskFactory, TaskLockFactory
 from webhooks.api import WebhookInfoAPI
 from webhooks.models import Webhook
 
@@ -188,6 +190,50 @@ class ActionPermissionTests(TestCase):
         with self.assertRaises(PermissionDenied):
             ensure_org_owner(world.creator, world.organization)
         ensure_org_owner(world.owner, world.organization)
+
+    def test_soft_deleted_member_does_not_reveal_organization(self):
+        world = make_access_world()
+        membership = OrganizationMember.objects.get(user=world.member_a, organization=world.organization)
+        membership.deleted_at = timezone.now()
+        membership.save(update_fields=['deleted_at'])
+        world.member_a.refresh_from_db()
+        self.assertEqual(world.member_a.active_organization_id, world.organization.id)
+        with self.assertRaises(NotFound):
+            ensure_org_owner(world.member_a, world.organization)
+
+    def test_object_without_resolvable_project_is_denied(self):
+        world = make_access_world()
+        permission = ProjectActionPermission()
+        view = type('Tasks', (), {'permission_required': 'tasks.view'})()
+        request = self.factory.get('/')
+        request.user = world.member_a
+        self.assertTrue(permission.has_permission(request, view))
+        with self.assertRaises(NotFound):
+            permission.has_object_permission(request, view, object())
+
+        task = TaskFactory(project=world.project_1)
+        draft = AnnotationDraftFactory(task=task, user=world.member_a)
+        lock = TaskLockFactory(task=task, user=world.member_a)
+        self.assertTrue(permission.has_object_permission(request, view, draft))
+        self.assertTrue(permission.has_object_permission(request, view, lock))
+
+        hidden = TaskFactory(project=world.project_2)
+        hidden_draft = AnnotationDraftFactory(task=hidden, user=world.member_b)
+        hidden_lock = TaskLockFactory(task=hidden, user=world.member_b)
+        with self.assertRaises(NotFound):
+            permission.has_object_permission(request, view, hidden_draft)
+        with self.assertRaises(NotFound):
+            permission.has_object_permission(request, view, hidden_lock)
+
+    def test_anonymous_org_owner_permission_returns_false(self):
+        request = self.factory.get('/')
+        request.user = AnonymousUser()
+        view = type('Org', (), {'permission_required': 'organizations.change'})()
+        try:
+            allowed = ProjectActionPermission().has_permission(request, view)
+        except (NotFound, PermissionDenied) as exc:
+            self.fail(f'anonymous org permission raised {type(exc).__name__}')
+        self.assertFalse(allowed)
 
     def test_project_actions_api_next_task_is_access_and_other_actions_are_manage(self):
         self.assertIs(project_actions_api_action(None), None)
