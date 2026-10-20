@@ -225,6 +225,27 @@ class ActionPermissionTests(TestCase):
         with self.assertRaises(NotFound):
             permission.has_object_permission(request, view, hidden_lock)
 
+    def test_self_permission_ignores_non_user_objects_and_hides_other_users(self):
+        world = make_access_world()
+        permission = ProjectActionPermission()
+        view = type('Token', (), {'permission_required': 'users.token.any'})()
+        request = self.factory.get('/')
+        request.user = world.member_a
+        self.assertTrue(permission.has_permission(request, view))
+        self.assertTrue(permission.has_object_permission(request, view, object()))
+        self.assertTrue(permission.has_object_permission(request, view, world.member_a))
+        with self.assertRaises(NotFound):
+            permission.has_object_permission(request, view, world.owner)
+        with self.assertRaises(NotFound):
+            permission.has_object_permission(request, view, type('Owned', (), {'user_id': world.owner.id})())
+        self.assertTrue(
+            permission.has_object_permission(request, view, type('Owned', (), {'user_id': world.member_a.id})())
+        )
+
+        anonymous = self.factory.get('/')
+        anonymous.user = AnonymousUser()
+        self.assertFalse(permission.has_permission(anonymous, view))
+
     def test_anonymous_org_owner_permission_returns_false(self):
         request = self.factory.get('/')
         request.user = AnonymousUser()

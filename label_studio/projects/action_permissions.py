@@ -244,6 +244,9 @@ class ProjectActionPermission(BasePermission):
             if not getattr(user, 'is_authenticated', False):
                 return False
             ensure_org_owner(user, getattr(user, 'active_organization', None))
+        if action is Action.SELF:
+            user = getattr(request, 'user', None)
+            return bool(getattr(user, 'is_authenticated', False))
         return True
 
     def has_object_permission(self, request, view, obj):
@@ -411,7 +414,29 @@ def _enforce(user, action, obj) -> None:
             raise NotFound()
         _enforce_annotation_write(user, obj)
         return
+    if action is Action.SELF:
+        _enforce_self(user, obj)
+        return
     raise NotFound()
+
+
+def _enforce_self(user, obj) -> None:
+    """Allow an account action for the requester, not for another user.
+
+    Boundary: this does not resolve a project. A ``User`` is visible only when
+    its pk is the requester; any other user is ``NotFound``. A non-user object
+    is left alone unless ``user_id`` names a different user.
+    """
+    from users.models import User
+
+    requester_id = getattr(user, 'pk', None)
+    if isinstance(obj, User):
+        if getattr(obj, 'pk', None) != requester_id:
+            raise NotFound()
+        return
+    owner_id = getattr(obj, 'user_id', None)
+    if owner_id is not None and owner_id != requester_id:
+        raise NotFound()
 
 
 def _enforce_annotation_write(user, annotation) -> None:
