@@ -1480,6 +1480,11 @@ class ProjectMember(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['project', 'user'], name='unique_project_member_project_user'),
+        ]
+
 
 def _build_flat_increment_sql(column, keys):
     """Build chained jsonb_set expression for flat {key: count} columns.
