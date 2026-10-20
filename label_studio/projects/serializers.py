@@ -36,7 +36,7 @@ from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectRe
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import Annotation, Task
+from tasks.models import Annotation, AnnotationDraft, Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -446,6 +446,33 @@ class ProjectLabelConfigSerializer(serializers.Serializer):
 
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
+    created_labels_drafts = serializers.SerializerMethodField()
+
+    def get_created_labels_drafts(self, summary):
+        """Draft label counts for the current user, read from that user's drafts.
+
+        The stored ``created_labels_drafts`` aggregate stays in place for label
+        config checks. This response does not add another aggregate table.
+        """
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not getattr(user, 'is_authenticated', False):
+            return {}
+
+        labels = {}
+        drafts = AnnotationDraft.objects.filter(task__project_id=summary.project_id, user_id=user.id)
+        for draft in drafts:
+            results = draft.result or []
+            if not isinstance(results, list):
+                continue
+            for result in results:
+                if not isinstance(result, dict) or 'from_name' not in result:
+                    continue
+                bucket = labels.setdefault(result['from_name'], {})
+                for label in summary._get_labels(result):
+                    bucket[label] = bucket.get(label, 0) + 1
+        return {name: counts for name, counts in labels.items() if counts}
+
     class Meta:
         model = ProjectSummary
         fields = '__all__'

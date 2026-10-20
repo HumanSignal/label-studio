@@ -449,7 +449,27 @@ class BaseTaskSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
             data = instance.data
             replace_task_data_undefined_with_config_field(data, project)
 
-        return super().to_representation(instance)
+        data = super().to_representation(instance)
+        self._limit_prefetched_draft_exists(instance, data)
+        return data
+
+    def _limit_prefetched_draft_exists(self, instance, data):
+        """Replace the shared draft flag with the prefetched drafts of this user.
+
+        The queryset annotation counts every draft on the task. Task detail
+        prefetches only the caller's drafts, and that cache is the count the
+        response may expose. Responses that did not prefetch drafts keep the
+        annotation.
+        """
+        if 'draft_exists' not in data:
+            return
+        prefetched = getattr(instance, '_prefetched_objects_cache', {}).get('drafts')
+        if prefetched is None:
+            return
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        user_id = getattr(user, 'id', None) if getattr(user, 'is_authenticated', False) else None
+        data['draft_exists'] = any(draft.user_id == user_id for draft in prefetched)
 
     class Meta:
         model = Task
@@ -1194,10 +1214,15 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         if not isinstance(task, Task):
             return AnnotationDraftSerializer(many=True)
 
-        drafts = task.drafts
-        if 'request' in self.context and hasattr(self.context['request'], 'user'):
-            user = self.context['request'].user
-            drafts = drafts.filter(user=user)
+        user = self._get_user()
+        user_id = getattr(user, 'id', None) if getattr(user, 'is_authenticated', False) else None
+        prefetched = getattr(task, '_prefetched_objects_cache', {}).get('drafts')
+        if prefetched is not None:
+            drafts = [draft for draft in prefetched if user_id is not None and draft.user_id == user_id]
+        elif user_id is not None:
+            drafts = task.drafts.filter(user_id=user_id)
+        else:
+            drafts = task.drafts.none()
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=[], context=self.context).data
 

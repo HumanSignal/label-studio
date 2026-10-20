@@ -1021,8 +1021,11 @@ class AnnotationDraft(FsmHistoryStateModel):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        if self.task_id:
+            user.project = self.task.project  # link for activity log
+        from projects.access import draft_visible_to
+
+        return draft_visible_to(user, self)
 
     def save(self, *args, **kwargs):
         # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
