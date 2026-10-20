@@ -1,7 +1,7 @@
 """Tests for projects.models (Project model and related logic)."""
 
 from django.test import TestCase
-from projects.models import Project
+from projects.models import Project, ProjectMember
 from projects.tests.factories import ProjectFactory
 from tasks.models import Task
 from tasks.tests.factories import AnnotationFactory, TaskFactory
@@ -151,11 +151,12 @@ class TestRearrangeOverlapCohort(TestCase):
 
 
 class TestProjectHasPermission(TestCase):
-    """LSO has one organization, so has_permission only has to reject revoked membership."""
+    """has_permission follows project visibility, not organization membership alone."""
 
     def test_member_is_allowed(self):
         project = ProjectFactory()
         user = UserFactory(active_organization=project.organization)
+        ProjectMember.objects.create(project=project, user=user, enabled=True)
 
         assert project.has_permission(user) is True
 
@@ -167,8 +168,8 @@ class TestProjectHasPermission(TestCase):
 
         assert project.has_permission(user) is False
 
-    def test_project_without_organization_is_allowed(self):
+    def test_project_without_organization_is_denied(self):
         project = Project.objects.create(title='No organization')
         user = UserFactory()
 
-        assert project.has_permission(user) is True
+        assert project.has_permission(user) is False

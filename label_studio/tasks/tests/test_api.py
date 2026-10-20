@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from organizations.tests.factories import OrganizationFactory
-from projects.models import Project
+from projects.models import Project, ProjectMember
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
 from tasks.models import Annotation, AnnotationDraft, Task
@@ -925,6 +925,8 @@ class TestAnnotationConvertToDraftAPI(APITestCase):
         cls.organization.add_user(cls.annotator)
         cls.other_annotator = UserFactory(active_organization=cls.organization)
         cls.organization.add_user(cls.other_annotator)
+        ProjectMember.objects.create(project=cls.project, user=cls.annotator, enabled=True)
+        ProjectMember.objects.create(project=cls.project, user=cls.other_annotator, enabled=True)
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
     def _convert(self, user, annotation):
@@ -944,7 +946,7 @@ class TestAnnotationConvertToDraftAPI(APITestCase):
         assert draft.user_id == self.annotator.id
 
     def test_another_users_skip_converts_to_a_draft_for_the_caller(self):
-        # Open source has no roles, so any member may take over another user's skip.
+        # An enabled project member may take over another user's skip.
         for caller in (self.other_annotator, self.owner):
             with self.subTest(caller=caller.id):
                 annotation = AnnotationFactory(

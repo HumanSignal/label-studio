@@ -83,10 +83,10 @@ class ProjectMixin:
         )
 
     def has_permission(self, user):
-        # LSO always runs a single organization, so cross-org access does not exist by design;
-        # the only membership this has to reject is one that was revoked.
         user.project = self  # link for activity log
-        return not (self.organization_id and self.organization.has_deleted(user))
+        from projects.access import can_access_project
+
+        return can_access_project(user, self)
 
     def _can_use_overlap(self):
         """
@@ -101,6 +101,6 @@ class ProjectMixin:
         Returns all users of project
         :return: QuerySet[User]
         """
-        from users.models import User
+        from projects.access import project_member_users
 
-        return User.objects.filter(id__in=self.organization.members.values_list('user__id'))
+        return project_member_users(self)

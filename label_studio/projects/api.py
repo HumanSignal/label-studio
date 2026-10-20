@@ -47,7 +47,7 @@ from projects.serializers import (
     ProjectSummarySerializer,
 )
 from rest_framework import filters, generics, status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -89,6 +89,38 @@ class ProjectImportJobListPagination(PageNumberPagination):
 class ProjectFilterSet(FilterSet):
     ids = NumberInFilter(field_name='id', lookup_expr='in')
     title = CharFilter(field_name='title', lookup_expr='icontains')
+
+
+def _requested_project_ids(request):
+    """Parse the explicit ``ids`` filter. Invalid tokens are not visible projects."""
+    requested = []
+    for value in request.query_params.getlist('ids'):
+        for part in str(value).split(','):
+            part = part.strip()
+            if not part:
+                continue
+            try:
+                requested.append(int(part))
+            except ValueError:
+                raise NotFound()
+    return requested
+
+
+def projects_visible_on_request(request):
+    """Return projects this user can see.
+
+    When ``ids`` names a project outside that queryset, raise ``NotFound`` before pagination
+    so a mixed id list cannot be narrowed to the visible page.
+    """
+    from projects.access import visible_projects
+
+    visible = visible_projects(request.user)
+    requested = _requested_project_ids(request)
+    if requested:
+        found = set(visible.filter(id__in=requested).values_list('id', flat=True))
+        if any(project_id not in found for project_id in requested):
+            raise NotFound()
+    return Project.objects.filter(id__in=visible.values('pk'))
 
 
 @method_decorator(
@@ -177,7 +209,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         fields = self.get_requested_fields(serializer)
         sparse_fields = self.get_sparse_fields()
         filter = serializer.validated_data.get('filter')
-        projects = Project.objects.filter(organization=self.request.user.active_organization).order_by(
+        projects = projects_visible_on_request(self.request).order_by(
             F('pinned_at').desc(nulls_last=True), '-created_at'
         )
         search = serializer.validated_data.get('search')
@@ -221,9 +253,25 @@ class ProjectListAPI(generics.ListCreateAPIView):
         context['created_by'] = self.request.user
         return context
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        if hasattr(data, '_mutable'):
+            data._mutable = True
+        data.pop('created_by', None)
+        data.pop('organization', None)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, ser):
+        from projects.access import can_create_project
+
+        if not can_create_project(self.request.user):
+            raise PermissionDenied()
         try:
-            ser.save(organization=self.request.user.active_organization)
+            ser.save(organization=self.request.user.active_organization, created_by=self.request.user)
         except IntegrityError as e:
             if str(e) == 'UNIQUE constraint failed: project.title, project.created_by_id':
                 raise ProjectExistException(
@@ -268,9 +316,9 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.with_counts(fields=fields).filter(
-            organization=self.request.user.active_organization
-        )
+        projects = ProjectManager.with_counts_annotate(
+            projects_visible_on_request(self.request), fields=fields
+        ).order_by(F('pinned_at').desc(nulls_last=True), '-created_at')
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
@@ -402,9 +450,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.with_counts(fields=fields).filter(
-            organization=self.request.user.active_organization
-        )
+        projects = ProjectManager.with_counts_annotate(projects_visible_on_request(self.request), fields=fields)
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
@@ -467,6 +513,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer
     queryset = Project.objects.all()
 
+    def get_queryset(self):
+        return projects_visible_on_request(self.request)
+
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         dm_queue = filters_ordering_selected_items_exist(request.data)
@@ -490,6 +539,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 class LabelStreamHistoryAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.tasks_view
     queryset = Project.objects.all()
+
+    def get_queryset(self):
+        return projects_visible_on_request(self.request)
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -592,6 +644,9 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     serializer_class = ProjectSummarySerializer
     permission_required = all_permissions.projects_view
     queryset = ProjectSummary.objects.all()
+
+    def get_queryset(self):
+        return ProjectSummary.objects.filter(project__in=projects_visible_on_request(self.request))
 
     @extend_schema(exclude=True)
     def get(self, *args, **kwargs):
@@ -1059,6 +1114,9 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
     serializer_class = ProjectSerializer
 
+    def get_queryset(self):
+        return projects_visible_on_request(self.request)
+
     def post(self, request, *args, **kwargs):
         label_config = self.request.data.get('label_config')
         include_annotation_and_prediction = self.request.data.get('include_annotation_and_prediction', False)
@@ -1096,7 +1154,7 @@ class ProjectModelVersions(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
     def get_queryset(self):
-        return Project.objects.filter(organization=self.request.user.active_organization)
+        return projects_visible_on_request(self.request)
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
@@ -1153,6 +1211,9 @@ class ProjectModelVersions(generics.RetrieveAPIView):
 class ProjectAnnotatorsAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
     queryset = Project.objects.all()
+
+    def get_queryset(self):
+        return projects_visible_on_request(self.request)
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()

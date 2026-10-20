@@ -1539,7 +1539,9 @@ class TaskManager(models.Manager):
         return TaskQuerySet(self.model, using=self._db)
 
     def for_user(self, user):
-        return self.get_queryset().filter(project__organization=user.active_organization)
+        from projects.access import visible_projects
+
+        return self.get_queryset().filter(project__in=visible_projects(user))
 
     def with_state(self):
         """Return queryset with FSM state annotated."""

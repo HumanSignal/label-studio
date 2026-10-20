@@ -155,6 +155,9 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
+    access = serializers.SerializerMethodField(
+        read_only=True, help_text='Whether the current user can annotate or manage this project'
+    )
 
     @property
     def user_id(self):
@@ -162,6 +165,16 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             return self.context['request'].user.id
         except KeyError:
             return next(iter(self.context['user_cache']))
+
+    def get_access(self, project) -> dict:
+        from projects.access import can_access_project, can_manage_project
+
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        return {
+            'can_annotate': can_access_project(user, project),
+            'can_manage': can_manage_project(user, project),
+        }
 
     @staticmethod
     def get_config_has_control_tags(project) -> bool:
@@ -345,6 +358,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'queue_done',
             'config_suitable_for_bulk_annotation',
             'state',
+            'access',
         ]
 
     def validate_label_config(self, value):
