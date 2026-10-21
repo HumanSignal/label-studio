@@ -214,6 +214,7 @@ class ExportAPI(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
         ensure_project_manage(request.user, project)
+        request.user.project = project
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
 
@@ -277,6 +278,7 @@ class ProjectExportFiles(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
         ensure_project_manage(request.user, project)
+        request.user.project = project
 
         paths = []
         for name in os.listdir(settings.EXPORT_DIR):
@@ -700,6 +702,7 @@ class ExportConvertAPI(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
         ensure_project_manage(request.user, project)
+        request.user.project = project
         snapshot = generics.get_object_or_404(Export.objects.filter(project=project), pk=self.kwargs['export_pk'])
         serializer = ExportConvertSerializer(data=request.data, context={'project': snapshot.project})
         serializer.is_valid(raise_exception=True)

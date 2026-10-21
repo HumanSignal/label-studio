@@ -530,6 +530,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
         ensure_project_manage(request.user, project)
+        request.user.project = project
 
         # Use feature flag to control memory-efficient implementation rollout
         if flag_set('fflag_fix_back_4620_memory_efficient_predictions_import_08012025_short', user=self.request.user):
@@ -970,10 +971,20 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = FileUpload.objects.all()
 
     def get_object(self):
+        """Load the upload, then require management before the response or any write.
+
+        Responsibility: fetch the ``FileUpload`` named by the URL, then call
+        ``ensure_project_manage`` before GET, PATCH, PUT, or DELETE continues.
+
+        Boundary: an invisible project is ``NotFound``. A visible project the
+        caller cannot manage is ``PermissionDenied``. Does not call
+        ``has_permission``.
+        """
         queryset = self.filter_queryset(self.get_queryset())
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         upload = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
         ensure_project_manage(self.request.user, upload.project)
+        self.request.user.project = upload.project
         return upload
 
     def get(self, *args, **kwargs):
