@@ -114,8 +114,8 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
     contributed_to_projects = serializers.SerializerMethodField(read_only=True)
 
     def get_annotations_count(self, member) -> int:
-        org = self.context.get('organization')
-        return member.user.annotations.filter(project__organization=org).count()
+        visible = _projects_visible_to_requester(self.context).filter(organization=self.context.get('organization'))
+        return member.user.annotations.filter(project__in=visible).count()
 
     def get_contributed_projects_count(self, member) -> int:
         visible = _projects_visible_to_requester(self.context).filter(organization=self.context.get('organization'))

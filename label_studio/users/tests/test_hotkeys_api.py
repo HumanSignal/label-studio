@@ -134,7 +134,7 @@ class ProjectHotkeysAPITestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.project = ProjectFactory()
-        self.user = UserFactory(active_organization=self.project.organization)
+        self.user = self.project.created_by
         self.client.force_authenticate(user=self.user)
         self.url = reverse('current-user-hotkeys')
         self.valid_payload = {

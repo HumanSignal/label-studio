@@ -111,6 +111,14 @@ class OrganizationAccessTests(APITestCase):
         self.assertNotIn('hidden-contributed-project', contributed_titles)
         self.assertIn('visible-annotated-project', contributed_titles)
         self.assertEqual(body['contributed_projects_count'], 1)
+        self.assertEqual(body['annotations_count'], 1)
+
+        self.client.force_authenticate(world.owner)
+        owner_response = self.client.get(
+            f'/api/organizations/{world.organization.id}/memberships/{world.owner.id}/',
+        )
+        self.assertEqual(owner_response.status_code, 200)
+        self.assertEqual(owner_response.json()['annotations_count'], 2)
 
     def test_member_list_project_maps_drop_hidden_projects(self):
         world = make_access_world()
