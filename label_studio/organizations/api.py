@@ -20,6 +20,8 @@ from organizations.serializers import (
     OrganizationMemberSerializer,
     OrganizationSerializer,
 )
+from projects.access import visible_projects
+from projects.action_permissions import ensure_org_owner
 from projects.models import Project
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -80,6 +82,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         if not settings.ALLOW_ORGANIZATION_CREATION:
             raise PermissionDenied('Creating organizations over the API is disabled on this instance')
+        ensure_org_owner(request.user, request.user.active_organization)
         return super(OrganizationListAPI, self).post(request, *args, **kwargs)
 
 
@@ -125,7 +128,7 @@ class OrganizationMemberListPagination(PageNumberPagination):
 class OrganizationMemberListAPI(generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
-        GET=all_permissions.organizations_view,
+        GET=all_permissions.organizations_change,
         PUT=all_permissions.organizations_change,
         PATCH=all_permissions.organizations_change,
         DELETE=all_permissions.organizations_change,
@@ -141,7 +144,8 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         members = self.paginated_members
         user_ids = [member.user_id for member in members]
         projects = (
-            Project.objects.filter(created_by_id__in=user_ids, organization=self.request.user.active_organization)
+            visible_projects(self.request.user)
+            .filter(created_by_id__in=user_ids, organization=self.request.user.active_organization)
             .values('created_by_id', 'id', 'title')
             .distinct()
         )
@@ -158,11 +162,13 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     def _get_contributed_to_projects_map(self):
         members = self.paginated_members
         user_ids = [member.user_id for member in members]
-        org_project_ids = Project.objects.filter(organization=self.request.user.active_organization).values_list(
-            'id', flat=True
+        visible_project_ids = (
+            visible_projects(self.request.user)
+            .filter(organization=self.request.user.active_organization)
+            .values_list('id', flat=True)
         )
         annotations = (
-            Annotation.objects.filter(completed_by__in=list(user_ids), project__in=list(org_project_ids))
+            Annotation.objects.filter(completed_by__in=list(user_ids), project_id__in=list(visible_project_ids))
             .values('completed_by', 'project_id')
             .distinct()
         )
@@ -209,6 +215,19 @@ class OrganizationMemberListAPI(generics.ListAPIView):
             return org.members.prefetch_related('user__om_through').order_by('user__username')
 
     def list(self, request, *args, **kwargs):
+        """List members of the organization the requester owns.
+
+        Responsibility: return the member page for organization administration.
+
+        Boundary: ``ensure_org_owner`` rejects an inactive account, a missing
+        organization, a mismatched ``active_organization``, or a soft-deleted
+        membership with ``NotFound``, and a live member who is not the owner
+        with ``PermissionDenied``. Created and contributed projects in the
+        response are limited to ``visible_projects``. Does not call
+        ``user.has_perm``.
+        """
+        organization = generics.get_object_or_404(Organization, pk=self.kwargs[self.lookup_field])
+        ensure_org_owner(request.user, organization)
         page = self.paginated_members  # Using cached property to avoid multiple queries
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -303,7 +322,16 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
         return Response(serializer.data)
 
     def delete(self, request, pk=None, user_pk=None):
+        """Soft-delete a member of the organization the requester owns.
+
+        Responsibility: remove another member from the active organization.
+
+        Boundary: ``ensure_org_owner`` rejects anyone except the live owner of
+        this organization. The owner cannot remove themself. Does not call
+        ``user.has_perm``.
+        """
         org = self.parent_object
+        ensure_org_owner(request.user, org)
         if org != request.user.active_organization:
             raise PermissionDenied('You can delete members only for your current active organization')
 
@@ -359,13 +387,39 @@ class OrganizationAPI(generics.RetrieveUpdateAPIView):
     redirect_kwarg = 'pk'
 
     def get(self, request, *args, **kwargs):
+        """Return settings for the organization the requester owns.
+
+        Responsibility: read one organization's settings.
+
+        Boundary: ``ensure_org_owner`` allows only the live owner of this
+        organization. Does not call ``user.has_perm``.
+        """
+        ensure_org_owner(request.user, self.get_object())
         return super(OrganizationAPI, self).get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
+        """Update settings for the organization the requester owns.
+
+        Responsibility: write one organization's settings.
+
+        Boundary: ``ensure_org_owner`` allows only the live owner of this
+        organization, and it runs before the serializer saves. Does not call
+        ``user.has_perm``.
+        """
+        ensure_org_owner(request.user, self.get_object())
         return super(OrganizationAPI, self).patch(request, *args, **kwargs)
 
     @extend_schema(exclude=True)
     def put(self, request, *args, **kwargs):
+        """Replace settings for the organization the requester owns.
+
+        Responsibility: write one organization's settings.
+
+        Boundary: ``ensure_org_owner`` allows only the live owner of this
+        organization, and it runs before the serializer saves. Does not call
+        ``user.has_perm``.
+        """
+        ensure_org_owner(request.user, self.get_object())
         return super(OrganizationAPI, self).put(request, *args, **kwargs)
 
 
@@ -389,7 +443,16 @@ class OrganizationInviteAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.organizations_invite
 
     def get(self, request, *args, **kwargs):
+        """Return the invite link for the organization the requester owns.
+
+        Responsibility: show the current organization invite token.
+
+        Boundary: ``ensure_org_owner`` allows only the live owner of the
+        requester's active organization. Does not rotate the token and does
+        not call ``user.has_perm``.
+        """
         org = request.user.active_organization
+        ensure_org_owner(request.user, org)
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
         if hasattr(settings, 'FORCE_SCRIPT_NAME') and settings.FORCE_SCRIPT_NAME:
             invite_url = invite_url.replace(settings.FORCE_SCRIPT_NAME, '', 1)
@@ -424,7 +487,16 @@ class OrganizationResetTokenAPI(APIView):
     parser_classes = (JSONParser,)
 
     def post(self, request, *args, **kwargs):
+        """Reset the invite token for the organization the requester owns.
+
+        Responsibility: issue a new organization invite token.
+
+        Boundary: ``ensure_org_owner`` allows only the live owner of the
+        requester's active organization, and it runs before ``reset_token``.
+        Does not call ``user.has_perm``.
+        """
         org = request.user.active_organization
+        ensure_org_owner(request.user, org)
         org.reset_token()
         logger.debug(f'New token for organization {org.pk} is {org.token}')
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)

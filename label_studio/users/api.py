@@ -23,6 +23,27 @@ from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerU
 
 logger = logging.getLogger(__name__)
 
+_PRIVILEGED_ACCOUNT_FIELDS = ('is_staff', 'is_superuser', 'active_organization')
+
+
+def _drop_privileged_account_fields(request):
+    """Remove privilege fields from a profile update body.
+
+    Responsibility: keep ``is_staff``, ``is_superuser``, and
+    ``active_organization`` from being written by the user API.
+
+    Boundary: does not decide whether this caller may update the object.
+    Missing keys are ignored. Does not call ``user.has_perm``.
+    """
+    data = getattr(request, 'data', None)
+    if data is None:
+        return
+    if hasattr(data, '_mutable'):
+        data._mutable = True
+    for field in _PRIVILEGED_ACCOUNT_FIELDS:
+        if field in data:
+            del data[field]
+
 
 @method_decorator(
     name='update',
@@ -166,6 +187,19 @@ class UserAPI(viewsets.ModelViewSet):
         return context
 
     def update(self, request, *args, **kwargs):
+        """Update the signed-in user's own profile.
+
+        Responsibility: persist allowed changes to the current account.
+
+        Boundary: a different user raises ``PermissionDenied``, including when
+        the caller is an organization owner. ``is_staff``, ``is_superuser``, and
+        ``active_organization`` in the body are discarded and do not change the
+        database. Does not call ``user.has_perm``.
+        """
+        instance = self.get_object()
+        if instance.pk != request.user.pk:
+            raise PermissionDenied()
+        _drop_privileged_account_fields(request)
         return super(UserAPI, self).update(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):

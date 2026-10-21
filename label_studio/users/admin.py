@@ -11,6 +11,41 @@ from tasks.models import Annotation, Prediction, Task
 from users.models import User
 
 
+def user_may_use_django_admin(user) -> bool:
+    """Return whether this account may open Django admin.
+
+    Responsibility: the admin site permission gate.
+
+    Boundary: true only for an active staff user who is ``created_by`` of an
+    organization and a non-deleted member of that same organization.
+    ``is_superuser`` alone is not enough. This does not grant project API
+    access and does not call ``user.has_perm``.
+    """
+    if user is None or not getattr(user, 'is_authenticated', False):
+        return False
+    if not getattr(user, 'is_active', False) or not getattr(user, 'is_staff', False):
+        return False
+    user_id = getattr(user, 'id', None)
+    if user_id is None:
+        return False
+    return Organization.objects.filter(
+        created_by_id=user_id,
+        organizationmember__user_id=user_id,
+        organizationmember__deleted_at__isnull=True,
+    ).exists()
+
+
+def _admin_has_permission(request):
+    """Adapt ``user_may_use_django_admin`` to ``AdminSite.has_permission``.
+
+    Responsibility: read the request user and apply the admin gate.
+
+    Boundary: a missing user is denied. Does not treat ``is_superuser`` as
+    sufficient and does not call ``user.has_perm``.
+    """
+    return user_may_use_django_admin(getattr(request, 'user', None))
+
+
 class UserAdminShort(UserAdmin):
     add_fieldsets = ((None, {'fields': ('email', 'password1', 'password2')}),)
 
@@ -194,3 +229,4 @@ admin.site.register(AsyncMigrationStatus, AsyncMigrationStatusAdmin)
 
 # remove unused django groups
 admin.site.unregister(Group)
+admin.site.has_permission = _admin_has_permission

@@ -5,6 +5,7 @@ from typing import TypedDict
 from drf_dynamic_fields import DynamicFieldsMixin
 from drf_spectacular.utils import extend_schema_serializer
 from organizations.models import Organization, OrganizationMember
+from projects.access import visible_projects
 from projects.models import Project
 from rest_framework import serializers
 from tasks.models import Annotation
@@ -35,6 +36,22 @@ class OrganizationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class ProjectInfo(TypedDict):
     id: int
     title: str
+
+
+def _projects_visible_to_requester(context):
+    """Return projects the requesting user may see.
+
+    Responsibility: bound created-project and contributed-project fields to
+    ``visible_projects``.
+
+    Boundary: a missing request or an unauthenticated user sees no projects.
+    Does not grant access and does not call ``user.has_perm``.
+    """
+    request = context.get('request')
+    user = getattr(request, 'user', None) if request is not None else None
+    if user is None or not getattr(user, 'is_authenticated', False):
+        return Project.objects.none()
+    return visible_projects(user)
 
 
 class OrganizationMemberListParamsSerializer(serializers.Serializer):
@@ -101,15 +118,18 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
         return member.user.annotations.filter(project__organization=org).count()
 
     def get_contributed_projects_count(self, member) -> int:
-        org = self.context.get('organization')
-        return member.user.annotations.filter(project__organization=org).values('project').distinct().count()
+        visible = _projects_visible_to_requester(self.context).filter(organization=self.context.get('organization'))
+        return member.user.annotations.filter(project__in=visible).values('project').distinct().count()
 
     def get_created_projects(self, member) -> list[ProjectInfo] | None:
         if not self.context.get('contributed_to_projects', False):
             return None
         organization = self.context.get('organization')
-        projects = Project.objects.filter(created_by=member.user, organization=organization).values('id', 'title')
-        projects = projects[:100]  # Limit to 100 projects
+        projects = (
+            _projects_visible_to_requester(self.context)
+            .filter(created_by=member.user, organization=organization)
+            .values('id', 'title')[:100]
+        )
         return [
             {
                 'id': project['id'],
@@ -122,8 +142,9 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
         if not self.context.get('contributed_to_projects', False):
             return None
         organization = self.context.get('organization')
+        visible = _projects_visible_to_requester(self.context).filter(organization=organization)
         annotations = (
-            Annotation.objects.filter(completed_by=member.user, project__organization=organization)
+            Annotation.objects.filter(completed_by=member.user, project__in=visible)
             .values('project__id', 'project__title')
             .distinct()
         )

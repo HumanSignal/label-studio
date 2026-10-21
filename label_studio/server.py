@@ -154,9 +154,6 @@ def _create_user(input_args, config):
 
     try:
         user = User.objects.create_user(email=username, password=password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
 
         if token and len(token) > 5:
             from rest_framework.authtoken.models import Token
