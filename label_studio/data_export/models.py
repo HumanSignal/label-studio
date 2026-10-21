@@ -8,18 +8,16 @@ from copy import deepcopy
 from datetime import datetime
 
 import ujson as json
-from core import version
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
 from data_export.functions import converter_http_session
 from django.conf import settings
-from django.db import models
-from django.db.models.signals import post_save
+from django.db import models, transaction
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
-from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
@@ -93,42 +91,6 @@ def set_export_default_name(sender, instance, created, **kwargs):
 
 
 class DataExport(object):
-    # TODO: deprecated
-    @staticmethod
-    def save_export_files(project, now, get_args, data, md5, name):
-        """Generate two files: meta info and result file and store them locally for logging"""
-        filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
-        filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
-        annotation_number = Annotation.objects.filter(project=project).count()
-        try:
-            platform_version = version.get_git_version()
-        except:  # noqa: E722
-            platform_version = 'none'
-            logger.error('Version is not detected in save_export_files()')
-        info = {
-            'project': {
-                'title': project.title,
-                'id': project.id,
-                'created_at': project.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'created_by': project.created_by.email,
-                'task_number': project.tasks.count(),
-                'annotation_number': annotation_number,
-            },
-            'platform': {'version': platform_version},
-            'download': {
-                'GET': dict(get_args),
-                'time': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'result_filename': filename_results,
-                'md5': md5,
-            },
-        }
-
-        with open(filename_results, 'w', encoding='utf-8') as f:
-            f.write(data)
-        with open(filename_info, 'w', encoding='utf-8') as f:
-            json.dump(info, f, ensure_ascii=False)
-        return filename_results
-
     @staticmethod
     def get_export_formats(project):
         converter = Converter(config=project.get_parsed_config(), project_dir=None)
@@ -158,8 +120,6 @@ class DataExport(object):
         md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()  # nosec
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
-        input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
-
         converter = Converter(
             config=project.get_parsed_config(),
             project_dir=None,
@@ -170,7 +130,11 @@ class DataExport(object):
             local_files_resolver=project_local_files_resolver(project),
             http_session=converter_http_session(hostname),
         )
-        with get_temp_dir() as tmp_dir:
+        # The converter input lives in its own temp dir so it is neither kept on disk nor packed into the output
+        with get_temp_dir() as input_dir, get_temp_dir() as tmp_dir:
+            input_json = os.path.join(input_dir, name + '.json')
+            with open(input_json, 'w', encoding='utf-8') as f:
+                f.write(data)
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)
             # if only one file is exported - no need to create archive
@@ -252,5 +216,26 @@ class ConvertedFormat(models.Model):
         verbose_name=_('created by'),
     )
 
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
+
+def delete_file_from_storage(field_file):
+    """Delete the file behind a FileField value; a file that is already gone is not an error"""
+    if field_file and field_file.storage.exists(field_file.name):
+        field_file.storage.delete(field_file.name)
+
+
+@receiver(post_delete, sender=Export)
+@receiver(post_delete, sender=ConvertedFormat)
+def delete_export_file_on_commit(sender, instance, using, **kwargs):
+    """Remove the file once the row deletion is committed, including deletions cascaded
+    from a project, an organization or a parent export. Storage errors are only logged here;
+    ExportDetailAPI deletes files itself and reports storage errors to the client."""
+    field_file = instance.file
+
+    def delete_file():
+        try:
+            delete_file_from_storage(field_file)
+        except Exception:
+            logger.warning(f'Could not delete export file {field_file.name} from storage', exc_info=True)
+
+    if field_file:
+        transaction.on_commit(delete_file, using=using)
