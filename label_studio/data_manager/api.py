@@ -27,10 +27,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from io_storages.functions import get_import_storage_link_prefetches
+from projects.access import can_manage_project, visible_projects
+from projects.action_permissions import (
+    PERMISSION_ACTIONS,
+    Action,
+    ensure_project_manage,
+    ensure_project_visible,
+)
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -45,6 +53,39 @@ from users.models import User
 from users.serializers import UserSimpleSerializer
 
 logger = logging.getLogger(__name__)
+
+
+def _enforce_project_permission(user, project, permission_name):
+    """Apply the Task 4 action mapped from a declared permission string.
+
+    Responsibility: ``views.*`` write permissions are management, so they call
+    ``ensure_project_manage``. A read such as ``tasks.view`` stays access.
+
+    Boundary: an unmapped string is denied. Does not call ``user.has_perm``.
+    """
+    mapped = PERMISSION_ACTIONS.get(permission_name)
+    if mapped is Action.ACCESS:
+        ensure_project_visible(user, project)
+        return
+    if mapped is Action.MANAGE:
+        ensure_project_manage(user, project)
+        return
+    raise PermissionDenied()
+
+
+def _reject_url_project_mismatch(request, project_id):
+    """Reject a view write whose project is not the ``project`` query value.
+
+    Boundary: no query project is not a mismatch. An invisible URL project is
+    NotFound. A visible URL project that differs is ValidationError, and the
+    caller must not save.
+    """
+    declared = int_from_request(request.query_params, 'project', 0)
+    if not declared or int(declared) == int(project_id):
+        return
+    url_project = generics.get_object_or_404(Project, pk=declared)
+    ensure_project_visible(request.user, url_project)
+    raise ValidationError('Project and View mismatch')
 
 
 @extend_schema(exclude=True)
@@ -211,9 +252,25 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
+        if project is not None:
+            _reject_url_project_mismatch(self.request, project.id)
+            _enforce_project_permission(self.request.user, project, all_permissions.views_create)
         max_order = View.objects.filter(project=project).aggregate(Max('order'))['order__max']
         order = (max_order if max_order is not None else -1) + 1
         serializer.save(user=self.request.user, order=order)
+
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        _reject_url_project_mismatch(self.request, instance.project_id)
+        incoming = serializer.validated_data.get('project')
+        if incoming is not None and getattr(incoming, 'id', None) != instance.project_id:
+            raise ValidationError('Project and View mismatch')
+        _enforce_project_permission(self.request.user, instance.project, all_permissions.views_change)
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        _enforce_project_permission(self.request.user, instance.project, all_permissions.views_delete)
+        instance.delete()
 
     @extend_schema(
         tags=['Data Manager'],
@@ -243,9 +300,8 @@ class ViewAPI(viewsets.ModelViewSet):
             data=request.data if 'project' in request.data else {'project': request.query_params.get('project')}
         )
         serializer.is_valid(raise_exception=True)
-        project = generics.get_object_or_404(
-            Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id
-        )
+        project = generics.get_object_or_404(Project, pk=serializer.validated_data['project'].id)
+        _enforce_project_permission(request.user, project, all_permissions.views_reset)
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         queryset.all().delete()
         return Response(status=204)
@@ -270,10 +326,13 @@ class ViewAPI(viewsets.ModelViewSet):
         project_id = serializer.validated_data['project']
         view_ids = serializer.validated_data['ids']
 
-        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=project_id)
+        project = generics.get_object_or_404(Project, pk=project_id)
+        _enforce_project_permission(request.user, project, all_permissions.views_change)
 
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         views = list(queryset.filter(id__in=view_ids))
+        if len({view.id for view in views}) != len(set(view_ids)):
+            raise ValidationError('Project and View mismatch')
 
         # Update the order field for each view
         view_dict = {view.id: view for view in views}
@@ -286,8 +345,28 @@ class ViewAPI(viewsets.ModelViewSet):
 
         return Response(status=204)
 
+    def list(self, request, *args, **kwargs):
+        project_id = int_from_request(request.query_params, 'project', 0)
+        if project_id:
+            project = generics.get_object_or_404(Project, pk=project_id)
+            _enforce_project_permission(request.user, project, all_permissions.views_view)
+        return super().list(request, *args, **kwargs)
+
+    def get_object(self):
+        """Load a visible view, then reject a query project that is not its project.
+
+        The list filter would otherwise hide that view and return 404 before the
+        write can be refused without saving.
+        """
+        queryset = View.objects.filter(project__in=visible_projects(self.request.user))
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        obj = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
+        self.check_object_permissions(self.request, obj)
+        _reject_url_project_mismatch(self.request, obj.project_id)
+        return obj
+
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')
+        return View.objects.filter(project__in=visible_projects(self.request.user)).order_by('order', 'id')
 
 
 def _paginator_with_known_count(paginator_class, count):
@@ -436,10 +515,12 @@ class TaskListAPI(generics.ListCreateAPIView):
         project_pk = int_from_request(request.GET, 'project', 0) or int_from_request(request.data, 'project', 0)
         if project_pk:
             project = generics.get_object_or_404(Project, pk=project_pk)
+            _enforce_project_permission(request.user, project, all_permissions.tasks_view)
             self.check_object_permissions(request, project)
         elif view_pk:
             view = generics.get_object_or_404(View, pk=view_pk)
             project = view.project
+            _enforce_project_permission(request.user, project, all_permissions.tasks_view)
             self.check_object_permissions(request, project)
         else:
             return Response({'detail': 'Neither project nor view id specified'}, status=404)
@@ -566,6 +647,7 @@ class ProjectColumnsAPI(APIView):
     def get(self, request):
         pk = int_from_request(request.GET, 'project', 1)
         project = generics.get_object_or_404(Project, pk=pk)
+        _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
         data = GET_ALL_COLUMNS(project, request.user)
@@ -589,14 +671,16 @@ class ProjectStateAPI(APIView):
     def get(self, request):
         pk = int_from_request(request.GET, 'project', 1)  # replace 1 to None, it's for debug only
         project = generics.get_object_or_404(Project, pk=pk)
+        _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
+        can_manage = can_manage_project(request.user, project)
 
         data.update(
             {
-                'can_delete_tasks': True,
-                'can_manage_annotations': True,
-                'can_manage_tasks': True,
+                'can_delete_tasks': can_manage,
+                'can_manage_annotations': can_manage,
+                'can_manage_tasks': can_manage,
                 'source_syncing': False,
                 'target_syncing': False,
                 'task_count': project.tasks.count(),
@@ -759,12 +843,14 @@ class ProjectActionsAPI(APIView):
     def get(self, request):
         pk = int_from_request(request.GET, 'project', 0)
         project = generics.get_object_or_404(Project, pk=pk)
+        _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
         return Response(get_all_actions(request.user, project))
 
     def post(self, request):
         pk = int_from_request(request.GET, 'project', 0)
         project = generics.get_object_or_404(Project, pk=pk)
+        _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
 
         # keep ordering only when needed, otherwise drop to avoid expensive sorts/annotations
@@ -829,6 +915,7 @@ class ProjectActionsFormAPI(APIView):
     def get(self, request, action_id):
         pk = int_from_request(request.GET, 'project', 0)
         project = generics.get_object_or_404(Project, pk=pk)
+        _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
 
         form = get_action_form(action_id, project, request.user)

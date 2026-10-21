@@ -10,6 +10,7 @@ from core.utils.common import int_from_request, load_func
 from data_manager.models import View
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from tasks.models import Task
 
@@ -310,7 +311,7 @@ def get_prepare_params(request, project):
     if view_id > 0:
         view = get_object_or_404(View, pk=view_id)
         if view.project.pk != project.pk:
-            raise DataManagerException('Project and View mismatch')
+            raise ValidationError('Project and View mismatch')
         prepare_params = view.get_prepare_tasks_params(add_selected_items=True)
         prepare_params.request = request
 

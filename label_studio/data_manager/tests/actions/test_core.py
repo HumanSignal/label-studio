@@ -10,9 +10,11 @@ class TestCheckActionPermission(TestCase):
         project = ProjectFactory()
         user = project.created_by
         action = {
+            'id': 'delete_tasks',
             'permission': [all_permissions.tasks_delete, all_permissions.projects_view],
         }
         assert check_action_permission(user, action, project) is True
 
         anon_user = AnonymousUser()  # Unauthenticated user
         assert check_action_permission(anon_user, action, project) is False
+        assert check_action_permission(user, {'permission': action['permission']}, project) is False

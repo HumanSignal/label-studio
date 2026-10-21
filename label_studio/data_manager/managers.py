@@ -1328,9 +1328,23 @@ def annotate_avg_lead_time(queryset):
 
 
 def annotate_draft_exists(queryset):
+    """Annotate whether the request user has a draft on each task.
+
+    Responsibility: the Data Manager ``draft_exists`` flag.
+
+    Boundary: only that user's drafts count. A missing request or anonymous
+    user matches nothing, so another person's draft is not visible. Draft text
+    is not selected.
+    """
     from tasks.models import AnnotationDraft
 
-    return queryset.annotate(draft_exists=Exists(AnnotationDraft.objects.filter(task=OuterRef('pk'))))
+    user = getattr(getattr(queryset, 'request', None), 'user', None)
+    user_id = user.id if getattr(user, 'is_authenticated', False) else None
+    if user_id is None:
+        drafts = AnnotationDraft.objects.none()
+    else:
+        drafts = AnnotationDraft.objects.filter(task=OuterRef('pk'), user_id=user_id)
+    return queryset.annotate(draft_exists=Exists(drafts))
 
 
 def file_upload(queryset):
@@ -1497,6 +1511,13 @@ class PreparedTaskManager(models.Manager):
         )
 
     def only_filtered(self, prepare_params=None):
+        """Return tasks for the prepared project, limited to projects the user can see.
+
+        A background rebuild passes ``request=None`` after an authorized action and
+        keeps the project filter alone. Any request, including an anonymous one, is
+        intersected with ``visible_projects``.
+        """
+        from projects.access import visible_projects
         from projects.models import Project
 
         request = prepare_params.request
@@ -1506,12 +1527,14 @@ class PreparedTaskManager(models.Manager):
         if prepare_params.is_multi_project:
             queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
             project = Project.objects.get(pk=prepare_params.projects[0])
-            queryset.project = project
         else:
             queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
             project = Project.objects.get(pk=prepare_params.project)
-            # Attach project before annotate_queryset so it does not call queryset.first().
-            queryset.project = project
+        if request is not None:
+            queryset = queryset.filter(project__in=visible_projects(getattr(request, 'user', None)))
+        # Attach project before annotate_queryset so it does not call queryset.first().
+        queryset.project = project
+        if not prepare_params.is_multi_project:
             _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)

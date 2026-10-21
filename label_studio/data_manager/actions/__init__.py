@@ -51,18 +51,57 @@ def user_option_label(user):
 
 
 def check_action_permission(user, action, project):
-    """Actions must have permissions, if only one is in the user role then the action is allowed"""
-    if 'permission' not in action:
-        logger.error('Action must have "permission" field: %s', str(action))
-        return False
+    """Return whether this user may run the registered data-manager action.
 
-    permissions = action['permission']
-    if not isinstance(permissions, list):
-        permissions = [permissions]
-    for permission in permissions:
-        if not user.has_perm(permission):
-            return False
-    return True
+    Responsibility: ``project_actions_api_action`` decides the action.
+    ``next_task`` needs project access. Every other registered action needs
+    management. A missing or unknown id is denied.
+
+    Boundary: returns False instead of raising. Does not call ``user.has_perm``
+    and does not read the action's permission strings.
+    """
+    from projects.access import can_access_project, can_manage_project
+    from projects.action_permissions import Action, project_actions_api_action
+
+    action_id = action.get('id') if isinstance(action, dict) else None
+    resolved = project_actions_api_action(action_id)
+    if resolved is Action.ACCESS:
+        return can_access_project(user, project)
+    if resolved is Action.MANAGE:
+        return can_manage_project(user, project)
+    return False
+
+
+def _selected_task_ids(prepare_params):
+    """Return explicit task ids from a selection, ignoring an unfiltered set."""
+    selected = getattr(prepare_params, 'selectedItems', None)
+    if selected is None:
+        return []
+    if selected.all is False:
+        return list(selected.included or [])
+    return list(selected.excluded or [])
+
+
+def _ensure_selected_ids_in_project(project, prepare_params):
+    """Raise NotFound when any selected task id is outside this project.
+
+    Responsibility: reject a mixed id set before the action function runs.
+
+    Boundary: an empty selection is not a mismatch. A missing id and an id
+    from another project are both NotFound. Does not delete tasks or emit
+    webhooks.
+    """
+    if prepare_params is None:
+        return
+    ids = _selected_task_ids(prepare_params)
+    if not ids:
+        return
+    from rest_framework.exceptions import NotFound
+    from tasks.models import Task
+
+    found = set(Task.objects.filter(project_id=project.id, id__in=ids).values_list('id', flat=True))
+    if found != set(ids):
+        raise NotFound()
 
 
 def get_all_actions(user, project):
@@ -166,6 +205,8 @@ def perform_action(action_id, project, queryset, user, **kwargs):
     # check user permissions for this action
     if not check_permission(user, action, project):
         raise PermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
+
+    _ensure_selected_ids_in_project(project, kwargs.get('prepare_params'))
 
     try:
         result = action['entry_point'](project, queryset, **kwargs)
