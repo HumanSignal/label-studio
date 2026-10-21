@@ -3,7 +3,7 @@ name = "label-studio"
 version = "1.24.0.dev0"
 description = "Label Studio annotation tool"
 authors = [{ name = "HumanSignal", email = "support@humansignal.com" }]
-requires-python = ">=3.10,<4"
+requires-python = ">=3.11,<4"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "fe11b3aa98aa48297be0b7a2c3687c31c375a535" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "3a0a1cf970b7c5ee88ddac9e9a5333e5d95c8d50" }
 
 [project.optional-dependencies]
 uwsgi = [
@@ -89,19 +89,13 @@ label-studio = "label_studio.server:main"
 
 [dependency-groups]
 test = [
-    "pytest==9.0.3; python_version >= '3.11'",
-    "pytest==7.2.2; python_version < '3.11'",
+    "pytest==9.0.3",
     "pytest-cov==7.1.0",
     "pytest-django==4.12.0",
     "pytest-mock==3.15.1",
-    "tavern==3.3.3; python_version >= '3.11'",
-    "tavern==2.17.0; python_version < '3.11'",
-    # tavern 2.x (py3.10) unconditionally loads its grpc plugin because grpcio is
-    # present transitively; without grpc_reflection every tavern test errors at setup
-    "grpcio-reflection==1.78.0 ; python_full_version < '3.11'",
+    "tavern==3.3.3",
     "fakeredis~=2.26.1",
-    "pytest-env==1.6.0; python_version >= '3.11'",
-    "pytest-env==0.6.2; python_version < '3.11'",
+    "pytest-env==1.6.0",
     "responses==0.13.0",
     "pytest-xdist==3.8.0",
     "psutil==7.0.0",
@@ -125,6 +119,7 @@ build-backend = "uv_build"
 [tool.uv]
 required-version = ">=0.11.8"
 exclude-newer = "4 days"
+exclude-newer-package = { certifi = false }
 
 
 [tool.uv.build-backend]
@@ -132,8 +127,8 @@ module-name = "label_studio"
 module-root = ""
 
 [tool.ruff]
-# Assume Python 3.10 at a minimum
-target-version = "py310"
+# Assume Python 3.11 at a minimum
+target-version = "py311"
 
 line-length = 119
 
