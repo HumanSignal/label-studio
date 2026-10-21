@@ -17,6 +17,28 @@ from .s3.api import S3ExportStorageListAPI, S3ImportStorageListAPI
 logger = logging.getLogger(__name__)
 
 
+def _project_reassigned(data, current_project_id) -> bool:
+    """Return whether the payload moves a storage onto a different project.
+
+    Responsibility: detect a project change before validation opens a connection
+    or listing walks objects.
+
+    Boundary: an omitted project field is not a change. A different id, an empty
+    value on a project-bound row, or a non-numeric id is a change, including when
+    the caller can manage both projects. This does not persist the row.
+    """
+    if not hasattr(data, '__contains__') or 'project' not in data:
+        return False
+    raw = data.get('project')
+    if raw in (None, ''):
+        return current_project_id is not None
+    try:
+        submitted = int(raw)
+    except (TypeError, ValueError):
+        return True
+    return submitted != current_project_id
+
+
 def validate_storage_instance(request, serializer_class):
     """
     Preload and prepare a storage instance from request data.
@@ -56,6 +78,11 @@ def validate_storage_instance(request, serializer_class):
     if project is not None:
         ensure_project_manage(request.user, project)
         request.user.project = project
+
+    # S3 validation opens a client inside is_valid(), and update() would persist
+    # a new project. Reject the move before either of those.
+    if instance is not None and _project_reassigned(request.data, instance.project_id):
+        raise ValidationError('The project cannot be changed.')
 
     # combine instance fields with request.data
     serializer = serializer_class(data=request.data)

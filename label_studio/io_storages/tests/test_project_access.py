@@ -91,6 +91,37 @@ class StorageAccessTests(APITestCase):
         self.assertEqual(storage.project_id, world.project_1.id)
         self.assertNotIn(SECRET_ACCESS_KEY_ID, response.content.decode())
 
+    def test_validate_cannot_move_storage_to_another_project(self):
+        world = make_access_world()
+        storage = S3ImportStorageFactory(
+            project=world.project_1,
+            bucket='project-a',
+            prefix='project-a/',
+            aws_access_key_id=SECRET_ACCESS_KEY_ID,
+        )
+        payload = {
+            'id': storage.id,
+            'project': world.project_2.id,
+            'bucket': 'project-a',
+            'prefix': 'project-a/',
+        }
+        self.client.force_authenticate(world.owner)
+        for url in (
+            reverse('storages:api:storage-s3-validate'),
+            reverse('storages:api:storage-s3-list-files'),
+        ):
+            with (
+                patch('io_storages.s3.models.S3ImportStorage.get_client') as get_client,
+                patch('io_storages.s3.models.S3ImportStorage.iter_objects') as iter_objects,
+            ):
+                response = self.client.post(url, payload, format='json')
+            self.assertEqual(response.status_code, 400, response.content)
+            storage.refresh_from_db()
+            self.assertEqual(storage.project_id, world.project_1.id)
+            get_client.assert_not_called()
+            iter_objects.assert_not_called()
+            self.assertNotIn(SECRET_ACCESS_KEY_ID, response.content.decode())
+
     def test_overlapping_local_directories_are_rejected(self):
         world = make_access_world()
         LocalFilesImportStorage.objects.create(project=world.project_1, path=LOCAL_PATH_A)
