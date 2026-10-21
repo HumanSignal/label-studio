@@ -11,7 +11,8 @@ from projects.models import ProjectImport, ProjectReimport
 from projects.tests.access_setup import make_access_world
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.test import APITestCase
-from tasks.models import Task
+from tasks.models import Prediction, Task
+from tasks.tests.factories import TaskFactory
 
 
 def _save_upload(project, user, name='tasks.json'):
@@ -183,3 +184,51 @@ class ImportAccessTests(APITestCase):
         self.assertEqual(hidden_reimport_list.status_code, 404, hidden_reimport_list.content)
         self.assertEqual(hidden_reimport_detail.status_code, 404, hidden_reimport_detail.content)
         self.assertEqual(ProjectImport.objects.count(), 2)
+
+    def test_member_cannot_read_or_delete_one_upload(self):
+        world = make_access_world()
+        own = _save_upload(world.project_1, world.creator, name='one.json')
+        hidden = _save_upload(world.project_2, world.owner, name='other.json')
+        self.client.force_authenticate(world.member_a)
+        own_url = reverse('data_import:api:file-upload-detail', kwargs={'pk': own.id})
+        hidden_url = reverse('data_import:api:file-upload-detail', kwargs={'pk': hidden.id})
+
+        fetched = self.client.get(own_url)
+        deleted = self.client.delete(own_url)
+        hidden_fetch = self.client.get(hidden_url)
+        hidden_delete = self.client.delete(hidden_url)
+
+        self.assertEqual(fetched.status_code, 403, fetched.content)
+        self.assertEqual(deleted.status_code, 403, getattr(deleted, 'content', b''))
+        self.assertEqual(hidden_fetch.status_code, 404, hidden_fetch.content)
+        self.assertEqual(hidden_delete.status_code, 404, getattr(hidden_delete, 'content', b''))
+        self.assertTrue(FileUpload.objects.filter(id=own.id).exists())
+        self.assertTrue(FileUpload.objects.filter(id=hidden.id).exists())
+
+    def test_member_cannot_import_predictions(self):
+        world = make_access_world()
+        task = TaskFactory(project=world.project_1, data={'text': 'visible'})
+        hidden_task = TaskFactory(project=world.project_2, data={'text': 'hidden'})
+        self.client.force_authenticate(world.member_a)
+        predictions_before = Prediction.objects.count()
+        imports_before = ProjectImport.objects.count()
+        payload = [{'result': [], 'score': 0.5, 'model_version': 'member', 'task': task.id}]
+        hidden_payload = [{'result': [], 'score': 0.5, 'model_version': 'member', 'task': hidden_task.id}]
+
+        with patch('data_import.api.start_job_async_or_sync') as enqueue:
+            imported = self.client.post(
+                reverse('data_import:api-projects:project-import-predictions', kwargs={'pk': world.project_1.id}),
+                payload,
+                format='json',
+            )
+            hidden = self.client.post(
+                reverse('data_import:api-projects:project-import-predictions', kwargs={'pk': world.project_2.id}),
+                hidden_payload,
+                format='json',
+            )
+
+        self.assertEqual(imported.status_code, 403, imported.content)
+        self.assertEqual(hidden.status_code, 404, hidden.content)
+        self.assertEqual(Prediction.objects.count(), predictions_before)
+        self.assertEqual(ProjectImport.objects.count(), imports_before)
+        enqueue.assert_not_called()

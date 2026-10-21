@@ -212,7 +212,8 @@ class ExportAPI(generics.RetrieveAPIView):
         return qs
 
     def get(self, request, *args, **kwargs):
-        project = self.get_object()
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, project)
         query_serializer = ExportParamSerializer(data=request.GET)
         query_serializer.is_valid(raise_exception=True)
 
@@ -274,8 +275,8 @@ class ProjectExportFiles(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get(self, request, *args, **kwargs):
-        # project permission check
-        self.get_object()
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, project)
 
         paths = []
         for name in os.listdir(settings.EXPORT_DIR):
@@ -376,6 +377,7 @@ class ExportListAPI(generics.ListCreateAPIView):
             self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
+        ensure_project_manage(self.request.user, project)
         return project
 
     def perform_create(self, serializer):
@@ -474,6 +476,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
             self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
+        ensure_project_manage(self.request.user, project)
         return project
 
     def get_queryset(self):
@@ -695,7 +698,9 @@ class ExportConvertAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
 
     def post(self, request, *args, **kwargs):
-        snapshot = self.get_object()
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, project)
+        snapshot = generics.get_object_or_404(Export.objects.filter(project=project), pk=self.kwargs['export_pk'])
         serializer = ExportConvertSerializer(data=request.data, context={'project': snapshot.project})
         serializer.is_valid(raise_exception=True)
         export_type = serializer.validated_data['export_type']

@@ -2,7 +2,11 @@
 
 from unittest.mock import patch
 
-from data_export.models import Export
+import io
+import os
+
+from data_export.models import ConvertedFormat, Export
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.test import override_settings
 from django.urls import reverse
@@ -109,3 +113,93 @@ class ExportAccessTests(APITestCase):
         self.assertEqual(downloaded.status_code, 403)
         self.assertEqual(opened, [])
         self.assertTrue(Export.objects.filter(id=export.id).exists())
+
+    def test_member_cannot_list_delete_or_convert_exports(self):
+        world = make_access_world()
+        existing = Export.objects.create(project=world.project_1, created_by=world.creator)
+        hidden = Export.objects.create(project=world.project_2, created_by=world.owner)
+        exports_before = Export.objects.count()
+        conversions_before = ConvertedFormat.objects.count()
+        self.client.force_authenticate(world.member_a)
+        own_detail = reverse(
+            'data_export:api-projects:project-exports-detail',
+            kwargs={'pk': world.project_1.id, 'export_pk': existing.id},
+        )
+        hidden_detail = reverse(
+            'data_export:api-projects:project-exports-detail',
+            kwargs={'pk': world.project_2.id, 'export_pk': hidden.id},
+        )
+        own_convert = reverse(
+            'data_export:api-projects:project-exports-convert',
+            kwargs={'pk': world.project_1.id, 'export_pk': existing.id},
+        )
+        hidden_convert = reverse(
+            'data_export:api-projects:project-exports-convert',
+            kwargs={'pk': world.project_2.id, 'export_pk': hidden.id},
+        )
+
+        with patch('data_export.api.start_job_async_or_sync') as enqueue:
+            listed = self.client.get(_export_list_url(world.project_1))
+            hidden_list = self.client.get(_export_list_url(world.project_2))
+            detail = self.client.get(own_detail)
+            deleted = self.client.delete(own_detail)
+            hidden_detail_response = self.client.get(hidden_detail)
+            hidden_delete = self.client.delete(hidden_detail)
+            converted = self.client.post(own_convert, {'export_type': 'CSV'}, format='json')
+            hidden_converted = self.client.post(hidden_convert, {'export_type': 'CSV'}, format='json')
+
+        self.assertEqual(listed.status_code, 403, listed.content)
+        self.assertEqual(hidden_list.status_code, 404, hidden_list.content)
+        self.assertEqual(detail.status_code, 403, detail.content)
+        self.assertEqual(deleted.status_code, 403, getattr(deleted, 'content', b''))
+        self.assertEqual(hidden_detail_response.status_code, 404, hidden_detail_response.content)
+        self.assertEqual(hidden_delete.status_code, 404, getattr(hidden_delete, 'content', b''))
+        self.assertEqual(converted.status_code, 403, converted.content)
+        self.assertEqual(hidden_converted.status_code, 404, hidden_converted.content)
+        self.assertEqual(Export.objects.count(), exports_before)
+        self.assertTrue(Export.objects.filter(id=existing.id).exists())
+        self.assertTrue(Export.objects.filter(id=hidden.id).exists())
+        self.assertEqual(ConvertedFormat.objects.count(), conversions_before)
+        enqueue.assert_not_called()
+
+    def test_member_cannot_sync_export_or_list_export_files(self):
+        world = make_access_world()
+        self.client.force_authenticate(world.member_a)
+        exports_before = Export.objects.count()
+        generated = []
+        listed_dirs = []
+        real_listdir = os.listdir
+
+        def fake_generate(*args, **kwargs):
+            generated.append(args)
+            return io.BytesIO(b'[]'), 'application/json', 'export.json'
+
+        def track_listdir(path):
+            if os.path.abspath(path) == os.path.abspath(settings.EXPORT_DIR):
+                listed_dirs.append(path)
+                return []
+            return real_listdir(path)
+
+        with patch('data_export.api.DataExport.generate_export_file', side_effect=fake_generate), patch(
+            'data_export.api.os.listdir', side_effect=track_listdir
+        ):
+            sync_export = self.client.get(
+                reverse('data_export:api-projects:project-export', kwargs={'pk': world.project_1.id})
+            )
+            hidden_sync = self.client.get(
+                reverse('data_export:api-projects:project-export', kwargs={'pk': world.project_2.id})
+            )
+            files = self.client.get(
+                reverse('data_export:api-projects:project-export-files', kwargs={'pk': world.project_1.id})
+            )
+            hidden_files = self.client.get(
+                reverse('data_export:api-projects:project-export-files', kwargs={'pk': world.project_2.id})
+            )
+
+        self.assertEqual(sync_export.status_code, 403)
+        self.assertEqual(hidden_sync.status_code, 404)
+        self.assertEqual(files.status_code, 403, getattr(files, 'content', b''))
+        self.assertEqual(hidden_files.status_code, 404, getattr(hidden_files, 'content', b''))
+        self.assertEqual(generated, [])
+        self.assertEqual(listed_dirs, [])
+        self.assertEqual(Export.objects.count(), exports_before)
