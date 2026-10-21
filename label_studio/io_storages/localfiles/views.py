@@ -14,6 +14,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpRe
 from drf_spectacular.utils import extend_schema
 from io_storages.localfiles.functions import build_local_files_path, is_within_storage
 from io_storages.localfiles.models import LocalFilesImportStorage
+from projects.access import can_access_project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -100,14 +101,17 @@ def localfiles_data(request):
         localfiles_storage = LocalFilesImportStorage.objects.annotate(
             _full_path=Value(full_path_dir, output_field=CharField())
         ).filter(_full_path__startswith=F('path'))
+        accessible_storage = None
         if localfiles_storage.exists():
-            user_has_permissions = any(
-                is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
-                for storage in localfiles_storage
-            )
+            for storage in localfiles_storage:
+                if is_within_storage(full_path_dir, storage.path) and can_access_project(request.user, storage.project):
+                    accessible_storage = storage
+                    break
+            user_has_permissions = accessible_storage is not None
 
         # Check user permissions for this file and if it exists
         if user_has_permissions and os.path.exists(full_path):
+            request.user.project = accessible_storage.project
             # Detect mime type and encoding
             return build_localfile_response(
                 request=request,

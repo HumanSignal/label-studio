@@ -131,13 +131,20 @@ class ModelProviderConnection(models.Model):
         help_text='Budget alert threshold for the given provider connection',
     )
 
-    # Check if user is Admin or Owner
-    # This will need to be updated if we ever use this model in LSO as `is_owner` and
-    # `is_administrator` only exist in LSE
     def has_permission(self, user):
-        return (
-            user.is_administrator or user.is_owner or user.is_manager
-        ) and user.active_organization_id == self.organization_id
+        """Allow only the owner of this connection's organization.
+
+        Responsibility: provider credentials belong to the organization owner.
+
+        Boundary: a project creator who is not the organization owner is denied.
+        An inactive account, a missing organization, or a user outside the
+        organization is denied. Does not call ``user.has_perm``. Staff and
+        superuser flags are ignored.
+        """
+        from projects.action_permissions import ensure_org_owner
+
+        ensure_org_owner(user, self.organization)
+        return True
 
     def update_budget_total_spent_from_predictions_meta(self, predictions_meta: List[PredictionMeta]):
         total_cost = sum(meta.total_cost or 0 for meta in predictions_meta)

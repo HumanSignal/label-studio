@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
+from projects.access import can_access_project
 from projects.models import Project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework import serializers, status
@@ -66,6 +67,25 @@ def decode_react_code_token(token: str) -> dict:
     )
 
 
+def _allow_project_access(user, project) -> bool:
+    """Return whether this user may open the project before any file is served.
+
+    Responsibility: the project gate for ReactCode token and resolve requests.
+
+    Boundary: a saved project is decided by ``can_access_project``.
+    ``user.project`` is set only after that check succeeds. Unsaved stand-ins
+    keep ``has_permission``. Management permission is not granted. Does not
+    call ``user.has_perm``.
+    """
+    project_id = getattr(project, 'pk', None)
+    if isinstance(project_id, int) and not isinstance(project_id, bool):
+        if not can_access_project(user, project):
+            return False
+        user.project = project
+        return True
+    return bool(project.has_permission(user))
+
+
 def _decode_fileuri(raw: str) -> str:
     """Decode a base64url or percent-encoded fileuri, returning the original string."""
     import base64
@@ -106,7 +126,7 @@ class ReactCodeTokenView(APIView):
         except Project.DoesNotExist:
             return Response({'detail': 'Project not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        if not project.has_permission(request.user):
+        if not _allow_project_access(request.user, project):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         ttl = serializer.validated_data['ttl']
@@ -173,7 +193,7 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         # bearer's current access to that project has to be re-checked on every request.
         # This must guard every branch below — the local-upload branch used to run first
         # and served bytes without ever reaching this check.
-        if not project.has_permission(user):
+        if not _allow_project_access(user, project):
             return _add_cors_headers(Response(status=status.HTTP_403_FORBIDDEN))
 
         decoded_fileuri = _decode_fileuri(fileuri)

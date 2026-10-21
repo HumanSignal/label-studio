@@ -5,14 +5,60 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from projects import models as project_models
+from projects.access import manageable_project_filter
+from projects.action_permissions import ensure_org_owner, ensure_project_manage
 from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Webhook, WebhookAction
 from .serializers import WebhookSerializer, WebhookSerializerForUpdate
+
+
+def _webhook_project_reassigned(data, current_project_id) -> bool:
+    """Return whether an update moves a webhook onto another project.
+
+    Responsibility: detect a project change before the webhook serializer saves.
+
+    Boundary: an omitted project field is not a change. Clearing a project
+    webhook, or pointing it at a different id, is a change. This does not
+    persist the row.
+    """
+    if not hasattr(data, '__contains__') or 'project' not in data:
+        return False
+    raw = data.get('project')
+    if raw in (None, ''):
+        return current_project_id is not None
+    try:
+        return int(raw) != current_project_id
+    except (TypeError, ValueError):
+        return True
+
+
+def _authorize_webhook_target(user, project_value):
+    """Require the organization owner or a manager of the named project.
+
+    Responsibility: authorize a webhook save before serializer validation.
+
+    Boundary: a missing project is an organization webhook and requires the
+    organization owner. An unknown project is ``NotFound``. A visible project
+    the user cannot manage is ``PermissionDenied``. ``user.project`` is set
+    only after a project check succeeds. Does not call ``user.has_perm``.
+    """
+    if project_value in (None, ''):
+        ensure_org_owner(user, user.active_organization)
+        return None
+    try:
+        project = project_models.Project.objects.filter(pk=project_value).first()
+    except (TypeError, ValueError):
+        raise ValidationError('Select a project in this organization.')
+    if project is None:
+        raise NotFound()
+    ensure_project_manage(user, project)
+    user.project = project
+    return project
 
 
 class WebhookFilterSet(django_filters.FilterSet):
@@ -67,17 +113,45 @@ class WebhookListAPI(generics.ListCreateAPIView):
     )
 
     def get_queryset(self):
-        return Webhook.objects.filter(organization=self.request.user.active_organization)
+        user = self.request.user
+        organization = user.active_organization
+        queryset = Webhook.objects.filter(organization=organization)
+        project_param = self.request.query_params.get('project')
+        if project_param in ('', 'null', 'isnull'):
+            ensure_org_owner(user, organization)
+            return queryset.filter(project__isnull=True)
+        if project_param is None:
+            try:
+                ensure_org_owner(user, organization)
+            except PermissionDenied:
+                managed = project_models.Project.objects.filter(manageable_project_filter(user))
+                return queryset.filter(project__in=managed)
+            except NotFound:
+                return queryset.none()
+            return queryset
+        project = generics.get_object_or_404(project_models.Project, pk=project_param)
+        ensure_project_manage(user, project)
+        user.project = project
+        return queryset.filter(project=project)
+
+    def create(self, request, *args, **kwargs):
+        project_value = request.data.get('project') if hasattr(request.data, 'get') else None
+        if hasattr(request.data, '__contains__') and 'project' not in request.data:
+            project_value = None
+        _authorize_webhook_target(request.user, project_value)
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        from rest_framework.exceptions import PermissionDenied
-
         project = serializer.validated_data.get('project')
-        if project is None or project.organization_id != self.request.user.active_organization.id:
-            raise NotFound('Project not found.')
-        if not project.has_permission(self.request.user):
-            raise PermissionDenied('You do not have permission to create webhooks for this project.')
-        serializer.save(organization=self.request.user.active_organization)
+        organization = self.request.user.active_organization
+        if project is None:
+            ensure_org_owner(self.request.user, organization)
+        else:
+            if project.organization_id != organization.id:
+                raise NotFound('Project not found.')
+            ensure_project_manage(self.request.user, project)
+            self.request.user.project = project
+        serializer.save(organization=organization)
 
 
 @method_decorator(
@@ -146,6 +220,31 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Webhook.objects.filter(organization=self.request.user.active_organization)
+
+    def get_object(self):
+        """Return one webhook after the organization or project check.
+
+        Responsibility: this view sets ``permission_classes`` to authentication
+        only, so the management check has to run here.
+
+        Boundary: an unbound webhook requires the organization owner. A project
+        webhook requires management of that project. A hidden project is
+        ``NotFound``. ``request.user.project`` is set only after a project
+        check succeeds. Does not call ``user.has_perm``.
+        """
+        webhook = super().get_object()
+        if webhook.project_id is None:
+            ensure_org_owner(self.request.user, webhook.organization)
+            return webhook
+        ensure_project_manage(self.request.user, webhook.project)
+        self.request.user.project = webhook.project
+        return webhook
+
+    def update(self, request, *args, **kwargs):
+        webhook = self.get_object()
+        if _webhook_project_reassigned(request.data, webhook.project_id):
+            raise ValidationError('The project cannot be changed.')
+        return super().update(request, *args, **kwargs)
 
 
 @method_decorator(

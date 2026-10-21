@@ -18,7 +18,8 @@ from rest_framework.views import APIView
 from tasks.models import Task
 
 from label_studio.io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
-from label_studio.io_storages.utils import parse_range
+from label_studio.io_storages.localfiles.functions import key_within_prefix
+from label_studio.io_storages.utils import parse_bucket_uri, parse_range
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,52 @@ def get_streamer_storage_type(storage):
     return None
 
 
+def _unsafe_object_key(key: str) -> bool:
+    """Return whether a cloud object key is absolute or contains a parent segment.
+
+    Responsibility: separate malformed keys from keys that are merely outside a prefix.
+
+    Boundary: empty keys, keys that start with ``/``, and keys with a ``..``
+    segment are unsafe. This does not sign a URL.
+    """
+    if not isinstance(key, str) or key == '':
+        return True
+    normalized = key.replace('\\', '/')
+    if normalized.startswith('/'):
+        return True
+    parts = [part for part in normalized.split('/') if part != '']
+    if '..' in parts:
+        return True
+    head = normalized.split('/', 1)[0]
+    return ':' in head
+
+
+def storage_key_boundary_response(storage, fileuri):
+    """Return 400 or 404 when a cloud key leaves the storage prefix.
+
+    Responsibility: stop URI resolution before a URL is signed or bytes are proxied.
+
+    Boundary: ``..`` and absolute keys are 400. A key outside the configured
+    prefix, including an empty prefix, is 404. Storages without a URL scheme are
+    left to the existing resolver. This does not sign a URL.
+    """
+    scheme = getattr(storage, 'url_scheme', None)
+    if not isinstance(scheme, str) or not scheme:
+        return None
+    uri = parse_bucket_uri(fileuri, storage)
+    if uri is None:
+        return None
+    key = uri.path
+    if _unsafe_object_key(key):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    prefix = getattr(storage, 'prefix', None)
+    if not isinstance(prefix, str):
+        prefix = ''
+    if not key_within_prefix(key, prefix):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    return None
+
+
 class ResolveStorageUriAPIMixin:
     def resolve(self, request: HttpRequest, fileuri: str, instance: Union[Task, Project]) -> Response:
         model_name = type(instance).__name__
@@ -98,6 +145,9 @@ class ResolveStorageUriAPIMixin:
         if not storage:
             logger.error(f'Could not find storage for URI {fileuri}')
             return Response(status=status.HTTP_404_NOT_FOUND)
+        boundary = storage_key_boundary_response(storage, fileuri)
+        if boundary is not None:
+            return boundary
         # Not all storages support presigned URLs
         if not hasattr(storage, 'presign'):
             logger.error(f'Storage {storage} does not support presign URLs')

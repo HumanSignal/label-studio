@@ -5,7 +5,9 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from io_storages.base_models import ImportStorage
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from projects.action_permissions import ensure_project_manage
+from projects.models import Project
+from rest_framework.exceptions import ValidationError
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
 from .gcs.api import GCSExportStorageListAPI, GCSImportStorageListAPI
@@ -39,11 +41,21 @@ def validate_storage_instance(request, serializer_class):
 
     storage_id = request.data.get('id')
     instance = None
+    project = None
 
     if storage_id:
         instance = get_object_or_404(serializer_class.Meta.model.objects.all(), pk=storage_id)
-        if not instance.has_permission(request.user):
-            raise PermissionDenied()
+        project = instance.project
+    else:
+        project_id = request.data.get('project')
+        if project_id not in (None, ''):
+            try:
+                project = Project.objects.filter(pk=project_id).first()
+            except (TypeError, ValueError):
+                project = None
+    if project is not None:
+        ensure_project_manage(request.user, project)
+        request.user.project = project
 
     # combine instance fields with request.data
     serializer = serializer_class(data=request.data)
