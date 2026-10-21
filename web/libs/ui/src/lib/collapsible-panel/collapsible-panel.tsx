@@ -26,6 +26,8 @@ export type CollapsiblePanelProps = {
   disableToggle?: boolean;
   /** Test ID for the panel container */
   dataTestId?: string;
+  /** Name used in the toggle's accessible label, e.g. "Expand Languages" */
+  toggleLabel?: string;
 };
 
 export const CollapsiblePanel = ({
@@ -40,6 +42,7 @@ export const CollapsiblePanel = ({
   onExpandedChange,
   disableToggle = false,
   dataTestId,
+  toggleLabel = "panel",
 }: CollapsiblePanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
 
@@ -100,7 +103,7 @@ export const CollapsiblePanel = ({
             disableToggle && "opacity-40 cursor-not-allowed pointer-events-none",
           )}
           disabled={disableToggle}
-          aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
+          aria-label={`${isExpanded ? "Collapse" : "Expand"} ${toggleLabel}`}
           aria-expanded={isExpanded}
           data-testid="collapsible-panel-toggle"
         >
