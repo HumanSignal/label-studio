@@ -27,6 +27,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
+from projects.action_permissions import ensure_project_manage
 from projects.functions.next_task import get_next_task
 from projects.functions.search import search_projects
 from projects.functions.stream_history import get_label_stream_history
@@ -695,10 +696,12 @@ class _ProjectImportJobMixin:
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
-        return generics.get_object_or_404(
+        project = generics.get_object_or_404(
             self.project_model.objects.for_user(self.request.user),
             pk=project_pk,
         )
+        ensure_project_manage(self.request.user, project)
+        return project
 
     def get_queryset(self):
         return super().get_queryset().filter(project=self._get_project())

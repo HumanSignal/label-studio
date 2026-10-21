@@ -19,6 +19,7 @@ from django.http import FileResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from projects.action_permissions import ensure_project_manage
 from projects.models import Project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework import generics, status
@@ -304,7 +305,8 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        project = generics.get_object_or_404(Project, pk=pk)
+        ensure_project_manage(request.user, project)
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
@@ -377,11 +379,12 @@ class ExportListAPI(generics.ListCreateAPIView):
         return project
 
     def perform_create(self, serializer):
+        project = self._get_project()
+        ensure_project_manage(self.request.user, project)
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
 
-        project = self._get_project()
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -547,6 +550,8 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
         return super().get_queryset().filter(project=project)
 
     def get(self, request, *args, **kwargs):
+        project = self._get_project()
+        ensure_project_manage(request.user, project)
         snapshot = self.get_object()
         export_type = request.GET.get('exportType')
 
