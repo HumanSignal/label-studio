@@ -18,7 +18,7 @@ If you are using Label Studio Enterprise Cloud, all upgrades and updates are aut
 If you are using the on-premises version of Label Studio, you will need to take additional steps. 
 
 !!! attention "Release support lifecycle"
-    Each Label Studio Enterprise on-premises release version is supported for up to 12 months from its release date. After this period, please contact your HumanSignal representative to upgrade to a currently supported release.
+    All releases from the last 12 months are supported: you can report bugs against them, and we fix those bugs in the current or an upcoming release, so you might need to upgrade to get a fix. Security patches are released only for the current minor release and the previous minor release. To keep receiving security fixes, stay on one of the two most recent minor releases. For help planning an upgrade, contact your HumanSignal representative.
 
 ## Upgrade process overview
 
