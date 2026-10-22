@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ "ubuntu-latest", "windows-latest" ]
-        python-version: [ "3.13" ]
+        python-version: [ "3.14" ]
         include:
           - os: "ubuntu-latest"
             pip-cache-path: "~/.cache/pip"
@@ -47,7 +47,7 @@ jobs:
       - name: "Set up uv"
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 

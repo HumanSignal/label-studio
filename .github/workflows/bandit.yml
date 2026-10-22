@@ -9,7 +9,7 @@ on:
 
 env:
   PROJECT_PATH: 'label_studio'
-  PYTHON_VERSION: '3.13'
+  PYTHON_VERSION: '3.14'
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
