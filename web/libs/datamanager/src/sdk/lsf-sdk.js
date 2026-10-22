@@ -740,7 +740,9 @@ export class LSFWrapper {
         currentUserId,
         canManage,
       );
-      annotation.setEditable?.(editable);
+      // Only tighten. View All already set editable=false before selectAnnotation;
+      // calling setEditable(true) would reopen that read-only mode.
+      if (!editable) annotation.setEditable?.(false);
     }
   }
 

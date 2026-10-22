@@ -4,8 +4,54 @@ type AnnotationLike = {
   completed_by?: AnnotationOwner;
 };
 
-let projectAccessHeld = false;
-const holdListeners = new Set<() => void>();
+/** Shared across bundles. Data Manager and ApiProvider must see the same hold. */
+export const PROJECT_ACCESS_HELD_KEY = "__labelStudioProjectAccessHeld";
+const PROJECT_ACCESS_PROJECT_KEY = "__labelStudioProjectAccessProjectId";
+const PROJECT_ACCESS_WATCH_KEY = "__labelStudioProjectAccessPathWatch";
+
+export const PROJECT_ACCESS_HELD_EVENT = "label-studio:project-access-held";
+const PROJECT_ACCESS_RELEASED_EVENT = "label-studio:project-access-released";
+
+const BLOCKED_HTTP_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
+
+type SharedWindow = Window & Record<string, unknown>;
+
+function sharedWindow(): SharedWindow | null {
+  if (typeof window === "undefined") return null;
+  return window as SharedWindow;
+}
+
+function projectIdFromPathname(pathname: string | null | undefined): string | null {
+  const match = /^\/projects\/([^/]+)/.exec(pathname ?? "");
+  return match?.[1] ?? null;
+}
+
+function installPathnameWatch(): void {
+  const target = sharedWindow();
+  const browserHistory = target?.history;
+  if (!target || !browserHistory || target[PROJECT_ACCESS_WATCH_KEY]) return;
+  target[PROJECT_ACCESS_WATCH_KEY] = true;
+
+  const notify = () => {
+    syncProjectAccessHoldToPathname(window.location?.pathname ?? "");
+  };
+  const originalPush = browserHistory.pushState.bind(browserHistory);
+  const originalReplace = browserHistory.replaceState.bind(browserHistory);
+
+  browserHistory.pushState = ((...args: Parameters<History["pushState"]>) => {
+    originalPush(...args);
+    notify();
+  }) as History["pushState"];
+
+  browserHistory.replaceState = ((...args: Parameters<History["replaceState"]>) => {
+    originalReplace(...args);
+    notify();
+  }) as History["replaceState"];
+
+  window.addEventListener("popstate", notify);
+}
+
+installPathnameWatch();
 
 /**
  * Whether the current user may edit this annotation.
@@ -37,17 +83,66 @@ export function shouldHoldProjectAccessDenied(pathname: string, status: number):
 }
 
 export function isProjectAccessHeld(): boolean {
-  return projectAccessHeld;
+  return sharedWindow()?.[PROJECT_ACCESS_HELD_KEY] === true;
 }
 
 export function holdProjectAccessDenied(): void {
-  projectAccessHeld = true;
-  for (const listener of holdListeners) listener();
+  const target = sharedWindow();
+  if (!target) return;
+  installPathnameWatch();
+  target[PROJECT_ACCESS_HELD_KEY] = true;
+  target[PROJECT_ACCESS_PROJECT_KEY] = projectIdFromPathname(window.location?.pathname ?? "");
+  window.dispatchEvent(new Event(PROJECT_ACCESS_HELD_EVENT));
+}
+
+export function clearProjectAccessHold(): void {
+  const target = sharedWindow();
+  if (!target || target[PROJECT_ACCESS_HELD_KEY] !== true) return;
+  target[PROJECT_ACCESS_HELD_KEY] = false;
+  target[PROJECT_ACCESS_PROJECT_KEY] = null;
+  window.dispatchEvent(new Event(PROJECT_ACCESS_RELEASED_EVENT));
+}
+
+/** Drop the hold when the open project id changes. Same-project routes stay held. */
+export function syncProjectAccessHoldToPathname(pathname: string): void {
+  if (!isProjectAccessHeld()) return;
+  const heldFor = sharedWindow()?.[PROJECT_ACCESS_PROJECT_KEY] ?? null;
+  if (projectIdFromPathname(pathname) !== heldFor) clearProjectAccessHold();
+}
+
+/**
+ * While the project is held, block writes. Reads still run.
+ */
+export function shouldBlockRequestWhileProjectAccessHeld(httpMethod: string | null | undefined): boolean {
+  if (!isProjectAccessHeld()) return false;
+  return BLOCKED_HTTP_METHODS.has(String(httpMethod ?? "GET").toUpperCase());
+}
+
+/** HTTP verb from an ApiConfig endpoint (`"PATCH:/projects/:pk"` or `{ path, method }`). */
+export function httpMethodFromEndpoint(endpoint: unknown): string {
+  const source =
+    typeof endpoint === "string"
+      ? endpoint
+      : endpoint && typeof endpoint === "object" && "path" in endpoint
+        ? String((endpoint as { path?: unknown }).path ?? "")
+        : "";
+  const matched = /^(GET|POST|PATCH|PUT|DELETE|HEAD|OPTIONS):/i.exec(source);
+  if (matched) return matched[1].toUpperCase();
+  if (endpoint && typeof endpoint === "object" && "method" in endpoint && (endpoint as { method?: unknown }).method) {
+    return String((endpoint as { method: unknown }).method).toUpperCase();
+  }
+  return "GET";
 }
 
 export function subscribeProjectAccessHeld(listener: () => void): () => void {
-  holdListeners.add(listener);
+  const target = sharedWindow();
+  if (!target) return () => {};
+  installPathnameWatch();
+  const onChange = () => listener();
+  target.addEventListener(PROJECT_ACCESS_HELD_EVENT, onChange);
+  target.addEventListener(PROJECT_ACCESS_RELEASED_EVENT, onChange);
   return () => {
-    holdListeners.delete(listener);
+    target.removeEventListener(PROJECT_ACCESS_HELD_EVENT, onChange);
+    target.removeEventListener(PROJECT_ACCESS_RELEASED_EVENT, onChange);
   };
 }

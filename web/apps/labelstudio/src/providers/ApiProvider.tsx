@@ -14,7 +14,9 @@ import { FF_IMPROVE_GLOBAL_ERROR_MESSAGES, isFF } from "../utils/feature-flags";
 import { Button, ToastType, useToast } from "@humansignal/ui";
 import {
   holdProjectAccessDenied,
+  httpMethodFromEndpoint,
   isProjectAccessHeld,
+  shouldBlockRequestWhileProjectAccessHeld,
   shouldHoldProjectAccessDenied,
   subscribeProjectAccessHeld,
 } from "@humansignal/core/lib/utils/project-access-ui";
@@ -35,7 +37,9 @@ const apiInstance = createApiInstance({
 
 const originalInvoke = apiInstance.invoke.bind(apiInstance);
 apiInstance.invoke = ((method, params, options) => {
-  if (isProjectAccessHeld()) return Promise.resolve(null);
+  const name = String(method).replace(/Raw$/, "");
+  const httpMethod = httpMethodFromEndpoint((API_CONFIG.endpoints as Record<string, unknown>)[name]);
+  if (shouldBlockRequestWhileProjectAccessHeld(httpMethod)) return Promise.resolve(null);
   return originalInvoke(method, params, options);
 }) as typeof apiInstance.invoke;
 
@@ -87,7 +91,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
   const toast = useToast();
   const [accessHeld, setAccessHeld] = useState(isProjectAccessHeld());
 
-  useEffect(() => subscribeProjectAccessHeld(() => setAccessHeld(true)), []);
+  useEffect(() => subscribeProjectAccessHeld(() => setAccessHeld(isProjectAccessHeld())), []);
 
   /**
    * Handles errors with Label Studio-specific logic including:
