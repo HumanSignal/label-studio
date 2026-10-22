@@ -3,14 +3,6 @@
 import enum
 
 from core.permissions import ViewClassPermission
-from projects.access import (
-    can_access_project,
-    can_create_project,
-    can_manage_project,
-    can_modify_annotation,
-    user_is_active_account,
-)
-from projects.models import Project
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import BasePermission
 
@@ -163,6 +155,8 @@ def ensure_project_visible(user, project) -> None:
     ``NotFound``. Staff and superuser flags are ignored. Does not call
     ``user.has_perm``.
     """
+    from projects.access import can_access_project
+
     if not can_access_project(user, project):
         raise NotFound()
 
@@ -177,6 +171,8 @@ def ensure_project_manage(user, project) -> None:
     A member who can annotate but not manage gets ``PermissionDenied``. Does
     not call ``user.has_perm``.
     """
+    from projects.access import can_manage_project
+
     ensure_project_visible(user, project)
     if not can_manage_project(user, project):
         raise PermissionDenied()
@@ -190,6 +186,8 @@ def ensure_can_create_project(user) -> None:
     Boundary: delegates to ``can_create_project``. There is no project id to
     hide, so a non-owner is 403. Does not call ``user.has_perm``.
     """
+    from projects.access import can_create_project
+
     if not can_create_project(user):
         raise PermissionDenied()
 
@@ -206,6 +204,8 @@ def ensure_org_owner(user, organization) -> None:
     who is not ``organization.created_by`` is ``PermissionDenied``. Does not
     call ``user.has_perm``.
     """
+    from projects.access import user_is_active_account
+
     org_id = getattr(organization, 'pk', None)
     if org_id is None or not user_is_active_account(user):
         raise NotFound()
@@ -224,10 +224,10 @@ class ProjectActionPermission(BasePermission):
     ``ProjectActionsAPI`` exceptions, and enforce the mapped action when the
     target object is known.
 
-    Boundary: does not call ``user.has_perm`` and is not part of
-    ``DEFAULT_PERMISSION_CLASSES`` yet. A missing mapping is denied. Project
-    visibility failures raise ``NotFound``; a visible project with the wrong
-    action raises ``PermissionDenied``.
+    Boundary: does not call ``user.has_perm``. A missing mapping is denied.
+    Project visibility failures raise ``NotFound``; a visible project with the
+    wrong action raises ``PermissionDenied``. This class is installed on
+    ``DEFAULT_PERMISSION_CLASSES``.
     """
 
     def has_permission(self, request, view):
@@ -237,6 +237,8 @@ class ProjectActionPermission(BasePermission):
         if action is None:
             return False
         if action is Action.CREATE_PROJECT:
+            from projects.access import can_create_project
+
             return can_create_project(getattr(request, 'user', None))
         if action is Action.ORG_OWNER:
             user = getattr(request, 'user', None)
@@ -347,6 +349,8 @@ def _resolve_request_action(view, request, obj):
 
 
 def _project_of(obj):
+    from projects.models import Project
+
     if isinstance(obj, Project):
         return obj
     project = getattr(obj, 'project', None)
@@ -445,6 +449,8 @@ def _enforce_annotation_write(user, annotation) -> None:
     Boundary: no project access is ``NotFound``. Access without authorship or
     management is ``PermissionDenied``.
     """
+    from projects.access import can_access_project, can_modify_annotation
+
     project = _project_of(annotation)
     if project is None or not can_access_project(user, project):
         raise NotFound()

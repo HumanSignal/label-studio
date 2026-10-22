@@ -1,3 +1,4 @@
+from core.views import MappedAPIRootView
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -6,6 +7,7 @@ from . import api
 app_name = 'labels_manager'
 
 router = DefaultRouter()
+router.APIRootView = MappedAPIRootView
 router.register(r'labels', api.LabelAPI, basename='label')
 router.register(r'label_links', api.LabelLinkAPI, basename='label_link')
 api_urlpatterns = router.urls

@@ -7,6 +7,7 @@ from django import forms
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from projects.action_permissions import ProjectActionPermission
 from projects.models import ProjectHotkeyPreference
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
@@ -158,6 +159,30 @@ class UserAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return User.objects.filter(organizations=self.request.user.active_organization)
+
+    def get_object(self):
+        """Load one user and check the declared action on a resolvable object.
+
+        Responsibility: PATCH of another account is ``PermissionDenied`` before
+        a self check can hide that account.
+
+        Boundary: PATCH checks the user row (``organizations.view``). Other
+        methods check the caller's active organization, because
+        ``organizations.change`` cannot resolve a ``User``. Avatar actions
+        check the caller. Does not call ``user.has_perm``.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        obj = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
+        if self.request.method == 'PATCH' and obj.pk != self.request.user.pk:
+            raise PermissionDenied()
+        if self.request.method == 'PATCH':
+            self.check_object_permissions(self.request, obj)
+        elif getattr(self, 'action', None) == 'avatar':
+            self.check_object_permissions(self.request, self.request.user)
+        else:
+            self.check_object_permissions(self.request, self.request.user.active_organization)
+        return obj
 
     @extend_schema(exclude=True)
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)
@@ -334,7 +359,8 @@ class UserGetTokenAPI(APIView):
 class UserWhoAmIAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.organizations_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
     serializer_class = WhoAmIUserSerializer
 
     def get_object(self):
@@ -406,7 +432,8 @@ _hotkey_access_error_responses = {
     ),
 )
 class UserHotkeysAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_required = all_permissions.organizations_view
+    permission_classes = [IsAuthenticated, ProjectActionPermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def get(self, request, *args, **kwargs):

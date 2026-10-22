@@ -99,6 +99,7 @@ class LabelAPI(viewsets.ModelViewSet):
     permission_required = ViewClassPermission(
         GET=all_permissions.labels_view,
         POST=all_permissions.labels_create,
+        PUT=all_permissions.labels_change,
         PATCH=all_permissions.labels_change,
         DELETE=all_permissions.labels_delete,
     )
@@ -207,6 +208,7 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     permission_required = ViewClassPermission(
         GET=all_permissions.labels_view,
         POST=all_permissions.labels_create,
+        PUT=all_permissions.labels_change,
         PATCH=all_permissions.labels_change,
         DELETE=all_permissions.labels_delete,
     )

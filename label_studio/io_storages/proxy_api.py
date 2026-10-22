@@ -5,9 +5,11 @@ import time
 from typing import Union
 from urllib.parse import unquote, urlparse
 
+from core.permissions import all_permissions
 from core.utils.common import load_func
 from core.utils.exceptions import extract_message
 from django.conf import settings
+from projects.action_permissions import ProjectActionPermission
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from drf_spectacular.utils import extend_schema
 from projects.models import Project
@@ -445,7 +447,8 @@ class TaskResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
     """
 
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.tasks_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
 
     def get(self, request, *args, **kwargs):
         """Get the presigned url for a given fileuri or proxy data through Label Studio"""
@@ -473,7 +476,8 @@ class ProjectResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
     """
 
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.projects_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
 
     def get(self, request, *args, **kwargs):
         """Get the presigned url for a given fileuri or proxy data through Label Studio"""

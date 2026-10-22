@@ -11,7 +11,9 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
+from core.permissions import all_permissions
 from projects.access import can_access_project
+from projects.action_permissions import ProjectActionPermission
 from projects.models import Project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework import serializers, status
@@ -114,7 +116,8 @@ class ReactCodeTokenView(APIView):
     """
 
     http_method_names = ['post']
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.projects_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
 
     def post(self, request, *args, **kwargs):
         serializer = ReactCodeTokenSerializer(data=request.data)
@@ -144,7 +147,10 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
     """
 
     http_method_names = ['get', 'options']
-    permission_classes = ()
+    permission_required = all_permissions.tasks_view
+    # The token in the URL is the credential. tasks.view is project access,
+    # which allows the request to reach the token check. Session auth stays off.
+    permission_classes = (ProjectActionPermission,)
     authentication_classes = ()
     throttle_classes = ()
 

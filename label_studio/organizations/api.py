@@ -4,6 +4,7 @@ import logging
 
 from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
+from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import load_func
 from django.conf import settings
 from django.urls import reverse
@@ -21,7 +22,7 @@ from organizations.serializers import (
     OrganizationSerializer,
 )
 from projects.access import visible_projects
-from projects.action_permissions import ensure_org_owner
+from projects.action_permissions import ProjectActionPermission, ensure_org_owner
 from projects.models import Project
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -35,7 +36,6 @@ from rest_framework.views import APIView
 from tasks.models import Annotation
 from users.models import User
 
-from label_studio.core.permissions import ViewClassPermission, all_permissions
 from label_studio.core.utils.params import bool_from_request
 
 logger = logging.getLogger(__name__)
@@ -301,7 +301,7 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
     @property
     def permission_classes(self):
         if self.request.method == 'DELETE':
-            return [IsAuthenticated, HasObjectPermission]
+            return [IsAuthenticated, HasObjectPermission, ProjectActionPermission]
         return api_settings.DEFAULT_PERMISSION_CLASSES
 
     def get_queryset(self):
@@ -315,9 +315,17 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
         }
 
     def get(self, request, pk, user_pk):
+        """Return one membership after the parent organization check.
+
+        Responsibility: read a member of the organization in the URL.
+
+        Boundary: ``parent_object`` already runs object permissions on the
+        organization. Checking the membership row would treat
+        ``organizations.view`` as a self action and hide every other member.
+        Does not call ``user.has_perm``.
+        """
         queryset = self.get_queryset()
         member = get_object_or_404(queryset, user=user_pk)
-        self.check_object_permissions(request, member)
         serializer = self.get_serializer(member)
         return Response(serializer.data)
 

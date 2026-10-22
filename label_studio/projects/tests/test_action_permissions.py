@@ -378,10 +378,10 @@ class ActionPermissionTests(TestCase):
                 permission.has_permission(member_request, org_view)
             self.assertTrue(permission.has_permission(member_request, self_view))
 
-    def test_action_permission_is_not_installed_by_default(self):
+    def test_action_permission_is_installed_by_default(self):
         from django.conf import settings
 
-        self.assertNotIn(
+        self.assertIn(
             'projects.action_permissions.ProjectActionPermission',
             settings.REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES'],
         )

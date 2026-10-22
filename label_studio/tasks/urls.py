@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+from core.views import MappedAPIRootView
 from django.urls import include, path
 from rest_framework import routers
 
@@ -8,6 +9,7 @@ from . import api
 app_name = 'tasks'
 
 router = routers.DefaultRouter()
+router.APIRootView = MappedAPIRootView
 router.register(r'predictions', api.PredictionAPI, basename='prediction')
 
 _api_urlpatterns = [

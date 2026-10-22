@@ -85,6 +85,17 @@ class JWTSettingsAPI(CreateAPIView):
 
 
 class DecoratedTokenRefreshView(TokenRefreshView):
+    """Exchange a refresh token for an access token.
+
+    Responsibility: declare ``users.token.any`` so this view is mapped.
+
+    Boundary: ``permission_classes`` stay empty. The refresh token in the body
+    is the credential, and the action class would reject the anonymous caller
+    before that token is read. Does not call ``user.has_perm``.
+    """
+
+    permission_required = all_permissions.users_token_any
+
     @extend_schema(
         tags=['JWT'],
         summary='Refresh JWT token',
@@ -191,6 +202,15 @@ class LSAPITokenView(generics.ListCreateAPIView):
 
 
 class LSTokenBlacklistView(TokenViewBase):
+    """Blacklist a refresh token presented in the request body.
+
+    Responsibility: declare ``users.token.any`` so this view is mapped.
+
+    Boundary: ``permission_classes`` stay empty. The token in the body is the
+    credential. Does not call ``user.has_perm``.
+    """
+
+    permission_required = all_permissions.users_token_any
     _serializer_class = 'jwt_auth.serializers.LSAPITokenBlacklistSerializer'
 
     @extend_schema(

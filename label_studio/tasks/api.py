@@ -1505,7 +1505,13 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
 class PredictionAPI(viewsets.ModelViewSet):
     queryset = Prediction.objects.none()
     serializer_class = PredictionSerializer
-    permission_required = all_permissions.predictions_any
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.predictions_any,
+        PUT=all_permissions.predictions_any,
+        PATCH=all_permissions.predictions_any,
+        DELETE=all_permissions.predictions_any,
+    )
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['task', 'task__project', 'project']
 
@@ -1541,7 +1547,12 @@ class PredictionAPI(viewsets.ModelViewSet):
     ),
 )
 class AnnotationConvertAPI(generics.RetrieveAPIView):
-    permission_required = ViewClassPermission(POST=all_permissions.annotations_change)
+    # POST stays project access. can_convert still rejects another user's
+    # submitted annotation and allows taking over a skip.
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        POST=all_permissions.annotations_create,
+    )
     queryset = Annotation.objects.all()
 
     def process_intermediate_state(self, annotation, draft):

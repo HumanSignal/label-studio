@@ -8,8 +8,10 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from core.permissions import all_permissions
 from django.conf import settings
 from django.db.models import CharField, F, Value
+from projects.action_permissions import ProjectActionPermission
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotModified
 from drf_spectacular.utils import extend_schema
 from io_storages.localfiles.functions import build_local_files_path, is_within_storage
@@ -80,7 +82,7 @@ Main view for serving files residing under LocalFilesImportStorage roots with ET
 
 @extend_schema(exclude=True)
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, ProjectActionPermission])
 def localfiles_data(request):
     """Serve files residing under LocalFilesImportStorage roots with ETag support."""
     path = request.GET.get('d')
@@ -122,3 +124,7 @@ def localfiles_data(request):
             return HttpResponseNotFound()
 
     return HttpResponseForbidden()
+
+
+# @api_view copies permission_classes onto its generated class, not permission_required.
+localfiles_data.cls.permission_required = all_permissions.projects_view

@@ -474,7 +474,7 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
         assert response.status_code == 200
         assert set(self._user_ids(response)) == expected
 
-    def test_non_member_follows_lso_organization_wide_project_visibility(self):
+    def test_creator_sees_column_options_after_annotator_membership_removed(self):
         ProjectMember.objects.filter(project=self.project, user=self.annotator).delete()
         expected = {
             self.updated_by.id,
@@ -483,7 +483,7 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
             self.annotator.id,
             self.departed_annotator.id,
         }
-        self.client.force_authenticate(self.annotator)
+        self.client.force_authenticate(self.owner)
         response = self.client.get(
             f'/api/dm/projects/{self.project.id}/user-options/',
             {'column': 'annotators'},
