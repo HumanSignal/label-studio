@@ -14,7 +14,7 @@
  * instance - and pass `EditorDeps` for the upload engine. The hook depends
  * only on structural types, so it is unit-testable with a fake engine.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import type { MediaCardPdfSource } from "./media-card";
 import {
   evaluateSubmissionRules,
@@ -139,7 +139,8 @@ export function submissionFacts(server: SubmissionServerMeta): string[] {
 
 export interface SubmissionEngine {
   rows: SubmissionUploadRow[];
-  upload(file: File): Promise<SubmissionUploadRow>;
+  /** Engines that predate `clientRef` ignore it and mint their own. */
+  upload(file: File, options?: { clientRef?: string }): Promise<SubmissionUploadRow>;
   retry(clientRef: string): Promise<SubmissionUploadRow | null>;
   cancel(clientRef: string): void;
   discard(uploadId: number): Promise<void>;
@@ -464,6 +465,7 @@ async function withCustomValidation(
 const EMPTY_RULES: SubmissionRules = {};
 
 let REJECT_SEQ = 0;
+let PICK_SEQ = 0;
 const REJECTION_MESSAGE = "This file doesn't meet the requirements. See the checks above and pick another file.";
 
 export function useCollectionSubmission(options: UseCollectionSubmissionOptions): CollectionSubmission {
@@ -539,6 +541,24 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
    * never resurrect them. */
   const removedUploadIds = useRef(new Set<string>());
   const pickedMetaByRef = useRef<Record<string, { meta: SubmissionFileMeta; url: string }>>({});
+  const [, rerenderPreviews] = useReducer((n: number) => n + 1, 0);
+  // The local preview is keyed to the row before the upload starts: a failure
+  // reported to the server settles long after the card first renders.
+  const startUpload = useCallback(
+    (engine: SubmissionEngine, file: File, picked: { meta: SubmissionFileMeta; url: string }) => {
+      const clientRef = `pick-${(PICK_SEQ += 1)}-${Date.now().toString(36)}`;
+      pickedMetaByRef.current[clientRef] = picked;
+      return engine.upload(file, { clientRef }).then((row) => {
+        if (row.clientRef !== clientRef) {
+          delete pickedMetaByRef.current[clientRef];
+          pickedMetaByRef.current[row.clientRef] = picked;
+          rerenderPreviews();
+        }
+        return row;
+      });
+    },
+    [],
+  );
   const replaceTargetRef = useRef<{
     regionId: string;
     index: number;
@@ -877,21 +897,19 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       const epoch = taskId;
       allowed.forEach((file) => {
         validateAndHandle(file, (validFile, meta, url) => {
-          engine
-            .upload(validFile)
+          startUpload(engine, validFile, { meta, url })
             .then((row) => {
               if (sessionTaskRef.current !== epoch) {
                 URL.revokeObjectURL(url);
                 return;
               }
-              pickedMetaByRef.current[row.clientRef] = { meta, url };
               attachRow(row, taskId);
             })
             .catch((err) => setError(uploadErrorMessage(err)));
         });
       });
     },
-    [readonly, getEngine, props.visibleRegions, rows, bounds.max, validateAndHandle, attachRow, taskId],
+    [readonly, getEngine, props.visibleRegions, rows, bounds.max, validateAndHandle, startUpload, attachRow, taskId],
   );
 
   // ---- replace ---------------------------------------------------------------
@@ -915,8 +933,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         };
         replacePendingRef.current = pendingEntry;
         const epoch = taskId;
-        engine
-          .upload(validFile)
+        startUpload(engine, validFile, { meta, url })
           .then((row) => {
             if (sessionTaskRef.current !== epoch) {
               URL.revokeObjectURL(url);
@@ -927,7 +944,6 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
             if (replacePendingRef.current === pendingEntry) {
               pendingEntry.clientRef = row.clientRef;
             }
-            pickedMetaByRef.current[row.clientRef] = { meta, url };
             attachRow(row, taskId);
           })
           .catch((err) => {
@@ -936,7 +952,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           });
       });
     },
-    [getEngine, validateAndHandle, attachRow, taskId],
+    [getEngine, validateAndHandle, startUpload, attachRow, taskId],
   );
 
   const replaceInput = useMemo(

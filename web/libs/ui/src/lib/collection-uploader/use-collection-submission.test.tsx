@@ -38,9 +38,11 @@ class FakeEngine {
   emit() {
     this.onChange(this.rows.map((r) => ({ ...r })));
   }
-  upload(file: File): Promise<SubmissionUploadRow> {
+  honorsClientRef = true;
+  deferResolve = false;
+  upload(file: File, options?: { clientRef?: string }): Promise<SubmissionUploadRow> {
     const row: SubmissionUploadRow = {
-      clientRef: `ref-${++SEQ}`,
+      clientRef: this.honorsClientRef && options?.clientRef ? options.clientRef : `ref-${++SEQ}`,
       uploadId: null,
       filename: file.name,
       size: file.size,
@@ -72,6 +74,11 @@ class FakeEngine {
     row.error = message;
     if (errorCode) row.errorCode = errorCode;
     this.emit();
+    // The real engine reports the failure to the server before it resolves.
+    if (!this.deferResolve) this.resolvers.get(clientRef)?.({ ...row });
+  }
+  settle(clientRef: string) {
+    const row = this.rows.find((r) => r.clientRef === clientRef)!;
     this.resolvers.get(clientRef)?.({ ...row });
   }
   retry(clientRef: string): Promise<SubmissionUploadRow | null> {
@@ -445,6 +452,35 @@ describe("submitted detection & capacity", () => {
     expect(member.message).toContain("already added this file");
     expect(member.onRetry).toBeUndefined();
     expect(member.onRemove).toBeDefined();
+  });
+
+  describe("local preview", () => {
+    it("shows the picked file while it uploads and after a failure that settles late", async () => {
+      const engine = new FakeEngine(() => undefined);
+      engine.deferResolve = true;
+      const { refs, Host } = makeHarness({ engine });
+      render(<Host />);
+      await act(async () => refs.api!.pick([pdf("a.pdf")]));
+      await waitFor(() => expect(engine.rows).toHaveLength(1));
+      await waitFor(() => expect(refs.api!.members[0].previewUrl).toBeTruthy());
+
+      await act(async () => engine.failRow(engine.rows[0].clientRef, "blocked", "storage_unreachable"));
+      expect(refs.api!.members[0].state).toBe("failed");
+      expect(refs.api!.members[0].previewUrl).toBeTruthy();
+    });
+
+    it("still shows the preview once an engine that ignores the chosen ref settles", async () => {
+      const engine = new FakeEngine(() => undefined);
+      engine.honorsClientRef = false;
+      engine.deferResolve = true;
+      const { refs, Host } = makeHarness({ engine });
+      render(<Host />);
+      await act(async () => refs.api!.pick([pdf("a.pdf")]));
+      await waitFor(() => expect(engine.rows).toHaveLength(1));
+      await act(async () => engine.failRow(engine.rows[0].clientRef, "blocked", "storage_unreachable"));
+      await act(async () => engine.settle(engine.rows[0].clientRef));
+      await waitFor(() => expect(refs.api!.members[0].previewUrl).toBeTruthy());
+    });
   });
 
   it("falls back to initialResults only when the upload capability is absent (B2)", async () => {
