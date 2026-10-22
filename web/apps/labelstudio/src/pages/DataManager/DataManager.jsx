@@ -310,17 +310,18 @@ DataManagerPage.context = ({ dmRef }) => {
         </Button>
       )}
 
-      {Object.entries(links).map(([path, label]) => (
-        <Link
-          key={path}
-          tag={NavLink}
-          className={buttonVariant({ size: "small", look: "outlined" })}
-          to={`/projects/${project.id}${path}`}
-          data-external
-        >
-          {label}
-        </Link>
-      ))}
+      {project.access?.can_manage !== false &&
+        Object.entries(links).map(([path, label]) => (
+          <Link
+            key={path}
+            tag={NavLink}
+            className={buttonVariant({ size: "small", look: "outlined" })}
+            to={`/projects/${project.id}${path}`}
+            data-external
+          >
+            {label}
+          </Link>
+        ))}
     </Space>
   ) : null;
 };

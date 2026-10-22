@@ -3,8 +3,10 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { CheckIcon, DotsThreeIcon, IconSparks, MinusIcon } from "@humansignal/icons";
-import { Userpic, Button, Dropdown, Tooltip } from "@humansignal/ui";
-import { Menu, Pagination } from "../../components";
+import { Userpic, Button, Dropdown, EmptyState, Tooltip } from "@humansignal/ui";
+import { IconFolder } from "@humansignal/icons";
+import { Menu } from "../../components/Menu/Menu";
+import { Pagination } from "../../components/Pagination/Pagination";
 import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { ProjectStateChip } from "@humansignal/app-common";
@@ -35,7 +37,21 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
   );
 };
 
-export const EmptyProjectsList = ({ openModal }) => {
+export const EmptyProjectsList = ({ openModal, canCreate = true }) => {
+  if (!canCreate) {
+    return (
+      <div className={cn("empty-projects-page").toClassName()}>
+        <EmptyState
+          icon={<IconFolder />}
+          title="暂无获授权的项目，请联系项目负责人"
+          description="获授权后，项目会显示在这里。"
+          size="large"
+          variant="neutral"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={cn("empty-projects-page").toClassName()}>
       <img
@@ -99,7 +115,9 @@ const ProjectCard = ({ project }) => {
               <Dropdown.Trigger
                 content={
                   <Menu contextual>
-                    <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
+                    {project.access?.can_manage !== false && (
+                      <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
+                    )}
                     <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
                   </Menu>
                 }

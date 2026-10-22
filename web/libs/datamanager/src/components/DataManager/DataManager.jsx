@@ -72,14 +72,18 @@ const ConnectedTabsItem = observer(function ConnectedTabsItem({ tab, ...props })
 const TabsSwitch = switchInjector(
   observer(({ sdk, views, tabs, selectedKey }) => {
     const editable = sdk.tabControls;
+    const canManageViews = sdk.project?.access?.can_manage !== false;
 
-    const onDragEnd = useCallback((result) => {
-      if (!result.destination) {
-        return;
-      }
+    const onDragEnd = useCallback(
+      (result) => {
+        if (!canManageViews || !result.destination) {
+          return;
+        }
 
-      views.updateViewOrder(result.source.index, result.destination.index);
-    }, []);
+        views.updateViewOrder(result.source.index, result.destination.index);
+      },
+      [canManageViews, views],
+    );
 
     return (
       <Tabs

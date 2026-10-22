@@ -1,5 +1,6 @@
 import type React from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { ProjectContext } from "./project-context";
 import { shallowEqualObjects } from "shallow-equal";
 import { addVisitedProject } from "@humansignal/core";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -19,8 +20,7 @@ type Context = {
   invalidateCache: () => void;
 };
 
-export const ProjectContext = createContext<Context>({} as Context);
-ProjectContext.displayName = "ProjectContext";
+export { ProjectContext };
 
 const projectCache = new Map<number, APIProject>();
 
