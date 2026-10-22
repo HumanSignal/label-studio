@@ -26,7 +26,7 @@ dependencies = [
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
     "django-debug-toolbar (==3.2.1)",
-    "django-environ (==0.10.0)",
+    "django-environ (==0.14.0)",
     "django-filter (==24.3)",
     "django-rq (>=4.1.1,<4.2)",
     "django-cors-headers (==4.7.0)",
@@ -73,11 +73,11 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "3a0a1cf970b7c5ee88ddac9e9a5333e5d95c8d50" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "45027498ffe0852437ed646a246a7eb79479cf1a" }
 
 [project.optional-dependencies]
 uwsgi = [
-    "pyuwsgi (==2.0.28.post1)",
+    "pyuwsgi (==2.0.30.post1)",
     "uwsgitop (==0.12)",
 ]
 
