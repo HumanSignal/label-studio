@@ -32,7 +32,7 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 - `3.233.209.176`
 
 #### Outbound connections IP addresses
-*Used for Import/Export, ML backends, and Prompts*
+*Used for Import/Export, storage proxy, ML backends, and Prompts*
 
 - `3.219.3.197`
 - `34.237.73.3`
@@ -46,7 +46,7 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 - `18.153.87.16`
 
 #### Outbound connections IP addresses
-*Used for Import/Export, ML backends, and Prompts*
+*Used for Import/Export, storage proxy, ML backends, and Prompts*
 
 - `52.59.18.15`
 - `18.194.85.62`
