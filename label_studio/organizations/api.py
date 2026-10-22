@@ -315,17 +315,22 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
         }
 
     def get(self, request, pk, user_pk):
-        """Return one membership after the parent organization check.
+        """Return one membership of the requester's active organization.
 
         Responsibility: read a member of the organization in the URL.
 
-        Boundary: ``parent_object`` already runs object permissions on the
-        organization. Checking the membership row would treat
-        ``organizations.view`` as a self action and hide every other member.
-        Does not call ``user.has_perm``.
+        Boundary: the parent check only proves a live membership.
+        ``organizations.view`` is SELF, and an Organization has no
+        ``user_id``, so that check does not compare ``active_organization``.
+        A live member of this organization whose active organization is
+        somewhere else is ``NotFound`` before the member row is loaded.
+        Object permissions are not run on the membership row, because SELF
+        would hide every other member. Does not call ``user.has_perm``.
         """
-        queryset = self.get_queryset()
-        member = get_object_or_404(queryset, user=user_pk)
+        organization = self.parent_object
+        if getattr(request.user, 'active_organization_id', None) != organization.id:
+            raise NotFound()
+        member = get_object_or_404(self.get_queryset(), user=user_pk)
         serializer = self.get_serializer(member)
         return Response(serializer.data)
 

@@ -120,6 +120,30 @@ class OrganizationAccessTests(APITestCase):
         self.assertEqual(owner_response.status_code, 200)
         self.assertEqual(owner_response.json()['annotations_count'], 2)
 
+    def test_member_detail_get_requires_the_active_organization(self):
+        world = make_access_world()
+        self.assertTrue(
+            OrganizationMember.objects.filter(
+                user=world.member_a,
+                organization=world.organization,
+                deleted_at__isnull=True,
+            ).exists()
+        )
+        world.member_a.active_organization = world.outsider_organization
+        world.member_a.save(update_fields=['active_organization'])
+
+        self.client.force_authenticate(world.member_a)
+        hidden = self.client.get(f'/api/organizations/{world.organization.id}/memberships/{world.owner.id}/')
+        self.assertEqual(hidden.status_code, 404)
+        self.assertNotIn('user', hidden.json())
+        self.assertNotIn(world.owner.email, hidden.content.decode())
+
+        world.member_a.active_organization = world.organization
+        world.member_a.save(update_fields=['active_organization'])
+        visible = self.client.get(f'/api/organizations/{world.organization.id}/memberships/{world.owner.id}/')
+        self.assertEqual(visible.status_code, 200)
+        self.assertEqual(visible.json()['user'], world.owner.id)
+
     def test_member_list_project_maps_drop_hidden_projects(self):
         world = make_access_world()
         world.project_2.title = 'hidden-from-member-list'
