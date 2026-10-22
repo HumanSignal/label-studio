@@ -115,6 +115,18 @@ class ProjectVisibilityTests(APITestCase):
         )
         self.assertCountEqual(list(world.project_1.all_members), [world.owner, world.creator, world.member_a])
 
+    def test_enabled_member_of_project_1_gets_404_for_project_2_detail(self):
+        """An explicit request for an inaccessible project is 404, not 403.
+
+        Production change that fails the test: HasObjectPermission runs first
+        and returns False, so DRF responds 403 before ProjectActionPermission
+        can raise NotFound.
+        """
+        world = make_access_world()
+        self.client.force_authenticate(world.member_a)
+        hidden = self.client.get(reverse('projects:api:project-detail', kwargs={'pk': world.project_2.id}))
+        self.assertEqual(hidden.status_code, 404)
+
     def test_detail_ignores_ids_that_would_404_the_list(self):
         world = make_access_world()
         self.client.force_authenticate(world.member_a)

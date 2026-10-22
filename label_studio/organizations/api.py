@@ -301,7 +301,7 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
     @property
     def permission_classes(self):
         if self.request.method == 'DELETE':
-            return [IsAuthenticated, HasObjectPermission, ProjectActionPermission]
+            return [IsAuthenticated, ProjectActionPermission, HasObjectPermission]
         return api_settings.DEFAULT_PERMISSION_CLASSES
 
     def get_queryset(self):

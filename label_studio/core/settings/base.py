@@ -298,9 +298,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'core.api_permissions.HasObjectPermission',
         'rest_framework.permissions.IsAuthenticated',
         'projects.action_permissions.ProjectActionPermission',
+        'core.api_permissions.HasObjectPermission',
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),

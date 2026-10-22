@@ -196,14 +196,19 @@ class PermissionCoverageTests(TestCase):
             self.assertEqual(resolve_permission_name(view, request), 'predictions.any')
 
     def test_project_action_permission_is_installed_by_default(self):
-        """Default DRF permissions must run the project action check.
+        """Authentication, then the action check, then the legacy object check.
 
-        Production change that fails the test: ProjectActionPermission is
-        removed from DEFAULT_PERMISSION_CLASSES.
+        DRF stops at the first failure. The action class has to run before
+        HasObjectPermission so a hidden project is NotFound, and after
+        IsAuthenticated so an anonymous request stays unauthenticated.
         """
         from django.conf import settings
 
-        self.assertIn(
-            'projects.action_permissions.ProjectActionPermission',
+        self.assertEqual(
             settings.REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES'],
+            [
+                'rest_framework.permissions.IsAuthenticated',
+                'projects.action_permissions.ProjectActionPermission',
+                'core.api_permissions.HasObjectPermission',
+            ],
         )
