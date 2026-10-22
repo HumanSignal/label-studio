@@ -61,4 +61,6 @@ STALE_FEATURE_FLAGS = {
     'ff_front_dev_2669_paragraph_author_filter_210622_short': True,
     'fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short': False,
     'fflag_fix_all_optic_79_task_count_is_wrong_short': True,
+    # Oct 22
+    'fflag_feat_interfaces_new_drafts': True,
 }
