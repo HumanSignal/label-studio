@@ -1657,6 +1657,108 @@ describe("TabStore project column defaults (FIT-2846)", () => {
     expect(view.hiddenColumns.explore).not.toContain("tasks:id");
     expect(view.columnOrderSnapshot["tasks:dimension_agreement_7"]).toBe(2);
   });
+
+  // FIT-3058: Quick View is the `labeling` mode of the same tab and reads the same role-filtered
+  // catalog as the main grid. A column the role's deny list rejects is dropped from that catalog
+  // server-side (FIT-2850), so soft defaults, stale aliases and Reset must never bring it back.
+  describe("Quick View respects Data Manager column access (FIT-3058)", () => {
+    const QuickViewRoot = ProjectRoot.views(() => ({
+      get isLabeling() {
+        return true;
+      },
+    }));
+
+    const quickViewColumn = (id, extra = {}) => ({
+      id,
+      title: id,
+      target: "tasks",
+      type: "Number",
+      visibility_defaults: { explore: true, labeling: true },
+      ...extra,
+    });
+
+    // Catalog an Annotator receives when `agreement` is denied: the column is absent, not flagged.
+    const allowedCatalog = [quickViewColumn("id")];
+    const fullCatalog = [...allowedCatalog, quickViewColumn("agreement")];
+
+    // Soft defaults (FIT-2845/2849 era data) still name the denied alias — stale or hand-written.
+    const defaultsNamingDenied = {
+      order: ["agreement", "id"],
+      visible: { OW: ["id", "agreement"], AD: ["id", "agreement"], MA: ["id", "agreement"], AN: ["id", "agreement"] },
+    };
+
+    const createRoot = (columnsRaw, role) =>
+      QuickViewRoot.create({
+        project: {
+          id: 42,
+          dm_column_defaults: { explore: defaultsNamingDenied, labeling: defaultsNamingDenied },
+        },
+        SDK: { hasInterface: () => false, invoke: () => {}, role },
+        viewsStore: {
+          columnsRaw,
+          views: [
+            {
+              id: 1,
+              title: "Custom",
+              saved: true,
+              key: "custom",
+              hiddenColumns: { explore: [], labeling: [] },
+            },
+          ],
+          selected: 1,
+        },
+      });
+
+    const quickViewColumnIds = (view) => view.fieldsAsColumns.filter((field) => !field.hidden).map((f) => f.id);
+
+    it("keeps a denied column out of the Quick View table and picker after Reset", () => {
+      History.navigate = mock(() => {});
+      root = createRoot(allowedCatalog, "ANNOTATOR");
+      root.viewsStore.fetchColumns();
+      const view = root.viewsStore.selected;
+
+      expect(root.isLabeling).toBe(true);
+
+      view.resetColumnsToProjectDefaults();
+
+      expect(quickViewColumnIds(view)).toEqual(["tasks:id"]);
+      expect(view.targetColumns.map((c) => c.id)).not.toContain("tasks:agreement");
+      expect(view.fieldsAsColumns.map((f) => f.id)).not.toContain("tasks:agreement");
+    });
+
+    it("does not reveal a denied column when Quick View hides every allowed column", () => {
+      History.navigate = mock(() => {});
+      root = createRoot(allowedCatalog, "ANNOTATOR");
+      root.viewsStore.fetchColumns();
+      const view = root.viewsStore.selected;
+
+      view.hiddenColumns.add({ id: "tasks:id" });
+
+      expect(view.hiddenColumns.labeling).toEqual(["tasks:id"]);
+      expect(quickViewColumnIds(view)).toEqual([]);
+    });
+
+    it("does not give a new tab a denied column from soft defaults", () => {
+      root = createRoot(allowedCatalog, "ANNOTATOR");
+      root.viewsStore.fetchColumns();
+
+      const { snapshot } = root.viewsStore.createSnapshot({});
+
+      expect(snapshot.hiddenColumns.labeling).not.toContain("tasks:agreement");
+      expect(Object.keys(snapshot.columnOrder ?? {})).not.toContain("tasks:agreement");
+    });
+
+    it("control: the same defaults still show the column when the catalog grants it", () => {
+      History.navigate = mock(() => {});
+      root = createRoot(fullCatalog, "OWNER");
+      root.viewsStore.fetchColumns();
+      const view = root.viewsStore.selected;
+
+      view.resetColumnsToProjectDefaults();
+
+      expect(quickViewColumnIds(view)).toContain("tasks:agreement");
+    });
+  });
 });
 
 describe("TabStore saveView conflict (PLT-1699)", () => {
