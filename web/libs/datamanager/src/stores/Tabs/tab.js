@@ -812,6 +812,16 @@ export const Tab = types
       const serialized = self.serialize();
 
       if (!self.saved || !deepEqual(self.snapshot, serialized)) {
+        // Members may filter and sort the tasks they are looking at, but that
+        // must not PATCH the shared view. The task request carries the local
+        // query instead of the saved view id. Managers keep the save.
+        const canManageSharedView = self.root.SDK?.project?.access?.can_manage !== false;
+
+        if (!canManageSharedView && self.virtual !== true) {
+          yield self.dataStore.reload({ id: self.id, query: self.query, interaction });
+          return;
+        }
+
         self.snapshot = serialized;
         if (self.virtual === true) {
           self.persistVirtual();
