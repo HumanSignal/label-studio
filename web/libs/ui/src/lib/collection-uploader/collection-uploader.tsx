@@ -183,6 +183,8 @@ export const CollectionUploader = ({
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
       event.preventDefault();
+      // A screen that accepts drops anywhere must not pick this drop a second time.
+      event.stopPropagation();
       setDragging(false);
       pick(event.dataTransfer?.files ?? null);
     },

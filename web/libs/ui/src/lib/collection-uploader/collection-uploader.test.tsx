@@ -107,6 +107,21 @@ describe("CollectionUploader (bundle mode)", () => {
     expect(screen.getByTestId("collection-uploader-overpick")).toHaveTextContent("bundle is full");
   });
 
+  it("a drop on the dropzone is picked once and never reaches a surrounding drop handler", () => {
+    const onPick = jest.fn();
+    const onSurfaceDrop = jest.fn();
+    render(
+      <div onDrop={onSurfaceDrop} data-testid="surface">
+        <CollectionUploader {...bundleProps} onPick={onPick} fileCount={0} storedCount={0} />
+      </div>,
+    );
+    const file = new File(["x"], "clip.png", { type: "image/png" });
+    fireEvent.drop(screen.getByTestId("collection-uploader-dropzone"), { dataTransfer: { files: [file] } });
+    expect(onPick).toHaveBeenCalledTimes(1);
+    expect(onPick.mock.calls[0][0]).toEqual([file]);
+    expect(onSurfaceDrop).not.toHaveBeenCalled();
+  });
+
   it("legacy row list never renders in bundle mode", () => {
     render(
       <CollectionUploader

@@ -247,6 +247,54 @@ describe("pick → upload → attach", () => {
     expect(refs.api!.rejected[0].message).toContain("at most 3 files");
   });
 
+  it("the same file picked twice in one tick uploads once on a single-file task", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const single = schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 });
+    const { refs, Host } = makeHarness({ engine, outputSchema: single });
+    render(<Host />);
+    const file = pdf("dropped.pdf");
+    await act(async () => {
+      refs.api!.pick([file]);
+      refs.api!.pick([file]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(1);
+    expect(refs.api!.rejected).toHaveLength(0);
+    expect(refs.api!.members.map((m) => m.state)).toEqual(["uploading"]);
+  });
+
+  it("two different files picked in one tick respect single-file capacity", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const single = schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 });
+    const { refs, Host } = makeHarness({ engine, outputSchema: single });
+    render(<Host />);
+    await act(async () => {
+      refs.api!.pick([pdf("first.pdf")]);
+      refs.api!.pick([pdf("second.pdf")]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows.map((r) => r.filename)).toEqual(["first.pdf"]);
+    expect(refs.api!.rejected).toHaveLength(1);
+    expect(refs.api!.rejected[0].file.name).toBe("second.pdf");
+  });
+
+  it("the same file picked twice in one tick uploads once in a bundle", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    const file = pdf("dropped.pdf");
+    await act(async () => {
+      refs.api!.pick([file]);
+      refs.api!.pick([file]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(1);
+    expect(refs.api!.rejected).toHaveLength(0);
+  });
+
   it("failed upload offers retry that attaches on success (A10)", async () => {
     const engine = new FakeEngine(() => undefined);
     const { refs, Host } = makeHarness({ engine });
