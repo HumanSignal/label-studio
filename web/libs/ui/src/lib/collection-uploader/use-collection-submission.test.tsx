@@ -954,3 +954,59 @@ describe("server facts", () => {
     expect(member.meta?.facts).toEqual(["30 fps"]);
   });
 });
+
+describe("locked regions", () => {
+  const fireReplaceInput = async (refs: HarnessRefs, file: File) => {
+    await act(async () =>
+      refs.api!.replaceInput.onChange({
+        target: { files: [file], value: "" } as unknown as HTMLInputElement,
+      }),
+    );
+  };
+
+  it("a locked region offers neither Replace nor Remove while its neighbour offers both", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [{ ...region(70, 0), locked: true }, region(71, 1)],
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(2));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeUndefined();
+    expect(refs.api!.members[0].onRemove).toBeUndefined();
+    expect(refs.api!.members[1].onReplace).toBeDefined();
+    expect(refs.api!.members[1].onRemove).toBeDefined();
+  });
+
+  it("a replace pick is ignored when the region was locked while the file dialog was open", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await act(async () => refs.setRegions!([{ ...region(70, 0), locked: true }]));
+    await fireReplaceInput(refs, pdf("new.pdf", 2222));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(0);
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.regions[0]._submission!.upload_id).toBe(70);
+  });
+
+  it("a region locked while its replacement uploads keeps the original and drops the new file", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await fireReplaceInput(refs, pdf("new.pdf", 2222));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await act(async () => refs.setRegions!([{ ...region(70, 0), locked: true }]));
+    await act(async () => engine.complete(engine.rows[0].clientRef, 99));
+    await waitFor(() => expect(engine.discarded).toContain(99));
+    expect(engine.discarded).not.toContain(70);
+    expect(refs.regions).toHaveLength(1);
+    expect(refs.regions[0]._submission!.upload_id).toBe(70);
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].file.name).toBe("f70.pdf");
+  });
+});
