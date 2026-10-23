@@ -6,6 +6,7 @@ import {
   httpMethodFromEndpoint,
   isProjectAccessHeld,
   shouldBlockRequestWhileProjectAccessHeld,
+  shouldHoldProjectRequestDenied,
   subscribeProjectAccessHeld,
 } from "./project-access-ui";
 
@@ -57,4 +58,27 @@ test("a held GET still proceeds, a held POST does not, and a new project id clea
   window.history.pushState(null, "", "/projects/8/data");
   expect(isProjectAccessHeld()).toBe(false);
   expect(shouldBlockRequestWhileProjectAccessHeld("POST")).toBe(false);
+});
+
+test("an ML backends 403 on the data page does not hold, an annotation write 403 does", () => {
+  const page = "/projects/5/data";
+
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/ml?project=5")).toBe(false);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/storages?project=5")).toBe(false);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/webhooks/?project=5")).toBe(false);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/projects/5/import")).toBe(false);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/projects/5/export?exportType=JSON")).toBe(
+    false,
+  );
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/projects/9/")).toBe(false);
+
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/tasks/7/annotations/")).toBe(true);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/annotations/3/")).toBe(true);
+  expect(shouldHoldProjectRequestDenied(page, 404, "http://localhost:8080/api/drafts/2/")).toBe(true);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/tasks/7/")).toBe(true);
+  expect(shouldHoldProjectRequestDenied(page, 403, "http://localhost:8080/api/projects/5/")).toBe(true);
+  expect(shouldHoldProjectRequestDenied(page, 404, "http://localhost:8080/api/dm/project?project=5")).toBe(true);
+
+  expect(shouldHoldProjectRequestDenied("/organization", 403, "http://localhost:8080/api/annotations/3/")).toBe(false);
+  expect(shouldHoldProjectRequestDenied(page, 500, "http://localhost:8080/api/annotations/3/")).toBe(false);
 });

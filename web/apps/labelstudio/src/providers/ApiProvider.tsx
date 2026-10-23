@@ -17,7 +17,7 @@ import {
   httpMethodFromEndpoint,
   isProjectAccessHeld,
   shouldBlockRequestWhileProjectAccessHeld,
-  shouldHoldProjectAccessDenied,
+  shouldHoldProjectRequestDenied,
   subscribeProjectAccessHeld,
 } from "@humansignal/core/lib/utils/project-access-ui";
 import { captureException } from "../config/Sentry";
@@ -102,7 +102,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
   const handleError = useCallback(
     (errorDetails: FormattedError, result: ApiResponse) => {
       const status = result.$meta?.status;
-      if (shouldHoldProjectAccessDenied(location.pathname, Number(status))) {
+      if (shouldHoldProjectRequestDenied(location.pathname, Number(status), result.$meta?.url)) {
         holdProjectAccessDenied();
         return;
       }
@@ -152,7 +152,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
       return;
     }
 
-    if (shouldHoldProjectAccessDenied(location.pathname, Number(status))) {
+    if (shouldHoldProjectRequestDenied(location.pathname, Number(status), result.$meta?.url)) {
       holdProjectAccessDenied();
       return;
     }

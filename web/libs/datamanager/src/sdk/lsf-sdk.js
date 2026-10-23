@@ -20,6 +20,7 @@ import {
   holdProjectAccessDenied,
   isProjectAccessHeld,
   shouldHoldProjectAccessDenied,
+  shouldHoldProjectRequestDenied,
 } from "@humansignal/core/lib/utils/project-access-ui";
 
 export { annotationEditable, shouldHoldProjectAccessDenied };
@@ -862,7 +863,7 @@ export class LSFWrapper {
 
   /** @private */
   showOperationToast(status, successMessage, errorAction, result) {
-    if (shouldHoldProjectAccessDenied(window.location?.pathname ?? "", status)) {
+    if (shouldHoldProjectRequestDenied(window.location?.pathname ?? "", status, result?.$meta?.url)) {
       holdProjectAccessDenied();
       return;
     }

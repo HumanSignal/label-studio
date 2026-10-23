@@ -82,6 +82,60 @@ export function shouldHoldProjectAccessDenied(pathname: string, status: number):
   return /^\/projects\/[^/]+/.test(pathname ?? "");
 }
 
+/** API path segments after `/api/` that always belong to the open project's work. */
+const PROJECT_WORK_RESOURCES = new Set(["tasks", "annotations", "drafts"]);
+/** `/api/dm/<name>` calls that load the open project itself. */
+const DM_PROJECT_RESOURCES = new Set(["project", "tasks", "views"]);
+
+/**
+ * Whether the failed request is for the open project, one of its tasks, an
+ * annotation, or a draft. Side resources (ML backends, storage, webhooks,
+ * import, export) return false: a member is expected to get 403 there and
+ * that must not lock annotation.
+ *
+ * Without a URL the request cannot be told apart, so the existing hold stays.
+ */
+export function isOpenProjectRequest(
+  pathname: string | null | undefined,
+  requestUrl: string | null | undefined,
+): boolean {
+  if (!requestUrl) return true;
+
+  let requestPath: string;
+  try {
+    requestPath = new URL(requestUrl, "http://localhost").pathname;
+  } catch {
+    return true;
+  }
+
+  const apiIndex = requestPath.indexOf("/api/");
+  const apiPath = apiIndex === -1 ? requestPath : requestPath.slice(apiIndex + "/api".length);
+  const [head, next, after] = apiPath.split("/").filter(Boolean);
+
+  if (PROJECT_WORK_RESOURCES.has(head)) return true;
+  if (head === "dm") return DM_PROJECT_RESOURCES.has(next);
+  if (head === "projects") {
+    const openProjectId = projectIdFromPathname(pathname);
+    if (openProjectId === null || next !== openProjectId) return false;
+    return after === undefined || after === "next";
+  }
+
+  return false;
+}
+
+/**
+ * Hold the open project page only when the denied request is the project's own
+ * work. The page pathname alone is not enough: a 403 from a side resource
+ * such as `/api/ml` must not lock a member who can still annotate.
+ */
+export function shouldHoldProjectRequestDenied(
+  pathname: string,
+  status: number,
+  requestUrl: string | null | undefined,
+): boolean {
+  return shouldHoldProjectAccessDenied(pathname, status) && isOpenProjectRequest(pathname, requestUrl);
+}
+
 export function isProjectAccessHeld(): boolean {
   return sharedWindow()?.[PROJECT_ACCESS_HELD_KEY] === true;
 }
