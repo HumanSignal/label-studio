@@ -101,9 +101,14 @@ describe("Project member access", () => {
     cy.then(() => cy.setCookie("sessionid", state.memberSessionId));
 
     // A changes the answer and saves again from the original page: denied, no success.
+    cy.intercept("PATCH", "/api/annotations/*").as("updateAnnotation");
     cy.contains("Negative").click();
     cy.contains("button", "Update").click();
+    // The backend refused the save.
+    cy.wait("@updateAnnotation").its("response.statusCode").should("be.oneOf", [403, 404]);
     cy.contains(DENIED).should("be.visible");
-    cy.contains("Annotation saved").should("not.exist");
+    // Updating an existing annotation shows "updated"; "saved" is the create message. Neither may appear.
+    cy.contains("Annotation updated successfully").should("not.exist");
+    cy.contains("Annotation saved successfully").should("not.exist");
   });
 });
