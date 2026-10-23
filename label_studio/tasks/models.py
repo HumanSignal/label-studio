@@ -255,8 +255,11 @@ class Task(TaskMixin, FsmHistoryStateModel):
                     return []
                 else:
                     return new_predictions
-            else:
+            elif project.model_version:
                 return predictions.filter(model_version=project.model_version)
+            else:
+                # No version selected (''): don't filter, matching DataManagerTaskSerializer.get_predictions
+                return predictions
         else:
             return []
 
