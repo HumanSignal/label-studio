@@ -179,6 +179,9 @@ const _Annotation = types
 
     // LSE review badge / filter state from API accepted_state (stub and full payloads).
     acceptedState: types.maybeNull(types.string),
+    // FIT-3230: the current user's own accept is live (API accepted_by_current_user), so their
+    // plain Accept is spent; another reviewer can still accept (multi-layer review).
+    acceptedByCurrentUser: types.optional(types.boolean, false),
 
     // @todo use types.Date
     draftSaved: types.maybe(types.string),
@@ -277,6 +280,7 @@ const _Annotation = types
       ground_truth: sn.honeypot ?? sn.ground_truth ?? false,
       skipped: sn.skipped || sn.was_cancelled,
       acceptedState: sn.accepted_state ?? sn.acceptedState ?? null,
+      acceptedByCurrentUser: Boolean(sn.accepted_by_current_user ?? sn.acceptedByCurrentUser),
     };
   })
   .views((self) =>
@@ -485,6 +489,10 @@ const _Annotation = types
     /** LSE review badge / History — must run inside an MST action (FIT-2498). */
     setAcceptedState(val) {
       self.acceptedState = val ?? null;
+    },
+
+    setAcceptedByCurrentUser(val) {
+      self.acceptedByCurrentUser = Boolean(val);
     },
 
     setReadonly(val) {

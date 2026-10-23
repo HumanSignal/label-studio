@@ -406,6 +406,7 @@ export default types
       if (isUpdateDisabled) return;
       if (entity.isReadOnly()) return;
       if (entity.hasIncompleteRegions) return;
+      if (isReview && ownAcceptIsLive(entity)) return;
 
       entity?.submissionInProgress();
 
@@ -855,8 +856,15 @@ export default types
       }, "Error during cancel skipping task, try again");
     }
 
+    // FIT-3230: the reviewer's own live accept spends a plain Accept (same rule as AcceptButton);
+    // Fix + Accept and other reviewers' Accept stay available (multi-layer review).
+    function ownAcceptIsLive(entity) {
+      return Boolean(entity?.acceptedByCurrentUser) && !(entity.history?.canUndo || entity.versions?.draft);
+    }
+
     function acceptAnnotation() {
       if (self.isSubmitting || self.isLoading) return;
+      if (ownAcceptIsLive(self.annotationStore.selected)) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;

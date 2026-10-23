@@ -53,6 +53,7 @@ export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
 export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before submitting";
 export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before updating";
 export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before accepting";
+export const ALREADY_ACCEPTED_TOOLTIP = "You already accepted this annotation";
 
 /** Arrows move between rows; Escape closes. Enter/Space commit natively on the focused button. */
 function moveRejectMenuFocus(menu: HTMLElement, step: 1 | -1) {
