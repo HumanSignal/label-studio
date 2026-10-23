@@ -26,6 +26,26 @@ export const Default: Story = {
   },
 };
 
+export const PerItemVariants: Story = {
+  args: {
+    look: "outline",
+    shape: "rounded",
+    size: "small",
+    badgeMaxWidth: 160,
+    items: [
+      { id: 1, label: "Computer Science & Engineering", variant: "positive", icon: "✓" },
+      { id: 2, label: "Python", variant: "neutral", icon: "○" },
+      { id: 3, label: "Law & Policy", variant: "negative", icon: "×" },
+      { id: 4, label: "Mathematics & Statistics", variant: "positive", icon: "✓" },
+    ],
+  },
+  render: (args) => (
+    <div style={{ width: 320 }}>
+      <BadgeGroup {...args} />
+    </div>
+  ),
+};
+
 export const WithVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-base w-[400px]">

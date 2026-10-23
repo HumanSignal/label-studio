@@ -16,12 +16,22 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
   );
 }
 
-function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Input>) {
+function CommandInput({
+  className,
+  wrapperClassName,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input> & {
+  /** Replaces the field's default `m-1` margin, e.g. to inset it like the content around it. */
+  wrapperClassName?: string;
+}) {
   const ref = React.useRef<HTMLInputElement>(null);
   return (
     <div
       data-slot="command-input-wrapper"
-      className="flex items-center gap-2 h-8 px-2 m-1 focus-within:border-neutral-border-bold border outline-none border-neutral-border rounded-smaller hover:border-neutral-border-bold shadow-inner box-border"
+      className={cn(
+        "flex items-center gap-2 h-8 px-2 focus-within:border-neutral-border-bold border outline-none border-neutral-border rounded-smaller hover:border-neutral-border-bold shadow-inner box-border",
+        wrapperClassName ?? "m-1",
+      )}
       ref={ref}
     >
       <MagnifyingGlassIcon className="text-neutral-content-subtlest w-6 h-6 flex-none" />

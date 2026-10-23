@@ -84,6 +84,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   /** Label template for the create option; `{value}` is replaced with the search value. */
   createOptionLabel?: string;
   searchPlaceholder?: string;
+  /** Margin of the search field, replacing its default `m-1`; match it to the header's inset when there is one. */
+  searchClassName?: string;
   /** Initial value for the search input field. Useful for restoring a previous search state. */
   defaultSearchValue?: string;
   ref?: React.Ref<HTMLSelectElement>;
@@ -95,6 +97,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onChange?: (value: any) => void | false;
   setValue?: (value: ExtractOption<A>) => void;
   header?: string | FC | JSX.Element;
+  /** Pinned between the search field and the options, e.g. column headings for a custom `optionRenderer`. */
+  listHeader?: ReactNode;
   footer?: ReactNode;
   multiple?: boolean;
   disabled?: boolean;

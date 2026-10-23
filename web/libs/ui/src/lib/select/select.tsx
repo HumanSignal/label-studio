@@ -290,6 +290,8 @@ export const Select = forwardRef(
       onClose,
       onOpen,
       footer,
+      listHeader,
+      searchClassName,
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
@@ -830,9 +832,11 @@ export const Select = forwardRef(
                   value={query}
                   onChangeCapture={onSearchInputHandler}
                   data-testid="select-search-field"
+                  wrapperClassName={searchClassName}
                   autoFocus
                 />
               )}
+              {listHeader ?? null}
               <CommandList
                 label="Select an option"
                 className={cnm({
@@ -1149,7 +1153,8 @@ const Option = ({
           />
         )}
         <div data-testid="select-option-label" className="flex w-full min-w-0 items-center gap-2">
-          <span className="truncate">{labelContent}</span>
+          {/* A custom row takes the full width so trailing cells (status columns, counts) line up across rows. */}
+          <span className={clsx("truncate", optionRenderer && "flex-1 min-w-0")}>{labelContent}</span>
           {badge && <Badge size="small">{badge}</Badge>}
           {description && (
             <Tooltip title={description}>

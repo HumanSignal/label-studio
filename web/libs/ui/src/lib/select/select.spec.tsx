@@ -320,6 +320,31 @@ describe("Select Component", () => {
     });
   });
 
+  describe("Custom option rows", () => {
+    it("lets a custom row span the option width so trailing cells line up across rows", async () => {
+      render(
+        <Select
+          options={[{ value: "a", label: "A" }]}
+          placeholder="Select"
+          optionRenderer={({ option }: { option: { label: string } }) => <span>row:{option.label}</span>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const row = await screen.findByText("row:A");
+      expect(row.parentElement).toHaveClass("flex-1");
+    });
+
+    it("keeps plain labels sized to their text", async () => {
+      render(<Select options={[{ value: "a", label: "Plain" }]} placeholder="Select" />);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      expect(await screen.findByText("Plain")).not.toHaveClass("flex-1");
+    });
+  });
+
   describe("Infinite Loading Support", () => {
     it("supports loadMore callback for infinite scroll", async () => {
       const loadMore = mock();
@@ -598,6 +623,47 @@ describe("Select Component", () => {
       expect(inner).not.toHaveClass("px-4");
       expect(inner.querySelector('input[type="checkbox"]')).toBeInTheDocument();
       expect(sizer.querySelector("svg")).toBeInTheDocument();
+    });
+  });
+
+  describe("List header", () => {
+    it("pins the list header between the search field and the options", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          searchable
+          header={<div data-testid="custom-header">Header</div>}
+          listHeader={<div data-testid="list-header">Columns</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const listHeader = await screen.findByTestId("list-header");
+      const search = screen.getByTestId("select-search-field");
+      const list = document.querySelector("[data-slot='command-list']");
+      const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(follows(screen.getByTestId("custom-header"), search)).toBe(true);
+      expect(follows(search, listHeader)).toBe(true);
+      expect(list?.contains(listHeader)).toBe(false);
+      expect(follows(listHeader, list as Node)).toBe(true);
+    });
+  });
+
+  describe("Search inset", () => {
+    it("keeps the default margin unless searchClassName replaces it", async () => {
+      const { unmount } = render(<Select options={["Apple"] as any} placeholder="Select" searchable />);
+      fireEvent.click(screen.getByRole("button"));
+      const wrapper = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(wrapper).toHaveClass("m-1");
+      unmount();
+
+      render(<Select options={["Apple"] as any} placeholder="Select" searchable searchClassName="mx-tight my-1" />);
+      fireEvent.click(screen.getByRole("button"));
+      const inset = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(inset).toHaveClass("mx-tight");
+      expect(inset).not.toHaveClass("m-1");
     });
   });
 
