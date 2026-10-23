@@ -6,8 +6,8 @@ from django.urls import reverse
 from projects.models import ProjectMember
 from projects.tests.access_setup import make_access_world
 from rest_framework.test import APITestCase
-from tasks.models import Annotation, AnnotationDraft
-from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, TaskFactory
+from tasks.models import Annotation, AnnotationDraft, Prediction
+from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, PredictionFactory, TaskFactory
 
 SECRET_DRAFT_TEXT = 'secret-draft-text'
 SECRET_DRAFT_RESULT = [
@@ -254,3 +254,92 @@ class AnnotationAccessTests(APITestCase):
             ProjectMember.objects.filter(project=world.project_1, user=world.unassigned).count(),
             before,
         )
+
+
+class PredictionAccessTests(APITestCase):
+    def setUp(self):
+        self.world = make_access_world()
+        self.visible = PredictionFactory(task=TaskFactory(project=self.world.project_1), result=[{'secret': 'one'}])
+        self.hidden = PredictionFactory(task=TaskFactory(project=self.world.project_2), result=[{'secret': 'two'}])
+        self.list_url = reverse('tasks:api-predictions:prediction-list')
+
+    @staticmethod
+    def _ids(response):
+        data = response.json()
+        rows = data['results'] if isinstance(data, dict) else data
+        return {row['id'] for row in rows}
+
+    def test_member_lists_only_predictions_of_projects_they_can_open(self):
+        self.client.force_authenticate(self.world.member_a)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(self._ids(response), {self.visible.id})
+        self.assertNotIn('two', response.content.decode())
+
+    def test_filter_naming_a_hidden_project_or_task_is_not_found(self):
+        self.client.force_authenticate(self.world.member_a)
+        for params in (
+            {'project': self.world.project_2.id},
+            {'task__project': self.world.project_2.id},
+            {'task': self.hidden.task_id},
+        ):
+            response = self.client.get(self.list_url, params)
+            self.assertEqual(response.status_code, 404, (params, response.content))
+            self.assertNotIn('two', response.content.decode())
+
+    def test_hidden_prediction_detail_is_not_found_and_unassigned_sees_nothing(self):
+        self.client.force_authenticate(self.world.member_a)
+        detail = self.client.get(reverse('tasks:api-predictions:prediction-detail', kwargs={'pk': self.hidden.id}))
+        self.assertEqual(detail.status_code, 404, detail.content)
+
+        self.client.force_authenticate(self.world.unassigned)
+        listed = self.client.get(self.list_url)
+        self.assertEqual(listed.status_code, 200, listed.content)
+        self.assertEqual(self._ids(listed), set())
+
+    def test_manager_lists_their_project_predictions_only(self):
+        self.client.force_authenticate(self.world.creator)
+        self.assertEqual(self._ids(self.client.get(self.list_url)), {self.visible.id})
+        self.client.force_authenticate(self.world.owner)
+        self.assertEqual(self._ids(self.client.get(self.list_url)), {self.visible.id, self.hidden.id})
+
+    def test_member_cannot_create_a_prediction(self):
+        self.client.force_authenticate(self.world.member_a)
+        own_task = TaskFactory(project=self.world.project_1)
+        hidden_task = TaskFactory(project=self.world.project_2)
+        before = Prediction.objects.count()
+
+        denied = self.client.post(
+            self.list_url, {'task': own_task.id, 'result': [], 'model_version': 'forged'}, format='json'
+        )
+        hidden = self.client.post(
+            self.list_url, {'task': hidden_task.id, 'result': [], 'model_version': 'forged'}, format='json'
+        )
+
+        self.assertEqual(denied.status_code, 403, denied.content)
+        self.assertEqual(hidden.status_code, 404, hidden.content)
+        self.assertEqual(Prediction.objects.count(), before)
+        self.assertFalse(Prediction.objects.filter(model_version='forged').exists())
+
+    def test_member_cannot_update_or_delete_a_prediction(self):
+        self.client.force_authenticate(self.world.member_a)
+        own_url = reverse('tasks:api-predictions:prediction-detail', kwargs={'pk': self.visible.id})
+        hidden_url = reverse('tasks:api-predictions:prediction-detail', kwargs={'pk': self.hidden.id})
+
+        for url, expected in ((own_url, 403), (hidden_url, 404)):
+            patched = self.client.patch(url, {'model_version': 'forged'}, format='json')
+            deleted = self.client.delete(url)
+            self.assertEqual(patched.status_code, expected, patched.content)
+            self.assertEqual(deleted.status_code, expected, deleted.content)
+
+        self.assertEqual(Prediction.objects.count(), 2)
+        self.assertNotEqual(Prediction.objects.get(pk=self.visible.pk).model_version, 'forged')
+        self.assertNotEqual(Prediction.objects.get(pk=self.hidden.pk).model_version, 'forged')
+
+    def test_manager_can_delete_a_prediction(self):
+        self.client.force_authenticate(self.world.creator)
+        response = self.client.delete(
+            reverse('tasks:api-predictions:prediction-detail', kwargs={'pk': self.visible.id})
+        )
+        self.assertEqual(response.status_code, 204, response.content)
+        self.assertFalse(Prediction.objects.filter(pk=self.visible.pk).exists())

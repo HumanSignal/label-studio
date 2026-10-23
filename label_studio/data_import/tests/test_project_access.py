@@ -105,34 +105,43 @@ class ImportAccessTests(APITestCase):
         self.assertTrue(FileUpload.objects.filter(id=hidden.id).exists())
 
     @override_settings(USE_NGINX_FOR_UPLOADS=False)
-    def test_member_cannot_open_uploaded_or_storage_files(self):
+    def test_member_can_read_uploaded_files_of_visible_project_only(self):
         world = make_access_world()
         own = _save_upload(world.project_1, world.creator, name='open.json')
         hidden = _save_upload(world.project_2, world.owner, name='closed.json')
-        self.client.force_authenticate(world.member_a)
         opened = []
 
         def track_open(*args, **kwargs):
             opened.append(args)
             return RangedFileResponse(*args, **kwargs)
 
-        with patch('data_import.api.RangedFileResponse', side_effect=track_open):
-            storage = self.client.get(
-                reverse('data_import:storage-data-upload'),
-                {'filepath': own.file.name},
-            )
+        def read_all():
+            storage = self.client.get(reverse('data_import:storage-data-upload'), {'filepath': own.file.name})
             uploaded = self.client.get(_uploaded_file_url(own))
             hidden_storage = self.client.get(
-                reverse('data_import:storage-data-upload'),
-                {'filepath': hidden.file.name},
+                reverse('data_import:storage-data-upload'), {'filepath': hidden.file.name}
             )
             hidden_uploaded = self.client.get(_uploaded_file_url(hidden))
+            return storage, uploaded, hidden_storage, hidden_uploaded
 
-        self.assertEqual(storage.status_code, 403)
-        self.assertEqual(uploaded.status_code, 403)
+        # a member views the project's uploaded images; the project they cannot open is a 404
+        self.client.force_authenticate(world.member_a)
+        with patch('data_import.api.RangedFileResponse', side_effect=track_open):
+            storage, uploaded, hidden_storage, hidden_uploaded = read_all()
+        self.assertEqual(storage.status_code, 200)
+        self.assertEqual(uploaded.status_code, 200)
         self.assertEqual(hidden_storage.status_code, 404)
         self.assertEqual(hidden_uploaded.status_code, 404)
-        self.assertEqual(opened, [])
+        self.assertEqual(len(opened), 2)
+
+        # an unassigned user and an outsider cannot open either file, and nothing is opened
+        for user in (world.unassigned, world.outsider):
+            opened.clear()
+            self.client.force_authenticate(user)
+            with patch('data_import.api.RangedFileResponse', side_effect=track_open):
+                responses = read_all()
+            self.assertEqual([r.status_code for r in responses], [404, 404, 404, 404], user)
+            self.assertEqual(opened, [])
 
     def test_member_cannot_read_import_task_lists_or_details(self):
         world = make_access_world()

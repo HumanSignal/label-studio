@@ -1,7 +1,7 @@
 import logging
 
 from core.permissions import ViewClassPermission, all_permissions
-from django.db.models import CharField, Count, Q
+from django.db.models import CharField, Count, Prefetch, Q
 from django.db.models.functions import Cast
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -13,6 +13,7 @@ from labels_manager.serializers import (
     LabelLinkSerializer,
     LabelSerializer,
 )
+from projects.access import manageable_project_filter, visible_projects
 from rest_framework import views, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -114,7 +115,14 @@ class LabelAPI(viewsets.ModelViewSet):
         serializer.save(created_by=self.request.user, organization=self.request.user.active_organization)
 
     def get_queryset(self):
-        return Label.objects.filter(organization=self.request.user.active_organization).prefetch_related('links')
+        """Labels linked to a project the requester can open, with only those links attached."""
+        user = self.request.user
+        visible = visible_projects(user)
+        return (
+            Label.objects.filter(organization=user.active_organization, links__project__in=visible)
+            .distinct()
+            .prefetch_related(Prefetch('links', queryset=LabelLink.objects.filter(project__in=visible)))
+        )
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -214,7 +222,11 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
-        return LabelLink.objects.filter(label__organization=self.request.user.active_organization).annotate(
+        """Links of projects the requester can open; a hidden project's links are never listed."""
+        return LabelLink.objects.filter(
+            label__organization=self.request.user.active_organization,
+            project__in=visible_projects(self.request.user),
+        ).annotate(
             annotations_count=Count(
                 'project__tasks__annotations',
                 filter=Q(
@@ -253,16 +265,21 @@ class LabelBulkUpdateAPI(views.APIView):
     permission_required = all_permissions.labels_change
 
     def post(self, request):
-        serializer = LabelBulkUpdateSerializer(data=request.data)
+        serializer = LabelBulkUpdateSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
+        # The serializer's project field already ran ensure_project_manage (404 hidden, 403 not a manager).
         project = serializer.validated_data['project']
-        if project is not None:
-            self.check_object_permissions(self.request, project)
+        user = self.request.user
+        manageable = None
+        if project is None:
+            # Without a project the rewrite is limited to projects the requester manages.
+            manageable = visible_projects(user).filter(manageable_project_filter(user)).values('pk')
 
         updated_count = bulk_update_label(
             old_label=serializer.validated_data['old_label'],
             new_label=serializer.validated_data['new_label'],
-            organization=self.request.user.active_organization,
+            organization=user.active_organization,
             project=project,
+            projects=manageable,
         )
         return Response({'annotations_updated': updated_count})

@@ -21,7 +21,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from projects.access import can_modify_annotation, draft_visible_to, visible_projects
-from projects.action_permissions import ensure_project_visible
+from projects.action_permissions import ensure_project_manage, ensure_project_visible
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
@@ -1515,8 +1515,36 @@ class PredictionAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['task', 'task__project', 'project']
 
+    def _reject_hidden_filter_targets(self, visible):
+        """404 when a query filter names a project, or a task of a project, the user cannot open."""
+        params = self.request.query_params
+        for key in ('project', 'task__project'):
+            value = params.get(key)
+            if value in (None, ''):
+                continue
+            try:
+                project_id = int(value)
+            except (TypeError, ValueError):
+                continue  # the filter backend reports the malformed value as a 400
+            if not visible.filter(pk=project_id).exists():
+                raise NotFound()
+        task_value = params.get('task')
+        if task_value not in (None, ''):
+            try:
+                task_id = int(task_value)
+            except (TypeError, ValueError):
+                return
+            project_id = Task.objects.filter(pk=task_id).values_list('project_id', flat=True).first()
+            if project_id is not None and not visible.filter(pk=project_id).exists():
+                raise NotFound()
+
     def get_queryset(self):
-        return Prediction.objects.filter(project__organization=self.request.user.active_organization)
+        """Predictions of projects the requester can open, never the whole organization."""
+        visible = visible_projects(self.request.user)
+        if getattr(self, 'swagger_fake_view', False):
+            return Prediction.objects.none()
+        self._reject_hidden_filter_targets(visible)
+        return Prediction.objects.filter(project__in=visible)
 
     def get_serializer(self, *args, **kwargs):
         serializer = super().get_serializer(*args, **kwargs)
@@ -1529,9 +1557,17 @@ class PredictionAPI(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         task = serializer.validated_data['task']
-        if not task.has_permission(self.request.user):
-            raise PermissionDenied(f"You don't have permission for task {task.id}")
+        # Predictions are managed by project managers only; a hidden project is a 404.
+        ensure_project_manage(self.request.user, task.project)
         serializer.save(project=task.project)
+
+    def perform_update(self, serializer):
+        ensure_project_manage(self.request.user, serializer.instance.project)
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        ensure_project_manage(self.request.user, instance.project)
+        instance.delete()
 
 
 @method_decorator(name='get', decorator=extend_schema(exclude=True))

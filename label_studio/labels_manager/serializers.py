@@ -1,11 +1,39 @@
 from django.conf import settings
 from django.db import transaction
+from projects.action_permissions import ensure_project_manage
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 
 from .models import Label, LabelLink
+
+
+class ManageableProjectField(serializers.PrimaryKeyRelatedField):
+    """A project the requester may manage; used wherever a label write names a project.
+
+    Responsibility: resolve the project id from the body and run
+    ``ensure_project_manage``. A project that does not exist or that the user
+    cannot open is ``NotFound`` (404), so a hidden project is not revealed. A
+    visible project the user cannot manage is ``PermissionDenied`` (403).
+
+    Boundary: does not validate label content. Needs ``request`` in the
+    serializer context.
+    """
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('queryset', Project.objects.all())
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        try:
+            project = super().to_internal_value(data)
+        except ValidationError as exc:
+            if 'does_not_exist' in exc.get_codes():
+                raise NotFound() from exc
+            raise
+        ensure_project_manage(self.context['request'].user, project)
+        return project
 
 
 class LabelListSerializer(serializers.ListSerializer):
@@ -88,7 +116,7 @@ class LabelListSerializer(serializers.ListSerializer):
 class LabelCreateSerializer(serializers.ModelSerializer):
     created_by = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     organization = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects)
+    project = ManageableProjectField()
     from_name = serializers.CharField()
 
     class Meta:
@@ -99,6 +127,7 @@ class LabelCreateSerializer(serializers.ModelSerializer):
 
 class LabelLinkSerializer(FlexFieldsModelSerializer):
     annotations_count = serializers.IntegerField(read_only=True)
+    project = ManageableProjectField()
 
     class Meta:
         model = LabelLink
@@ -116,7 +145,7 @@ class LabelSerializer(FlexFieldsModelSerializer):
 
 
 class LabelBulkUpdateSerializer(serializers.Serializer):
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects, required=False, default=None)
+    project = ManageableProjectField(required=False, default=None)
     old_label = serializers.JSONField()
     new_label = serializers.JSONField()
 

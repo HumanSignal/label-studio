@@ -2,8 +2,15 @@ from django.db import transaction
 from tasks.models import Annotation
 
 
-def bulk_update_label(old_label, new_label, organization, project=None):
+def bulk_update_label(old_label, new_label, organization, project=None, projects=None):
+    """Rewrite a label in saved annotations of ``organization``.
+
+    ``project`` limits the rewrite to one project. ``projects`` (a queryset of
+    pks or projects) limits it to those projects; ``None`` means no extra limit.
+    """
     annotations = Annotation.objects.filter(project__organization=organization)
+    if projects is not None:
+        annotations = annotations.filter(project__in=projects)
     if project is not None:
         annotations = annotations.filter(project=project)
 

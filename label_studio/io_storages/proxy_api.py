@@ -97,9 +97,11 @@ def storage_key_boundary_response(storage, fileuri):
 
     Responsibility: stop URI resolution before a URL is signed or bytes are proxied.
 
-    Boundary: ``..`` and absolute keys are 400. A key outside the configured
-    prefix, including an empty prefix, is 404. Storages without a URL scheme are
-    left to the existing resolver. This does not sign a URL.
+    Boundary: ``..`` and absolute keys are 400. A key outside a non-empty
+    configured prefix is 404. An empty prefix means the whole keyspace of that
+    storage credential, so any safe key is allowed (``key_within_prefix`` is not
+    consulted). Storages without a URL scheme are left to the existing
+    resolver. This does not sign a URL.
     """
     scheme = getattr(storage, 'url_scheme', None)
     if not isinstance(scheme, str) or not scheme:
@@ -113,6 +115,8 @@ def storage_key_boundary_response(storage, fileuri):
     prefix = getattr(storage, 'prefix', None)
     if not isinstance(prefix, str):
         prefix = ''
+    if prefix == '':
+        return None
     if not key_within_prefix(key, prefix):
         return Response(status=status.HTTP_404_NOT_FOUND)
     return None

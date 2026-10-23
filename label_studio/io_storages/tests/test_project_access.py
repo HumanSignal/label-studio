@@ -184,6 +184,39 @@ class StorageAccessTests(APITestCase):
         for response in (outside, traversal, absolute):
             self.assertNotIn(SECRET_ACCESS_KEY_ID, response.content.decode())
 
+    def test_empty_prefix_allows_normal_keys_but_not_unsafe_ones(self):
+        from io_storages.proxy_api import storage_key_boundary_response
+
+        world = make_access_world()
+        storage = S3ImportStorageFactory(
+            project=world.project_1,
+            bucket='whole-bucket',
+            prefix='',
+            aws_access_key_id=SECRET_ACCESS_KEY_ID,
+        )
+        # the helper: an empty prefix is the whole keyspace, `..` and absolute keys stay 400
+        self.assertIsNone(storage_key_boundary_response(storage, 's3://whole-bucket/images/cat.png'))
+        self.assertEqual(
+            storage_key_boundary_response(storage, 's3://whole-bucket/../secret').status_code, 400
+        )
+        self.assertEqual(
+            storage_key_boundary_response(storage, 's3://whole-bucket//etc/passwd').status_code, 400
+        )
+
+        # the endpoint: a member opens a normal key, and traversal is still refused before signing
+        self.client.force_authenticate(world.member_a)
+        url = reverse('storages:project-storage-data-resolve', kwargs={'project_id': world.project_1.id})
+        with patch(
+            'io_storages.s3.models.S3ImportStorage.generate_http_url', return_value='https://signed.example/cat.png'
+        ) as generate_http_url:
+            normal = self.client.get(url, {'fileuri': _fileuri('s3://whole-bucket/images/cat.png')})
+            normal_calls = generate_http_url.call_count
+            traversal = self.client.get(url, {'fileuri': _fileuri('s3://whole-bucket/../secret')})
+        self.assertNotIn(normal.status_code, (400, 404), normal.content)
+        self.assertEqual(normal_calls, 1)
+        self.assertEqual(traversal.status_code, 400, traversal.content)
+        self.assertEqual(generate_http_url.call_count, 1)
+
     def test_local_file_requires_project_access(self):
         world = make_access_world()
         with tempfile.TemporaryDirectory() as root:

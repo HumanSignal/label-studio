@@ -1048,8 +1048,14 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
         else:
             raise Http404
 
+    def _manageable_project(self):
+        """Resolve the URL project; 404 when hidden, 403 when visible but not managed by the user."""
+        project = generics.get_object_or_404(Project.objects.all(), pk=self.kwargs['pk'])
+        ensure_project_manage(self.request.user, project)
+        return project
+
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self._manageable_project()
         task_ids = list(Task.objects.filter(project=project).values('id'))
         Task.delete_tasks_without_signals(Task.objects.filter(project=project))
         logger.info(f'calling reset project_id={project.id} ProjectTaskListAPI.delete()')
@@ -1062,6 +1068,8 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
 
     @extend_schema(exclude=True)
     def post(self, *args, **kwargs):
+        # Creating a task is a management action; check before any body is parsed into a Task.
+        self._manageable_project()
         return super(ProjectTaskListAPI, self).post(*args, **kwargs)
 
     def get_serializer_context(self):

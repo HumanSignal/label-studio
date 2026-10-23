@@ -309,8 +309,10 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         extra_kwargs = {
             'memberships': {'required': False},
             'title': {'required': False},
-            'created_by': {'required': False},
         }
+        # Ownership is set by the create view (``ser.save(organization=..., created_by=...)``).
+        # An ordinary update must not move a project to another organization or creator.
+        read_only_fields = ['organization', 'created_by']
         fields = [
             'id',
             'title',

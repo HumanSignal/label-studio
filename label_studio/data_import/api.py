@@ -24,7 +24,7 @@ from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from label_studio_sdk.label_interface import LabelInterface
-from projects.action_permissions import ensure_project_manage
+from projects.action_permissions import ensure_project_manage, ensure_project_visible
 from projects.import_health import mark_import_job_finished
 from projects.models import Project, ProjectImport, ProjectReimport
 from ranged_fileresponse import RangedFileResponse
@@ -1035,7 +1035,8 @@ class UploadedFileResponse(generics.RetrieveAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         request.user.project = file_upload.project
-        ensure_project_manage(request.user, file_upload.project)
+        # Reading an uploaded file is project access: a member views the images they annotate.
+        ensure_project_visible(request.user, file_upload.project)
 
         file = file_upload.file
         if file.storage.exists(file.name):
@@ -1099,7 +1100,8 @@ class DownloadStorageData(APIView):
                 # unit tests do not, and keep the previous permission check.
                 if isinstance(project, Project):
                     request.user.project = project
-                    ensure_project_manage(request.user, project)
+                    # Reading is project access; uploading or deleting files stays manage-only.
+                    ensure_project_visible(request.user, project)
                     file_obj = file_upload.file
                 elif file_upload.has_permission(request.user):
                     file_obj = file_upload.file
