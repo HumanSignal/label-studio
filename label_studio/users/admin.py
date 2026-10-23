@@ -1,12 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 from core.models import AsyncMigrationStatus
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from ml.models import MLBackend, MLBackendTrainJob
 from organizations.models import Organization, OrganizationMember
 from projects.models import Project
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from tasks.models import Annotation, Prediction, Task
 from users.models import User
 
@@ -176,6 +178,28 @@ class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ('title', 'created_by__email')
 
 
+class PredictionAdminForm(forms.ModelForm):
+    class Meta:
+        model = Prediction
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        task = cleaned_data.get('task')
+        project = cleaned_data.get('project') or (task.project if task else None)
+        if project is not None and 'result' in cleaned_data:
+            # Prediction.save() raises the DRF error, which the admin would turn into a 500
+            try:
+                Prediction.prepare_prediction_result(cleaned_data['result'], project)
+            except DRFValidationError as e:
+                raise forms.ValidationError({'result': e.detail})
+        return cleaned_data
+
+
+class PredictionAdmin(admin.ModelAdmin):
+    form = PredictionAdminForm
+
+
 class ProjectAdmin(admin.ModelAdmin):
     autocomplete_fields = ('created_by', 'organization', 'deleted_by')
     search_fields = ('title', 'organization__title', 'organization__created_by__email', 'created_by__email')
@@ -187,7 +211,7 @@ admin.site.register(MLBackend)
 admin.site.register(MLBackendTrainJob)
 admin.site.register(Task)
 admin.site.register(Annotation)
-admin.site.register(Prediction)
+admin.site.register(Prediction, PredictionAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationMember, OrganizationMemberAdmin)
 admin.site.register(AsyncMigrationStatus, AsyncMigrationStatusAdmin)

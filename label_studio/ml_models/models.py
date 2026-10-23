@@ -3,12 +3,12 @@
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection, ModelProviders
 from projects.models import Project
-from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, FailedPrediction, Prediction, PredictionMeta
 
 logger = logging.getLogger(__name__)
