@@ -52,7 +52,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
@@ -110,7 +110,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
@@ -174,7 +174,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
