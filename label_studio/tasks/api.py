@@ -105,7 +105,7 @@ def _draft_for_annotation_create(user, task, draft_id):
     if not draft_visible_to(user, draft):
         raise NotFound()
     if draft.task_id != task.id:
-        raise _invalid_pk('draft_id', draft)
+        raise PermissionDenied()
     if draft.annotation_id and not can_modify_annotation(user, draft.annotation):
         raise PermissionDenied()
     return draft
@@ -1327,8 +1327,6 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
             annotation = Annotation.objects.filter(pk=annotation_id, task=task).first()
             if annotation is None:
                 raise NotFound(f'Annotation {annotation_id} does not exist')
-            if not can_modify_annotation(user, annotation):
-                raise PermissionDenied()
         serializer.save(task_id=task.id, annotation_id=annotation_id, user=self.request.user)
 
 

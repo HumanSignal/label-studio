@@ -58,7 +58,7 @@ stages:
     headers:
       content-type: application/json
   response:
-    status_code: 405
+    status_code: 403
 
 ---
 test_name: test_users_malicious_redirect

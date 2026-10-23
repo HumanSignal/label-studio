@@ -22,7 +22,7 @@ from django.conf import settings
 from django.test import Client
 from ml.models import MLBackend
 from organizations.models import Organization
-from projects.models import Project
+from projects.models import Project, ProjectMember
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
 
@@ -405,27 +405,38 @@ def make_annotator(config, project, login=False, client=None):
     user.save()
 
     create_business(user)
+    _join_project_for_tests(user, project)
 
     if login:
-        Organization.create_organization(created_by=user, title=user.first_name)
-
         if client is None:
             client = Client()
         signin_status_code = signin(client, config['email'], '12345').status_code
         assert signin_status_code == 302, f'Sign-in status code: {signin_status_code}'
-
-    project.add_collaborator(user)
     if login:
         client.annotator = user
         return client
     return user
 
 
+def _join_project_for_tests(user, project):
+    """Put a test user on a project the way a granted member would be.
+
+    Community fixtures used to rely on every active-organization user seeing
+    every project. Access now also needs a live organization membership and an
+    enabled project membership, in that project's organization.
+    """
+    project.organization.add_user(user)
+    if user.active_organization_id != project.organization_id:
+        user.active_organization = project.organization
+        user.save(update_fields=['active_organization'])
+    ProjectMember.objects.update_or_create(user=user, project=project, defaults={'enabled': True})
+
+
 def invite_client_to_project(client, project):
     if apps.is_installed('annotators'):
         return client.get(f'/annotator/invites/{project.token}/')
-    else:
-        return SimpleNamespace(status_code=200)
+    _join_project_for_tests(client.user, project)
+    return SimpleNamespace(status_code=200)
 
 
 def login(client, email, password):

@@ -3,6 +3,7 @@
 from core.permissions import all_permissions
 from django.db.models import CharField, Q, Value
 from django.db.models.functions import Concat
+from drf_spectacular.utils import extend_schema
 from projects.access import project_member_users
 from projects.action_permissions import ensure_project_manage
 from projects.membership import grant_project_member, revoke_project_member
@@ -255,6 +256,7 @@ def _target_user(user_id):
     return User.objects.filter(pk=user_id).first()
 
 
+@extend_schema(tags=['Projects'])
 class ProjectMemberListAPI(GenericAPIView):
     """List implicit managers and explicit project members.
 
@@ -282,6 +284,7 @@ class ProjectMemberListAPI(GenericAPIView):
         return Response(data)
 
 
+@extend_schema(tags=['Projects'])
 class ProjectMemberAvailableAPI(GenericAPIView):
     """Search organization users who can be enabled on this project.
 
@@ -309,6 +312,7 @@ class ProjectMemberAvailableAPI(GenericAPIView):
         return Response(data)
 
 
+@extend_schema(tags=['Projects'])
 class ProjectMemberGrantAPI(GenericAPIView):
     """Enable one explicit project member.
 
@@ -357,6 +361,7 @@ class ProjectMemberRevokeAPI(GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema(tags=['Projects'])
 class ProjectMemberAPI(ProjectMemberGrantAPI, ProjectMemberRevokeAPI):
     """Grant or revoke the user named by the member URL.
 

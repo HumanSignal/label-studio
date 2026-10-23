@@ -261,7 +261,7 @@ class ActionPermissionTests(TestCase):
         self.assertIs(project_actions_api_action(''), None)
         self.assertIs(project_actions_api_action('next_task'), Action.ACCESS)
         self.assertIs(project_actions_api_action('delete_tasks'), Action.MANAGE)
-        self.assertIsNone(project_actions_api_action('not-a-registered-action'))
+        self.assertIs(project_actions_api_action('not-a-registered-action'), Action.MANAGE)
 
         world = make_access_world()
         view = ProjectActionsAPI()
@@ -273,7 +273,7 @@ class ActionPermissionTests(TestCase):
 
         unknown = self.factory.post('/?id=not-a-registered-action')
         unknown.user = world.owner
-        self.assertFalse(permission.has_permission(unknown, view))
+        self.assertTrue(permission.has_permission(unknown, view))
 
         nxt = self.factory.post(f'/?id=next_task&project={world.project_1.id}')
         nxt.user = world.member_a

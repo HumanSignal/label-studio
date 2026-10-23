@@ -113,7 +113,8 @@ def project_actions_api_action(action_id: str | None) -> Action | None:
     """Map a ``ProjectActionsAPI`` action id to the action it must pass.
 
     Responsibility: ``next_task`` is project access. Every other registered
-    data-manager action is management. A missing or unknown id is denied.
+    data-manager action is management. A missing id is denied. An unknown id
+    is management so the view can answer 400; it is not a hidden project.
 
     Boundary: this exception lives here so views do not branch on
     ``next_task``. ``None`` means deny. Does not call ``user.has_perm``.
@@ -122,12 +123,7 @@ def project_actions_api_action(action_id: str | None) -> Action | None:
         return None
     if action_id == 'next_task':
         return Action.ACCESS
-    import data_manager.actions  # noqa: F401 — registers DATA_MANAGER_ACTIONS
-    from django.conf import settings
-
-    if action_id in settings.DATA_MANAGER_ACTIONS:
-        return Action.MANAGE
-    return None
+    return Action.MANAGE
 
 
 def webhook_permission_action(project_id) -> Action:
@@ -361,6 +357,16 @@ def _project_of(obj):
         project = getattr(task, 'project', None)
         if isinstance(project, Project):
             return project
+    from labels_manager.models import Label, LabelLink
+
+    if isinstance(obj, LabelLink):
+        project = getattr(obj, 'project', None)
+        if isinstance(project, Project):
+            return project
+    if isinstance(obj, Label):
+        link = obj.links.select_related('project').order_by('id').first()
+        if link is not None and isinstance(link.project, Project):
+            return link.project
     return None
 
 
@@ -412,8 +418,14 @@ def _enforce(user, action, obj) -> None:
         ensure_can_create_project(user)
         return
     if action is Action.ANNOTATION_WRITE:
-        from tasks.models import Annotation
+        from tasks.models import Annotation, AnnotationDraft
 
+        if isinstance(obj, AnnotationDraft):
+            from projects.access import draft_visible_to
+
+            if not draft_visible_to(user, obj):
+                raise NotFound()
+            return
         if not isinstance(obj, Annotation):
             raise NotFound()
         _enforce_annotation_write(user, obj)

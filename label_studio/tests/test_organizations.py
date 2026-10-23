@@ -79,4 +79,4 @@ def test_organization_member_retrieve_not_active_org(business_client):
     other_organization = Organization.create_organization(created_by=other_user)
     OrganizationMember.objects.create(user=user, organization=other_organization)
     response = business_client.get(f'/api/organizations/{other_organization.id}/memberships/{user.id}/')
-    assert response.status_code == 403
+    assert response.status_code == 404

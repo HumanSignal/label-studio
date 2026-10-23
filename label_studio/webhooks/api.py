@@ -22,15 +22,15 @@ def _webhook_project_reassigned(data, current_project_id) -> bool:
 
     Responsibility: detect a project change before the webhook serializer saves.
 
-    Boundary: an omitted project field is not a change. Clearing a project
-    webhook, or pointing it at a different id, is a change. This does not
+    Boundary: an omitted project field, or a null project field, is not a
+    change. Pointing the webhook at a different id is a change. This does not
     persist the row.
     """
     if not hasattr(data, '__contains__') or 'project' not in data:
         return False
     raw = data.get('project')
     if raw in (None, ''):
-        return current_project_id is not None
+        return False
     try:
         return int(raw) != current_project_id
     except (TypeError, ValueError):

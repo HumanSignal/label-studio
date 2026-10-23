@@ -228,6 +228,24 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/members/",
+        "module": "projects.member_api.ProjectMemberListAPI",
+        "name": "projects:api:project-member-list",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/members/available/",
+        "module": "projects.member_api.ProjectMemberAvailableAPI",
+        "name": "projects:api:project-member-available",
+        "decorators": ""
+    },
+    {
+        "url": "/api/projects/<int:pk>/members/<int:user_id>/",
+        "module": "projects.member_api.ProjectMemberAPI",
+        "name": "projects:api:project-member",
+        "decorators": ""
+    },
+    {
         "url": "/api/templates/",
         "module": "projects.api.TemplateListAPI",
         "name": "projects:api-templates:template-list",
@@ -331,13 +349,13 @@
     },
     {
         "url": "/api/dm/",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "data_manager:api:api-root",
         "decorators": ""
     },
     {
         "url": "/api/dm/<drf_format_suffix:format>",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "data_manager:api:api-root",
         "decorators": ""
     },
@@ -481,13 +499,13 @@
     },
     {
         "url": "/api/",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "api-root",
         "decorators": ""
     },
     {
         "url": "/api/<drf_format_suffix:format>",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "api-root",
         "decorators": ""
     },
@@ -643,13 +661,13 @@
     },
     {
         "url": "/api/",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "tasks:api-predictions:api-root",
         "decorators": ""
     },
     {
         "url": "/api/<drf_format_suffix:format>",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "tasks:api-predictions:api-root",
         "decorators": ""
     },
@@ -1044,6 +1062,12 @@
         "decorators": ""
     },
     {
+        "url": "/data/local-files/",
+        "module": "io_storages.localfiles.views.localfiles_data",
+        "name": "storages:localfiles_data",
+        "decorators": ""
+    },
+    {
         "url": "/api/ml/",
         "module": "ml.api.MLBackendListAPI",
         "name": "ml:api:ml-list",
@@ -1098,6 +1122,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/labels/bulk/",
+        "module": "labels_manager.api.LabelBulkUpdateAPI",
+        "name": "labels_manager:api-labels-bulk-slash",
+        "decorators": ""
+    },
+    {
         "url": "/api/labels/",
         "module": "labels_manager.api.LabelAPI",
         "name": "labels_manager:api-labels:label-list",
@@ -1147,13 +1177,13 @@
     },
     {
         "url": "/api/",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "labels_manager:api-labels:api-root",
         "decorators": ""
     },
     {
         "url": "/api/<drf_format_suffix:format>",
-        "module": "rest_framework.routers.APIRootView",
+        "module": "core.views.MappedAPIRootView",
         "name": "labels_manager:api-labels:api-root",
         "decorators": ""
     },
@@ -1173,12 +1203,6 @@
         "url": "/api/fsm/entities/<str:entity_name>/<int:entity_id>/transition/",
         "module": "fsm.api.FSMEntityTransitionAPI",
         "name": "fsm:fsm-entity-transition",
-        "decorators": ""
-    },
-    {
-        "url": "/data/local-files/",
-        "module": "io_storages.localfiles.views.localfiles_data",
-        "name": "storages:localfiles_data",
         "decorators": ""
     },
     {
@@ -2113,31 +2137,31 @@
     },
     {
         "url": "/docs/api/schema/",
-        "module": "drf_spectacular.views.SpectacularAPIView",
+        "module": "core.views.OpenAPISchemaView",
         "name": "schema",
         "decorators": ""
     },
     {
         "url": "/docs/api/schema/swagger-ui/",
-        "module": "drf_spectacular.views.SpectacularSwaggerView",
+        "module": "core.views.OpenAPISwaggerView",
         "name": "swagger-ui",
         "decorators": ""
     },
     {
         "url": "/docs/api/schema/redoc/",
-        "module": "drf_spectacular.views.SpectacularRedocView",
+        "module": "core.views.OpenAPIRedocView",
         "name": "redoc",
         "decorators": ""
     },
     {
         "url": "/docs/api/schema/json/",
-        "module": "drf_spectacular.views.SpectacularJSONAPIView",
+        "module": "core.views.OpenAPIJSONView",
         "name": "schema-json",
         "decorators": ""
     },
     {
         "url": "/docs/api/schema/yaml/",
-        "module": "drf_spectacular.views.SpectacularYAMLAPIView",
+        "module": "core.views.OpenAPIYAMLView",
         "name": "schema-yaml",
         "decorators": ""
     }

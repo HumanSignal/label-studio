@@ -463,6 +463,36 @@ stages:
     method: POST
   response:
     status_code: 302
+- name: remember other user
+  request:
+    method: GET
+    url: '{django_live_url}/api/current-user/whoami'
+  response:
+    save:
+      json:
+        other_user_id: id
+    status_code: 200
+- id: logout
+  type: ref
+- id: login
+  type: ref
+- name: grant other user on the project
+  request:
+    method: PUT
+    url: '{django_live_url}/api/projects/{project_pk}/members/{other_user_id}/'
+  response:
+    status_code: 200
+- id: logout
+  type: ref
+- name: login other user
+  request:
+    url: "{django_live_url}/user/login"
+    data:
+      email: other_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
 - name: create_draft
   request:
     headers:
@@ -478,7 +508,6 @@ stages:
           - class_A
     method: POST
     url: '{django_live_url}/api/tasks/{task_pk}/annotations/{annotation_pk}/drafts'
-    # url: '{django_live_url}/api/tasks/{task_pk}/drafts'
   response:
     save:
       json:
@@ -492,6 +521,10 @@ stages:
     status_code: 200
     json:
       - id: !int '{draft_pk}'
+- id: logout
+  type: ref
+- id: login
+  type: ref
 - name: stage
   request:
     headers:

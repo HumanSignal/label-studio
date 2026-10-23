@@ -3,6 +3,7 @@
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from core.permissions import ViewClassPermission, all_permissions
 from django.urls import reverse
 from ml.models import MLBackend
 from ml_model_providers.models import ModelProviderConnection
@@ -25,6 +26,10 @@ class _ProviderSerializer(serializers.ModelSerializer):
 class _ProviderConnectionView(generics.RetrieveUpdateAPIView):
     queryset = ModelProviderConnection.objects.all()
     serializer_class = _ProviderSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.model_provider_connection_view,
+        PATCH=all_permissions.model_provider_connection_change,
+    )
 
 
 class MLAccessTests(APITestCase):
