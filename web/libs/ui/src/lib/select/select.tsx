@@ -972,6 +972,9 @@ export const Select = forwardRef(
         )}
         <select
           name={props?.name}
+          hidden
+          aria-hidden="true"
+          tabIndex={-1}
           value={selectedOptions.map((option) => option?.value ?? option).join(",")}
           ref={ref}
           disabled={disabled}
@@ -994,7 +997,9 @@ export const Select = forwardRef(
     }
     return combobox;
   },
-);
+) as (<T, A extends SelectOption<T>[]>(props: SelectProps<T, A>) => React.ReactElement | null) & {
+  displayName?: string;
+};
 
 type GroupActionsProps = {
   groupItems: any[];

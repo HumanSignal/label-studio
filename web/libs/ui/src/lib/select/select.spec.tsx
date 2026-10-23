@@ -114,6 +114,25 @@ describe("Select Component", () => {
   });
 
   describe("Basic Rendering", () => {
+    it("names only the visible trigger and preserves hidden form submission", () => {
+      const { container } = render(
+        <form>
+          <Select name="speed" options={["One"]} value="One" triggerProps={{ "aria-label": "Playback speed" }} />
+        </form>,
+      );
+      expect(screen.getByLabelText("Playback speed")).toHaveAttribute("aria-expanded", "false");
+      const backing = container.querySelector("select")!;
+      expect(backing).toHaveAttribute("hidden");
+      expect(backing).toHaveAttribute("aria-hidden", "true");
+      expect(backing).toHaveAttribute("tabindex", "-1");
+      expect(new window.FormData(container.querySelector("form")!).get("speed")).toBe("One");
+    });
+
+    it("keeps a trigger-provided label off the backing select", () => {
+      render(<Select options={["One"]} value="One" triggerProps={{ "aria-label": "Speed" }} />);
+      expect(screen.getByLabelText("Speed")).toHaveAttribute("aria-expanded", "false");
+    });
+
     it("renders with placeholder", () => {
       render(<Select options={["Apple", "Banana"]} placeholder="Select a fruit" />);
       expect(screen.getByText("Select a fruit")).toBeInTheDocument();

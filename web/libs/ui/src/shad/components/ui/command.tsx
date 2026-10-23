@@ -1,7 +1,7 @@
-import { MagnifyingGlassIcon } from "@humansignal/icons";
+import { SearchInput } from "../../../lib/search-input/search-input";
 import { cn } from "@humansignal/shad/utils";
 import { Command as CommandPrimitive } from "cmdk";
-import React from "react";
+import type React from "react";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
@@ -24,26 +24,15 @@ function CommandInput({
   /** Replaces the field's default `m-1` margin, e.g. to inset it like the content around it. */
   wrapperClassName?: string;
 }) {
-  const ref = React.useRef<HTMLInputElement>(null);
   return (
-    <div
-      data-slot="command-input-wrapper"
-      className={cn(
-        "flex items-center gap-2 h-8 px-2 focus-within:border-neutral-border-bold border outline-none border-neutral-border rounded-smaller hover:border-neutral-border-bold shadow-inner box-border",
-        wrapperClassName ?? "m-1",
-      )}
-      ref={ref}
+    <SearchInput
+      asChild
+      wrapperDataSlot="command-input-wrapper"
+      wrapperClassName={wrapperClassName ?? "m-1"}
+      className={className}
     >
-      <MagnifyingGlassIcon className="text-neutral-content-subtlest w-6 h-6 flex-none" />
-      <CommandPrimitive.Input
-        data-slot="command-input"
-        className={cn(
-          "placeholder:text-neutral-content-subtler flex h-8 w-full rounded-md bg-transparent py-3 outline-hidden disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none border-0",
-          className,
-        )}
-        {...props}
-      />
-    </div>
+      <CommandPrimitive.Input data-slot="command-input" {...props} />
+    </SearchInput>
   );
 }
 

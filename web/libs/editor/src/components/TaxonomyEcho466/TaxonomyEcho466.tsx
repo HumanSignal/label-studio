@@ -1,11 +1,9 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeGrid as Grid, type GridChildComponentProps } from "react-window";
 
 import { IconChevronDown, IconEllipsis, IconEmptyFolder, IconSearch } from "@humansignal/icons";
-import { Badge, Button, EmptyState, Popover, Tooltip } from "@humansignal/ui";
+import { Button, EmptyState, Popover, TaxonomySelectionList, Tooltip, Typography } from "@humansignal/ui";
 
 import { TaxonomySearch, type TaxonomySearchRef } from "./TaxonomySearch";
 import { TaxonomyTree, type TaxonomyTreeNode } from "./taxonomy-tree";
@@ -78,63 +76,6 @@ function parsePositiveMaxUsages(raw: unknown): number | undefined {
 const TAXONOMY_ADD_ROW_VALUE_SUFFIX = "\u0007taxonomy-add-row";
 
 const ROW_ACTIONS_MENU_MIN_WIDTH_PX = 160;
-
-/** Max height of selected-tags area in the trigger (prevents full-page growth). */
-const SELECTION_VIEWPORT_MAX_PX = 120;
-/** Row height for virtualized tag grid (single-line badge + gap). */
-const SELECTION_CHIP_ROW_HEIGHT_PX = 30;
-const SELECTION_GRID_MIN_COL_WIDTH_PX = 100;
-const SELECTION_GRID_GAP_PX = 6;
-/** Use react-window grid above this count to cap DOM nodes while keeping wrap-like layout. */
-const SELECTION_VIRTUALIZE_THRESHOLD = 12;
-
-type DisplayedSelection = { value: string; label: string; isUserAdded?: boolean };
-
-type SelectionGridData = {
-  displayed: DisplayedSelection[];
-  columnCount: number;
-  isEditable: boolean;
-  removeTag: (pathValue: string) => void;
-};
-
-function TaxonomySelectionBadgeCell({
-  columnIndex,
-  rowIndex,
-  style,
-  data,
-}: GridChildComponentProps<SelectionGridData>) {
-  const index = rowIndex * data.columnCount + columnIndex;
-  const { displayed, isEditable, removeTag } = data;
-  if (index >= displayed.length) {
-    return <div style={style as React.CSSProperties} className="box-border" />;
-  }
-  const d = displayed[index]!;
-  return (
-    <div
-      style={style as React.CSSProperties}
-      className="box-border flex min-w-0 items-center justify-start pr-tighter pb-tighter"
-    >
-      <Badge
-        variant="grape"
-        look="filled"
-        size="small"
-        shape="squared"
-        className="htx-taxonomy-selection-item max-w-full min-w-0 shrink"
-        maxWidth={220}
-        onClose={
-          isEditable
-            ? (e) => {
-                e.stopPropagation();
-                removeTag(d.value);
-              }
-            : undefined
-        }
-      >
-        <span className={`htx-taxonomy-selection-item-label truncate${d.isUserAdded ? " italic" : ""}`}>{d.label}</span>
-      </Badge>
-    </div>
-  );
-}
 
 type UserLabelsTreeContext = {
   pendingAddParentValueStr: string | null;
@@ -538,12 +479,19 @@ const convert = (
 
   const enrich = (item: TaxonomyItem) => {
     const userAdded = isUserAddedTaxonomyItem(item);
-    const emphasize = (node: React.ReactNode) => (userAdded ? <span className="italic">{node}</span> : node);
+    const emphasize = (node: React.ReactNode) =>
+      userAdded ? (
+        <Typography as="span" size="small" fontStyle="italic">
+          {node}
+        </Typography>
+      ) : (
+        node
+      );
 
     const color = (it: TaxonomyItem) => (
-      <span className="htx-taxonomy-item-color" style={{ background: it.color }}>
+      <Typography as="span" size="small" className="htx-taxonomy-item-color" style={{ background: it.color }}>
         {it.label}
-      </span>
+      </Typography>
     );
 
     const body = item.color ? color(item) : item.label;
@@ -553,7 +501,9 @@ const convert = (
 
     return (
       <Tooltip title={item.hint}>
-        <span className="min-w-0 truncate">{formatted}</span>
+        <Typography as="span" size="small" className="min-w-0 truncate">
+          {formatted}
+        </Typography>
       </Tooltip>
     );
   };
@@ -1073,77 +1023,12 @@ const TaxonomyEcho466 = ({
             <div className="min-w-0 flex-1 self-stretch">
               {displayed.length === 0 ? (
                 <div className="flex items-center">
-                  <span className="text-neutral-content-subtle">{options.placeholder || "Click to add..."}</span>
-                </div>
-              ) : displayed.length < SELECTION_VIRTUALIZE_THRESHOLD ? (
-                <div className="flex max-h-[7.5rem] min-w-0 flex-1 flex-wrap items-center gap-tighter overflow-y-auto content-center">
-                  {displayed.map((d) => (
-                    <Badge
-                      key={d.value}
-                      variant="grape"
-                      look="filled"
-                      size="small"
-                      shape="squared"
-                      className="htx-taxonomy-selection-item max-w-full min-w-0 shrink"
-                      maxWidth={220}
-                      onClose={
-                        isEditable
-                          ? (e) => {
-                              e.stopPropagation();
-                              removeTag(d.value);
-                            }
-                          : undefined
-                      }
-                    >
-                      <span className={`htx-taxonomy-selection-item-label${d.isUserAdded ? " italic" : ""}`}>
-                        {d.label}
-                      </span>
-                    </Badge>
-                  ))}
+                  <Typography as="span" size="small" className="text-neutral-content-subtle">
+                    {options.placeholder || "Click to add..."}
+                  </Typography>
                 </div>
               ) : (
-                <div
-                  className="max-h-[7.5rem] min-h-0 min-w-0 w-full overflow-hidden"
-                  style={{ height: SELECTION_VIEWPORT_MAX_PX }}
-                >
-                  <AutoSizer>
-                    {({ width, height: viewportH }) => {
-                      const columnCount = Math.max(
-                        1,
-                        Math.min(
-                          displayed.length,
-                          Math.floor(
-                            (width + SELECTION_GRID_GAP_PX) / (SELECTION_GRID_MIN_COL_WIDTH_PX + SELECTION_GRID_GAP_PX),
-                          ),
-                        ),
-                      );
-                      const rowCount = Math.ceil(displayed.length / columnCount);
-                      const columnWidth = width / columnCount;
-                      const gridData: SelectionGridData = {
-                        displayed,
-                        columnCount,
-                        isEditable,
-                        removeTag,
-                      };
-                      return (
-                        <Grid
-                          className="htx-taxonomy-selection-virtual-grid"
-                          columnCount={columnCount}
-                          columnWidth={columnWidth}
-                          height={Math.min(SELECTION_VIEWPORT_MAX_PX, viewportH)}
-                          rowCount={rowCount}
-                          rowHeight={SELECTION_CHIP_ROW_HEIGHT_PX}
-                          width={width}
-                          itemData={gridData}
-                          overscanColumnCount={1}
-                          overscanRowCount={2}
-                        >
-                          {TaxonomySelectionBadgeCell}
-                        </Grid>
-                      );
-                    }}
-                  </AutoSizer>
-                </div>
+                <TaxonomySelectionList items={displayed} onRemove={isEditable ? removeTag : undefined} />
               )}
             </div>
             <IconChevronDown

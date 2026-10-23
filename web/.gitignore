@@ -126,3 +126,13 @@ dist
 
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+# design-sync (claude.ai/design) — local build/verification state; .design-sync/ durable files are committed
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.ds-sync/
+ds-bundle/
+# durable sync build inputs (the repo-root `services/**/build` rule would otherwise ignore them)
+!.design-sync/build/

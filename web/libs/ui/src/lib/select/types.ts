@@ -113,7 +113,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   isInline?: boolean;
   isLoading?: boolean;
   dataTestid?: string;
-  size?: SelectSize | undefined;
+  size?: SelectSize | `${SelectSize}` | undefined;
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
@@ -147,7 +147,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
    */
   align?: "start" | "center" | "end";
 } & SelectVirtualizedProps &
-  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
+  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder" | "onChange" | "size">;
 
 type ToNever<T> = {
   [key in keyof T]?: never;

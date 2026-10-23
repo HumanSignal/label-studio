@@ -1,0 +1,33 @@
+{
+  "extends": "../../libs/ui/tsconfig.lib.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "noEmitOnError": false,
+    "sourceMap": false,
+    "declarationMap": false,
+    "skipLibCheck": true,
+    "rootDir": "../..",
+    "outDir": "../../dist/design-sync/ui/types",
+    "types": [
+      "node",
+      "vite-plugin-svgr/client"
+    ]
+  },
+  "files": [],
+  "include": [
+    "ambient.d.ts",
+    "../../libs/ui/src/**/*.ts",
+    "../../libs/ui/src/**/*.tsx",
+    "../../libs/ui/src/**/*.js"
+  ],
+  "exclude": [
+    "../../libs/ui/src/**/*.spec.ts",
+    "../../libs/ui/src/**/*.test.ts",
+    "../../libs/ui/src/**/*.spec.tsx",
+    "../../libs/ui/src/**/*.test.tsx",
+    "../../libs/ui/src/**/*.stories.tsx",
+    "../../libs/ui/src/**/*.stories.ts"
+  ]
+}
