@@ -533,3 +533,44 @@ class TestProjectUsersColumnOptionsAPI(APITestCase):
                 assert access_ids <= option_ids
                 assert root_matchers <= option_ids
                 assert child_matchers <= option_ids
+
+
+class TestProjectStateAPIQueueCounters(APITestCase):
+    """ProjectStateAPI must report queue counters for the requesting user.
+
+    `queue_total` and `queue_done` are resolved from `ProjectSerializer.user_id`,
+    which reads the request out of the serializer context. Without that context the
+    serializer falls back to the first entry of its internal user cache, which is
+    populated as a side effect of serializing `created_by`, so every requester used
+    to receive the project owner's counters.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.organization = OrganizationFactory()
+        cls.owner = cls.organization.created_by
+        cls.project = ProjectFactory(organization=cls.organization, created_by=cls.owner)
+        cls.viewer = UserFactory(active_organization=cls.organization)
+        ProjectMember.objects.create(project=cls.project, user=cls.viewer)
+        for _ in range(2):
+            task = TaskFactory(project=cls.project)
+            AnnotationFactory(task=task, project=cls.project, completed_by=cls.owner)
+        cls.project.tasks.update(is_labeled=True)
+
+    def _project_state(self, user):
+        self.client.force_authenticate(user)
+        response = self.client.get(f'/api/dm/project?project={self.project.id}')
+        assert response.status_code == 200, response.content
+        return response.json()
+
+    def test_owner_sees_own_counters(self):
+        state = self._project_state(self.owner)
+
+        assert state['queue_total'] == 2
+        assert state['queue_done'] == 2
+
+    def test_viewer_does_not_see_owner_counters(self):
+        state = self._project_state(self.viewer)
+
+        assert state['queue_total'] == 0
+        assert state['queue_done'] == 0
