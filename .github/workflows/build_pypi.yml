@@ -112,7 +112,7 @@ jobs:
         run: bun run version:libs
 
       - name: "Set up uv"
-        uses: astral-sh/setup-uv@v10.3.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '3.14'
           enable-cache: true
