@@ -359,6 +359,13 @@ export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
 export const FF_VERIFIED_SKILLS_AND_ONBOARDING = "fflag_feat_utc_1407_verified_skills_and_onboarding";
 
 /**
+ * UTC-1437 restricted locations (workforce organizations only): contributors who must verify their identity
+ * also need a reviewed tax form before they can be added to projects or join them. Ships with the backend
+ * flag of the same name.
+ */
+export const FF_RESTRICTED_LOCATIONS = "fflag_feat_utc_1437_restricted_locations_short";
+
+/**
  * UTC-1446 experiment: the "Ask AI" pill in the labeling editor's comment headers, which prefills Ask AI
  * with the comment. Also needs the per-project switch in Django admin. Checked as an explicit `true` only,
  * never the installation default (which is `true` on-prem). Remove with the AskAIInComments folder.
