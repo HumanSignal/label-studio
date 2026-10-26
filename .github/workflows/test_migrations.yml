@@ -35,7 +35,7 @@ jobs:
           ref: ${{ inputs.ref }}
 
       - name: "Set up uv"
-        uses: astral-sh/setup-uv@v10.3.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '3.14'
           enable-cache: true
@@ -95,7 +95,7 @@ jobs:
           fetch-depth: 2147483647
 
       - name: "Set up uv"
-        uses: astral-sh/setup-uv@v10.3.0
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '3.14'
           enable-cache: true
