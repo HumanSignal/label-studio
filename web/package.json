@@ -129,14 +129,14 @@
     "react-window-infinite-loader": "^1.0.5",
     "rehype-raw": "^7.0.0",
     "sanitize-html": "^2.14.0",
-    "shadcn": "^2.1.8",
+    "shadcn": "^4.22.1",
     "simplify-js": "^1.2.4",
     "storybook": "^9.1.19",
     "sucrase": "^3.35.0",
     "tailwind-merge": "^2.6.0",
     "webfft": "^1.0.3",
     "xpath-range": "^1.1.1",
-    "zod": "^3.23.8"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
@@ -192,7 +192,7 @@
     "tailwind-scrollbar": "3",
     "tailwindcss": "3.4.3",
     "tailwindcss-animate": "^1.0.7",
-    "toml": "^4.1.2",
+    "toml": "^5.0.1",
     "truncate-middle": "^1.0.6",
     "tslib": "^2.3.0",
     "typescript": "5.8.3",
