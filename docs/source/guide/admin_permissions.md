@@ -72,14 +72,14 @@ Note the following:
 | **Reset Project Cache** | Administrators, Managers | Manager+ | Controls who can perform the **Reset Cache** action for a project. This is a troubleshooting action that resets the project labeling cache to fix labeling configuration validation errors. |
 | **Drop All Tabs** | Administrators, Managers | Manager+ | Controls who can perform the **Drop All Tabs** action for a project. This is a troubleshooting action that deletes all Data Manager tabs except the **Default** tab. It can help when the Data Manager is not loading properly. |
 | **Delete Project** | Administrators, Managers | Manager+ | Controls who can perform the **Delete Project** action. Users with this permission can permanently delete projects and all associated data, including tasks and annotations. |
-| **Delete Own Projects in Personal Sandbox** | Managers | Off | Lets Managers who cannot **Delete Project** delete projects they created while those projects are in their own [Personal Sandbox](workspaces#Sandbox-workspace).<br><br>Projects created by someone else, and projects that were ever moved out of the sandbox, stay protected, even if they are moved back.<br><br>Can only be selected while **Delete Project** is off for Managers. |
+| **Delete Own Projects in Personal Sandbox** | Managers | Off | Lets Managers who cannot **Delete Project** delete projects they created while those projects are in their own [Personal Sandbox](workspaces#Sandbox-workspace).<br><br>Projects created by someone else, and projects that were ever moved out of the sandbox, stay protected, even if they are moved back.<br><br>Only shown while **Delete Project** is off for Managers. |
 
 ## Dependent permissions
 
 Two permissions depend on another permission for the same role:
 
 * **Author Interfaces** requires **Manage Interfaces**. If you turn off **Manage Interfaces** for a role, **Author Interfaces** is turned off and disabled for that role.
-* **Delete Own Projects in Personal Sandbox** is only available while **Delete Project** is off for Managers. **Delete Project** already lets Managers delete any project they can access, so if you turn **Delete Project** on for Managers, **Delete Own Projects in Personal Sandbox** is cleared and disabled. If you turn **Delete Project** off again, you need to select it again.
+* **Delete Own Projects in Personal Sandbox** is only available while **Delete Project** is off for Managers. **Delete Project** already lets Managers delete any project they can access, so while **Delete Project** is on for Managers, **Delete Own Projects in Personal Sandbox** is hidden and any earlier selection is cleared. If you turn **Delete Project** off again, the option reappears unchecked and you need to select it again.
 
 !!! info tip
     You can click **Reset to Defaults** to return all permissions to their default value.
