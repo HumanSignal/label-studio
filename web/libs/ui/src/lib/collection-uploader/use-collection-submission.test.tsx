@@ -133,6 +133,7 @@ function makeHarness(config: {
   outputSchema?: Record<string, unknown> | null;
   validateFile?: (file: File, meta: unknown) => unknown;
   documentAI?: SubmissionEngineDeps["documentAI"];
+  annotationSubmitted?: boolean;
 }) {
   const refs: HarnessRefs = { api: null, regions: config.initialRegions || [], setRegions: null, setTaskId: null };
   const deps: SubmissionEngineDeps | null = config.engine
@@ -153,6 +154,7 @@ function makeHarness(config: {
       props: {
         task,
         readOnly: config.readOnly,
+        annotationSubmitted: config.annotationSubmitted,
         rpcCapabilities: new Set(config.capabilities ?? ["collectionUpload"]),
         visibleRegions: regions,
         initialResults: config.initialResults,
@@ -1008,5 +1010,60 @@ describe("locked regions", () => {
     expect(refs.api!.members).toHaveLength(1);
     expect(refs.api!.members[0].state).toBe("uploaded");
     expect(refs.api!.members[0].file.name).toBe("f70.pdf");
+  });
+});
+
+describe("submitted state follows the open annotation", () => {
+  it("a draft that reuses a submitted annotation's file shows it as uploaded, not submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(90)], annotationSubmitted: false });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta).not.toBeUndefined());
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].submitted).toBe(false);
+    expect(refs.api!.members[0].onRemove).toBeDefined();
+    expect(refs.api!.collection.submitted).toBe(false);
+  });
+
+  it("a reviewer's duplicated draft shows the reused file as uploaded, without actions", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(90)],
+      capabilities: ["collectionUpload", "reviewAnnotation"],
+      annotationSubmitted: false,
+    });
+    render(<Host />);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeUndefined();
+    expect(refs.api!.members[0].onRemove).toBeUndefined();
+    expect(refs.api!.collection.submitted).toBe(false);
+  });
+
+  it("a reviewer viewing a submitted annotation still sees its file as submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(90)],
+      capabilities: ["collectionUpload", "reviewAnnotation"],
+      annotationSubmitted: true,
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].submitted).toBe(true));
+    expect(refs.api!.members[0].state).toBe("readonly");
+  });
+
+  it("the submitted annotation itself still shows its file as submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(90)], annotationSubmitted: true });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].state).toBe("submitted"));
+    expect(refs.api!.collection.submitted).toBe(true);
   });
 });

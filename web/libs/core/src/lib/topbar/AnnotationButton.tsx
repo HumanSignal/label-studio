@@ -355,6 +355,8 @@ interface MenuActionItem {
   icon: React.ReactNode;
   onClick: () => void;
   enabled: boolean;
+  /** Shown disabled, with this text as its tooltip, instead of being clickable. */
+  disabledReason?: string;
   separator?: boolean;
   danger?: boolean;
   dataTestId: string;
@@ -435,6 +437,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
           close();
         },
         enabled: capabilities.enableCreateAnnotation && !isDraft,
+        disabledReason: capabilities.duplicateDisabledReason,
         dataTestId: "annotation-button-menu-duplicate",
       },
       {
@@ -504,16 +507,34 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
     <div className={contextMenuStyles.menu}>
       {items.map((item, index) => {
         if (!item.enabled) return null;
-        const className = [contextMenuStyles.option, item.danger ? contextMenuStyles.danger : ""]
+        const className = [
+          contextMenuStyles.option,
+          item.danger ? contextMenuStyles.danger : "",
+          item.disabledReason ? contextMenuStyles.disabled : "",
+        ]
           .filter(Boolean)
           .join(" ");
+        const option = (
+          <div
+            className={className}
+            onClick={item.disabledReason ? undefined : item.onClick}
+            aria-disabled={item.disabledReason ? true : undefined}
+            data-testid={item.dataTestId}
+          >
+            {item.icon && <span className={contextMenuStyles.icon}>{item.icon}</span>}
+            {item.label}
+          </div>
+        );
         return (
           <div key={item.dataTestId ?? index}>
             {item.separator && <div className={contextMenuStyles.seperator} />}
-            <div className={className} onClick={item.onClick} data-testid={item.dataTestId}>
-              {item.icon && <span className={contextMenuStyles.icon}>{item.icon}</span>}
-              {item.label}
-            </div>
+            {item.disabledReason ? (
+              <Tooltip title={item.disabledReason} alignment="bottom-center">
+                {option}
+              </Tooltip>
+            ) : (
+              option
+            )}
           </div>
         );
       })}

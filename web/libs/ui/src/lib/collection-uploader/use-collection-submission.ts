@@ -194,6 +194,8 @@ export interface SubmissionScreenProps {
   task?: { id?: number } | null;
   readOnly?: boolean;
   rpcCapabilities?: Set<string>;
+  /** False while the open annotation is a draft never submitted (e.g. a duplicate). */
+  annotationSubmitted?: boolean;
   visibleRegions?: SubmissionRegion[];
   initialResults?: Array<{ value?: { upload_id?: number | string } | null } | null>;
   outputSchema?: Record<string, unknown> | null;
@@ -1086,15 +1088,22 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     : null;
 
   const capacityOver = regions.length > bounds.max;
+  // The server only knows that some annotation references the file. A draft that
+  // reuses it (a duplicated annotation) is not submitted until it is submitted itself.
+  const isReferencedSubmission = (server: SubmissionCurrentUpload | undefined) =>
+    !!(server && server.referenced_by_annotation) && props.annotationSubmitted !== false;
 
   const storedMembers: CollectionMember[] = regions.map((region) => {
     const sub = region._submission!;
     const locked = region.locked === true;
     const server = serverByUploadId[String(sub.upload_id)];
     const submitted =
-      !!(server && server.referenced_by_annotation) ||
-      (!canUpload &&
-        (props.initialResults || []).some((r) => r && r.value && String(r.value.upload_id) === String(sub.upload_id)));
+      props.annotationSubmitted !== false &&
+      (isReferencedSubmission(server) ||
+        (!canUpload &&
+          (props.initialResults || []).some(
+            (r) => r && r.value && String(r.value.upload_id) === String(sub.upload_id),
+          )));
 
     if (pendingReplace && replaceRow && pendingReplace.regionId === region.id) {
       const failed = replaceRow.status === "failed";
@@ -1150,7 +1159,8 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     const storedKind = submissionMediaKind(sub.filename, sub.contentType);
     return {
       key: region.id,
-      state: readonly ? "readonly" : submitted ? "submitted" : "uploaded",
+      // A read-only card reads "Submitted"; one that is not part of a submitted annotation stays "Uploaded".
+      state: readonly ? (submitted ? "readonly" : "uploaded") : submitted ? "submitted" : "uploaded",
       file: { name: sub.filename || "", size: sub.size, contentType: sub.contentType },
       kind: storedKind,
       pdf: memberPdf(storedKind, previewUrl),
@@ -1274,8 +1284,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       submitted:
         regions.length > 0 &&
         regions.every((r) => {
-          const server = serverByUploadId[String(r._submission!.upload_id)];
-          return !!(server && server.referenced_by_annotation);
+          return isReferencedSubmission(serverByUploadId[String(r._submission!.upload_id)]);
         }),
       readonly,
     },
