@@ -14,7 +14,6 @@ classifiers = [
 dependencies = [
     "wheel (>=0.46.3)",
     "appdirs (>=1.4.3)",
-    "attr (==0.3.1)",
     "attrs (>=19.2.0)",
     "pyyaml (>=6.0.0)",
     "azure-storage-blob (>=12.6.0)",
@@ -100,7 +99,6 @@ test = [
     "pytest-xdist==3.8.0",
     "psutil==7.0.0",
     "freezegun~=1.5.1",
-    "pre-commit==3.3.3",
     "s3transfer>=0.16.0",
     "mock>=5.1.0",
     "moto>=4.2.6",
