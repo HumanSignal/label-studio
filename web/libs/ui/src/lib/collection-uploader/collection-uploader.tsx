@@ -197,12 +197,18 @@ export const CollectionUploader = ({
   // still replaces the dropzone with its rejected card.
   const hasCards = Children.count(children) > 0;
   const showDropzone = fileCount === 0 && !hasCards;
+  // Files the screen counts but renders no card for are hidden from the Regions
+  // panel. Rejected picks are cards that hold no slot, so they do not count.
+  const memberCards = Children.toArray(children).filter(
+    (child) => !(isValidElement<{ state?: string }>(child) && child.props.state === "rejected"),
+  ).length;
+  const hiddenCount = children !== undefined && rows.length === 0 ? Math.max(0, fileCount - memberCards) : 0;
 
   return (
     <div className={cn("flex flex-col gap-tight", className)} data-testid="collection-uploader">
       {bundleMode ? (
         <CollectionHeader
-          storedCount={storedCount}
+          storedCount={storedCount + hiddenCount}
           minFiles={minFiles}
           maxFiles={maxFiles}
           uploadingCount={uploadingCount}
@@ -267,7 +273,14 @@ export const CollectionUploader = ({
         </div>
       ) : null}
 
-      {fileCount > 0 || hasCards ? (
+      {hiddenCount > 0 ? (
+        <Message variant="neutral" size="small" data-testid="collection-uploader-hidden">
+          {hiddenCount === 1 ? "1 uploaded file is hidden." : `${hiddenCount} uploaded files are hidden.`} Show{" "}
+          {hiddenCount === 1 ? "it" : "them"} again from the Regions panel.
+        </Message>
+      ) : null}
+
+      {hasCards ? (
         <div
           className={
             bundleMode && view === "grid"

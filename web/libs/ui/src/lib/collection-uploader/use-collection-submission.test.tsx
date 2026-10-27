@@ -156,7 +156,8 @@ function makeHarness(config: {
         readOnly: config.readOnly,
         annotationSubmitted: config.annotationSubmitted,
         rpcCapabilities: new Set(config.capabilities ?? ["collectionUpload"]),
-        visibleRegions: regions,
+        regions,
+        visibleRegions: regions.filter((r) => !r.hidden),
         initialResults: config.initialResults,
         outputSchema: config.outputSchema ?? schemaWith({ types: ["application/pdf"], max_files: 3, min_files: 1 }),
         fileResolverTemplate: "https://proxy/resolve/{fileuri}",
@@ -1010,6 +1011,76 @@ describe("locked regions", () => {
     expect(refs.api!.members).toHaveLength(1);
     expect(refs.api!.members[0].state).toBe("uploaded");
     expect(refs.api!.members[0].file.name).toBe("f70.pdf");
+  });
+});
+
+describe("hidden regions", () => {
+  const hide = (r: SubmissionRegion): SubmissionRegion => ({ ...r, hidden: true });
+
+  it("hiding an uploaded file removes its card without turning it into an upload in progress", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    await act(async () => refs.api!.pick([pdf("a.pdf")]));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await act(async () => engine.complete(engine.rows[0].clientRef, 101));
+    await waitFor(() => expect(refs.regions).toHaveLength(1));
+
+    await act(async () => refs.setRegions!(refs.regions.map(hide)));
+    expect(refs.api!.members).toHaveLength(0);
+    expect(refs.api!.collection.uploadingCount).toBe(0);
+    expect(refs.api!.capacity.count).toBe(1);
+    expect(refs.regions).toHaveLength(1);
+
+    await act(async () => refs.setRegions!(refs.regions.map((r) => ({ ...r, hidden: false }))));
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeDefined();
+    expect(refs.api!.members[0].onRemove).toBeDefined();
+  });
+
+  it("a replace still uploading into a hidden slot keeps its card and Cancel", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await act(async () =>
+      refs.api!.replaceInput.onChange({
+        target: { files: [pdf("new.pdf", 2222)], value: "" } as unknown as HTMLInputElement,
+      }),
+    );
+    await waitFor(() => expect(refs.api!.members[0].state).toBe("uploading"));
+    await act(async () => refs.setRegions!(refs.regions.map(hide)));
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploading");
+    expect(refs.api!.members[0].onCancel).toBeDefined();
+  });
+
+  it("a hidden file still counts toward the task's file limit", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [hide(region(70, 0))],
+      outputSchema: schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 }),
+    });
+    render(<Host />);
+    expect(refs.api!.capacity.full).toBe(true);
+    await act(async () => refs.api!.pick([pdf("b.pdf")]));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(0);
+    expect(refs.api!.rejected).toHaveLength(1);
+  });
+
+  it("draft recovery does not re-attach a file whose region is only hidden", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(70)];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [hide(region(70, 0))] });
+    render(<Host />);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(refs.regions).toHaveLength(1);
+    expect(refs.regions[0].hidden).toBe(true);
+    expect(refs.api!.members).toHaveLength(0);
+    expect(refs.api!.capacity.count).toBe(1);
   });
 });
 
