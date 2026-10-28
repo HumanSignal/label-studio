@@ -12,7 +12,7 @@ const meta: Meta<typeof CollapsiblePanel> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "default"],
+      options: ["primary", "default", "positive"],
     },
     disableToggle: {
       control: "boolean",
