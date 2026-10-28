@@ -60,12 +60,29 @@ You can review tasks in random order, or order tasks in the project data manager
 
 #### Task ordering and limiting (Enterprise)
 
-For Label Studio Enterprise projects, you can configure the review stream ordering and limit the review slice:
+Open **Settings > Review > Task Ordering** to choose how the review stream presents tasks. **Random** and **By Annotator** require Label Studio Enterprise. For the field reference, see [Task Ordering](project_settings_lse#review-task-ordering).
 
-- Task Ordering: Choose between By Task ID (sequential) and Random. Random preserves the order of annotations within each task but randomizes task order.
-- Task Limit (%): When Random is selected, optionally limit the percentage of project tasks available for review. The limit is applied after any filters such as “Show only finished tasks.” When reviewers start a review session from a Data Manager selection (selected items), the limit is bypassed for that session.
+| Ordering | What reviewers see |
+| --- | --- |
+| **By Task ID** | Tasks in ascending task ID. Annotations within a task stay in a stable order. |
+| **Random** | Tasks in a random order. Annotations within a task stay in a stable order. |
+| **By Annotator** | One annotator at a time, until a configured share of that annotator's remaining annotations has been reviewed. |
 
-See **Settings > Review > Task Ordering** and **Task Limit** for configuration details.
+**By Annotator** gives each annotator a turn in the review stream, including annotators with fewer submissions. Set **Review Coverage per Annotator (%)** to the share of an annotator's remaining submitted annotations to review before the stream moves on. The default is 20. Enter a value from 1 to 100. The percentage is rounded up to a whole annotation. Coverage counts submitted annotations. Skipped annotations are left out, and reviews that are already recorded count toward the percentage.
+
+The stream applies that percentage as follows:
+
+- It stays with one annotator until the current round reaches the percentage. That annotator's annotations are shown in task ID order.
+- Annotators who are still below the percentage are reviewed before annotators who have reached it. Among annotators below the percentage, those who have not finished a round yet come first. An annotator whose newer submissions drop them back below the percentage is picked up after those unfinished first rounds.
+- Annotations submitted during a round count as remaining work, so the round continues until the percentage of that updated remaining work has been reviewed.
+- After every annotator has reached the percentage, the next round starts with the annotator who finished their previous round earliest.
+- Changing the percentage, or switching to **By Task ID** or **Random**, starts coverage over.
+
+For example, at 20% an annotator with 10 annotations is reviewed for 2 annotations. When 8 annotations are still waiting, the next round reviews 2 of those 8.
+
+This order applies to the automatic review stream. Tasks assigned to the reviewer, and annotations an annotator updated after a rejection, are still served first. A review started from a selection in the Data Manager follows that selection. If another reviewer has locked every remaining task for the current annotator, the stream moves to the next annotator until that work is available.
+
+To decide which tasks enter the review stream at all, use [Review Sampling](project_settings_lse#review-sampling).
 
 ### Navigate between tasks or annotations
 
