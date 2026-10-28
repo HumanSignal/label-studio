@@ -472,7 +472,7 @@ Use [agreement scores](stats) to determine which and how many tasks enter the **
 
 <dd>
 
-Select the order in which reviewers see tasks in the review stream. For how **By Annotator** moves through the queue, see [Task ordering and limiting](quality#Task-ordering-and-limiting-Enterprise).
+Select the order in which reviewers see tasks in the review stream.
 
 <table>
 <thead>
@@ -520,10 +520,13 @@ Review one annotator's annotations at a time. The stream covers a set percentage
 <li>The percentage of that annotator's remaining submitted annotations to review before the stream moves on. The default is 20. Enter a value from 1 to 100. The percentage is rounded up to a whole annotation.</li>
 <li>Coverage counts submitted annotations. Skipped annotations are left out, and reviews that are already recorded count toward the percentage.</li>
 <li>Annotations submitted during a round count as remaining work, so the round grows with them.</li>
-<li>Annotators who are still below the percentage are reviewed before annotators who have reached it. Among annotators below the percentage, those who have not finished a round yet come first.</li>
+<li>The stream stays with one annotator until the current round reaches the percentage. That annotator's annotations are shown in task ID order.</li>
+<li>Annotators who are still below the percentage are reviewed before annotators who have reached it. Among annotators below the percentage, those who have not finished a round yet come first. An annotator whose newer submissions drop them back below the percentage is picked up after those unfinished first rounds.</li>
 <li>After every annotator has reached the percentage, the next round starts with the annotator who finished their previous round earliest.</li>
 <li>Changing the percentage, or switching to another task ordering, starts coverage over.</li>
 </ul>
+
+<p>For example, at 20% an annotator with 10 annotations is reviewed for 2 annotations. When 8 annotations are still waiting, the next round reviews 2 of those 8.</p>
 
 <p>This order applies to the automatic review stream. Tasks assigned to the reviewer, and annotations an annotator updated after a rejection, are still served first. A review started from a Data Manager selection follows that selection. If another reviewer has locked every remaining task for the current annotator, the stream moves to the next annotator until that work is available.</p>
 
