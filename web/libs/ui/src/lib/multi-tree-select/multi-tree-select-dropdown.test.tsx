@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as transitionUtils from "@humansignal/core/lib/utils/transition";
 import { MultiTreeSelectDropdown } from "./multi-tree-select-dropdown";
+import type { TreeNodeProps } from "./tree-context";
 
 type TransitionCallbacks = {
   beforeTransition?: () => void;
@@ -426,4 +427,42 @@ describe("MultiTreeSelectDropdown", () => {
 
     expect(screen.getByRole("checkbox", { name: "Select Ada Lovelace" })).not.toBeChecked();
   });
+
+  it(
+    "with requireApply, enables Apply for a nested node after another instance indexed the same data",
+    async () => {
+      const onChange = mock();
+      // No schema: node ids are rewritten into paths in place, so a second index must not prefix them again.
+      const node = (id: string, label: string, children: TreeNodeProps[] = []) => ({
+        id,
+        label,
+        searchBy: [label],
+        children,
+      });
+      const nested = [node("a", "Area", [node("b", "Branch", [node("c", "Leaf")])])];
+      const props = {
+        data: nested,
+        selected: [],
+        onChange,
+        disableAllOption: true,
+        preventAutoChildSelection: true,
+        requireApply: true,
+        inline: true,
+        triggerTestId: "dropdown-trigger",
+      };
+      render(<MultiTreeSelectDropdown {...props} />).unmount();
+      render(<MultiTreeSelectDropdown {...props} />);
+
+      await openRequireApplyDropdown();
+      fireEvent.click(screen.getByRole("button", { name: "Expand Area" }));
+      fireEvent.click(await screen.findByRole("button", { name: "Expand Branch" }));
+      fireEvent.click(await screen.findByRole("checkbox", { name: "Select Leaf" }));
+      await waitForApplyEnabled();
+      fireEvent.click(applyButton());
+
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1), { timeout: APPLY_WAIT_MS });
+      expect(onChange.mock.calls[0][1]).toEqual(["a-b-c"]);
+    },
+    REQUIRE_APPLY_TEST_MS,
+  );
 });
