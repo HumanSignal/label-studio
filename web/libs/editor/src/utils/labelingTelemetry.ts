@@ -289,31 +289,6 @@ export function emitRegionListGrouped(
   });
 }
 
-export function emitRegionFilterToggled(
-  store: LabelingStore | null | undefined,
-  annotation: LabelingEntity | null | undefined,
-  options: { filter_open: boolean },
-) {
-  const ids = annotation?.id ? annotationTelemetryIds(annotation) : { annotation_tab_id: null, annotation_pk: null };
-  emitLabelingEvent(store, "region_filter_toggled", {
-    ...ids,
-    filter_open: options.filter_open,
-  });
-}
-
-export function emitRegionListFiltered(
-  store: LabelingStore | null | undefined,
-  annotation: LabelingEntity | null | undefined,
-  options: { filter_query: string; match_count: number },
-) {
-  const ids = annotation?.id ? annotationTelemetryIds(annotation) : { annotation_tab_id: null, annotation_pk: null };
-  emitLabelingEvent(store, "region_list_filtered", {
-    ...ids,
-    filter_query: options.filter_query,
-    match_count: options.match_count,
-  });
-}
-
 export function emitRelationCreated(
   store: LabelingStore | null | undefined,
   annotation: LabelingEntity | null | undefined,

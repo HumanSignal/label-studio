@@ -33,6 +33,13 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 };
 
 describe("SkipButton", () => {
+  // setupAppSettings() replaces window.APP_SETTINGS; restore it so enterprise billing doesn't leak into later files.
+  const originalAppSettings = (window as any).APP_SETTINGS;
+
+  afterAll(() => {
+    (window as any).APP_SETTINGS = originalAppSettings;
+  });
+
   beforeEach(() => {
     mock.clearAllMocks();
     spyOn(uiModule, "Button").mockImplementation(({ children, disabled, tooltip, onClick, ...props }: any) => (

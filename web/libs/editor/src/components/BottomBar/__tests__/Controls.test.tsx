@@ -74,6 +74,13 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 };
 
 describe("Controls", () => {
+  // setupAppSettings() replaces window.APP_SETTINGS; restore it so enterprise billing doesn't leak into later files.
+  const originalAppSettings = (window as any).APP_SETTINGS;
+
+  afterAll(() => {
+    (window as any).APP_SETTINGS = originalAppSettings;
+  });
+
   beforeEach(() => {
     mock.clearAllMocks();
     spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (

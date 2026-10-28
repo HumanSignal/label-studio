@@ -54,6 +54,18 @@ const renderSelector = ({
 };
 
 describe("ProjectHotkeyScopeSelector", () => {
+  // Non-enterprise by default; files that run earlier in the same worker may leave billing set.
+  let originalBilling: unknown;
+
+  beforeEach(() => {
+    originalBilling = window.APP_SETTINGS.billing;
+    window.APP_SETTINGS.billing = undefined;
+  });
+
+  afterEach(() => {
+    window.APP_SETTINGS.billing = originalBilling;
+  });
+
   it("selects account defaults when the URL has no project query", () => {
     renderSelector();
 

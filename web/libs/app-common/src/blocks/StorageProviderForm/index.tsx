@@ -8,6 +8,7 @@ import { useStorageForm } from "./hooks/useStorageForm";
 import { useStorageApi } from "./hooks/useStorageApi";
 import { step1Schema, getProviderSchema } from "./schemas";
 import { addProvider } from "./providers";
+import { emitAppCommonEvent } from "../../utils/appCommonTelemetry";
 import type { ProviderConfig } from "./types/provider";
 import { InlineError } from "apps/labelstudio/src/components/Error/InlineError";
 
@@ -203,6 +204,12 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         setFilesPreview(null);
         setConnectionChecked(false);
       });
+      emitAppCommonEvent("storage_provider_selected", {
+        surface: "project_setup",
+        provider: value,
+        target,
+        project_id: project ?? null,
+      });
     };
 
     // Handle form navigation
@@ -241,9 +248,25 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         onSuccess: (response) => {
           const isSuccess = response?.$meta?.ok || response?.$meta?.status === 200;
           setConnectionChecked(isSuccess);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: Boolean(isSuccess),
+            status: response?.$meta?.status ?? null,
+          });
         },
         onError: () => {
           setConnectionChecked(false);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: false,
+            status: null,
+          });
         },
       });
     };

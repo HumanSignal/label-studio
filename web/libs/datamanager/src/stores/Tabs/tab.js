@@ -8,6 +8,7 @@ import { TabSelectedItems } from "./tab_selected_items";
 import { History } from "../../utils/history";
 import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
 import { clamp } from "../../utils/helpers";
+import { emitDatamanagerTabEvent } from "../../utils/datamanagerTelemetry";
 const THRESHOLD_MIN = 0;
 const THRESHOLD_MIN_DIFF = 0.001;
 const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
@@ -370,6 +371,7 @@ export const Tab = types
       self.type = type;
       self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
       self.save({ reload: false });
+      emitDatamanagerTabEvent(self, "dm_view_type_changed", { view_type: type });
     },
 
     setTarget(target) {
@@ -394,6 +396,10 @@ export const Tab = types
       if (self.isLockedByManager) return self.notifyLocked();
       self.conjunction = value;
       self.save();
+      emitDatamanagerTabEvent(self, "dm_filter_conjunction_changed", {
+        conjunction: value,
+        filter_count: self.filters.length,
+      });
     },
 
     setOrdering(value) {
@@ -413,6 +419,7 @@ export const Tab = types
 
       self.clearSelection();
       self.save({ interaction: "ordering" });
+      emitDatamanagerTabEvent(self, "dm_sort_changed", { column: value, ordering: self.ordering[0] ?? null });
     },
 
     setLabelingTableWidth(width) {
@@ -536,6 +543,10 @@ export const Tab = types
       }
 
       if (filter.isValidFilter) self.save();
+      emitDatamanagerTabEvent(self, "dm_filter_added", {
+        column: filter.filter?.id ?? null,
+        filter_count: self.filters.length,
+      });
     },
 
     /**
@@ -608,12 +619,14 @@ export const Tab = types
 
     toggleColumn(column) {
       if (self.isLockedByManager) return self.notifyLocked();
-      if (self.hiddenColumns.hasColumn(column)) {
+      const wasHidden = self.hiddenColumns.hasColumn(column);
+      if (wasHidden) {
         self.hiddenColumns.remove(column);
       } else {
         self.hiddenColumns.add(column);
       }
       self.save();
+      emitDatamanagerTabEvent(self, "dm_column_toggled", { column: column?.id ?? null, visible: wasHidden });
     },
 
     /**
@@ -630,6 +643,7 @@ export const Tab = types
         }
       }
       self.save();
+      emitDatamanagerTabEvent(self, "dm_columns_reordered", { column_count: self.columnOrder.size });
     },
 
     /**
@@ -662,6 +676,7 @@ export const Tab = types
       clearPersonalColumnOrder(columnIds);
 
       self.save();
+      emitDatamanagerTabEvent(self, "dm_columns_reset");
       return true;
     },
 
@@ -707,9 +722,11 @@ export const Tab = types
 
       const index = self.filters.indexOf(filter);
       if (index > -1) {
+        const column = filter.filter?.id ?? null;
         self.filters.splice(index, 1);
         destroy(filter);
         self.save();
+        emitDatamanagerTabEvent(self, "dm_filter_removed", { column, filter_count: self.filters.length });
         return;
       }
 
