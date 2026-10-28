@@ -760,6 +760,8 @@ class ProjectImportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
         summary='Get project import status',
         description="""
             Poll the status of an asynchronous project import operation.
+
+            *Note*: this endpoint is also accessible as `client.tasks.create_many_status`, its historical location.
             
             **Usage:**
             1. When you POST to `/api/projects/{project_id}/import`, you'll receive a response like `{"import": <import_id>}`
@@ -786,8 +788,10 @@ class ProjectImportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
             ),
         ],
         extensions={
-            'x-fern-sdk-group-name': 'tasks',
-            'x-fern-sdk-method-name': 'create_many_status',
+            # Docs/SDK under projects.imports.get (parity with list + projects.reimports.get).
+            # client.tasks.create_many_status remains a supported alias via TasksClientExt.
+            'x-fern-sdk-group-name': ['projects', 'imports'],
+            'x-fern-sdk-method-name': 'get',
             'x-fern-audiences': ['public'],
         },
     ),
