@@ -30,6 +30,8 @@ export type OptionProps = {
   disabled?: boolean;
   style?: any;
   multiple?: boolean;
+  /** Draws the row's checkbox in multiple mode. Off when a custom row carries its own controls. */
+  optionCheckbox?: boolean;
   onSelect?: () => void;
   isIndeterminate?: boolean;
   className?: string;
@@ -101,6 +103,11 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   listHeader?: ReactNode;
   footer?: ReactNode;
   multiple?: boolean;
+  /**
+   * In multiple mode, hide the checkbox at the start of every row. The row still toggles on click and a picked
+   * row keeps the selected background and `aria-selected`, so a custom row only has to render its own controls.
+   */
+  optionCheckbox?: boolean;
   disabled?: boolean;
   /**
    * When true, the trigger stays enabled so the dropdown can open for inspection,

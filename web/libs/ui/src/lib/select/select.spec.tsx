@@ -819,6 +819,30 @@ describe("Select Component", () => {
 
       expect(onChange).toHaveBeenCalledTimes(2);
     });
+
+    it("drops the row checkbox with optionCheckbox off while rows still toggle", async () => {
+      const onChange = mock();
+
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          onChange={onChange}
+          multiple={true}
+          optionCheckbox={false}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Apple")).toBeInTheDocument();
+      });
+
+      expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+      fireEvent.click(screen.getByText("Apple"));
+      expect(onChange).toHaveBeenCalledWith(["Apple"]);
+    });
   });
 
   describe("Edge Cases", () => {
