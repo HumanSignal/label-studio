@@ -3822,6 +3822,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_plt_2342_clickhouse_task_data_27102026_short": {
+      "key": "fflag_feat_plt_2342_clickhouse_task_data_27102026_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "dbacc1c968cc4d4abd4e122a5b623ee3",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_plt_837_job_concurrency_limit_10022026_short": {
       "key": "fflag_feat_plt_837_job_concurrency_limit_10022026_short",
       "on": true,
@@ -4148,7 +4175,7 @@
     },
     "fflag_feat_utc_1368_review_child_filters": {
       "key": "fflag_feat_utc_1368_review_child_filters",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -4170,7 +4197,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_utc_1369_new_work_email_short": {
@@ -4329,6 +4356,33 @@
       },
       "clientSide": false,
       "salt": "1442d28e86a0485fbcc94f576f5fdbed",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_utc_1459_manual_project_done": {
+      "key": "fflag_feat_utc_1459_manual_project_done",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "026e0025d3bb497098ad527e17258c67",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
