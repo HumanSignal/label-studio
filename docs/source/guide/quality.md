@@ -60,12 +60,13 @@ You can review tasks in random order, or order tasks in the project data manager
 
 #### Task ordering and limiting (Enterprise)
 
-For Label Studio Enterprise projects, you can configure the review stream ordering and limit the review slice:
+Open **Settings > Review > Task Ordering** to choose how the review stream presents tasks. **Random** and **By Annotator** require Label Studio Enterprise. See [Task Ordering](project_settings_lse#review-task-ordering) for how **By Annotator** coverage works. To decide which tasks enter the review stream, use [Review Sampling](project_settings_lse#review-sampling).
 
-- Task Ordering: Choose between By Task ID (sequential) and Random. Random preserves the order of annotations within each task but randomizes task order.
-- Task Limit (%): When Random is selected, optionally limit the percentage of project tasks available for review. The limit is applied after any filters such as “Show only finished tasks.” When reviewers start a review session from a Data Manager selection (selected items), the limit is bypassed for that session.
-
-See **Settings > Review > Task Ordering** and **Task Limit** for configuration details.
+| Ordering | What reviewers see |
+| --- | --- |
+| **By Task ID** | Tasks in ascending task ID. Annotations within a task stay in a stable order. |
+| **Random** | Tasks in a random order. Annotations within a task stay in a stable order. |
+| **By Annotator** | One annotator at a time, until a configured share of that annotator's remaining annotations has been reviewed. |
 
 ### Navigate between tasks or annotations
 
