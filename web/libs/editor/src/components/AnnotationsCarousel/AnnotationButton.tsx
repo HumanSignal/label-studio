@@ -246,8 +246,7 @@ const AnnotationButtonInner = injector(
             if (!isLSE) return;
             emitAnnotationMenuAction(store, entity, "open_performance_dashboard");
             const url = new URL(window.location.origin);
-            const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-            url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
+            url.pathname = "/analytics/member-performance";
             if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
             const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
             if (projectMatch) url.searchParams.set("project", projectMatch[1]);
