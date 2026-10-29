@@ -1,5 +1,11 @@
+import base64
+
 from django.test import TestCase
-from io_storages.utils import get_all_uris_via_regex
+from io_storages.utils import (
+    decode_resolve_fileuri,
+    get_all_uris_via_regex,
+    unwrap_storage_media_path,
+)
 
 
 class TestGetAllUrisViaRegex(TestCase):
@@ -106,3 +112,21 @@ class TestGetAllUrisViaRegex(TestCase):
         html = '<img src="s3://my-bucket/images/some directory/sub folder/image.jpg" alt="test" />'
         result = get_all_uris_via_regex(html, prefixes=['s3'])
         assert result == [('s3://my-bucket/images/some directory/sub folder/image.jpg', 's3')]
+
+
+class TestUnwrapStorageMediaPath(TestCase):
+    """Unit tests for resolve/upload proxy unwrap helpers used by Prompts media typing."""
+
+    def test_decode_resolve_fileuri(self):
+        uri = 's3://bucket/doc.pdf'
+        link = f'/tasks/1/resolve/?fileuri={base64.urlsafe_b64encode(uri.encode()).decode()}'
+        assert decode_resolve_fileuri(link) == uri
+        assert decode_resolve_fileuri('https://example.com/a.pdf') is None
+
+    def test_unwrap_resolve_and_upload_proxy(self):
+        uri = 's3://bucket/doc.pdf'
+        link = f'/api/react-code/resolve/tok/?fileuri={base64.urlsafe_b64encode(uri.encode()).decode()}'
+        assert unwrap_storage_media_path(link) == '/doc.pdf'
+        assert unwrap_storage_media_path('/storage-data/uploaded/?filepath=upload/1/file.pdf') == 'upload/1/file.pdf'
+        assert unwrap_storage_media_path('https://cdn.example/a.jpg?version=1') == '/a.jpg'
+        assert unwrap_storage_media_path('s3://bucket/docs/invoice.pdf') == '/docs/invoice.pdf'
