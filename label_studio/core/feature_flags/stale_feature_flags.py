@@ -41,7 +41,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_back_plt_807_batch_size_26062025_short': True,
     'fflag_fix_back_plt_802_update_is_labeled_20062025_short': True,
     # Apr 8
-    'fflag_all_feat_utc_274_permissions_improvements': True,
     'fflag_feat_all_fit_778_analytics_short': True,
     'fflag_feat_all_leap_883_custom_script_270524_short': True,
     'fflag_feat_all_lops_315_temp_datasets_limitations_short': True,
