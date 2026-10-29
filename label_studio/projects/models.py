@@ -6,7 +6,6 @@ from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
@@ -587,12 +586,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             )
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(annotation_count=Count('annotations'))
-            if flag_set('fflag_feat_utc_563_randomize_overlap_cohort', user='auto'):
-                # Randomize within tie groups so cohort selection isn't deterministic.
-                # If there are many tasks with the same annotation count, their order is random.
-                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count', '?')
-            else:
-                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count').distinct()
+            # Randomize within tie groups so cohort selection isn't deterministic.
+            # If there are many tasks with the same annotation count, their order is random.
+            tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count', '?')
 
             # Materialize the full ID list once to ensure consistent ordering across slices, instead of slicing twice with random ordering.
             all_min_ids = list(tasks_with_min_annotations.values_list('id', flat=True))
