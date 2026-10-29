@@ -228,7 +228,7 @@ function AnnotationButtonTooltip({
 }: TooltipProps) {
   const statusBadge = useMemo(() => {
     if (isPrediction) return null;
-    if (isDraft || isDraftSaved) return { label: "Draft", variant: "primary" as const };
+    if (isDraft || isDraftSaved) return { label: "Draft", variant: "neutral" as const };
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":

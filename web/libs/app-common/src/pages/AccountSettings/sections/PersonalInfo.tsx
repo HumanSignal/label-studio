@@ -25,7 +25,7 @@ const isRequiredProfileValueMissing = (isRequired: boolean, value: string) => is
 const RequiredFieldLabel = ({ label }: { label: string }) => (
   <span className={styles.requiredLabel}>
     <span>{label}</span>
-    <Badge variant="neutral" look="outline" shape="square" size="small">
+    <Badge variant="neutral" shape="square" size="small">
       Required
     </Badge>
   </span>

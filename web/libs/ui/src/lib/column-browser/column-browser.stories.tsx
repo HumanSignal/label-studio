@@ -91,7 +91,7 @@ function Browser({ withActions = false, withFooter = false }: { withActions?: bo
               childCount={childrenOf(node.id).length}
               trailing={
                 node.inactive && (
-                  <Badge variant="neutral" look="outline" size="small">
+                  <Badge variant="neutral" size="small">
                     Inactive
                   </Badge>
                 )

@@ -22,7 +22,9 @@
  * - INITIAL: Starting point, newly created entities
  * - IN_PROGRESS: Active work happening
  * - ATTENTION: Requires intervention or review
+ * - VERIFICATION: Under review (LSE In Review)
  * - TERMINAL: Completed, no further changes expected
+ * - FAILED: Failed, rejected, skipped or cancelled
  */
 export enum StateType {
   INITIAL = "initial",
@@ -30,6 +32,7 @@ export enum StateType {
   ATTENTION = "attention",
   TERMINAL = "terminal",
   VERIFICATION = "verification",
+  FAILED = "failed",
 }
 
 /**
@@ -63,6 +66,7 @@ const STATE_TYPE_STYLES: Record<StateType, string> = {
   [StateType.ATTENTION]: "bg-warning-emphasis border-warning-border-subtlest text-warning-content",
   [StateType.VERIFICATION]: "bg-accent-plum-subtle border-accent-plum-subtle text-accent-plum-bold",
   [StateType.TERMINAL]: "bg-positive-emphasis border-positive-border-subtlest text-positive-content",
+  [StateType.FAILED]: "bg-negative-emphasis border-negative-border-subtlest text-negative-content",
 };
 
 /**
@@ -74,6 +78,7 @@ const STATE_TYPE_VARIANTS: Record<StateType, string> = {
   [StateType.ATTENTION]: "canteloupe",
   [StateType.VERIFICATION]: "plum",
   [StateType.TERMINAL]: "kale",
+  [StateType.FAILED]: "persimmon",
 };
 
 /**
@@ -177,7 +182,7 @@ class StateRegistry {
    * Use this with StateChip / Badge variant prop instead of className.
    *
    * @param state - State constant
-   * @returns Badge variant string (e.g. "sand", "grape", "canteloupe", "kale", "plum")
+   * @returns Badge variant string (e.g. "sand", "grape", "canteloupe", "kale", "plum", "persimmon")
    */
   getVariant(state: string): string {
     const stateType = this.getType(state);
@@ -216,7 +221,14 @@ class StateRegistry {
       .filter(([_, metadata]) => metadata.tooltips && entityType in metadata.tooltips)
       .sort((a, b) => {
         // Sort by logical workflow order: INITIAL → IN_PROGRESS → ATTENTION → TERMINAL
-        const workflowOrder = [StateType.INITIAL, StateType.IN_PROGRESS, StateType.ATTENTION, StateType.TERMINAL];
+        const workflowOrder = [
+          StateType.INITIAL,
+          StateType.IN_PROGRESS,
+          StateType.ATTENTION,
+          StateType.VERIFICATION,
+          StateType.TERMINAL,
+          StateType.FAILED,
+        ];
         const aType = this.getType(a[0]);
         const bType = this.getType(b[0]);
         const typeDiff = workflowOrder.indexOf(aType) - workflowOrder.indexOf(bType);

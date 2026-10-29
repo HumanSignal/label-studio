@@ -295,13 +295,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               {button.title}
             </Typography>
             {isDefault && (
-              <Badge
-                variant="neutral"
-                look="outline"
-                shape="rounded"
-                size="small"
-                data-testid="reject-action-default-badge"
-              >
+              <Badge variant="neutral" shape="rounded" size="small" data-testid="reject-action-default-badge">
                 Default
               </Badge>
             )}
