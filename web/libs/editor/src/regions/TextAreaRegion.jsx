@@ -121,6 +121,7 @@ const HtxTextAreaRegionView = ({ item, onFocus }) => {
         className={classes.join(" ")}
         rows={parent.rows}
         text={item._value}
+        markdown={parent.markdown}
         {...params}
         ignoreShortcuts={true}
       />
