@@ -110,13 +110,6 @@ export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance_improvements";
 
 /**
- * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
- * Also enables virtualization of annotation tabs carousel
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
- */
-export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
-
-/**
  * Use agreement dashboard v2 in Task Summary ViewAll summary tab
  */
 export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "fflag_feat_utc_554_agreement_v2_in_task_summary_view";

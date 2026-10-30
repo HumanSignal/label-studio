@@ -1,4 +1,3 @@
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { LabelStudio, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_DEV_3391 } from "../../../../src/utils/feature-flags";
 import { ratingConfig, ratingResult, textData } from "../../data/view_all/readonly";
@@ -77,7 +76,6 @@ describe("View All - Compare / Grid", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         [FF_DEV_3391]: true,
-        [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true,
       });
     });
 

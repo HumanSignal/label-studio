@@ -1,6 +1,5 @@
 import { Button } from "@humansignal/ui";
 import { FF_DEV_1752, FF_DEV_2186, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -407,11 +406,9 @@ export class LSFWrapper {
     const loadSeq = this._setLSFTaskSeq;
     this.lsf.setHydrated?.(false);
 
-    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      // Invalidate in-flight stub hydrations from annotation tab switches so their finally
-      // does not call setLoading(false) while this task load is in progress (FIT-1570).
-      this._hydrateStubAnnotationSeq++;
-    }
+    // Invalidate in-flight stub hydrations from annotation tab switches so their finally
+    // does not call setLoading(false) while this task load is in progress (FIT-1570).
+    this._hydrateStubAnnotationSeq++;
 
     try {
       // Let the browser paint the loading indicator before heavy store operations
@@ -548,11 +545,6 @@ export class LSFWrapper {
    * @private
    */
   async ensureAnnotationLoaded(annotationPk) {
-    // Not label-stream-only: Grid / other callers may hydrate stubs outside label stream (FIT-1570).
-    if (!isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      return null;
-    }
-
     // Check if this annotation is a stub in the original task data
     const taskAnnotation = this.task?.annotations?.find((a) => String(a.id) === String(annotationPk));
     if (!taskAnnotation?.is_stub) {
@@ -697,12 +689,10 @@ export class LSFWrapper {
       // FIT-1570: Stub hydration is debounced in onSelectAnnotation (setTimeout(0)), so it used to run
       // after setLoading(false). Await hydration here so the editor stays blocked until results exist,
       // avoiding drafts that overwrite the payload still in flight.
-      if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-        const selected = this.lsf.annotationStore.selected;
-        if (selected?.type === "annotation" && selected?.pk) {
-          // setLSFTask already set isLoading; do not toggle again inside hydration (FIT-1570)
-          await this._hydrateStubAnnotation(selected, { showLoadingWhileFetching: false });
-        }
+      const selected = this.lsf.annotationStore.selected;
+      if (selected?.type === "annotation" && selected?.pk) {
+        // setLSFTask already set isLoading; do not toggle again inside hydration (FIT-1570)
+        await this._hydrateStubAnnotation(selected, { showLoadingWhileFetching: false });
       }
     }
   }
@@ -1245,33 +1235,28 @@ export class LSFWrapper {
     // FIT-720: Debounce selectAnnotation callbacks during batch selection (init)
     // During init, selectAnnotation fires for ALL annotations in rapid succession.
     // This debounce ensures only the final selection triggers the callback.
-    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      if (this._selectAnnotationTimeout) {
-        clearTimeout(this._selectAnnotationTimeout);
-        // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
-        // After resetAnnotationStore + initializeStore, the first selectAnnotation fires
-        // with oldSelection=null (nothing was selected before). Subsequent calls during
-        // init have oldSelection=someOtherInitAnnotation. The DataManager's history
-        // handler compares new vs old annotation pk to decide whether to refetch.
-        // If we use the last call's old selection (which may equal the new selection
-        // when re-selecting the same annotation), the handler thinks nothing changed
-        // and skips the history fetch. Preserving the first old=null ensures the
-        // handler sees a genuine annotation change and fetches history.
-      } else {
-        this._debouncedFirstOldSelection = nextAnnotation;
-      }
-      this._selectAnnotationTimeout = setTimeout(() => {
-        this._selectAnnotationTimeout = null;
-        const firstOld = this._debouncedFirstOldSelection;
-        this._debouncedFirstOldSelection = undefined;
-        // prevAnnotation from last call = the final newly selected annotation (correct)
-        // firstOld = the selection state before the batch started (null after reset)
-        this._invokeSelectAnnotation(prevAnnotation, firstOld, options);
-      }, 0);
-      return;
+    if (this._selectAnnotationTimeout) {
+      clearTimeout(this._selectAnnotationTimeout);
+      // Keep nextAnnotation (the "old" selection) from the FIRST call in the batch.
+      // After resetAnnotationStore + initializeStore, the first selectAnnotation fires
+      // with oldSelection=null (nothing was selected before). Subsequent calls during
+      // init have oldSelection=someOtherInitAnnotation. The DataManager's history
+      // handler compares new vs old annotation pk to decide whether to refetch.
+      // If we use the last call's old selection (which may equal the new selection
+      // when re-selecting the same annotation), the handler thinks nothing changed
+      // and skips the history fetch. Preserving the first old=null ensures the
+      // handler sees a genuine annotation change and fetches history.
+    } else {
+      this._debouncedFirstOldSelection = nextAnnotation;
     }
-
-    this._invokeSelectAnnotation(prevAnnotation, nextAnnotation, options);
+    this._selectAnnotationTimeout = setTimeout(() => {
+      this._selectAnnotationTimeout = null;
+      const firstOld = this._debouncedFirstOldSelection;
+      this._debouncedFirstOldSelection = undefined;
+      // prevAnnotation from last call = the final newly selected annotation (correct)
+      // firstOld = the selection state before the batch started (null after reset)
+      this._invokeSelectAnnotation(prevAnnotation, firstOld, options);
+    }, 0);
   };
 
   _invokeSelectAnnotation = async (prevAnnotation, nextAnnotation, options) => {
@@ -1289,23 +1274,21 @@ export class LSFWrapper {
     // FIT-720: Hydrate stub annotations when selected
     // IMPORTANT: Use the CURRENTLY SELECTED annotation, not the one from the callback
     // The debounce may have caused the callback annotation to be stale
-    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      const currentSelected = this.lsf?.annotationStore?.selected;
-      if (currentSelected?.pk) {
-        // Custom interface quick view / shell owns comments via editor-comments + TanStack Query.
-        // Hidden LSF must not prefetch /api/comments in parallel (duplicate + stale tab state).
-        if (!this.usesCustomInterface()) {
-          // Prefetch comments on annotation selection so region comment indicators
-          // are visible immediately, without waiting for the Comments tab to be opened.
-          // Deduplication in CommentStore.listComments prevents redundant API calls
-          // if the Comments tab is already open and triggers its own fetch.
-          this.lsf?.commentStore?.listComments({ suppressClearComments: false });
-        }
-
-        // FIT-1570: This path runs from setTimeout(0) (debounced) and is not awaited by the editor.
-        // Show the app loader until the stub fetch completes so users cannot edit or create drafts first.
-        await this._hydrateStubAnnotation(currentSelected, { showLoadingWhileFetching: true });
+    const currentSelected = this.lsf?.annotationStore?.selected;
+    if (currentSelected?.pk) {
+      // Custom interface quick view / shell owns comments via editor-comments + TanStack Query.
+      // Hidden LSF must not prefetch /api/comments in parallel (duplicate + stale tab state).
+      if (!this.usesCustomInterface()) {
+        // Prefetch comments on annotation selection so region comment indicators
+        // are visible immediately, without waiting for the Comments tab to be opened.
+        // Deduplication in CommentStore.listComments prevents redundant API calls
+        // if the Comments tab is already open and triggers its own fetch.
+        this.lsf?.commentStore?.listComments({ suppressClearComments: false });
       }
+
+      // FIT-1570: This path runs from setTimeout(0) (debounced) and is not awaited by the editor.
+      // Show the app loader until the stub fetch completes so users cannot edit or create drafts first.
+      await this._hydrateStubAnnotation(currentSelected, { showLoadingWhileFetching: true });
     }
   };
 
@@ -1328,7 +1311,7 @@ export class LSFWrapper {
 
     const annotationPk = annotation.pk;
     let seq = 0;
-    if (showLoadingWhileFetching && isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+    if (showLoadingWhileFetching) {
       seq = ++this._hydrateStubAnnotationSeq;
       this.setLoading(true);
     }
@@ -1515,9 +1498,7 @@ export class LSFWrapper {
       this.dismissOverlapToast();
     }
 
-    if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-      imageCache?.forceClear?.();
-    }
+    imageCache?.forceClear?.();
 
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;

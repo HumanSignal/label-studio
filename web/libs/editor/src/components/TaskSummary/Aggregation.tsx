@@ -7,7 +7,6 @@ import type { RawResult } from "../../stores/types";
 import { Chip } from "./Chip";
 import type { AnnotationSummary, ControlTag } from "./types";
 import { getLabelCounts } from "./utils";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 import styles from "./TaskSummary.module.css";
 
@@ -305,8 +304,8 @@ export const AggregationTableRow = ({
   const [hasOverflow, setHasOverflow] = useState(false);
   const rowRef = useRef<HTMLTableRowElement>(null);
 
-  // For non-lazy loading mode, compute from annotations as before
-  const useApiData = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId;
+  // Without a task id, compute from annotations instead
+  const useApiData = !!taskId;
 
   const {
     data: distributionData,
@@ -315,7 +314,7 @@ export const AggregationTableRow = ({
   } = useQuery({
     queryKey: ["task-agreement", taskId],
     queryFn: fetchTaskAgreement,
-    enabled: useApiData && !!taskId,
+    enabled: useApiData,
     staleTime: 30000, // Consider data fresh for 30 seconds
     cacheTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });

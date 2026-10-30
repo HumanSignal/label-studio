@@ -45,7 +45,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_lops_134_find_similarity_29082023_short': True,
     'fflag_feat_utc_239_filterable_agreement_column_short': True,
     'fflag_fix_all_fit_287_preview_performance_improvements': True,
-    'fflag_fix_all_fit_720_lazy_load_annotations': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
     'fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short': False,
     'fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short': False,

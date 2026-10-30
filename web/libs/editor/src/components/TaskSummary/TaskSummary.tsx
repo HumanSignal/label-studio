@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
-import { isFF } from "../../utils/feature-flags";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
 import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 import { fetchTaskAgreementDistribution } from "./Aggregation";
@@ -24,8 +22,7 @@ interface Annotation {
 const TaskSummary = observer(({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
   const task = annotationStore.store.task;
   const taskId = task?.id;
-  // Use editor `isFF` (reads `APP_SETTINGS` live) so unit tests can toggle the flag; core `isActive` snapshots flags at import time.
-  const agreementQueryEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId != null;
+  const agreementQueryEnabled = taskId != null;
 
   const { data: agreementPayload, isFetching: agreementQueryFetching } = useQuery({
     queryKey: ["task-agreement", taskId],

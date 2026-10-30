@@ -2,7 +2,6 @@
 
 import logging
 
-from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -329,9 +328,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def prefetch(self, queryset, request=None):
         ordering = parse_annotations_ordering_request(request)
-        annotations_stub = False
-        if request and flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False) if request else False
 
         if annotations_stub:
             from tasks.ordering import (
@@ -387,10 +384,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         """
         fields = ['drafts', 'predictions', 'annotations']
 
-        # Lazy load annotations behind feature flag (FIT-720)
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
 
         return {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
@@ -464,9 +458,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {'all': False, 'included': [self.kwargs.get('pk')]}
 
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=self.request.user):
-            annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
 
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}

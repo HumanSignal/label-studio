@@ -17,7 +17,6 @@ import type { ReactElement } from "react";
 import { render as rtlRender, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "mobx-react";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { AnnotationButton } from "../AnnotationButton";
 import * as useAnnotationQueryModule from "../../../hooks/useAnnotationQuery";
 import * as useResolveUserModule from "@humansignal/core/hooks/useResolveUser";
@@ -591,7 +590,7 @@ describe("AnnotationButton", () => {
       const newAnnotation = { id: 99 };
       const addAnnotationFromPrediction = mock().mockReturnValue(newAnnotation);
       const selectAnnotation = mock();
-      const entity = createEntity();
+      const entity = createEntity({ versions: { result: [{ id: "region-1" }] } });
       const { container } = renderWithProviders(
         <Provider store={defaultStore}>
           <AnnotationButton
@@ -628,8 +627,7 @@ describe("AnnotationButton", () => {
     }
   });
 
-  it("fetches annotation before duplicate when lazy-load FF is on and annotation is a stub", async () => {
-    ff.set({ [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+  it("fetches annotation before duplicate when annotation is a stub", async () => {
     mockFetchAnnotationCached.mockResolvedValue({ result: [{ id: "region-1" }] });
     const newAnnotation = { id: 99 };
     const addAnnotationFromPrediction = mock().mockReturnValue(newAnnotation);

@@ -303,7 +303,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     Lightweight Annotation Serializer for lazy loading.
 
     Returns only minimal metadata needed for annotation list display.
-    Used when fflag_fix_all_fit_720_lazy_load_annotations is enabled
+    Used when the client requests annotation stubs
     to improve performance for tasks with many annotations.
 
     Fields included:
