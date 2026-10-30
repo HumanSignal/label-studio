@@ -3,11 +3,7 @@ import { isDefined } from "../../../utils/utils";
 import { useState } from "react";
 import { Button, Popover, Tooltip } from "@humansignal/ui";
 import { IconInfoOutline } from "@humansignal/icons";
-import {
-  isActive,
-  FF_AGREEMENT_FILTERED,
-  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
-} from "@humansignal/core/lib/utils/feature-flags";
+import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
 import {
   buildAgreementCalculationPlainSummary,
   normalizeAgreementSelected,
@@ -101,8 +97,7 @@ Agreement.HeaderCell = ({ agreementFilters, onSave, children, disabled = false, 
   const AgreementSettingsSummary = sdk?.AgreementSettingsSummary ?? null;
 
   const agreementFeatureFlagsActive =
-    isActive(FF_AGREEMENT_FILTERED) &&
-    (sdk?.project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT));
+    sdk?.project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
   const normalized = normalizeAgreementSelected(agreementFilters);
   const showCustomSummary = shouldShowAgreementCalculationIndicator(agreementFeatureFlagsActive, agreementFilters);
 

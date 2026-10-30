@@ -69,11 +69,6 @@ export const FF_NEW_STORAGES = "fflag_feat_bros_193_new_cloud_storage_providers_
 export const FF_CUSTOM_TAGS = "fflag_feat_front_bros_194_custom_tags_short";
 
 /**
- * Agreement Filtered
- */
-export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
-
-/**
  * Consensus control-tag agreement (v2) — enables dimension-based agreement calculation
  * and the v2 agreement UI (new Agreement column). When disabled, the legacy
  * agreement_selected column and v1 UI are used instead.
