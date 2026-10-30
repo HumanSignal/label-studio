@@ -3,14 +3,14 @@
 Async import (LSE / non-Community) used to construct
 ``ImportApiSerializer(... context={'project': project})`` without ``user``,
 falling back to ``project.created_by`` for any unknown annotator. The fix passes
-``user`` (the importer) when the FF is enabled. These tests cover both the
-streaming and non-streaming async paths.
+``user`` (the importer) when the FF is enabled. These tests cover the
+streaming async path.
 """
 
 from unittest.mock import patch
 
 import pytest
-from data_import.functions import _async_import_background_streaming, async_import_background
+from data_import.functions import _async_import_background_streaming
 from data_import.models import FileUpload
 from django.core.files.base import ContentFile
 from organizations.models import OrganizationMember
@@ -65,7 +65,7 @@ UNKNOWN_COMPLETED_BY_TASKS = b'[{"data":{"text":"A"},"annotations":[{"completed_
 
 
 class TestAsyncImportBackgroundStreaming:
-    """Streaming async import (FF ``fflag_fix_back_plt_902_*`` on by default).
+    """Streaming async import.
 
     With FF on, unknown ``completed_by`` must be re-attributed to the importer
     (``user`` argument), not ``project.created_by``.
@@ -82,39 +82,6 @@ class TestAsyncImportBackgroundStreaming:
         pimport.refresh_from_db()
         assert pimport.status == ProjectImport.Status.COMPLETED
         # Find the imported annotation and check attribution.
-        from tasks.models import Annotation
-
-        annotations = list(Annotation.objects.filter(project=project))
-        assert len(annotations) == 1
-        assert annotations[0].completed_by_id == importer.id
-        assert annotations[0].completed_by_id != project.created_by_id
-
-
-class TestAsyncImportBackgroundNonStreaming:
-    """Legacy (non-streaming) async import path, gated by the OOM-fix FF.
-
-    The OOM-fix FF (``fflag_fix_back_plt_902_*``) is mocked off so we exercise
-    the legacy branch and confirm the BROS-1092 fix passes ``user`` there too.
-    """
-
-    @patch('data_import.functions.flag_set')
-    def test_unknown_completed_by_attributes_to_importer(self, mock_flag_set, importer, project):
-        # Disable OOM streaming FF; keep BROS-1092 FF enabled.
-        def fake_flag_set(name, *args, **kwargs):
-            if name == 'fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short':
-                return False
-            return True
-
-        mock_flag_set.side_effect = fake_flag_set
-
-        fu = _create_upload(importer, project, UNKNOWN_COMPLETED_BY_TASKS)
-        pimport = ProjectImport.objects.create(project=project, file_upload_ids=[fu.id], commit_to_project=True)
-
-        async_import_background(pimport.id, importer.id)
-
-        pimport.refresh_from_db()
-        assert pimport.status == ProjectImport.Status.COMPLETED
-
         from tasks.models import Annotation
 
         annotations = list(Annotation.objects.filter(project=project))

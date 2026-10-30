@@ -716,9 +716,6 @@ class ImportStorage(Storage):
         validation_errors = []
 
         # Check feature flags once for the entire sync process
-        check_file_extension = flag_set(
-            'fflag_fix_back_plt_804_check_file_extension_11072025_short', organization=self.project.organization
-        )
         existed_count_flag_set = flag_set(
             'fflag_root_212_reduce_importstoragelink_counts', organization=self.project.organization
         )
@@ -779,7 +776,7 @@ class ImportStorage(Storage):
 
                 # Check if file should be processed as JSON based on extension
                 # Skip non-JSON files if use_blob_urls is False
-                if check_file_extension and not self.use_blob_urls:
+                if not self.use_blob_urls:
                     _, ext = os.path.splitext(key.lower())
                     # Only process files with JSON/JSONL/PARQUET extensions
                     json_extensions = {'.json', '.jsonl', '.parquet'}

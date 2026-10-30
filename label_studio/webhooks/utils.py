@@ -153,9 +153,7 @@ def emit_webhooks_for_instance_sync(organization, project, action, instance=None
 
     # Check if batching is needed
     is_batch_collection = isinstance(instance, (list, QuerySet))
-    use_batching = is_batch_collection and flag_set('fflag_fix_back_plt_843_webhook_memory_improvement_12082025_short')
-
-    if use_batching:
+    if is_batch_collection:
         # Process in batches
         batch_size = settings.WEBHOOK_BATCH_SIZE
 

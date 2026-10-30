@@ -12,11 +12,9 @@ from typing import Any, Mapping, Optional, Union, cast
 from urllib.parse import urljoin
 
 import ujson as json
-from core.bulk_update_utils import bulk_update
 from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
-from core.redis import start_job_async_or_sync
 from core.utils.common import (
     find_first_one_to_one_related_field_by_prefix,
     load_func,
@@ -28,9 +26,8 @@ from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
 from django.conf import settings
-from django.db import OperationalError, models, transaction
-from django.db.models import CheckConstraint, F, JSONField, Q
-from django.db.models.lookups import GreaterThanOrEqual
+from django.db import models, transaction
+from django.db.models import CheckConstraint, JSONField, Q
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
@@ -1574,94 +1571,25 @@ def update_ml_backend(sender, instance, **kwargs):
                 ml_backend.train()
 
 
-def update_task_stats(task, stats=('is_labeled',), save=True):
-    """Update single task statistics:
-        accuracy
-        is_labeled
-    :param task: Task to update
-    :param stats: to update separate stats
-    :param save: to skip saving in some cases
-    :return:
-    """
-    logger.debug(f'Update stats {stats} for task {task}')
-    if 'is_labeled' in stats:
-        task.update_is_labeled(save=save)
-    if save:
-        task.save()
-
-
-def deprecated_bulk_update_stats_project_tasks(tasks, project=None):
-    """bulk Task update accuracy
-       ex: after change settings
-       apply several update queries size of batch
-       on updated Task objects
-       in single transaction as execute sql
-    :param tasks:
-    :return:
-    """
-    # recalc accuracy
-    if not tasks:
-        # break if tasks is empty
-        return
-    # get project if it's not in params
-    if project is None:
-        project = tasks[0].project
-
-    with transaction.atomic():
-        use_overlap = project._can_use_overlap()
-        # update filters if we can use overlap
-        if use_overlap:
-            # following definition of `completed_annotations` above, count cancelled annotations
-            # as completed if project is in IGNORE_SKIPPED mode
-            completed_annotations_f_expr = F('total_annotations')
-            if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
-                completed_annotations_f_expr += F('cancelled_annotations')
-            finished_q = Q(GreaterThanOrEqual(completed_annotations_f_expr, F('overlap')))
-            finished_tasks = tasks.filter(finished_q)
-            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
-            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
-
-        else:
-            # update objects without saving if we can't use overlap
-            for task in tasks:
-                update_task_stats(task, save=False)
-            try:
-                # start update query batches
-                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-            except OperationalError:
-                logger.error('Operational error while updating tasks: {exc}', exc_info=True)
-                # try to update query batches one more time
-                start_job_async_or_sync(
-                    bulk_update,
-                    tasks,
-                    in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT,
-                    update_fields=['is_labeled'],
-                    batch_size=settings.BATCH_SIZE,
-                )
-
-
 def bulk_update_stats_project_tasks(tasks, project=None):
     # Avoid circular import
     from projects.functions.utils import get_unique_ids_list
 
     bulk_update_is_labeled = load_func(settings.BULK_UPDATE_IS_LABELED)
 
-    if flag_set('fflag_fix_back_plt_802_update_is_labeled_20062025_short', user='auto'):
-        task_ids = get_unique_ids_list(tasks)
+    task_ids = get_unique_ids_list(tasks)
 
-        if not task_ids:
-            return
+    if not task_ids:
+        return
 
-        if project is None:
-            first_task = Task.objects.get(id=task_ids[0])
-            project = first_task.project
+    if project is None:
+        first_task = Task.objects.get(id=task_ids[0])
+        project = first_task.project
 
-        # Set user context so FSM checks work when this runs in an async worker
-        if project.created_by_id:
-            CurrentContext.set_user(project.created_by)
-        bulk_update_is_labeled(task_ids, project)
-    else:
-        return deprecated_bulk_update_stats_project_tasks(tasks, project)
+    # Set user context so FSM checks work when this runs in an async worker
+    if project.created_by_id:
+        CurrentContext.set_user(project.created_by)
+    bulk_update_is_labeled(task_ids, project)
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

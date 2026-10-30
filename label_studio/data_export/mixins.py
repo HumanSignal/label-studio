@@ -216,7 +216,6 @@ class ExportMixin:
     def get_task_queryset(self, ids, annotation_filter_options, expand=None):
         """expand: the export serializer's expand list. Relations it doesn't expand are serialized as IDs only, so
         their payload isn't loaded. None loads everything."""
-        from core.feature_flags import flag_set
 
         # Only annotate FSM state if both feature flags are enabled
         # This prevents unnecessary query annotations when state won't be serialized
@@ -312,10 +311,7 @@ class ExportMixin:
         expand = base_export_serializer_option['expand']
         i = 0
 
-        if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):
-            BATCH_SIZE = self.project.get_task_batch_size()
-        else:
-            BATCH_SIZE = settings.BATCH_SIZE
+        BATCH_SIZE = self.project.get_task_batch_size()
 
         for ids in batch(task_ids, BATCH_SIZE):
             i += 1
