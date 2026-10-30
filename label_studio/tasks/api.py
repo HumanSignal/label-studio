@@ -743,6 +743,9 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
     queryset = Task.objects.all()
 
+    def check_summary_access(self, request, task):
+        """Hook for extra access checks once the task exists and the user is a project member."""
+
     def get(self, request, pk):
         include_predictions = bool_from_request(request.GET, 'include_predictions', False)
 
@@ -754,6 +757,7 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
         # Check project access using LSO's native permission check
         if not task.project.has_permission(request.user):
             raise PermissionDenied('You do not have permission to view this task')
+        self.check_summary_access(request, task)
 
         # Fetch annotations with user info for the summary panel
         annotation_objs = list(
