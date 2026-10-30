@@ -189,7 +189,7 @@ class ExportAPI(generics.RetrieveAPIView):
     def get_task_queryset(self, queryset):
         # Import here to avoid circular dependencies
         from core.feature_flags import flag_set
-        from tasks.models import Annotation
+        from tasks.models import Annotation, Prediction
 
         # Create a prefetch for annotations with FSM state
         annotations_qs = Annotation.objects.all()
@@ -204,7 +204,9 @@ class ExportAPI(generics.RetrieveAPIView):
             annotations_qs = annotations_qs.with_state()
 
         qs = queryset.select_related('project').prefetch_related(
-            Prefetch('annotations', queryset=annotations_qs), 'predictions'
+            Prefetch('annotations', queryset=annotations_qs),
+            # Export writes prediction ids only - do not load prediction results into memory
+            Prefetch('predictions', queryset=Prediction.objects.only('id', 'task_id')),
         )
 
         # Add FSM state annotation to tasks as well to avoid N+1 queries during export
