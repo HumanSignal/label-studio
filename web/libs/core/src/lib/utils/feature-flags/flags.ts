@@ -36,16 +36,6 @@ export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_tok
 export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_data_short";
 
 /**
- * Enables the theme toggle in the UI to enable the dark mode
- */
-export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
-
-/**
- * Enables enterprise email notifications
- */
-export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email_notifications_short";
-
-/**
  * New storage providers experience
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_bros_193_new_cloud_storage_providers_short/targeting?env=production&selected-env=production
  */
