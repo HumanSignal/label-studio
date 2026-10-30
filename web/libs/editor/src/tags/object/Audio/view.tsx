@@ -1,4 +1,3 @@
-import { ff } from "@humansignal/core";
 import { observer } from "mobx-react";
 import { type FC, type ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { usePersistentJSONState } from "@humansignal/core/lib/hooks/usePersistentState";
@@ -24,8 +23,6 @@ const NORMALIZED_STEP = 0.1;
 const isAudioSpectrograms = isFF(FF_AUDIO_SPECTROGRAMS);
 
 const useSpectrogramControls = isAudioSpectrograms ? useSpectrogramControlsHook : () => {};
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 interface AudioProps {
   item: any;
@@ -60,8 +57,6 @@ const AudioView: FC<AudioProps> = observer(
       showLabels: item.annotationStore.store.settings.showLabels,
       rate: item.defaultspeed ? Number(item.defaultspeed) : 1,
       muted: item.muted === "true",
-      buffering: item.isBuffering,
-      onBuffering: item.handleBuffering,
       onLoad: (wf) => {
         if (isAudioSpectrograms) {
           const spectrogramLayer = wf.getLayer("spectrogram");
@@ -192,25 +187,16 @@ const AudioView: FC<AudioProps> = observer(
         />
         <Controls
           position={controls.currentTime}
-          playing={isSyncedBuffering && item.isBuffering ? item.wasPlayingBeforeBuffering : controls.playing}
-          buffering={item.isBuffering}
+          playing={controls.playing}
           volume={controls.volume}
           speed={controls.rate}
           zoom={controls.zoom}
           duration={controls.duration}
           onPlay={() => {
-            if (isSyncedBuffering && item.isBuffering) {
-              item.triggerSyncPlay(true);
-            } else {
-              controls.setPlaying(true);
-            }
+            controls.setPlaying(true);
           }}
           onPause={() => {
-            if (isSyncedBuffering && item.isBuffering) {
-              item.triggerSyncPause(true);
-            } else {
-              controls.setPlaying(false);
-            }
+            controls.setPlaying(false);
           }}
           allowFullscreen={false}
           onVolumeChange={(vol) => controls.setVolume(vol)}

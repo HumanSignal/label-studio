@@ -29,8 +29,6 @@ import { ff } from "@humansignal/core";
 import { InteractiveOverlayHost } from "../../../ml-interactive/InteractiveOverlayHost";
 import { InteractiveActionsBar } from "../../../ml-interactive/InteractiveActionsBar";
 
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
-
 function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
   const [zoomState, setZoomState] = useState({ zoom: 1, pan: { x: 0, y: 0 } });
   const data = useRef({});
@@ -460,19 +458,11 @@ const HtxVideoView = ({ item, store }) => {
   }, []);
 
   const handlePlayClick = useCallback(() => {
-    if (isSyncedBuffering && item.isBuffering) {
-      item.triggerSyncPlay(true);
-    } else {
-      handlePlay();
-    }
+    handlePlay();
   }, []);
 
   const handlePauseClick = useCallback(() => {
-    if (isSyncedBuffering && item.isBuffering) {
-      item.triggerSyncPause(true);
-    } else {
-      handlePause();
-    }
+    handlePause();
   });
 
   const handleSelectRegion = useCallback(
@@ -662,7 +652,6 @@ const HtxVideoView = ({ item, store }) => {
                   pan={pan}
                   speed={item.speed}
                   framerate={item.framerate}
-                  buffering={item.isBuffering}
                   allowInteractions={false}
                   allowPanOffscreen={!limitCanvasDrawingBoundaries}
                   onFrameChange={handleFrameChange}
@@ -674,7 +663,6 @@ const HtxVideoView = ({ item, store }) => {
                   onPlay={handlePlay}
                   onPause={handlePause}
                   onSeeked={item.handleSeek}
-                  onBuffering={item.handleBuffering}
                   loopFrameRange={item.loopTimelineRegion}
                   selectedFrameRange={item.selectedFrameRange}
                 />
@@ -688,8 +676,7 @@ const HtxVideoView = ({ item, store }) => {
         {loaded && (
           <Timeline
             className={cn("video-segmentation").elem("timeline").toClassName()}
-            playing={isSyncedBuffering && item.isBuffering ? item.wasPlayingBeforeBuffering : playing}
-            buffering={isSyncedBuffering ? item.isBuffering : false}
+            playing={playing}
             length={videoLength}
             position={position}
             regions={regions}

@@ -47,13 +47,6 @@ export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in
  */
 export const FF_LSDV_4930 = "fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short";
 
-/**
- * Fix task count on projects with over 100 tasks (switch from task history to queue count)
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_optic_79_task_count_is_wrong_short/targeting
- */
-
-export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_short";
-
 /** Select annotation only once during store init and trigger the rest from this select */
 export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
 

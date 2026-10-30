@@ -22,17 +22,6 @@ mockModule("@humansignal/core", () => {
   };
 });
 
-mockModule("../../../../utils/FileLoader", () => {
-  return {
-    FileLoader: mock().mockImplementation(() => ({
-      download: mock(),
-      isError: mock(() => false),
-      isPreloaded: mock(() => false),
-      getPreloadedURL: mock(),
-    })),
-  };
-});
-
 const ModelWithMixin = types.compose(ImageEntityMixin).actions((self) => ({
   setCurrentEntity(entity) {
     self.currentImageEntity = entity;

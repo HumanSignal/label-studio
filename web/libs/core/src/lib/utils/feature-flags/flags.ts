@@ -30,8 +30,6 @@ export const FF_PRODUCT_TOUR = "fflag_feat_dia_1697_product_tour_short";
  */
 export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_token_auth";
 
-export const FF_IMPROVE_GLOBAL_ERROR_MESSAGES = "fflag_feat_front_optic_1746_improve_global_error_messages_short";
-
 /**
  * Sample datasets UI for the import flow
  */
@@ -46,11 +44,6 @@ export const FF_JSON_PREVIEW = "fflag_feat_dia_1925_view_sample_raw_json_short";
  * Enables the theme toggle in the UI to enable the dark mode
  */
 export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
-
-/**
- * Fixes synced audio/video buffering
- */
-export const FF_SYNCED_BUFFERING = "fflag_fix_front_fit_31_synced_media_buffering";
 
 /**
  * Enables enterprise email notifications

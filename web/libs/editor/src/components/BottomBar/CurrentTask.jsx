@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { Button, Tooltip } from "@humansignal/ui";
 import { CaretLeftIcon, CaretRightIcon } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
-import { FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
+import { FF_LEAP_1173, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.prefix.css";
@@ -12,10 +12,6 @@ import "./CurrentTask.prefix.css";
 const MANAGER_ROLES = ["OW", "AD", "MA"];
 
 export const CurrentTask = observer(({ store }) => {
-  const currentIndex = useMemo(() => {
-    return store.taskHistory.findIndex((x) => x.taskId === store.task.id) + 1;
-  }, [store.taskHistory]);
-
   useEffect(() => {
     store.commentStore.setAddedCommentThisSession(false);
   }, []);
@@ -76,17 +72,11 @@ export const CurrentTask = observer(({ store }) => {
       <div className={cn("current-task").mod({ "with-history": historyEnabled }).toClassName()}>
         <div className={cn("current-task").elem("task-id").toClassName()}>
           {store.task.id ?? guidGenerator()}
-          {historyEnabled &&
-            showCounter &&
-            (isFF(FF_TASK_COUNT_FIX) ? (
-              <div className={cn("current-task").elem("task-count").toClassName()}>
-                {store.queuePosition} of {store.queueTotal}
-              </div>
-            ) : (
-              <div className={cn("current-task").elem("task-count").toClassName()}>
-                {currentIndex} of {store.taskHistory.length}
-              </div>
-            ))}
+          {historyEnabled && showCounter && (
+            <div className={cn("current-task").elem("task-count").toClassName()}>
+              {store.queuePosition} of {store.queueTotal}
+            </div>
+          )}
         </div>
         {historyEnabled && (
           <div className={cn("current-task").elem("history-controls").mod({ newui: true }).toClassName()}>

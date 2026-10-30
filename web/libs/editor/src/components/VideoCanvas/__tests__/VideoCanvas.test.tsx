@@ -1,10 +1,8 @@
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import type { VideoRef } from "../VideoCanvas";
-import { FF_VIDEO_FRAME_SEEK_PRECISION } from "../../../utils/feature-flags";
 import type { Mock } from "bun:test";
 import * as coreModule from "@humansignal/core";
-import * as useUpdateBufferingModule from "../../../hooks/useUpdateBuffering";
 import * as useLoopRangeModule from "../hooks/useLoopRange";
 import {
   mockModuleAllSpecifiers,
@@ -12,9 +10,6 @@ import {
   VIRTUAL_VIDEO_MODULE_SPECIFIERS,
 } from "./videoCanvasBunModuleRegistry";
 
-const ff = mockFF();
-
-const mockUpdateBuffering = mock();
 const mockPrepareLoop = mock();
 
 const mockClearRect = mock();
@@ -189,7 +184,6 @@ afterAll(() => {
 });
 
 beforeEach(() => {
-  mockUpdateBuffering.mockClear();
   mockPrepareLoop.mockClear();
   mockClearRect.mockClear();
   mockDrawImage.mockClear();
@@ -199,8 +193,6 @@ beforeEach(() => {
   mockVideoEl = undefined as any;
 
   spyOn(coreModule.ff, "isActive").mockImplementation(() => false);
-
-  spyOn(useUpdateBufferingModule, "useUpdateBuffering").mockImplementation(() => mockUpdateBuffering);
 
   spyOn(useLoopRangeModule, "useLoopRange").mockImplementation(() => ({ prepareLoop: mockPrepareLoop }));
 });
@@ -406,16 +398,6 @@ describe("VideoCanvas", () => {
     expect(typeof t).toBe("number");
   });
 
-  it("ref.frameSteppedTime with time arg returns that time when isFF false", async () => {
-    const ref = { current: null as VideoRef | null };
-    render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} />);
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 50));
-    });
-    const t = ref.current?.frameSteppedTime(3.5, false);
-    expect(t).toBe(3.5);
-  });
-
   it("accepts function ref", async () => {
     let captured: VideoRef | null = null;
     const refFn = (r: VideoRef | null) => {
@@ -581,8 +563,7 @@ describe("VideoCanvas", () => {
     }
   });
 
-  it("frameSteppedTime with FF_VIDEO_FRAME_SEEK_PRECISION uses rounded time", async () => {
-    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: true });
+  it("frameSteppedTime uses rounded time", async () => {
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} />);
     await act(async () => {
@@ -590,7 +571,6 @@ describe("VideoCanvas", () => {
     });
     const t = ref.current?.frameSteppedTime(0.1, true);
     expect(typeof t).toBe("number");
-    ff.reset();
   });
 
   it("allowPanOffscreen allows pan outside bounds", async () => {
@@ -610,8 +590,7 @@ describe("VideoCanvas", () => {
     }
   });
 
-  it("ref.pause with FF_VIDEO_FRAME_SEEK_PRECISION clamps currentTime when duration not finite", async () => {
-    ff.set({ [FF_VIDEO_FRAME_SEEK_PRECISION]: true });
+  it("ref.pause clamps currentTime when duration not finite", async () => {
     const ref = { current: null as VideoRef | null };
     render(<VideoCanvas ref={ref} src="/test.mp4" speed={1} />);
     await act(async () => {
@@ -623,7 +602,6 @@ describe("VideoCanvas", () => {
     act(() => {
       ref.current?.pause();
     });
-    ff.reset();
   });
 
   it("calls video.load when error after load (recovery path)", async () => {

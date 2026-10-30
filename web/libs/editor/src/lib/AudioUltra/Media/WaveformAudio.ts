@@ -1,10 +1,7 @@
-import { ff } from "@humansignal/core";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { Events } from "../Common/Events";
 import { audioDecoderPool } from "./AudioDecoderPool";
 import { type BaseAudioDecoder, DEFAULT_FREQUENCY_HZ } from "./BaseAudioDecoder";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 export interface WaveformAudioOptions {
   src?: string;
@@ -19,7 +16,6 @@ interface WaveformAudioEvents {
   chunkLoaded: (chunk: number) => void;
   canplay: () => void;
   resetSource: () => void;
-  waiting: () => void;
 }
 
 export class WaveformAudio extends Events<WaveformAudioEvents> {
@@ -194,9 +190,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
 
     this.el.addEventListener("canplaythrough", this.mediaReady);
     this.el.addEventListener("error", this.mediaError);
-    if (isSyncedBuffering) {
-      this.el.addEventListener("waiting", this.mediaWaiting);
-    }
     this.loadMedia();
   }
 
@@ -209,15 +202,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
       // otherwise it's an unrecoverable error
       this.mediaReject?.(this.el?.error);
     }
-  };
-
-  mediaWaiting = () => {
-    // If this has already buffered the time segment we are on, we don't need to report waiting
-    if (this.el && this.el.buffered.length > 0 && this.el.currentTime > this.el.buffered.end(0)) {
-      return;
-    }
-
-    this.invoke("waiting");
   };
 
   mediaReady = () => {

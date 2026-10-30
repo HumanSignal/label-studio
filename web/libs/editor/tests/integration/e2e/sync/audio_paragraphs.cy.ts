@@ -1,5 +1,4 @@
 import { AudioView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_2669 } from "../../../../src/utils/feature-flags";
 
 const config = `
 <View>
@@ -152,7 +151,6 @@ describe("Sync: Audio Paragraphs", () => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,
         fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
-        [FF_DEV_2669]: true,
       });
     });
 
@@ -515,17 +513,16 @@ describe("Sync: Audio Paragraphs", () => {
     });
   });
 
-  describe("Paragraphs AuthorFilter (FF_DEV_2669 on)", () => {
+  describe("Paragraphs AuthorFilter", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,
-        ff_front_dev_2669_paragraph_author_filter_210622_short: true,
         fflag_feat_front_lsdv_e_278_contextual_scrolling_short: false,
         fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short: false,
       });
     });
 
-    it("shows AuthorFilter and filters by author when FF_DEV_2669 is on", () => {
+    it("shows AuthorFilter and filters by author", () => {
       LabelStudio.params().config(configWithScroll).data(data).withResult(annotations).init();
 
       LabelStudio.waitForObjectsReady();

@@ -6,14 +6,11 @@ export const FF_DEV_1284 = "fflag_fix_front_dev_1284_auto_detect_undo_281022_sho
 
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
 
-export const FF_DEV_2669 = "ff_front_dev_2669_paragraph_author_filter_210622_short";
-
 // Change the rotate tool from bbox
 export const FF_DEV_2671 = "ff_front_dev_2671_anchor_rotate_bbox_010722_short";
 
 /**
  * Creating separated regions if selection includes hidden phrases
- * @see FF_DEV_2669 (allows filtering)
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short
  */
 export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short";

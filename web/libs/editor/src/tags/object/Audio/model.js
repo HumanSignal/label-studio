@@ -11,9 +11,6 @@ import { FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utilities";
 import ObjectBase from "../Base";
 import { WS_SPEED, WS_VOLUME, WS_ZOOM_X } from "./constants";
-import { ff } from "@humansignal/core";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 /**
  * The Audio tag plays audio and shows its waveform. Use for audio annotation tasks where you want to label regions of audio, see the waveform, and manipulate audio during annotation.
@@ -138,7 +135,6 @@ export const AudioModel = types.compose(
       stageRef: createRef(),
       _ws: null,
       _wfFrame: null,
-      _skip_seek_event: false,
     }))
     .views((self) => ({
       get hasStates() {
@@ -204,36 +200,21 @@ export const AudioModel = types.compose(
         self.triggerSync("speed", { speed });
       },
 
-      triggerSyncPlay(isManual = false) {
-        if (isSyncedBuffering && self.isBuffering && !isManual) return;
-        self.wasPlayingBeforeBuffering = true;
+      triggerSyncPlay() {
         // @todo should not be handled like this
         self.handleSyncPlay();
         // trigger play only after it actually started to play
         self.triggerSync("play", { playing: true });
       },
 
-      triggerSyncPause(isManual = false) {
-        if (isSyncedBuffering && self.isBuffering && !isManual) return;
-        self.wasPlayingBeforeBuffering = false;
+      triggerSyncPause() {
         // @todo should not be handled like this
         self.handleSyncPause();
         self.triggerSync("pause", { playing: false });
       },
 
       triggerSyncSeek(time) {
-        self.triggerSync("seek", { time, ...(isSyncedBuffering ? { playing: self.wasPlayingBeforeBuffering } : {}) });
-      },
-
-      triggerSyncBuffering(isBuffering) {
-        if (!self._ws) return;
-
-        const playing = self.wasPlayingBeforeBuffering;
-
-        self.triggerSync("buffering", {
-          buffering: isBuffering,
-          playing,
-        });
+        self.triggerSync("seek", { time });
       },
 
       ////// Incoming
@@ -243,62 +224,23 @@ export const AudioModel = types.compose(
           self.syncHandlers.set(event, self.handleSync);
         }
         self.syncHandlers.set("speed", self.handleSyncSpeed);
-        if (isSyncedBuffering) {
-          self.syncHandlers.set("buffering", self.handleSyncBuffering);
-        }
       },
 
-      handleSyncBuffering({ playing, ...data }) {
-        self.isBuffering = self.syncManager?.isBuffering;
-        if (data.buffering) {
-          self.wasPlayingBeforeBuffering = playing;
-          self._skip_seek_event = true;
-          self.isPlaying = false;
-          self._ws?.pause();
-          self._skip_seek_event = false;
-        }
-        if (!self.isBuffering && !data.buffering) {
-          if (playing) {
-            self._skip_seek_event = true;
-            self.isPlaying = true;
-            self._ws?.play();
-            self._skip_seek_event = false;
-          }
-        }
-        // process other data
-        self.handleSyncSeek(data);
-      },
-
-      handleSync(data, event) {
+      handleSync(data) {
         if (!self._ws?.loaded) return;
 
-        if (!isSyncedBuffering) {
-          self.handleSyncSeek(data);
-        }
+        self.handleSyncSeek(data);
 
-        const isBuffering = self.syncManager?.isBuffering;
-
-        // Normal logic when no buffering
-        if (!isSyncedBuffering || (!isBuffering && isDefined(data.playing))) {
-          if (data.playing) {
-            if (!self._ws.playing) {
-              self.isPlaying = true;
-              self._ws?.play();
-            }
-          } else {
-            if (self._ws.playing) {
-              self.isPlaying = false;
-              self._ws?.pause();
-            }
+        if (data.playing) {
+          if (!self._ws.playing) {
+            self.isPlaying = true;
+            self._ws?.play();
           }
-        }
-        // during the buffering only these events have real `playing` values (in other cases it's paused all the time)
-        if (["play", "pause"].indexOf(event) > -1) {
-          self.wasPlayingBeforeBuffering = data.playing;
-        }
-
-        if (isSyncedBuffering) {
-          self.handleSyncSeek(data);
+        } else {
+          if (self._ws.playing) {
+            self.isPlaying = false;
+            self._ws?.pause();
+          }
         }
       },
 
@@ -556,12 +498,10 @@ export const AudioModel = types.compose(
         },
 
         onSeek(time) {
-          if (isSyncedBuffering && self._skip_seek_event) return;
           self.triggerSyncSeek(time);
         },
 
         onPlaying(playing) {
-          if (isSyncedBuffering && self.isPlaying === playing) return;
           if (playing) {
             // @todo self.play();
             self.triggerSyncPlay();
@@ -570,35 +510,6 @@ export const AudioModel = types.compose(
             self.triggerSyncPause();
           }
           self.isPlaying = playing;
-        },
-
-        handleBuffering(isBuffering) {
-          if (!isSyncedBuffering) return;
-          if (self.syncManager?.isBufferingOrigin(self.name) === isBuffering) return;
-          const isAlreadyBuffering = self.syncManager?.isBuffering;
-          const isLastCauseOfBuffering =
-            self.syncManager?.bufferingOrigins.size === 1 && self.syncManager?.isBufferingOrigin(self.name);
-          const willStartBuffering = !isAlreadyBuffering && isBuffering;
-          const willStopBuffering = isLastCauseOfBuffering && !isBuffering;
-
-          if (willStopBuffering) {
-            if (self.wasPlayingBeforeBuffering) {
-              self.isPlaying = true;
-              self._ws?.play();
-            }
-          }
-
-          self.triggerSyncBuffering(isBuffering);
-
-          // The real value, relevant for all medias synced together we have only after triggering the buffering event
-          self.isBuffering = self.syncManager?.isBuffering;
-
-          if (willStartBuffering) {
-            if (self._ws?.playing) {
-              self.isPlaying = false;
-              self._ws?.pause();
-            }
-          }
         },
 
         onError(error) {

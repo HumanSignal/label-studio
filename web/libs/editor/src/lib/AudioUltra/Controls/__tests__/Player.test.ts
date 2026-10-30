@@ -2,7 +2,6 @@
  * Unit tests for Player (lib/AudioUltra/Controls/Player.ts).
  * Player is abstract; we test it via Html5Player with mocks.
  */
-import { ff } from "@humansignal/core";
 import type { Mock } from "bun:test";
 const { Html5Player } = require("../Html5Player") as any;
 
@@ -49,7 +48,6 @@ function createMockAudio(overrides: Record<string, unknown> = {}) {
 
 describe("Player (via Html5Player)", () => {
   beforeEach(() => {
-    spyOn(ff, "isActive").mockReturnValue(false);
     if (typeof window.requestAnimationFrame === "undefined") {
       (window as any).requestAnimationFrame = (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number;
     }
@@ -231,7 +229,7 @@ describe("Player (via Html5Player)", () => {
   });
 
   describe("init", () => {
-    it("registers canplay and waiting handlers", () => {
+    it("registers canplay handler", () => {
       const wf = createMockWaveform() as any;
       const audio = createMockAudio() as any;
       const player = new Html5Player(wf);
@@ -669,8 +667,7 @@ describe("Player (via Html5Player)", () => {
   });
 
   describe("Html5Player handleResetSource", () => {
-    it("calls audio.el.load() and play() when ff is inactive and was playing", async () => {
-      (ff.isActive as Mock<any>).mockReturnValue(false);
+    it("calls audio.el.load() and play() when was playing", async () => {
       const wf = createMockWaveform() as any;
       const audio = createMockAudio() as any;
       audio.el.load = mock();
@@ -683,22 +680,7 @@ describe("Player (via Html5Player)", () => {
       expect([true, false, undefined]).toContain((player as any).playing);
     });
 
-    it("does not call audio.el.load() when ff FF_SYNCED_BUFFERING is active", async () => {
-      (ff.isActive as Mock<any>).mockImplementation((flag: string) => flag === "FF_SYNCED_BUFFERING");
-      const wf = createMockWaveform() as any;
-      const audio = createMockAudio() as any;
-      audio.el.load = mock();
-      const player = new Html5Player(wf);
-      player.init(audio);
-      (player as any).playing = true;
-      const resetSourceCb = audio.on.mock.calls.find((c: string[]) => c[0] === "resetSource")?.[1];
-      await resetSourceCb?.();
-      expect((audio.el.load as Mock<any>).mock.calls.length).toBeGreaterThanOrEqual(0);
-      (ff.isActive as Mock<any>).mockReturnValue(false);
-    });
-
     it("returns early when audio has no el", async () => {
-      (ff.isActive as Mock<any>).mockReturnValue(false);
       const wf = createMockWaveform() as any;
       const player = new Html5Player(wf);
       (player as any).audio = { el: null };
