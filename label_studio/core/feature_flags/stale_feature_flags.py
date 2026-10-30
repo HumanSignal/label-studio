@@ -12,7 +12,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_root_223_optimize_delete_predictions': True,
     'fflag_root_212_reduce_importstoragelink_counts': True,
     # Jan 8
-    'fflag_feat_all_leap_1821_annotation_limit_short': True,
     # Apr 8
     'fflag_feat_all_leap_883_custom_script_270524_short': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
