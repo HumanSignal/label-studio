@@ -1,14 +1,8 @@
 STALE_FEATURE_FLAGS = {
-    # Feb 6
-    'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31
-    'fflag_feat_root_47_plugins_without_eval': False,
     'fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short': True,
-    'fflag_fix_leap_2052_detect_empty_filters_at_next_task_endpoint_short': True,
     'fflag_feat_dia_1925_view_sample_raw_json_short': False,
     'fflag__feature_develop__prompts__dia_1868_azure_ai_foundry': True,
-    'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
-    'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
     # Jan 5
     'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
     'fflag_feat_front_fit_183_email_notifications_short': True,
@@ -24,7 +18,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_root_212_reduce_importstoragelink_counts': True,
     # Jan 8
     'fflag_feat_all_leap_1821_annotation_limit_short': True,
-    'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
     'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,
     'fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short': True,
     'fflag_fix_back_plt_893_project_list_oom_fix_02102025_short': True,

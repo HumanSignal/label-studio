@@ -2,10 +2,7 @@
  * Unit tests for RequiredMixin (mixins/Required.js), perItem branch.
  */
 import { types } from "mobx-state-tree";
-import { FF_LSDV_4583 } from "../../utils/feature-flags";
 import RequiredMixin from "../Required";
-
-const ff = mockFF();
 
 // perItem control (e.g. TextArea) whose visibility per item is driven by `hiddenItems`,
 // standing in for a wrapping <View visibleWhen="choice-selected"> gated by a perItem Choices
@@ -54,14 +51,6 @@ function setup({ hiddenItems = [], valuedItems = [], maxItemIndex = 2 } = {}) {
 }
 
 describe("RequiredMixin perItem", () => {
-  beforeEach(() => {
-    ff.set({ [FF_LSDV_4583]: true });
-  });
-
-  afterEach(() => {
-    ff.reset();
-  });
-
   it("skips items where the control is hidden by visibleWhen", () => {
     const { control, objectTag } = setup({ hiddenItems: [1, 2], valuedItems: [0] });
 

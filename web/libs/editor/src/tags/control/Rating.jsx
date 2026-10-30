@@ -13,7 +13,6 @@ import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import ClassificationBase from "./ClassificationBase";
 import PerItemMixin from "../../mixins/PerItem";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 
 /**
  * The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.
@@ -123,7 +122,7 @@ const RatingModel = types.compose(
   RequiredMixin,
   ReadOnlyControlMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   AnnotationMixin,
   TagAttrs,
   Model,

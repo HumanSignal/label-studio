@@ -6,9 +6,6 @@ import {
   requiredPerTagMIGTaxonomyConfig,
   TAXONOMY_REQUIRED_WARNING,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Taxonomy /> */
 describe("Classification - MIG perTag - Taxonomy", () => {

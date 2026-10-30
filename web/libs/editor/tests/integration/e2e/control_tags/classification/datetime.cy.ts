@@ -15,9 +15,6 @@ import {
   simpleImageDateTimeConfig,
   simpleMIGData,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <DateTime /> */
 describe("Classification - single image - DateTime", () => {

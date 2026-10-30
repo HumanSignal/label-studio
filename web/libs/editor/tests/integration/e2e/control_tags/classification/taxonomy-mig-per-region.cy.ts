@@ -7,9 +7,6 @@ import {
   perRegionTaxonomyResult,
   requiredPerRegionMIGTaxonomyConfig,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Taxonomy /> */
 describe("Control Tags - MIG perRegion - Taxonomy", () => {

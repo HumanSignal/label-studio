@@ -3,7 +3,6 @@ import chroma from "chroma-js";
 import Constants from "../core/Constants";
 
 import * as Colors from "./colors";
-import { FF_LSDV_4583, isFF } from "./feature-flags";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -269,77 +268,7 @@ function exportRLE(region) {
  * @returns {string} RLE encoded contents.
  */
 function Region2RLE(region) {
-  // New way of exporting brush regions
-  if (isFF(FF_LSDV_4583)) return exportRLE(region);
-
-  // Legacy encoder
-  const nw = region.currentImageEntity.naturalWidth;
-  const nh = region.currentImageEntity.naturalHeight;
-  const stage = region.object?.stageRef;
-  const parent = region.parent;
-
-  if (!stage) {
-    console.error(`Stage not found for area #${region.cleanId}`);
-    return;
-  }
-
-  const layer = stage.findOne(`#${region.cleanId}`);
-
-  if (!layer) {
-    console.error(`Layer #${region.id} was not found on Stage`);
-    return [];
-  }
-  const isVisible = layer.visible();
-
-  !isVisible && layer.show();
-
-  const width = stage.getWidth();
-  const height = stage.getHeight();
-  const scaleX = stage.getScaleX();
-  const scaleY = stage.getScaleY();
-  const x = stage.getX();
-  const y = stage.getY();
-  const offsetX = stage.getOffsetX();
-  const offsetY = stage.getOffsetY();
-  const rotation = stage.getRotation();
-
-  stage
-    .setWidth(parent.stageWidth)
-    .setHeight(parent.stageHeight)
-    .setScaleX(1)
-    .setScaleY(1)
-    .setX(0)
-    .setY(0)
-    .setOffsetX(0)
-    .setOffsetY(0)
-    .setRotation(0);
-  stage.drawScene();
-  // resize to original size
-  const canvas = layer.toCanvas({ pixelRatio: nw / region.currentImageEntity.stageWidth });
-  const ctx = canvas.getContext("2d");
-
-  // get the resulting raw data and encode into RLE format
-  const data = ctx.getImageData(0, 0, nw, nh);
-
-  for (let i = data.data.length / 4; i--; ) {
-    data.data[i * 4] = data.data[i * 4 + 1] = data.data[i * 4 + 2] = data.data[i * 4 + 3];
-  }
-  stage
-    .setWidth(width)
-    .setHeight(height)
-    .setScaleX(scaleX)
-    .setScaleY(scaleY)
-    .setX(x)
-    .setY(y)
-    .setOffsetX(offsetX)
-    .setOffsetY(offsetY)
-    .setRotation(rotation);
-  stage.drawScene();
-  const rle = encode(data.data, data.data.length);
-
-  !isVisible && layer.hide();
-
-  return rle;
+  return exportRLE(region);
 }
 
 /**

@@ -24,9 +24,6 @@ import {
   requiredPerItemMIGTextareaConfig,
   requiredPerItemVisibleWhenMIGTextareaConfig,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Textarea /> */
 describe("Classification - single image - Textarea", () => {

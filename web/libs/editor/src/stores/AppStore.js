@@ -18,7 +18,7 @@ import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import { emitRegionDeleted } from "../utils/labelingTelemetry";
-import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import { FF_CUSTOM_SCRIPT, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 import { REJECT_ACTION_HOTKEY_NAMES } from "../utils/rejectHotkeys";
@@ -956,9 +956,7 @@ export default types
 
       if (oldAnnotationStore) {
         oldAnnotationStore.beforeReset?.();
-        if (isFF(FF_LSDV_4998)) {
-          destroySharedStore();
-        }
+        destroySharedStore();
         detach(oldAnnotationStore);
         destroy(oldAnnotationStore);
       }

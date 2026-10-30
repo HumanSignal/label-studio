@@ -26,12 +26,6 @@ export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_w
  */
 export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short";
 
-/**
- * Correction of image and stage size. It also affects the zoom position restrictions.
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short
- */
-export const FF_DEV_3377 = "fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short";
-
 // Refactoring to use separate trees for every annotation to allow real annotations in View All
 export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
 
@@ -55,23 +49,11 @@ export const FF_LSDV_E_278 = "fflag_feat_front_lsdv_e_278_contextual_scrolling_s
 export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short";
 
 /**
- * Multi-image segmentation support via `valueList`
- */
-export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation_short";
-
-/**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short
  */
 export const FF_LSDV_4930 = "fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short";
-
-/**
- * Resetting shared stores on task change to correctly generate dynamic children
- * @see: fflag_fix_front_dev_3617_taxonomy_memory_leaks_fix: To enable shared store
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short
- */
-export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short";
 
 /**
  * Fix task count on projects with over 100 tasks (switch from task history to queue count)

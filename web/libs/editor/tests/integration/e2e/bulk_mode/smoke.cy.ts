@@ -16,7 +16,6 @@ import {
   Collapse,
 } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
-import { FF_LSDV_4583 } from "../../../../src/utils/feature-flags";
 import {
   allTagsConfig,
   allTagsSampleData,
@@ -92,10 +91,6 @@ describe("Bulk mode", () => {
   });
 
   it("should not show per-item classifications", () => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_LSDV_4583]: true,
-    });
-
     LabelStudio.params()
       .config(perItemMIGConfig)
       .withInterface("annotation:bulk")

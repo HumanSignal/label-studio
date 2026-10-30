@@ -1,9 +1,6 @@
 /* global describe, test, expect, mock, spyOn, beforeEach */
 import { encode as rleEncode } from "@thi.ng/rle-pack";
 import Canvas from "../canvas";
-import { FF_LSDV_4583 } from "../feature-flags";
-
-const ff = mockFF();
 
 const svgs = {
   simple: [
@@ -292,12 +289,7 @@ function createExportRLECanvas(nw, nh) {
 }
 
 describe("Region2RLE", () => {
-  beforeEach(() => {
-    ff.reset();
-  });
-
-  test("returns RLE when isFF(FF_LSDV_4583) is true (exportRLE path)", () => {
-    ff.set({ [FF_LSDV_4583]: true });
+  test("returns RLE (exportRLE path)", () => {
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -315,7 +307,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with existing region.rle applies decode and putImageData", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const nw = 4;
     const nh = 4;
     const raw = new Uint8Array(nw * nh * 4);
@@ -349,7 +340,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with getMaskImage draws mask on canvas", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -370,7 +360,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with touches renders strokes and encodes", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(10, 10);
@@ -390,36 +379,5 @@ describe("Region2RLE", () => {
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
     restoreAllMocks();
-  });
-
-  test("legacy path returns undefined when stage is missing", () => {
-    const consoleSpy = spyOn(console, "error").mockImplementation(() => {});
-    const region = {
-      currentImageEntity: { naturalWidth: 4, naturalHeight: 4 },
-      object: {},
-      cleanId: "area-1",
-    };
-    const result = Canvas.Region2RLE(region);
-    expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("Stage not found for area #area-1");
-    consoleSpy.mockRestore();
-  });
-
-  test("legacy path returns [] when layer not found on stage", () => {
-    const consoleSpy = spyOn(console, "error").mockImplementation(() => {});
-    const region = {
-      currentImageEntity: { naturalWidth: 4, naturalHeight: 4 },
-      id: "layer-1",
-      cleanId: "layer-1",
-      object: {
-        stageRef: {
-          findOne: () => null,
-        },
-      },
-    };
-    const result = Canvas.Region2RLE(region);
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith("Layer #layer-1 was not found on Stage");
-    consoleSpy.mockRestore();
   });
 });

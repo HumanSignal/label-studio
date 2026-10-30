@@ -14,7 +14,6 @@ import ControlBase from "./Base";
 import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
 import ClassificationBase from "./ClassificationBase";
 import PerItemMixin from "../../mixins/PerItem";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 import { Select } from "@humansignal/ui";
 
 const FORMAT_FULL = "%Y-%m-%dT%H:%M";
@@ -327,7 +326,7 @@ const DateTimeModel = types.compose(
   RequiredMixin,
   ReadOnlyControlMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   AnnotationMixin,
   TagAttrs,
   Model,

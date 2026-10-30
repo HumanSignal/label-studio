@@ -25,7 +25,7 @@ import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
 import { dedupeAnnotationWireResults } from "../../utils/dedupeAnnotationWireResults";
-import { FF_DEV_1284, FF_DEV_3391, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { FF_DEV_1284, FF_DEV_3391, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
@@ -1528,15 +1528,13 @@ const _Annotation = types
 
           area = createArea(areaSnapshot);
 
-          if (isFF(FF_LSDV_4583)) {
-            // store copy of the original result inside the area
-            // useful when you need to serialize a result without
-            // updating it from current/actual data
-            // For safety reasons this object is always readonly
-            Object.defineProperty(area, "_rawResult", {
-              value: Object.freeze(structuredClone(obj)),
-            });
-          }
+          // store copy of the original result inside the area
+          // useful when you need to serialize a result without
+          // updating it from current/actual data
+          // For safety reasons this object is always readonly
+          Object.defineProperty(area, "_rawResult", {
+            value: Object.freeze(structuredClone(obj)),
+          });
         }
 
         const newResult = { ...data, id: resultId, type, value, from_name, to_name };
