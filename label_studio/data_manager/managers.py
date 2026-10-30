@@ -9,7 +9,6 @@ from functools import reduce
 from typing import ClassVar
 
 import ujson as json
-from core.feature_flags import flag_set
 from core.utils.db import fast_first
 from data_manager.column_names import UNQUERYABLE_COLUMN_NAME_CHARACTERS, is_queryable_column_name
 from data_manager.prepare_params import ConjunctionEnum
@@ -1267,44 +1266,31 @@ def annotate_predictions_score(queryset):
     if not first_task:
         return queryset
 
-    # new approach with each ML backend contains it's version
-    if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', first_task.project.organization.created_by):
-        model_versions = list(
-            first_task.project.ml_backends.filter(project=first_task.project).values_list('model_version', flat=True)
-        )
-        if len(model_versions) == 0:
-            return queryset.annotate(predictions_score=Avg('predictions__score'))
-
-        else:
-            return queryset.annotate(
-                predictions_score=Avg('predictions__score', filter=Q(predictions__model_version__in=model_versions))
+    project = first_task.project
+    model_version = project.model_version
+    if model_version is not None:
+        backend_exists_for_model_version = project.ml_backends.filter(model_version=model_version).exists()
+        predictions_exists_for_model_version = False
+        if not backend_exists_for_model_version:
+            predictions_exists_for_model_version = project.predictions.filter(model_version=model_version).exists()
+        if not backend_exists_for_model_version and not predictions_exists_for_model_version:
+            # project.model_version can secretly store a title instead of a model_version
+            backup_model_version = (
+                project.ml_backends.filter(title=model_version)
+                .order_by('-updated_at')
+                .values_list('model_version', flat=True)
+                .first()
             )
+            if backup_model_version is not None:
+                # '' is used for 'no selected model version', don't overwrite it
+                model_version = backup_model_version
+
+    if model_version is None:
+        return queryset.annotate(predictions_score=Avg('predictions__score'))
     else:
-        project = first_task.project
-        model_version = project.model_version
-        if model_version is not None:
-            backend_exists_for_model_version = project.ml_backends.filter(model_version=model_version).exists()
-            predictions_exists_for_model_version = False
-            if not backend_exists_for_model_version:
-                predictions_exists_for_model_version = project.predictions.filter(model_version=model_version).exists()
-            if not backend_exists_for_model_version and not predictions_exists_for_model_version:
-                # project.model_version can secretly store a title instead of a model_version
-                backup_model_version = (
-                    project.ml_backends.filter(title=model_version)
-                    .order_by('-updated_at')
-                    .values_list('model_version', flat=True)
-                    .first()
-                )
-                if backup_model_version is not None:
-                    # '' is used for 'no selected model version', don't overwrite it
-                    model_version = backup_model_version
-
-        if model_version is None:
-            return queryset.annotate(predictions_score=Avg('predictions__score'))
-        else:
-            return queryset.annotate(
-                predictions_score=Avg('predictions__score', filter=Q(predictions__model_version=model_version))
-            )
+        return queryset.annotate(
+            predictions_score=Avg('predictions__score', filter=Q(predictions__model_version=model_version))
+        )
 
 
 def annotate_annotations_ids(queryset):

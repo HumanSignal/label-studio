@@ -239,7 +239,6 @@ export const CreateProject = ({ onClose }) => {
           show={step === "import"}
           sample={sample}
           onSampleDatasetSelect={setSample}
-          openLabelingConfig={() => setStep("config")}
           {...pageProps}
         />
         <ConfigPage

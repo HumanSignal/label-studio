@@ -1171,11 +1171,6 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
         return ml_backends
 
-    def get_active_ml_backends(self):
-        from ml.models import MLBackendState
-
-        return self.get_ml_backends(state=MLBackendState.CONNECTED)
-
     @cached_property
     def get_all_import_storage_objects(self):
         from io_storages.models import get_storage_classes

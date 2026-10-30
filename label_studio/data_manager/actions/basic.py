@@ -4,7 +4,6 @@ import logging
 from datetime import datetime
 
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
@@ -216,10 +215,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     """
     task_ids = queryset.values_list('id', flat=True)
     predictions = Prediction.objects.filter(task__id__in=task_ids)
-    if flag_set('fflag_root_223_optimize_delete_predictions', organization=project.organization):
-        real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
-    else:
-        real_task_ids = set(list(predictions.values_list('task_id', flat=True)))
+    real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
 
     count = predictions.count()
     predictions.delete()

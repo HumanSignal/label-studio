@@ -715,11 +715,6 @@ class ImportStorage(Storage):
         max_inner_id = (task.inner_id + 1) if task else 1
         validation_errors = []
 
-        # Check feature flags once for the entire sync process
-        existed_count_flag_set = flag_set(
-            'fflag_root_212_reduce_importstoragelink_counts', organization=self.project.organization
-        )
-
         tasks_for_webhook = []
         bulk_tasks = connection.features.can_return_rows_from_bulk_insert and flag_set(
             FF_IMPORT_BULK_TASK_STATES, organization=self.project.organization
@@ -750,10 +745,7 @@ class ImportStorage(Storage):
             tasks_for_webhook.extend(task.id for task in created)
             emit_webhooks_if_full()
 
-        # fflag_root_212_reduce_importstoragelink_counts is always on (pinned in STALE_FEATURE_FLAGS), so bulk task
-        # inserts span keys; with a key batch of 1 they would only batch the objects of a single file.
-        key_batch_size = settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
-        for keys_batch in _batched(self.iter_keys(), key_batch_size):
+        for keys_batch in _batched(self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE):
             deduplicated_keys = list(dict.fromkeys(keys_batch))  # preserve order
             for key in deduplicated_keys:
                 logger.debug(f'Scanning key {key}')

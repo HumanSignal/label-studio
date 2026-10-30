@@ -1,16 +1,14 @@
 import { SampleDatasetSelect } from "@humansignal/app-common/blocks/SampleDatasetSelect/SampleDatasetSelect";
 import { ff, formatFileSize } from "@humansignal/core";
-import { IconCode, IconErrorAlt, IconFileUpload, IconInfoOutline, IconTrash, IconUpload } from "@humansignal/icons";
+import { IconErrorAlt, IconFileUpload, IconInfoOutline, IconTrash, IconUpload } from "@humansignal/icons";
 import { cn as scn } from "@humansignal/shad/utils";
-import { useAtomValue } from "jotai";
 import Input from "libs/datamanager/src/components/Common/Input/Input";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import { unique } from "../../../utils/helpers";
-import { sampleDatasetAtom } from "../utils/atoms";
 import "./Import.prefix.css";
-import { Badge, Button, CodeBlock, Message, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
+import { Badge, Button, SimpleCard, Tooltip, Typography } from "@humansignal/ui";
 import truncate from "truncate-middle";
 import samples from "./samples.json";
 import { importFiles } from "./utils";
@@ -151,14 +149,11 @@ export const ImportPage = ({
   csvHandling,
   setCsvHandling,
   addColumns,
-  openLabelingConfig,
 }) => {
   const [error, setError] = useState();
   const [newlyUploadedFiles, setNewlyUploadedFiles] = useState(new Set());
   const prevUploadedRef = useRef(new Set());
   const api = useAPI();
-  const projectConfigured = project?.label_config !== "<View></View>";
-  const sampleConfig = useAtomValue(sampleDatasetAtom);
 
   const processFiles = (state, action) => {
     if (action.sending) {
@@ -336,15 +331,6 @@ export const ImportPage = ({
       importFilesImmediately([{ name: url }], body);
     },
     [importFilesImmediately],
-  );
-
-  const openConfig = useCallback(
-    (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openLabelingConfig?.();
-    },
-    [openLabelingConfig],
   );
 
   useEffect(() => {
@@ -607,60 +593,6 @@ export const ImportPage = ({
                     </tbody>
                   </table>
                 </SimpleCard>
-              </div>
-            )}
-
-            {ff.isFF(ff.FF_JSON_PREVIEW) && (
-              <div className="w-full h-full flex flex-col min-h-[400px]">
-                {projectConfigured ? (
-                  <SimpleCard
-                    title="Expected Input Preview"
-                    className="w-full h-full overflow-hidden flex flex-col"
-                    contentClassName="h-[calc(100%-48px)]"
-                    flushContent
-                  >
-                    {sampleConfig.data ? (
-                      <div className={importClass.elem("code-wrapper").toClassName()}>
-                        <CodeBlock
-                          title="Expected Input Preview"
-                          code={sampleConfig?.data ?? ""}
-                          className="w-full h-full"
-                        />
-                      </div>
-                    ) : sampleConfig.isLoading ? (
-                      <div className="w-full flex justify-center py-12">
-                        <Spinner className="h-6 w-6" />
-                      </div>
-                    ) : sampleConfig.isError ? (
-                      <Message variant="negative" className="m-tight">
-                        Something went wrong, the sample data could not be loaded.
-                      </Message>
-                    ) : null}
-                  </SimpleCard>
-                ) : (
-                  <SimpleCard className="w-full h-full flex flex-col items-center justify-center text-center p-wide">
-                    <div className="flex flex-col items-center gap-tight">
-                      <div className="bg-primary-background rounded-largest p-tight flex items-center justify-center">
-                        <IconCode className="w-6 h-6 text-primary-icon" />
-                      </div>
-                      <div className="flex flex-col items-center gap-tighter">
-                        <div className="text-label-small text-neutral-content font-medium">View JSON input format</div>
-                        <div className="text-body-small text-neutral-content-subtler text-center">
-                          Setup your{" "}
-                          <Button
-                            type="button"
-                            look="string"
-                            onClick={openConfig}
-                            className="border-none bg-none p-0 m-0 text-primary-content underline"
-                          >
-                            labeling configuration
-                          </Button>{" "}
-                          first to preview the expected JSON data format
-                        </div>
-                      </div>
-                    </div>
-                  </SimpleCard>
-                )}
               </div>
             )}
           </div>

@@ -101,9 +101,6 @@ export const Inner = () => {
         sample={sample}
         onSampleDatasetSelect={setSample}
         projectConfigured={Object.keys(project.parsed_label_config ?? {}).length > 0}
-        openLabelingConfig={() => {
-          history.push(`/projects/${project.id}/settings/labeling`);
-        }}
         {...pageProps}
       />
     </Modal>

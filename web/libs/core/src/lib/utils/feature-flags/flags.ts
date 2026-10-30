@@ -36,11 +36,6 @@ export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_tok
 export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_data_short";
 
 /**
- * JSON preview window for the import flow
- */
-export const FF_JSON_PREVIEW = "fflag_feat_dia_1925_view_sample_raw_json_short";
-
-/**
  * Enables the theme toggle in the UI to enable the dark mode
  */
 export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
