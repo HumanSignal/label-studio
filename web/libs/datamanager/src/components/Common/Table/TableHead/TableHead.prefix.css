@@ -30,9 +30,121 @@
   }
 
   &__draggable {
-    --scale: 1;
+    position: relative;
+    border-radius: var(--corner-radius-smaller);
 
-    transform: scale(var(--scale));
-    cursor: grab;
+    /* Affordances only for cells that can actually be dragged (not on a locked tab). */
+    &[data-draggable="true"] {
+      cursor: grab;
+      transition: background-color 120ms ease-out;
+      /* Pointer drags must not scroll the page on touch screens. */
+      touch-action: none;
+
+      /* Hovering a header cell highlights it so it is clear it can be dragged. */
+      &:hover {
+        background-color: var(--color-neutral-emphasis-subtle);
+      }
+    }
+
+    /* The dragged column stays in place as a transparent ghost; a copy follows the pointer. */
+    &[data-dragging="true"] {
+      opacity: 0.4;
+    }
   }
+
+  /* The copy of the dragged column that follows the pointer (rendered in the drag overlay): it owns the rounded
+     corners and the fill, and shows the column without its resize separator or grip. */
+  &__drag-image {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--corner-radius-small);
+    background-color: var(--color-neutral-background);
+    color: var(--color-neutral-content);
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: none;
+    cursor: grabbing;
+    /* A ring and a soft shadow so the copy stands out over a header of the same colour. */
+    box-shadow:
+      0 0 0 1px var(--color-neutral-border-bold),
+      0 6px 16px rgb(0 0 0 / 20%);
+
+    & [class*="handle"] {
+      display: none;
+    }
+  }
+
+  /* Six-dot grip shown on hover (and when focused, for keyboard users), overlaid in the cell's left padding so
+     showing it never shifts the title. It is the keyboard activator: space/enter picks the column up, arrows move it. */
+  &__drag-handle {
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    transform: translateY(-50%);
+    color: var(--color-neutral-icon);
+    cursor: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease-out;
+
+    & > svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    &:focus-visible {
+      opacity: 1;
+      outline: 2px solid var(--color-primary-border);
+      outline-offset: 1px;
+    }
+  }
+
+  &__draggable[data-draggable="true"]:hover > &__drag-handle {
+    opacity: 1;
+  }
+
+  /* No grip or highlight on the cell being dragged: it is the ghost. */
+  &__draggable[data-dragging="true"] > &__drag-handle {
+    opacity: 0;
+  }
+
+  /* Drop indicator shown between columns while dragging. Position and offset are set inline (absolute, out of
+     flow) so it never shifts the columns; this only styles the bar. It is inset like the column resize handle
+     so the two read as the same kind of separator. */
+  &__drop-placeholder {
+    top: var(--dm-column-separator-inset-y);
+    bottom: var(--dm-column-separator-inset-y);
+    width: var(--dm-column-separator-line-width-active);
+    /* The resize handle's line is centered in its hit area, which ends at the column's right edge, so it sits
+       (hit size / 2) inside that edge. Centre the bar on the same line. The very first gap has no handle in front of
+       it and is centered on the edge itself. All sizes come from columnSeparator.prefix.css. */
+    margin-left: calc(
+      -1 *
+      (var(--dm-column-separator-hit-size) / 2 + var(--dm-column-separator-line-width-active) / 2)
+    );
+    border-radius: calc(var(--dm-column-separator-line-width-active) / 2);
+    background-color: var(--color-accent-grape-base);
+    /* Above the column resize handles (z-index: 100), which would otherwise hide the bar. */
+    z-index: 200;
+
+    &[data-first-gap="true"] {
+      margin-left: calc(-1 * var(--dm-column-separator-line-width-active) / 2);
+    }
+  }
+}
+
+/* While a column is dragged: closed-hand cursor everywhere (the drag is a pointer drag, so CSS controls it) and no
+   accidental text selection. Set on <html> by TableHead. */
+html[data-column-dragging="true"],
+html[data-column-dragging="true"] * {
+  cursor: grabbing !important;
+  user-select: none !important;
 }
