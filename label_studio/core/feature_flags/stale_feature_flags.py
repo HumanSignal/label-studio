@@ -10,7 +10,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_root_212_reduce_importstoragelink_counts': True,
     # Jan 8
     # Apr 8
-    'fflag_feat_all_leap_883_custom_script_270524_short': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
     # Apr 14
     'ff_front_dev_1682_model_version_dropdown_070622_short': False,

@@ -18,7 +18,7 @@ import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import { emitRegionDeleted } from "../utils/labelingTelemetry";
-import { FF_CUSTOM_SCRIPT, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import { FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 import { REJECT_ACTION_HOTKEY_NAMES } from "../utils/rejectHotkeys";
@@ -776,26 +776,16 @@ export default types
 
       if (!entity.validate()) return;
 
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
-        entity.sendUserGenerate();
-      }
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          await self.waitForDraftSubmission();
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        await self.waitForDraftSubmission();
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
-          entity.sendUserGenerate();
-        }
+        entity.sendUserGenerate();
         await getEnv(self).events.invoke(event, self, entity);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
-      }
+      });
     }
 
     function updateAnnotation(extraData) {
@@ -808,24 +798,16 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "updateAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "updateAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         entity.setAcceptedState?.(null);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-          !entity.sentUserGenerate && entity.sendUserGenerate();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
         !entity.sentUserGenerate && entity.sendUserGenerate();
-      }
+      });
     }
 
     function skipTask(extraData) {
@@ -871,12 +853,10 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "acceptAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "acceptAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         // changes in current sessions or saved draft should send the result along with approval
         const isDirty = entity.history.canUndo || entity.versions.draft;
@@ -895,12 +875,10 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "rejectAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "rejectAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         const isDirty = entity.history.canUndo;
 

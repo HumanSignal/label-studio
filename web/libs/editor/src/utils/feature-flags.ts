@@ -55,8 +55,6 @@ export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
  */
 export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
 
-export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
-
 /**
  * Disable the postpone option if the skip interface isn't set
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short

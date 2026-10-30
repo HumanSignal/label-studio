@@ -608,11 +608,12 @@ describe("AppStore", () => {
   });
 
   describe("isSubmitting guard", () => {
-    it("submitAnnotation returns early when isSubmitting", () => {
+    it("submitAnnotation returns early when isSubmitting", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       store.setFlags({ isSubmitting: true });
       store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
@@ -941,11 +942,12 @@ describe("AppStore", () => {
   });
 
   describe("isLoading guard", () => {
-    it("submitAnnotation returns early when isLoading", () => {
+    it("submitAnnotation returns early when isLoading", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       store.setFlags({ isLoading: true });
       store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
@@ -996,33 +998,38 @@ describe("AppStore", () => {
       expect(store.hydrated).toBe(true);
     });
 
-    it("submit hotkey fires when hydrated", () => {
+    it("submit hotkey fires when hydrated", async () => {
       const store = createSubmitStore();
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey is inert while not hydrated", () => {
+    it("submit hotkey is inert while not hydrated", async () => {
       const store = createSubmitStore();
       store.setHydrated(false);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey is inert when there is no task to label", () => {
+    it("submit hotkey is inert when there is no task to label", async () => {
       const store = createSubmitStore();
       store.setFlags({ noTask: true });
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey fires again once re-hydrated", () => {
+    it("submit hotkey fires again once re-hydrated", async () => {
       const store = createSubmitStore();
       store.setHydrated(false);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
       store.setHydrated(true);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
