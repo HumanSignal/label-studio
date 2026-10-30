@@ -6,8 +6,8 @@ import { fetchTaskAgreementDistribution } from "./Aggregation";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
-import type { ControlTag, ObjectTagEntry, ObjectTypes } from "./types";
-import { getLabelColors, sortControls } from "./utils";
+import type { ControlTag, ObjectTypes } from "./types";
+import { buildObjectDataTypes, getLabelColors, sortControls } from "./utils";
 
 type TaskSummaryProps = {
   annotations: MSTAnnotation[];
@@ -84,25 +84,7 @@ const TaskSummary = observer(({ annotations: all, store: annotationStore }: Task
   // show global classifications first, then labels, then per-regions
   const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
 
-  const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value?.includes("$") || tag.valueList?.includes("$") || tag.loadedData),
-  ) as ObjectTagEntry[];
-  const dataTypes: ObjectTypes = Object.fromEntries(
-    objectTags.map(([name, object]) => [
-      name,
-      // most of tags has `updateValue()` method which resolves `value` and stores it in `_value`
-      // Image tag uses `parsedValue` instead of `_value`
-      // Pdf tag uses `_url` instead of `_value`
-      // TimeSeries tag uses `dataObj` instead of `_value`, it's always an object {<channel name>: [array of values]}
-      // for other tags with complex logic (like TimeSeries) we use `value` for now, which is not ideal
-      {
-        type: object.type,
-        value:
-          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
-      },
-    ]),
-  );
+  const dataTypes: ObjectTypes = buildObjectDataTypes(allTags);
 
   const agreementFromQuery = agreementPayload?.agreement;
 
