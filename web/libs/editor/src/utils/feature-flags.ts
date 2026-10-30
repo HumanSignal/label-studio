@@ -17,8 +17,6 @@ export const FF_DEV_2671 = "ff_front_dev_2671_anchor_rotate_bbox_010722_short";
  */
 export const FF_AUDIO_SPECTROGRAMS = "fflag_feat_optic_2123_audio_spectrograms";
 
-export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short";
-
 /**
  * Creating separated regions if selection includes hidden phrases
  * @see FF_DEV_2669 (allows filtering)
@@ -28,12 +26,6 @@ export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraph
 
 // Refactoring to use separate trees for every annotation to allow real annotations in View All
 export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
-
-/**
- * Label stream ablation experiment for solving overlap issue
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short
- */
-export const FF_DEV_4174 = "fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short";
 
 /**
  * Contextual scrolling of Paragraph segments with Audio V0

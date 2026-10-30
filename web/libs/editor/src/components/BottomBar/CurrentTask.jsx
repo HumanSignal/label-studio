@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { observer } from "mobx-react";
 import { Button, Tooltip } from "@humansignal/ui";
 import { CaretLeftIcon, CaretRightIcon } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
-import { FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
+import { FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.prefix.css";
-import { reaction } from "mobx";
 
 // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
 const MANAGER_ROLES = ["OW", "AD", "MA"];
@@ -17,29 +16,9 @@ export const CurrentTask = observer(({ store }) => {
     return store.taskHistory.findIndex((x) => x.taskId === store.task.id) + 1;
   }, [store.taskHistory]);
 
-  const [initialCommentLength, setInitialCommentLength] = useState(0);
-  const [visibleComments, setVisibleComments] = useState(0);
-
   useEffect(() => {
     store.commentStore.setAddedCommentThisSession(false);
-
-    const reactionDisposer = reaction(
-      () => store.commentStore.comments.map((item) => item.isDeleted),
-      (result) => {
-        setVisibleComments(result.filter((item) => !item).length);
-      },
-    );
-
-    return () => {
-      reactionDisposer?.();
-    };
   }, []);
-
-  useEffect(() => {
-    if (store.commentStore.addedCommentThisSession) {
-      setInitialCommentLength(visibleComments);
-    }
-  }, [store.commentStore.addedCommentThisSession]);
 
   const historyEnabled = store.hasInterface("topbar:prevnext");
   const showCounter = store.hasInterface("topbar:task-counter");
@@ -56,7 +35,7 @@ export const CurrentTask = observer(({ store }) => {
 
   // If task cannot be skipped and user doesn't have force_skip, also disable postpone
   // Note: store.hasInterface("postpone") is set by lsf-sdk based on task.allow_postpone from API
-  let canPostpone =
+  const canPostpone =
     !hasSubmittedAnnotation &&
     !store.canGoNextTask &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
@@ -91,10 +70,6 @@ export const CurrentTask = observer(({ store }) => {
     }
     return "No next task available";
   }, [requiresAnnotationSubmission, canNavigateNext, canPostponeTask, canSkipOrPostpone]);
-
-  if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
-    canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;
-  }
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>

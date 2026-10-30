@@ -1172,7 +1172,7 @@ export default types
     async function postponeTask() {
       const annotation = self.annotationStore.selected;
 
-      // save draft before postponing; this can be new draft with FF_DEV_4174 off
+      // save draft before postponing; this can be a new draft
       // or annotation created from prediction
       await annotation.saveDraft({ was_postponed: true });
       await getEnv(self).events.invoke("nextTask");

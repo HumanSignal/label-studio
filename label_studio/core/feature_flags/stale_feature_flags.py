@@ -4,15 +4,10 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_dia_1925_view_sample_raw_json_short': False,
     'fflag__feature_develop__prompts__dia_1868_azure_ai_foundry': True,
     # Jan 5
-    'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
-    'fflag_feat_front_fit_183_email_notifications_short': True,
     'fflag_feat_front_optic_1746_improve_global_error_messages_short': True,
-    'ff_front_optic_1610_ask_ai_questions': True,
     'fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short': True,
     'fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short': True,
     'ff_front_optic_1494_saved_templates_to_custom_templates': True,
-    'fflag_feat_all_optic_1354_sum_annotation_region_count_short': True,
-    'fflag_feat_front_optic_1217_theme_toggle_short': True,
     # Jan 6
     'fflag_root_223_optimize_delete_predictions': True,
     'fflag_root_212_reduce_importstoragelink_counts': True,
@@ -20,12 +15,7 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_all_leap_1821_annotation_limit_short': True,
     # Apr 8
     'fflag_feat_all_leap_883_custom_script_270524_short': True,
-    'fflag_feat_all_lops_315_temp_datasets_limitations_short': True,
-    'fflag_feat_front_lops_134_find_similarity_29082023_short': True,
-    'fflag_fix_all_fit_287_preview_performance_improvements': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
-    'fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short': False,
-    'fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short': False,
     # Apr 14
     'ff_front_dev_1682_model_version_dropdown_070622_short': False,
     # May 7

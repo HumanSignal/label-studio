@@ -5,7 +5,6 @@ import {
   FF_INTERFACES_SCENARIOS,
   FF_NEW_STORAGES,
   FF_SEGMENT_ANYTHING_ML_BACKEND,
-  FF_THEME_TOGGLE,
 } from "./flags";
 
 const FLAGS_OVERRIDE: Record<string, boolean> = {
@@ -16,7 +15,6 @@ const FLAGS_OVERRIDE: Record<string, boolean> = {
   // Add your flags overrides as following:
   // [FF_FLAG_NAME]: boolean
   [FF_NEW_STORAGES]: true,
-  [FF_THEME_TOGGLE]: true,
   // Remove before merging — local dev testing for vertical annotations sidebar
   [FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT]: true,
 };

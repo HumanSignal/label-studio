@@ -1,6 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "mobx-react";
-import { FF_DEV_2755 } from "../../../../utils/feature-flags";
 import { OutlinerTree } from "../OutlinerTree";
 import * as bemModule from "../../../../utils/bem";
 import * as registryModule from "../../../../core/Registry";
@@ -14,8 +13,6 @@ import * as uiModule from "@humansignal/ui";
 import * as iconsModule from "@humansignal/icons";
 import * as mobxReactModule from "mobx-react";
 import * as resizeObserverModule from "../../../../utils/resize-observer";
-
-const ff = mockFF();
 
 (OutlinerTree as any).defaultProps = {
   ...((OutlinerTree as any).defaultProps ?? {}),
@@ -555,63 +552,6 @@ describe("OutlinerTree", () => {
     });
     fireEvent.click(container.querySelector(".dm-ocr")!);
     expect(selectArea).toHaveBeenCalledWith(items[0]);
-  });
-
-  describe("with FF_DEV_2755 (persist collapse)", () => {
-    beforeEach(() => {
-      ff.set({ [FF_DEV_2755]: true });
-    });
-    afterEach(() => {
-      ff.reset();
-    });
-
-    it("uses expandedKeys and onExpand when group is label", async () => {
-      const storageKey = "collapsed-label-pos";
-      const getItem = spyOn(Storage.prototype, "getItem").mockReturnValue(null);
-      const setItem = spyOn(Storage.prototype, "setItem");
-
-      const parentItem = { ...defaultItem, id: "label-1", type: "label" };
-      const childItem = { ...defaultItem, id: "r1", type: "rectangle" };
-      const regions = {
-        group: "label",
-        selection: { keys: [] as string[] },
-        getRegionsTree: (processor: (item: any, idx: number) => any) => {
-          const childNode = {
-            ...processor(childItem, 1),
-            item: childItem,
-            children: [],
-            isArea: true,
-            key: "r1",
-            pos: "r1",
-          };
-          const parentNode = {
-            ...processor(parentItem, 0),
-            item: parentItem,
-            children: [childNode],
-            isArea: false,
-            key: "label-1",
-            pos: "Label 1",
-          };
-          return [parentNode];
-        },
-      };
-      const { container } = renderWithStore(
-        <OutlinerTree regions={regions} footer={null} store={{ hasInterface: () => false }} />,
-      );
-
-      await waitFor(() => {
-        expect(container.querySelector(".dm-tree")).toBeInTheDocument();
-      });
-      expect(getItem).toHaveBeenCalledWith(storageKey);
-      const switchers = container.querySelectorAll(".dm-tree-switcher");
-      const expandableSwitcher = Array.from(switchers).find((s) => !s.classList.contains("dm-tree-switcher-noop"));
-      if (expandableSwitcher) {
-        fireEvent.click(expandableSwitcher);
-        expect(setItem).toHaveBeenCalled();
-      }
-      getItem.mockRestore();
-      setItem.mockRestore();
-    });
   });
 
   it("renders item text with escaped newlines", async () => {

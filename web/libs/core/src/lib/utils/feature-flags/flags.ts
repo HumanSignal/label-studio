@@ -100,11 +100,6 @@ export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
 export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 
 /**
- * Preview performance improvements - uses lightweight static preview for large configs
- */
-export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance_improvements";
-
-/**
  * Use agreement dashboard v2 in Task Summary ViewAll summary tab
  */
 export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "fflag_feat_utc_554_agreement_v2_in_task_summary_view";

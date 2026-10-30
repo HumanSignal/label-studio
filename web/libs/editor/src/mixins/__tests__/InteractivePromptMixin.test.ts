@@ -33,8 +33,7 @@ describe("InteractivePromptMixinImpl", () => {
   // In-memory Storage-compatible map spied into Storage.prototype so other
   // test files' `spyOn(Storage.prototype, ...)` calls still intercept
   // localStorage traffic. Previous attempts replaced `window.localStorage`
-  // outright, which made sibling tests silently miss their own spies
-  // (OutlinerTree's `collapsed-label-pos` assertion was the canary).
+  // outright, which made sibling tests silently miss their own spies.
   const storage = new Map<string, string>();
   let getSpy: ReturnType<typeof spyOn>;
   let setSpy: ReturnType<typeof spyOn>;
