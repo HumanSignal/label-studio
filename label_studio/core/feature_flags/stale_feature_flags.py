@@ -34,7 +34,6 @@ STALE_FEATURE_FLAGS = {
     # Apr 8
     'fflag_feat_all_leap_883_custom_script_270524_short': True,
     'fflag_feat_all_lops_315_temp_datasets_limitations_short': True,
-    'fflag_feat_fit_890_ask_ai_event_stream': True,
     'fflag_feat_front_lops_134_find_similarity_29082023_short': True,
     'fflag_fix_all_fit_287_preview_performance_improvements': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
