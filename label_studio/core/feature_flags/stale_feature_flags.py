@@ -10,10 +10,8 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
     'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
     # Jan 5
-    'fflag_feat_all_fit_524_review_time_chart': True,
     'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
     'fflag_feat_front_fit_183_email_notifications_short': True,
-    'fflag_fix_back_optic_1380_dashboard_task_chart_grouped_by_completed_at_reviewed_at_short': True,
     'fflag_feat_front_optic_1746_improve_global_error_messages_short': True,
     'ff_front_optic_1610_ask_ai_questions': True,
     'fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short': True,
