@@ -127,6 +127,10 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
                     representation[field] = f'deleted-{uid}-user@example.com'
                 else:
                     representation[field] = 'Deleted'
+            # The avatar file may still exist (the user can be active in another organization),
+            # so never expose it next to the masked identity.
+            if 'avatar' in representation:
+                representation['avatar'] = None
 
         # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
         requester = self._get_requester()

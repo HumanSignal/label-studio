@@ -34,10 +34,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.10'
           - '3.11'
           - '3.12'
           - '3.13'
+          - '3.14'
 
     env:
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
@@ -52,7 +52,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
@@ -78,7 +78,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.13' ]
+        python-version: [ '3.14' ]
     env:
       DJANGO_DB: default
       COVERAGE_PROCESS_START: label_studio/.coveragerc
@@ -110,7 +110,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true
@@ -158,7 +158,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.13'
+          - '3.14'
     defaults:
       run:
         shell: bash
@@ -174,7 +174,7 @@ jobs:
           ref: ${{ inputs.head_sha }}
 
       - name: "Set up uv with Python ${{ matrix.python-version }}"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           python-version: '${{ matrix.python-version }}'
           enable-cache: true

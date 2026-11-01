@@ -32,7 +32,7 @@ export const Default: Story = {
     description: "The agent will wait for your choice before changing the interface.",
     options: flavorOptions,
     badge: (
-      <Badge variant="primary" size="small" look="outline">
+      <Badge variant="primary" size="small">
         Needs approval
       </Badge>
     ),

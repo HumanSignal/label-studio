@@ -421,7 +421,11 @@ stages:
     response:
       status_code: 204
       verify_response_with:
-        function: label_studio.tests.utils:file_exists_in_storage
-        extra_kwargs:
-          exists: true
-          file_path: "{convert_file_path}"
+        - function: label_studio.tests.utils:file_exists_in_storage
+          extra_kwargs:
+            exists: false
+            file_path: "{file_path}"
+        - function: label_studio.tests.utils:file_exists_in_storage
+          extra_kwargs:
+            exists: false
+            file_path: "{convert_file_path}"

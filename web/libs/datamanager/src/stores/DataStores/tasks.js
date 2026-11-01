@@ -6,7 +6,6 @@ import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
 import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { logLabelStreamDebug } from "@humansignal/core/lib/utils/streamDebugLog";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
@@ -199,11 +198,9 @@ export const create = (columns) => {
         if (isLabelStream) {
           taskParams.interaction = "labelstream";
         }
-        // FIT-720: Lazy load annotations - use stubs for both label stream and quick view modes
+        // Lazy load annotations - use stubs for both label stream and quick view modes
         // Hydration happens in lsf-sdk.js when the annotation is selected
-        if (isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
-          taskParams.annotations_stub = true;
-        }
+        taskParams.annotations_stub = true;
         // Django-style: GET /api/tasks/:id/?annotations_ordering=-id
         taskParams.annotations_ordering = "-id";
 

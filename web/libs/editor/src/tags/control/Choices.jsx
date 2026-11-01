@@ -17,7 +17,6 @@ import "./Choices/Choices.prefix.css";
 
 import "./Choice";
 import DynamicChildrenMixin from "../../mixins/DynamicChildrenMixin";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
 import SelectedChoiceMixin from "../../mixins/SelectedChoiceMixin";
 import ClassificationBase from "./ClassificationBase";
@@ -262,7 +261,7 @@ const ChoicesModel = types.compose(
   SelectedModelMixin.props({ _child: "ChoiceModel" }),
   RequiredMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   ReadOnlyControlMixin,
   SelectedChoiceMixin,
   VisibilityMixin,

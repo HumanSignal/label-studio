@@ -1,14 +1,19 @@
+import io
+
 import pytest
 from data_export.serializers import CompletedBySerializer
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from io_storages.serializers import StorageCompletedBySerializer
 from organizations.models import OrganizationMember
 from organizations.tests.factories import OrganizationFactory
+from PIL import Image
 from projects.tests.factories import ProjectFactory
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
     AnnotationStubSerializer,
+    CompletedByDMSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer,
 )
 from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, TaskFactory
@@ -148,6 +153,39 @@ def test_storage_completed_by_serializer_masked_when_user_soft_deleted(org_with_
     assert data['email'] == f'deleted-{annotator.id}-user@example.com'
     assert 'John' not in data.values()
     assert 'john.doe@example.com' not in data.values()
+
+
+@pytest.mark.django_db
+def test_completed_by_dm_serializer_masks_avatar_when_user_soft_deleted(org_with_members, settings, tmp_path):
+    """Data Manager annotators column: a user removed from this org (but still active in another
+    org, so their avatar file is kept) must not expose the real picture next to the masked name."""
+    settings.MEDIA_ROOT = str(tmp_path)
+    ctx = org_with_members
+    annotator = ctx['annotator']
+    om = ctx['om']
+    project = ctx['project']
+
+    buf = io.BytesIO()
+    Image.new('RGB', (4, 4), color='red').save(buf, format='PNG')
+    annotator.avatar = SimpleUploadedFile('avatar.png', buf.getvalue(), content_type='image/png')
+    annotator.save()
+    other_org = OrganizationFactory()
+    OrganizationMember.objects.create(organization=other_org, user=annotator)
+
+    active_data = CompletedByDMSerializer(annotator, context={'project': project}).data
+    assert active_data['avatar'] == annotator.avatar_url
+    assert active_data['initials'] == 'JD'
+
+    om.soft_delete()
+    annotator.refresh_from_db()
+    assert annotator.avatar  # file kept: user is still a member of other_org
+
+    data = CompletedByDMSerializer(annotator, context={'project': project}).data
+    assert data['first_name'] == 'Deleted'
+    assert data['last_name'] == f'User {annotator.id}'
+    assert data['email'] == f'deleted-{annotator.id}-user@example.com'
+    assert data['initials'] == 'DU'
+    assert data['avatar'] is None
 
 
 @pytest.mark.django_db

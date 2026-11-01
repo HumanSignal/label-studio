@@ -17,6 +17,38 @@ describe("CollectionUploader (single-file default)", () => {
     expect(screen.queryByTestId("collection-uploader-grid")).not.toBeInTheDocument();
   });
 
+  it("a stored file whose card is hidden shows a hint instead of an empty area or the dropzone", () => {
+    render(
+      <CollectionUploader rows={[]} onPick={() => undefined} fileCount={1} storedCount={0}>
+        {[]}
+        {[]}
+      </CollectionUploader>,
+    );
+    expect(screen.queryByTestId("collection-uploader-dropzone")).not.toBeInTheDocument();
+    expect(screen.getByTestId("collection-uploader-hidden")).toHaveTextContent("1 uploaded file is hidden.");
+  });
+
+  it("a rejected card does not hide the hint for a hidden stored file", () => {
+    render(
+      <CollectionUploader rows={[]} onPick={() => undefined} fileCount={1} storedCount={0}>
+        {[]}
+        {[<MediaCard key="r" state="rejected" file={{ name: "bad.exe" }} message="Not allowed" />]}
+      </CollectionUploader>,
+    );
+    expect(screen.getByTestId("collection-uploader-hidden")).toHaveTextContent("1 uploaded file is hidden.");
+  });
+
+  it("the legacy rows list never shows the hidden hint", () => {
+    render(
+      <CollectionUploader
+        rows={[{ clientRef: "r1", filename: "f.png", size: 10, status: "uploading", progress: 0.5, error: null }]}
+        onPick={() => undefined}
+        fileCount={1}
+      />,
+    );
+    expect(screen.queryByTestId("collection-uploader-hidden")).not.toBeInTheDocument();
+  });
+
   it("passes every picked file through unclamped", () => {
     const onPick = jest.fn();
     render(<CollectionUploader rows={[]} onPick={onPick} />);
@@ -105,6 +137,35 @@ describe("CollectionUploader (bundle mode)", () => {
     fireEvent.change(input, { target: { files: [new File(["x"], "extra.png", { type: "image/png" })] } });
     expect(onPick).not.toHaveBeenCalled();
     expect(screen.getByTestId("collection-uploader-overpick")).toHaveTextContent("bundle is full");
+  });
+
+  it("a drop on the dropzone is picked once and never reaches a surrounding drop handler", () => {
+    const onPick = jest.fn();
+    const onSurfaceDrop = jest.fn();
+    render(
+      <div onDrop={onSurfaceDrop} data-testid="surface">
+        <CollectionUploader {...bundleProps} onPick={onPick} fileCount={0} storedCount={0} />
+      </div>,
+    );
+    const file = new File(["x"], "clip.png", { type: "image/png" });
+    fireEvent.drop(screen.getByTestId("collection-uploader-dropzone"), { dataTransfer: { files: [file] } });
+    expect(onPick).toHaveBeenCalledTimes(1);
+    expect(onPick.mock.calls[0][0]).toEqual([file]);
+    expect(onSurfaceDrop).not.toHaveBeenCalled();
+  });
+
+  it("a partly hidden bundle counts the hidden files and says they are hidden", () => {
+    render(
+      <CollectionUploader {...bundleProps} onPick={() => undefined} fileCount={3} storedCount={2}>
+        {[
+          <MediaCard key="a" state="uploaded" file={{ name: "a.png" }} />,
+          <MediaCard key="b" state="uploaded" file={{ name: "b.png" }} />,
+        ]}
+        {[]}
+      </CollectionUploader>,
+    );
+    expect(screen.getByText(/3 \/ 3–8/)).toBeInTheDocument();
+    expect(screen.getByTestId("collection-uploader-hidden")).toHaveTextContent("1 uploaded file is hidden.");
   });
 
   it("legacy row list never renders in bundle mode", () => {

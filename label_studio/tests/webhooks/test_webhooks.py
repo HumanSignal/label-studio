@@ -444,10 +444,8 @@ def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook,
 
 
 @pytest.mark.django_db
-def test_webhook_batching_with_feature_flag(configured_project, organization_webhook):
-    """Test that webhooks are sent in batches when feature flag is enabled."""
-    from unittest.mock import patch
-
+def test_webhook_batching(configured_project, organization_webhook):
+    """Test that webhooks for a collection are sent in batches of WEBHOOK_BATCH_SIZE."""
     from django.conf import settings
     from tasks.models import Task
     from webhooks.utils import emit_webhooks_for_instance_sync
@@ -461,79 +459,37 @@ def test_webhook_batching_with_feature_flag(configured_project, organization_web
         task = Task.objects.create(data={'text': f'Test task {i}'}, project=project)
         tasks.append(task)
 
-    # Test with feature flag enabled
-    with patch('webhooks.utils.flag_set') as mock_flag_set:
-        mock_flag_set.return_value = True
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
 
-        with requests_mock.Mocker(real_http=True) as m:
-            m.register_uri('POST', webhook.url)
+        # Set batch size to 100 for testing
+        original_batch_size = getattr(settings, 'WEBHOOK_BATCH_SIZE', 100)
+        settings.WEBHOOK_BATCH_SIZE = 100
 
-            # Set batch size to 100 for testing
-            original_batch_size = getattr(settings, 'WEBHOOK_BATCH_SIZE', 100)
-            settings.WEBHOOK_BATCH_SIZE = 100
-
-            try:
-                emit_webhooks_for_instance_sync(
-                    webhook.organization, webhook.project, WebhookAction.TASKS_CREATED, instance=tasks
-                )
-
-                # Should have 3 requests (250 tasks / 100 batch size = 3 batches)
-                webhook_requests = list(filter(lambda x: x.url == webhook.url, m.request_history))
-                assert len(webhook_requests) == 3
-
-                # Check first batch has 100 tasks
-                first_batch = webhook_requests[0].json()
-                assert 'tasks' in first_batch
-                assert len(first_batch['tasks']) == 100
-
-                # Check second batch has 100 tasks
-                second_batch = webhook_requests[1].json()
-                assert len(second_batch['tasks']) == 100
-
-                # Check third batch has 50 tasks (remaining)
-                third_batch = webhook_requests[2].json()
-                assert len(third_batch['tasks']) == 50
-
-            finally:
-                settings.WEBHOOK_BATCH_SIZE = original_batch_size
-
-
-@pytest.mark.django_db
-def test_webhook_no_batching_without_feature_flag(configured_project, organization_webhook):
-    """Test that webhooks are sent in single request when feature flag is disabled."""
-    from unittest.mock import patch
-
-    from tasks.models import Task
-    from webhooks.utils import emit_webhooks_for_instance_sync
-
-    webhook = organization_webhook
-    project = configured_project
-
-    # Create multiple tasks
-    tasks = []
-    for i in range(150):
-        task = Task.objects.create(data={'text': f'Test task {i}'}, project=project)
-        tasks.append(task)
-
-    # Test with feature flag disabled
-    with patch('webhooks.utils.flag_set') as mock_flag_set:
-        mock_flag_set.return_value = False
-
-        with requests_mock.Mocker(real_http=True) as m:
-            m.register_uri('POST', webhook.url)
-
+        try:
             emit_webhooks_for_instance_sync(
                 webhook.organization, webhook.project, WebhookAction.TASKS_CREATED, instance=tasks
             )
 
-            # Should have only 1 request (no batching)
+            # Should have 3 requests (250 tasks / 100 batch size = 3 batches)
             webhook_requests = list(filter(lambda x: x.url == webhook.url, m.request_history))
-            assert len(webhook_requests) == 1
+            assert len(webhook_requests) == 3
 
-            # Check all 150 tasks are in single request
-            request_data = webhook_requests[0].json()
-            assert 'tasks' in request_data
-            assert len(request_data['tasks']) == 150
+            # Check first batch has 100 tasks
+            first_batch = webhook_requests[0].json()
+            assert 'tasks' in first_batch
+            assert len(first_batch['tasks']) == 100
+
+            # Check second batch has 100 tasks
+            second_batch = webhook_requests[1].json()
+            assert len(second_batch['tasks']) == 100
+
+            # Check third batch has 50 tasks (remaining)
+            third_batch = webhook_requests[2].json()
+            assert len(third_batch['tasks']) == 50
+
+        finally:
+            settings.WEBHOOK_BATCH_SIZE = original_batch_size
 
 
 @pytest.mark.django_db

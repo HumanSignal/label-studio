@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from core.models import DeletedRow
@@ -35,8 +36,16 @@ class TestDeletedRow(TestCase):
         # and shouldn't be compared
         new_dict.pop('_original_values', None)
 
+        # JSON serialization truncates datetimes to milliseconds, so compare every datetime field
+        # (e.g. Organization.token_expires_at) with a tolerance instead of exact equality
+        original_dts = {
+            k: original_dict.pop(k) for k, v in list(original_dict.items()) if isinstance(v, datetime.datetime)
+        }
+        new_dts = {k: new_dict.pop(k) for k in original_dts}
+
         assert new_dict == original_dict
-        # Datetime loses microsecond precision, so we can't compare them directly
+        for key, original_dt in original_dts.items():
+            assert abs((new_dts[key] - original_dt).total_seconds()) < 0.001, key
         assert abs((new_created_at - original_created_at).total_seconds()) < 0.001
         assert abs((new_updated_at - original_updated_at).total_seconds()) < 0.001
 

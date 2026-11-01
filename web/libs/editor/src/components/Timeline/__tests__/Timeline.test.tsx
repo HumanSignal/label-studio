@@ -25,6 +25,9 @@ const defaultProps = {
 };
 
 describe("Timeline", () => {
+  // All test files share one window: put the real storage back, or later files get this stub.
+  const ownLocalStorage = Object.getOwnPropertyDescriptor(window, "localStorage");
+
   beforeEach(() => {
     mock.clearAllMocks();
     (viewsModule.default as any).frames = {
@@ -36,7 +39,13 @@ describe("Timeline", () => {
     Object.defineProperty(window, "localStorage", {
       value: { getItem: mock(() => null), setItem: mock() },
       writable: true,
+      configurable: true,
     });
+  });
+
+  afterEach(() => {
+    if (ownLocalStorage) Object.defineProperty(window, "localStorage", ownLocalStorage);
+    else delete (window as { localStorage?: Storage }).localStorage;
   });
 
   it("renders with required props", () => {

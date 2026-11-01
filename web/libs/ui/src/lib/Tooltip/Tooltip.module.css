@@ -20,6 +20,7 @@
   border-radius: 3px;
   white-space: normal;
   overflow-wrap: anywhere;
+  width: max-content;
   max-width: 250px;
 
   &::before {

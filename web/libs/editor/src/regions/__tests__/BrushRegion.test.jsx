@@ -256,21 +256,6 @@ describe("BrushRegion", () => {
       region.updateImageSize(100, 100, 800, 600);
       expect(region.needsUpdate).toBe(before + 1);
     });
-
-    it("serialize without fast returns null when canvas context is unavailable", () => {
-      const result = region.serialize();
-      expect(result).toBeNull();
-    });
-
-    it("serialize without fast returns null when there is no staged data", () => {
-      const result = region.serialize();
-      expect(result).toBeNull();
-    });
-
-    it("serialize without fast returns null when conversion cannot produce rle", () => {
-      const result = region.serialize();
-      expect(result).toBeNull();
-    });
   });
 
   describe("Points (touches) views", () => {

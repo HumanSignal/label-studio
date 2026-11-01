@@ -33,7 +33,7 @@ At a high level, the embed process is a secure handshake between your app and La
 
 1. A user logs into your external app.
 
-2. Your backend signs a JWT with their `user_email` and `organization_id `using your private key.
+2. Your backend signs a JWT with their `user_email`, `organization_id`, and `project_id` using your private key.
 
 3. Your frontend initializes the Label Studio embed with `id`, `url`, and `token`.
 
@@ -47,7 +47,7 @@ sequenceDiagram
     participant LSE as Label Studio Enterprise
 
     User->>YourApp: Logs in
-    YourApp->>YourApp: Backend signs JWT (user_email + organization_id)
+    YourApp->>YourApp: Backend signs JWT (user_email + organization_id + project_id)
     YourApp->>User: Sends JWT to frontend
     User->>LSE: Initializes Embed with (id, url, token)
     LSE->>LSE: Verifies JWT with Public Key
@@ -66,11 +66,15 @@ JWT claims required:
 ```json
 {
   "user_email": "user@example.com",
-  "organization_id": "12345",
-  "iat": 1692445200,   // (optional) issued-at timestamp
-  "exp": 1692452400    // (optional) expiration timestamp
+  "organization_id": 12345,
+  "project_id": 67890,
+  "iat": 1692445200,
+  "exp": 1692452400
 }
 ```
+
+!!! note
+    `exp`, `organization_id`, and `project_id` are required. Each accepts a positive integer or a string of digits. `exp` is a Unix timestamp in seconds and must fall within your organization's token lifetime (60 minutes by default). `project_id` scopes the embed to that project and must match the project in the embed URL. `iat` is optional.
 
 **Notes:**
 
@@ -91,7 +95,8 @@ const privateKey = fs.readFileSync("./private.pem");
 const token = jwt.sign(
   {
     user_email: "user@example.com",
-    organization_id: "12345",
+    organization_id: 12345,
+    project_id: 67890,
   },
   privateKey,
   { algorithm: "RS256", expiresIn: "1h" }
@@ -138,7 +143,7 @@ Here is an example:
         const sdk = LabelStudioEmbedSDK.create({
 	        id: "embed-1", // targets the id of the `label-studio-embed` WebComponent that serves as the outlet of the embed
 	        url: "https://app.humansignal.com", // url of the target LabelStudioEnterprise instance
-	        token: "<signed-jwt-of-current-user>", // Signed JWT using private key of the paired public verify key configured in organization settings with following structure: {"user_email": "targetuser@email.com", "organization_id": <yourlseorg_id:int>}
+	        token: "<signed-jwt-of-current-user>", // Signed JWT using private key of the paired public verify key configured in organization settings with following structure: {"user_email": "targetuser@email.com", "organization_id": 12345, "project_id": 67890, "exp": 1692452400}
 	        mode: "label" // Loaded tasks and annotations for the user will be presented with a preconfigured interface for the purpose of labeling
         });
 

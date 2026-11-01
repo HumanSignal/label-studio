@@ -30,32 +30,10 @@ export const FF_PRODUCT_TOUR = "fflag_feat_dia_1697_product_tour_short";
  */
 export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_token_auth";
 
-export const FF_IMPROVE_GLOBAL_ERROR_MESSAGES = "fflag_feat_front_optic_1746_improve_global_error_messages_short";
-
 /**
  * Sample datasets UI for the import flow
  */
 export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_data_short";
-
-/**
- * JSON preview window for the import flow
- */
-export const FF_JSON_PREVIEW = "fflag_feat_dia_1925_view_sample_raw_json_short";
-
-/**
- * Enables the theme toggle in the UI to enable the dark mode
- */
-export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
-
-/**
- * Fixes synced audio/video buffering
- */
-export const FF_SYNCED_BUFFERING = "fflag_fix_front_fit_31_synced_media_buffering";
-
-/**
- * Enables enterprise email notifications
- */
-export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email_notifications_short";
 
 /**
  * New storage providers experience
@@ -67,11 +45,6 @@ export const FF_NEW_STORAGES = "fflag_feat_bros_193_new_cloud_storage_providers_
  * Modify MST models to allow custom tags
  */
 export const FF_CUSTOM_TAGS = "fflag_feat_front_bros_194_custom_tags_short";
-
-/**
- * Agreement Filtered
- */
-export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
 
 /**
  * Consensus control-tag agreement (v2) — enables dimension-based agreement calculation
@@ -103,18 +76,6 @@ export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
  * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
  */
 export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
-
-/**
- * Preview performance improvements - uses lightweight static preview for large configs
- */
-export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance_improvements";
-
-/**
- * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
- * Also enables virtualization of annotation tabs carousel
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
- */
-export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
 
 /**
  * Use agreement dashboard v2 in Task Summary ViewAll summary tab
@@ -221,12 +182,6 @@ export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_was
 export const FF_FIT_2007_VIRTUALIZED_JSON_EDITOR = "fflag_feat_fit_2007_virtualized_json_editor_short";
 
 /**
- * Annotator/reviewer firewall — backend anonymizes PII, so frontend no longer needs
- * to suppress userpics or hide annotation info when this flag is on.
- */
-export const FF_UTC_950_FIREWALL = "fflag_feat_utc_950_annotator_reviewer_firewall_short";
-
-/**
  * LSE-only "Description (Internal)" project field — a manager-only notes field stored on
  * LseProject, editable in Project Settings and Create Project, and displayed on the Projects
  * page (cards/table) under the public description.
@@ -276,13 +231,6 @@ export const FF_FLEX_SEATS = "fflag_feat_back_fit_2313_flex_seats_short";
  * eligible projects themselves (workforce/services organizations only).
  */
 export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
-
-/**
- * Configurable Annotator Evaluation metric (No-GT Evaluation): lets a project
- * choose the metric that drives Annotator Evaluation — ground truth agreement
- * (default, today's behavior), review acceptance score, or rejection rate.
- */
-export const FF_ANNOTATOR_EVALUATION_METRIC = "fflag_feat_utc_1085_annotator_evaluation_metric";
 
 /**
  * Review stream "By Annotator" task ordering: review one annotator's work at a
@@ -339,8 +287,35 @@ export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_o
 export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
 
 /**
+ * Interface workspaces (UTC-1367): Personal Sandbox interfaces private to their owner, the
+ * interface Workspace control and move confirmation modal, `can_edit` gating, and the workspace
+ * delete guard for workspaces that still hold interfaces. Ships with the backend flag of the same name.
+ */
+export const FF_UTC_1367_INTERFACE_WORKSPACES = "fflag_feat_utc_1367_interface_workspaces";
+
+/**
  * Analytics → Member Performance "Submitted by Project" / "Reviewed by Project" columns, their export
  * fields, and the backend user × project KPI segmentation they read. UTC-1389.
  */
 export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
   "fflag_feat_utc_1389_analytics_performance_project_breakdown";
+
+/**
+ * Verified Skills and Onboarding (workforce organizations only): skill assessments that test
+ * contributors, onboarding projects and verified skill statuses.
+ */
+export const FF_VERIFIED_SKILLS_AND_ONBOARDING = "fflag_feat_utc_1407_verified_skills_and_onboarding";
+
+/**
+ * UTC-1437 restricted locations (workforce organizations only): contributors who must verify their identity
+ * also need a reviewed tax form before they can be added to projects or join them. Ships with the backend
+ * flag of the same name.
+ */
+export const FF_RESTRICTED_LOCATIONS = "fflag_feat_utc_1437_restricted_locations_short";
+
+/**
+ * UTC-1446 experiment: the "Ask AI" pill in the labeling editor's comment headers, which prefills Ask AI
+ * with the comment. Also needs the per-project switch in Django admin. Checked as an explicit `true` only,
+ * never the installation default (which is `true` on-prem). Remove with the AskAIInComments folder.
+ */
+export const FF_UTC_1446_ASK_AI_IN_COMMENTS = "fflag_feat_utc_1446_ask_ai_in_comments";

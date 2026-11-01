@@ -294,6 +294,16 @@ export const requiredPerItemMIGTextareaConfig = `<View>
   <Textarea name="textarea" toName="image" perItem="true" required="true" />
 </View>`;
 
+export const requiredPerItemVisibleWhenMIGTextareaConfig = `<View>
+  <Image name="image" valueList="$images"/>
+  <Choices name="important" toName="image" perItem="true">
+    <Choice value="Important" />
+  </Choices>
+  <View visibleWhen="choice-selected" whenTagName="important" whenChoiceValue="Important">
+    <Textarea name="textarea" toName="image" perItem="true" required="true" />
+  </View>
+</View>`;
+
 export const perRegionRegionsResult = [
   {
     id: "rect_1",

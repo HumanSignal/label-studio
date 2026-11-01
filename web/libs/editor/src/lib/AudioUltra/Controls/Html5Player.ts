@@ -1,6 +1,5 @@
 import type { WaveformAudio } from "../Media/WaveformAudio";
 import { Player } from "./Player";
-import { ff } from "@humansignal/core";
 
 export class Html5Player extends Player {
   mute() {
@@ -122,8 +121,7 @@ export class Html5Player extends Player {
     const wasPlaying = this.playing;
 
     this.stop();
-    // We don't need to load the audio when the feature flag is active
-    if (!ff.isActive(ff.FF_SYNCED_BUFFERING)) this.audio.el.load();
+    this.audio.el.load();
 
     if (wasPlaying) this.play();
   };

@@ -18,6 +18,8 @@ export type TabProps = {
   createNewPanel: EventHandlers["createNewPanel"];
   setActiveTab: EventHandlers["setActiveTab"];
   checkSnap: EventHandlers["checkSnap"];
+  /** A dot on the label: only the host tab has one, and only while the host asks for it. */
+  badge?: boolean;
 };
 
 // Shared with PanelBase (outliner/details panel names)
@@ -25,6 +27,15 @@ export type PanelType = "outliner" | "details";
 
 // false: don't show the tab; string: show tab with given title
 export type ShowCustomTab = false | string;
+
+/** The one side-panel tab a host app fills itself (UTC-1446) — see `hostPanel` in AppStore. */
+export interface HostPanelConfig {
+  title: string;
+  shown: boolean;
+  badge?: boolean;
+  onElement?: (element: HTMLElement | null) => void;
+  onAvailability?: (available: boolean) => void;
+}
 
 export interface SidePanelsProps {
   panelsHidden: boolean;
@@ -35,6 +46,9 @@ export interface SidePanelsProps {
   focusTab: string | null;
   /** FIT-2813: increments on each comment validation so collapsed sidebar re-expands. */
   focusRequest?: number;
+  hostPanel?: HostPanelConfig | null;
+  /** Increments each time the host asks for its tab to be brought forward. */
+  hostPanelFocusRequest?: number;
 }
 
 export interface ViewportSize {
@@ -140,6 +154,8 @@ export type BaseProps = PanelBBox &
     dragTop: boolean;
     dragBottom: boolean;
     lockPanelContents: boolean;
+    /** Whether the host tab's label carries its dot (see HostPanelConfig.badge). */
+    hostBadge?: boolean;
   };
 
 export type Result = {

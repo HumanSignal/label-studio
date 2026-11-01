@@ -1,6 +1,10 @@
 import { destroy, flow, types } from "mobx-state-tree";
 import { runInAction } from "mobx";
-import { emitDatamanagerEvent, labelingDisplayViewFromLsf } from "../utils/datamanagerTelemetry";
+import {
+  emitDatamanagerEvent,
+  emitDatamanagerTabEvent,
+  labelingDisplayViewFromLsf,
+} from "../utils/datamanagerTelemetry";
 import { Modal } from "../components/Common/Modal/Modal";
 import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
@@ -356,6 +360,9 @@ export const AppStore = types
 
         if (options?.pushState !== false) {
           History.navigate({ labeling: 1 });
+          emitDatamanagerTabEvent(self.currentView, "dm_label_stream_started", {
+            mode: localStorage.getItem("dm:labelstream:mode") ?? "all",
+          });
         }
       };
 
@@ -831,6 +838,12 @@ export const AppStore = types
 
       if (actionCallback instanceof Function) {
         const result = actionCallback(actionParams, view);
+        emitDatamanagerTabEvent(view, "dm_action_invoked", {
+          action_id: actionId,
+          select_all: actionParams.selectedItems?.all === true,
+          selected_count: view.selectedCount ?? null,
+          client_side: true,
+        });
         self.SDK.invoke("actionDialogOkComplete", actionId, {
           result,
           view: viewReloaded,
@@ -861,6 +874,17 @@ export const AppStore = types
           errorHandler: () => actionId === "add_data_field",
         },
       );
+
+      // next_task runs once per task in the label stream; it is not a bulk action.
+      if (actionId !== "next_task") {
+        emitDatamanagerTabEvent(view, "dm_action_invoked", {
+          action_id: actionId,
+          select_all: actionParams.selectedItems?.all === true,
+          selected_count: view.selectedCount ?? null,
+          success: Boolean(result && !result.error),
+          async: Boolean(result?.async),
+        });
+      }
 
       if (actionId === "add_data_field") {
         if (!result || result.error) {

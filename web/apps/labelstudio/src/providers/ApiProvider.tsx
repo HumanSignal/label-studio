@@ -10,7 +10,6 @@ import { ErrorWrapper } from "../components/Error/Error";
 import { modal } from "../components/Modal/Modal";
 import { API_CONFIG } from "../config/ApiConfig";
 import { absoluteURL, isDefined } from "../utils/helpers";
-import { FF_IMPROVE_GLOBAL_ERROR_MESSAGES, isFF } from "../utils/feature-flags";
 import { ToastType, useToast } from "@humansignal/ui";
 import { captureException } from "../config/Sentry";
 
@@ -53,12 +52,7 @@ const displayErrorModal = (errorDetails: FormattedError) => {
         message={"Server not responding. Is it still running?"}
       />
     ) : (
-      <ErrorWrapper
-        {...formattedError}
-        title={title}
-        message={message}
-        stacktrace={isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) ? undefined : stacktrace}
-      />
+      <ErrorWrapper {...formattedError} title={title} message={message} />
     ),
     simple: true,
     style: { width: 680 },
@@ -97,7 +91,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
       }
 
       // Show toast for 4xx without validation errors
-      if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && is4xx && !containsValidationErrors) {
+      if (is4xx && !containsValidationErrors) {
         toast?.show({
           message: `${errorDetails.title}: ${errorDetails.message}`,
           type: ToastType.error,
@@ -127,7 +121,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
     }
 
     // Handle 404 redirects with improved error messages
-    if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && status === 404) {
+    if (status === 404) {
       apiLocked = true;
       let redirectUrl = absoluteURL("/");
 

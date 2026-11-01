@@ -6,11 +6,7 @@ import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
-import {
-  isActive,
-  FF_AGREEMENT_FILTERED,
-  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
-} from "@humansignal/core/lib/utils/feature-flags";
+import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
@@ -127,8 +123,7 @@ function DataViewInner({
   );
 
   const agreementFeatureFlagsActive =
-    isActive(FF_AGREEMENT_FILTERED) &&
-    (project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT));
+    project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
   const agreementSelectedKey = JSON.stringify(view?.agreement_selected ?? {});
 
   const columnHeaderExtra = useCallback(

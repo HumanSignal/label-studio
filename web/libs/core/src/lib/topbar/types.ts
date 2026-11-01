@@ -94,6 +94,8 @@ export interface AnnotationCapabilities {
    * wrappers (classic + shell) pass an explicit value.
    */
   enableCompareAllAnnotations?: boolean;
+  /** When set, "Duplicate Annotation" is shown disabled with this text as its tooltip. */
+  duplicateDisabledReason?: string;
   /** When true, the "Open Performance Dashboard" item is shown (LSE only, with project id). */
   enablePerformanceDashboard?: boolean;
   /** When true, show Accepted / Rejected / Fix + Accepted filters (LSE only). */

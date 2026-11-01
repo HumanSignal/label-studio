@@ -7,6 +7,10 @@ import clsx from "clsx";
 export interface BadgeGroupItem {
   id: string | number;
   label: string;
+  /** Overrides the group variant for this badge, e.g. one colour per status. */
+  variant?: BadgeProps["variant"];
+  /** Rendered before the label. */
+  icon?: React.ReactNode;
 }
 
 export interface BadgeGroupProps {
@@ -101,6 +105,9 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
       return null;
     }
 
+    // Per-item colours carry meaning, so the overflow count stays neutral instead of borrowing one.
+    const overflowVariant = items.some((item) => item.variant) ? "neutral" : variant;
+
     return (
       <div
         ref={mergedRef}
@@ -113,7 +120,8 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
           return (
             <Badge
               key={item.id}
-              variant={variant}
+              variant={item.variant ?? variant}
+              icon={item.icon}
               shape={shape}
               look={look}
               size={size}
@@ -126,7 +134,7 @@ export const BadgeGroup = forwardRef<HTMLDivElement, BadgeGroupProps>(
         })}
         {/* Show +n badge if truncate is enabled and there are hidden badges */}
         {truncate && visibleBadgeCount !== null && visibleBadgeCount < items.length && (
-          <Badge variant={variant} shape={shape} look={look} size={size} data-overflow-badge="true">
+          <Badge variant={overflowVariant} shape={shape} look={look} size={size} data-overflow-badge="true">
             +{items.length - visibleBadgeCount}
           </Badge>
         )}

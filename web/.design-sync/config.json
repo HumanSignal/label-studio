@@ -1,0 +1,100 @@
+{
+  "projectId": "d8504786-9fcc-40f7-b6ce-d51ffdac0559",
+  "shape": "storybook",
+  "storybookConfigDir": "libs/storybook/.storybook",
+  "storybookStatic": ".design-sync/sb-reference",
+  "pkg": "@humansignal/ui",
+  "globalName": "HumanSignalUI",
+  "entry": "dist/design-sync/ui/index.cjs",
+  "buildCmd": "bash .design-sync/build/build.sh",
+  "cssEntry": "style.css",
+  "tsconfig": "../../../tsconfig.base.json",
+  "storyImports": {
+    "shim": ["/libs/ui/src/", "/node_modules/pdfjs-dist/"],
+    "bundle": ["/date-range-picker/date-utils"]
+  },
+  "titleMap": {
+    "Tokens": null,
+    "Icons": null,
+    "ChatShell": "AiChatShell",
+    "Loading": "AiChatLoading",
+    "ApprovalCard": "AiChatApprovalCard",
+    "ToolActivity": "AiChatToolActivity",
+    "StreamingMessage": "AiChatStreamingMessage",
+    "Thinking": "AiChatThinking",
+    "PromptBar": "AiChatPromptBar",
+    "RegionList": null,
+    "RatingControl": null,
+    "TextCanvas": null,
+    "ChoiceGroup": null,
+    "VideoCanvas": null,
+    "AudioCanvas": null,
+    "DocumentCanvas": null,
+    "TextInput": null,
+    "LabelPicker": null,
+    "TaxonomyTree": null,
+    "RankerBoard": null,
+    "ImageCanvas": null,
+    "TimeSeriesCanvas": null,
+    "AnswerForm": null,
+    "DateTimeInput": null,
+    "MediaTransport": null,
+    "PairwiseRanker": null,
+    "NumberInput": null
+  },
+  "overrides": {
+    "MediaCard": {
+      "skip": ["ui-mediacard--pdf-real-sample"],
+      "cardMode": "column"
+    },
+    "BadgeGroup": {
+      "cardMode": "column"
+    },
+    "Button": {
+      "cardMode": "column"
+    },
+    "CollapsiblePanel": {
+      "cardMode": "column"
+    },
+    "CollectionHeader": {
+      "cardMode": "column"
+    },
+    "CollectionUploader": {
+      "cardMode": "column"
+    },
+    "Dropdown": {
+      "cardMode": "column"
+    },
+    "EmptyState": {
+      "cardMode": "column"
+    },
+    "EnterpriseUpgradeOverlay": {
+      "cardMode": "column"
+    },
+    "Pagination": {
+      "cardMode": "column",
+      "skip": ["ui-pagination--single-page"]
+    },
+    "Select": {
+      "cardMode": "column"
+    },
+    "TagAutocomplete": {
+      "cardMode": "column"
+    },
+    "Toast": {
+      "cardMode": "single",
+      "primaryStory": "Info"
+    },
+    "Tabs": {
+      "cardMode": "column"
+    }
+  },
+  "extraEntries": ["./icons.cjs"],
+  "tokensPkg": "../dist/design-sync/ui-tokens",
+  "tokensGlob": "tokens.css",
+  "libOverrides": {
+    "preview-gen-storybook.mjs": "honor storybook parameters.layout 'centered' (shrink-wrap + center the story root) and merge meta+story parameters"
+  },
+  "extraFonts": ["../../../.design-sync/fonts/ibm-plex-mono/ibm-plex-mono.css"],
+  "readmeHeader": ".design-sync/conventions.md"
+}

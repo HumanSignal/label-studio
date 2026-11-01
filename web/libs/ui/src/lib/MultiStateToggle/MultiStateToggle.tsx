@@ -13,6 +13,7 @@ export interface MultiStateToggleProps {
   onChange?: (option: string) => void;
   /** Stretches the control (and its options evenly) to fill the width of its container, e.g. a filter dropdown. */
   fullWidth?: boolean;
+  disabled?: boolean;
   className?: string;
   "aria-label"?: string;
   "data-testid"?: string;
@@ -23,6 +24,7 @@ export const MultiStateToggle = ({
   selectedOption,
   onChange,
   fullWidth,
+  disabled = false,
   className,
   "aria-label": ariaLabel,
   "data-testid": dataTestId,
@@ -33,7 +35,7 @@ export const MultiStateToggle = ({
   }, [options, selectedOption]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+    if (disabled || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
     event.preventDefault();
     event.stopPropagation();
     const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
@@ -49,6 +51,7 @@ export const MultiStateToggle = ({
       className={clsx(styles.multiStateToggle, { [styles.multiStateToggle_fullWidth]: fullWidth }, className)}
       role="radiogroup"
       aria-label={ariaLabel}
+      aria-disabled={disabled || undefined}
       data-testid={dataTestId}
     >
       {options?.map((option, index) => (
@@ -63,6 +66,7 @@ export const MultiStateToggle = ({
           onClick={() => onChange?.(option.value)}
           onKeyDown={(event) => handleKeyDown(event, index)}
           type="button"
+          disabled={disabled}
           role="radio"
           aria-checked={selectedIndex === index}
           tabIndex={selectedIndex === index || (selectedIndex === -1 && index === 0) ? 0 : -1}

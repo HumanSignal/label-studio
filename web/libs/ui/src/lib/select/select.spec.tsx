@@ -114,6 +114,25 @@ describe("Select Component", () => {
   });
 
   describe("Basic Rendering", () => {
+    it("names only the visible trigger and preserves hidden form submission", () => {
+      const { container } = render(
+        <form>
+          <Select name="speed" options={["One"]} value="One" triggerProps={{ "aria-label": "Playback speed" }} />
+        </form>,
+      );
+      expect(screen.getByLabelText("Playback speed")).toHaveAttribute("aria-expanded", "false");
+      const backing = container.querySelector("select")!;
+      expect(backing).toHaveAttribute("hidden");
+      expect(backing).toHaveAttribute("aria-hidden", "true");
+      expect(backing).toHaveAttribute("tabindex", "-1");
+      expect(new window.FormData(container.querySelector("form")!).get("speed")).toBe("One");
+    });
+
+    it("keeps a trigger-provided label off the backing select", () => {
+      render(<Select options={["One"]} value="One" triggerProps={{ "aria-label": "Speed" }} />);
+      expect(screen.getByLabelText("Speed")).toHaveAttribute("aria-expanded", "false");
+    });
+
     it("renders with placeholder", () => {
       render(<Select options={["Apple", "Banana"]} placeholder="Select a fruit" />);
       expect(screen.getByText("Select a fruit")).toBeInTheDocument();
@@ -317,6 +336,31 @@ describe("Select Component", () => {
 
       expect(optionRenderer.mock.calls.length).toBeLessThanOrEqual(5);
       expect(screen.queryByText("rendered:Option 19")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Custom option rows", () => {
+    it("lets a custom row span the option width so trailing cells line up across rows", async () => {
+      render(
+        <Select
+          options={[{ value: "a", label: "A" }]}
+          placeholder="Select"
+          optionRenderer={({ option }: { option: { label: string } }) => <span>row:{option.label}</span>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const row = await screen.findByText("row:A");
+      expect(row.parentElement).toHaveClass("flex-1");
+    });
+
+    it("keeps plain labels sized to their text", async () => {
+      render(<Select options={[{ value: "a", label: "Plain" }]} placeholder="Select" />);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      expect(await screen.findByText("Plain")).not.toHaveClass("flex-1");
     });
   });
 
@@ -601,6 +645,47 @@ describe("Select Component", () => {
     });
   });
 
+  describe("List header", () => {
+    it("pins the list header between the search field and the options", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          searchable
+          header={<div data-testid="custom-header">Header</div>}
+          listHeader={<div data-testid="list-header">Columns</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const listHeader = await screen.findByTestId("list-header");
+      const search = screen.getByTestId("select-search-field");
+      const list = document.querySelector("[data-slot='command-list']");
+      const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(follows(screen.getByTestId("custom-header"), search)).toBe(true);
+      expect(follows(search, listHeader)).toBe(true);
+      expect(list?.contains(listHeader)).toBe(false);
+      expect(follows(listHeader, list as Node)).toBe(true);
+    });
+  });
+
+  describe("Search inset", () => {
+    it("keeps the default margin unless searchClassName replaces it", async () => {
+      const { unmount } = render(<Select options={["Apple"] as any} placeholder="Select" searchable />);
+      fireEvent.click(screen.getByRole("button"));
+      const wrapper = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(wrapper).toHaveClass("m-1");
+      unmount();
+
+      render(<Select options={["Apple"] as any} placeholder="Select" searchable searchClassName="mx-tight my-1" />);
+      fireEvent.click(screen.getByRole("button"));
+      const inset = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(inset).toHaveClass("mx-tight");
+      expect(inset).not.toHaveClass("m-1");
+    });
+  });
+
   describe("Footer Support", () => {
     it("renders footer content when provided", async () => {
       render(
@@ -733,6 +818,30 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByText("Cherry"));
 
       expect(onChange).toHaveBeenCalledTimes(2);
+    });
+
+    it("drops the row checkbox with optionCheckbox off while rows still toggle", async () => {
+      const onChange = mock();
+
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          onChange={onChange}
+          multiple={true}
+          optionCheckbox={false}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Apple")).toBeInTheDocument();
+      });
+
+      expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+      fireEvent.click(screen.getByText("Apple"));
+      expect(onChange).toHaveBeenCalledWith(["Apple"]);
     });
   });
 

@@ -1,11 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import base64
+import binascii
 import io
 import json
 import logging
 import re
 from dataclasses import dataclass
 from typing import Iterator, Optional, Union
+from urllib.parse import parse_qs, unquote, urlsplit
 
 import ijson
 from core.utils.common import load_func
@@ -15,6 +18,68 @@ logger = logging.getLogger(__name__)
 
 # Put storage prefixes here
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
+
+# Upload proxy spelling used when CLOUD_FILE_STORAGE_ENABLED stores a rooted proxy URL in task
+# data (``StorageProxyMixin.url``). Automax re-exports this as ``UPLOAD_PROXY_ROUTE``.
+UPLOAD_PROXY_FILEPATH_ROUTE = '/storage-data/uploaded/?filepath='
+
+
+def decode_resolve_fileuri(url: str) -> Optional[str]:
+    """Decode the storage URI embedded in a resolve/proxy ``fileuri`` query param.
+
+    Same approach as Automax's resolve-link helpers (``parse_qs`` + ``urlsafe_b64decode``)
+    and the payload ``ResolveStorageUriAPIMixin`` expects after routing extracts ``fileuri``.
+    Returns ``None`` when the URL has no ``fileuri`` or the value is not valid base64 text.
+    """
+    if not isinstance(url, str) or not url or 'fileuri=' not in url.lower():
+        return None
+    try:
+        raw_list = parse_qs(urlsplit(url).query).get('fileuri')
+    except ValueError:
+        return None
+    if not raw_list:
+        return None
+    raw = raw_list[0]
+    try:
+        padding = '=' * (-len(raw) % 4)
+        return base64.urlsafe_b64decode(raw + padding).decode('utf-8')
+    except (binascii.Error, ValueError, UnicodeDecodeError):
+        return None
+
+
+def unwrap_storage_media_path(value: str) -> str:
+    """Normalize a task-data media reference to a path-like string for extension checks.
+
+    Peels wrappers without fetching or presigning:
+
+    - ``...?fileuri=<urlsafe-b64>`` resolve/proxy links (see ``decode_resolve_fileuri``)
+    - ``/storage-data/uploaded/?filepath=...`` upload proxy URLs
+    - ``http(s)://``, ``s3://``, ``gs://``, ``azure://`` URLs → path component
+    - rooted absolute paths → path component
+
+    Product resolve builders encode a storage URI (or path) in ``fileuri``, never another
+    resolve link — peel at most one ``fileuri`` layer.
+    """
+    if not isinstance(value, str) or not value:
+        return ''
+
+    decoded = decode_resolve_fileuri(value)
+    if decoded:
+        value = decoded
+
+    try:
+        parts = urlsplit(value)
+        filepath = parse_qs(parts.query).get('filepath')
+        if filepath and filepath[0]:
+            return unquote(filepath[0])
+        if parts.scheme in ('http', 'https', 's3', 'gs', 'azure'):
+            return unquote(parts.path or value)
+        if parts.path and value.startswith('/'):
+            return unquote(parts.path)
+    except ValueError:
+        pass
+
+    return value
 
 
 @dataclass

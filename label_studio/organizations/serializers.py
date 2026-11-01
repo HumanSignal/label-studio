@@ -155,3 +155,9 @@ class OrganizationMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializ
 class OrganizationInviteSerializer(serializers.Serializer):
     token = serializers.CharField(required=False)
     invite_url = serializers.CharField(required=False)
+    expires_at = serializers.DateTimeField(
+        required=False, allow_null=True, help_text='When the invite link expires; null if no expiry was recorded'
+    )
+    expired = serializers.BooleanField(
+        required=False, help_text='True once the invite link has expired; reset the token to issue a new link'
+    )

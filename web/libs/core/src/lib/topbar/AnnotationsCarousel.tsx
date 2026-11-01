@@ -9,7 +9,7 @@
  * above 50 items, or `__listScroll` with native overflow below that). Horizontal
  * layout keeps the classic transform carousel and the virtualized react-window
  * strip. The wrapper decides whether to enable virtualization at all (classic
- * gates on FF_FIT_720_LAZY_LOAD_ANNOTATIONS; shell passes `virtualizationEnabled={true}`).
+ * and shell both pass `virtualizationEnabled={true}`).
  *
  * Sort order: rendered in the order the wrapper supplies. Wrappers MUST place
  * predictions before annotations; sort within type matches the API's order. This is

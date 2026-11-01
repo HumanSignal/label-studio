@@ -2,6 +2,7 @@ import { observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { cn } from "../../../utils/bem";
+import { emitDatamanagerTabEvent } from "../../../utils/datamanagerTelemetry";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { FilterDropdown } from "../FilterDropdown";
 import * as FilterInputs from "../types";
@@ -60,6 +61,10 @@ export const FilterOperation = observer(({ filter, field, operator, value, disab
   const onOperatorSelected = (selectedKey) => {
     if (disabled) return;
     filter.setOperator(selectedKey);
+    emitDatamanagerTabEvent(filter.view, "dm_filter_operator_changed", {
+      column: filter.filter?.id ?? null,
+      operator: selectedKey,
+    });
   };
   const availableOperators = filter.cellView?.filterOperators;
   const Input = selected?.input;

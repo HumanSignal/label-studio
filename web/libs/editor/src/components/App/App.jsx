@@ -287,6 +287,8 @@ class App extends Component {
           showCustomTab={hasTagInSidebar(as.selected)}
           focusTab={store.commentStore.tooltipMessage ? "comments" : null}
           focusRequest={store.commentStore.panelFocusRequest}
+          hostPanel={store.hostPanel}
+          hostPanelFocusRequest={store.hostPanelFocusRequest}
         >
           {mainContent}
           {store.hasInterface("topbar") && <BottomBar store={store} />}

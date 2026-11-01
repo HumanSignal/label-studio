@@ -2,7 +2,6 @@
 
 import logging
 
-from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -329,9 +328,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def prefetch(self, queryset, request=None):
         ordering = parse_annotations_ordering_request(request)
-        annotations_stub = False
-        if request and flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False) if request else False
 
         if annotations_stub:
             from tasks.ordering import (
@@ -387,10 +384,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         """
         fields = ['drafts', 'predictions', 'annotations']
 
-        # Lazy load annotations behind feature flag (FIT-720)
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
 
         return {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
@@ -464,9 +458,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {'all': False, 'included': [self.kwargs.get('pk')]}
 
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=self.request.user):
-            annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
 
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
@@ -751,6 +743,9 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
     queryset = Task.objects.all()
 
+    def check_summary_access(self, request, task):
+        """Hook for extra access checks once the task exists and the user is a project member."""
+
     def get(self, request, pk):
         include_predictions = bool_from_request(request.GET, 'include_predictions', False)
 
@@ -762,6 +757,7 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
         # Check project access using LSO's native permission check
         if not task.project.has_permission(request.user):
             raise PermissionDenied('You do not have permission to view this task')
+        self.check_summary_access(request, task)
 
         # Fetch annotations with user info for the summary panel
         annotation_objs = list(

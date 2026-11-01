@@ -44,6 +44,15 @@
   .withAnimationFullscreen[data-state="closed"] {
     animation: none !important;
   }
+
+  /* The keyframes carry the centering transform, so restore it when they are disabled. */
+  .withAnimation[data-state="open"] {
+    transform: translate(-50%, 0);
+  }
+
+  .withAnimationDialog[data-state="open"] {
+    transform: translate(-50%, -50%);
+  }
 }
 
 @keyframes modalWindowEnter {

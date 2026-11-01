@@ -74,6 +74,13 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 };
 
 describe("Controls", () => {
+  // setupAppSettings() replaces window.APP_SETTINGS; restore it so enterprise billing doesn't leak into later files.
+  const originalAppSettings = (window as any).APP_SETTINGS;
+
+  afterAll(() => {
+    (window as any).APP_SETTINGS = originalAppSettings;
+  });
+
   beforeEach(() => {
     mock.clearAllMocks();
     spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (
@@ -804,6 +811,56 @@ describe("Controls", () => {
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
     expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
+  });
+
+  // FIT-3230: a second reviewer may accept again (multi-layer review), the same reviewer may not.
+  test("disables Accept when the current reviewer's own accept is live", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "accepted",
+      acceptedByCurrentUser: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
+    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("reject-annotation")).not.toBeDisabled();
+  });
+
+  test("keeps Fix + Accept enabled when the current reviewer's own accept is live", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "accepted",
+      acceptedByCurrentUser: true,
+      versions: { draft: [{ id: "r1" }] },
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: true },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Fix + Accept");
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
   test("shows first-time Accept / Reject after a stale verdict (acceptedState null)", () => {

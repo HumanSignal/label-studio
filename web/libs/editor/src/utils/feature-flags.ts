@@ -6,8 +6,6 @@ export const FF_DEV_1284 = "fflag_fix_front_dev_1284_auto_detect_undo_281022_sho
 
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
 
-export const FF_DEV_2669 = "ff_front_dev_2669_paragraph_author_filter_210622_short";
-
 // Change the rotate tool from bbox
 export const FF_DEV_2671 = "ff_front_dev_2671_anchor_rotate_bbox_010722_short";
 
@@ -17,29 +15,14 @@ export const FF_DEV_2671 = "ff_front_dev_2671_anchor_rotate_bbox_010722_short";
  */
 export const FF_AUDIO_SPECTROGRAMS = "fflag_feat_optic_2123_audio_spectrograms";
 
-export const FF_DEV_2755 = "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short";
-
 /**
  * Creating separated regions if selection includes hidden phrases
- * @see FF_DEV_2669 (allows filtering)
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short
  */
 export const FF_DEV_2918 = "fflag_fix_front_dev_2918_labeling_filtered_paragraphs_250822_short";
 
-/**
- * Correction of image and stage size. It also affects the zoom position restrictions.
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short
- */
-export const FF_DEV_3377 = "fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short";
-
 // Refactoring to use separate trees for every annotation to allow real annotations in View All
 export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
-
-/**
- * Label stream ablation experiment for solving overlap issue
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short
- */
-export const FF_DEV_4174 = "fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short";
 
 /**
  * Contextual scrolling of Paragraph segments with Audio V0
@@ -55,30 +38,11 @@ export const FF_LSDV_E_278 = "fflag_feat_front_lsdv_e_278_contextual_scrolling_s
 export const FF_NER_SELECT_ALL = "fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short";
 
 /**
- * Multi-image segmentation support via `valueList`
- */
-export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation_short";
-
-/**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short
  */
 export const FF_LSDV_4930 = "fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short";
-
-/**
- * Resetting shared stores on task change to correctly generate dynamic children
- * @see: fflag_fix_front_dev_3617_taxonomy_memory_leaks_fix: To enable shared store
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short
- */
-export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short";
-
-/**
- * Fix task count on projects with over 100 tasks (switch from task history to queue count)
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_optic_79_task_count_is_wrong_short/targeting
- */
-
-export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_short";
 
 /** Select annotation only once during store init and trigger the rest from this select */
 export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
@@ -88,17 +52,11 @@ export const FF_SIMPLE_INIT = "fflag_fix_front_leap_443_select_annotation_once";
  */
 export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
 
-export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
-
 /**
  * Disable the postpone option if the skip interface isn't set
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
  */
 export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
-
-export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short";
-
-export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
 /**
  * Strict task overlap enforcement - prevents annotators from submitting

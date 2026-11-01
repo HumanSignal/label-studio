@@ -305,6 +305,8 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 100,
+    # DRF 3.18 switched many=True validation errors to a dict; keep the list format API clients rely on
+    'LIST_SERIALIZER_ERRORS_AS_DICT': False,
 }
 SILENCED_SYSTEM_CHECKS += ['rest_framework.W001']
 
@@ -341,6 +343,8 @@ AUTHENTICATION_BACKENDS = [
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
+# Organization invite links stop working this many days after they are issued or reset; 0 disables expiration
+ORG_INVITE_EXPIRATION_DAYS = int(get_env('ORG_INVITE_EXPIRATION_DAYS', 30))
 
 # Creating extra organizations via POST /api/organizations/ is opt-in: most deployments are single-org
 ALLOW_ORGANIZATION_CREATION = get_bool_env('ALLOW_ORGANIZATION_CREATION', False)

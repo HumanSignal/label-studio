@@ -111,10 +111,18 @@ mockModule("../../Toolbar/Toolbar", () => ({
   Toolbar: () => <div data-testid="toolbar">Toolbar</div>,
 }));
 
+// LSO's preload never restores module mocks, so put the real Image back afterwards;
+// otherwise Image.test.jsx gets this stub when it runs later in the same Bun process.
+const actualImageModule = { ...requireActual("../Image") };
+
 mockModule("../Image", () => ({
   __esModule: true,
   Image: () => <div data-testid="image">Image</div>,
 }));
+
+afterAll(() => {
+  mockModule("../Image", () => ({ ...actualImageModule, __skipMerge: true }));
+});
 
 mockModule("../../../common/Pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages }) => (
@@ -124,6 +132,9 @@ mockModule("../../../common/Pagination/Pagination", () => ({
   ),
 }));
 
+// Same for the resize observer: this stub has no unobserve(), which breaks any later component that cleans up.
+const actualResizeObserverModule = { ...requireActual("../../../utils/resize-observer") };
+
 mockModule("../../../utils/resize-observer", () => ({
   __esModule: true,
   default: mock().mockImplementation(function () {
@@ -132,6 +143,10 @@ mockModule("../../../utils/resize-observer", () => ({
     return this;
   }),
 }));
+
+afterAll(() => {
+  mockModule("../../../utils/resize-observer", () => ({ ...actualResizeObserverModule, __skipMerge: true }));
+});
 
 mockModule("../../../core/Hotkey", () => {
   const Hotkey = Object.assign(

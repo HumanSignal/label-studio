@@ -14,8 +14,6 @@ import { Chip } from "./Chip";
 import { renderers, jsonPathToTitle } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
-import { isFF } from "../../utils/feature-flags";
 import { useAnnotationFetcher, annotationKeys, ANNOTATION_DETAIL_TASK_SCOPE } from "../../hooks/useAnnotationQuery";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -55,7 +53,7 @@ type Props = {
 // FIT-720: Observable cell component that reads directly from MST annotation
 const ObservableCell = observer(
   ({ annotation, control, render }: { annotation: AnnotationSummary; control: ControlTag; render: RendererType }) => {
-    if (isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && annotation._isStub) {
+    if (annotation._isStub) {
       return <SkeletonCell controlType={control.type} />;
     }
 
@@ -266,7 +264,6 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
   // Only react when new data lands in the TanStack cache (`success`). Other `updated` actions (`fetch`, `invalidate`, …)
   // fire constantly and were scheduling hundreds of hydrates → main-thread lock when switching Summary ↔ annotation.
   useEffect(() => {
-    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
     const cache = queryClient.getQueryCache();
     return cache.subscribe((event: { type?: string; query?: { queryKey?: unknown[] }; action?: { type?: string } }) => {
       if (event?.type !== "updated" || event?.action?.type !== "success") return;
@@ -349,7 +346,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
       annotation.type === "prediction"
         ? (annotation.results?.map(convertPredictionResult) ?? [])
         : (annotation.versions.result ?? []),
-    _isStub: isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && needsSummaryHydration(annotation, summaryHydratedPksRef.current),
+    _isStub: needsSummaryHydration(annotation, summaryHydratedPksRef.current),
     // FIT-720: Keep reference to MST annotation for MobX reactivity in cells
     _mstAnnotation: annotation,
   }));
@@ -409,7 +406,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         const annotation = row.original;
 
         // FIT-720: Show skeleton for stub annotations that haven't been hydrated yet
-        if (annotation._isStub && isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) {
+        if (annotation._isStub) {
           return <AnnotatorSkeletonCell />;
         }
 
@@ -419,11 +416,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
             className="flex gap-tight items-center cursor-pointer hover:bg-neutral-surface-active transition-colors p-1 rounded-small -ml-1"
             onClick={async () => {
               const mstAnnotation = annotation._mstAnnotation;
-              if (
-                isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
-                mstAnnotation &&
-                needsSummaryHydration(mstAnnotation, summaryHydratedPksRef.current)
-              ) {
+              if (mstAnnotation && needsSummaryHydration(mstAnnotation, summaryHydratedPksRef.current)) {
                 await hydrateAnnotation(mstAnnotation);
               }
               onSelect(annotation);
@@ -491,7 +484,6 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
   // virtualStart/virtualEnd already match rendered rows. Call hydrate directly — `hydrationInFlight` and
   // `lastAppliedQueryDataUpdatedAt` dedupe concurrent / duplicate work.
   useLayoutEffect(() => {
-    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
     const gate = hydrateGateRef.current;
 
     for (let i = virtualStart; i < virtualEnd; i++) {

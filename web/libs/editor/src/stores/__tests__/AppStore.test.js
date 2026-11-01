@@ -96,6 +96,7 @@ mockModule("../../components/Infomodal/Infomodal", () => ({
   },
 }));
 
+import { reaction } from "mobx";
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
 import "../../tags/object/Image/Image.js";
@@ -607,11 +608,12 @@ describe("AppStore", () => {
   });
 
   describe("isSubmitting guard", () => {
-    it("submitAnnotation returns early when isSubmitting", () => {
+    it("submitAnnotation returns early when isSubmitting", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       store.setFlags({ isSubmitting: true });
       store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
@@ -801,6 +803,85 @@ describe("AppStore", () => {
     });
   });
 
+  describe("setCommentHeaderExtra (UTC-1446 experiment)", () => {
+    const HeaderExtra = () => null;
+
+    it("defaults to null", () => {
+      expect(createStore().commentHeaderExtra).toBeNull();
+    });
+
+    it("stores the component as-is and clears it with null or undefined", () => {
+      const store = createStore();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      expect(store.commentHeaderExtra).toBe(HeaderExtra);
+
+      store.setCommentHeaderExtra(null);
+      expect(store.commentHeaderExtra).toBeNull();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(undefined);
+      expect(store.commentHeaderExtra).toBeNull();
+    });
+
+    it("is observable, so mounted comment items re-render when the host sets it later", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.commentHeaderExtra,
+        (value) => seen.push(value),
+      );
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(null);
+      dispose();
+
+      expect(seen).toEqual([HeaderExtra, null]);
+    });
+  });
+
+  describe("host panel (UTC-1446)", () => {
+    const config = { title: "Helper", shown: true, onElement: () => {}, onAvailability: () => {} };
+
+    it("is not registered by default", () => {
+      const store = createStore();
+      expect(store.hostPanel).toBeNull();
+      expect(store.hostPanelFocusRequest).toBe(0);
+    });
+
+    it("keeps the registration as given, observably, and clears it with null or undefined", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanel,
+        (value) => seen.push(value),
+      );
+
+      store.setHostPanel(config);
+      store.setHostPanel(null);
+      store.setHostPanel(config);
+      store.setHostPanel(undefined);
+      dispose();
+
+      expect(seen).toEqual([config, null, config, null]);
+    });
+
+    it("counts focus requests, so the same request made twice is seen twice", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanelFocusRequest,
+        (value) => seen.push(value),
+      );
+
+      store.focusHostPanel();
+      store.focusHostPanel();
+      dispose();
+
+      expect(seen).toEqual([1, 2]);
+    });
+  });
+
   describe("setDescription", () => {
     it("sets description to a string value", () => {
       const store = createStore();
@@ -861,11 +942,12 @@ describe("AppStore", () => {
   });
 
   describe("isLoading guard", () => {
-    it("submitAnnotation returns early when isLoading", () => {
+    it("submitAnnotation returns early when isLoading", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       store.setFlags({ isLoading: true });
       store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
@@ -916,33 +998,38 @@ describe("AppStore", () => {
       expect(store.hydrated).toBe(true);
     });
 
-    it("submit hotkey fires when hydrated", () => {
+    it("submit hotkey fires when hydrated", async () => {
       const store = createSubmitStore();
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey is inert while not hydrated", () => {
+    it("submit hotkey is inert while not hydrated", async () => {
       const store = createSubmitStore();
       store.setHydrated(false);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey is inert when there is no task to label", () => {
+    it("submit hotkey is inert when there is no task to label", async () => {
       const store = createSubmitStore();
       store.setFlags({ noTask: true });
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
-    it("submit hotkey fires again once re-hydrated", () => {
+    it("submit hotkey fires again once re-hydrated", async () => {
       const store = createSubmitStore();
       store.setHydrated(false);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
       store.setHydrated(true);
       store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 

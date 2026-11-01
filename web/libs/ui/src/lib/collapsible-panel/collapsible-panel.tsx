@@ -5,7 +5,7 @@ import { Button } from "../button/button";
 
 export type CollapsiblePanelProps = {
   /** Visual variant of the panel */
-  variant?: "primary" | "default";
+  variant?: "primary" | "default" | "positive";
   /** Panel title */
   title: ReactNode;
   /** Optional count badge/number to display */
@@ -26,6 +26,8 @@ export type CollapsiblePanelProps = {
   disableToggle?: boolean;
   /** Test ID for the panel container */
   dataTestId?: string;
+  /** Name used in the toggle's accessible label, e.g. "Expand Languages" */
+  toggleLabel?: string;
 };
 
 export const CollapsiblePanel = ({
@@ -40,6 +42,7 @@ export const CollapsiblePanel = ({
   onExpandedChange,
   disableToggle = false,
   dataTestId,
+  toggleLabel = "panel",
 }: CollapsiblePanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
 
@@ -68,6 +71,10 @@ export const CollapsiblePanel = ({
     default: {
       container: "border-neutral-border",
       header: "bg-neutral-surface hover:bg-neutral-surface-hover",
+    },
+    positive: {
+      container: "border-positive-border-subtlest",
+      header: "bg-positive-background hover:bg-positive-emphasis",
     },
   };
 
@@ -100,7 +107,7 @@ export const CollapsiblePanel = ({
             disableToggle && "opacity-40 cursor-not-allowed pointer-events-none",
           )}
           disabled={disableToggle}
-          aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
+          aria-label={`${isExpanded ? "Collapse" : "Expand"} ${toggleLabel}`}
           aria-expanded={isExpanded}
           data-testid="collapsible-panel-toggle"
         >

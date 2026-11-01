@@ -1,5 +1,4 @@
 import { type MutableRefObject, useCallback, useEffect, useRef } from "react";
-import { FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../../utils/feature-flags";
 import type { VideoRef } from "../VideoCanvas";
 
 type UseLoopRangeProps = {
@@ -40,9 +39,7 @@ export const useLoopRange = ({
       const startFrame = selectedFrameRange.start;
       const endFrame = selectedFrameRange.end;
 
-      const currentFrame = isFF(FF_VIDEO_FRAME_SEEK_PRECISION)
-        ? Math.ceil(mediaTime * framerateRef.current)
-        : Math.round(mediaTime * framerateRef.current);
+      const currentFrame = Math.ceil(mediaTime * framerateRef.current);
 
       if (currentFrame < startFrame) {
         // If current time is before the start of the range, seek to the start

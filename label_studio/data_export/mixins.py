@@ -14,7 +14,7 @@ from core.utils.io import (
     get_all_files_from_dir,
     get_temp_dir,
 )
-from data_export.functions import converter_http_session
+from data_export.functions import CONVERTER_ACCESS_TOKEN, converter_http_session
 from data_manager.models import View
 from django.conf import settings
 from django.core.files import File
@@ -216,7 +216,6 @@ class ExportMixin:
     def get_task_queryset(self, ids, annotation_filter_options, expand=None):
         """expand: the export serializer's expand list. Relations it doesn't expand are serialized as IDs only, so
         their payload isn't loaded. None loads everything."""
-        from core.feature_flags import flag_set
 
         # Only annotate FSM state if both feature flags are enabled
         # This prevents unnecessary query annotations when state won't be serialized
@@ -312,10 +311,7 @@ class ExportMixin:
         expand = base_export_serializer_option['expand']
         i = 0
 
-        if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):
-            BATCH_SIZE = self.project.get_task_batch_size()
-        else:
-            BATCH_SIZE = settings.BATCH_SIZE
+        BATCH_SIZE = self.project.get_task_batch_size()
 
         for ids in batch(task_ids, BATCH_SIZE):
             i += 1
@@ -422,7 +418,7 @@ class ExportMixin:
                 serialization_options=serialization_options,
             )
 
-    def convert_file(self, to_format, download_resources=False, hostname=None):
+    def convert_file(self, to_format, download_resources=False, hostname=None, user=None):
         logger.info(
             ('Starting export conversion: export_id=%s project_id=%s to_format=%s download_resources=%s hostname=%s'),
             self.id,
@@ -441,11 +437,10 @@ class ExportMixin:
                 project_dir=None,
                 upload_dir=out_dir,
                 download_resources=download_resources,
-                # for downloading resource we need access to the API
-                access_token=self.project.organization.created_by.auth_token.key,
+                access_token=CONVERTER_ACCESS_TOKEN,
                 hostname=hostname,
                 local_files_resolver=project_local_files_resolver(self.project),
-                http_session=converter_http_session(hostname),
+                http_session=converter_http_session(hostname, user),
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name

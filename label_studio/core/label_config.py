@@ -216,29 +216,35 @@ def config_line_stipped(c):
     return etree.tostring(xml, encoding='unicode').replace('\n', '').replace('\r', '')
 
 
+_CONFIG_COMMENT_RE = re.compile(r'<!--(.*?)-->', re.DOTALL)
+# AI-generated configs label the embedded task, e.g. "<!-- Sample task:\n{...}\n-->"
+_SAMPLE_TASK_LABEL_RE = re.compile(r'^sample\s+task\s*:?', re.IGNORECASE)
+
+
 def get_task_from_labeling_config(config):
-    """Get task, annotations and predictions from labeling config comment,
-    it must start from "<!-- {" and end as "} -->"
+    """Get task, annotations and predictions from labeling config comment.
+
+    The first comment whose body is a JSON object is used, e.g. "<!-- {...} -->".
+    The body may be preceded by whitespace and an optional "Sample task:" label.
     """
     # try to get task data, annotations & predictions from config comment
     task_data, annotations, predictions = {}, None, None
-    start = config.find('<!-- {')
-    start = start if start >= 0 else config.find('<!--{')
-    start += 4
-    end = config[start:].find('-->') if start >= 0 else -1
-    if 3 < start < start + end:
+    for match in _CONFIG_COMMENT_RE.finditer(config):
+        text = _SAMPLE_TASK_LABEL_RE.sub('', match.group(1).strip(), count=1).strip()
+        if not text.startswith('{'):
+            continue
         try:
-            logger.debug('Parse ' + config[start : start + end])
-            body = json.loads(config[start : start + end])
+            logger.debug('Parse ' + text)
+            body = json.loads(text)
         except Exception as exc:
             logger.warning("Can't parse task from labeling config: %s", exc)
-            pass
-        else:
-            logger.debug(json.dumps(body, indent=2))
-            dont_use_root = 'predictions' in body or 'annotations' in body
-            task_data = body['data'] if 'data' in body else (None if dont_use_root else body)
-            predictions = body['predictions'] if 'predictions' in body else None
-            annotations = body['annotations'] if 'annotations' in body else None
+            continue
+        logger.debug(json.dumps(body, indent=2))
+        dont_use_root = 'predictions' in body or 'annotations' in body
+        task_data = body['data'] if 'data' in body else (None if dont_use_root else body)
+        predictions = body['predictions'] if 'predictions' in body else None
+        annotations = body['annotations'] if 'annotations' in body else None
+        break
     return task_data, annotations, predictions
 
 

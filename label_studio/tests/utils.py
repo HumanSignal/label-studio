@@ -324,7 +324,7 @@ def azure_client_mock(sample_json_contents=None, sample_blob_names=None):
     # def dummy_generate_blob_sas(*args, **kwargs):
     #     return 'token'
 
-    with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
+    with mock.patch.object(models, 'get_blob_service_client', return_value=DummyAzureClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
 

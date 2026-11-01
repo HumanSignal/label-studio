@@ -4,6 +4,7 @@ import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
+import { emitDatamanagerTabEvent } from "../../utils/datamanagerTelemetry";
 import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 import {
   resolveFilterTransition,
@@ -278,6 +279,10 @@ export const TabFilter = types
     setFilterDelayed(value) {
       self.setFilter(value, false);
       self.saveDelayed();
+      emitDatamanagerTabEvent(self.view, "dm_filter_column_changed", {
+        column: self.filter?.id ?? null,
+        source: "picker",
+      });
     },
 
     /**
@@ -317,6 +322,10 @@ export const TabFilter = types
       }
 
       self.saveDelayed();
+      emitDatamanagerTabEvent(self.view, "dm_filter_column_changed", {
+        column: self.filter?.id ?? null,
+        source: "recent",
+      });
     },
 
     setOperator(operator) {
