@@ -1,0 +1,172 @@
+name: Publish custom Docker image
+
+on:
+  push:
+    tags:
+      - 'custom-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New image version, for example custom-v1.0.0'
+        required: true
+        type: string
+
+# Serialize releases, including manual runs, so version checks and latest updates
+# cannot race. A new release must not cancel a build already publishing images.
+concurrency:
+  group: docker-publish-custom
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      image: ${{ steps.release.outputs.image }}
+      sha_tag: ${{ steps.release.outputs.sha_tag }}
+    steps:
+      - name: Validate version and refuse an existing release
+        id: release
+        uses: actions/github-script@v8
+        env:
+          REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
+        with:
+          script: |
+            const version = process.env.REQUESTED_VERSION;
+            if (!/^custom-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) {
+              throw new Error('Version must be custom-vMAJOR.MINOR.PATCH, for example custom-v1.0.0');
+            }
+            if (context.ref.startsWith('refs/tags/') && context.ref !== `refs/tags/${version}`) {
+              throw new Error('When building a Git tag, the input version must match that tag');
+            }
+            const { owner, repo } = context.repo;
+            const packageName = repo.toLowerCase();
+            const { data: repository } = await github.rest.repos.get({ owner, repo });
+            const ownerType = repository.owner.type;
+            const route = ownerType === 'Organization'
+              ? 'GET /orgs/{org}/packages/container/{package_name}/versions'
+              : 'GET /users/{username}/packages/container/{package_name}/versions';
+            let versions;
+            try {
+              versions = await github.paginate(route, {
+                org: owner, username: owner, package_name: packageName, per_page: 100,
+              });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              versions = []; // The first release has no package yet.
+            }
+            if (versions.some(item => item.metadata?.container?.tags?.includes(version))) {
+              throw new Error(`${version} already exists; choose a new version instead of overwriting it`);
+            }
+            core.setOutput('version', version);
+            core.setOutput('image', `ghcr.io/${owner.toLowerCase()}/${packageName}`);
+            core.setOutput('sha_tag', `sha-${context.sha.slice(0, 12)}`);
+
+  build:
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            arch: amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@v3.11.1
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          file: Dockerfile
+          platforms: ${{ matrix.platform }}
+          tags: ${{ needs.prepare.outputs.image }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          provenance: true
+          sbom: true
+          cache-from: type=gha,scope=custom-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=custom-${{ matrix.arch }}
+          build-args: |
+            COMMIT_VERSION=${{ needs.prepare.outputs.version }}
+            COMMIT_SHA=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.prepare.outputs.version }}
+      - name: Export digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: custom-digest-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: custom-digest-*
+          merge-multiple: true
+      - uses: docker/setup-buildx-action@v3.11.1
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish multi-platform tags
+        working-directory: ${{ runner.temp }}/digests
+        env:
+          IMAGE: ${{ needs.prepare.outputs.image }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SHA_TAG: ${{ needs.prepare.outputs.sha_tag }}
+        run: |
+          sources=()
+          for digest in *; do
+            sources+=("$IMAGE@sha256:$digest")
+          done
+          docker buildx imagetools create \
+            --tag "$IMAGE:$VERSION" \
+            --tag "$IMAGE:$SHA_TAG" \
+            --tag "$IMAGE:latest" \
+            "${sources[@]}"
+          docker buildx imagetools inspect "$IMAGE:$VERSION"
+          {
+            echo "### Published Docker image"
+            echo "- Version: $IMAGE:$VERSION"
+            echo "- Commit: $IMAGE:$SHA_TAG"
+            echo "- Latest: $IMAGE:latest"
+            echo "- Platforms: linux/amd64, linux/arm64"
+          } >> "$GITHUB_STEP_SUMMARY"
