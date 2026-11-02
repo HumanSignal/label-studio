@@ -59,6 +59,25 @@ class TestOrganizationMember(TestCase):
         storage_delete.assert_called_once_with('avatars/test.png')
         assert not TaskLock.objects.filter(pk=task_lock.pk).exists()
 
+    def test_soft_delete_keeps_active_organization_when_removed_from_another(self):
+        # FIT-3313: removal from an organization the user isn't working in must not move them
+        first_organization = OrganizationFactory()
+        active_organization = OrganizationFactory()
+        removed_organization = OrganizationFactory()
+        user = UserFactory(active_organization=first_organization)
+        OrganizationMember.objects.create(user=user, organization=active_organization)
+        OrganizationMember.objects.create(user=user, organization=removed_organization)
+        user.active_organization = active_organization
+        user.avatar.name = 'avatars/test.png'
+        user.save(update_fields=['active_organization', 'avatar'])
+
+        membership = OrganizationMember.objects.get(user=user, organization=removed_organization)
+        membership.soft_delete()
+
+        user.refresh_from_db()
+        assert user.active_organization == active_organization
+        assert user.avatar.name == 'avatars/test.png'
+
 
 class TestOrganizationInviteTokenExpiration(TestCase):
     """FIT-2685: an invite link's expiry is fixed when the link is issued."""

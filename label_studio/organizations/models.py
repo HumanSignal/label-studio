@@ -79,15 +79,17 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
         with transaction.atomic():
             self.deleted_at = timezone.now()
             self.save(update_fields=['deleted_at'])
-            self.user.active_organization = self.user.organizations.filter(
-                organizationmember__deleted_at__isnull=True
-            ).first()
-            update_fields = ['active_organization']
-            if self.user.active_organization is None and self.user.avatar:
-                self.user.avatar.delete(save=False)
-                self.user.avatar = None
-                update_fields.append('avatar')
-            self.user.save(update_fields=update_fields)
+            # Only move the user when they lose the organization they are working in (FIT-3313)
+            if self.user.active_organization_id in (None, self.organization_id):
+                self.user.active_organization = self.user.organizations.filter(
+                    organizationmember__deleted_at__isnull=True
+                ).first()
+                update_fields = ['active_organization']
+                if self.user.active_organization is None and self.user.avatar:
+                    self.user.avatar.delete(save=False)
+                    self.user.avatar = None
+                    update_fields.append('avatar')
+                self.user.save(update_fields=update_fields)
 
         self.user.task_locks.filter(task__project__organization=self.organization).delete()
 
