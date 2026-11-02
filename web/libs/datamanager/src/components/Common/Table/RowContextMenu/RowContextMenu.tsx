@@ -24,8 +24,6 @@ export interface RowContextMenuProps {
   view: any;
   /** API object from useSDK hook */
   api?: any;
-  /** SDK type (e.g., "DE" for Data Explorer) */
-  sdkType?: string;
   /** LSE-only callback for viewing analytics */
   onViewAnalytics?: (row: any) => void;
   /** Callback when menu closes */
@@ -44,7 +42,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   column,
   view,
   api,
-  sdkType,
   onViewAnalytics,
   onClose,
   projectId,
@@ -196,7 +193,6 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
         <TaskSourceViewer
           content={taskData}
           onTaskLoad={onTaskLoad}
-          sdkType={sdkType}
           storageKey={getTaskSourceViewerStorageKey(projectId)}
           renderToggle={(toggle) => {
             // Update modal header with toggle
@@ -207,7 +203,7 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
     });
 
     onClose();
-  }, [row, api, sdkType, onClose, projectId]);
+  }, [row, api, onClose, projectId]);
 
   // 5. View annotator performance (LSE-only)
   const handleViewAnalytics = useCallback(() => {

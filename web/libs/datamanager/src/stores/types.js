@@ -57,8 +57,3 @@ export const HtmlOrReact = types.custom({
     return "is not a valid element";
   },
 });
-
-export const ThresholdType = types.model("ThresholdType", {
-  min: types.maybeNull(types.number),
-  max: types.maybeNull(types.number),
-});

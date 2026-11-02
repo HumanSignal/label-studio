@@ -90,7 +90,7 @@ export const Table = observer(
     }, [sharedColumnOrder]);
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
-    const { api, type, projectId } = useSDK();
+    const { api, projectId } = useSDK();
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [toolbarVisible, setToolbarVisible] = useState(true);
@@ -220,7 +220,6 @@ export const Table = observer(
                   <TaskSourceViewer
                     content={out}
                     onTaskLoad={onTaskLoad}
-                    sdkType={type}
                     storageKey={getTaskSourceViewerStorageKey(projectId)}
                     renderToggle={(toggle) => {
                       // Update modal header with toggle
@@ -293,24 +292,13 @@ export const Table = observer(
           column={contextMenu.column}
           view={view}
           api={api}
-          sdkType={type}
           projectId={projectId}
           onViewAnalytics={onViewAnalytics}
           onViewReviewerAnalytics={onViewReviewerAnalytics}
           onClose={closeContextMenu}
         />
       );
-    }, [
-      MenuComponent,
-      api,
-      closeContextMenu,
-      contextMenu,
-      onViewAnalytics,
-      onViewReviewerAnalytics,
-      projectId,
-      type,
-      view,
-    ]);
+    }, [MenuComponent, api, closeContextMenu, contextMenu, onViewAnalytics, onViewReviewerAnalytics, projectId, view]);
 
     const contextMenuPosition = useMemo(
       () => (contextMenu ? { x: contextMenu.x, y: contextMenu.y } : null),

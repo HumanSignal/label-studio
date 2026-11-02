@@ -6,11 +6,8 @@ import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
 import { History } from "../../utils/history";
-import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
-import { clamp } from "../../utils/helpers";
+import { CustomJSON, StringOrNumberID } from "../types";
 import { emitDatamanagerTabEvent } from "../../utils/datamanagerTelemetry";
-const THRESHOLD_MIN = 0;
-const THRESHOLD_MIN_DIFF = 0.001;
 const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
 const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed.";
 const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
@@ -60,8 +57,6 @@ export const Tab = types
     locked_at: types.optional(types.maybeNull(types.string), null),
     editable: true,
     deletable: true,
-    semantic_search: types.optional(types.array(CustomJSON), []),
-    threshold: types.optional(types.maybeNull(ThresholdType), null),
     agreement_selected: types.optional(CustomJSON, {}),
   })
   .volatile(() => {
@@ -316,8 +311,6 @@ export const Tab = types
         columnOrder: self.columnOrderSnapshot,
         gridWidth: self.gridWidth,
         gridFitImagesToWidth: self.gridFitImagesToWidth,
-        semantic_search: self.semantic_search?.toJSON() ?? [],
-        threshold: self.threshold?.toJSON(),
         agreement_selected: self.agreement_selected,
       };
 
@@ -441,35 +434,6 @@ export const Tab = types
 
     setSelected(ids) {
       self.selected = ids;
-    },
-
-    setSemanticSearch(semanticSearchList, min, max) {
-      if (self.isLockedByManager) return self.notifyLocked();
-      self.semantic_search = semanticSearchList ?? [];
-      /* if no semantic search we have to clean up threshold */
-      if (self.semantic_search.length === 0) {
-        self.threshold = null;
-        return self.save();
-      }
-      /* if we have a min and max we need to make sure we save that too.
-      this prevents firing 2 view save requests to accomplish the same thing */
-      return !isNaN(min) && !isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
-    },
-
-    setSemanticSearchThreshold(_min, max) {
-      if (self.isLockedByManager) return self.notifyLocked();
-      const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
-
-      if (self.semantic_search?.length && !isNaN(min) && !isNaN(max)) {
-        self.threshold = { min, max };
-        return self.save();
-      }
-    },
-
-    clearSemanticSearchThreshold(save = true) {
-      if (self.isLockedByManager) return self.notifyLocked();
-      self.threshold = null;
-      return save && self.save();
     },
 
     selectAll() {

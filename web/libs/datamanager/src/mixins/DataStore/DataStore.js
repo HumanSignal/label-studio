@@ -262,7 +262,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
+        const data = yield root.apiCall(apiMethod, params);
 
         if (!isAlive(self)) return;
 

@@ -481,18 +481,6 @@ class ImportStorage(Storage):
             logger.info(f"Can't resolve URIs in data={data}", exc_info=True)
             return None
 
-    def _scan_and_create_links_v2(self):
-        # Async job execution for batch of objects:
-        # e.g. GCS example
-        # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
-        # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
-        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket
-        # --> add objects from batch to Vector DB
-        # or for project task creation last step would be
-        # | "AddObject" >> ImportStorage.add_task
-
-        raise NotImplementedError
-
     @staticmethod
     def is_bare_task_data(task_data) -> bool:
         """True when a storage object carries no annotations or predictions, so its task can be bulk-created."""
@@ -702,10 +690,6 @@ class ImportStorage(Storage):
         return task
 
     def _scan_and_create_links(self, link_class):
-        """
-        TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2,
-        TODO: it must be compatible with opensource, so old version is needed as well
-        """
         # set in progress status for storage info
         self.info_set_in_progress()
 

@@ -193,13 +193,12 @@ const ColumnRenderer = observer(
     }
 
     const root = getRoot(column.original);
-    const isDE = root.SDK.type === "DE";
     const selectedView = root.viewsStore.selected;
     const isTabLocked = selectedView?.isLockedByManager;
     const lockedTooltip = selectedView?.lockedUpdateMessage;
     const canOrder = sortingEnabled && column.original?.canOrder;
     const Decoration = decoration?.get?.(column);
-    const extra = !isDE && columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
+    const extra = columnHeaderExtra ? columnHeaderExtra(column, Decoration) : null;
     const content = Decoration?.content ? Decoration.content(column) : column.title;
     const style = getStyle(cellViews, column, Decoration);
     const isAgreementV2Enabled =
@@ -238,7 +237,7 @@ const ColumnRenderer = observer(
           onResizeFinished={(width) => onResize?.(column, width)}
           onReset={() => onReset?.(column)}
         >
-          {!isDE && column.parent && !isAgreementColumn && !isAgreementSelected ? (
+          {column.parent && !isAgreementColumn && !isAgreementSelected ? (
             <DropdownWrapper
               column={column}
               cellViews={cellViews}

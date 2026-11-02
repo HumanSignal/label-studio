@@ -239,25 +239,6 @@ describe("TaskSourceViewer Component", () => {
     });
   });
 
-  describe("Data Explorer Mode", () => {
-    it("should not include annotations/predictions for Data Explorer", async () => {
-      localStorage.setItem(`${GLOBAL_STORAGE_KEY}:view`, "code");
-      const mockOnTaskLoad = mock().mockResolvedValue({
-        ...mockTaskData,
-        annotations: [{ id: 1 }],
-        predictions: [{ id: 2 }],
-      });
-
-      render(<TaskSourceViewer {...defaultProps} onTaskLoad={mockOnTaskLoad} sdkType="DE" />);
-
-      await waitFor(() => {
-        const codeView = screen.getByTestId("code-view");
-        expect(codeView).not.toHaveTextContent("annotations");
-        expect(codeView).not.toHaveTextContent("predictions");
-      });
-    });
-  });
-
   describe("Loading State", () => {
     it("should show skeleton while loading then update to interactive view", async () => {
       // Create a promise that doesn't resolve immediately
