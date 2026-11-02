@@ -1,0 +1,5 @@
+(^|/)uv\.lock$
+(^|/)bun\.lock$
+(^|/)yarn\.lock$
+^label_studio/feature_flags\.json$
+^docs/
