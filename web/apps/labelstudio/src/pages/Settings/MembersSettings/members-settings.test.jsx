@@ -2,9 +2,10 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/project-context";
-import { EmptyProjectsList } from "../../Projects/ProjectsList";
+import { EmptyProjectsList, ProjectsList } from "../../Projects/ProjectsList";
 import { MembersSettings } from "./MembersSettings";
 
 const settingsSource = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../index.jsx"), "utf8");
@@ -119,4 +120,37 @@ test("organization owner keeps the create project entry on an empty list", () =>
 
   expect(screen.getByRole("button", { name: "Create new project" })).toBeInTheDocument();
   expect(screen.queryByText(EMPTY_PROJECTS_TEXT)).toBeNull();
+});
+
+test.each([
+  ["manager", { can_manage: true }, true],
+  ["member", { can_manage: false }, false],
+  ["missing permissions", undefined, false],
+])("project options for %s only show authorized settings", async (_, access, canManage) => {
+  const originalLocation = Object.getOwnPropertyDescriptor(globalThis, "location");
+  const originalHistory = Object.getOwnPropertyDescriptor(globalThis, "history");
+  Object.defineProperty(globalThis, "location", { configurable: true, value: window.location });
+  Object.defineProperty(globalThis, "history", { configurable: true, value: window.history });
+  try {
+    render(
+      <MemoryRouter>
+        <ProjectsList
+          projects={[{ id: 5, title: "Example", created_at: "2026-01-01T00:00:00Z", access }]}
+          currentPage={1}
+          totalItems={1}
+          pageSize={30}
+          loadNextPage={() => {}}
+        />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Project options" }));
+    expect(await screen.findByText("Label")).toBeInTheDocument();
+    expect(screen.queryByText("Settings") !== null).toBe(canManage);
+  } finally {
+    if (originalLocation) Object.defineProperty(globalThis, "location", originalLocation);
+    else delete globalThis.location;
+    if (originalHistory) Object.defineProperty(globalThis, "history", originalHistory);
+    else delete globalThis.history;
+  }
 });
