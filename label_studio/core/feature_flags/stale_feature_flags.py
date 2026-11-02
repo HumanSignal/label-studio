@@ -1,66 +1,8 @@
 STALE_FEATURE_FLAGS = {
-    # Feb 6
-    'fflag_front_dia_1150_ddisco_sneak_preview': False,
     # Dec 31
-    'fflag_feat_root_47_plugins_without_eval': False,
     'fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short': True,
-    'fflag_fix_leap_2052_detect_empty_filters_at_next_task_endpoint_short': True,
-    'fflag_feat_dia_1925_view_sample_raw_json_short': False,
-    'fflag__feature_develop__prompts__dia_1868_azure_ai_foundry': True,
-    'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
-    'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
     # Jan 5
-    'fflag_feat_all_fit_524_review_time_chart': True,
-    'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
-    'fflag_feat_front_fit_183_email_notifications_short': True,
-    'fflag_fix_back_optic_1380_dashboard_task_chart_grouped_by_completed_at_reviewed_at_short': True,
-    'fflag_feat_front_optic_1746_improve_global_error_messages_short': True,
-    'ff_front_optic_1610_ask_ai_questions': True,
-    'fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short': True,
-    'fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short': True,
     'ff_front_optic_1494_saved_templates_to_custom_templates': True,
-    'fflag_feat_all_optic_1354_sum_annotation_region_count_short': True,
-    'fflag_feat_front_optic_1217_theme_toggle_short': True,
-    # Jan 6
-    'fflag_root_223_optimize_delete_predictions': True,
-    'fflag_root_212_reduce_importstoragelink_counts': True,
-    # Jan 8
-    'fflag_feat_all_leap_1821_annotation_limit_short': True,
-    'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
-    'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,
-    'fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short': True,
-    'fflag_fix_back_plt_893_project_list_oom_fix_02102025_short': True,
-    'fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short': True,
-    'fflag_fix_back_plt_863_remove_iterator_27082025_short': True,
-    'fflag_fix_back_plt_843_webhook_memory_improvement_12082025_short': True,
-    'fflag_fix_back_plt_838_reimport_memory_improvement_05082025_short': True,
-    'fflag_fix_back_plt_840_redis_last_activity_29072025_short': True,
-    'fflag_fix_back_plt_825_rate_limiter_debug_14072025_short': False,
-    'fflag_fix_back_plt_804_check_file_extension_11072025_short': True,
-    'fflag_fix_back_plt_811_finished_task_number_01072025_short': True,
-    'fflag_fix_back_plt_807_batch_size_26062025_short': True,
-    'fflag_fix_back_plt_802_update_is_labeled_20062025_short': True,
     # Apr 8
-    'fflag_all_feat_utc_274_permissions_improvements': True,
-    'fflag_feat_all_fit_778_analytics_short': True,
-    'fflag_feat_all_leap_883_custom_script_270524_short': True,
-    'fflag_feat_all_lops_315_temp_datasets_limitations_short': True,
-    'fflag_feat_fit_890_ask_ai_event_stream': True,
-    'fflag_feat_front_lops_134_find_similarity_29082023_short': True,
-    'fflag_feat_utc_239_filterable_agreement_column_short': True,
-    'fflag_fix_all_fit_287_preview_performance_improvements': True,
-    'fflag_fix_all_fit_720_lazy_load_annotations': True,
     'fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short': False,
-    'fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short': False,
-    'fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short': False,
-    # Apr 14
-    'ff_front_dev_1682_model_version_dropdown_070622_short': False,
-    # May 7
-    'fflag_fix_front_fit_31_synced_media_buffering': False,
-    # May 11
-    'ff_front_dev_2669_paragraph_author_filter_210622_short': True,
-    'fflag_fix_all_optic_18_dashboard_label_distribution_chart_async_22082023_short': False,
-    'fflag_fix_all_optic_79_task_count_is_wrong_short': True,
-    # Oct 22
-    'fflag_feat_interfaces_new_drafts': True,
 }

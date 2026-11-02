@@ -3,7 +3,6 @@
 import datetime
 from typing import Optional
 
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.db import fast_first
 from django.conf import settings
@@ -70,17 +69,13 @@ class UserLastActivityMixin(models.Model):
         """Update user's last activity timestamp using Redis caching."""
         current_time = timezone.now()
 
-        if flag_set('fflag_fix_back_plt_840_redis_last_activity_29072025_short', user='auto'):
-            redis_success = set_user_last_activity(self.id, current_time)
+        redis_success = set_user_last_activity(self.id, current_time)
 
-            if not redis_success:
-                self.last_activity = current_time
-                self.save(update_fields=['last_activity'])
-            else:
-                schedule_activity_sync()
-        else:
+        if not redis_success:
             self.last_activity = current_time
             self.save(update_fields=['last_activity'])
+        else:
+            schedule_activity_sync()
 
     def get_last_activity(self):
         """Get user's last activity timestamp with Redis caching."""

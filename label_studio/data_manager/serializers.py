@@ -826,8 +826,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_annotations(self, task) -> list[dict[str, Any]]:
         """Return annotations for the task.
 
-        If annotations_stub=True is in context (via feature flag
-        fflag_fix_all_fit_720_lazy_load_annotations), returns lightweight
+        If annotations_stub=True is in context, returns lightweight
         annotation stubs without result data for improved performance.
         """
         if not self.context.get('annotations'):
@@ -836,7 +835,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         ordering = self.context.get('annotations_ordering')
         annotations = get_task_annotations_queryset(task, ordering, include_completed_by=True)
 
-        # Use stub serializer if requested (feature flag checked at API level)
+        # Use stub serializer if requested
         if self.context.get('annotations_stub'):
             return AnnotationStubSerializer(
                 annotations,

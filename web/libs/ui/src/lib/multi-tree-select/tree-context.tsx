@@ -549,12 +549,14 @@ export const useMultiTreeSelectProvider = ({
         // to define how to traverse the tree data
         // and what properties to use for id, label, and children
         let schema = _schema;
+        // Indexing rewrites `id` into a path in place, so a later index (another instance, or a remount) must start from
+        // the original id, or nested paths get their parents prefixed twice.
+        const rawRecord = node as unknown as Record<string | symbol, any>;
+        if (rawRecord[OriginalIdSymbol] === undefined) {
+          rawRecord[OriginalIdSymbol] = schema ? rawRecord[schema.id] : node.id;
+        }
+        node.id = rawRecord[OriginalIdSymbol];
         if (schema) {
-          const rawRecord = node as unknown as Record<string | symbol, any>;
-          if (rawRecord[OriginalIdSymbol] === undefined) {
-            rawRecord[OriginalIdSymbol] = rawRecord[schema.id];
-          }
-          node.id = rawRecord[OriginalIdSymbol];
           node.label = (node as unknown as Record<string, TreeNodeProps["label"]>)[schema.label];
           node.searchBy = schema.searchBy?.map(
             (k: string) => (node as unknown as Record<string, TreeNodeProps["label"]>)[k],

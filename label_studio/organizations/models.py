@@ -155,7 +155,8 @@ class Organization(OrganizationMixin, models.Model):
         memberships = OrganizationMember.objects.filter(user=user).prefetch_related('organization')
         if not memberships.exists():
             raise ValueError(f'No memberships found for user {user}')
-        membership = memberships.first()
+        # Prefer a live membership: the oldest one may have been removed while others remain
+        membership = memberships.filter(deleted_at__isnull=True).first() or memberships.first()
         if check_deleted:
             return (membership.organization, True) if membership.deleted_at else (membership.organization, False)
 

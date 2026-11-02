@@ -14,7 +14,6 @@ classifiers = [
 dependencies = [
     "wheel (>=0.46.3)",
     "appdirs (>=1.4.3)",
-    "attr (==0.3.1)",
     "attrs (>=19.2.0)",
     "pyyaml (>=6.0.0)",
     "azure-storage-blob (>=12.6.0)",
@@ -34,7 +33,7 @@ dependencies = [
     "django-user-agents (==0.4.0)",
     "django-ranged-fileresponse (>=0.1.2)",
     "drf-dynamic-fields (==0.3.0)",
-    "djangorestframework (==3.17.2)",
+    "djangorestframework (==3.18.3)",
     "drf-flex-fields (==0.9.5)",
     "drf-spectacular (==0.28.0)",
     "drf-generators (==0.3.0)",
@@ -57,7 +56,7 @@ dependencies = [
     "colorama (>=0.4.4)",
     "pyboxen (>=1.3.0)",
     "redis (>=5.2.1,<5.3.0)",
-    "sentry-sdk (>=2.16.0)",
+    "sentry-sdk (>=2.69.0)",
     "launchdarkly-server-sdk (==8.2.1)",
     "python-json-logger (==2.0.4)",
     "google-cloud-storage (>=3.8.0,<4.0.0)",
@@ -73,7 +72,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "0ffe62a8ea136837628b5c11045e2b8fe5852f4a" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "debf4444cdf163a695286796f3af497b319b878d" }
 
 [project.optional-dependencies]
 uwsgi = [
@@ -100,7 +99,6 @@ test = [
     "pytest-xdist==3.8.0",
     "psutil==7.0.0",
     "freezegun~=1.5.1",
-    "pre-commit==3.3.3",
     "s3transfer>=0.16.0",
     "mock>=5.1.0",
     "moto>=4.2.6",
@@ -113,11 +111,11 @@ build = [
 ]
 
 [build-system]
-requires = ["uv_build<0.13.0"]
+requires = ["uv_build<0.14.0"]
 build-backend = "uv_build"
 
 [tool.uv]
-required-version = ">=0.11.8"
+required-version = ">=0.13.5"
 exclude-newer = "4 days"
 exclude-newer-package = { certifi = false }
 

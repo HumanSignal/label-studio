@@ -18,7 +18,7 @@ import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import { emitRegionDeleted } from "../utils/labelingTelemetry";
-import { FF_CUSTOM_SCRIPT, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import { FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
 import { REJECT_ACTION_HOTKEY_NAMES } from "../utils/rejectHotkeys";
@@ -406,6 +406,7 @@ export default types
       if (isUpdateDisabled) return;
       if (entity.isReadOnly()) return;
       if (entity.hasIncompleteRegions) return;
+      if (isReview && ownAcceptIsLive(entity)) return;
 
       entity?.submissionInProgress();
 
@@ -775,26 +776,16 @@ export default types
 
       if (!entity.validate()) return;
 
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
-        entity.sendUserGenerate();
-      }
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          await self.waitForDraftSubmission();
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        await self.waitForDraftSubmission();
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
-          entity.sendUserGenerate();
-        }
+        entity.sendUserGenerate();
         await getEnv(self).events.invoke(event, self, entity);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
-      }
+      });
     }
 
     function updateAnnotation(extraData) {
@@ -807,24 +798,16 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "updateAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "updateAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         entity.setAcceptedState?.(null);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-          !entity.sentUserGenerate && entity.sendUserGenerate();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
         !entity.sentUserGenerate && entity.sendUserGenerate();
-      }
+      });
     }
 
     function skipTask(extraData) {
@@ -855,20 +838,25 @@ export default types
       }, "Error during cancel skipping task, try again");
     }
 
+    // FIT-3230: the reviewer's own live accept spends a plain Accept (same rule as AcceptButton);
+    // Fix + Accept and other reviewers' Accept stay available (multi-layer review).
+    function ownAcceptIsLive(entity) {
+      return Boolean(entity?.acceptedByCurrentUser) && !(entity.history?.canUndo || entity.versions?.draft);
+    }
+
     function acceptAnnotation() {
       if (self.isSubmitting || self.isLoading) return;
+      if (ownAcceptIsLive(self.annotationStore.selected)) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "acceptAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "acceptAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         // changes in current sessions or saved draft should send the result along with approval
         const isDirty = entity.history.canUndo || entity.versions.draft;
@@ -887,12 +875,10 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "rejectAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "rejectAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         const isDirty = entity.history.canUndo;
 
@@ -948,9 +934,7 @@ export default types
 
       if (oldAnnotationStore) {
         oldAnnotationStore.beforeReset?.();
-        if (isFF(FF_LSDV_4998)) {
-          destroySharedStore();
-        }
+        destroySharedStore();
         detach(oldAnnotationStore);
         destroy(oldAnnotationStore);
       }
@@ -1166,7 +1150,7 @@ export default types
     async function postponeTask() {
       const annotation = self.annotationStore.selected;
 
-      // save draft before postponing; this can be new draft with FF_DEV_4174 off
+      // save draft before postponing; this can be a new draft
       // or annotation created from prediction
       await annotation.saveDraft({ was_postponed: true });
       await getEnv(self).events.invoke("nextTask");

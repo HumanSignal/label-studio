@@ -178,6 +178,7 @@ export interface SubmissionRegion {
   id: string;
   type: string;
   locked?: boolean;
+  hidden?: boolean;
   _submission?: {
     upload_id: number;
     bucket?: string | null;
@@ -194,6 +195,10 @@ export interface SubmissionScreenProps {
   task?: { id?: number } | null;
   readOnly?: boolean;
   rpcCapabilities?: Set<string>;
+  /** False while the open annotation is a draft never submitted (e.g. a duplicate). */
+  annotationSubmitted?: boolean;
+  /** Every region, hidden ones included: hiding a file never removes it from the submission. */
+  regions?: SubmissionRegion[];
   visibleRegions?: SubmissionRegion[];
   initialResults?: Array<{ value?: { upload_id?: number | string } | null } | null>;
   outputSchema?: Record<string, unknown> | null;
@@ -466,6 +471,7 @@ const EMPTY_RULES: SubmissionRules = {};
 
 let REJECT_SEQ = 0;
 let PICK_SEQ = 0;
+const pickKey = (name: string, size: number | null | undefined) => `${name}\u0000${size ?? ""}`;
 const REJECTION_MESSAGE = "This file doesn't meet the requirements. See the checks above and pick another file.";
 
 export function useCollectionSubmission(options: UseCollectionSubmissionOptions): CollectionSubmission {
@@ -480,9 +486,17 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
   const accept = useMemo(() => submissionAccept(rules, fallbackRules), [rules, fallbackRules]);
   const bounds = useMemo(() => submissionFileBounds(rules), [rules]);
 
+  const allRegions = props.regions || props.visibleRegions;
   const regions = useMemo(
-    () => (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission),
-    [props.visibleRegions],
+    () => (allRegions || []).filter((r) => r.type === "submission" && r._submission),
+    [allRegions],
+  );
+  // Upload completions read the lock state at that moment, not at pick time.
+  const regionsRef = useRef(regions);
+  regionsRef.current = regions;
+  const isRegionLocked = useCallback(
+    (regionId: string) => regionsRef.current.some((r) => r.id === regionId && r.locked === true),
+    [],
   );
 
   const pdfjsLib = deps?.documentAI?.pdfjsLib;
@@ -500,6 +514,10 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
   const engineRef = useRef<SubmissionEngine | null>(null);
   const engineTaskRef = useRef<number | undefined | null>(null);
   const [rows, setRows] = useState<SubmissionUploadRow[]>([]);
+  // Capacity is decided synchronously from these, never from the `rows` state:
+  // two picks in one tick (a drop handled twice) would both read the stale count.
+  const engineRowsRef = useRef<SubmissionUploadRow[]>([]);
+  const pendingPickKeysRef = useRef<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const getEngine = useCallback((): SubmissionEngine | null => {
@@ -511,9 +529,14 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         throw new Error("Uploads are not available in this view.");
       }
       engineRef.current = factory.createEngine({
-        onChange: (nextRows) => setRows(nextRows.map((row) => ({ ...row }))),
+        onChange: (nextRows) => {
+          engineRowsRef.current = nextRows;
+          setRows(nextRows.map((row) => ({ ...row })));
+        },
       });
       engineTaskRef.current = taskId;
+      engineRowsRef.current = [];
+      pendingPickKeysRef.current = [];
       setRows([]);
     } catch (err) {
       engineRef.current = null;
@@ -531,6 +554,8 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         engineRef.current.dispose();
         engineRef.current = null;
         engineTaskRef.current = null;
+        engineRowsRef.current = [];
+        pendingPickKeysRef.current = [];
       }
     };
   }, [taskId]);
@@ -629,7 +654,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
   }, [taskId]);
 
   // ---- attach: the ONLY way an upload becomes a member ---------------------
-  const { visibleRegions, addRegion, updateRegion, deleteRegion } = props;
+  const { addRegion, updateRegion, deleteRegion } = props;
   const attachRow = useCallback(
     (row: SubmissionUploadRow, forTaskId: number | undefined | null) => {
       if (!row || row.status !== "uploaded" || row.uploadId == null) return;
@@ -667,7 +692,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         );
         return;
       }
-      const live = (visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
+      const live = (allRegions || []).filter((r) => r.type === "submission" && r._submission);
       if (live.some((r) => String(r._submission!.upload_id) === String(row.uploadId))) return;
 
       const pending = replacePendingRef.current;
@@ -677,12 +702,19 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           ? pending.clientRef === row.clientRef
           : pending.name === row.filename && pending.size === row.size);
       if (pending && pendingMatches) {
+        replacePendingRef.current = null;
+        const engine = engineRef.current;
+        // The host rejects updates to a locked region, so the original stays
+        // and the replacement is dropped instead of lingering as an extra card.
+        if (isRegionLocked(pending.regionId)) {
+          removedUploadIds.current.add(String(row.uploadId));
+          if (engine) engine.discard(row.uploadId).catch(() => undefined);
+          return;
+        }
         // Swap in place: same slot, new file. The old upload is tombstoned so
         // recovery never resurrects it, and discarded best-effort - the server
         // refuses while an annotation or history revision still needs it.
-        replacePendingRef.current = null;
         removedUploadIds.current.add(String(pending.oldUploadId));
-        const engine = engineRef.current;
         if (engine && pending.oldUploadId) engine.discard(pending.oldUploadId).catch(() => undefined);
         if (pending.url && row.key) {
           previewCache(taskId)[row.key] = {
@@ -729,7 +761,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         previewCache(taskId)[row.key] = { url: picked.url, kind: submissionMediaKind(row.filename, row.contentType) };
       }
     },
-    [visibleRegions, addRegion, updateRegion, taskId, bounds.max, rules],
+    [allRegions, addRegion, updateRegion, isRegionLocked, taskId, bounds.max, rules],
   );
 
   // Bind the in-flight replace to its engine row once, by clientRef. Name+size
@@ -775,7 +807,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
         uploads.forEach((u) => {
           byId[String(u.upload_id)] = u;
         });
-        const live = (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
+        const live = (allRegions || []).filter((r) => r.type === "submission" && r._submission);
         // The list holds the viewer's own uploads. A manager or reviewer opening
         // another contributor's task reads each shown file by id instead, so its
         // submitted state and server facts still arrive.
@@ -832,15 +864,16 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
 
   // ---- pick -----------------------------------------------------------------
   const validateAndHandle = useCallback(
-    (file: File, onValid: (file: File, meta: SubmissionFileMeta, url: string) => void) => {
+    (file: File, onValid: (file: File, meta: SubmissionFileMeta, url: string) => void, onSettled?: () => void) => {
       const epoch = taskId;
       probeSubmissionFile(file).then(async (meta) => {
-        if (sessionTaskRef.current !== epoch) return;
+        if (sessionTaskRef.current !== epoch) return onSettled?.();
         const declared = evaluateSubmissionRules(meta, rules);
         const results = await withCustomValidation(declared, file, meta, validateFile);
         // The awaits above can outlive a task navigation: bail before creating
         // object URLs or rejected cards that would land on the next task.
-        if (sessionTaskRef.current !== epoch) return;
+        if (sessionTaskRef.current !== epoch) return onSettled?.();
+        onSettled?.();
         if (results.some((r) => r.status === "fail")) {
           const url = URL.createObjectURL(file);
           setRejectedPicks((old) =>
@@ -870,11 +903,22 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       const engine = getEngine();
       if (!engine) return;
       setError(null);
-      const live = (props.visibleRegions || []).filter((r) => r.type === "submission" && r._submission);
-      const inFlight = rows.filter((r) => r.status === "pending" || r.status === "uploading").length;
+      const live = (allRegions || []).filter((r) => r.type === "submission" && r._submission);
+      const inFlightRows = engineRowsRef.current.filter((r) => r.status === "pending" || r.status === "uploading");
+      // The same bytes already on their way (a drop handled twice, a double click) are not a new pick.
+      const inFlightKeys = new Set(
+        inFlightRows.map((r) => pickKey(r.filename, r.size)).concat(pendingPickKeysRef.current),
+      );
+      const fresh = files.filter((file) => {
+        const key = pickKey(file.name, file.size);
+        if (inFlightKeys.has(key)) return false;
+        inFlightKeys.add(key);
+        return true;
+      });
+      const inFlight = inFlightRows.length + pendingPickKeysRef.current.length;
       const free = Math.max(0, bounds.max - live.length - inFlight);
-      const allowed = files.slice(0, free);
-      const excess = files.slice(free);
+      const allowed = fresh.slice(0, free);
+      const excess = fresh.slice(free);
       if (excess.length) {
         setRejectedPicks((old) =>
           old.concat(
@@ -896,20 +940,30 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       }
       const epoch = taskId;
       allowed.forEach((file) => {
-        validateAndHandle(file, (validFile, meta, url) => {
-          startUpload(engine, validFile, { meta, url })
-            .then((row) => {
-              if (sessionTaskRef.current !== epoch) {
-                URL.revokeObjectURL(url);
-                return;
-              }
-              attachRow(row, taskId);
-            })
-            .catch((err) => setError(uploadErrorMessage(err)));
-        });
+        const key = pickKey(file.name, file.size);
+        pendingPickKeysRef.current.push(key);
+        const release = () => {
+          const at = pendingPickKeysRef.current.indexOf(key);
+          if (at >= 0) pendingPickKeysRef.current.splice(at, 1);
+        };
+        validateAndHandle(
+          file,
+          (validFile, meta, url) => {
+            startUpload(engine, validFile, { meta, url })
+              .then((row) => {
+                if (sessionTaskRef.current !== epoch) {
+                  URL.revokeObjectURL(url);
+                  return;
+                }
+                attachRow(row, taskId);
+              })
+              .catch((err) => setError(uploadErrorMessage(err)));
+          },
+          release,
+        );
       });
     },
-    [readonly, getEngine, props.visibleRegions, rows, bounds.max, validateAndHandle, startUpload, attachRow, taskId],
+    [readonly, getEngine, allRegions, bounds.max, validateAndHandle, startUpload, attachRow, taskId],
   );
 
   // ---- replace ---------------------------------------------------------------
@@ -921,6 +975,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       replaceTargetRef.current = null;
       const engine = getEngine();
       if (!file || !target || !engine) return;
+      if (isRegionLocked(target.regionId)) return;
       validateAndHandle(file, (validFile, meta, url) => {
         const priorRefs = new Set((engine.rows || []).map((row) => row.clientRef));
         const pendingEntry = {
@@ -952,7 +1007,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
           });
       });
     },
-    [getEngine, validateAndHandle, startUpload, attachRow, taskId],
+    [getEngine, isRegionLocked, validateAndHandle, startUpload, attachRow, taskId],
   );
 
   const replaceInput = useMemo(
@@ -1037,14 +1092,27 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     : null;
 
   const capacityOver = regions.length > bounds.max;
+  // The server only knows that some annotation references the file. A draft that
+  // reuses it (a duplicated annotation) is not submitted until it is submitted itself.
+  const isReferencedSubmission = (server: SubmissionCurrentUpload | undefined) =>
+    !!(server && server.referenced_by_annotation) && props.annotationSubmitted !== false;
 
-  const storedMembers: CollectionMember[] = regions.map((region) => {
+  // A hidden region keeps its file in the submission; only its card leaves the
+  // screen. A replace still uploading into that slot keeps its card and Cancel.
+  const shownRegions = regions.filter(
+    (region) => !region.hidden || (!!pendingReplace && !!replaceRow && pendingReplace.regionId === region.id),
+  );
+  const storedMembers: CollectionMember[] = shownRegions.map((region) => {
     const sub = region._submission!;
+    const locked = region.locked === true;
     const server = serverByUploadId[String(sub.upload_id)];
     const submitted =
-      !!(server && server.referenced_by_annotation) ||
-      (!canUpload &&
-        (props.initialResults || []).some((r) => r && r.value && String(r.value.upload_id) === String(sub.upload_id)));
+      props.annotationSubmitted !== false &&
+      (isReferencedSubmission(server) ||
+        (!canUpload &&
+          (props.initialResults || []).some(
+            (r) => r && r.value && String(r.value.upload_id) === String(sub.upload_id),
+          )));
 
     if (pendingReplace && replaceRow && pendingReplace.regionId === region.id) {
       const failed = replaceRow.status === "failed";
@@ -1100,7 +1168,8 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     const storedKind = submissionMediaKind(sub.filename, sub.contentType);
     return {
       key: region.id,
-      state: readonly ? "readonly" : submitted ? "submitted" : "uploaded",
+      // A read-only card reads "Submitted"; one that is not part of a submitted annotation stays "Uploaded".
+      state: readonly ? (submitted ? "readonly" : "uploaded") : submitted ? "submitted" : "uploaded",
       file: { name: sub.filename || "", size: sub.size, contentType: sub.contentType },
       kind: storedKind,
       pdf: memberPdf(storedKind, previewUrl),
@@ -1113,22 +1182,23 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       submitted,
       storedHint: true,
       duplicate: (server && server.duplicate) || undefined,
-      onReplace: readonly
-        ? undefined
-        : () => {
-            replaceTargetRef.current = {
-              regionId: region.id,
-              index: sub.index || 0,
-              oldUploadId: sub.upload_id,
-              oldKey: sub.key,
-            };
-            replacePendingRef.current = null;
-            if (replaceInputElRef.current) replaceInputElRef.current.click();
-          },
+      onReplace:
+        readonly || locked
+          ? undefined
+          : () => {
+              replaceTargetRef.current = {
+                regionId: region.id,
+                index: sub.index || 0,
+                oldUploadId: sub.upload_id,
+                oldKey: sub.key,
+              };
+              replacePendingRef.current = null;
+              if (replaceInputElRef.current) replaceInputElRef.current.click();
+            },
       // Submitted members are Replace-only - except when the collection is
       // over the (lowered) capacity: trimming must stay possible, and the old
       // revision keeps its files regardless (removal lands on Update).
-      onRemove: readonly || (submitted && !capacityOver) ? undefined : () => removeRegion(region),
+      onRemove: readonly || locked || (submitted && !capacityOver) ? undefined : () => removeRegion(region),
       onRetryPreview: sub.key
         ? () =>
             setPreviewRetryNonce((prior) => ({ ...prior, [sub.key as string]: (prior[sub.key as string] || 0) + 1 }))
@@ -1201,7 +1271,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
     ? uploadingRows.reduce((sum, r) => sum + (r.progress || 0), 0) / uploadingRows.length
     : null;
 
-  const count = members.length;
+  const count = regions.length + rowMembers.length;
   return {
     rules,
     accept,
@@ -1223,8 +1293,7 @@ export function useCollectionSubmission(options: UseCollectionSubmissionOptions)
       submitted:
         regions.length > 0 &&
         regions.every((r) => {
-          const server = serverByUploadId[String(r._submission!.upload_id)];
-          return !!(server && server.referenced_by_annotation);
+          return isReferencedSubmission(serverByUploadId[String(r._submission!.upload_id)]);
         }),
       readonly,
     },

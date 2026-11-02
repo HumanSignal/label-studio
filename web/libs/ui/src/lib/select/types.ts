@@ -30,6 +30,8 @@ export type OptionProps = {
   disabled?: boolean;
   style?: any;
   multiple?: boolean;
+  /** Draws the row's checkbox in multiple mode. Off when a custom row carries its own controls. */
+  optionCheckbox?: boolean;
   onSelect?: () => void;
   isIndeterminate?: boolean;
   className?: string;
@@ -84,6 +86,8 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   /** Label template for the create option; `{value}` is replaced with the search value. */
   createOptionLabel?: string;
   searchPlaceholder?: string;
+  /** Margin of the search field, replacing its default `m-1`; match it to the header's inset when there is one. */
+  searchClassName?: string;
   /** Initial value for the search input field. Useful for restoring a previous search state. */
   defaultSearchValue?: string;
   ref?: React.Ref<HTMLSelectElement>;
@@ -95,8 +99,15 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onChange?: (value: any) => void | false;
   setValue?: (value: ExtractOption<A>) => void;
   header?: string | FC | JSX.Element;
+  /** Pinned between the search field and the options, e.g. column headings for a custom `optionRenderer`. */
+  listHeader?: ReactNode;
   footer?: ReactNode;
   multiple?: boolean;
+  /**
+   * In multiple mode, hide the checkbox at the start of every row. The row still toggles on click and a picked
+   * row keeps the selected background and `aria-selected`, so a custom row only has to render its own controls.
+   */
+  optionCheckbox?: boolean;
   disabled?: boolean;
   /**
    * When true, the trigger stays enabled so the dropdown can open for inspection,
@@ -109,7 +120,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   isInline?: boolean;
   isLoading?: boolean;
   dataTestid?: string;
-  size?: SelectSize | undefined;
+  size?: SelectSize | `${SelectSize}` | undefined;
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
@@ -143,7 +154,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
    */
   align?: "start" | "center" | "end";
 } & SelectVirtualizedProps &
-  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
+  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder" | "onChange" | "size">;
 
 type ToNever<T> = {
   [key in keyof T]?: never;

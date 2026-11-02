@@ -16,7 +16,18 @@ export interface PopoverProps extends React.ComponentProps<typeof ShadPopover> {
   children: React.ReactNode;
   align?: "start" | "center" | "end";
   sideOffset?: number;
+  side?: PopoverContentProps["side"];
+  /** Attributes and interaction behavior for the portaled content element. */
+  contentProps?: Omit<PopoverContentProps, "children" | "className" | "align" | "side" | "sideOffset"> & {
+    "data-theme"?: "light" | "dark";
+    "data-color-scheme"?: "light" | "dark";
+    "data-testid"?: string;
+  };
   className?: string;
+  /** Accessible name of the portaled dialog content. */
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  onOpenAutoFocus?: PopoverContentProps["onOpenAutoFocus"];
   /** Passed to Radix content; use to ignore interactions with portaled UI (e.g. nested dropdowns). */
   onInteractOutside?: PopoverContentProps["onInteractOutside"];
   onPointerDownOutside?: PopoverContentProps["onPointerDownOutside"];
@@ -27,7 +38,12 @@ const Popover = ({
   children,
   align = "start",
   sideOffset = 4,
+  side,
+  contentProps,
   className,
+  ariaLabel,
+  ariaLabelledBy,
+  onOpenAutoFocus,
   onInteractOutside,
   onPointerDownOutside,
   ...props
@@ -38,11 +54,20 @@ const Popover = ({
         {trigger}
       </PopoverTrigger>
       <PopoverContent
+        {...contentProps}
+        side={side}
+        aria-label={
+          (ariaLabelledBy ?? contentProps?.["aria-labelledby"])
+            ? undefined
+            : (ariaLabel ?? contentProps?.["aria-label"])
+        }
+        aria-labelledby={ariaLabelledBy ?? contentProps?.["aria-labelledby"]}
+        onOpenAutoFocus={onOpenAutoFocus ?? contentProps?.onOpenAutoFocus}
         align={align}
         sideOffset={sideOffset}
         data-slot="popover-content"
-        onInteractOutside={onInteractOutside}
-        onPointerDownOutside={onPointerDownOutside}
+        onInteractOutside={onInteractOutside ?? contentProps?.onInteractOutside}
+        onPointerDownOutside={onPointerDownOutside ?? contentProps?.onPointerDownOutside}
         className={twMerge(
           clsx(
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-99999 origin-(--radix-popover-content-transform-origin) rounded-md outline-hidden min-w-full bg-neutral-background",

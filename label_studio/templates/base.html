@@ -24,20 +24,18 @@
   {% endblock %}
 
   {% block theme_colors %}
-    {% if feature_flags.fflag_feat_front_optic_1217_theme_toggle_short %}
-    <script>
-      function handleThemeColor() {
-        let themeColor = window.localStorage.getItem("preferred-color-scheme");
-        if (themeColor === "Auto") {
-          themeColor = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"
-        } else if (!themeColor) {
-          themeColor = "Light";
-        }
-        document.documentElement.setAttribute("data-color-scheme", themeColor.toLowerCase());
+  <script>
+    function handleThemeColor() {
+      let themeColor = window.localStorage.getItem("preferred-color-scheme");
+      if (themeColor === "Auto") {
+        themeColor = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"
+      } else if (!themeColor) {
+        themeColor = "Light";
       }
-      handleThemeColor();
-    </script>
-    {% endif %}
+      document.documentElement.setAttribute("data-color-scheme", themeColor.toLowerCase());
+    }
+    handleThemeColor();
+  </script>
   {% endblock %}
 
   {% block app-scripts %}

@@ -1,10 +1,6 @@
 import { types, getParent, addDisposer, isAlive } from "mobx-state-tree";
-import { FileLoader } from "../../../utils/FileLoader";
 import { imageCache } from "@humansignal/core";
 import { clamp } from "../../../utils/utilities";
-import { FF_IMAGE_MEMORY_USAGE, isFF } from "../../../utils/feature-flags";
-
-const fileLoader = new FileLoader();
 
 export const ImageEntity = types
   .model("ImageEntity", {
@@ -130,33 +126,17 @@ export const ImageEntity = types
         .catch(() => {
           if (!isAlive(self)) return;
           // Fallback to old behavior if global cache fails
-          if (isFF(FF_IMAGE_MEMORY_USAGE)) {
-            const img = new Image();
-            if (crossOrigin) img.crossOrigin = crossOrigin;
-            img.onload = () => {
-              if (!isAlive(self)) return;
-              self.markAsLoaded(self.src);
-            };
-            img.onerror = () => {
-              if (!isAlive(self)) return;
-              self.markAsFailed();
-            };
-            img.src = self.src;
-          } else {
-            fileLoader
-              .download(self.src, (_t, _l, progress) => {
-                if (!isAlive(self)) return;
-                self.setProgress(progress);
-              })
-              .then((url) => {
-                if (!isAlive(self)) return;
-                self.markAsLoaded(url);
-              })
-              .catch(() => {
-                if (!isAlive(self)) return;
-                self.markAsFailed();
-              });
-          }
+          const img = new Image();
+          if (crossOrigin) img.crossOrigin = crossOrigin;
+          img.onload = () => {
+            if (!isAlive(self)) return;
+            self.markAsLoaded(self.src);
+          };
+          img.onerror = () => {
+            if (!isAlive(self)) return;
+            self.markAsFailed();
+          };
+          img.src = self.src;
         });
     },
 
@@ -167,17 +147,7 @@ export const ImageEntity = types
         return true;
       }
 
-      if (isFF(FF_IMAGE_MEMORY_USAGE)) return self.currentSrc !== undefined;
-
-      if (fileLoader.isError(self.src)) {
-        self.markAsFailed();
-        return true;
-      }
-      if (fileLoader.isPreloaded(self.src)) {
-        self.markAsLoaded(fileLoader.getPreloadedURL(self.src));
-        return true;
-      }
-      return false;
+      return self.currentSrc !== undefined;
     },
 
     /**

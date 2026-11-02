@@ -28,6 +28,7 @@ export * from "./lib/json-viewer";
 export * from "./lib/label/label";
 export * from "./lib/message/message";
 export * from "./lib/select/select";
+export * from "./lib/search-input/search-input";
 export * from "./lib/tag-autocomplete";
 // Named exports only — avoid `export *` so MultiTreeSelect's internal TreeSelect
 // does not collide with the public TreeSelect from ./lib/tree-select.
@@ -55,6 +56,7 @@ export {
   type TreeNodeProps,
 } from "./lib/multi-tree-select";
 export * from "./lib/taxonomy-multi-tree-select";
+export * from "./lib/taxonomy-selection-list";
 export * from "./lib/skeleton/skeleton";
 export * from "./lib/state-chip/state-chip";
 export * from "./lib/stepper";

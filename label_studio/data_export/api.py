@@ -252,7 +252,13 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Prepare export files')
 
         export_file, content_type, filename = DataExport.generate_export_file(
-            project, tasks, export_type, download_resources, request.GET, hostname=get_export_hostname(request)
+            project,
+            tasks,
+            export_type,
+            download_resources,
+            request.GET,
+            hostname=get_export_hostname(request),
+            user=request.user,
         )
 
         r = FileResponse(export_file, as_attachment=True, content_type=content_type, filename=filename)
@@ -641,7 +647,11 @@ def async_convert(converted_format_id, export_type, project, hostname, download_
         converted_format.save(update_fields=['status'])
 
     snapshot = converted_format.export
-    converted_file = snapshot.convert_file(export_type, download_resources=download_resources, hostname=hostname)
+    # Jobs queued before conversions recorded their user fall back to the snapshot's
+    user = converted_format.created_by or snapshot.created_by
+    converted_file = snapshot.convert_file(
+        export_type, download_resources=download_resources, hostname=hostname, user=user
+    )
     if converted_file is None:
         raise ValidationError('No converted file found, probably there are no annotations in the export snapshot')
     md5 = Export.eval_md5(converted_file)
@@ -721,7 +731,7 @@ class ExportConvertAPI(generics.CreateAPIView):
 
         converted_format, created = ConvertedFormat.objects.exclude(
             status=ConvertedFormat.Status.FAILED
-        ).get_or_create(export=snapshot, export_type=export_type)
+        ).get_or_create(export=snapshot, export_type=export_type, defaults={'created_by': request.user})
 
         if not created:
             raise ValidationError(f'Conversion to {export_type} already started')

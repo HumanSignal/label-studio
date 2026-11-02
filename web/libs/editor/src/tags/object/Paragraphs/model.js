@@ -9,14 +9,11 @@ import { SyncableMixin } from "../../../mixins/Syncable";
 import { ParagraphsRegionModel } from "../../../regions/ParagraphsRegion";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2918, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
 import messages from "../../../utils/messages";
 import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
 import styles from "./Paragraphs.module.css";
-import { ff } from "@humansignal/core";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 /**
  * The `Paragraphs` tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.
@@ -176,8 +173,6 @@ const Model = types
     },
 
     isVisibleForAuthorFilter(data) {
-      if (!isFF(FF_DEV_2669)) return true;
-
       return !self.filterByAuthor.length || self.filterByAuthor.includes(data[self.namekey]);
     },
   }));
@@ -256,85 +251,25 @@ const PlayableAndSyncable = types
       );
     },
 
-    triggerSyncBuffering(isBuffering) {
-      if (!self.audioRef?.current) return;
-      if (!isSyncedBuffering) return;
-      const playing = self.wasPlayingBeforeBuffering;
-
-      self.triggerSync("buffering", {
-        buffering: isBuffering,
-        playing,
-      });
-    },
-
     registerSyncHandlers() {
-      self.syncHandlers.set("pause", isSyncedBuffering ? self.handleSyncPause : self.stopNow);
+      self.syncHandlers.set("pause", self.stopNow);
       self.syncHandlers.set("play", self.handleSyncPlay);
       self.syncHandlers.set("seek", self.handleSyncPlay);
       self.syncHandlers.set("speed", self.handleSyncSpeed);
-      if (isSyncedBuffering) {
-        self.syncHandlers.set("buffering", self.handleSyncBuffering);
-      }
     },
 
-    handleSyncBuffering({ playing, ...data }) {
-      const audio = self.audioRef.current;
-
-      audio.currentTime = data.time;
-
-      self.isBuffering = self.syncManager?.isBuffering;
-
-      if (data.buffering) {
-        self.wasPlayingBeforeBuffering = playing;
-        audio?.pause();
-        self.playing = false;
-      }
-      if (!self.isBuffering && !data.buffering) {
-        if (playing) {
-          audio?.play();
-          self.playing = true;
-          self.trackPlayingId();
-        }
-      }
-    },
-
-    handleSyncPlay({ time, playing }, event) {
+    handleSyncPlay({ time, playing }) {
       const audio = self.audioRef.current;
 
       if (!audio) return;
 
-      const isBuffering = self.syncManager?.isBuffering;
-
       audio.currentTime = time;
 
-      // Normal logic when no buffering
-      if (!isSyncedBuffering || (!isBuffering && isDefined(playing))) {
-        // so we are changing time inside current region only
-        const isPaused = isSyncedBuffering ? !self.wasPlayingBeforeBuffering : audio.paused;
-        if (isPaused && playing) {
-          self.play();
-        } else if (isSyncedBuffering && !isPaused && !playing) {
-          // some times video can trigger `seek` event with `playing=false` and we need to pause at this case
-          self.stopNow();
-        } else {
-          self.trackPlayingId();
-        }
-      }
-      // during the buffering only these events have real `playing` values (in other cases it's paused all the time)
-      if (["play", "pause"].indexOf(event) > -1) {
-        self.wasPlayingBeforeBuffering = playing;
-      }
-    },
-
-    handleSyncPause({ playing }, event) {
-      if (event === "pause") {
-        self.wasPlayingBeforeBuffering = false;
-      }
-
-      const isBuffering = self.syncManager?.isBuffering;
-
-      if (!isSyncedBuffering || (!isBuffering && isDefined(playing))) {
-        self.stopNow();
+      // so we are changing time inside current region only
+      if (audio.paused && playing) {
+        self.play();
+      } else {
+        self.trackPlayingId();
       }
     },
 
@@ -374,7 +309,7 @@ const PlayableAndSyncable = types
 
       audio.pause();
       self.playing = false;
-      self.triggerSync("pause", isSyncedBuffering ? { playing: false } : undefined);
+      self.triggerSync("pause");
     },
 
     /**
@@ -401,12 +336,7 @@ const PlayableAndSyncable = types
     },
 
     trackPlayingId() {
-      if (!isSyncedBuffering) {
-        self._trackPlayingId();
-        return;
-      }
-      if (self.audioFrameHandler) cancelAnimationFrame(self.audioFrameHandler);
-      self.audioFrameHandler = requestAnimationFrame(self._trackPlayingId);
+      self._trackPlayingId();
     },
     _trackPlayingId() {
       if (self.audioFrameHandler) cancelAnimationFrame(self.audioFrameHandler);
@@ -426,7 +356,7 @@ const PlayableAndSyncable = types
         return currentTime >= start && currentTime < end;
       });
 
-      const isPlaying = isSyncedBuffering ? self.playing && !self.isBuffering : !audio.paused;
+      const isPlaying = !audio.paused;
       if (isPlaying) {
         self.audioFrameHandler = requestAnimationFrame(self._trackPlayingId);
       }
@@ -441,7 +371,7 @@ const PlayableAndSyncable = types
 
       if (isPaused) {
         audio.play();
-        self.triggerSync("play", isSyncedBuffering ? { playing: true } : undefined);
+        self.triggerSync("play");
       }
 
       self.playing = true;
@@ -449,7 +379,6 @@ const PlayableAndSyncable = types
     },
 
     play(idx) {
-      self.wasPlayingBeforeBuffering = true;
       if (!isDefined(idx)) {
         self.playAny();
         return;
@@ -464,7 +393,6 @@ const PlayableAndSyncable = types
       const currentId = self.playingId;
 
       if (isPlaying && currentId === idx) {
-        self.wasPlayingBeforeBuffering = false;
         self.stopNow();
         return;
       }
@@ -476,37 +404,8 @@ const PlayableAndSyncable = types
       audio.play();
       self.playing = true;
       self.playingId = idx;
-      self.triggerSync("play", isSyncedBuffering ? { playing: true } : undefined);
+      self.triggerSync("play");
       self.trackPlayingId();
-    },
-    handleBuffering(isBuffering) {
-      if (!isSyncedBuffering) return;
-      if (self.syncManager?.isBufferingOrigin(self.name) === isBuffering) return;
-      const isAlreadyBuffering = self.syncManager?.isBuffering;
-      const isLastCauseOfBuffering =
-        self.syncManager?.bufferingOrigins.size === 1 && self.syncManager?.isBufferingOrigin(self.name);
-      const willStartBuffering = !isAlreadyBuffering && isBuffering;
-      const willStopBuffering = isLastCauseOfBuffering && !isBuffering;
-      const audio = self.audioRef?.current;
-
-      if (willStopBuffering) {
-        if (self.wasPlayingBeforeBuffering) {
-          audio?.play();
-        }
-      }
-
-      self.triggerSyncBuffering(isBuffering);
-
-      // The real value, relevant for all medias synced together we have only after triggering the buffering event
-      self.isBuffering = self.syncManager?.isBuffering;
-
-      if (willStartBuffering) {
-        audio?.pause();
-      }
-
-      if (willStopBuffering && self.wasPlayingBeforeBuffering) {
-        self.trackPlayingId();
-      }
     },
   }))
   .actions((self) => ({

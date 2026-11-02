@@ -86,32 +86,10 @@ export function isFieldRequired(
     return true;
   }
 
-  // Check if the schema indicates the field is required
-  // A schema is considered required if it doesn't have .optional() or .default()
-  const schemaAny = field.schema as any;
-
-  // Check if the schema has .optional() modifier
-  if (schemaAny._def?.typeName === "ZodOptional") {
-    return false;
-  }
-
-  // Check if the schema has .default() modifier
-  if (schemaAny._def?.typeName === "ZodDefault") {
-    return false;
-  }
-
-  // Check if the inner type of a default schema is optional
-  if (schemaAny._def?.innerType?._def?.typeName === "ZodOptional") {
-    return false;
-  }
-
-  // For string fields, check if they have min(1) validation (indicating required)
-  if (field.schema instanceof z.ZodString) {
-    const stringSchema = field.schema as z.ZodString;
-    // Check if the schema has min(1) validation
-    if (stringSchema._def?.checks?.some((check: any) => check.kind === "min" && check.value === 1)) {
-      return true;
-    }
+  // A bare string schema with min(1) validation is required.
+  // Schemas wrapped in .optional() or .default() are not ZodString instances, so they fall through.
+  if (field.schema instanceof z.ZodString && field.schema.minLength === 1) {
+    return true;
   }
 
   // Default to not required
@@ -211,11 +189,6 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
             ? schemaAny._def.defaultValue()
             : schemaAny._def.defaultValue;
       } else if (schemaAny._def?.innerType?._def?.defaultValue !== undefined) {
-        defaultValue =
-          typeof schemaAny._def.innerType._def.defaultValue === "function"
-            ? schemaAny._def.innerType._def.defaultValue()
-            : schemaAny._def.innerType._def.defaultValue;
-      } else if (schemaAny._def?.typeName === "ZodDefault") {
         defaultValue =
           typeof schemaAny._def.innerType._def.defaultValue === "function"
             ? schemaAny._def.innerType._def.defaultValue()

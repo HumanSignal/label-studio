@@ -80,9 +80,6 @@ const defaultItem = {
   defaultzoom: undefined,
   defaultspeed: undefined,
   muted: "false",
-  isBuffering: false,
-  wasPlayingBeforeBuffering: false,
-  handleBuffering: mock(),
   onLoad: mock(),
   spectrogram: true,
   onPlaying: mock(),
@@ -537,33 +534,6 @@ describe("Audio view", () => {
       fireEvent.click(screen.getByText("Position"));
       expect(mockSeek).toHaveBeenCalledWith(5);
       expect(mockSyncCursor).toHaveBeenCalled();
-    });
-  });
-
-  describe("synced buffering play/pause", () => {
-    it("when isBuffering, onPlay calls triggerSyncPlay", () => {
-      const triggerSyncPlay = mock();
-      const item = { ...defaultItem, isBuffering: true, triggerSyncPlay } as any;
-      render(<Audio item={item} />);
-      fireEvent.click(screen.getByText("Play"));
-      if (triggerSyncPlay.mock.calls.length > 0) {
-        const firstArg = triggerSyncPlay.mock.calls[0]?.[0];
-        expect([true, undefined]).toContain(firstArg);
-      } else {
-        expect(triggerSyncPlay).not.toHaveBeenCalled();
-      }
-    });
-    it("when isBuffering, onPause calls triggerSyncPause", () => {
-      const triggerSyncPause = mock();
-      const item = { ...defaultItem, isBuffering: true, triggerSyncPause } as any;
-      render(<Audio item={item} />);
-      fireEvent.click(screen.getByText("Pause"));
-      if (triggerSyncPause.mock.calls.length > 0) {
-        const firstArg = triggerSyncPause.mock.calls[0]?.[0];
-        expect([true, undefined]).toContain(firstArg);
-      } else {
-        expect(triggerSyncPause).not.toHaveBeenCalled();
-      }
     });
   });
 

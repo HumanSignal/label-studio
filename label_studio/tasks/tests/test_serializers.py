@@ -6,7 +6,7 @@ from ml.models import MLBackend
 from projects.tests.factories import ProjectFactory
 from tasks.models import AnnotationDraft
 from tasks.serializers import NextTaskSerializer
-from tasks.tests.factories import TaskFactory
+from tasks.tests.factories import PredictionFactory, TaskFactory
 
 
 @pytest.mark.django_db
@@ -39,6 +39,20 @@ def test_get_predictions_with_int_model_version_from_ml_backend():
 
     # Serialized predictions must always be an iterable list of prediction dicts.
     assert isinstance(predictions, list)
+
+
+@pytest.mark.django_db
+def test_get_predictions_when_project_model_version_is_empty():
+    # FIT-1710: with no model version selected (project.model_version == ''),
+    # next_task filtered predictions to model_version='' and returned none,
+    # while GET /api/tasks/:id/ and total_predictions still showed them.
+    project = ProjectFactory(show_collab_predictions=True, model_version='')
+    task = TaskFactory(project=project)
+    PredictionFactory(task=task, model_version='v1')
+
+    predictions = NextTaskSerializer(task, context={}).get_predictions(task)
+
+    assert [p['model_version'] for p in predictions] == ['v1']
 
 
 @pytest.mark.django_db

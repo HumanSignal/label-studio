@@ -27,6 +27,17 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
           // super simple support for images, audio, and video
           // @todo create a proper data type handler for all data types
           if (type === "image") {
+            // multi-page images (`valuelist`) resolve to a list of urls
+            if (Array.isArray(value)) {
+              return (
+                <div className="flex flex-col gap-tight">
+                  {value.map((src, index) => (
+                    <img key={`${index}-${src}`} src={src} alt={`${field} ${index + 1}`} className="w-full" />
+                  ))}
+                </div>
+              );
+            }
+
             return <img src={value} alt={field} className="w-full" />;
           }
 

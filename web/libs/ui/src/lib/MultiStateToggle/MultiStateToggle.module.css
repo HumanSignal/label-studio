@@ -40,6 +40,11 @@
       outline-offset: 1px;
     }
 
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
     &_selected {
       background: var(--color-neutral-surface-hover);
       color: var(--color-neutral-content);

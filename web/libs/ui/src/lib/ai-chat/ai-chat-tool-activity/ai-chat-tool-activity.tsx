@@ -67,25 +67,25 @@ function isBusyStatus(status?: AiChatToolActivityStatus) {
 function statusBadge(status?: AiChatToolActivityStatus) {
   if (status === "completed")
     return (
-      <Badge variant="positive" size="small" look="outline">
+      <Badge variant="positive" size="small">
         Completed
       </Badge>
     );
   if (status === "failed")
     return (
-      <Badge variant="negative" size="small" look="outline">
+      <Badge variant="negative" size="small">
         Failed
       </Badge>
     );
   if (status === "running")
     return (
-      <Badge variant="primary" size="small" look="outline">
+      <Badge variant="primary" size="small">
         Running
       </Badge>
     );
   if (status === "pending")
     return (
-      <Badge variant="neutral" size="small" look="outline">
+      <Badge variant="warning" size="small">
         Pending
       </Badge>
     );

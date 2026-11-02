@@ -1,7 +1,7 @@
 /**
  * Unit tests for HtxParagraphs view (tags/object/Paragraphs/HtxParagraphs.jsx)
  */
-import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
+import { FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
 import * as selectionTools from "../../../../utils/selection-tools";
 import * as htmlUtils from "../../../../utils/html";
 import { HtxParagraphsView } from "../HtxParagraphs";
@@ -1399,8 +1399,8 @@ describe("HtxParagraphsView", () => {
   });
 
   describe("render", () => {
-    it("returns null when FF_DEV_2669 and !item._value", () => {
-      ff.set({ [FF_DEV_2669]: true, [FF_LSDV_E_278]: true });
+    it("returns null when !item._value", () => {
+      ff.set({ [FF_LSDV_E_278]: true });
       const item = createMockItem({ _value: null });
       const view = new HtxParagraphsView({ item });
       expect(view.render()).toBe(null);

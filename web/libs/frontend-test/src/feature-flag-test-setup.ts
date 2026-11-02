@@ -7,10 +7,10 @@
  *
  * In tests that need specific flags on/off:
  *   import { withFeatureFlags, setFeatureFlag, clearFeatureFlag } from "@humansignal/frontend-test/feature-flag-test-setup";
- *   withFeatureFlags({ [FF_LSDV_4583]: true }, () => { ... });
+ *   withFeatureFlags({ [FF_SOME_FLAG]: true }, () => { ... });
  *   // or
- *   beforeEach(() => setFeatureFlag(FF_LSDV_4583, true));
- *   afterEach(() => clearFeatureFlag(FF_LSDV_4583));
+ *   beforeEach(() => setFeatureFlag(FF_SOME_FLAG, true));
+ *   afterEach(() => clearFeatureFlag(FF_SOME_FLAG));
  */
 
 declare global {

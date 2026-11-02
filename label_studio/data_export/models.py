@@ -10,7 +10,7 @@ from datetime import datetime
 import ujson as json
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
-from data_export.functions import converter_http_session
+from data_export.functions import CONVERTER_ACCESS_TOKEN, converter_http_session
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models.signals import post_delete, post_save
@@ -108,9 +108,10 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, download_resources, get_args, hostname=None):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args, hostname=None, user=None):
         """Generate export file and return it as an open file object.
 
+        Media stored in Label Studio is fetched from ``hostname`` as ``user``, the user who exports.
         Be sure to close the file after using it, to avoid wasting disk space.
         """
 
@@ -125,10 +126,10 @@ class DataExport(object):
             project_dir=None,
             upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
             download_resources=download_resources,
-            access_token=project.organization.created_by.auth_token.key,
+            access_token=CONVERTER_ACCESS_TOKEN,
             hostname=hostname,
             local_files_resolver=project_local_files_resolver(project),
-            http_session=converter_http_session(hostname),
+            http_session=converter_http_session(hostname, user),
         )
         # The converter input lives in its own temp dir so it is neither kept on disk nor packed into the output
         with get_temp_dir() as input_dir, get_temp_dir() as tmp_dir:

@@ -412,6 +412,38 @@ export const WithGroupByAndOptionRenderer: Story = {
 };
 
 /**
+ * `listHeader` sits under the search field and above the options, so column headings for a custom
+ * `optionRenderer` stay pinned while the list scrolls.
+ */
+export const WithListHeader: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    options: [
+      { value: "summary", label: "summary", readableType: "TextArea" },
+      { value: "rating", label: "rating", readableType: "Rating" },
+      { value: "author", label: "author", readableType: "str" },
+    ] as any[],
+    listHeader: (
+      <div className="flex items-center justify-between px-4 py-2 text-body-smaller text-neutral-content-subtle">
+        <span>Column</span>
+        <span>Type</span>
+      </div>
+    ),
+    optionRenderer: ({ option }) => (
+      <span className="flex w-full items-center justify-between gap-2">
+        <span>{option?.label}</span>
+        <Badge variant="secondary" shape="squared" className="text-[10px]">
+          {option?.readableType}
+        </Badge>
+      </span>
+    ),
+    label: "With listHeader (pinned column headings)",
+  },
+};
+
+/**
  * Demonstrates the controlled `open` prop with a footer Apply button.
  *
  * The dropdown stays open while the user makes selections. Clicking Apply

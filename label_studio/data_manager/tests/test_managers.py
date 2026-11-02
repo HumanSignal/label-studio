@@ -332,7 +332,6 @@ class TestPreparedTaskManagerBehavior(TestCase):
         with (
             patch('data_manager.managers.get_annotations_map', return_value={}),
             patch('data_manager.managers.load_func', return_value=overlay_func),
-            patch('data_manager.managers.flag_set', return_value=False),
         ):
             manager = PreparedTaskManager()
             manager.annotate_queryset(

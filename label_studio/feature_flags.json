@@ -3822,6 +3822,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_plt_2342_clickhouse_task_data_27102026_short": {
+      "key": "fflag_feat_plt_2342_clickhouse_task_data_27102026_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "dbacc1c968cc4d4abd4e122a5b623ee3",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_plt_837_job_concurrency_limit_10022026_short": {
       "key": "fflag_feat_plt_837_job_concurrency_limit_10022026_short",
       "on": true,
@@ -4148,7 +4175,7 @@
     },
     "fflag_feat_utc_1368_review_child_filters": {
       "key": "fflag_feat_utc_1368_review_child_filters",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -4167,6 +4194,33 @@
       },
       "clientSide": false,
       "salt": "c88831c8001244589568defd5d958be5",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
+    "fflag_feat_utc_1369_new_work_email_short": {
+      "key": "fflag_feat_utc_1369_new_work_email_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "597d9af1e3b74273a7b5498da6acffe2",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
@@ -4254,6 +4308,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_utc_1437_restricted_locations_short": {
+      "key": "fflag_feat_utc_1437_restricted_locations_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7c9e70caa3914140a91cb60f9f36fa98",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_utc_1446_ask_ai_in_comments": {
       "key": "fflag_feat_utc_1446_ask_ai_in_comments",
       "on": false,
@@ -4275,6 +4356,33 @@
       },
       "clientSide": false,
       "salt": "1442d28e86a0485fbcc94f576f5fdbed",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_utc_1459_manual_project_done": {
+      "key": "fflag_feat_utc_1459_manual_project_done",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "026e0025d3bb497098ad527e17258c67",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,

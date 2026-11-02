@@ -322,7 +322,7 @@ export const GroundTruthRow = ({
               />
               <span className="mr-tighter">Ground Truth</span>
               {status === "draft" ? (
-                <Badge variant="warning" shape="squared">
+                <Badge variant="neutral" shape="squared">
                   draft
                 </Badge>
               ) : status === "saved" ? (

@@ -3,8 +3,7 @@
  *
  * Mounts the shared `AnnotationButton` from `@humansignal/core/lib/topbar` and is the
  * ONLY place MobX/MST runs for the tab UI. Responsibilities that stay here:
- *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi`
- *     when FF_FIT_720_LAZY_LOAD_ANNOTATIONS is on (B10).
+ *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi` (B10).
  *   - User resolution via `useResolveUser` + `enrichUsers` for stub annotations.
  *   - Live MST → SharedAnnotation mapping (snake_case → camelCase, isAlive guard).
  *   - Delete confirmation via `editor/common/Modal/Modal#confirm` (B9).
@@ -29,7 +28,6 @@ import {
   resolveClassicEntityReviewState,
 } from "@humansignal/core";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import {
   emitAnnotationCreated,
   emitAnnotationTabSelected,
@@ -186,14 +184,9 @@ const AnnotationButtonInner = injector(
           onDuplicate: async () => {
             if (!entityIsAlive) return;
             try {
-              // FF_FIT_720_LAZY_LOAD_ANNOTATIONS: hydrate stub annotations before duplicating
+              // Hydrate stub annotations before duplicating
               // so the resulting copy has region results, not an empty shell.
-              if (
-                isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
-                entity.type === "annotation" &&
-                entity.pk &&
-                annotationNeedsHydration(entity)
-              ) {
+              if (entity.type === "annotation" && entity.pk && annotationNeedsHydration(entity)) {
                 const data = await fetchAnnotationCached(entity.pk);
                 if (!data || (data as { error?: unknown }).error) {
                   toast?.show({
@@ -246,8 +239,7 @@ const AnnotationButtonInner = injector(
             if (!isLSE) return;
             emitAnnotationMenuAction(store, entity, "open_performance_dashboard");
             const url = new URL(window.location.origin);
-            const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-            url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
+            url.pathname = "/analytics/member-performance";
             if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
             const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
             if (projectMatch) url.searchParams.set("project", projectMatch[1]);

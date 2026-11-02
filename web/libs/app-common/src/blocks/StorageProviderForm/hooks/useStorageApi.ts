@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { isDefined, useAPI } from "@humansignal/core";
 import { getProviderConfig } from "../providers";
 import { omitHiddenProviderFields } from "../types/provider";
+import { emitAppCommonEvent } from "../../../utils/appCommonTelemetry";
 
 interface UseStorageApiProps {
   target?: "import" | "export";
@@ -188,11 +189,20 @@ export const useStorageApi = ({
 
       return result;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, storageData) => {
       if (response?.$meta?.ok) {
         onSubmit();
         onClose();
       }
+      emitAppCommonEvent("storage_saved", {
+        surface: "project_setup",
+        provider: storageData?.provider ?? null,
+        target,
+        project_id: project ?? null,
+        edit: isDefined(storage?.id),
+        sync: target !== "export",
+        success: Boolean(response?.$meta?.ok),
+      });
     },
   });
 
@@ -225,11 +235,20 @@ export const useStorageApi = ({
 
       return result;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, storageData) => {
       if (response?.$meta?.ok) {
         onSubmit();
         onClose();
       }
+      emitAppCommonEvent("storage_saved", {
+        surface: "project_setup",
+        provider: storageData?.provider ?? null,
+        target,
+        project_id: project ?? null,
+        edit: isDefined(storage?.id),
+        sync: false,
+        success: Boolean(response?.$meta?.ok),
+      });
     },
   });
 

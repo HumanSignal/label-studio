@@ -29,7 +29,6 @@ import "./Menubar.prefix.css";
 import "./MenuContent.prefix.css";
 import "./MenuSidebar.prefix.css";
 import { pages } from "@humansignal/app-common";
-import { ff } from "@humansignal/core";
 import { openHotkeyHelp } from "@humansignal/app-common/pages/AccountSettings/sections/Hotkeys/Help";
 
 export const MenubarContext = createContext();
@@ -172,7 +171,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
             </div>
           </div>
 
-          {ff.isActive(ff.FF_THEME_TOGGLE) && <ThemeToggle />}
+          <ThemeToggle />
 
           <Dropdown.Trigger
             ref={useMenuRef}

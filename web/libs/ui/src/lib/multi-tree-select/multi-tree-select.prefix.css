@@ -194,6 +194,21 @@
       gap: 0.5rem;
     }
 
+    /* With an Apply footer the tree scrolls on its own, so Apply stays in view under a long list. */
+    &:has(> .multi-tree-select__content__footer) {
+      overflow: hidden;
+
+      .multi-tree-select__content__select {
+        overflow-y: auto;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      .multi-tree-select__content__footer {
+        flex: 0 0 auto;
+      }
+    }
+
     &__toggle {
       --button-color: var(--icon-color);
 
