@@ -6,9 +6,6 @@
  * serialize, setHighlight, toggleHighlight, toggleHidden).
  */
 import { types } from "mobx-state-tree";
-import { FF_LSDV_4583 } from "../../utils/feature-flags";
-
-const ff = mockFF();
 
 mockModule("@humansignal/core", () => {
   const actual = requireActual("@humansignal/core");
@@ -793,13 +790,11 @@ describe("Result", () => {
       expect(data.parentID).toBe("pid-123");
     });
 
-    it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", () => {
-      ff.set({ [FF_LSDV_4583]: true });
+    it("includes item_index when area.item_index is set", () => {
       const root = createTree({}, {}, { item_index: 2 });
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();
       expect(data.item_index).toBe(2);
-      ff.reset();
     });
 
     it("initializes data.value when area.serialize returns object without value", () => {

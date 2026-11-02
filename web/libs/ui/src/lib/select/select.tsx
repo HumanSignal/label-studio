@@ -269,6 +269,7 @@ export const Select = forwardRef(
       disabled = false,
       readOnly = false,
       multiple = false,
+      optionCheckbox = true,
       isInline = false,
       isLoading = false,
       triggerProps,
@@ -290,6 +291,8 @@ export const Select = forwardRef(
       onClose,
       onOpen,
       footer,
+      listHeader,
+      searchClassName,
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
@@ -621,6 +624,7 @@ export const Select = forwardRef(
           disabled={readOnly || option?.disabled}
           style={option?.style}
           multiple={multiple}
+          optionCheckbox={optionCheckbox}
           onSelect={() => {
             _onChange(optionValue, isOptionSelected);
           }}
@@ -659,6 +663,7 @@ export const Select = forwardRef(
                 disabled={readOnly || (typeof item === "object" && item?.disabled)}
                 style={typeof item === "object" ? item?.style : undefined}
                 multiple={multiple}
+                optionCheckbox={optionCheckbox}
                 onSelect={() => {
                   _onChange(val, isOptionSelected);
                 }}
@@ -708,6 +713,7 @@ export const Select = forwardRef(
               {multiple ? (
                 <Option
                   multiple={multiple}
+                  optionCheckbox={optionCheckbox}
                   label={label}
                   isIndeterminate={!isOptionSelected && isIndeterminate}
                   isOptionSelected={isOptionSelected}
@@ -741,6 +747,7 @@ export const Select = forwardRef(
                       disabled={readOnly || item?.disabled}
                       style={item?.style}
                       multiple={multiple}
+                      optionCheckbox={optionCheckbox}
                       onSelect={() => {
                         _onChange(val, isChildOptionSelected);
                       }}
@@ -830,9 +837,11 @@ export const Select = forwardRef(
                   value={query}
                   onChangeCapture={onSearchInputHandler}
                   data-testid="select-search-field"
+                  wrapperClassName={searchClassName}
                   autoFocus
                 />
               )}
+              {listHeader ?? null}
               <CommandList
                 label="Select an option"
                 className={cnm({
@@ -968,6 +977,9 @@ export const Select = forwardRef(
         )}
         <select
           name={props?.name}
+          hidden
+          aria-hidden="true"
+          tabIndex={-1}
           value={selectedOptions.map((option) => option?.value ?? option).join(",")}
           ref={ref}
           disabled={disabled}
@@ -990,7 +1002,9 @@ export const Select = forwardRef(
     }
     return combobox;
   },
-);
+) as (<T, A extends SelectOption<T>[]>(props: SelectProps<T, A>) => React.ReactElement | null) & {
+  displayName?: string;
+};
 
 type GroupActionsProps = {
   groupItems: any[];
@@ -1051,6 +1065,7 @@ const Option = ({
   style,
   onSelect,
   multiple,
+  optionCheckbox = true,
   className,
   optionRenderer,
   option,
@@ -1095,6 +1110,7 @@ const Option = ({
       {...(style ? { style } : {})}
       data-value={value}
       data-selected={isOptionSelected}
+      aria-selected={multiple && !optionCheckbox ? isOptionSelected : undefined}
       data-testid={`select-option-${value}`}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={keyDownHandler}
@@ -1133,13 +1149,13 @@ const Option = ({
             "hover:data-[disabled=true]:cursor-not-allowed",
             "duration-150 ease-out",
           ],
-          !multiple && isOptionSelected && ["bg-primary-emphasis"],
+          (!multiple || !optionCheckbox) && isOptionSelected && ["bg-primary-emphasis"],
           highlighted && "bg-primary-emphasis-subtle",
         )}
         data-disabled={disabled}
       >
         {leadingIcon}
-        {multiple && (
+        {multiple && optionCheckbox && (
           <Checkbox
             tabIndex={-1}
             checked={isOptionSelected}
@@ -1149,7 +1165,8 @@ const Option = ({
           />
         )}
         <div data-testid="select-option-label" className="flex w-full min-w-0 items-center gap-2">
-          <span className="truncate">{labelContent}</span>
+          {/* A custom row takes the full width so trailing cells (status columns, counts) line up across rows. */}
+          <span className={clsx("truncate", optionRenderer && "flex-1 min-w-0")}>{labelContent}</span>
           {badge && <Badge size="small">{badge}</Badge>}
           {description && (
             <Tooltip title={description}>

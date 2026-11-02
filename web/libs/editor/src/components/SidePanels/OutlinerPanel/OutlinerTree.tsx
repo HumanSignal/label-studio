@@ -19,7 +19,6 @@ import {
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
-import { FF_DEV_2755, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import {
   emitRegionSelected,
@@ -32,12 +31,9 @@ import { LockButton } from "../Components/LockButton";
 import { RegionContextMenu } from "../Components/RegionContextMenu";
 import { RegionControlButton } from "../Components/RegionControlButton";
 import "./TreeView.prefix.css";
-import type { EventDataNode, Key } from "rc-tree/es/interface";
 import ResizeObserver from "../../../utils/resize-observer";
 import { RegionLabel } from "./RegionLabel";
 
-const { localStorage } = window;
-const localStoreName = "collapsed-label-pos";
 const MIN_REGIONS_TREE_ROW_HEIGHT = 34;
 
 interface OutlinerContextProps {
@@ -116,60 +112,6 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   const eventHandlers = useEventHandlers();
   const selectedKeys = regions.selection.keys;
   const rootClass = cn("tree");
-  let expandedKeys;
-  let onExpand;
-  // It works only for 'label' mode yet.
-  // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
-  // It also doesn't work with nesting level more than 1
-  const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
-
-  if (isFF(FF_DEV_2755)) {
-    const [collapsedPos, setCollapsedPos] = useState(
-      localStorage
-        .getItem(localStoreName)
-        ?.split?.(",")
-        ?.filter((pos) => !!pos) ?? [],
-    );
-
-    const updateLocalStorage = (collapsedPos: Array<string>) => {
-      localStorage.setItem(localStoreName, collapsedPos.join(","));
-    };
-
-    const collapse = (pos: string) => {
-      const newCollapsedPos = [...collapsedPos, pos];
-
-      setCollapsedPos(newCollapsedPos);
-      updateLocalStorage(newCollapsedPos);
-    };
-
-    const expand = (pos: string) => {
-      const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
-
-      setCollapsedPos(newCollapsedPos);
-      updateLocalStorage(newCollapsedPos);
-    };
-
-    expandedKeys =
-      regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
-
-    onExpand = (
-      _internalExpandedKeys: Key[],
-      {
-        node,
-      }: {
-        node: EventDataNode;
-      },
-    ): void => {
-      const region = regionsTree.find((region: any) => region.key === node.key);
-
-      if (!region) return;
-
-      // pos is equal to label name
-      const pos = region.pos;
-
-      collapsedPos.includes(pos) ? expand(pos) : collapse(pos);
-    };
-  }
 
   return (
     <div className={cn("outliner-tree").toClassName()} ref={setRef}>
@@ -179,7 +121,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           draggable={regions.group === "manual" ? (node: any) => !node?.data?.isClassification : false}
           multiple
           defaultExpandAll
-          defaultExpandParent={!isPersistCollapseEnabled}
+          defaultExpandParent
           autoExpandParent
           checkable={false}
           prefixCls={rootClass.toClassName()}
@@ -192,12 +134,6 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
           height={height}
           {...eventHandlers}
-          {...(isPersistCollapseEnabled
-            ? {
-                expandedKeys,
-                onExpand,
-              }
-            : {})}
         />
       )}
     </div>

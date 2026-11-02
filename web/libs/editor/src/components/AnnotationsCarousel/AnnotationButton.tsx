@@ -3,8 +3,7 @@
  *
  * Mounts the shared `AnnotationButton` from `@humansignal/core/lib/topbar` and is the
  * ONLY place MobX/MST runs for the tab UI. Responsibilities that stay here:
- *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi`
- *     when FF_FIT_720_LAZY_LOAD_ANNOTATIONS is on (B10).
+ *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi` (B10).
  *   - User resolution via `useResolveUser` + `enrichUsers` for stub annotations.
  *   - Live MST → SharedAnnotation mapping (snake_case → camelCase, isAlive guard).
  *   - Delete confirmation via `editor/common/Modal/Modal#confirm` (B9).
@@ -28,9 +27,7 @@ import {
   type SharedAnnotation,
   resolveClassicEntityReviewState,
 } from "@humansignal/core";
-import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { annotationDeletable } from "@humansignal/core/lib/utils/project-access-ui";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import {
   emitAnnotationCreated,
   emitAnnotationTabSelected,
@@ -42,7 +39,6 @@ import {
   applyAnnotationHydrationFromApi,
 } from "@humansignal/core/lib/utils/annotationLazyHydration";
 import { isUserComplete, useResolveUser } from "@humansignal/core/hooks/useResolveUser";
-import { isFF } from "../../utils/feature-flags";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
 // eslint-disable-next-line
 // @ts-ignore
@@ -97,6 +93,7 @@ function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: bool
     selected: Boolean(entity.selected),
     createdBy: entity.createdBy ?? "",
     createdDate: entity.createdDate ?? "",
+    updatedDate: entity.draftSaved ?? entity.updatedDate ?? entity.createdDate ?? "",
     user,
     groundTruth: Boolean(entity.ground_truth),
     skipped: Boolean(entity.skipped),
@@ -130,7 +127,6 @@ const AnnotationButtonInner = injector(
       });
 
       const entityIsAlive = entity ? isAlive(entity) : false;
-      const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
       const infoIsHidden = annotationStore?.store?.hasInterface?.("annotations:hide-info");
       const canDeleteAnnotation =
         entityIsAlive &&
@@ -190,14 +186,9 @@ const AnnotationButtonInner = injector(
           onDuplicate: async () => {
             if (!entityIsAlive) return;
             try {
-              // FF_FIT_720_LAZY_LOAD_ANNOTATIONS: hydrate stub annotations before duplicating
+              // Hydrate stub annotations before duplicating
               // so the resulting copy has region results, not an empty shell.
-              if (
-                isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) &&
-                entity.type === "annotation" &&
-                entity.pk &&
-                annotationNeedsHydration(entity)
-              ) {
+              if (entity.type === "annotation" && entity.pk && annotationNeedsHydration(entity)) {
                 const data = await fetchAnnotationCached(entity.pk);
                 if (!data || (data as { error?: unknown }).error) {
                   toast?.show({
@@ -250,8 +241,7 @@ const AnnotationButtonInner = injector(
             if (!isLSE) return;
             emitAnnotationMenuAction(store, entity, "open_performance_dashboard");
             const url = new URL(window.location.origin);
-            const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-            url.pathname = useNewAnalytics ? "/analytics/member-performance" : "/performance";
+            url.pathname = "/analytics/member-performance";
             if (entity?.user?.id) url.searchParams.set("user", String(entity.user.id));
             const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
             if (projectMatch) url.searchParams.set("project", projectMatch[1]);

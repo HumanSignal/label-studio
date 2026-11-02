@@ -16,7 +16,6 @@ import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
 import RequiredMixin from "../../../mixins/Required";
 import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
-import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
@@ -365,7 +364,7 @@ const TextAreaModel = types.compose(
   ProcessAttrsMixin,
   RequiredMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   AnnotationMixin,
   ReadOnlyControlMixin,
   Model,

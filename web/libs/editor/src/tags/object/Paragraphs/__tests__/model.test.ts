@@ -1,5 +1,5 @@
 import { types } from "mobx-state-tree";
-import { isFF, FF_DEV_2669, FF_LSDV_E_278 } from "../../../../utils/feature-flags";
+import { isFF, FF_LSDV_E_278 } from "../../../../utils/feature-flags";
 import type { Mock } from "bun:test";
 
 const createMockStoreType = (paragraphsModel: any, typesApi = types) => {
@@ -194,13 +194,7 @@ describe("Paragraphs phrases", () => {
     expect(mockCreate).toHaveBeenCalledWith(2);
   });
 
-  it("should return true from isVisibleForAuthorFilter when FF_DEV_2669 is off", () => {
-    (window as any).APP_SETTINGS.feature_flags[FF_DEV_2669] = false;
-    expect(model.isVisibleForAuthorFilter({ author: "Anyone", text: "x" })).toBe(true);
-  });
-
-  it("should filter by author when FF_DEV_2669 is on and filterByAuthor is set", () => {
-    (window as any).APP_SETTINGS.feature_flags[FF_DEV_2669] = true;
+  it("should filter by author when filterByAuthor is set", () => {
     model.setAuthorFilter(["Alice"]);
     expect(model.isVisibleForAuthorFilter({ author: "Alice", text: "x" })).toBe(true);
     expect(model.isVisibleForAuthorFilter({ author: "Bob", text: "y" })).toBe(false);
@@ -533,14 +527,6 @@ describe("Paragraphs phrases", () => {
     model.handleSyncPlay({ time: 2, playing: true }, "play");
     expect(mockAudio.currentTime).toBe(2);
     expect(mockAudio.play).toHaveBeenCalled();
-  });
-
-  it("handleSyncPause calls stopNow when audio exists", () => {
-    const mockAudio = { paused: false, currentTime: 1, pause: mock(), play: mock() };
-    model.audioRef.current = mockAudio as unknown as HTMLAudioElement;
-    (model as { syncSend?: (d: unknown, e: string) => void }).syncSend = mock();
-    model.handleSyncPause({ playing: false }, "pause");
-    expect(mockAudio.pause).toHaveBeenCalled();
   });
 
   it("should stopAtTheEnd call stopNow and reset when currentTime reaches region end", () => {

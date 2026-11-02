@@ -132,6 +132,9 @@ mockModule("../../../common/Pagination/Pagination", () => ({
   ),
 }));
 
+// Same for the resize observer: this stub has no unobserve(), which breaks any later component that cleans up.
+const actualResizeObserverModule = { ...requireActual("../../../utils/resize-observer") };
+
 mockModule("../../../utils/resize-observer", () => ({
   __esModule: true,
   default: mock().mockImplementation(function () {
@@ -140,6 +143,10 @@ mockModule("../../../utils/resize-observer", () => ({
     return this;
   }),
 }));
+
+afterAll(() => {
+  mockModule("../../../utils/resize-observer", () => ({ ...actualResizeObserverModule, __skipMerge: true }));
+});
 
 mockModule("../../../core/Hotkey", () => {
   const Hotkey = Object.assign(

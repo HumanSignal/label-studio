@@ -1,5 +1,4 @@
 import { getParent, hasParent, types } from "mobx-state-tree";
-import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 import { isNodeVisibleForItem } from "./Visibility";
 
 /**
@@ -72,7 +71,7 @@ const RequiredMixin = types
               return false;
             }
           }
-        } else if (isFF(FF_LSDV_4583) && self.peritem) {
+        } else if (self.peritem) {
           // validating when choices labeling is done per item,
           const objectTag = self.toNameTag;
           const maxItemIndex = objectTag.maxItemIndex;

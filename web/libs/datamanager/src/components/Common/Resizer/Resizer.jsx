@@ -1,6 +1,7 @@
 import React from "react";
 import { cnm } from "@humansignal/ui";
 import styles from "./Resizer.module.css";
+import "./columnSeparator.prefix.css";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
   const offset = currentX - initialX;
@@ -83,6 +84,7 @@ export const Resizer = ({
       <div
         className={cnm(styles.handle, showResizerLine !== false && isResizing && styles.handleResizing)}
         ref={resizeHandler}
+        data-resizer-handle
         style={handleStyle}
         onPointerDown={handleResize}
         onDoubleClick={() => onReset?.()}

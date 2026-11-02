@@ -6,6 +6,7 @@ import {
   type PropsWithChildren,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -78,6 +79,15 @@ const TooltipInner = forwardRef(
         setAlign(resultAlign);
       }
     }, [align, disableAutoFlip]);
+
+    // The alignment's pointer margin can push the box past the viewport edge once it keeps its full width.
+    useLayoutEffect(() => {
+      const target = tooltipElement.current;
+      if (!target || !("left" in offset)) return;
+      const rect = target.getBoundingClientRect();
+      const overflow = Math.max(0, rect.right - document.documentElement.clientWidth) || Math.min(0, rect.left);
+      if (overflow) setOffset((current) => ({ ...current, left: (current as { left: number }).left - overflow }));
+    }, [offset, align]);
 
     const performAnimation = useCallback(
       (visible: boolean) => {

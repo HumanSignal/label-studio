@@ -1,0 +1,8 @@
+/* Host-app CSS variables that libs/ui components read but the DS itself never defines.
+   In Label Studio, apps/labelstudio/src/themes/default/typography.prefix.css sets `--font-mono: monaco, monospace`;
+   ai-chat-loading/ai-chat-thinking/code-editor use `var(--font-mono, ui-monospace, monospace)`.
+   design-sync maps it to the DS mono token (IBM Plex Mono — user decision 2026-10-03, see .design-sync/NOTES.md).
+   Injected into the reference storybook too (inject-reference-fonts.mjs) so both compare sides agree. */
+:root {
+  --font-mono: var(--font-family-mono);
+}

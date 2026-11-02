@@ -1,15 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
-import { isFF } from "../../utils/feature-flags";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
 import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 import { fetchTaskAgreementDistribution } from "./Aggregation";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
-import type { ControlTag, ObjectTagEntry, ObjectTypes } from "./types";
-import { getLabelColors, sortControls } from "./utils";
+import type { ControlTag, ObjectTypes } from "./types";
+import { buildObjectDataTypes, getLabelColors, sortControls } from "./utils";
 
 type TaskSummaryProps = {
   annotations: MSTAnnotation[];
@@ -24,8 +22,7 @@ interface Annotation {
 const TaskSummary = observer(({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
   const task = annotationStore.store.task;
   const taskId = task?.id;
-  // Use editor `isFF` (reads `APP_SETTINGS` live) so unit tests can toggle the flag; core `isActive` snapshots flags at import time.
-  const agreementQueryEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS) && taskId != null;
+  const agreementQueryEnabled = taskId != null;
 
   const { data: agreementPayload, isFetching: agreementQueryFetching } = useQuery({
     queryKey: ["task-agreement", taskId],
@@ -87,25 +84,7 @@ const TaskSummary = observer(({ annotations: all, store: annotationStore }: Task
   // show global classifications first, then labels, then per-regions
   const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
 
-  const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value?.includes("$") || tag.valueList?.includes("$") || tag.loadedData),
-  ) as ObjectTagEntry[];
-  const dataTypes: ObjectTypes = Object.fromEntries(
-    objectTags.map(([name, object]) => [
-      name,
-      // most of tags has `updateValue()` method which resolves `value` and stores it in `_value`
-      // Image tag uses `parsedValue` instead of `_value`
-      // Pdf tag uses `_url` instead of `_value`
-      // TimeSeries tag uses `dataObj` instead of `_value`, it's always an object {<channel name>: [array of values]}
-      // for other tags with complex logic (like TimeSeries) we use `value` for now, which is not ideal
-      {
-        type: object.type,
-        value:
-          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
-      },
-    ]),
-  );
+  const dataTypes: ObjectTypes = buildObjectDataTypes(allTags);
 
   const agreementFromQuery = agreementPayload?.agreement;
 

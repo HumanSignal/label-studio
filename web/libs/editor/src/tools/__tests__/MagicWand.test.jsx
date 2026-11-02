@@ -11,6 +11,14 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { getRoot } from "mobx-state-tree";
 
+// Module mocks outlive this file in Bun's shared process: put the real colour library back afterwards, or every later
+// file gets this stub (no chroma.random(), so any user picture rendered later throws).
+const actualChroma = requireActual("chroma-js");
+
+afterAll(() => {
+  mockModule("chroma-js", () => ({ ...actualChroma, default: actualChroma, __skipMerge: true }));
+});
+
 mockModule("chroma-js", () => {
   const hex = (c) => (c && typeof c === "string" ? c : "#000000");
   return (c) => ({ hex: () => hex(c) });

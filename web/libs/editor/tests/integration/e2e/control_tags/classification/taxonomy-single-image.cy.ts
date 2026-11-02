@@ -1,8 +1,5 @@
 import { LabelStudio, ImageView, Taxonomy } from "@humansignal/frontend-test/helpers/LSF";
 import { simpleImageTaxonomyConfig, simpleImageData, perTagTaxonomyResult } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Taxonomy /> */
 describe("Classification - single image - Taxonomy", () => {

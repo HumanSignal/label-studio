@@ -15,9 +15,6 @@ import {
   perItemRatingResult,
   requiredPerItemMIGRatingConfig,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Rating /> */
 describe("Classification - single image - Rating", () => {

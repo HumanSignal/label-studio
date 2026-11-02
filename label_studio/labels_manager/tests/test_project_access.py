@@ -284,3 +284,18 @@ class SharedLabelWriteAccessTests(APITestCase):
         self.assertTrue(Label.objects.filter(pk=self.label.pk).exists())
         self.assertTrue(LabelLink.objects.filter(pk=self.other_link.pk).exists())
         self.assertFalse(LabelLink.objects.filter(pk=self.own_link.pk).exists())
+
+    def test_creator_cannot_link_a_label_from_another_organization(self):
+        foreign_label = Label.objects.create(
+            title='Foreign',
+            value={'choices': ['Foreign']},
+            created_by=self.world.outsider,
+            organization=self.world.outsider_organization,
+        )
+        response = self.client.post(
+            reverse('labels_manager:api-labels:label_link-list'),
+            {'project': self.world.project_1.pk, 'label': foreign_label.pk, 'from_name': 'label'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertFalse(LabelLink.objects.filter(label=foreign_label).exists())

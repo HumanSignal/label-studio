@@ -38,9 +38,11 @@ class FakeEngine {
   emit() {
     this.onChange(this.rows.map((r) => ({ ...r })));
   }
-  upload(file: File): Promise<SubmissionUploadRow> {
+  honorsClientRef = true;
+  deferResolve = false;
+  upload(file: File, options?: { clientRef?: string }): Promise<SubmissionUploadRow> {
     const row: SubmissionUploadRow = {
-      clientRef: `ref-${++SEQ}`,
+      clientRef: this.honorsClientRef && options?.clientRef ? options.clientRef : `ref-${++SEQ}`,
       uploadId: null,
       filename: file.name,
       size: file.size,
@@ -72,6 +74,11 @@ class FakeEngine {
     row.error = message;
     if (errorCode) row.errorCode = errorCode;
     this.emit();
+    // The real engine reports the failure to the server before it resolves.
+    if (!this.deferResolve) this.resolvers.get(clientRef)?.({ ...row });
+  }
+  settle(clientRef: string) {
+    const row = this.rows.find((r) => r.clientRef === clientRef)!;
     this.resolvers.get(clientRef)?.({ ...row });
   }
   retry(clientRef: string): Promise<SubmissionUploadRow | null> {
@@ -126,6 +133,7 @@ function makeHarness(config: {
   outputSchema?: Record<string, unknown> | null;
   validateFile?: (file: File, meta: unknown) => unknown;
   documentAI?: SubmissionEngineDeps["documentAI"];
+  annotationSubmitted?: boolean;
 }) {
   const refs: HarnessRefs = { api: null, regions: config.initialRegions || [], setRegions: null, setTaskId: null };
   const deps: SubmissionEngineDeps | null = config.engine
@@ -146,8 +154,10 @@ function makeHarness(config: {
       props: {
         task,
         readOnly: config.readOnly,
+        annotationSubmitted: config.annotationSubmitted,
         rpcCapabilities: new Set(config.capabilities ?? ["collectionUpload"]),
-        visibleRegions: regions,
+        regions,
+        visibleRegions: regions.filter((r) => !r.hidden),
         initialResults: config.initialResults,
         outputSchema: config.outputSchema ?? schemaWith({ types: ["application/pdf"], max_files: 3, min_files: 1 }),
         fileResolverTemplate: "https://proxy/resolve/{fileuri}",
@@ -238,6 +248,54 @@ describe("pick → upload → attach", () => {
     await waitFor(() => expect(engine.rows).toHaveLength(1)); // one free slot of 3
     expect(refs.api!.rejected).toHaveLength(1);
     expect(refs.api!.rejected[0].message).toContain("at most 3 files");
+  });
+
+  it("the same file picked twice in one tick uploads once on a single-file task", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const single = schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 });
+    const { refs, Host } = makeHarness({ engine, outputSchema: single });
+    render(<Host />);
+    const file = pdf("dropped.pdf");
+    await act(async () => {
+      refs.api!.pick([file]);
+      refs.api!.pick([file]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(1);
+    expect(refs.api!.rejected).toHaveLength(0);
+    expect(refs.api!.members.map((m) => m.state)).toEqual(["uploading"]);
+  });
+
+  it("two different files picked in one tick respect single-file capacity", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const single = schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 });
+    const { refs, Host } = makeHarness({ engine, outputSchema: single });
+    render(<Host />);
+    await act(async () => {
+      refs.api!.pick([pdf("first.pdf")]);
+      refs.api!.pick([pdf("second.pdf")]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows.map((r) => r.filename)).toEqual(["first.pdf"]);
+    expect(refs.api!.rejected).toHaveLength(1);
+    expect(refs.api!.rejected[0].file.name).toBe("second.pdf");
+  });
+
+  it("the same file picked twice in one tick uploads once in a bundle", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    const file = pdf("dropped.pdf");
+    await act(async () => {
+      refs.api!.pick([file]);
+      refs.api!.pick([file]);
+    });
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(1);
+    expect(refs.api!.rejected).toHaveLength(0);
   });
 
   it("failed upload offers retry that attaches on success (A10)", async () => {
@@ -445,6 +503,35 @@ describe("submitted detection & capacity", () => {
     expect(member.message).toContain("already added this file");
     expect(member.onRetry).toBeUndefined();
     expect(member.onRemove).toBeDefined();
+  });
+
+  describe("local preview", () => {
+    it("shows the picked file while it uploads and after a failure that settles late", async () => {
+      const engine = new FakeEngine(() => undefined);
+      engine.deferResolve = true;
+      const { refs, Host } = makeHarness({ engine });
+      render(<Host />);
+      await act(async () => refs.api!.pick([pdf("a.pdf")]));
+      await waitFor(() => expect(engine.rows).toHaveLength(1));
+      await waitFor(() => expect(refs.api!.members[0].previewUrl).toBeTruthy());
+
+      await act(async () => engine.failRow(engine.rows[0].clientRef, "blocked", "storage_unreachable"));
+      expect(refs.api!.members[0].state).toBe("failed");
+      expect(refs.api!.members[0].previewUrl).toBeTruthy();
+    });
+
+    it("still shows the preview once an engine that ignores the chosen ref settles", async () => {
+      const engine = new FakeEngine(() => undefined);
+      engine.honorsClientRef = false;
+      engine.deferResolve = true;
+      const { refs, Host } = makeHarness({ engine });
+      render(<Host />);
+      await act(async () => refs.api!.pick([pdf("a.pdf")]));
+      await waitFor(() => expect(engine.rows).toHaveLength(1));
+      await act(async () => engine.failRow(engine.rows[0].clientRef, "blocked", "storage_unreachable"));
+      await act(async () => engine.settle(engine.rows[0].clientRef));
+      await waitFor(() => expect(refs.api!.members[0].previewUrl).toBeTruthy());
+    });
   });
 
   it("falls back to initialResults only when the upload capability is absent (B2)", async () => {
@@ -868,5 +955,186 @@ describe("server facts", () => {
     const member = refs.api!.members[0];
     expect(member.meta).toMatchObject({ durationSec: 10.5, width: 720, height: 1280, verified: true });
     expect(member.meta?.facts).toEqual(["30 fps"]);
+  });
+});
+
+describe("locked regions", () => {
+  const fireReplaceInput = async (refs: HarnessRefs, file: File) => {
+    await act(async () =>
+      refs.api!.replaceInput.onChange({
+        target: { files: [file], value: "" } as unknown as HTMLInputElement,
+      }),
+    );
+  };
+
+  it("a locked region offers neither Replace nor Remove while its neighbour offers both", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [{ ...region(70, 0), locked: true }, region(71, 1)],
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members).toHaveLength(2));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeUndefined();
+    expect(refs.api!.members[0].onRemove).toBeUndefined();
+    expect(refs.api!.members[1].onReplace).toBeDefined();
+    expect(refs.api!.members[1].onRemove).toBeDefined();
+  });
+
+  it("a replace pick is ignored when the region was locked while the file dialog was open", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await act(async () => refs.setRegions!([{ ...region(70, 0), locked: true }]));
+    await fireReplaceInput(refs, pdf("new.pdf", 2222));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(0);
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.regions[0]._submission!.upload_id).toBe(70);
+  });
+
+  it("a region locked while its replacement uploads keeps the original and drops the new file", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await fireReplaceInput(refs, pdf("new.pdf", 2222));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await act(async () => refs.setRegions!([{ ...region(70, 0), locked: true }]));
+    await act(async () => engine.complete(engine.rows[0].clientRef, 99));
+    await waitFor(() => expect(engine.discarded).toContain(99));
+    expect(engine.discarded).not.toContain(70);
+    expect(refs.regions).toHaveLength(1);
+    expect(refs.regions[0]._submission!.upload_id).toBe(70);
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].file.name).toBe("f70.pdf");
+  });
+});
+
+describe("hidden regions", () => {
+  const hide = (r: SubmissionRegion): SubmissionRegion => ({ ...r, hidden: true });
+
+  it("hiding an uploaded file removes its card without turning it into an upload in progress", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine });
+    render(<Host />);
+    await act(async () => refs.api!.pick([pdf("a.pdf")]));
+    await waitFor(() => expect(engine.rows).toHaveLength(1));
+    await act(async () => engine.complete(engine.rows[0].clientRef, 101));
+    await waitFor(() => expect(refs.regions).toHaveLength(1));
+
+    await act(async () => refs.setRegions!(refs.regions.map(hide)));
+    expect(refs.api!.members).toHaveLength(0);
+    expect(refs.api!.collection.uploadingCount).toBe(0);
+    expect(refs.api!.capacity.count).toBe(1);
+    expect(refs.regions).toHaveLength(1);
+
+    await act(async () => refs.setRegions!(refs.regions.map((r) => ({ ...r, hidden: false }))));
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeDefined();
+    expect(refs.api!.members[0].onRemove).toBeDefined();
+  });
+
+  it("a replace still uploading into a hidden slot keeps its card and Cancel", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(70, 0)] });
+    render(<Host />);
+    await act(async () => refs.api!.members[0].onReplace!());
+    await act(async () =>
+      refs.api!.replaceInput.onChange({
+        target: { files: [pdf("new.pdf", 2222)], value: "" } as unknown as HTMLInputElement,
+      }),
+    );
+    await waitFor(() => expect(refs.api!.members[0].state).toBe("uploading"));
+    await act(async () => refs.setRegions!(refs.regions.map(hide)));
+    expect(refs.api!.members).toHaveLength(1);
+    expect(refs.api!.members[0].state).toBe("uploading");
+    expect(refs.api!.members[0].onCancel).toBeDefined();
+  });
+
+  it("a hidden file still counts toward the task's file limit", async () => {
+    const engine = new FakeEngine(() => undefined);
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [hide(region(70, 0))],
+      outputSchema: schemaWith({ types: ["application/pdf"], max_files: 1, min_files: 1 }),
+    });
+    render(<Host />);
+    expect(refs.api!.capacity.full).toBe(true);
+    await act(async () => refs.api!.pick([pdf("b.pdf")]));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(engine.rows).toHaveLength(0);
+    expect(refs.api!.rejected).toHaveLength(1);
+  });
+
+  it("draft recovery does not re-attach a file whose region is only hidden", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(70)];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [hide(region(70, 0))] });
+    render(<Host />);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(refs.regions).toHaveLength(1);
+    expect(refs.regions[0].hidden).toBe(true);
+    expect(refs.api!.members).toHaveLength(0);
+    expect(refs.api!.capacity.count).toBe(1);
+  });
+});
+
+describe("submitted state follows the open annotation", () => {
+  it("a draft that reuses a submitted annotation's file shows it as uploaded, not submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(90)], annotationSubmitted: false });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].meta).not.toBeUndefined());
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].submitted).toBe(false);
+    expect(refs.api!.members[0].onRemove).toBeDefined();
+    expect(refs.api!.collection.submitted).toBe(false);
+  });
+
+  it("a reviewer's duplicated draft shows the reused file as uploaded, without actions", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(90)],
+      capabilities: ["collectionUpload", "reviewAnnotation"],
+      annotationSubmitted: false,
+    });
+    render(<Host />);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(refs.api!.members[0].state).toBe("uploaded");
+    expect(refs.api!.members[0].onReplace).toBeUndefined();
+    expect(refs.api!.members[0].onRemove).toBeUndefined();
+    expect(refs.api!.collection.submitted).toBe(false);
+  });
+
+  it("a reviewer viewing a submitted annotation still sees its file as submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({
+      engine,
+      initialRegions: [region(90)],
+      capabilities: ["collectionUpload", "reviewAnnotation"],
+      annotationSubmitted: true,
+    });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].submitted).toBe(true));
+    expect(refs.api!.members[0].state).toBe("readonly");
+  });
+
+  it("the submitted annotation itself still shows its file as submitted", async () => {
+    const engine = new FakeEngine(() => undefined);
+    engine.currentAllValue = [serverUpload(90, { referenced_by_annotation: true })];
+    const { refs, Host } = makeHarness({ engine, initialRegions: [region(90)], annotationSubmitted: true });
+    render(<Host />);
+    await waitFor(() => expect(refs.api!.members[0].state).toBe("submitted"));
+    expect(refs.api!.collection.submitted).toBe(true);
   });
 });

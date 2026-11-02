@@ -113,6 +113,13 @@ class LabelListSerializer(serializers.ListSerializer):
         return result
 
 
+class OrganizationLabelField(serializers.PrimaryKeyRelatedField):
+    queryset = Label.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organization=self.context['request'].user.active_organization)
+
+
 class LabelCreateSerializer(serializers.ModelSerializer):
     created_by = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     organization = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
@@ -128,6 +135,7 @@ class LabelCreateSerializer(serializers.ModelSerializer):
 class LabelLinkSerializer(FlexFieldsModelSerializer):
     annotations_count = serializers.IntegerField(read_only=True)
     project = ManageableProjectField()
+    label = OrganizationLabelField()
 
     class Meta:
         model = LabelLink
@@ -141,6 +149,7 @@ class LabelSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Label
         fields = '__all__'
+        read_only_fields = ('organization', 'created_by')
         expandable_fields = {'links': ('labels_manager.serializers.LabelLinkSerializer', {'many': True})}
 
 

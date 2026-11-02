@@ -5,7 +5,7 @@ import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
 import "./Tabs.prefix.css";
 import { type BaseProps, Side, type TabProps } from "./types";
-import { determineDroppableArea, determineLeftOrRight } from "./utils";
+import { determineDroppableArea, determineLeftOrRight, HOST_VIEW_NAME } from "./utils";
 import { Button } from "../../../common/Button/Button";
 
 const classAddedTabs: (Element | undefined)[] = [];
@@ -52,6 +52,7 @@ const Tab = ({
   createNewPanel,
   setActiveTab,
   checkSnap,
+  badge,
 }: TabProps) => {
   const tabRef = useRef<HTMLDivElement>();
   const ghostTabRef = useRef<HTMLDivElement>();
@@ -167,6 +168,7 @@ const Tab = ({
     >
       {!locked && <IconOutlinerDrag className={cn("panel-tabs").elem("icon").toClassName()} />}
       {tabText}
+      {badge && <span className={cn("panel-tabs").elem("badge").toClassName()} aria-hidden="true" />}
     </div>
   );
 
@@ -212,7 +214,18 @@ export const Tabs = (
   return (
     <>
       <div className={cn("tabs").toClassName()}>
-        <div className={cn("tabs").elem("tabs-row").toClassName()}>
+        <div
+          className={cn("tabs")
+            .elem("tabs-row")
+            .mod({
+              // Only a strip holding the host's tab: native strips look exactly as before, whatever was dragged in.
+              crowded:
+                !props.locked &&
+                props.panelViews.length > 3 &&
+                props.panelViews.some((view) => view.name === HOST_VIEW_NAME),
+            })
+            .toClassName()}
+        >
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
 
@@ -238,6 +251,7 @@ export const Tabs = (
                   checkSnap={props.checkSnap}
                   breakPointActiveTab={props.breakPointActiveTab}
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
+                  badge={view.name === HOST_VIEW_NAME && !!props.hostBadge}
                 >
                   <div className={cn("tabs").elem("content").toClassName()}>
                     {/* FIT-720: Pass isActive={false} for ghost/preview components to prevent eager loading */}
