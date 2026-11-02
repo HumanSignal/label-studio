@@ -6,7 +6,6 @@ import {
   labelingDisplayViewFromLsf,
 } from "../utils/datamanagerTelemetry";
 import { Modal } from "../components/Common/Modal/Modal";
-import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
@@ -584,11 +583,6 @@ export const AppStore = types
           self.project = Object.assign(self.project ?? {}, newProject ?? {});
         } else if (JSON.stringify(newProject ?? {}) !== JSON.stringify(self.project ?? {})) {
           self.project = newProject;
-        }
-        if (isFF(FF_LOPS_E_3)) {
-          const itemType = self.SDK.type === "DE" ? "dataset" : "project";
-
-          self.SDK.invoke(`${itemType}Updated`, self.project);
         }
       } catch {
         // When in timer (polling project counts) mode, we can still continue

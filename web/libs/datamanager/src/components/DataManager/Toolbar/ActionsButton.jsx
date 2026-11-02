@@ -4,14 +4,12 @@ import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
 import { cn } from "../../../utils/bem";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "@humansignal/ui";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
 import { modal, useModalControls } from "../../Common/Modal/Modal";
 import "./ActionsButton.prefix.css";
 
-const isFFLOPSE3 = isFF(FF_LOPS_E_3);
 const injector = inject(({ store }) => ({
   store,
   hasSelected: store.currentView?.selected?.hasSelected ?? false,
@@ -395,7 +393,6 @@ export const ActionsButton = injector(
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
     ));
-    const recordTypeLabel = isFFLOPSE3 && store.SDK.type === "DE" ? "Record" : "Task";
 
     return (
       <Dropdown.Trigger
@@ -424,7 +421,7 @@ export const ActionsButton = injector(
           data-testid="dm-actions-button"
           {...rest}
         >
-          {selectedCount > 0 ? `${selectedCount} ${recordTypeLabel}${selectedCount > 1 ? "s" : ""}` : "Actions"}
+          {selectedCount > 0 ? `${selectedCount} Task${selectedCount > 1 ? "s" : ""}` : "Actions"}
         </Button>
       </Dropdown.Trigger>
     );

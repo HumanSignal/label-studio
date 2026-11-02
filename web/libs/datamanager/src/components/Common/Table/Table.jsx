@@ -14,7 +14,6 @@ import { RowContextMenu } from "./RowContextMenu";
 import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import {
   FF_DM_SHARED_COLUMN_ORDER,
   FF_PROJECT_DM_COLUMN_DEFAULTS,
@@ -200,9 +199,6 @@ export const Table = observer(
         };
 
         const onTaskLoad = async (options = {}) => {
-          if (isFF(FF_LOPS_E_3) && type === "DE") {
-            return new Promise((resolve) => resolve(out));
-          }
           const response = await api.task({
             taskID: out.id,
             resolve_uri: options.resolveUri ?? false,

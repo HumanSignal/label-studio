@@ -5,7 +5,7 @@ import { isDefined } from "../../utils/utils";
 import { Assignee } from "../Assignee";
 import { DynamicModel, registerModel } from "../DynamicModel";
 import { CustomJSON } from "../types";
-import { FF_DEV_2536, FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
+import { FF_DEV_2536, isFF } from "../../utils/feature-flags";
 import { logLabelStreamDebug } from "@humansignal/core/lib/utils/streamDebugLog";
 
 const SIMILARITY_UPPER_LIMIT_PRECISION = 1000;
@@ -15,17 +15,6 @@ const DM_USER_CHIP_COUNT_FIELDS = {
   reviewers_count: "reviewers",
   comment_authors_count: "comment_authors",
 };
-const fileAttributes = types.model({
-  certainty: types.optional(types.maybeNull(types.number), 0),
-  distance: types.optional(types.maybeNull(types.number), 0),
-  id: types.optional(types.maybeNull(types.string), ""),
-});
-
-const exportedModel = types.model({
-  project_id: types.optional(types.maybeNull(types.number), null),
-  created_at: types.optional(types.maybeNull(types.string), ""),
-});
-
 export const create = (columns) => {
   const TaskModelBase = DynamicModel("TaskModelBase", columns, {
     ...(isFF(FF_DEV_2536) ? { comment_authors: types.optional(types.array(Assignee), []) } : {}),
@@ -52,13 +41,6 @@ export const create = (columns) => {
     annotators_count: types.optional(types.maybeNull(types.number), 0),
     reviewers_count: types.optional(types.maybeNull(types.number), 0),
     comment_authors_count: types.optional(types.maybeNull(types.number), 0),
-    ...(isFF(FF_LOPS_E_3)
-      ? {
-          _additional: types.optional(fileAttributes, {}),
-          candidate_task_id: types.optional(types.string, ""),
-          project: types.union(types.number, types.optional(types.array(exportedModel), [])), //number for Projects, array of exportedModel for Datasets
-        }
-      : {}),
   }).actions((self) => ({
     mergeAnnotations(annotations) {
       // skip drafts, they'll be added later

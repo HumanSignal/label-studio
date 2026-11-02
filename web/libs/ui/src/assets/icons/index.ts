@@ -102,7 +102,6 @@ export { ReactComponent as IconCrossCircleFilledRed } from "./cross-circle-fille
 export { ReactComponent as IconCrossNoPadding } from "./cross-no-padding.svg";
 export { ReactComponent as IconCursor } from "./cursor.svg";
 export { ReactComponent as IconCursorAgent } from "./cursor-agent.svg";
-export { ReactComponent as IconDatasets } from "./datasets.svg";
 export { ReactComponent as IconDelete } from "./delete.svg";
 export { ReactComponent as IconDetails } from "./details.svg";
 export { ReactComponent as IconDocument } from "./document.svg";

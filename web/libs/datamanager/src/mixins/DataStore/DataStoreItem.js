@@ -1,11 +1,10 @@
 import { applySnapshot, getParent, getSnapshot, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
-import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 export const DataStoreItem = types
   .model("DataStoreItem", {
     updated: guidGenerator(),
-    loading: isFF(FF_LOPS_E_3) ? types.maybeNull(types.union(types.string, types.boolean), false) : false,
+    loading: false,
   })
   .views((self) => ({
     get parent() {

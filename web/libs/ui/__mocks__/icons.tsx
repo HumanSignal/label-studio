@@ -119,7 +119,6 @@ export const IconCrossBold = IconStub;
 export const IconCrossCircleFilledRed = IconStub;
 export const IconCrossNoPadding = IconStub;
 export const IconCursor = IconStub;
-export const IconDatasets = IconStub;
 export const IconDelete = IconStub;
 export const IconDetails = IconStub;
 export const IconDocument = IconStub;

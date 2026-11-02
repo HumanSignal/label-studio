@@ -1,9 +1,7 @@
 import { observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../../../utils/bem";
-import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 import { normalizeCellAlias } from "../../../CellViews";
-import { SkeletonLoader } from "../../SkeletonLoader";
 import "./TableRow.prefix.css";
 import { TableContext, tableCN } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
@@ -29,7 +27,6 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
   const renderProps = { column: col, original: data, value };
   const Decoration = decoration?.get?.(col);
   const style = getStyle(cellViews, col, Decoration);
-  const cellIsLoading = isFF(FF_LOPS_E_3) && data.loading === colInput.alias;
 
   return (
     <div className={tableCN.elem("cell").toClassName()}>
@@ -38,10 +35,10 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
           ...(style ?? {}),
           display: "flex",
           height: "100%",
-          alignItems: cellIsLoading ? "" : "center",
+          alignItems: "center",
         }}
       >
-        {cellIsLoading ? <SkeletonLoader /> : Renderer ? <Renderer {...renderProps} /> : value}
+        {Renderer ? <Renderer {...renderProps} /> : value}
       </div>
     </div>
   );

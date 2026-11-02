@@ -1,6 +1,5 @@
 import { types } from "mobx-state-tree";
-import { FF_LOPS_E_3, isFF } from "../utils/feature-flags";
-import { CustomCalback, HtmlOrReact, StringOrNumberID } from "./types";
+import { StringOrNumberID } from "./types";
 
 const SelectOptions = types.model("SelectOptions", {
   label: types.string,
@@ -35,8 +34,6 @@ const ActionDialog = types.model("ActionDialog", {
   form: types.maybeNull(types.array(ActionFormRow)),
 });
 
-const isFFLOPSE3 = isFF(FF_LOPS_E_3);
-
 export const Action = types
   .model("Action", {
     id: StringOrNumberID,
@@ -44,19 +41,8 @@ export const Action = types
     order: types.integer,
     disabled: types.optional(types.boolean, false),
     disabled_reason: types.optional(types.string, ""),
-    title: isFFLOPSE3 ? types.union(types.string, HtmlOrReact) : types.string,
+    title: types.string,
     enterprise_badge: types.optional(types.boolean, false),
-    ...(isFFLOPSE3
-      ? {
-          children: types.optional(types.array(types.late(() => Action)), []),
-          callback: types.maybeNull(CustomCalback),
-          isSeparator: types.optional(types.boolean, false),
-          isTitle: types.optional(types.boolean, false),
-          newStyle: types.optional(types.boolean, false),
-          disabled: types.optional(types.boolean, false),
-          disabledReason: types.optional(types.string, ""),
-        }
-      : {}),
   })
   .volatile(() => ({
     caller: null,

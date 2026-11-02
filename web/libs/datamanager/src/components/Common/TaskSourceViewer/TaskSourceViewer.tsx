@@ -1,6 +1,5 @@
 import { type ChangeEvent, type FC, useEffect, useMemo, useState, useCallback } from "react";
 import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.css";
 import { ViewToggle, type ViewMode } from "./ViewToggle";
@@ -104,7 +103,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
       };
 
       // Don't include annotations/predictions for Data Explorer
-      if (sdkType !== "DE" && !isFF(FF_LOPS_E_3)) {
+      if (sdkType !== "DE") {
         formatted.annotations = response.annotations ?? [];
         formatted.predictions = response.predictions ?? [];
       }
