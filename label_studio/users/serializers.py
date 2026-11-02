@@ -167,7 +167,8 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
 
 class BaseUserSerializerUpdate(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
-        read_only_fields = ('email',)
+        # username is not unique and enterprise SSO must not treat it as a license identity
+        read_only_fields = ('email', 'username')
 
 
 class BaseWhoAmIUserSerializer(BaseUserSerializer):
