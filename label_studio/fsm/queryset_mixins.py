@@ -13,20 +13,13 @@ Usage:
             return TaskQuerySet(self.model, using=self._db)
 
 Note:
-    State annotation is guarded by 'fflag_feat_fit_568_finite_state_management' only.
-    This allows background FSM processes to annotate current_state for internal use.
-
-    UI/API consumption of state fields is separately controlled by serializers
-    that check BOTH 'fflag_feat_fit_568_finite_state_management' AND
-    'fflag_feat_fit_710_fsm_state_fields' before exposing state data.
-
-    When the flag is disabled, no annotation is performed and there is zero performance impact.
+    State annotation is guarded by `settings.FSM_ENABLED`.
+    When FSM is disabled (e.g., in LSO), no annotation is performed and there is zero performance impact.
 """
 
 import logging
 
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
+from django.conf import settings
 from django.db.models import OuterRef, Subquery
 from fsm.registry import get_state_model
 
@@ -91,13 +84,8 @@ class FSMStateQuerySetMixin:
             - If no state exists for an entity, `current_state` will be None
             - The state is read-only and should not be modified directly
         """
-        # Check only fflag_feat_fit_568_finite_state_management for background FSM processes.
-        # This allows background processes to annotate current_state for internal use.
-        # UI/API serializers separately check both fflag_feat_fit_568 AND fflag_feat_fit_710
-        # before exposing state data to consumers.
-        user = CurrentContext.get_user()
-        if not flag_set('fflag_feat_fit_568_finite_state_management', user=user):
-            logger.debug('FSM feature flag disabled, skipping state annotation')
+        if not getattr(settings, 'FSM_ENABLED', False):
+            logger.debug('FSM disabled, skipping state annotation')
             return self
 
         # Get the entity name from the model

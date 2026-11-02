@@ -83,24 +83,18 @@ class CurrentContext:
         Cache the FSM enabled state for this request/thread.
 
         PERFORMANCE: This is called once when the user is first set (typically in middleware).
-        It checks the feature flag once and caches the result, so all downstream code
-        can check a simple boolean property instead of repeatedly calling feature flag checks.
-
-        This eliminates thousands of feature flag lookups per request.
+        It checks settings.FSM_ENABLED once and caches the result, so all downstream code
+        can check a simple boolean property.
 
         Args:
-            user: The user to check FSM feature flag for
+            user: The user for the current request/context
         """
         try:
-            from core.feature_flags import flag_set
+            from django.conf import settings
 
-            # Only import when needed to avoid circular imports
-
-            # Check feature flag once and cache the result
-            fsm_enabled = flag_set('fflag_feat_fit_568_finite_state_management', user=user) if user else False
+            fsm_enabled = bool(getattr(settings, 'FSM_ENABLED', False)) if user else False
             cls.set('fsm_enabled_cached', fsm_enabled)
         except Exception:
-            # If feature flag check fails, assume disabled to be safe
             cls.set('fsm_enabled_cached', False)
 
     @classmethod
@@ -109,7 +103,6 @@ class CurrentContext:
         Check if FSM is enabled for the current request/thread.
 
         PERFORMANCE: Returns cached value that was set when user was first set.
-        This avoids repeated feature flag lookups throughout the request.
 
         Returns:
             True if FSM is enabled, False otherwise (includes manual disable via set_fsm_disabled)
@@ -118,7 +111,12 @@ class CurrentContext:
         if cls.is_fsm_disabled():
             return False
 
-        # Return cached feature flag state (set once per request in _cache_fsm_enabled_state)
+        from django.conf import settings
+
+        if not getattr(settings, 'FSM_ENABLED', False):
+            return False
+
+        # Return cached FSM enabled state (set once per request in _cache_fsm_enabled_state)
         return cls.get('fsm_enabled_cached', False)
 
     @classmethod

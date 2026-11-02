@@ -4,7 +4,6 @@ import logging
 import os
 import pathlib
 
-from core.feature_flags import flag_set
 from core.filters import NumberInFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
@@ -25,6 +24,7 @@ from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from fsm.serializer_fields import fsm_state_fields_enabled
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
@@ -188,18 +188,14 @@ class ProjectListAPI(generics.ListCreateAPIView):
         if fields is None or set(fields) & set(ProjectManager.COUNTER_FIELDS):
             projects = ProjectManager.with_counts_annotate(projects, fields=fields)
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
         state_requested = (
             sparse_fields is None
             or 'state' in sparse_fields
             or 'state' in self.request.query_params.get('ordering', '')
             or bool(self.request.query_params.get('state'))
         )
-        if (
-            state_requested
-            and flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=self.request.user)
-        ):
+        if state_requested and fsm_state_fields_enabled():
             projects = projects.with_state()
 
         prefetch_fields = []
@@ -272,10 +268,8 @@ class ProjectCountsListAPI(generics.ListAPIView):
             organization=self.request.user.active_organization
         )
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
-        ):
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
+        if fsm_state_fields_enabled():
             projects = projects.with_state()
 
         return projects
@@ -406,10 +400,8 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
             organization=self.request.user.active_organization
         )
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
-        ):
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
+        if fsm_state_fields_enabled():
             projects = projects.with_state()
 
         return projects

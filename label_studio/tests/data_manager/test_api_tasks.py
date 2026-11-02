@@ -1,7 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
-from unittest.mock import patch
 
 import pytest
 from django.db import connection
@@ -104,6 +103,8 @@ def test_views_tasks_api(business_client, project_id):
 
 @pytest.mark.django_db
 def test_tasks_api_annotates_state_when_state_field_flags_enabled(business_client, project_id):
+    from django.test import override_settings
+
     project = Project.objects.get(pk=project_id)
     task_1 = make_task({'data': {'text': 'one'}}, project)
     task_2 = make_task({'data': {'text': 'two'}}, project)
@@ -111,10 +112,7 @@ def test_tasks_api_annotates_state_when_state_field_flags_enabled(business_clien
     TaskStateFactory(task=task_2, state=TaskStateChoices.COMPLETED)
 
     with (
-        patch('data_manager.api.flag_set', return_value=True),
-        patch('data_manager.serializers.flag_set', return_value=True),
-        patch('fsm.queryset_mixins.flag_set', return_value=True),
-        patch('fsm.serializer_fields.flag_set', return_value=True),
+        override_settings(FSM_ENABLED=True),
         CaptureQueriesContext(connection) as queries,
     ):
         response = business_client.get(f'/api/tasks?fields=all&project={project_id}')

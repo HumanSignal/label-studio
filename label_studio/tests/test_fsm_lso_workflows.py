@@ -25,7 +25,8 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture(autouse=True)
-def clear_fsm_cache():
+def clear_fsm_cache(settings):
+    settings.FSM_ENABLED = True
     cache.clear()
     yield
     CurrentContext.clear()
@@ -33,8 +34,9 @@ def clear_fsm_cache():
 
 
 @pytest.fixture
-def fsm_context(business_client):
+def fsm_context(business_client, settings):
     """Set CurrentContext so FSM state lookups (e.g. in assert_*_state) work in tests."""
+    settings.FSM_ENABLED = True
     CurrentContext.set_user(business_client.user)
     try:
         yield

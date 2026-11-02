@@ -16,16 +16,11 @@ Usage:
             fields = ['id', 'data', 'state', ...]
 
 Note:
-    All state serialization functionality is guarded by TWO feature flags:
-    1. 'fflag_feat_fit_568_finite_state_management' - Controls FSM background calculations
-    2. 'fflag_feat_fit_710_fsm_state_fields' - Controls state field display in APIs
-
-    When either flag is disabled, fields return None. This allows enabling FSM background
-    work while keeping state fields hidden during incremental rollout and testing.
+    All state serialization functionality is guarded by `settings.FSM_ENABLED`.
+    When FSM is disabled (e.g., in LSO), fields return None.
 """
 
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
+from django.conf import settings
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from fsm.state_manager import StateManager
@@ -35,17 +30,14 @@ FSM_STATE_FIELDS_CONTEXT_KEY = 'fsm_state_fields_enabled'
 
 
 def fsm_state_fields_enabled(context=None):
-    """Whether both FSM flags allow exposing state for the current user.
+    """Whether FSM state fields are enabled.
 
     Serializers that render many objects (e.g. exports) can resolve this once and put it in their context
-    under FSM_STATE_FIELDS_CONTEXT_KEY; otherwise the flags are evaluated on every call.
+    under FSM_STATE_FIELDS_CONTEXT_KEY; otherwise `settings.FSM_ENABLED` is evaluated.
     """
     if context and FSM_STATE_FIELDS_CONTEXT_KEY in context:
         return context[FSM_STATE_FIELDS_CONTEXT_KEY]
-    user = CurrentContext.get_user()
-    return flag_set('fflag_feat_fit_568_finite_state_management', user=user) and flag_set(
-        'fflag_feat_fit_710_fsm_state_fields', user=user
-    )
+    return bool(getattr(settings, 'FSM_ENABLED', False))
 
 
 @extend_schema_field(OpenApiTypes.STR)

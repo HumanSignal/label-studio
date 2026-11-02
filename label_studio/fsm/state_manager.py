@@ -10,7 +10,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Type
 
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from django.conf import settings
 from django.core.cache import cache, caches
 from django.db.models import Model, QuerySet
@@ -101,10 +100,12 @@ class StateManager:
 
     @classmethod
     def _is_fsm_enabled(cls, user='auto') -> bool:
-        """Check if FSM feature is enabled via feature flag."""
+        """Check if FSM is enabled."""
+        if not getattr(settings, 'FSM_ENABLED', False):
+            return False
         if user is None or user == 'auto':
             return CurrentContext.is_fsm_enabled()
-        return flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+        return not CurrentContext.is_fsm_disabled()
 
     @classmethod
     def get_cache_key(cls, entity: Model) -> str:

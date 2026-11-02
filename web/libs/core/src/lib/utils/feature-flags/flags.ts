@@ -67,11 +67,6 @@ export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable
 export const FF_UTC_1166_FILTER_SHELL = "fflag_utc_1166_filter_shell";
 
 /**
- * FSM State Fields
- */
-export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
-
-/**
  * Starter Cloud (Self Serve) plan
  * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
  */

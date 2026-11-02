@@ -282,13 +282,9 @@ class AnnotationSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
         return name
 
     def to_representation(self, obj):
-        """Remove state field if feature flags are disabled"""
+        """Remove state field if FSM state fields are disabled"""
         ret = super().to_representation(obj)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
         return ret
 
@@ -798,10 +794,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                 # Strip FSM state field from predictions before validation
                 # Exported data may include 'state' which is not a valid prediction field
-                ff_user = self.project.organization.created_by
-                if flag_set('fflag_feat_fit_568_finite_state_management', user=ff_user) and flag_set(
-                    'fflag_feat_fit_710_fsm_state_fields', user=ff_user
-                ):
+                if fsm_state_fields_enabled(self.context):
                     prediction.pop('state', None)
 
                 # Validate prediction only when project label config is not default

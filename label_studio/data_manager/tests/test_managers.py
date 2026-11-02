@@ -1464,8 +1464,9 @@ class TestAnnotateStateProjectScoped(TestCase):
 
     def _states(self, queryset):
         from data_manager.managers import annotate_state
+        from django.test import override_settings
 
-        with patch('fsm.queryset_mixins.flag_set', return_value=True):
+        with override_settings(FSM_ENABLED=True):
             annotated = annotate_state(queryset)
             return annotated, dict(annotated.values_list('id', 'state'))
 
@@ -1477,8 +1478,9 @@ class TestAnnotateStateProjectScoped(TestCase):
 
     def test_filter_and_order_by_state(self):
         from data_manager.managers import annotate_state
+        from django.test import override_settings
 
-        with patch('fsm.queryset_mixins.flag_set', return_value=True):
+        with override_settings(FSM_ENABLED=True):
             annotated = annotate_state(Task.objects.filter(project=self.project))
             completed = list(annotated.filter(state__icontains='complet').values_list('id', flat=True))
             ordered = list(annotated.exclude(state=None).order_by('state').values_list('id', flat=True))

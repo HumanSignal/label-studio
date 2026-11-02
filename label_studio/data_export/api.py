@@ -188,19 +188,14 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get_task_queryset(self, queryset):
         # Import here to avoid circular dependencies
-        from core.feature_flags import flag_set
+        from fsm.serializer_fields import fsm_state_fields_enabled
         from tasks.models import Annotation
 
         # Create a prefetch for annotations with FSM state
         annotations_qs = Annotation.objects.all()
 
-        # Only annotate FSM state if both feature flags are enabled
-        user = getattr(self.request, 'user', None)
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(annotations_qs, 'with_state')
-        ):
+        # Only annotate FSM state if FSM state fields are enabled
+        if fsm_state_fields_enabled() and hasattr(annotations_qs, 'with_state'):
             annotations_qs = annotations_qs.with_state()
 
         qs = queryset.select_related('project').prefetch_related(
@@ -208,11 +203,7 @@ class ExportAPI(generics.RetrieveAPIView):
         )
 
         # Add FSM state annotation to tasks as well to avoid N+1 queries during export
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(qs, 'with_state')
-        ):
+        if fsm_state_fields_enabled() and hasattr(qs, 'with_state'):
             qs = qs.with_state()
         return qs
 

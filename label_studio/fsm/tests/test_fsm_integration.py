@@ -5,7 +5,6 @@ and API endpoints.
 """
 
 from datetime import datetime
-from unittest.mock import patch
 
 from django.test import TestCase
 from fsm.state_manager import get_state_manager
@@ -134,15 +133,11 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'CREATED'  # FsmHistoryStateModel auto-creates state
 
-    @patch('fsm.state_manager.flag_set')
-    def test_transition_state(self, mock_flag_set):
+    def test_transition_state(self):
         """Test state transition functionality with immediate cache updates"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Initial transition
         success = self.StateManager.transition_state(
@@ -173,15 +168,11 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'IN_PROGRESS'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_get_current_state_object(self, mock_flag_set):
+    def test_get_current_state_object(self):
         """Test getting current state object with full details"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Create some state transitions
         self.StateManager.transition_state(entity=self.task, new_state='CREATED', user=self.user)
@@ -197,15 +188,11 @@ class TestStateManager(TestCase):
         assert current_state_obj.triggered_by == self.user
         assert current_state_obj.context_data == {'test': 'data'}
 
-    @patch('fsm.state_manager.flag_set')
-    def test_get_state_history(self, mock_flag_set):
+    def test_get_state_history(self):
         """Test state history retrieval"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         transitions = [('CREATED', 'create_task'), ('IN_PROGRESS', 'start_work'), ('COMPLETED', 'finish_work')]
 
@@ -228,15 +215,11 @@ class TestStateManager(TestCase):
         assert history[1].previous_state == 'CREATED'
         assert history[0].previous_state == 'IN_PROGRESS'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_get_states_in_time_range(self, mock_flag_set):
+    def test_get_states_in_time_range(self):
         """Test time-based state queries using StateManager"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Create some states
         self.StateManager.transition_state(entity=self.task, new_state='CREATED', user=self.user)
@@ -248,15 +231,11 @@ class TestStateManager(TestCase):
         # Should have at least the states we created
         assert len(states) >= 2
 
-    @patch('fsm.state_manager.flag_set')
-    def test_immediate_cache_update_success_case(self, mock_flag_set):
+    def test_immediate_cache_update_success_case(self):
         """Test that cache is updated immediately on successful transitions"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Perform a successful transition
         success = self.StateManager.transition_state(
@@ -284,15 +263,11 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'IN_PROGRESS'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_transaction_on_commit_success_case(self, mock_flag_set):
+    def test_transaction_on_commit_success_case(self):
         """Test successful state transitions"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Perform a successful transition
         success = self.StateManager.transition_state(
@@ -306,15 +281,11 @@ class TestStateManager(TestCase):
         assert success
         assert self.StateManager.get_current_state_value(self.task) == 'CREATED'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_transaction_on_commit_database_failure_case(self, mock_flag_set):
+    def test_transaction_on_commit_database_failure_case(self):
         """Test state transitions work correctly"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Perform a transition
         self.StateManager.transition_state(
@@ -328,15 +299,11 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'CREATED'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_immediate_cache_update_content(self, mock_flag_set):
+    def test_immediate_cache_update_content(self):
         """Test that cache is immediately updated during transition"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Perform a transition
         success = self.StateManager.transition_state(
@@ -356,15 +323,11 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'CREATED'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_cache_cleanup_on_transaction_rollback(self, mock_flag_set):
+    def test_cache_cleanup_on_transaction_rollback(self):
         """Test cache behavior with state transitions"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Create a state transition
         self.StateManager.transition_state(
@@ -380,15 +343,11 @@ class TestStateManager(TestCase):
         cached_state = cache.get(cache_key)
         assert cached_state == 'CREATED'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_same_state_transition_prevention(self, mock_flag_set):
+    def test_same_state_transition_prevention(self):
         """Test that same-state transitions are prevented"""
         from django.core.cache import cache
 
         cache.clear()
-
-        # Enable FSM feature flag
-        mock_flag_set.return_value = True
 
         # Create initial state
         success = self.StateManager.transition_state(
@@ -425,15 +384,12 @@ class TestStateManager(TestCase):
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state == 'CREATED'
 
-    @patch('fsm.state_manager.flag_set')
-    def test_transition_with_anonymous_user(self, mock_flag_set):
+    def test_transition_with_anonymous_user(self):
         """Test that transitioning state with AnonymousUser succeeds and sets triggered_by to None."""
         from django.contrib.auth.models import AnonymousUser
         from django.core.cache import cache
 
         cache.clear()
-
-        mock_flag_set.return_value = True
 
         anon_user = AnonymousUser()
         success = self.StateManager.transition_state(

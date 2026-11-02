@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -55,7 +55,7 @@ class TestProjectListAPI(APITestCase):
     def test_fields_with_whitespace_matches_enrichment_skips(self):
         """Whitespace around fields tokens must not desync serializer flex-fields vs enrichment gating."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,
@@ -80,7 +80,7 @@ class TestProjectListAPI(APITestCase):
     def test_sparse_fields_skip_counts_state_and_related_prefetches(self):
         """The picker shape avoids unrelated list enrichment work."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,
@@ -101,7 +101,7 @@ class TestProjectListAPI(APITestCase):
     def test_default_fields_preserve_project_list_enrichment(self):
         """The normal project list keeps its existing counts, state, and related prefetches."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,

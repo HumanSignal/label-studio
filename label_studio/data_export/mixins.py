@@ -6,7 +6,6 @@ import shutil
 from datetime import datetime
 from functools import reduce
 
-from core.feature_flags import flag_set
 from core.redis import redis_connected, start_job_async_or_sync
 from core.utils.common import batch
 from core.utils.io import (
@@ -217,12 +216,9 @@ class ExportMixin:
         """expand: the export serializer's expand list. Relations it doesn't expand are serialized as IDs only, so
         their payload isn't loaded. None loads everything."""
 
-        # Only annotate FSM state if both feature flags are enabled
+        # Only annotate FSM state if FSM state fields are enabled
         # This prevents unnecessary query annotations when state won't be serialized
-        user = getattr(self, 'created_by', None)
-        with_state = flag_set('fflag_feat_fit_568_finite_state_management', user=user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=user
-        )
+        with_state = fsm_state_fields_enabled()
 
         annotations_qs = self._get_filtered_annotations_queryset(
             annotation_filter_options=annotation_filter_options, with_state=with_state, expand=expand

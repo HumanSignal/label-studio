@@ -1131,6 +1131,7 @@ QS_ITERATOR_DEFAULT_CHUNK_SIZE = int(get_env('QS_ITERATOR_DEFAULT_CHUNK_SIZE', 1
 DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
+FSM_ENABLED = get_bool_env('FSM_ENABLED', False)
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
 FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
