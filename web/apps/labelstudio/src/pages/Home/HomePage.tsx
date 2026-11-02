@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useUpdatePageTitle } from "@humansignal/core";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
@@ -66,6 +67,8 @@ type Action = (typeof actions)[number]["type"];
 
 export const HomePage: Page = () => {
   const api = useAPI();
+  const { permissions, user } = useAuth();
+  const canCreate = !!user && permissions.can("projects.create");
   const location = useLocation();
   const [modalIsOpen, setModalIsOpen] = useAtom(creationDialogOpen);
   const [invitationIsOpen, setInvitationIsOpen] = useAtom(invitationOpen);
@@ -127,7 +130,7 @@ export const HomePage: Page = () => {
     return () => {
       switch (action) {
         case "createProject":
-          setModalIsOpen(true);
+          if (canCreate) setModalIsOpen(true);
           break;
         case "inviteMembers":
           setInvitationIsOpen(true);
@@ -150,6 +153,7 @@ export const HomePage: Page = () => {
           </div>
           <div className="flex justify-start gap-4">
             {actions.map((action) => {
+              if (action.type === "createProject" && !canCreate) return null;
               return (
                 <Button
                   key={action.title}
@@ -193,14 +197,18 @@ export const HomePage: Page = () => {
                   <FolderOpenIcon />
                 </div>
                 <Typography variant="headline" size="small">
-                  Create your first project
+                  {canCreate ? "Create your first project" : "暂无获授权的项目，请联系项目负责人"}
                 </Typography>
                 <Typography size="small" className="text-neutral-content-subtler">
-                  Import your data and set up the labeling interface to start annotating
+                  {canCreate
+                    ? "Import your data and set up the labeling interface to start annotating"
+                    : "获授权后，项目会显示在这里。"}
                 </Typography>
-                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
-                  Create Project
-                </Button>
+                {canCreate && (
+                  <Button className="mt-4" onClick={handleActions("createProject")} aria-label="Create new project">
+                    Create Project
+                  </Button>
+                )}
               </div>
             ) : isSuccess && data && sortedProjects.length > 0 ? (
               <div className="flex flex-col gap-1">
@@ -238,7 +246,7 @@ export const HomePage: Page = () => {
           </div>
         </section>
       </div>
-      {modalIsOpen && <CreateProject onClose={() => setModalIsOpen(false)} />}
+      {canCreate && modalIsOpen && <CreateProject onClose={() => setModalIsOpen(false)} />}
       <InviteLink opened={invitationIsOpen} onClosed={() => setInvitationIsOpen(false)} />
     </main>
   );

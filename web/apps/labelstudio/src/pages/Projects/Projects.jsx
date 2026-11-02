@@ -23,8 +23,8 @@ const getCurrentPage = () => {
 
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
-  const { permissions, isLoading: userLoading, user } = useAuth();
-  const canCreate = userLoading || !user || permissions.can("projects.create");
+  const { permissions, user } = useAuth();
+  const canCreate = !!user && permissions.can("projects.create");
   const abortController = useAbortController();
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);
@@ -37,7 +37,9 @@ export const ProjectsPage = () => {
 
   const [modal, setModal] = React.useState(false);
 
-  const openModal = () => setModal(true);
+  const openModal = () => {
+    if (canCreate) setModal(true);
+  };
 
   const closeModal = () => setModal(false);
 
@@ -137,7 +139,7 @@ export const ProjectsPage = () => {
           ) : (
             <EmptyProjectsList openModal={openModal} canCreate={canCreate} />
           )}
-          {modal && <CreateProject onClose={closeModal} />}
+          {canCreate && modal && <CreateProject onClose={closeModal} />}
         </div>
       </Oneof>
     </div>
