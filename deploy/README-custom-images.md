@@ -3,6 +3,9 @@
 工作流：`.github/workflows/docker-publish-custom.yml`（Publish custom Docker image）。
 使用仓库根目录的 Dockerfile，从源码构建前后端，并发布 AMD64、ARM64 两种架构。
 两个架构都构建成功后才发布版本标签。
+Python 构建和运行阶段使用 Debian slim，使 OpenCV 使用锁定版本的 manylinux
+预编译包；不允许 OpenCV 回退到耗时的源码编译。镜像构建还会检查 OpenCV、
+PyArrow 和 uWSGI 在最终运行环境中能否加载。
 
 ## 首次准备
 

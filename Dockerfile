@@ -46,7 +46,9 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,
     bun run build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
-FROM python:${PYTHON_VERSION}-alpine AS venv-builder
+# OpenCV ships manylinux (glibc) wheels, not musllinux wheels. Alpine would
+# compile OpenCV from source on every cold build, taking tens of minutes.
+FROM python:${PYTHON_VERSION}-slim-bookworm AS venv-builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -55,14 +57,14 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE="copy" \
     UV_COMPILE_BYTECODE=1 \
     UV_PYTHON_DOWNLOADS=never \
+    UV_NO_BUILD_PACKAGE=opencv-python-headless \
     PATH="/label-studio/.venv/bin:$PATH"
 
-RUN apk add --no-cache \
-    build-base \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     git \
-    linux-headers \
-    python3-dev \
-    pcre2-dev
+    libpcre2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 COPY --from=uv /uv /usr/local/bin/uv
@@ -77,7 +79,7 @@ COPY pyproject.toml uv.lock README.md ./
 
 ARG INCLUDE_DEV=false
 
-RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
+RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-bookworm,sharing=locked \
     if [ "$INCLUDE_DEV" = "true" ]; then \
         uv sync --frozen --no-install-project --group test --extra uwsgi; \
     else \
@@ -92,7 +94,7 @@ COPY --from=frontend-builder /label-studio/label_studio/core/static/js/manifest.
 COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js ./label_studio/core/static/js/sw.js
 COPY --from=frontend-builder /label-studio/label_studio/core/static/js/sw.js.map ./label_studio/core/static/js/sw.js.map
 
-RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
+RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-bookworm,sharing=locked \
     if [ "$INCLUDE_DEV" = "true" ]; then \
         uv sync --frozen --group test --extra uwsgi; \
     else \
@@ -103,7 +105,7 @@ RUN --mount=type=cache,target=/.uv-cache,id=uv-cache-alpine,sharing=locked \
 RUN DJANGO_SETTINGS_MODULE=core.settings.label_studio python3 ./label_studio/manage.py collectstatic --no-input
 
 ################################### Stage: prod
-FROM python:${PYTHON_VERSION}-alpine AS production
+FROM python:${PYTHON_VERSION}-slim-bookworm AS production
 
 ENV LS_DIR=/label-studio \
     HOME=/label-studio \
@@ -117,12 +119,16 @@ ENV LS_DIR=/label-studio \
 WORKDIR $LS_DIR
 
 # install prerequisites for app
-RUN apk upgrade --no-cache && apk add --no-cache \
-    expat \
-    glib \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libexpat1 \
+    libglib2.0-0 \
+    libgomp1 \
+    libpcre2-8-0 \
     nginx \
     bash \
-    procps
+    procps \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
     mkdir -p $LS_DIR $LABEL_STUDIO_BASE_DATA_DIR $OPT_DIR && \
@@ -137,6 +143,9 @@ COPY --chown=1001:0 deploy deploy
 # Copy files from build stages
 COPY --chown=1001:0 --from=venv-builder               /label-studio                                  $LS_DIR
 COPY --chown=1001:0 --from=frontend-builder           /label-studio/web/dist                        $LS_DIR/web/dist
+
+# Check native wheels against the runtime image, not just the build toolchain.
+RUN python -c "import cv2; import pyarrow" && uwsgi --version
 
 ARG COMMIT_VERSION=N/A
 ARG COMMIT_BRANCH=N/A
