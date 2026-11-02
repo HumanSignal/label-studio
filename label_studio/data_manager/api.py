@@ -673,7 +673,7 @@ class ProjectStateAPI(APIView):
         project = generics.get_object_or_404(Project, pk=pk)
         _enforce_project_permission(request.user, project, all_permissions.projects_view)
         self.check_object_permissions(request, project)
-        data = ProjectSerializer(project).data
+        data = ProjectSerializer(project, context={'request': request}).data
         can_manage = can_manage_project(request.user, project)
 
         data.update(

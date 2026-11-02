@@ -182,17 +182,14 @@ class DataManagerAccessTests(APITestCase):
         world = make_access_world()
         url = reverse('data_manager:dm-project')
 
-        self.client.force_authenticate(world.member_a)
-        member = self.client.get(url, {'project': world.project_1.id})
-        self.assertEqual(member.status_code, 200, member.content)
-        for field in ('can_delete_tasks', 'can_manage_annotations', 'can_manage_tasks'):
-            self.assertIs(member.json()[field], False)
-
-        self.client.force_authenticate(world.creator)
-        manager = self.client.get(url, {'project': world.project_1.id})
-        self.assertEqual(manager.status_code, 200, manager.content)
-        for field in ('can_delete_tasks', 'can_manage_annotations', 'can_manage_tasks'):
-            self.assertIs(manager.json()[field], True)
+        for user, can_manage in ((world.member_a, False), (world.creator, True), (world.owner, True)):
+            with self.subTest(user=user.id):
+                self.client.force_authenticate(user)
+                response = self.client.get(url, {'project': world.project_1.id})
+                self.assertEqual(response.status_code, 200, response.content)
+                self.assertEqual(response.json()['access'], {'can_annotate': True, 'can_manage': can_manage})
+                for field in ('can_delete_tasks', 'can_manage_annotations', 'can_manage_tasks'):
+                    self.assertIs(response.json()[field], can_manage)
 
     def test_view_project_must_match_url_project(self):
         world = make_access_world()
