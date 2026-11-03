@@ -264,6 +264,64 @@ def get_fields_for_filter_ordering(prepare_params):
     return result
 
 
+RESULT_FILTER_OPERATORS = (
+    Operator.EQUAL,
+    Operator.NOT_EQUAL,
+    Operator.CONTAINS,
+    Operator.NOT_CONTAINS,
+    Operator.EMPTY,
+)
+
+
+def result_filters_use_exists(filters):
+    """Whether the Data Manager filter pass evaluates ``annotations_results`` filters as EXISTS.
+
+    Not when they are ORed with other filters: Postgres runs a correlated EXISTS under OR once per
+    joined row, and other filters (e.g. ``annotators``) join annotations, so it would run per pair of
+    a task's annotations. There the aggregate and the join-based lookups stay.
+    """
+    return bool(filters) and (filters.conjunction == ConjunctionEnum.AND or len(filters.items) == 1)
+
+
+def _is_results_empty_filter(item):
+    if item.operator != Operator.EMPTY:
+        return False
+    try:
+        return cast_bool_from_str(item.value) is True
+    except ValueError:
+        return True
+
+
+def get_fields_for_filter_pass(prepare_params):
+    """Fields to annotate on the filter/ordering pass.
+
+    ``annotations_results`` aggregates every annotation of every task, but ``add_result_filter`` filters
+    it with subqueries for these operators, so the aggregate is only needed when ordering by it.
+    A filter with child filters keeps it: with the aggregate's join in place, Django correlates the
+    ``[]`` check of the join-based "not empty" lookup to the task rather than to the joined annotation.
+    So do filters that ``result_filters_use_exists`` keeps on the join-based lookups, and "results are
+    empty", which ``add_result_filter`` keeps on the join: its EXISTS form ORs two correlated
+    subqueries, which Postgres probes per task, slower than the join on large projects.
+    """
+    fields = get_fields_for_filter_ordering(prepare_params)
+    if 'annotations_results' not in fields or not prepare_params.filters:
+        return fields
+    ordering_field = fields[0] if prepare_params.ordering else None
+    result_filters = [
+        item
+        for item in prepare_params.filters.items
+        if item.filter.replace('filter:tasks:', '') == 'annotations_results'
+    ]
+    if (
+        ordering_field == 'annotations_results'
+        or not result_filters_use_exists(prepare_params.filters)
+        or not all(item.operator in RESULT_FILTER_OPERATORS and not item.child_filters for item in result_filters)
+        or any(_is_results_empty_filter(item) for item in result_filters)
+    ):
+        return fields
+    return [field for field in fields if field != 'annotations_results']
+
+
 def is_agreement_related_field(field_name):
     return field_name in {
         'agreement',
@@ -356,7 +414,7 @@ def _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, pro
 
     narrowed_filters = Filters(conjunction=filters.conjunction, items=narrowed_items)
     try:
-        narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request)
+        narrowed_queryset = apply_filters(queryset, narrowed_filters, project, request, exists_result_filters=True)
     except FieldError:
         # Fail open: prefilter is an optimization only, the main filtered query still runs later.
         logger.warning('DM agreement prefilter skipped due to unresolved filter field', exc_info=True)
@@ -635,7 +693,39 @@ def validate_in_list_filter(_filter, field_name: str) -> str:
     return 'ok'
 
 
-def add_result_filter(field_name, _filter, filter_expressions, project):
+def annotation_results_empty_q(is_empty, annotations=None, other_annotations=None):
+    """Task-level "annotation results are empty / not empty" as correlated EXISTS subqueries.
+
+    No join on annotations, which would multiply rows per task and need GROUP BY to deduplicate.
+    - empty: no annotation in ``annotations``, or one with a null or ``[]`` result
+    - not empty: an annotation in ``annotations`` with a non-null result, and no annotation in
+      ``other_annotations`` with a ``[]`` result
+
+    ``annotations`` / ``other_annotations`` default to all annotations of the outer task.
+    """
+    from tasks.models import Annotation
+
+    task_annotations = Annotation.objects.filter(task=OuterRef('pk'))
+    annotations = task_annotations if annotations is None else annotations
+    other_annotations = task_annotations if other_annotations is None else other_annotations
+    if is_empty:
+        return ~Exists(annotations) | Exists(annotations.filter(Q(result__isnull=True) | Q(result=[])))
+    return Exists(annotations.filter(result__isnull=False)) & ~Exists(other_annotations.filter(result=[]))
+
+
+def annotation_results_empty_join_q(is_empty):
+    """The join form of ``annotation_results_empty_q``.
+
+    Other filters in the same filter line that join annotations (e.g. ``annotators``) reuse this join,
+    so they constrain the same annotation row. On a queryset without the ``annotations_results``
+    aggregate, "not empty" means one annotation whose result is neither null nor ``[]``.
+    """
+    if is_empty:
+        return Q(annotations__result__isnull=True) | Q(annotations__result=[])
+    return Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+
+
+def add_result_filter(field_name, _filter, filter_expressions, project, use_exists=False):
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
@@ -673,10 +763,9 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
         filter_expressions.append(~Q(subquery))
         return 'continue'
     elif _filter.operator == Operator.EMPTY:
-        if cast_bool_from_str(_filter.value):
-            q = Q(annotations__result__isnull=True) | Q(annotations__result=[])
-        else:
-            q = Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+        is_empty = cast_bool_from_str(_filter.value)
+        use_exists = use_exists and not is_empty  # see get_fields_for_filter_pass
+        q = annotation_results_empty_q(is_empty) if use_exists else annotation_results_empty_join_q(is_empty)
         filter_expressions.append(q)
         return 'continue'
 
@@ -806,9 +895,17 @@ def add_user_filter(enabled, key, _filter, filter_expressions):
         return 'continue'
 
 
-def apply_filters(queryset, filters, project, request):
+def apply_filters(queryset, filters, project, request, exists_result_filters=False):
+    """Filter ``queryset`` by Data Manager filters.
+
+    ``exists_result_filters`` is for the Data Manager filter pass, where these filters used to run with
+    the ``annotations_results`` aggregate annotated: there, "annotation results not empty" excludes a
+    task that has any ``[]`` result, and it is evaluated as EXISTS so the aggregate can be skipped.
+    Other callers filter plain task querysets and keep the join semantics.
+    """
     if not filters:
         return queryset
+    exists_result_filters = exists_result_filters and result_filters_use_exists(filters)
 
     # Fail closed before custom emitters build ``__regex`` Q objects (FIT-2460).
     if filters_contain_invalid_regex(filters):
@@ -870,6 +967,7 @@ def apply_filters(queryset, filters, project, request):
                 request=request,
                 is_child_filter=is_child_filter,
                 child_filter=parent_filter.child_filter if not is_child_filter else None,
+                exists_result_filters=exists_result_filters,
                 child_filters=child_filters if not is_child_filter else None,
             )
             if isinstance(filter_expression, CustomFilterResult):
@@ -904,7 +1002,13 @@ def apply_filters(queryset, filters, project, request):
 
             # annotations results & predictions results
             if field_name in ['annotations_results', 'predictions_results']:
-                result = add_result_filter(field_name, _filter, filter_expressions, project)
+                result = add_result_filter(
+                    field_name,
+                    _filter,
+                    filter_expressions,
+                    project,
+                    use_exists=exists_result_filters and len(filter_line) == 1,
+                )
                 if result == 'exit':
                     return queryset.none()
                 elif result == 'continue':
@@ -1109,7 +1213,7 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
             queryset.project = project
 
         request = prepare_params.request
-        queryset = apply_filters(queryset, prepare_params.filters, project, request)
+        queryset = apply_filters(queryset, prepare_params.filters, project, request, exists_result_filters=True)
         queryset = apply_ordering(queryset, prepare_params.ordering, project, request, view_data=prepare_params.data)
 
         if prepare_params.selectedItems:
@@ -1146,6 +1250,21 @@ class FirstArrayElement(Func):
     template = '(%(expressions)s)[1]'
 
 
+class SourceColumnsGroupByCase(Case):
+    """Case that contributes its source columns to GROUP BY instead of the whole expression.
+
+    Django's default puts a non-aggregate Case in GROUP BY as-is. When it wraps a correlated
+    subquery and the query also joins a multi-valued relation (e.g. annotations for an ArrayAgg),
+    Postgres evaluates the subquery once per joined row instead of once per task.
+    """
+
+    def get_group_by_cols(self):
+        cols = []
+        for source in self.get_source_expressions():
+            cols.extend(source.get_group_by_cols())
+        return cols
+
+
 def newest_annotation_created_at_from_join() -> FirstArrayElement:
     """Same value as newest_annotation_subquery(), read from the task's joined annotation rows.
 
@@ -1159,7 +1278,9 @@ def newest_annotation_created_at_from_join() -> FirstArrayElement:
 
 
 def base_annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
-    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=newest_annotation_subquery())))
+    return queryset.annotate(
+        completed_at=SourceColumnsGroupByCase(When(is_labeled=True, then=newest_annotation_subquery()))
+    )
 
 
 def annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
@@ -1448,6 +1569,8 @@ class PreparedTaskManager(models.Manager):
                 function = annotations_map[field]
                 queryset = function(queryset)
 
+        # Annotate functions return clones without the attribute; list prefetches read it
+        queryset.project = project
         return queryset
 
     def get_queryset(
@@ -1499,7 +1622,7 @@ class PreparedTaskManager(models.Manager):
             # Attach project before annotate_queryset so it does not call queryset.first().
             queryset.project = project
             _set_prefilter_task_ids_for_agreement(request, queryset, prepare_params, project)
-        fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
+        fields_for_filter_ordering = get_fields_for_filter_pass(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
         # TaskListAPI runs a second annotate_queryset on the same request for the paginated id__in slice.
         # Drop the prefilter so agreement does not reuse this large ID list for that pass (must use page tasks only).

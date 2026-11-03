@@ -4,6 +4,7 @@ This file tests the core functionality of the excluded_fields_for_evaluation
 feature that optimizes task API performance by excluding expensive fields.
 """
 
+import json
 from unittest.mock import Mock, patch
 
 from data_manager.prepare_params import ConjunctionEnum, Filter, Filters, PrepareParams
@@ -12,7 +13,7 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import Q
 from django.test import TestCase, override_settings
 from projects.tests.factories import ProjectFactory
-from tasks.models import Task
+from tasks.models import Annotation, Task
 from tasks.tests.factories import AnnotationFactory, TaskFactory
 from users.tests.factories import UserFactory
 
@@ -1487,6 +1488,278 @@ class TestAnnotateStateProjectScoped(TestCase):
 
         assert completed == [self.moved_on.id]
         assert ordered == [self.moved_on.id, self.single.id]
+
+
+class TestBaseAnnotateCompletedAt(TestCase):
+    """completed_at keeps the newest-annotation subquery out of GROUP BY (UTC-1491).
+
+    In GROUP BY, Postgres evaluates the subquery once per joined annotation row, which is
+    O(annotations²) per task on high-overlap projects whenever another column aggregates annotations.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        from django.utils import timezone
+
+        cls.project = ProjectFactory()
+        now = timezone.now()
+        cls.older_task = TaskFactory(project=cls.project)
+        cls.newer_task = TaskFactory(project=cls.project)
+        cls.unlabeled_task = TaskFactory(project=cls.project)
+        cls.expected = {}
+        for task, newest_offset in ((cls.older_task, 10), (cls.newer_task, 1)):
+            for offset in (newest_offset + 20, newest_offset + 10, newest_offset):
+                annotation = AnnotationFactory(task=task, project=cls.project)
+                created_at = now - timezone.timedelta(days=offset)
+                Annotation.objects.filter(id=annotation.id).update(created_at=created_at)
+            cls.expected[task.id] = created_at
+        AnnotationFactory(task=cls.unlabeled_task, project=cls.project)
+        Task.objects.filter(id__in=[cls.older_task.id, cls.newer_task.id]).update(is_labeled=True)
+        Task.objects.filter(id=cls.unlabeled_task.id).update(is_labeled=False)
+        cls.expected[cls.unlabeled_task.id] = None
+
+    def _annotated(self):
+        from data_manager.managers import base_annotate_completed_at
+        from django.contrib.postgres.aggregates import ArrayAgg
+
+        queryset = Task.objects.filter(project=self.project).annotate(
+            annotators=ArrayAgg('annotations__completed_by', distinct=True)
+        )
+        return base_annotate_completed_at(queryset)
+
+    def test_values_with_annotations_join(self):
+        assert dict(self._annotated().values_list('id', 'completed_at')) == self.expected
+
+    def test_order_by_completed_at_with_annotations_join(self):
+        from django.db.models import F
+
+        ordered = list(
+            self._annotated().order_by(F('completed_at').desc(nulls_last=True)).values_list('id', flat=True)
+        )
+
+        assert ordered == [self.newer_task.id, self.older_task.id, self.unlabeled_task.id]
+
+    def test_subquery_is_not_a_group_by_key(self):
+        sql = str(self._annotated().query)
+        group_by = sql[sql.index('GROUP BY') + len('GROUP BY') :].split('ORDER BY')[0]
+        terms = [term.strip() for term in group_by.split(',')]
+
+        # A grouped annotation renders as its select position (e.g. `"task"."id", 20`); Postgres
+        # collapses the task columns to `"task"."id"`, SQLite lists them all.
+        assert '"task"."id"' in terms
+        assert all(term.startswith('"task".') for term in terms), terms
+
+
+REAL_RESULT = [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['pos']}}]
+OTHER_RESULT = [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['neg']}}]
+
+
+def legacy_annotation_results_empty_q(is_empty):
+    """The join-based "annotation results is empty" lookup used before UTC-1491."""
+    if is_empty:
+        return Q(annotations__result__isnull=True) | Q(annotations__result=[])
+    return Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+
+
+def results_filter_params(project, operator, value, ordering=('tasks:id',)):
+    item = {'filter': 'filter:tasks:annotations_results', 'operator': operator, 'type': 'String', 'value': value}
+    return PrepareParams(project=project.id, filters={'conjunction': 'and', 'items': [item]}, ordering=list(ordering))
+
+
+class TestAnnotationResultsFilter(TestCase):
+    """Annotation results filters use EXISTS and skip the results aggregate on the filter pass (UTC-1491).
+
+    Results must match the join-based filters evaluated with the aggregate annotated, as before.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.tasks = {}
+        for name, results in {
+            'no_annotations': [],
+            'null': [None],
+            'empty_list': [[]],
+            'real': [REAL_RESULT],
+            'real_and_empty_list': [REAL_RESULT, []],
+            'real_and_null': [REAL_RESULT, None],
+            'same_real_twice': [REAL_RESULT, REAL_RESULT],
+            'two_results': [REAL_RESULT, OTHER_RESULT],
+        }.items():
+            task = TaskFactory(project=cls.project)
+            for result in results:
+                annotation = AnnotationFactory(task=task, project=cls.project)
+                Annotation.objects.filter(id=annotation.id).update(result=result)
+            cls.tasks[name] = task.id
+        TaskFactory(project=ProjectFactory(), data={'other': 'project'})
+
+    def _with_aggregate(self):
+        from data_manager.managers import annotate_annotations_results
+
+        return annotate_annotations_results(Task.objects.filter(project=self.project))
+
+    def _legacy_ids(self, operator, value):
+        from data_manager.managers import apply_filters
+
+        queryset = self._with_aggregate()
+        if operator == 'empty':
+            queryset = queryset.filter(legacy_annotation_results_empty_q(value == 'true'))
+        else:
+            params = results_filter_params(self.project, operator, value)
+            queryset = apply_filters(queryset, params.filters, self.project, request=None)
+        return sorted(queryset.values_list('id', flat=True))
+
+    def _ids(self, operator, value):
+        params = results_filter_params(self.project, operator, value)
+        ids = list(Task.prepared.only_filtered(prepare_params=params).values_list('id', flat=True))
+        assert len(ids) == len(set(ids)), ids
+        return ids
+
+    def test_matches_legacy_for_every_operator(self):
+        cases = [
+            ('empty', 'true'),
+            ('empty', 'false'),
+            ('equal', json.dumps(REAL_RESULT)),
+            ('not_equal', json.dumps(REAL_RESULT)),
+            ('contains', 'pos'),
+            ('not_contains', 'pos'),
+        ]
+        for operator, value in cases:
+            with self.subTest(operator=operator, value=value):
+                assert self._ids(operator, value) == self._legacy_ids(operator, value)
+
+    def test_empty_semantics(self):
+        tasks = self.tasks
+        assert self._ids('empty', 'true') == sorted(
+            tasks[name] for name in ('no_annotations', 'null', 'empty_list', 'real_and_empty_list', 'real_and_null')
+        )
+        # A [] result anywhere on the task excludes it from "not empty"
+        assert self._ids('empty', 'false') == sorted(
+            tasks[name] for name in ('real', 'real_and_null', 'same_real_twice', 'two_results')
+        )
+
+    def test_direct_apply_filters_keeps_join_semantics(self):
+        """Callers outside the Data Manager filter plain task querysets: "not empty" is per annotation."""
+        from data_manager.managers import apply_filters
+
+        plain = Task.objects.filter(project=self.project)
+        for value in ('true', 'false'):
+            with self.subTest(value=value):
+                legacy = plain.filter(legacy_annotation_results_empty_q(value == 'true'))
+                params = results_filter_params(self.project, 'empty', value)
+                ids = set(
+                    apply_filters(plain, params.filters, self.project, request=None).values_list('id', flat=True)
+                )
+                assert ids == set(legacy.values_list('id', flat=True))
+        assert self.tasks['real_and_empty_list'] in ids
+
+    def test_empty_with_annotators_in_the_same_line_matches_that_annotators_rows(self):
+        """Results and annotators in one filter line constrain the same annotation, as before UTC-1491."""
+        task, task_with_empty_list = TaskFactory(project=self.project), TaskFactory(project=self.project)
+        with_null, with_result, with_empty_list = UserFactory(), UserFactory(), UserFactory()
+        for annotation_task, user, result in (
+            (task, with_null, None),
+            (task, with_result, REAL_RESULT),
+            (task_with_empty_list, with_result, REAL_RESULT),
+            (task_with_empty_list, with_empty_list, []),
+        ):
+            annotation = AnnotationFactory(task=annotation_task, project=self.project, completed_by=user)
+            Annotation.objects.filter(id=annotation.id).update(result=result)
+
+        def matches(is_empty, user, results_is_parent, task=task):
+            results = {
+                'filter': 'filter:tasks:annotations_results',
+                'operator': 'empty',
+                'type': 'Boolean',
+                'value': is_empty,
+            }
+            annotators = {
+                'filter': 'filter:tasks:annotators',
+                'operator': 'contains',
+                'type': 'List',
+                'value': [user.id],
+            }
+            parent, child = (results, annotators) if results_is_parent else (annotators, results)
+            params = PrepareParams(
+                project=self.project.id,
+                filters={'conjunction': 'and', 'items': [{**parent, 'child_filters': [child]}]},
+                ordering=['tasks:id'],
+            )
+            return task.id in Task.prepared.only_filtered(prepare_params=params).values_list('id', flat=True)
+
+        for results_is_parent in (True, False):
+            with self.subTest(results_is_parent=results_is_parent):
+                assert matches(False, with_result, results_is_parent)
+                assert not matches(False, with_null, results_is_parent)
+                assert matches(True, with_null, results_is_parent)
+                assert not matches(True, with_result, results_is_parent)
+                # "Not empty" still excludes a task where another annotation's result is []
+                assert not matches(False, with_result, results_is_parent, task=task_with_empty_list)
+
+    def test_filter_pass_skips_results_aggregate(self):
+        params = results_filter_params(self.project, 'empty', 'false')
+        sql = str(Task.prepared.only_filtered(prepare_params=params).query)
+        assert 'JOIN "task_completion"' not in sql
+        assert 'GROUP BY' not in sql
+
+    def test_ordering_by_results_keeps_aggregate(self):
+        params = results_filter_params(self.project, 'empty', 'false', ordering=('tasks:annotations_results',))
+        queryset = Task.prepared.only_filtered(prepare_params=params)
+
+        assert 'annotations_results' in queryset.query.annotations
+        ids = list(queryset.values_list('id', flat=True))
+        assert sorted(ids) == self._ids('empty', 'false')
+
+    def test_results_ored_with_other_filters_keep_aggregate_and_join_form(self):
+        """Correlated EXISTS under OR runs per joined annotation row, so OR keeps the pre-UTC-1491 form."""
+        from data_manager.managers import annotate_annotations_results, apply_filters
+
+        for value in ('true', 'false'):
+            items = [
+                {'filter': 'filter:tasks:annotations_results', 'operator': 'empty', 'type': 'String', 'value': value},
+                {'filter': 'filter:tasks:annotators', 'operator': 'empty', 'type': 'List', 'value': True},
+            ]
+            params = PrepareParams(
+                project=self.project.id, filters={'conjunction': 'or', 'items': items}, ordering=['tasks:id']
+            )
+            with self.subTest(value=value):
+                queryset = Task.prepared.only_filtered(prepare_params=params)
+                assert 'annotations_results' in queryset.query.annotations
+                legacy = apply_filters(
+                    annotate_annotations_results(Task.objects.filter(project=self.project)),
+                    params.filters,
+                    self.project,
+                    request=None,
+                )
+                assert set(queryset.values_list('id', flat=True)) == set(legacy.values_list('id', flat=True))
+
+    def test_get_fields_for_filter_pass(self):
+        from data_manager.managers import get_fields_for_filter_pass
+
+        def fields(operator='empty', value='false', ordering=('tasks:id',)):
+            return get_fields_for_filter_pass(results_filter_params(self.project, operator, value, ordering=ordering))
+
+        def or_fields(*others):
+            params = results_filter_params(self.project, 'empty', 'false')
+            params.filters.conjunction = ConjunctionEnum.OR
+            params.filters.items += [
+                Filter(filter=f'filter:tasks:{column}', operator='empty', type='Boolean', value=True)
+                for column in others
+            ]
+            return get_fields_for_filter_pass(params)
+
+        assert or_fields() == ['id']
+        assert 'annotations_results' in or_fields('completed_at')
+
+        assert fields() == ['id']
+        assert fields(operator='contains', value='x') == ['id']
+        # "Results are empty" stays on the join: its EXISTS form is slower on large projects
+        assert fields(value='true') == ['id', 'annotations_results']
+        assert fields(value='x') == ['id', 'annotations_results']
+        assert fields(ordering=()) == []
+        assert fields(ordering=('tasks:-annotations_results',)) == ['annotations_results', 'annotations_results']
+        # Operators add_result_filter does not handle fall back to filtering the annotated column
+        assert fields(operator='regex') == ['id', 'annotations_results']
 
 
 class TestHiddenColumnsListForm(TestCase):
