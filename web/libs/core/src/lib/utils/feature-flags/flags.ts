@@ -314,3 +314,8 @@ export const FF_RESTRICTED_LOCATIONS = "fflag_feat_utc_1437_restricted_locations
  * never the installation default (which is `true` on-prem). Remove with the AskAIInComments folder.
  */
 export const FF_UTC_1446_ASK_AI_IN_COMMENTS = "fflag_feat_utc_1446_ask_ai_in_comments";
+
+/**
+ * UTC-1459: Managers+ can mark a project as Done from the project actions menu and reset its state later.
+ */
+export const FF_MANUAL_PROJECT_DONE = "fflag_feat_utc_1459_manual_project_done";

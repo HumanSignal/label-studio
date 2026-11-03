@@ -28,9 +28,19 @@ export interface ProjectStateChipProps {
    * Use this to provide context-specific tooltips.
    */
   description?: string;
+
+  /**
+   * Set when a Manager+ marked the project as Done by hand: the chip looks the same,
+   * the tooltip says "Marked as Done by {by} on {at}".
+   */
+  manual?: ManualProjectState;
 }
 
-export function ProjectStateChip({ state, projectId, interactive = true, description }: ProjectStateChipProps) {
+export type ManualProjectState = { by: string; at: string };
+
+export const getManualProjectStateDescription = ({ by, at }: ManualProjectState) => `Marked as Done by ${by} on ${at}`;
+
+export function ProjectStateChip({ state, projectId, interactive = true, description, manual }: ProjectStateChipProps) {
   const [open, setOpen] = useState(false);
 
   const label = formatStateName(state);
@@ -49,7 +59,7 @@ export function ProjectStateChip({ state, projectId, interactive = true, descrip
   return (
     <StateChip
       label={label}
-      description={description ?? defaultDescription}
+      description={manual ? getManualProjectStateDescription(manual) : (description ?? defaultDescription)}
       variant={variant}
       interactive={interactive && !!projectId}
       popoverContent={popoverContent}
