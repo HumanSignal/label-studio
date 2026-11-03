@@ -26,11 +26,13 @@ from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
 from django.conf import settings
+from django.core.signing import Signer
 from django.db import models, transaction
 from django.db.models import CheckConstraint, JSONField, Q
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
+from django.utils.crypto import constant_time_compare
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -44,6 +46,21 @@ from tasks.result_utils import sanitize_null_bytes
 logger = logging.getLogger(__name__)
 
 TaskMixin = load_func(settings.TASK_MIXIN)
+
+_FILE_PROXY_SIGNER = Signer(salt='projects-file-proxy')
+
+
+def sign_file_proxy_url(project_id: int, url: str) -> str:
+    """Signature proving that ``url`` came from the task data of project ``project_id``.
+
+    The file proxy sends the project's task-data credentials only with a signed URL,
+    so a caller can't make it send them to a host of their choice.
+    """
+    return _FILE_PROXY_SIGNER.signature(f'{project_id}:{url}')
+
+
+def is_signed_file_proxy_url(project_id: int, url: str, signature: Optional[str]) -> bool:
+    return bool(signature) and constant_time_compare(signature, sign_file_proxy_url(project_id, url))
 
 
 class Task(TaskMixin, FsmHistoryStateModel):
@@ -469,6 +486,8 @@ class Task(TaskMixin, FsmHistoryStateModel):
                         reverse('projects-file-proxy', kwargs={'pk': project.pk})
                         + '?url='
                         + base64.urlsafe_b64encode(value.encode()).decode()
+                        + '&sig='
+                        + sign_file_proxy_url(project.pk, value)
                     )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
