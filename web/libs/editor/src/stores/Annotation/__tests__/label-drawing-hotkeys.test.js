@@ -3,9 +3,20 @@ import "../../../tags/object/Image/Image";
 import "../../../tags/control/BrushLabels";
 import "../../../tags/control/RectangleLabels";
 import AppStore from "../../AppStore";
+import { types } from "mobx-state-tree";
+
+let DrawingAppStore;
+beforeAll(async () => {
+  // Other suites may load AppStore before drawing controls are registered.
+  // Rebuild this fixture's reference union after its controls are available.
+  const { default: AnnotationStore } = await import(`../store?bun_reload=${Date.now()}`);
+  DrawingAppStore = AppStore.props({
+    annotationStore: types.optional(AnnotationStore, { annotations: [], predictions: [], history: [] }),
+  });
+});
 
 function setup(tag = "BrushLabels") {
-  const store = AppStore.create(
+  const store = DrawingAppStore.create(
     {
       config: `<View><Image name="img" value="$img" /><${tag} name="label" toName="img"><Label value="A" /><Label value="B" /></${tag}></View>`,
       task: { id: 1, data: JSON.stringify({ img: "test.jpg" }) },

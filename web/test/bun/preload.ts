@@ -848,4 +848,7 @@ afterEach(() => {
   } else if (!(window as any).APP_SETTINGS.hostname) {
     (window as any).APP_SETTINGS = { ...(window as any).APP_SETTINGS, hostname: "http://localhost" };
   }
+  // JSDOM's window and Bun's global object are distinct. Keep both consumers
+  // on the restored settings after tests replace either reference.
+  (globalThis as any).APP_SETTINGS = (window as any).APP_SETTINGS;
 });
