@@ -148,7 +148,7 @@ class TestOrganizationUpdateAPI(APITestCase):
             format='json',
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 403
         self.organization.refresh_from_db()
         assert self.organization.created_by_id == self.owner.id
 
@@ -161,7 +161,7 @@ class TestOrganizationUpdateAPI(APITestCase):
             format='json',
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 403
         self.organization.refresh_from_db()
         assert self.organization.allow_unsafe_instruction_tags is False
 

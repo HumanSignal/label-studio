@@ -7,6 +7,7 @@ import { useProject } from "../../providers/ProjectProvider";
 import WebhookDetail from "./WebhookDetail";
 import WebhookList from "./WebhookList";
 import { createTitleFromSegments, useUpdatePageTitle } from "@humansignal/core";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 
 const Webhook = () => {
   const [activeWebhook, setActiveWebhook] = useState(null);
@@ -17,6 +18,7 @@ const Webhook = () => {
 
   const api = useAPI();
   const { project } = useProject();
+  const { permissions } = useAuth();
 
   useUpdatePageTitle(createTitleFromSegments([project?.title, "Webhooks Settings"]));
 
@@ -90,6 +92,9 @@ const Webhook = () => {
   } else if (activeWebhook === null) {
     content = (
       <WebhookList
+        canChangeWebhooks={
+          projectId !== undefined ? project?.access?.can_manage === true : permissions.can("organizations.change")
+        }
         onSelectActive={setActiveWebhook}
         onAddWebhook={() => {
           setActiveWebhook("new");

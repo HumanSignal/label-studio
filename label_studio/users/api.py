@@ -7,6 +7,7 @@ from django import forms
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from projects.action_permissions import ProjectActionPermission
 from projects.models import ProjectHotkeyPreference
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
@@ -22,6 +23,27 @@ from users.models import User
 from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerUpdate, WhoAmIUserSerializer
 
 logger = logging.getLogger(__name__)
+
+_PRIVILEGED_ACCOUNT_FIELDS = ('is_staff', 'is_superuser', 'active_organization')
+
+
+def _drop_privileged_account_fields(request):
+    """Remove privilege fields from a profile update body.
+
+    Responsibility: keep ``is_staff``, ``is_superuser``, and
+    ``active_organization`` from being written by the user API.
+
+    Boundary: does not decide whether this caller may update the object.
+    Missing keys are ignored. Does not call ``user.has_perm``.
+    """
+    data = getattr(request, 'data', None)
+    if data is None:
+        return
+    if hasattr(data, '_mutable'):
+        data._mutable = True
+    for field in _PRIVILEGED_ACCOUNT_FIELDS:
+        if field in data:
+            del data[field]
 
 
 @method_decorator(
@@ -138,6 +160,30 @@ class UserAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return User.objects.filter(organizations=self.request.user.active_organization)
 
+    def get_object(self):
+        """Load one user and check the declared action on a resolvable object.
+
+        Responsibility: PATCH of another account is ``PermissionDenied`` before
+        a self check can hide that account.
+
+        Boundary: PATCH checks the user row (``organizations.view``). Other
+        methods check the caller's active organization, because
+        ``organizations.change`` cannot resolve a ``User``. Avatar actions
+        check the caller. Does not call ``user.has_perm``.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        obj = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
+        if self.request.method == 'PATCH' and obj.pk != self.request.user.pk:
+            raise PermissionDenied()
+        if self.request.method == 'PATCH':
+            self.check_object_permissions(self.request, obj)
+        elif getattr(self, 'action', None) == 'avatar':
+            self.check_object_permissions(self.request, self.request.user)
+        else:
+            self.check_object_permissions(self.request, self.request.user.active_organization)
+        return obj
+
     @extend_schema(exclude=True)
     @action(detail=True, methods=['delete', 'post'], permission_required=all_permissions.avatar_any)
     def avatar(self, request, pk):
@@ -166,6 +212,19 @@ class UserAPI(viewsets.ModelViewSet):
         return context
 
     def update(self, request, *args, **kwargs):
+        """Update the signed-in user's own profile.
+
+        Responsibility: persist allowed changes to the current account.
+
+        Boundary: a different user raises ``PermissionDenied``, including when
+        the caller is an organization owner. ``is_staff``, ``is_superuser``, and
+        ``active_organization`` in the body are discarded and do not change the
+        database. Does not call ``user.has_perm``.
+        """
+        instance = self.get_object()
+        if instance.pk != request.user.pk:
+            raise PermissionDenied()
+        _drop_privileged_account_fields(request)
         return super(UserAPI, self).update(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
@@ -300,7 +359,8 @@ class UserGetTokenAPI(APIView):
 class UserWhoAmIAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.organizations_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
     serializer_class = WhoAmIUserSerializer
 
     def get_object(self):
@@ -372,7 +432,8 @@ _hotkey_access_error_responses = {
     ),
 )
 class UserHotkeysAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_required = all_permissions.organizations_view
+    permission_classes = [IsAuthenticated, ProjectActionPermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def get(self, request, *args, **kwargs):

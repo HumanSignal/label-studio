@@ -131,6 +131,7 @@ const serverViewSnapshot = (view, columns, response) => {
     id: view.id,
     saved: true,
     virtual: false,
+    localQueryApplied: false,
     hasData: !!data,
   };
 };
@@ -278,15 +279,24 @@ export const TabStore = types
         // Virtual-tab reload strips denied filters before the tasks request
         // (same policy as RefreshButton / initial apply).
         const queryBefore = selected.query;
+        const usedLocalQuery = selected.usesLocalQuery;
         let tasksPromise = selected.reload();
 
         if (selected.saved && selected.id) {
           const latest = yield root.apiCall("tab", { tabId: selected.id });
           if (self.selected === selected && !latest?.error && (latest.id == null || latest.id === selected.id)) {
             applySnapshot(selected, serverViewSnapshot(selected, self.columns, latest));
-            // View-list payload can be stale on later tab switches. If the
-            // single-view refresh changed filters/ordering, fetch tasks again.
-            if (self.selected === selected && selected.query !== queryBefore) {
+            // fetchTabs calls save() after selection. Treat the refreshed member
+            // snapshot as unchanged, including filters removed by dataCleanup.
+            if (root.SDK?.project?.access?.can_manage === false) {
+              selected.snapshot = selected.serialize();
+            }
+            // A shared view can also include filters hidden from the client.
+            // Reload when either the visible query or query/view mode changes.
+            if (
+              self.selected === selected &&
+              (selected.query !== queryBefore || selected.usesLocalQuery !== usedLocalQuery)
+            ) {
               tasksPromise = selected.reload();
             }
           }

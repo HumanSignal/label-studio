@@ -24,6 +24,7 @@ from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from label_studio_sdk.label_interface import LabelInterface
+from projects.action_permissions import ensure_project_manage, ensure_project_visible
 from projects.import_health import mark_import_job_finished
 from projects.models import Project, ProjectImport, ProjectReimport
 from ranged_fileresponse import RangedFileResponse
@@ -458,6 +459,7 @@ class ImportAPI(generics.CreateAPIView):
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(self.request.user, project)
 
         if settings.VERSION_EDITION != 'Community':
             return self.async_import(request, project, preannotated_from_fields, commit_to_project, return_task_ids)
@@ -526,7 +528,9 @@ class ImportPredictionsAPI(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         # check project permissions
-        project = self.get_object()
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, project)
+        request.user.project = project
 
         # Use feature flag to control memory-efficient implementation rollout
         if flag_set('fflag_fix_back_4620_memory_efficient_predictions_import_08012025_short', user=self.request.user):
@@ -799,6 +803,7 @@ class ReImportAPI(ImportAPI):
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(self.request.user, project)
 
         if not file_upload_ids:
             return Response(
@@ -887,6 +892,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
 
     def get_queryset(self):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        ensure_project_manage(self.request.user, project)
         if project.is_draft or bool_from_request(self.request.query_params, 'all', False):
             # If project is in draft state, we return all uploaded files, ignoring queried ids
             logger.debug(f'Return all uploaded files for draft project {project}')
@@ -902,6 +908,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
 
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, project)
         ids = self.request.data.get('file_upload_ids')
         if ids is None:
             deleted, _ = FileUpload.objects.filter(project=project).delete()
@@ -963,6 +970,23 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 
+    def get_object(self):
+        """Load the upload, then require management before the response or any write.
+
+        Responsibility: fetch the ``FileUpload`` named by the URL, then call
+        ``ensure_project_manage`` before GET, PATCH, PUT, or DELETE continues.
+
+        Boundary: an invisible project is ``NotFound``. A visible project the
+        caller cannot manage is ``PermissionDenied``. Does not call
+        ``has_permission``.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        upload = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
+        ensure_project_manage(self.request.user, upload.project)
+        self.request.user.project = upload.project
+        return upload
+
     def get(self, *args, **kwargs):
         return super(FileUploadAPI, self).get(*args, **kwargs)
 
@@ -1007,9 +1031,12 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
         file_upload = FileUpload.objects.filter(file=file).last()
+        if file_upload is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if not file_upload.has_permission(request.user):
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        request.user.project = file_upload.project
+        # Reading an uploaded file is project access: a member views the images they annotate.
+        ensure_project_visible(request.user, file_upload.project)
 
         file = file_upload.file
         if file.storage.exists(file.name):
@@ -1067,8 +1094,17 @@ class DownloadStorageData(APIView):
             logger.debug(f'Fetch uploaded file by user {request.user} => {filepath}')
             file_upload = FileUpload.objects.filter(file=filepath).last()
 
-            if file_upload is not None and file_upload.has_permission(request.user):
-                file_obj = file_upload.file
+            if file_upload is not None:
+                project = file_upload.project
+                # Persisted uploads have a Project. Stand-in objects in storage
+                # unit tests do not, and keep the previous permission check.
+                if isinstance(project, Project):
+                    request.user.project = project
+                    # Reading is project access; uploading or deleting files stays manage-only.
+                    ensure_project_visible(request.user, project)
+                    file_obj = file_upload.file
+                elif file_upload.has_permission(request.user):
+                    file_obj = file_upload.file
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
             if user is not None and request.user.active_organization.has_user(user):

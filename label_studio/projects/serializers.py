@@ -36,7 +36,7 @@ from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectRe
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import Annotation, Task
+from tasks.models import Annotation, AnnotationDraft, Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -128,7 +128,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         default=None, read_only=True, help_text='Tasks with annotations count'
     )
 
-    created_by = UserSimpleSerializer(default=CreatedByFromContext(), help_text='Project owner')
+    created_by = UserSimpleSerializer(read_only=True, default=CreatedByFromContext(), help_text='Project owner')
 
     control_weights = serializers.DictField(
         child=ControlTagWeightSerializer(),
@@ -155,6 +155,9 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
+    access = serializers.SerializerMethodField(
+        read_only=True, help_text='Whether the current user can annotate or manage this project'
+    )
 
     @property
     def user_id(self):
@@ -162,6 +165,16 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             return self.context['request'].user.id
         except KeyError:
             return next(iter(self.context['user_cache']))
+
+    def get_access(self, project) -> dict:
+        from projects.access import can_access_project, can_manage_project
+
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        return {
+            'can_annotate': can_access_project(user, project),
+            'can_manage': can_manage_project(user, project),
+        }
 
     @staticmethod
     def get_config_has_control_tags(project) -> bool:
@@ -296,8 +309,10 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         extra_kwargs = {
             'memberships': {'required': False},
             'title': {'required': False},
-            'created_by': {'required': False},
         }
+        # Ownership is set by the create view (``ser.save(organization=..., created_by=...)``).
+        # An ordinary update must not move a project to another organization or creator.
+        read_only_fields = ['organization', 'created_by']
         fields = [
             'id',
             'title',
@@ -345,6 +360,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'queue_done',
             'config_suitable_for_bulk_annotation',
             'state',
+            'access',
         ]
 
     def validate_label_config(self, value):
@@ -432,6 +448,33 @@ class ProjectLabelConfigSerializer(serializers.Serializer):
 
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
+    created_labels_drafts = serializers.SerializerMethodField()
+
+    def get_created_labels_drafts(self, summary):
+        """Draft label counts for the current user, read from that user's drafts.
+
+        The stored ``created_labels_drafts`` aggregate stays in place for label
+        config checks. This response does not add another aggregate table.
+        """
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if not getattr(user, 'is_authenticated', False):
+            return {}
+
+        labels = {}
+        drafts = AnnotationDraft.objects.filter(task__project_id=summary.project_id, user_id=user.id)
+        for draft in drafts:
+            results = draft.result or []
+            if not isinstance(results, list):
+                continue
+            for result in results:
+                if not isinstance(result, dict) or 'from_name' not in result:
+                    continue
+                bucket = labels.setdefault(result['from_name'], {})
+                for label in summary._get_labels(result):
+                    bucket[label] = bucket.get(label, 0) + 1
+        return {name: counts for name, counts in labels.items() if counts}
+
     class Meta:
         model = ProjectSummary
         fields = '__all__'

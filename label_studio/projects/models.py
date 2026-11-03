@@ -110,7 +110,9 @@ class ProjectManager(models.Manager):
         return ProjectQuerySetWithFSM(self.model, using=self._db)
 
     def for_user(self, user):
-        return self.get_queryset().filter(organization=user.active_organization)
+        from projects.access import visible_projects
+
+        return visible_projects(user)
 
     def with_state(self):
         """
@@ -1470,6 +1472,11 @@ class ProjectMember(models.Model):
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['project', 'user'], name='unique_project_member_project_user'),
+        ]
 
 
 def _build_flat_increment_sql(column, keys):

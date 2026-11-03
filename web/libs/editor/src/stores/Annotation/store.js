@@ -1,4 +1,5 @@
 import { destroy, getEnv, getParent, getRoot, types } from "mobx-state-tree";
+import { annotationDeletable } from "@humansignal/core/lib/utils/project-access-ui";
 
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
 import { DataValidator, ValidationError, VALIDATORS } from "../../core/DataValidator";
@@ -240,6 +241,11 @@ const AnnotationStoreModel = types
     }
 
     function deleteAnnotation(annotation) {
+      if (
+        self.viewingAll ||
+        !annotationDeletable(annotation, self.store.user?.id, !self.store.hasInterface("annotations:delete-own"))
+      )
+        return;
       getEnv(self).events.invoke("deleteAnnotation", self.store, annotation);
 
       /**

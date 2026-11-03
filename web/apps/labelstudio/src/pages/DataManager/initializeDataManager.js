@@ -28,6 +28,7 @@ export const initializeDataManager = async (root, props, params, { isCancelled }
     }
 
     const { ...settings } = root.dataset;
+    const canManage = params.project?.access?.can_manage !== false;
 
     const dmConfig = {
       root,
@@ -39,12 +40,25 @@ export const initializeDataManager = async (root, props, params, { isCancelled }
       showPreviews: false,
       apiEndpoints: APIConfig.endpoints,
       interfaces: {
-        import: true,
-        export: true,
+        import: canManage,
+        export: canManage,
         backButton: false,
         labelingHeader: false,
         autoAnnotation: params.autoAnnotation,
       },
+      ...(canManage
+        ? {}
+        : {
+            toolbar:
+              "grid-select-all filters ordering label-button loading-possum error-box | refresh density-toggle grid-size view-toggle",
+            tabControls: {
+              add: false,
+              delete: false,
+              edit: false,
+              duplicate: false,
+              lock: false,
+            },
+          }),
       labelStudio: {
         keymap: window.APP_SETTINGS.editor_keymap,
       },

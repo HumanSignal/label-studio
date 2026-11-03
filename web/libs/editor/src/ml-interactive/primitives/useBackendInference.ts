@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { ToastType, useToast } from "@humansignal/ui";
+import { fetchInteractiveBackends } from "../api";
 import type { InteractiveController } from "../controller";
 import type { PromptBox, PromptPoint } from "./types";
 import { findVideoElement } from "./utils";
@@ -136,18 +137,12 @@ export function useBackendInference(item: InteractiveController | null): {
       }
 
       try {
-        const res = await fetch(`${API_BASE}/api/ml/?project=${projectId}&is_interactive=true`);
-        if (!res.ok) {
-          reportError(`Failed to fetch ML backends: HTTP ${res.status}`);
-          return;
-        }
-        const data = await res.json();
-        const backends = data.results ?? data;
+        const backends = await fetchInteractiveBackends(projectId);
+        if (cancelled) return;
         if (!backends?.length) {
           reportError("No interactive ML backend connected. Go to Settings → Model to connect one.");
           return;
         }
-        if (cancelled) return;
         backendIdRef.current = backends[0].id;
         item.setState("stopped");
       } catch (err: any) {

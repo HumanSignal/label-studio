@@ -542,6 +542,41 @@ describe("AnnotationButton", () => {
     );
   });
 
+  it.each([
+    [false, 1, false, false, true],
+    [false, 2, false, false, false],
+    [false, null, false, false, false],
+    [true, 2, false, false, true],
+    [true, 2, true, false, false],
+    [false, 1, true, false, true],
+    [false, 1, false, true, false],
+  ])("delete menu respects ownership (manager=%j, owner=%j, draft=%j, viewAll=%j)", (manager, owner, draft, viewAll, allowed) => {
+    const store = {
+      ...defaultStore,
+      hasInterface: (name: string) => name === "annotations:delete-own" && !manager,
+    };
+    const entity = createEntity({
+      pk: draft ? null : "41",
+      user: owner ? { id: owner } : null,
+      userGenerate: draft,
+      sentUserGenerate: false,
+      draftId: draft ? 12 : 0,
+      editable: true,
+    });
+    renderWithProviders(
+      <AnnotationButton
+        entity={entity}
+        capabilities={defaultCapabilities}
+        annotationStore={{ ...defaultAnnotationStore, store, viewingAll: viewAll }}
+      />,
+      store,
+    );
+
+    fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+
+    expect(screen.queryByText("Delete Annotation") !== null).toBe(allowed);
+  });
+
   it("calls Copy Annotation ID and shows toast when menu item is clicked", () => {
     mockToastShow.mockClear();
     const entity = createEntity();

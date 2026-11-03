@@ -2,6 +2,7 @@ import { Button } from "@humansignal/ui";
 import { IconCopy, IconInfo, IconViewAll, IconTrash, IconSettings } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
+import { annotationDeletable } from "@humansignal/core/lib/utils/project-access-ui";
 import { cn } from "../../utils/bem";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
@@ -15,6 +16,8 @@ export const Actions = ({ store }) => {
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll;
   const isBulkMode = !isStarterCloudPlan() && store.hasInterface("annotation:bulk");
+  const canDeleteAnnotation =
+    !isPrediction && annotationDeletable(entity, store.user?.id, !store.hasInterface("annotations:delete-own"));
 
   const onToggleVisibility = useCallback(() => {
     annotationStore.toggleViewingAllAnnotations();
@@ -43,7 +46,7 @@ export const Actions = ({ store }) => {
 
       {!isPrediction && !isViewAll && store.hasInterface("edit-history") && <EditingHistory entity={entity} />}
 
-      {!isViewAll && !isBulkMode && store.hasInterface("annotations:delete") && (
+      {!isViewAll && !isBulkMode && canDeleteAnnotation && store.hasInterface("annotations:delete") && (
         <Tooltip title="Delete annotation">
           <Button
             icon={<IconTrash />}

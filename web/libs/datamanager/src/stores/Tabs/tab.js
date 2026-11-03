@@ -54,6 +54,8 @@ export const Tab = types
     renameMode: false,
     saved: false,
     virtual: false,
+    // Client state only; serialize() does not include it in shared or virtual saves.
+    localQueryApplied: false,
     locked: false,
     is_locked: types.optional(types.maybeNull(types.boolean), false),
     locked_by: types.optional(types.maybeNull(CustomJSON), null),
@@ -267,6 +269,11 @@ export const Tab = types
       const hiddenInLabeling = new Set(labeling);
 
       return [...new Set(explore)].filter((id) => hiddenInLabeling.has(id));
+    },
+
+    get usesLocalQuery() {
+      // Members can change their current query without updating the shared view.
+      return self.virtual || (self.localQueryApplied && self.root.SDK?.project?.access?.can_manage === false);
     },
 
     get query() {
@@ -708,7 +715,11 @@ export const Tab = types
       }
 
       if (self.saved) {
-        yield self.dataStore.reload({ id: self.id, interaction });
+        yield self.dataStore.reload({
+          id: self.id,
+          query: self.usesLocalQuery ? self.query : undefined,
+          interaction,
+        });
       }
       if (self.virtual) {
         yield self.dataStore.reload({ query: self.query, interaction });
@@ -828,7 +839,20 @@ export const Tab = types
     save: flow(function* ({ reload, interaction } = {}) {
       const serialized = self.serialize();
 
-      if (!self.saved || !deepEqual(self.snapshot, serialized)) {
+      // A member can restore the shared snapshot after applying another local
+      // query; that still needs a reload even though the shared snapshot matches.
+      if (!self.saved || self.localQueryApplied || !deepEqual(self.snapshot, serialized)) {
+        // Members may filter and sort the tasks they are looking at, but that
+        // must not PATCH the shared view. The task request carries the local
+        // query instead of the saved view id. Managers keep the save.
+        const canManageSharedView = self.root.SDK?.project?.access?.can_manage !== false;
+
+        if (!canManageSharedView && self.virtual !== true) {
+          self.localQueryApplied = true;
+          yield self.dataStore.reload({ id: self.id, query: self.query, interaction });
+          return;
+        }
+
         self.snapshot = serialized;
         if (self.virtual === true) {
           self.persistVirtual();

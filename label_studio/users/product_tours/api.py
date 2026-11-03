@@ -1,6 +1,8 @@
 import logging
 
+from core.permissions import all_permissions
 from drf_spectacular.utils import extend_schema
+from projects.action_permissions import ProjectActionPermission
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 @extend_schema(exclude=True)
 class ProductTourAPI(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.organizations_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
     serializer_class = UserProductTourSerializer
 
     def get_tour_name(self):

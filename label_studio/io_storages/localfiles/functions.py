@@ -62,6 +62,51 @@ def is_within_storage(directory: str, storage_path: str) -> bool:
     return directory == root or directory.startswith(root + os.sep)
 
 
+def storage_directories_overlap(path_a: str, path_b: str) -> bool:
+    """Return whether two local storage directories share a directory boundary.
+
+    Responsibility: detect equal paths and a directory that contains the other
+    after ``normalize_storage_path``.
+
+    Boundary: a sibling whose name only shares a string prefix does not overlap.
+    This does not read the filesystem or decide which user may save a storage.
+    """
+    left = normalize_storage_path(path_a)
+    right = normalize_storage_path(path_b)
+    if not left or not right:
+        return False
+    return is_within_storage(left, right) or is_within_storage(right, left)
+
+
+def key_within_prefix(key: str, prefix: str) -> bool:
+    """Return whether an object key stays inside a cloud storage prefix.
+
+    Responsibility: decide if one object key is the prefix itself or a child of it.
+
+    Boundary: an empty prefix, a key or prefix containing ``..``, an absolute
+    key, or a key that leaves the prefix returns False. A sibling prefix such as
+    ``project-a-private`` is not inside ``project-a``. This does not sign a URL
+    or read the object.
+    """
+    if not isinstance(key, str) or not isinstance(prefix, str):
+        return False
+    if prefix.strip() == '' or key.strip() == '':
+        return False
+    key_text = key.replace('\\', '/')
+    prefix_text = prefix.replace('\\', '/')
+    if key_text.startswith('/') or prefix_text.startswith('/'):
+        return False
+    key_parts = [part for part in key_text.split('/') if part != '']
+    prefix_parts = [part for part in prefix_text.split('/') if part != '']
+    if not key_parts or not prefix_parts:
+        return False
+    if '..' in key_parts or '..' in prefix_parts:
+        return False
+    if len(key_parts) < len(prefix_parts):
+        return False
+    return key_parts[: len(prefix_parts)] == prefix_parts
+
+
 def project_local_files_resolver(project) -> Callable[[str], Optional[str]]:
     """Build the SDK converter's Local Storage resolver for exports of ``project``.
 

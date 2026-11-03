@@ -27,6 +27,21 @@ logger = logging.getLogger(__name__)
 
 
 class FSMAPIMixin:
+    def initial(self, request, *args, **kwargs):
+        """Select the entity permission before DRF checks permissions.
+
+        Responsibility: history and transitions declare one mapped permission
+        per entity. ``ProjectActionPermission`` reads ``permission_required``.
+
+        Boundary: an unknown entity keeps the class declaration. Does not call
+        ``user.has_perm``.
+        """
+        entity_name = kwargs.get('entity_name')
+        mapped = getattr(self, 'permission_map', {}).get(entity_name)
+        if isinstance(mapped, str):
+            self.permission_required = mapped
+        super().initial(request, *args, **kwargs)
+
     def get_permission_required(self):
         entity_name = self.kwargs['entity_name']
         permission = self.permission_map.get(entity_name)
@@ -96,6 +111,7 @@ class FSMEntityHistoryAPI(FSMAPIMixin, generics.ListAPIView):
     filterset_class = FSMEntityHistoryFilterSet
     ordering_fields = ['id']  # Only allow ordering by id
 
+    permission_required = all_permissions.projects_view
     permission_map = {
         'task': all_permissions.tasks_view,
         'annotation': all_permissions.annotations_view,
@@ -139,6 +155,7 @@ class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
 
     serializer_class = FSMTransitionExecuteRequestSerializer
 
+    permission_required = all_permissions.projects_change
     permission_map = {
         'task': all_permissions.tasks_change,
         'annotation': all_permissions.annotations_change,

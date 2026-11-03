@@ -11,6 +11,16 @@ import { when, runInAction } from "mobx";
 
 import { imageCache } from "@humansignal/core";
 import {
+  annotationDeletable,
+  annotationEditable,
+  holdProjectAccessDenied,
+  isProjectAccessHeld,
+  shouldHoldProjectAccessDenied,
+  shouldHoldProjectRequestDenied,
+} from "@humansignal/core/lib/utils/project-access-ui";
+
+export { annotationEditable, shouldHoldProjectAccessDenied };
+import {
   invalidateAnnotationCachesForTask,
   invalidateTaskAgreementCache,
 } from "@humansignal/core/lib/utils/annotation-cache";
@@ -163,6 +173,9 @@ export class LSFWrapper {
     }
 
     let interfaces = [...DEFAULT_INTERFACES];
+    const canManage = this.project?.access?.can_manage !== false;
+
+    if (!canManage) interfaces.push("annotations:delete-own");
 
     if (this.project.enable_empty_annotation === false) {
       interfaces.push("annotations:deny-empty");
@@ -185,7 +198,7 @@ export class LSFWrapper {
         "annotations:delete",
         "annotations:tabs",
         "predictions:tabs",
-        "predictions:delete",
+        ...(canManage ? ["predictions:delete"] : []),
         "annotations:copy-link",
       );
     }
@@ -695,6 +708,24 @@ export class LSFWrapper {
         await this._hydrateStubAnnotation(selected, { showLoadingWhileFetching: false });
       }
     }
+
+    this.applyAnnotationEditability();
+  }
+
+  applyAnnotationEditability() {
+    const annotations = this.lsf?.annotationStore?.annotations;
+    if (!annotations) return;
+
+    const canManage = this.project?.access?.can_manage !== false;
+    const currentUserId = this.lsf?.user?.id ?? window.APP_SETTINGS?.user?.id;
+
+    for (const annotation of annotations) {
+      if (!annotation || annotation.type === "prediction") continue;
+      const editable = annotationEditable(annotation, currentUserId, canManage);
+      // Only tighten. View All already set editable=false before selectAnnotation;
+      // calling setEditable(true) would reopen that read-only mode.
+      if (!editable) annotation.setEditable?.(false);
+    }
   }
 
   saveUserLabels = async () => {
@@ -813,6 +844,12 @@ export class LSFWrapper {
 
   /** @private */
   showOperationToast(status, successMessage, errorAction, result) {
+    if (shouldHoldProjectRequestDenied(window.location?.pathname ?? "", status, result?.$meta?.url)) {
+      holdProjectAccessDenied();
+      return;
+    }
+    if (isProjectAccessHeld()) return;
+
     if (status === 200 || status === 201) {
       this.datamanager.invoke("toast", { message: successMessage, type: "info" });
     } else if (status !== undefined) {
@@ -909,6 +946,7 @@ export class LSFWrapper {
 
   /** @private */
   onUpdateAnnotation = async (ls, annotation, extraData) => {
+    if (isProjectAccessHeld()) return;
     const { task } = this;
     const serializedAnnotation = this.prepareData(annotation);
     const exitStream = this.shouldExitStream();
@@ -970,6 +1008,16 @@ export class LSFWrapper {
 
   /**@private */
   onDeleteAnnotation = async (ls, annotation) => {
+    if (isProjectAccessHeld()) return;
+    if (
+      ls?.annotationStore?.viewingAll ||
+      !annotationDeletable(
+        annotation,
+        ls?.user?.id ?? window.APP_SETTINGS?.user?.id,
+        this.project?.access?.can_manage !== false,
+      )
+    )
+      return;
     const { task } = this;
     const deletedAnnotationPk = annotation.pk;
     const taskId = task.id;
@@ -1016,6 +1064,7 @@ export class LSFWrapper {
 
   /**@private */
   onDeletePrediction = async (ls, prediction) => {
+    if (isProjectAccessHeld()) return;
     const { task } = this;
     const deletedPredictionPk = prediction.pk;
     const taskId = task.id;
@@ -1084,6 +1133,7 @@ export class LSFWrapper {
   };
 
   async _submitDraft(annotation, params = {}) {
+    if (isProjectAccessHeld()) return;
     // It should be preserved as soon as possible because each `await` will allow it to be changed
     const taskId = this.task.id;
     const data = { body: this.prepareData(annotation, { isNewDraft: true }) }; // serializedAnnotation
@@ -1225,6 +1275,7 @@ export class LSFWrapper {
   _selectAnnotationTimeout = null;
   _debouncedFirstOldSelection = undefined;
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
+    this.applyAnnotationEditability();
     // NOTE on parameter naming: LSF fires selectAnnotation(newAnnotation, oldAnnotation).
     // Despite the names here, prevAnnotation = the NEWLY selected annotation,
     // nextAnnotation = the PREVIOUSLY selected annotation (before this selection).
@@ -1347,6 +1398,7 @@ export class LSFWrapper {
     await this.loadTask(prevTaskId, prevAnnotationId, true);
   };
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
+    if (isProjectAccessHeld()) return;
     const { taskID, currentAnnotation } = this;
     const unique_id = this.task.unique_lock_id;
     const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });

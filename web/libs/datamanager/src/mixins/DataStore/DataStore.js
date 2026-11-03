@@ -228,7 +228,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
           const currentView = root.viewsStore.selected;
 
           currentViewId = currentView?.id;
-          currentViewQuery = currentView?.virtual ? currentView?.query : null;
+          currentViewQuery = currentView?.usesLocalQuery ? currentView.query : null;
         }
 
         if (!isDefined(currentViewId)) return;

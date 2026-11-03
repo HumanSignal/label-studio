@@ -5,8 +5,15 @@ marks:
       - django_live_url
       - configured_project
 stages:
-  - id: signup
-    type: ref
+  - name: Login as project owner
+    request:
+      url: "{django_live_url}/user/login"
+      data:
+        email: business@pytest.net
+        password: pytest
+      method: POST
+    response:
+      status_code: 302
   - name: Get webhook info
     request:
       url: "{django_live_url}/api/webhooks/info/"

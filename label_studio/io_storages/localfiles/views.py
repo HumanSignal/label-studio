@@ -8,12 +8,15 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from core.permissions import all_permissions
 from django.conf import settings
 from django.db.models import CharField, F, Value
+from projects.action_permissions import ProjectActionPermission
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotModified
 from drf_spectacular.utils import extend_schema
 from io_storages.localfiles.functions import build_local_files_path, is_within_storage
 from io_storages.localfiles.models import LocalFilesImportStorage
+from projects.access import can_access_project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -79,7 +82,7 @@ Main view for serving files residing under LocalFilesImportStorage roots with ET
 
 @extend_schema(exclude=True)
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, ProjectActionPermission])
 def localfiles_data(request):
     """Serve files residing under LocalFilesImportStorage roots with ETag support."""
     path = request.GET.get('d')
@@ -100,14 +103,17 @@ def localfiles_data(request):
         localfiles_storage = LocalFilesImportStorage.objects.annotate(
             _full_path=Value(full_path_dir, output_field=CharField())
         ).filter(_full_path__startswith=F('path'))
+        accessible_storage = None
         if localfiles_storage.exists():
-            user_has_permissions = any(
-                is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
-                for storage in localfiles_storage
-            )
+            for storage in localfiles_storage:
+                if is_within_storage(full_path_dir, storage.path) and can_access_project(request.user, storage.project):
+                    accessible_storage = storage
+                    break
+            user_has_permissions = accessible_storage is not None
 
         # Check user permissions for this file and if it exists
         if user_has_permissions and os.path.exists(full_path):
+            request.user.project = accessible_storage.project
             # Detect mime type and encoding
             return build_localfile_response(
                 request=request,
@@ -118,3 +124,7 @@ def localfiles_data(request):
             return HttpResponseNotFound()
 
     return HttpResponseForbidden()
+
+
+# @api_view copies permission_classes onto its generated class, not permission_required.
+localfiles_data.cls.permission_required = all_permissions.projects_view

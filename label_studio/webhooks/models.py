@@ -94,13 +94,23 @@ class Webhook(models.Model):
         WebhookAction.objects.filter(webhook=self, action__in=(old_actions - actions)).delete()
 
     def has_permission(self, user):
-        user.project = self.project  # link for activity log
-        if not self.organization.has_user(user):
-            return False
-        # If this webhook belongs to a project, also enforce project-level access.
-        # In LSE, LseProjectMixin.has_permission checks that Managers are project members.
-        if self.project is not None and not self.project.has_permission(user):
-            return False
+        """Allow the organization owner, or a manager of the bound project.
+
+        Responsibility: organization webhooks stay with the organization owner.
+        Project webhooks require management of that project.
+
+        Boundary: a project creator who is not the organization owner cannot use
+        an unbound webhook. A member who can annotate but not manage cannot use
+        a project webhook. ``user.project`` is set only after a project check
+        succeeds, for the activity log. Does not call ``user.has_perm``.
+        """
+        from projects.action_permissions import ensure_org_owner, ensure_project_manage
+
+        if self.project_id is None:
+            ensure_org_owner(user, self.organization)
+            return True
+        ensure_project_manage(user, self.project)
+        user.project = self.project
         return True
 
     class Meta:

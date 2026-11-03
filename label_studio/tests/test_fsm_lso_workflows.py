@@ -675,6 +675,7 @@ class TestColdStartScenarios:
             title='Bulk Cold Start Test',
             label_config='<View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="positive"/><Choice value="negative"/></Choices></View>',
             created_by=business_client.user,
+            organization=business_client.organization,
         )
         project.save()
 

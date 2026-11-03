@@ -291,6 +291,54 @@ describe("Annotation store (store.js)", () => {
   });
 
   describe("deleteAnnotation and clearDeletedParents", () => {
+    it.each([
+      [false, 1, false, true],
+      [false, 2, false, false],
+      [false, null, false, false],
+      [true, 2, false, true],
+      [true, 2, true, false],
+      [false, 1, true, true],
+    ])("deletion enforces ownership before destruction (manager=%j, owner=%j, draft=%j)", (manager, owner, draft, allowed) => {
+      const store = createStore({
+        interfaces: ["basic", "annotations:delete", ...(manager ? [] : ["annotations:delete-own"])],
+        users: [{ id: 1 }, { id: 2 }],
+        user: 1,
+      });
+      store.initializeStore({});
+      const annotation = store.annotationStore.addAnnotation({
+        pk: draft ? null : "41",
+        user: owner,
+        userGenerate: draft,
+        sentUserGenerate: false,
+        result: [],
+      });
+      if (draft) annotation.setDraftId(12);
+      store.annotationStore.selectAnnotation(annotation.id);
+      mockInvoke.mockClear();
+
+      store.annotationStore.deleteAnnotation(annotation);
+
+      expect(store.annotationStore.annotations).toHaveLength(allowed ? 0 : 1);
+      if (!allowed) {
+        expect(store.annotationStore.selected).toBe(annotation);
+        expect(mockInvoke).not.toHaveBeenCalled();
+      }
+    });
+
+    it("view all prevents direct annotation deletion", () => {
+      const store = createStore({ interfaces: ["annotations:delete", "annotations:view-all"] });
+      store.initializeStore({});
+      const annotation = store.annotationStore.addAnnotation({ result: [] });
+      store.annotationStore.selectAnnotation(annotation.id);
+      store.annotationStore.toggleViewingAllAnnotations();
+      mockInvoke.mockClear();
+
+      store.annotationStore.deleteAnnotation(annotation);
+
+      expect(store.annotationStore.annotations).toHaveLength(1);
+      expect(mockInvoke).not.toHaveBeenCalled();
+    });
+
     it("deleteAnnotation destroys annotation and selects next", () => {
       const store = createStore();
       store.initializeStore({});

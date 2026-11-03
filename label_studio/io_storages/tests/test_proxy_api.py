@@ -46,7 +46,7 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         with patch.object(self.mixin, 'redirect_to_presign_url') as mock_redirect:
             mock_redirect.return_value = Response()
             self.mixin.resolve(self.request, fileuri, self.task)
-            mock_redirect.assert_called_once_with('test_uri', self.task, 'Task')
+            mock_redirect.assert_called_once_with('test_uri', self.task, 'Task', storage=self.storage)
 
     @patch('io_storages.proxy_api.get_storage_by_url')
     def test_resolve_with_url_unquote_fallback(self, mock_get_storage):
@@ -56,7 +56,7 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             mock_redirect.return_value = Response()
             # Non-base64 uri to trigger fallback
             self.mixin.resolve(self.request, 's3://bucket/file.jpg', self.task)
-            mock_redirect.assert_called_once_with('s3://bucket/file.jpg', self.task, 'Task')
+            mock_redirect.assert_called_once_with('s3://bucket/file.jpg', self.task, 'Task', storage=self.storage)
 
     @patch('io_storages.proxy_api.get_storage_by_url')
     def test_resolve_storage_not_found(self, mock_get_storage):

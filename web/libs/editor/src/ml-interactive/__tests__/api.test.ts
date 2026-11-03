@@ -34,7 +34,19 @@ describe("ml-interactive/api", () => {
       { id: 10, title: "SAM2" },
       { id: 11, title: "Other" },
     ]);
-    expect(fetchMock).toHaveBeenCalledWith("http://localhost/api/ml/?project=7&is_interactive=true");
+    expect(fetchMock).toHaveBeenCalledWith("http://localhost/api/ml/interactive-backends?project=7");
+  });
+
+  it("discovers member-accessible backend IDs when the management list is forbidden", async () => {
+    globalThis.fetch = mock((input: string) =>
+      Promise.resolve(
+        input.endsWith("/api/ml/interactive-backends?project=7")
+          ? jsonResponse([{ id: 10, is_interactive: true }])
+          : new Response("Forbidden", { status: 403 }),
+      ),
+    ) as unknown as typeof fetch;
+
+    await expect(fetchInteractiveBackends(7)).resolves.toEqual([{ id: 10, title: undefined }]);
   });
 
   it("rejects non-OK backend discovery responses", async () => {

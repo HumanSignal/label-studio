@@ -11,8 +11,17 @@ import requests
 from core import utils
 from core.feature_flags import all_flags, get_feature_file_path
 from core.label_config import generate_time_series_json
+from core.permissions import all_permissions
 from core.utils.common import collect_versions
 from core.utils.io import find_file
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularJSONAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+    SpectacularYAMLAPIView,
+)
+from rest_framework.routers import APIRootView
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
@@ -216,3 +225,49 @@ def feature_flags(request):
 def collect_metrics(request):
     """Lightweight endpoint to collect usage metrics from the frontend only when COLLECT_ANALYTICS is enabled"""
     return HttpResponse(status=204)
+
+
+class MappedAPIRootView(APIRootView):
+    """Router index for a signed-in account.
+
+    Responsibility: declare ``organizations.view`` so the DRF router root is
+    a mapped API view.
+
+    Boundary: this is a self action. Any authenticated account may list route
+    names. The root does not read a project. Does not call ``user.has_perm``.
+    """
+
+    permission_required = all_permissions.organizations_view
+
+
+class _OpenAPIPermission:
+    """Mapped permission for schema views that stay publicly readable.
+
+    Responsibility: give OpenAPI views a permission string in the action table.
+
+    Boundary: spectacular still serves these views with AllowAny. The string
+    is ``organizations.view``. These views do not read a project. Does not
+    call ``user.has_perm``.
+    """
+
+    permission_required = all_permissions.organizations_view
+
+
+class OpenAPISchemaView(_OpenAPIPermission, SpectacularAPIView):
+    """OpenAPI schema document."""
+
+
+class OpenAPIYAMLView(_OpenAPIPermission, SpectacularYAMLAPIView):
+    """OpenAPI schema as YAML."""
+
+
+class OpenAPIJSONView(_OpenAPIPermission, SpectacularJSONAPIView):
+    """OpenAPI schema as JSON."""
+
+
+class OpenAPISwaggerView(_OpenAPIPermission, SpectacularSwaggerView):
+    """Swagger UI for the OpenAPI schema."""
+
+
+class OpenAPIRedocView(_OpenAPIPermission, SpectacularRedocView):
+    """ReDoc UI for the OpenAPI schema."""

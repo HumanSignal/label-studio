@@ -19,6 +19,19 @@ ML_BACKEND_REQUEST_EXCLUDE_FIELDS = (
 )
 
 
+class MLInteractiveBackendSerializer(serializers.ModelSerializer):
+    """Expose only the identifiers needed to request interactive predictions.
+
+    Project members may read these fields without receiving backend connection
+    settings, credentials, or model parameters.
+    """
+
+    class Meta:
+        model = MLBackend
+        fields = ('id', 'is_interactive')
+        read_only_fields = fields
+
+
 class MLBackendSerializer(serializers.ModelSerializer):
     """
     Serializer for MLBackend model.

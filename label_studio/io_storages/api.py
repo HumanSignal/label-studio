@@ -11,13 +11,77 @@ from core.utils.io import read_yaml
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from projects.action_permissions import ensure_project_manage
 from projects.models import Project
 from rest_framework import generics, status
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
+
+
+def _project_from_identifier(project_id):
+    """Resolve a project primary key from a storage payload.
+
+    Responsibility: find the project a storage write names before serializer
+    validation opens a connection.
+
+    Boundary: a missing or non-numeric id returns None so the serializer can
+    reject it. This does not check access.
+    """
+    if project_id in (None, ''):
+        return None
+    try:
+        return Project.objects.filter(pk=project_id).first()
+    except (TypeError, ValueError):
+        return None
+
+
+def _project_reassigned(data, current_project_id) -> bool:
+    """Return whether the payload moves a row to a different project.
+
+    Responsibility: detect a project change before validation or save.
+
+    Boundary: an omitted project field is not a change. A different id, an
+    empty value on a project-bound row, or a non-numeric id is a change.
+    This does not persist the row.
+    """
+    if not hasattr(data, '__contains__') or 'project' not in data:
+        return False
+    raw = data.get('project')
+    if raw in (None, ''):
+        return current_project_id is not None
+    try:
+        submitted = int(raw)
+    except (TypeError, ValueError):
+        return True
+    return submitted != current_project_id
+
+
+class StorageObjectPermissionMixin:
+    """Management gate for one storage row.
+
+    Responsibility: load a storage only after the caller may manage its project.
+
+    Boundary: a hidden project is ``NotFound``. A member who can annotate but
+    not manage is ``PermissionDenied``. ``request.user.project`` is set only
+    after the check succeeds, for the activity log. Does not call ``user.has_perm``.
+    """
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        storage = generics.get_object_or_404(queryset, **{self.lookup_field: self.kwargs[lookup_url_kwarg]})
+        ensure_project_manage(self.request.user, storage.project)
+        self.request.user.project = storage.project
+        return storage
+
+    def update(self, request, *args, **kwargs):
+        storage = self.get_object()
+        if _project_reassigned(request.data, storage.project_id):
+            raise ValidationError('The project cannot be changed.')
+        return super().update(request, *args, **kwargs)
 
 
 class StorageCreateMixin:
@@ -26,8 +90,12 @@ class StorageCreateMixin:
         storage_id = request.data.get('id')
         if storage_id:
             storage = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
-            if not storage.has_permission(request.user):
-                raise PermissionDenied()
+            ensure_project_manage(request.user, storage.project)
+            request.user.project = storage.project
+        project = _project_from_identifier(request.data.get('project'))
+        if project is not None:
+            ensure_project_manage(request.user, project)
+            request.user.project = project
         return super().create(request, *args, **kwargs)
 
 
@@ -46,7 +114,8 @@ class ImportStorageListAPI(StorageCreateMixin, generics.ListCreateAPIView):
             raise ValidationError('query parameter "project" is required')
 
         project = generics.get_object_or_404(Project, pk=project_pk)
-        self.check_object_permissions(self.request, project)
+        ensure_project_manage(self.request.user, project)
+        self.request.user.project = project
         StorageClass = self.serializer_class.Meta.model
         storages = StorageClass.objects.filter(project_id=project.id)
 
@@ -56,12 +125,13 @@ class ImportStorageListAPI(StorageCreateMixin, generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
-        if project is not None and not project.has_permission(self.request.user):
-            raise PermissionDenied('You do not have permission to create storages for this project.')
+        if project is not None:
+            ensure_project_manage(self.request.user, project)
+            self.request.user.project = project
         super().perform_create(serializer)
 
 
-class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+class ImportStorageDetailAPI(StorageObjectPermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
     permission_required = ViewClassPermission(
@@ -92,7 +162,8 @@ class ExportStorageListAPI(StorageCreateMixin, generics.ListCreateAPIView):
             raise ValidationError('query parameter "project" is required')
 
         project = generics.get_object_or_404(Project, pk=project_pk)
-        self.check_object_permissions(self.request, project)
+        ensure_project_manage(self.request.user, project)
+        self.request.user.project = project
         StorageClass = self.serializer_class.Meta.model
         storages = StorageClass.objects.filter(project_id=project.id)
 
@@ -102,8 +173,9 @@ class ExportStorageListAPI(StorageCreateMixin, generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
-        if project is not None and not project.has_permission(self.request.user):
-            raise PermissionDenied('You do not have permission to create storages for this project.')
+        if project is not None:
+            ensure_project_manage(self.request.user, project)
+            self.request.user.project = project
 
         # double check: not export storages don't validate connection in serializer,
         # just make another explicit check here, note: in this create API we have credentials in request.data
@@ -118,7 +190,7 @@ class ExportStorageListAPI(StorageCreateMixin, generics.ListCreateAPIView):
             storage.sync()
 
 
-class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+class ExportStorageDetailAPI(StorageObjectPermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
     permission_required = ViewClassPermission(
@@ -135,7 +207,7 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
-class ImportStorageSyncAPI(generics.GenericAPIView):
+class ImportStorageSyncAPI(StorageObjectPermissionMixin, generics.GenericAPIView):
     permission_required = ViewClassPermission(
         POST=all_permissions.storages_sync,
     )
@@ -163,7 +235,7 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
         return Response(self.serializer_class(storage).data)
 
 
-class ExportStorageSyncAPI(generics.GenericAPIView):
+class ExportStorageSyncAPI(StorageObjectPermissionMixin, generics.GenericAPIView):
     permission_required = ViewClassPermission(
         POST=all_permissions.storages_sync,
     )

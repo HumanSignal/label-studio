@@ -15,14 +15,71 @@ from ml.serializers import (
     MLBackendSerializer,
     MLBackendTrainRequestSerializer,
     MLInteractiveAnnotatingRequest,
+    MLInteractiveBackendSerializer,
 )
+from projects.action_permissions import ensure_project_manage, ensure_project_visible
 from projects.models import Project, Task
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
+
+
+def _project_reassigned(data, current_project_id) -> bool:
+    """Return whether the payload moves a backend to a different project.
+
+    Responsibility: detect a project change before validation contacts the backend.
+
+    Boundary: an omitted project field is not a change. A different id, an empty
+    value, or a non-numeric id is a change. This does not persist the row.
+    """
+    if not hasattr(data, '__contains__') or 'project' not in data:
+        return False
+    raw = data.get('project')
+    if raw in (None, ''):
+        return True
+    try:
+        submitted = int(raw)
+    except (TypeError, ValueError):
+        return True
+    return submitted != current_project_id
+
+
+def _project_from_payload(project_id):
+    """Resolve the project named by an ML create payload.
+
+    Responsibility: find the project before serializer validation calls the backend.
+
+    Boundary: a missing or non-numeric id returns None. This does not check access.
+    """
+    if project_id in (None, ''):
+        return None
+    try:
+        return Project.objects.filter(pk=project_id).first()
+    except (TypeError, ValueError):
+        return None
+
+
+class MLInteractiveBackendListAPI(generics.ListAPIView):
+    """Discover interactive predictors for a project the requester can annotate.
+
+    Unlike the management list, this reads stored identifiers without probing
+    remote backends or exposing their configuration. Hidden projects are 404.
+    """
+
+    permission_required = all_permissions.projects_view
+    serializer_class = MLInteractiveBackendSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return MLBackend.objects.none()
+        project = generics.get_object_or_404(Project, pk=self.request.query_params.get('project'))
+        ensure_project_visible(self.request.user, project)
+        return project.ml_backends.filter(is_interactive=True).only('id', 'is_interactive').order_by('id')
 
 
 @method_decorator(
@@ -82,8 +139,8 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
         project_pk = self.request.query_params.get('project')
         project = generics.get_object_or_404(Project, pk=project_pk)
-
-        self.check_object_permissions(self.request, project)
+        ensure_project_manage(self.request.user, project)
+        self.request.user.project = project
 
         ml_backends = project.update_ml_backends_state()
 
@@ -93,11 +150,13 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         # MLBackendSerializer.validate() calls setup() on the submitted URL, handing it the
         # project creator's API token, so authorize the target project before that runs.
         try:
-            project = Project.objects.filter(pk=request.data.get('project')).first()
-        except (AttributeError, TypeError, ValueError):
-            project = None  # malformed payload: let the serializer reject it
+            project_id = request.data.get('project')
+        except AttributeError:
+            project_id = None
+        project = _project_from_payload(project_id)
         if project is not None:
-            self.check_object_permissions(request, project)
+            ensure_project_manage(request.user, project)
+            request.user.project = project
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
@@ -179,9 +238,29 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = MLBackend.objects.all()
 
     def get_object(self):
-        ml_backend = super(MLBackendDetailAPI, self).get_object()
+        """Return one ML backend after a management check.
+
+        Responsibility: block reads and writes that would contact the backend or
+        reveal its configuration.
+
+        Boundary: a hidden project is ``NotFound``. An annotator is
+        ``PermissionDenied``. ``update_state`` runs only after the check.
+        ``request.user.project`` is set only then. Does not call ``user.has_perm``.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        ml_backend = generics.get_object_or_404(queryset, pk=self.kwargs['pk'])
+        ensure_project_manage(self.request.user, ml_backend.project)
+        self.request.user.project = ml_backend.project
         ml_backend.update_state()
         return ml_backend
+
+    def update(self, request, *args, **kwargs):
+        ml_backend = generics.get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
+        ensure_project_manage(request.user, ml_backend.project)
+        request.user.project = ml_backend.project
+        if _project_reassigned(request.data, ml_backend.project_id):
+            raise ValidationError('The project cannot be changed.')
+        return super().update(request, *args, **kwargs)
 
     def perform_update(self, serializer):
         ml_backend = serializer.save()
@@ -231,7 +310,10 @@ class MLBackendTrainAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, ml_backend)
+        ensure_project_manage(request.user, ml_backend.project)
+        request.user.project = ml_backend.project
+        serializer = MLBackendTrainRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         ml_backend.train()
         return Response(status=status.HTTP_200_OK)
@@ -277,7 +359,8 @@ class MLBackendPredictTestAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, ml_backend)
+        ensure_project_manage(request.user, ml_backend.project)
+        request.user.project = ml_backend.project
 
         random = request.query_params.get('random', False)
         if random:
@@ -365,7 +448,8 @@ class MLBackendInteractiveAnnotating(APIView):
         predicted region based on annotator input.
         """
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, ml_backend)
+        ensure_project_visible(request.user, ml_backend.project)
+        request.user.project = ml_backend.project
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -418,7 +502,8 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, ml_backend)
+        ensure_project_manage(request.user, ml_backend.project)
+        request.user.project = ml_backend.project
         versions_response = ml_backend.get_versions()
         if versions_response.status_code == 200:
             result = {'versions': versions_response.response.get('versions', [])}

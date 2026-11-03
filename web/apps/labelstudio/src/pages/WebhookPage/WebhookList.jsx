@@ -6,7 +6,6 @@ import { useCallback } from "react";
 import { Toggle } from "../../components/Form";
 import { useAPI } from "../../providers/ApiProvider";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
-import { ABILITY, useAuth } from "@humansignal/core/providers/AuthProvider";
 
 const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, canChangeWebhooks }) => {
   return (
@@ -63,10 +62,8 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
   );
 };
 
-const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) => {
+const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks, canChangeWebhooks = false }) => {
   const api = useAPI();
-  const { permissions } = useAuth();
-  const canChangeWebhooks = permissions.can(ABILITY.can_change_webhooks);
 
   if (webhooks === null) return <></>;
 

@@ -85,3 +85,7 @@ CLAUDE.local.md
 web/libs/editor/tests/coverage
 web/coverage-chunks
 .cache
+
+# Local implementation worktrees and superpowers session scratch
+.worktrees/
+.superpowers/

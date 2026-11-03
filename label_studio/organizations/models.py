@@ -76,9 +76,27 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
         ordering = ['pk']
 
     def soft_delete(self):
+        """Remove this membership and disable explicit project grants in this organization.
+
+        Responsibility: mark the organization membership deleted, move
+        ``active_organization`` when another live membership exists, delete this
+        organization's task locks, and set ``ProjectMember.enabled`` to False for
+        this user on projects in this organization.
+
+        Boundary: the membership, project-member rows, and task locks change in
+        one transaction. Member rows are disabled, not deleted. Clearing
+        ``deleted_at`` or calling ``add_user`` does not set ``enabled`` back to
+        True. Does not grant project access.
+        """
+        from projects.models import Project, ProjectMember
+
         with transaction.atomic():
             self.deleted_at = timezone.now()
             self.save(update_fields=['deleted_at'])
+            ProjectMember.objects.filter(
+                user_id=self.user_id,
+                project_id__in=Project.all_objects.filter(organization_id=self.organization_id).values('id'),
+            ).update(enabled=False, updated_at=timezone.now())
             self.user.active_organization = self.user.organizations.filter(
                 organizationmember__deleted_at__isnull=True
             ).first()
@@ -88,8 +106,7 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
                 self.user.avatar = None
                 update_fields.append('avatar')
             self.user.save(update_fields=update_fields)
-
-        self.user.task_locks.filter(task__project__organization=self.organization).delete()
+            self.user.task_locks.filter(task__project__organization=self.organization).delete()
 
 
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)

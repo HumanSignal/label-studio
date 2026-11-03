@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useHistory } from "react-router";
 import { useFixedLocation } from "../providers/RoutesProvider";
+
+export { useFirstMountState, useUpdateEffect } from "./use-update-effect";
 
 export const useRefresh = () => {
   const history = useHistory();
@@ -22,24 +24,3 @@ export const useRefresh = () => {
   return refresh;
 };
 
-export function useFirstMountState(): boolean {
-  const isFirst = useRef(true);
-
-  if (isFirst.current) {
-    isFirst.current = false;
-
-    return true;
-  }
-
-  return isFirst.current;
-}
-
-export const useUpdateEffect: typeof useEffect = (effect, deps) => {
-  const isFirstMount = useFirstMountState();
-
-  useEffect(() => {
-    if (!isFirstMount) {
-      return effect();
-    }
-  }, deps);
-};

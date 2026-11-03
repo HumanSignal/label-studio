@@ -52,7 +52,8 @@ export const DataManagerPage = ({ ...props }) => {
 
     const generation = initGenerationRef.current;
 
-    const mlBackends = await api.callApi("mlBackends", {
+    // Annotation discovery exposes IDs only and is available to project members.
+    const mlBackends = await api.callApi("mlInteractiveBackends", {
       params: { project: project.id },
     });
 
@@ -310,17 +311,18 @@ DataManagerPage.context = ({ dmRef }) => {
         </Button>
       )}
 
-      {Object.entries(links).map(([path, label]) => (
-        <Link
-          key={path}
-          tag={NavLink}
-          className={buttonVariant({ size: "small", look: "outlined" })}
-          to={`/projects/${project.id}${path}`}
-          data-external
-        >
-          {label}
-        </Link>
-      ))}
+      {project.access?.can_manage !== false &&
+        Object.entries(links).map(([path, label]) => (
+          <Link
+            key={path}
+            tag={NavLink}
+            className={buttonVariant({ size: "small", look: "outlined" })}
+            to={`/projects/${project.id}${path}`}
+            data-external
+          >
+            {label}
+          </Link>
+        ))}
     </Space>
   ) : null;
 };

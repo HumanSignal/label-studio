@@ -5,11 +5,13 @@ import time
 from typing import Union
 from urllib.parse import unquote, urlparse
 
+from core.permissions import all_permissions
 from core.utils.common import load_func
 from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from drf_spectacular.utils import extend_schema
+from projects.action_permissions import ProjectActionPermission
 from projects.models import Project
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -18,7 +20,8 @@ from rest_framework.views import APIView
 from tasks.models import Task
 
 from label_studio.io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
-from label_studio.io_storages.utils import parse_range
+from label_studio.io_storages.localfiles.functions import key_within_prefix
+from label_studio.io_storages.utils import parse_bucket_uri, parse_range
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +72,56 @@ def get_streamer_storage_type(storage):
     return None
 
 
+def _unsafe_object_key(key: str) -> bool:
+    """Return whether a cloud object key is absolute or contains a parent segment.
+
+    Responsibility: separate malformed keys from keys that are merely outside a prefix.
+
+    Boundary: empty keys, keys that start with ``/``, and keys with a ``..``
+    segment are unsafe. This does not sign a URL.
+    """
+    if not isinstance(key, str) or key == '':
+        return True
+    normalized = key.replace('\\', '/')
+    if normalized.startswith('/'):
+        return True
+    parts = [part for part in normalized.split('/') if part != '']
+    if '..' in parts:
+        return True
+    head = normalized.split('/', 1)[0]
+    return ':' in head
+
+
+def storage_key_boundary_response(storage, fileuri):
+    """Return 400 or 404 when a cloud key leaves the storage prefix.
+
+    Responsibility: stop URI resolution before a URL is signed or bytes are proxied.
+
+    Boundary: ``..`` and absolute keys are 400. A key outside a non-empty
+    configured prefix is 404. An empty prefix means the whole keyspace of that
+    storage credential, so any safe key is allowed (``key_within_prefix`` is not
+    consulted). Storages without a URL scheme are left to the existing
+    resolver. This does not sign a URL.
+    """
+    scheme = getattr(storage, 'url_scheme', None)
+    if not isinstance(scheme, str) or not scheme:
+        return None
+    uri = parse_bucket_uri(fileuri, storage)
+    if uri is None:
+        return None
+    key = uri.path
+    if _unsafe_object_key(key):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    prefix = getattr(storage, 'prefix', None)
+    if not isinstance(prefix, str):
+        prefix = ''
+    if prefix == '':
+        return None
+    if not key_within_prefix(key, prefix):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    return None
+
+
 class ResolveStorageUriAPIMixin:
     def resolve(self, request: HttpRequest, fileuri: str, instance: Union[Task, Project]) -> Response:
         model_name = type(instance).__name__
@@ -88,8 +141,17 @@ class ResolveStorageUriAPIMixin:
 
         # Try to find storage by URL
         project = instance if isinstance(instance, Project) else instance.project
-        storage_objects = project.get_all_import_storage_objects
+        storage_objects = iter(project.get_all_import_storage_objects)
         storage = get_storage_by_url(fileuri, storage_objects)
+        while storage is not None:
+            boundary = storage_key_boundary_response(storage, fileuri)
+            if boundary is None:
+                break
+            if boundary.status_code != status.HTTP_404_NOT_FOUND:
+                return boundary
+            # Several connections may share a bucket with different prefixes.
+            # Continue through that bucket's connections until the key is allowed.
+            storage = get_storage_by_url(fileuri, storage_objects)
         if not storage:
             # Fall back to the project's own export targets: assets the project
             # produced (Data Collection submissions) live there and must still
@@ -98,6 +160,9 @@ class ResolveStorageUriAPIMixin:
         if not storage:
             logger.error(f'Could not find storage for URI {fileuri}')
             return Response(status=status.HTTP_404_NOT_FOUND)
+        boundary = storage_key_boundary_response(storage, fileuri)
+        if boundary is not None:
+            return boundary
         # Not all storages support presigned URLs
         if not hasattr(storage, 'presign'):
             logger.error(f'Storage {storage} does not support presign URLs')
@@ -127,7 +192,7 @@ class ResolveStorageUriAPIMixin:
 
         if presign:
             # Redirect to presigned URL (original flow)
-            return self.redirect_to_presign_url(fileuri, instance, model_name)
+            return self.redirect_to_presign_url(fileuri, instance, model_name, storage=storage)
         else:
             return self.proxy_data_from_storage(request, fileuri, project, storage)
 
@@ -168,10 +233,17 @@ class ResolveStorageUriAPIMixin:
         response['X-Streamer-Action'] = 'delegate'
         return response
 
-    def redirect_to_presign_url(self, fileuri: str, instance: Union[Task, Project], model_name: str) -> Response:
+    def redirect_to_presign_url(
+        self, fileuri: str, instance: Union[Task, Project], model_name: str, storage=None
+    ) -> Response:
         """Generate and redirect to a presigned URL for the given file URI"""
         try:
-            resolved = instance.resolve_storage_uri(fileuri)
+            if storage is None:
+                resolved = instance.resolve_storage_uri(fileuri)
+            else:
+                # Keep the connection that passed the prefix boundary check;
+                # resolving through the instance would select by bucket again.
+                resolved = {'url': storage.generate_http_url(fileuri), 'presign_ttl': storage.presign_ttl}
         except Exception as exc:
             logger.error(f'Failed to resolve storage uri {fileuri} for {model_name} {instance.id}: {exc}')
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -395,7 +467,8 @@ class TaskResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
     """
 
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.tasks_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
 
     def get(self, request, *args, **kwargs):
         """Get the presigned url for a given fileuri or proxy data through Label Studio"""
@@ -423,7 +496,8 @@ class ProjectResolveStorageUri(ResolveStorageUriAPIMixin, APIView):
     """
 
     http_method_names = ['get']
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.projects_view
+    permission_classes = (IsAuthenticated, ProjectActionPermission)
 
     def get(self, request, *args, **kwargs):
         """Get the presigned url for a given fileuri or proxy data through Label Studio"""

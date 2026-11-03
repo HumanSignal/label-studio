@@ -647,7 +647,9 @@ class AnnotationManager(models.Manager):
         return AnnotationQuerySetWithFSM(self.model, using=self._db)
 
     def for_user(self, user):
-        return self.get_queryset().filter(project__organization=user.active_organization)
+        from projects.access import visible_projects
+
+        return self.get_queryset().filter(project__in=visible_projects(user))
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
@@ -1019,8 +1021,11 @@ class AnnotationDraft(FsmHistoryStateModel):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        if self.task_id:
+            user.project = self.task.project  # link for activity log
+        from projects.access import draft_visible_to
+
+        return draft_visible_to(user, self)
 
     def save(self, *args, **kwargs):
         # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an

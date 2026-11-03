@@ -177,7 +177,33 @@ class BaseWhoAmIUserSerializer(BaseUserSerializer):
         fields = BaseUserSerializer.Meta.fields + ('permissions',)
 
     def get_permissions(self, user) -> list[str]:
-        return [perm for _, perm in all_permissions]
+        """Return account and organization capabilities for whoami.
+
+        Responsibility: build the ``permissions`` list on the current-user response.
+
+        Boundary: every user receives ``users.token.any`` and ``avatar.any``.
+        An active organization owner also receives ``projects.create``,
+        ``organizations.change``, ``organizations.invite``, ``organizations.delete``,
+        and ``organizations.create``. Does not return ``projects.change``,
+        ``storages.change``, or ``webhooks.change``. Does not call ``user.has_perm``.
+        """
+        from projects.access import can_create_project
+
+        permissions = [
+            all_permissions.users_token_any,
+            all_permissions.avatar_any,
+        ]
+        if can_create_project(user):
+            permissions.extend(
+                [
+                    all_permissions.projects_create,
+                    all_permissions.organizations_change,
+                    all_permissions.organizations_invite,
+                    all_permissions.organizations_delete,
+                    all_permissions.organizations_create,
+                ]
+            )
+        return permissions
 
 
 class UserSimpleSerializer(BaseUserSerializer):

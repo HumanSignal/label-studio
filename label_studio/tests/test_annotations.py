@@ -85,7 +85,7 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
     if client_is_annotator:
         assert invite_client_to_project(any_client, task.project).status_code == 200
 
-    webhook_called = not client_is_annotator
+    webhook_called = True
     ground_truth = {
         'task': task.id,
         'result': json.dumps(

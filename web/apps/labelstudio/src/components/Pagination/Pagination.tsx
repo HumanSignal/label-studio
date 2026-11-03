@@ -13,7 +13,7 @@ import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from "@humansignal/ui";
 import "./Pagination.prefix.css";
-import { useUpdateEffect } from "../../utils/hooks";
+import { useUpdateEffect } from "../../utils/use-update-effect";
 
 interface PaginationProps {
   name?: string;

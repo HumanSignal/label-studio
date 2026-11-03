@@ -34,11 +34,14 @@ describe("interactiveCapabilityStore", () => {
       prompts: ["point", "box"],
       targets: [{ tag: "VideoVectorLabels", output: "polygon", features: ["track"] }],
     };
-    let call = 0;
-    globalThis.fetch = mock(() => {
-      call += 1;
-      if (call === 1) return Promise.resolve(jsonResponse([{ id: 10, title: "SAM2" }]));
-      return Promise.resolve(jsonResponse({ data: { result: [{ value: capabilities }] } }));
+    globalThis.fetch = mock((input: string) => {
+      if (input.endsWith("/api/ml/interactive-backends?project=7")) {
+        return Promise.resolve(jsonResponse([{ id: 10, is_interactive: true }]));
+      }
+      if (input.endsWith("/api/ml/10/interactive-annotating")) {
+        return Promise.resolve(jsonResponse({ data: { result: [{ value: capabilities }] } }));
+      }
+      return Promise.resolve(new Response("Forbidden", { status: 403 }));
     }) as unknown as typeof fetch;
 
     await interactiveCapabilityStore.load(7, 99);
@@ -47,7 +50,7 @@ describe("interactiveCapabilityStore", () => {
     expect(interactiveCapabilityStore.getBindings(7)).toMatchObject([
       {
         backendId: 10,
-        backendTitle: "SAM2",
+        modelInfo: { name: "SAM2" },
         controlTag: "VideoVectorLabels",
         output: "polygon",
         prompts: ["point", "box"],

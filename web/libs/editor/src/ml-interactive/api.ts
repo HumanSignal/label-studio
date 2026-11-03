@@ -1,10 +1,9 @@
 /**
  * Thin fetch helpers for the ML-backend capability discovery flow.
  *
- * Both helpers talk to the existing LS Django proxy, not the ML backend
- * directly — so no new Django routes are required for Phase 1. The
- * `capabilities` event reuses `/interactive-annotating`, which the SAM
- * backend now short-circuits before any task/control lookup.
+ * Discovery uses the project-visible metadata endpoint. The `capabilities`
+ * event uses the Django `/interactive-annotating` proxy, which the SAM
+ * backend short-circuits before any task/control lookup.
  */
 
 import type { Capabilities } from "./types";
@@ -22,7 +21,7 @@ export interface InteractiveBackendSummary {
 }
 
 export async function fetchInteractiveBackends(projectId: number): Promise<InteractiveBackendSummary[]> {
-  const res = await fetch(`${API_BASE}/api/ml/?project=${projectId}&is_interactive=true`);
+  const res = await fetch(`${API_BASE}/api/ml/interactive-backends?project=${projectId}`);
   if (!res.ok) throw new Error(`Failed to fetch interactive ML backends: ${res.status}`);
   const data = await res.json();
   const list = data.results ?? data ?? [];

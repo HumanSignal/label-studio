@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useEffect, forwardRef } from "react";
+import { type PropsWithChildren, useCallback, useEffect, useState, forwardRef } from "react";
 import {
   ApiProvider as CoreApiProvider,
   createApiInstance,
@@ -10,7 +10,15 @@ import { ErrorWrapper } from "../components/Error/Error";
 import { modal } from "../components/Modal/Modal";
 import { API_CONFIG } from "../config/ApiConfig";
 import { absoluteURL, isDefined } from "../utils/helpers";
-import { ToastType, useToast } from "@humansignal/ui";
+import { Button, ToastType, useToast } from "@humansignal/ui";
+import {
+  holdProjectAccessDenied,
+  httpMethodFromEndpoint,
+  isProjectAccessHeld,
+  shouldBlockRequestWhileProjectAccessHeld,
+  shouldHoldProjectRequestDenied,
+  subscribeProjectAccessHeld,
+} from "@humansignal/core/lib/utils/project-access-ui";
 import { captureException } from "../config/Sentry";
 
 // Duration for toast errors
@@ -25,6 +33,14 @@ const apiInstance = createApiInstance({
     }
   },
 });
+
+const originalInvoke = apiInstance.invoke.bind(apiInstance);
+apiInstance.invoke = ((method, params, options) => {
+  const name = String(method).replace(/Raw$/, "");
+  const httpMethod = httpMethodFromEndpoint((API_CONFIG.endpoints as Record<string, unknown>)[name]);
+  if (shouldBlockRequestWhileProjectAccessHeld(httpMethod)) return Promise.resolve(null);
+  return originalInvoke(method, params, options);
+}) as typeof apiInstance.invoke;
 
 // Export API instance for backward compatibility
 export const API = apiInstance;
@@ -63,8 +79,13 @@ const displayErrorModal = (errorDetails: FormattedError) => {
  * Label Studio application-specific ApiProvider.
  * Wraps the core ApiProvider with Label Studio-specific error handling.
  */
+const PROJECT_ACCESS_DENIED = "项目不可访问，可能已被删除或访问权限已取消";
+
 export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<string, never>>>(({ children }, ref) => {
   const toast = useToast();
+  const [accessHeld, setAccessHeld] = useState(isProjectAccessHeld());
+
+  useEffect(() => subscribeProjectAccessHeld(() => setAccessHeld(isProjectAccessHeld())), []);
 
   /**
    * Handles errors with Label Studio-specific logic including:
@@ -75,6 +96,11 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
   const handleError = useCallback(
     (errorDetails: FormattedError, result: ApiResponse) => {
       const status = result.$meta?.status;
+      if (shouldHoldProjectRequestDenied(location.pathname, Number(status), result.$meta?.url)) {
+        holdProjectAccessDenied();
+        return;
+      }
+
       const is4xx = status?.toString().startsWith("4");
       const containsValidationErrors =
         isDefined(result.response?.validation_errors) && Object.keys(result.response.validation_errors).length > 0;
@@ -120,6 +146,11 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
       return;
     }
 
+    if (shouldHoldProjectRequestDenied(location.pathname, Number(status), result.$meta?.url)) {
+      holdProjectAccessDenied();
+      return;
+    }
+
     // Handle 404 redirects with improved error messages
     if (status === 404) {
       apiLocked = true;
@@ -149,6 +180,24 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
 
   return (
     <CoreApiProvider ref={ref} onError={handleError} onFatalError={handleFatalError}>
+      {accessHeld ? (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-base border-b border-negative-border bg-negative-background px-base py-tight"
+        >
+          <p className="text-body-medium">{PROJECT_ACCESS_DENIED}</p>
+          <Button
+            type="button"
+            variant="neutral"
+            look="outlined"
+            onClick={() => {
+              location.assign(absoluteURL("/projects"));
+            }}
+          >
+            返回项目列表
+          </Button>
+        </div>
+      ) : null}
       {children}
     </CoreApiProvider>
   );

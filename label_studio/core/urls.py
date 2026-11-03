@@ -24,13 +24,6 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import path, re_path
 from django.views.generic.base import RedirectView
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularJSONAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-    SpectacularYAMLAPIView,
-)
 
 urlpatterns = [
     re_path(r'^$', views.main, name='main'),
@@ -104,11 +97,11 @@ urlpatterns = [
     re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^', include('jwt_auth.urls')),
     re_path(r'^', include('session_policy.urls')),
-    path('docs/api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('docs/api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('docs/api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('docs/api/schema/json/', SpectacularJSONAPIView.as_view(), name='schema-json'),
-    path('docs/api/schema/yaml/', SpectacularYAMLAPIView.as_view(), name='schema-yaml'),
+    path('docs/api/schema/', views.OpenAPISchemaView.as_view(), name='schema'),
+    path('docs/api/schema/swagger-ui/', views.OpenAPISwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('docs/api/schema/redoc/', views.OpenAPIRedocView.as_view(url_name='schema'), name='redoc'),
+    path('docs/api/schema/json/', views.OpenAPIJSONView.as_view(), name='schema-json'),
+    path('docs/api/schema/yaml/', views.OpenAPIYAMLView.as_view(), name='schema-yaml'),
 ]
 
 if settings.DEBUG:
