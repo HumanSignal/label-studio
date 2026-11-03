@@ -2,6 +2,8 @@ name: Publish custom Docker image
 
 on:
   push:
+    branches:
+      - develop
     tags:
       - 'custom-v*'
   workflow_dispatch:
@@ -38,8 +40,13 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.version || github.ref_name }}
         with:
           script: |
-            const version = process.env.REQUESTED_VERSION;
-            if (!/^custom-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) {
+            // Merging a PR updates develop and publishes the exact merge commit.
+            // Automatic builds do not need a Git tag or a manually chosen version.
+            const automatic = context.eventName === 'push' && context.ref === 'refs/heads/develop';
+            const version = automatic
+              ? `develop-${context.sha.slice(0, 12)}`
+              : process.env.REQUESTED_VERSION;
+            if (!automatic && !/^custom-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) {
               throw new Error('Version must be custom-vMAJOR.MINOR.PATCH, for example custom-v1.0.0');
             }
             if (context.ref.startsWith('refs/tags/') && context.ref !== `refs/tags/${version}`) {
