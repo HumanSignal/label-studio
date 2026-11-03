@@ -1814,3 +1814,63 @@ class TestHiddenColumnsListForm(TestCase):
         self.assertEqual(list_fields, dict_fields)
         self.assertEqual(dict_keys, frozenset({'image', 'text'}))
         self.assertEqual(list_keys, dict_keys)
+
+
+class TestApplyFiltersDatetimeOnTaskData(TestCase):
+    """Datetime filters on task.data keys compare parsed values and skip values that are not dates."""
+
+    VALUES = {
+        'iso_utc': '2024-05-10T12:00:00Z',
+        'iso_offset': '2024-05-10T12:00:00+03:00',
+        'offset_next_day': '2024-05-09T23:00:00-03:00',
+        'naive_space': '2024-05-10 12:00:00',
+        'date_only': '2024-05-10',
+        'old': '2023-01-01T00:00:00.000Z',
+        'us_format': '05/10/2024',
+        'invalid_day': '2024-02-30',
+        'time_only': '12:00:00',
+        'epoch': 1715342400,
+        'year_number': 2024,
+        'null': None,
+    }
+    MAY_10 = {'min': '2024-05-10T00:00:00.000Z', 'max': '2024-05-10T23:59:59.000Z'}
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        for name, value in cls.VALUES.items():
+            TaskFactory(project=cls.project, data={'name': name, 'dt': value, 'дата/created': value})
+        TaskFactory(project=cls.project, data={'name': 'missing'})
+
+    def _matched(self, operator, value, key='dt'):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[Filter(filter=f'filter:tasks:data.{key}', operator=operator, type='Datetime', value=value)],
+        )
+        queryset = apply_filters(Task.objects.filter(project=self.project), filters, self.project, None)
+        return sorted(task.data['name'] for task in queryset)
+
+    AFTER_MAY_10_MIDNIGHT = ['iso_offset', 'iso_utc', 'naive_space', 'offset_next_day']
+
+    def test_greater(self):
+        # a date-only value is midnight UTC, so it is not after midnight
+        self.assertEqual(self._matched('greater', '2024-05-10T00:00:00.000Z'), self.AFTER_MAY_10_MIDNIGHT)
+
+    def test_less(self):
+        # +03:00 is 09:00 UTC, -03:00 on May 9 is 02:00 UTC on May 10
+        self.assertEqual(
+            self._matched('less', '2024-05-10T10:00:00.000Z'), ['date_only', 'iso_offset', 'offset_next_day', 'old']
+        )
+
+    def test_in_range(self):
+        self.assertEqual(self._matched('in', dict(self.MAY_10)), sorted(['date_only', *self.AFTER_MAY_10_MIDNIGHT]))
+
+    def test_not_in_range_skips_values_that_are_not_dates(self):
+        self.assertEqual(self._matched('not_in', dict(self.MAY_10)), ['old'])
+
+    def test_key_with_non_ascii_and_slash(self):
+        self.assertEqual(
+            self._matched('greater', '2024-05-10T00:00:00.000Z', key='дата/created'), self.AFTER_MAY_10_MIDNIGHT
+        )

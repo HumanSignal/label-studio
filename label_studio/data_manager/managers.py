@@ -246,6 +246,39 @@ SUPPORTED_IN_LIST_FIELDS = {
 }
 
 
+class DataKeyAsDatetime(Func):
+    """Value of a task.data key as a datetime, NULL when it is not an ISO date or timestamp."""
+
+    output_field = DateTimeField()
+
+    def __init__(self, key):
+        super().__init__(KeyTextTransform(key, 'data'))
+        self.key = key
+
+    def as_sql(self, compiler, connection, **extra_context):
+        return compiler.compile(Cast(self.source_expressions[0], output_field=DateTimeField()))
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        # SQLite date functions accept times, Julian day numbers and roll 2024-02-30 over, so check the ISO date first
+        value_sql, value_params = compiler.compile(self.source_expressions[0])
+        sql = (
+            f"CASE WHEN {value_sql} GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]*'"
+            f' AND date(substr({value_sql}, 1, 10)) = substr({value_sql}, 1, 10)'
+            f' THEN datetime({value_sql}) END'
+        )
+        return sql, (*value_params,) * 4
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        # A plain cast fails the whole query on the first unparseable value; silent jsonpath datetime() yields NULL
+        data_sql, data_params = compiler.compile(self.source_expressions[0].lhs)
+        path = (
+            f'$.{json.dumps(self.key, escape_forward_slashes=False)}.datetime()'
+            ' ? (@.type() == "date" || @.type() starts with "timestamp")'
+        )
+        sql = f"(jsonb_path_query_first({data_sql}, %s::jsonpath, '{{}}', true) #>> '{{}}')::timestamptz"
+        return sql, (*data_params, path)
+
+
 def get_fields_for_filter_ordering(prepare_params):
     result = []
     if prepare_params is None:
@@ -1051,17 +1084,17 @@ def apply_filters(queryset, filters, project, request, exists_result_filters=Fal
                     f'column names cannot contain {UNQUERYABLE_COLUMN_NAME_CHARACTERS}.'
                 )
 
-            # annotate with cast to number if need
-            if _filter.type == 'Number' and field_name.startswith('data__'):
+            # annotate task.data values with a cast to number or datetime if need
+            if field_name.startswith('data__') and (
+                _filter.type == 'Number' or (_filter.type == 'Datetime' and _filter.operator != Operator.EMPTY)
+            ):
                 json_field = field_name.replace('data__', '')
-                queryset = queryset.annotate(
-                    **{
-                        f'filter_{json_field.replace("$undefined$", "undefined")}': Cast(
-                            KeyTextTransform(json_field, 'data'), output_field=FloatField()
-                        )
-                    }
-                )
                 clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
+                if _filter.type == 'Number':
+                    expression = Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField())
+                else:
+                    expression = DataKeyAsDatetime(json_field)
+                queryset = queryset.annotate(**{clean_field_name: expression})
             else:
                 clean_field_name = field_name
 
