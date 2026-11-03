@@ -272,6 +272,14 @@ const Model = types
     },
 
     onHotKey() {
+      const drawingLabel = Object.values(self.parent?.tools || {}).some((tool) => tool.isDrawingTool);
+      if (drawingLabel) {
+        const annotation = self.annotation;
+        // A label shortcut starts the next region; clicking a label remains the
+        // explicit way to relabel an existing selection. Never interrupt a stroke.
+        if (annotation.isReadOnly() || annotation.isDrawing) return;
+        annotation.unselectAll();
+      }
       return self.onLabelInteract();
     },
 

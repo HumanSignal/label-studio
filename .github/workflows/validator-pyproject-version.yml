@@ -13,6 +13,9 @@ on:
       - 'ls-release/**'
   merge_group:
 
+permissions:
+  contents: read
+
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
@@ -26,7 +29,7 @@ jobs:
       - name: Validate
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.GIT_PAT }}
+          github-token: ${{ github.token }}
           script: |
             const { repo, owner } = context.repo;
             const head_sha = '${{ github.event.merge_group.head_sha || github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha || github.event.after }}'

@@ -14,6 +14,15 @@ date: 2025-05-24 17:19:21
 
 Use keyboard shortcuts, or hotkeys, to improve your labeling performance. 
 
+For drawing labels (such as brush and rectangle labels), pressing a label hotkey
+clears the current region selection and selects the label for the next region.
+Existing regions keep their labels, including when you press the same label hotkey
+again. Finish the current stroke or shape before switching: label hotkeys are
+ignored while drawing is in progress.
+
+To correct an existing region's label, select the region and click the desired
+label with the mouse.
+
 ## View out-of-the-box hotkeys
 
 From the labeling editor, click the settings icon to see more details about hotkeys or to enable or disable hotkeys. 
