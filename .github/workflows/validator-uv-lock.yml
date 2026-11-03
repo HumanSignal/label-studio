@@ -13,6 +13,9 @@ on:
       - 'ls-release/**'
   merge_group:
 
+permissions:
+  contents: read
+
 env:
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
@@ -29,7 +32,7 @@ jobs:
           BASE_REF: "${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}"
           HEAD_REF: "${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.event.after }}"
         with:
-          github-token: ${{ secrets.GIT_PAT }}
+          github-token: ${{ github.token }}
           script: |
             const {repo, owner} = context.repo;
             const base_ref = process.env.BASE_REF;
