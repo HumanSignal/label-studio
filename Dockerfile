@@ -30,7 +30,7 @@ ENV BUILD_NO_SERVER=true \
 
 WORKDIR /label-studio/web
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git coreutils
 
 COPY web/package.json \
      web/bun.lock \
@@ -43,7 +43,7 @@ COPY web ./
 RUN mkdir -p /label-studio/label_studio/core/static/js
 COPY pyproject.toml ../pyproject.toml
 RUN --mount=type=cache,target=/root/.bun/install/cache,id=bun-install-cache-lso,sharing=locked \
-    bun run build
+    timeout --verbose --kill-after=15s 10m bun run build
 
 ################################ Stage: venv-builder (prepare the virtualenv)
 # OpenCV ships manylinux (glibc) wheels, not musllinux wheels. Alpine would
