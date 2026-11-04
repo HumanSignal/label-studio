@@ -74,6 +74,24 @@ The following tags are supported:
 **Known limitations:**
 - [Taxonomies loaded using `apiUrl`](/templates/taxonomy) will not be detected.
 
+### Use child filters
+
+Filters on annotation results, prediction results, and reviews can have child filters. To add one, select **Add Child Filter** under the filter.
+
+A child filter applies to the same annotation, prediction, or review as the filter above it. For example, an annotation results filter with the child filter **Annotated by** matches only tasks where that annotator's own annotation has the selected result. A task where the result is in someone else's annotation doesn't match.
+
+To check what a child filter applies to, hover over its **And**.
+
+#### Example: Find tasks accepted by other reviewers
+
+Find tasks with an accepted review, excluding the ones that a specific reviewer accepted:
+
+1. Add a filter on **reviews > Reviewed by**, select **is none of**, and select the reviewer.
+2. Select **Add Child Filter**, then set **Review result** to **is any of** with **Accepted** and **Fix + Accepted**.
+
+<img src="/images/data-manager-child-filters.png" class="gif-border">
+
+Put **is none of** on the parent filter, not on the child filter. On a child filter it only applies to the same review, so a task that the reviewer accepted still matches when another reviewer also accepted it.
 
 </div>
 
