@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { cn } from "../../../utils/bem";
 import { decodeBrushMask, getImageLabels, loadGridPreview, selectPreviewAnnotation } from "./annotation-overlay";
 
-function renderRegion(region, color, width, height) {
+function renderRegion(region, color, width, height, fillOpacity) {
   const value = region.value;
   if (!value || region.image_rotation) throw new Error("Unsupported image rotation");
   const x = (n) => (n * width) / 100;
   const y = (n) => (n * height) / 100;
-  const common = { stroke: color, fill: color, fillOpacity: 0.2, strokeWidth: 2, vectorEffect: "non-scaling-stroke" };
+  const common = { stroke: color, fill: color, fillOpacity, strokeWidth: 2, vectorEffect: "non-scaling-stroke" };
   const label = Array.isArray(value[region.type]) ? value[region.type].join(", ") : "";
   const title = <title>{label}</title>;
   const rotate = value.rotation ? `rotate(${value.rotation} ${x(value.x)} ${y(value.y)})` : undefined;
@@ -132,7 +132,11 @@ export function AnnotatedImage({ task, image, field, config, enabled, loadTask, 
       const label = region.value?.[region.type]?.[0];
       const color = labels.colors[`${region.from_name}:${label}`] ?? "#ff7800";
       try {
-        nodes.push(<g key={`${region.id}-${region.type}`}>{renderRegion(region, color, width, height)}</g>);
+        nodes.push(
+          <g key={`${region.id}-${region.type}`}>
+            {renderRegion(region, color, width, height, labels.fillOpacities[region.from_name] ?? 0.2)}
+          </g>,
+        );
       } catch {
         incomplete = true;
       }

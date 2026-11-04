@@ -47,6 +47,27 @@ describe("annotated grid image", () => {
     expect(loadTask).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ['fillOpacity="0" opacity="0.6"', "0"],
+    ['opacity="0"', "0"],
+    ['fillopacity="0.35" opacity="0.6"', "0.35"],
+    ["", "0.2"],
+  ])("respects configured shape fill opacity: %s", async (attributes, expected) => {
+    const { container } = render(
+      <AnnotatedImage
+        task={task}
+        image="/image.jpg"
+        field="image"
+        config={config.replace("<PolygonLabels ", `<PolygonLabels ${attributes} `)}
+        enabled
+        loadTask={async () => response}
+      />,
+    );
+    await waitFor(() => expect(container.querySelector("polygon")).not.toBeNull());
+    expect(container.querySelector("polygon").getAttribute("fill-opacity")).toBe(expected);
+    expect(container.querySelector("polygon").getAttribute("stroke")).toBe("#ff0000");
+  });
+
   it("uses the same cover/contain mode for the image and annotation overlay", async () => {
     const loadTask = async () => response;
     const props = { task, image: "/image.jpg", field: "image", config, enabled: true, loadTask };

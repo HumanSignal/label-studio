@@ -13,12 +13,19 @@ export function getImageLabels(config, field) {
     .filter((el) => el.tagName.toLowerCase() === "image" && el.getAttribute("value") === `$${field}`)
     .map((el) => el.getAttribute("name"));
   const colors = {};
+  const fillOpacities = {};
+  for (const el of elements.filter((el) => el.hasAttribute("toName") || el.hasAttribute("toname"))) {
+    // The editor gives fillOpacity precedence over opacity, including explicit zero.
+    const attrs = Object.fromEntries(Array.from(el.attributes, (attr) => [attr.name.toLowerCase(), attr.value]));
+    const opacity = Number(attrs.fillopacity ?? attrs.opacity ?? 0.2);
+    if (Number.isFinite(opacity) && opacity >= 0 && opacity <= 1) fillOpacities[attrs.name] = opacity;
+  }
   for (const el of elements.filter((el) => el.tagName.toLowerCase() === "label")) {
     const label = el.getAttribute("alias") || el.getAttribute("value");
     colors[`${el.parentElement?.getAttribute("name")}:${label}`] =
       el.getAttribute("background") || ColorScheme.make_color({ seed: el.getAttribute("value") })[0];
   }
-  return { imageNames, colors };
+  return { imageNames, colors, fillOpacities };
 }
 
 export function decodeBrushMask(rle, width, height, color) {
