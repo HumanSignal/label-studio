@@ -43,10 +43,15 @@ export const GridBody = observer(({ row, fields, columnCount }) => {
     return (
       <div
         key={type}
+        style={
+          type === "Image"
+            ? { display: "grid", gridTemplateRows: `repeat(${fields.length}, minmax(0, 1fr))`, minHeight: 0 }
+            : undefined
+        }
         className={cnm("h-full w-full", {
           "overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-border scrollbar-track-transparent":
             type !== "Image" || type === "Unknown",
-          "h-auto": !hasImage || hasImage,
+          "h-auto": type !== "Image",
         })}
       >
         {fields.map((field, index) => {
@@ -91,16 +96,21 @@ export const GridDataGroup = observer(({ type, value, field, row, columnCount, h
   );
 });
 
-export const GridCell = observer(({ view, selected, row, fields, onClick, columnCount, ...props }) => {
+export const GridCell = observer(({ view, selected, row, fields, onClick, onOpenTask, columnCount, ...props }) => {
   const { setCurrentTaskId, imageField, hasImage } = useContext(GridViewContext);
 
   const handleBodyClick = useCallback(
     (e) => {
+      if (onOpenTask) {
+        e.stopPropagation();
+        onOpenTask(row, e);
+        return;
+      }
       if (!imageField) return;
       e.stopPropagation();
       setCurrentTaskId(row.id);
     },
-    [imageField, row.id],
+    [imageField, row, onOpenTask, setCurrentTaskId],
   );
 
   return (
@@ -123,6 +133,15 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
         <div
           className={`${cn("grid-view").elem("cell-body").mod({ responsive: !view.gridFitImagesToWidth }).toClassName()} ${cnm({ "overflow-auto": !hasImage })}`}
           onClick={handleBodyClick}
+          role={onOpenTask ? "button" : undefined}
+          tabIndex={onOpenTask ? 0 : undefined}
+          aria-label={onOpenTask ? `Open task ${row.id}` : undefined}
+          onKeyDown={(e) => {
+            if (onOpenTask && (e.key === "Enter" || e.key === " ")) {
+              e.preventDefault();
+              handleBodyClick(e);
+            }
+          }}
         >
           <GridBody view={view} row={row} fields={fields} columnCount={columnCount} />
         </div>
@@ -131,7 +150,7 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
   );
 });
 
-export const GridView = observer(({ data, view, loadMore, fields, onChange, hiddenFields }) => {
+export const GridView = observer(({ data, view, loadMore, fields, onChange, onOpenTask, hiddenFields }) => {
   const columnCount = view.gridWidth ?? 4;
   const prevColumnCountRef = useRef(columnCount);
 
@@ -181,10 +200,11 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
           columnCount={columnCount}
           selected={view.selected}
           onClick={() => onChange?.(row.id)}
+          onOpenTask={onOpenTask}
         />
       );
     },
-    [data, columnCount, fieldsData, view, onChange, getCellIndex],
+    [data, columnCount, fieldsData, view, onChange, onOpenTask, getCellIndex],
   );
 
   const onItemsRenderedWrap = useCallback(
@@ -320,7 +340,7 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
                   width={width}
                   height={height}
                   rowHeight={finalRowHeight}
-                  overscanRowCount={Math.max(2, Math.floor(view.dataStore.pageSize / 2))}
+                  overscanRowCount={2}
                   columnCount={columnCount}
                   rowCount={loadedRows}
                   columnWidth={width / columnCount - 9.5}

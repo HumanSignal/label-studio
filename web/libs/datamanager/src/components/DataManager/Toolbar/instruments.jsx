@@ -9,6 +9,7 @@ import { Tooltip } from "@humansignal/ui";
 import { ActionsButton } from "./ActionsButton";
 import { GridSelectAll } from "./GridSelectAll";
 import { DensityToggle } from "./DensityToggle";
+import { GridAnnotationsToggle } from "./GridAnnotationsToggle";
 import { GridWidthButton } from "./GridWidthButton";
 import { LabelButton } from "./LabelButton";
 import { LoadingPossum } from "./LoadingPossum";
@@ -91,7 +92,12 @@ export const instruments = {
     return <OrderButton size={size} style={style} />;
   },
   "grid-size": ({ size }) => {
-    return <GridWidthButton size={size} />;
+    return (
+      <>
+        <GridAnnotationsToggle size={size} />
+        <GridWidthButton size={size} />
+      </>
+    );
   },
   refresh: ({ size }) => {
     return <RefreshButton size={size} />;

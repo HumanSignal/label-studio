@@ -129,6 +129,7 @@ export const AppStore = types
     },
   }))
   .volatile(() => ({
+    gridShowAnnotations: false,
     needsDataFetch: false,
     // Set when an action opts out of the automatic reload (result.reload === false), e.g. async Bulk
     // Review. Kept separate from needsDataFetch so the periodic project poll (which recomputes
@@ -138,6 +139,10 @@ export const AppStore = types
     requestsInFlight: new Map(),
   }))
   .actions((self) => ({
+    toggleGridAnnotations() {
+      self.gridShowAnnotations = !self.gridShowAnnotations;
+    },
+
     startPolling() {
       if (self._poll) return;
       if (self.SDK.polling === false) return;

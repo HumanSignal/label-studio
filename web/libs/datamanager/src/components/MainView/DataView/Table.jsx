@@ -430,6 +430,7 @@ function DataViewInner({
         fields={columns}
         loadMore={loadMore}
         onChange={(id) => view.toggleSelected(id)}
+        onOpenTask={store.SDK.type === "DE" || isSavingView ? undefined : onRowClick}
         hiddenFields={hiddenColumns}
         stopInteractions={isSavingView}
       />

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { GridView, GridCell, GridHeader, GridDataGroup } from "../GridView";
 import { configure } from "mobx";
+import * as mst from "mobx-state-tree";
 import type React from "react";
 import { cn } from "../../../../utils/bem";
 import { GridViewProvider } from "../GridPreview";
@@ -108,6 +109,7 @@ const renderWithBEM = (ui: React.ReactElement) => {
 describe("GridView", () => {
   beforeEach(() => {
     mock.clearAllMocks();
+    spyOn(mst, "getRoot").mockReturnValue({ SDK: { type: "dm" }, gridShowAnnotations: false, apiCall: mock() });
 
     spyOn(autoSizerModule, "default").mockImplementation(
       ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) =>
@@ -211,6 +213,28 @@ describe("GridView", () => {
   });
 
   describe("GridCell Component", () => {
+    it("opens task details from the image body without selecting the task", () => {
+      const open = mock();
+      const select = mock();
+      const { container } = renderWithBEM(
+        <GridCell
+          view={mockView}
+          row={mockData[0]}
+          fields={mockFields}
+          selected={{ isSelected: () => false }}
+          columnCount={2}
+          onClick={select}
+          onOpenTask={open}
+        />,
+      );
+      const body = container.querySelector('[class*="cell-body"]')!;
+      fireEvent.click(body);
+      expect(open).toHaveBeenCalledWith(mockData[0], expect.anything());
+      expect(select).not.toHaveBeenCalled();
+      fireEvent.keyDown(body, { key: "Enter" });
+      expect(open).toHaveBeenCalledTimes(2);
+    });
+
     it("renders cell with header and body", () => {
       const row = mockData[0];
       const selected = { isSelected: mock().mockReturnValue(false) };
