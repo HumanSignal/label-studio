@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // @ts-ignore
 import { Phrases } from "../Phrases";
 import { getRoot } from "mobx-state-tree";
-import { FF_LSDV_E_278, FF_NER_SELECT_ALL, isFF } from "../../../../utils/feature-flags";
+import { FF_NER_SELECT_ALL, isFF } from "../../../../utils/feature-flags";
 
 const ff = mockFF();
 
@@ -86,7 +86,6 @@ describe("Phrases Component", () => {
   describe("Basic Rendering", () => {
     beforeEach(() => {
       ff.set({
-        [FF_LSDV_E_278]: true,
         [FF_NER_SELECT_ALL]: false,
       });
     });
@@ -123,7 +122,6 @@ describe("Phrases Component", () => {
   describe("Enhanced Annotation Functionality (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
       ff.set({
-        [FF_LSDV_E_278]: true,
         [FF_NER_SELECT_ALL]: true,
       });
     });
@@ -281,7 +279,6 @@ describe("Phrases Component", () => {
 
       it("does not call seekToPhrase when feature flag is off", () => {
         ff.set({
-          [FF_LSDV_E_278]: true,
           [FF_NER_SELECT_ALL]: false,
         });
 

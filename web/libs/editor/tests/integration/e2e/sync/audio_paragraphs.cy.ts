@@ -138,7 +138,6 @@ describe("Sync: Audio Paragraphs", () => {
   beforeEach(() => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       ff_front_dev_2715_audio_3_280722_short: true,
-      fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
       fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short: false,
     });
 
@@ -150,7 +149,6 @@ describe("Sync: Audio Paragraphs", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,
-        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
       });
     });
 
@@ -517,7 +515,6 @@ describe("Sync: Audio Paragraphs", () => {
     beforeEach(() => {
       LabelStudio.addFeatureFlagsOnPageLoad({
         ff_front_dev_2715_audio_3_280722_short: true,
-        fflag_feat_front_lsdv_e_278_contextual_scrolling_short: false,
         fflag_feat_front_bros_199_enable_select_all_in_ner_phrase_short: false,
       });
     });
