@@ -1135,6 +1135,9 @@ FSM_ENABLED = get_bool_env('FSM_ENABLED', False)
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
 FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
+
+# Projects a user can access in their active organization, as one queryset (LSE adds role/workspace rules)
+ACCESSIBLE_PROJECTS_FUNCTION = 'projects.functions.access.accessible_projects'
 FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_name'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we

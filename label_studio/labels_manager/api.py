@@ -1,6 +1,8 @@
 import logging
 
 from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import load_func
+from django.conf import settings
 from django.db.models import CharField, Count, Q
 from django.db.models.functions import Cast
 from django.utils.decorators import method_decorator
@@ -254,13 +256,19 @@ class LabelBulkUpdateAPI(views.APIView):
         serializer = LabelBulkUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         project = serializer.validated_data['project']
+        project_ids = None
         if project is not None:
             self.check_object_permissions(self.request, project)
+        else:
+            # Without `project`, only touch projects this user can access (FIT-3296),
+            # resolved in one query instead of a per-project object check.
+            project_ids = load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(self.request.user).values('id')
 
         updated_count = bulk_update_label(
             old_label=serializer.validated_data['old_label'],
             new_label=serializer.validated_data['new_label'],
             organization=self.request.user.active_organization,
             project=project,
+            project_ids=project_ids,
         )
         return Response({'annotations_updated': updated_count})
