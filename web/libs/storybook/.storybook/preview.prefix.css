@@ -72,11 +72,11 @@ body {
   .sbdocs-content {
     color: var(--color-neutral-content) !important;
 
-    & p:not(.sbdocs-preview p),
-    & span:not(.sbdocs-preview span),
-    & div:not(.sbdocs-preview div),
-    & li:not(.sbdocs-preview li),
-    & code:not(.sbdocs-preview code) {
+    & p:not(.sbdocs-preview p, .ds-manifest p),
+    & span:not(.sbdocs-preview span, .ds-manifest span),
+    & div:not(.sbdocs-preview div, .ds-manifest div),
+    & li:not(.sbdocs-preview li, .ds-manifest li),
+    & code:not(.sbdocs-preview code, .ds-manifest code) {
       color: inherit !important;
     }
   }
@@ -176,4 +176,10 @@ body {
       }
     }
   }
+}
+
+/* Docs page title on the design-system type scale */
+#storybook-docs .sbdocs-content h1:not(.sbdocs-preview *) {
+  font-size: var(--font-size-title-large) !important;
+  font-weight: var(--font-weight-semibold, 600) !important;
 }

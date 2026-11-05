@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "plugins": ["./tools/biome/plugins/cn-to-classname.grit"],
-  "assist": { "actions": { "source": { "organizeImports": "off" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
   "files": {
     "includes": [
       "**",
@@ -62,7 +68,9 @@
       },
       "suspicious": {
         "noUnknownAtRules": {
-          "options": { "ignore": ["tailwind", "apply", "layer", "theme", "source", "variant"] }
+          "options": {
+            "ignore": ["tailwind", "apply", "layer", "theme", "source", "variant"]
+          }
         },
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
@@ -129,5 +137,13 @@
         "noDangerouslySetInnerHtml": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["libs/ui/components.manifest.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

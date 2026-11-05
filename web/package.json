@@ -44,6 +44,7 @@
     "test:unit:labelstudio": "bun test --dom apps/labelstudio/src",
     "test:unit:playground": "bun test --dom apps/playground/src",
     "design-tokens": "bun tools/design-tokens-converter/design-tokens-converter.mjs",
+    "ds:manifest": "bun tools/ds-manifest/cli.ts",
     "extract-antd-no-reset": "cd libs/editor && bun ../../tools/extract-antd-no-reset/extract-antd-no-reset.mjs",
     "storybook:serve": "bun run storybook dev -c libs/storybook/.storybook --port 4400",
     "storybook:build": "bun run storybook build -c libs/storybook/.storybook -o dist/libs/storybook/storybook",
