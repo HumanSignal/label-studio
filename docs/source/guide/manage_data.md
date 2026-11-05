@@ -58,7 +58,9 @@ When you filter or sort the data before you label it, you modify which tasks and
 
 ### Filter annotation results
 
-You can also filter on individual annotation results within a task:
+You can filter tasks by the results of their annotations. In the filter list, select a control tag from your labeling configuration under **Annotations**, then select the value to look for. If the project has predictions, its control tags are also listed under **Predictions**.
+
+An annotation results filter comes with an **Annotators** child filter, so you can look only at annotations by specific annotators. For more information, see [Use child filters](#Use-child-filters).
 
 <img src="/images/data-manager-filters-lse.png" class="gif-border" >
 
