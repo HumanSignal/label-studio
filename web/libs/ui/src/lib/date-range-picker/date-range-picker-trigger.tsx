@@ -128,10 +128,12 @@ export const DateRangePickerTrigger = ({
         aria-expanded={isOpen}
         aria-disabled={disabled || undefined}
         className={cnm(
-          "flex items-center gap-tight border border-neutral-border rounded-smaller cursor-pointer",
+          "flex items-center gap-tight cursor-pointer",
           "hover:border-neutral-border-bold",
-          // FilterShell supplies its own value-trigger chrome.
-          !ownChrome && "py-tight pl-base pr-tight h-10",
+          // FilterShell supplies its own value-trigger chrome: shape, border and height. Leaving the
+          // standalone border/radius utilities on would tie with `.filterShellValueTrigger` and, in a
+          // build that loads Tailwind last, win over the flush-left / round-right pill shape.
+          !ownChrome && "border border-neutral-border rounded-smaller py-tight pl-base pr-tight h-10",
           disabled && "opacity-50 cursor-not-allowed",
           className,
         )}
