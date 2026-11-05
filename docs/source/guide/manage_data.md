@@ -62,10 +62,8 @@ You can filter tasks by the results of their annotations. In the filter list, se
 
 An annotation results filter comes with an **Annotators** child filter, so you can look only at annotations by specific annotators. For more information, see [Use child filters](#Use-child-filters).
 
-<img src="/images/data-manager-filters-lse.png" class="gif-border" >
-
 !!! note
-    In Label Studio Community, the `Annotation results` filter is an unstructured text search across all annotations for the task, and the example above would not be achievable.
+    In Label Studio Community, the `Annotation results` filter is an unstructured text search across all annotations for the task, so you can't filter by the values of a control tag.
 
 The following tags are supported:
 - All `Labels` tags (ex. `Labels`, `ParagraphLabels`, ...)
@@ -81,6 +79,17 @@ The following tags are supported:
 Child filters let you filter tasks by conditions that must all apply to the _same_ annotation, review, or prediction, rather than to the task as a whole. For example, you can find tasks where a single annotation was both completed by a specific annotator and accepted, rather than tasks where one annotation matches one condition and a different annotation matches the other.
 
 Filters on annotation results, prediction results, and reviews can have child filters. To add one, select **Add Child Filter** under the filter.
+
+#### Example: Find tasks where an annotator chose a label
+
+Find tasks where a specific annotator chose a specific label:
+
+1. Add a filter on your control tag under **Annotations**, for example **annotations > sentiment**. Select **is** and select **Negative**.
+2. In the **Annotators** child filter added with it, select **is any of** and select the annotator.
+
+<img src="/images/data-manager-filters-lse.png" class="gif-border">
+
+Both conditions apply to the same annotation. A task where another annotator chose **Negative** doesn't match.
 
 #### Example: Find recent rejections by a reviewer
 
