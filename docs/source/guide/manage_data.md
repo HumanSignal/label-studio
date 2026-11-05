@@ -78,7 +78,9 @@ The following tags are supported:
 
 ### Use child filters
 
-A task can have several annotations, predictions, and reviews. Child filters add conditions to a filter on annotation results, prediction results, or reviews, and every condition applies to the same annotation, prediction, or review. To add one, select **Add Child Filter** under the filter.
+Child filters let you filter tasks by conditions that must all apply to the _same_ annotation, review, or prediction, rather than to the task as a whole. For example, you can find tasks where a single annotation was both completed by a specific annotator and accepted, rather than tasks where one annotation matches one condition and a different annotation matches the other.
+
+Filters on annotation results, prediction results, and reviews can have child filters. To add one, select **Add Child Filter** under the filter.
 
 #### Example: Find recent rejections by a reviewer
 
