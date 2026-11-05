@@ -1,5 +1,3 @@
-@import "../../../../ui/src/styles/userpic-badge.prefix.css";
-
 .annotation-button {
   display: flex;
   padding: var(--spacing-tighter) var(--spacing-tight);
@@ -35,24 +33,6 @@
     & .annotation-button__userpic_prediction {
       background-color: var(--color-accent-plum-subtle);
       color: var(--color-accent-plum-bold);
-    }
-
-    & .annotation-button__userpic {
-      .userpic-badge {
-        transform: translate(2px, 2px);
-
-        &_accepted {
-          background-color: var(--color-accent-kale-base);
-        }
-
-        &_rejected {
-          background-color: var(--color-accent-persimmon-base);
-        }
-
-        &_fixed {
-          background-color: var(--color-accent-grape-base);
-        }
-      }
     }
   }
 

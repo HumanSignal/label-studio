@@ -179,7 +179,7 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
         decoded_fileuri = _decode_fileuri(fileuri)
         if decoded_fileuri.startswith('/data/upload/'):
             return self._serve_local_upload(request, decoded_fileuri, project)
-        # FIT-2832: History / tab Userpics in the sandboxed shell need avatars without
+        # FIT-2832: History / tab avatars in the sandboxed shell need avatars without
         # session cookies. Canonical form is /data/avatars/... (also produced from
         # /storage-data/uploaded/?filepath=avatars/... by the FE URL rewrite).
         avatar_prefix = f'/data/{settings.AVATAR_PATH}/'

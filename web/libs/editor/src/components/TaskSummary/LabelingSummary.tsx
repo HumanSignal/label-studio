@@ -6,7 +6,7 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import { observer } from "mobx-react";
 
 import { userDisplayName } from "@humansignal/core";
-import { cnm, Skeleton, Userpic } from "@humansignal/ui";
+import { cnm, Skeleton, Avatar } from "@humansignal/ui";
 import { IconSparks } from "@humansignal/icons";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
 import { AggregationTableRow } from "./Aggregation";
@@ -422,12 +422,13 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
               onSelect(annotation);
             }}
           >
-            <Userpic
+            <Avatar
+              size="large"
               user={annotation.user}
               className={annotation.type === "prediction" ? "!bg-accent-plum-subtle text-accent-plum-bold" : ""}
             >
               {annotation.type === "prediction" && <IconSparks size={18} />}
-            </Userpic>
+            </Avatar>
             <div className="flex flex-col items-start">
               <span className="text-sm font-medium">{annotation.createdBy}</span>
               {!hideInfo && <span className="text-xs text-neutral-content-subtle">#{annotation.id}</span>}

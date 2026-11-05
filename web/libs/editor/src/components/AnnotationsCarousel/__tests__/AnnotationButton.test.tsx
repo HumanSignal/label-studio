@@ -364,7 +364,8 @@ describe("AnnotationButton", () => {
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
     const badge = screen.getByTestId("annotation-review-badge");
-    expect(badge.className).toContain("userpic-badge_rejected");
+    expect(badge).toHaveAttribute("data-variant", "persimmon");
+    expect(badge).toHaveAttribute("aria-label", "Rejected review");
     (window as any).APP_SETTINGS = origAppSettings;
   });
 
@@ -386,7 +387,8 @@ describe("AnnotationButton", () => {
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
     const badge = screen.getByTestId("annotation-review-badge");
-    expect(badge.className).toContain("userpic-badge_fixed");
+    expect(badge).toHaveAttribute("data-variant", "grape");
+    expect(badge).toHaveAttribute("aria-label", "Fixed review");
     (window as any).APP_SETTINGS = origAppSettings;
   });
 
@@ -408,7 +410,8 @@ describe("AnnotationButton", () => {
     );
     expect(screen.getByText("Test User")).toBeInTheDocument();
     const badge = screen.getByTestId("annotation-review-badge");
-    expect(badge.className).toContain("userpic-badge_fixed");
+    expect(badge).toHaveAttribute("data-variant", "grape");
+    expect(badge).toHaveAttribute("aria-label", "Fixed review");
     (window as any).APP_SETTINGS = origAppSettings;
   });
 

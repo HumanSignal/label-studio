@@ -11,7 +11,7 @@
  */
 
 import { confirm } from "@humansignal/ui/lib/modal";
-import { cnm, Userpic } from "@humansignal/ui";
+import { cnm, Avatar } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { computeReviewDecisions } from "./annotation-review-logic";
 import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth } from "./types";
@@ -72,7 +72,7 @@ const DialogBody = ({
             i < annotatorDecisions.length - 1 && "border-b border-neutral-border-subtle",
           )}
         >
-          <Userpic user={d.user} />
+          <Avatar user={d.user} size="large" />
           <span className="text-label-small font-medium flex-1 truncate">{d.displayName}</span>
           <span
             className={cnm(

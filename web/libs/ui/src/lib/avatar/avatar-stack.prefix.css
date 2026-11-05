@@ -1,0 +1,128 @@
+/* Global lsf-userpics classes: automation matches these class attributes exactly, so no other class goes on them. */
+.userpics[data-avatar-stack] {
+  --avatar-stack-overlap: var(--spacing-tight);
+  --avatar-stack-ring: var(--color-neutral-background);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  isolation: isolate;
+
+  & > .userpics__userpic {
+    position: relative;
+    z-index: var(--avatar-stack-layer, auto);
+    display: inline-flex;
+    flex: none;
+    border-radius: 50%;
+  }
+
+  /* The +N tile: same size as an avatar, a visible neutral fill and the count centred. */
+  & > .userpics__userpic[data-overflow] [data-testid="userpic"] {
+    background: var(--color-neutral-emphasis);
+    border-color: var(--color-neutral-border);
+
+    & > span {
+      opacity: 1;
+      color: var(--color-neutral-content-subtle);
+    }
+  }
+}
+
+.userpics_overlay[data-avatar-stack] {
+  gap: 0;
+
+  & > .userpics__userpic + .userpics__userpic {
+    margin-left: calc(-1 * var(--avatar-stack-overlap));
+  }
+
+  & > .userpics__userpic {
+    transition:
+      transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 200ms ease-out;
+  }
+
+  & > .userpics__userpic [data-testid="userpic"] {
+    box-shadow: 0 0 0 2px var(--avatar-stack-ring);
+  }
+
+  /* Hover or keyboard focus brings an avatar to the front, where its whole face or count shows. */
+  & > .userpics__userpic:hover,
+  & > .userpics__userpic:focus-within {
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 25%);
+  }
+
+  /* Every avatar but the first slides right by half the overlap, out from under its neighbour; nothing grows,
+     so clipping containers keep it whole. */
+  & > .userpics__userpic + .userpics__userpic:hover,
+  & > .userpics__userpic + .userpics__userpic:focus-within {
+    transform: translateX(calc(var(--avatar-stack-overlap) / 2));
+  }
+
+  /* Reduced motion: it moves at once instead of sliding. */
+  @media (prefers-reduced-motion: reduce) {
+    & > .userpics__userpic {
+      transition: none;
+    }
+  }
+}
+
+.avatar-stack-tile-button {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  color: inherit;
+  font: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-border);
+    outline-offset: 2px;
+  }
+}
+
+.avatar-stack-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 15rem;
+  max-width: 20rem;
+
+  &__search {
+    padding: var(--spacing-tight) var(--spacing-tight) 0;
+  }
+
+  &__meta {
+    padding: var(--spacing-tighter) var(--spacing-base);
+    text-align: right;
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &__rows {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--spacing-tighter);
+    max-height: 20rem;
+    overflow: auto;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-tight);
+    padding: var(--spacing-tighter) var(--spacing-base);
+  }
+
+  &__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__more {
+    padding: var(--spacing-tighter) var(--spacing-base);
+    color: var(--color-neutral-content-subtle);
+  }
+}

@@ -173,7 +173,7 @@ export const alignElements = (
       break;
   }
 
-  if (offsetTop < window.scrollY || !openUpwardForShortViewport) {
+  if (offsetTop < 0 || !openUpwardForShortViewport) {
     offsetTop = pos.bottom + padding;
     maxHeight = window.scrollY + window.innerHeight - offsetTop;
     resultAlign[0] = "bottom";

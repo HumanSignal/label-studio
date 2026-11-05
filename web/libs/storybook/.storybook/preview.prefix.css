@@ -14,6 +14,12 @@ body {
   background-color: var(--color-neutral-background) !important;
 }
 
+/* The wrapper also carries .sbdocs: let it grow with the page so its bottom padding sits under the last block */
+#storybook-docs .sbdocs-wrapper {
+  height: auto;
+  min-height: 100%;
+}
+
 /* Undo tailwind reset for the Docs pages */
 #storybook-docs .sbdocs-content h1:not(.sbdocs-preview *),
 #storybook-docs .sbdocs-content h2:not(.sbdocs-preview *),

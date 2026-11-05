@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { observer } from "mobx-react";
 import { IconBan, IconSparks, IconStar } from "@humansignal/icons";
-import { Userpic } from "@humansignal/ui";
+import { Avatar } from "@humansignal/ui";
 import { Space } from "../../common/Space/Space";
 import { cn } from "../../utils/bem";
 import "./AnnotationTabs.prefix.css";
@@ -25,14 +25,15 @@ export const EntityTab = observer(
           }}
         >
           <Space size="small">
-            <Userpic
+            <Avatar
+              size="medium"
               className={cn("entity-tab").elem("userpic").mod({ prediction }).toClassName()}
               showUsernameTooltip
               username={prediction ? entity.createdBy : null}
               user={infoIsHidden ? {} : (entity.user ?? { email: entity.createdBy })}
             >
               {prediction && <IconSparks style={{ width: 16, height: 16 }} />}
-            </Userpic>
+            </Avatar>
 
             {!infoIsHidden && (
               <div className={cn("entity-tab").elem("identifier").toClassName()}>

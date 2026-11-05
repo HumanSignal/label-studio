@@ -94,7 +94,7 @@ describe("Controls", () => {
         {children}
       </div>
     ));
-    spyOn(uiModule, "Userpic").mockImplementation(({ children }: any) => (
+    spyOn(uiModule, "Avatar").mockImplementation(({ children }: any) => (
       <div
         data-testid="userpic"
         className="userpic--tBKCQ"

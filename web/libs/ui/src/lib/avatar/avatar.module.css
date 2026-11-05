@@ -1,6 +1,6 @@
 .userpic {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   display: flex;
   position: relative;
@@ -45,27 +45,33 @@
     user-select: none;
   }
 
+  /* Corner content sits partly outside the circle so it reads as attached, not drawn on the face. */
   .badge {
     position: absolute;
+    display: flex;
 
     &.topLeft {
       top: 0;
       left: 0;
+      transform: translate(-40%, -40%);
     }
 
     &.topRight {
       top: 0;
       right: 0;
+      transform: translate(40%, -40%);
     }
 
     &.bottomLeft {
       bottom: 0;
       left: 0;
+      transform: translate(-40%, 40%);
     }
 
     &.bottomRight {
       bottom: 0;
       right: 0;
+      transform: translate(40%, 40%);
     }
   }
 

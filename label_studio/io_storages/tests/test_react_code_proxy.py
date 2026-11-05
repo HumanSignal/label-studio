@@ -625,7 +625,7 @@ class TestServeLocalUpload:
 
 
 class TestServeAvatar:
-    """FIT-2832: sandboxed History Userpics need cookie-less avatar bytes."""
+    """FIT-2832: sandboxed History avatars need cookie-less avatar bytes."""
 
     @pytest.fixture
     def setup(self):

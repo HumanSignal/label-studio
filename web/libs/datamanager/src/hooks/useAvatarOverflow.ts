@@ -70,7 +70,7 @@ export const useAvatarOverflow = ({
       }
 
       // Avatar sizing: 28px size + 4px gap = 32px per avatar
-      // The badge is rendered as a 28px Userpic item with a 4px gap before it,
+      // The badge is rendered as a 28px Avatar item with a 4px gap before it,
       // so it needs the same space as an avatar (itemSpacing)
       const avatarSize = 28;
       const gap = 4;

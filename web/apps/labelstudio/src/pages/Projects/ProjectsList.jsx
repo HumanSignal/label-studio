@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { CheckIcon, DotsThreeIcon, IconSparks, MinusIcon } from "@humansignal/icons";
-import { Userpic, Button, Dropdown, Tooltip } from "@humansignal/ui";
+import { Avatar, Button, Dropdown, Tooltip } from "@humansignal/ui";
 import { Menu, Pagination } from "../../components";
 import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
@@ -144,7 +144,7 @@ const ProjectCard = ({ project }) => {
             {format(new Date(project.created_at), "dd MMM yyyy, HH:mm")}
           </div>
           <div className={cn("project-card").elem("created-by").toClassName()}>
-            <Userpic src="#" user={project.created_by} showUsernameTooltip />
+            <Avatar src="#" user={project.created_by} size="large" showUsernameTooltip />
           </div>
         </div>
       </div>

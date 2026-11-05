@@ -3,7 +3,7 @@ export * from "./lib/InputFile/InputFile";
 export * from "./lib/MultiStateToggle/MultiStateToggle";
 export * from "./lib/ThemeToggle/ThemeToggle";
 export * from "./lib/Tooltip/Tooltip";
-export * from "./lib/Userpic/Userpic";
+export * from "./lib/avatar";
 export * from "./lib/badge/badge";
 export * from "./lib/badge-group";
 export * from "./lib/button/button";

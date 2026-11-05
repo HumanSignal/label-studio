@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { useState, useCallback, useMemo } from "react";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { useDataManagerUsers } from "../../hooks/useUsers";
-import { Select, Tooltip, Typography, Userpic } from "@humansignal/ui";
+import { Select, Tooltip, Typography, Avatar } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { SelectSize } from "@humansignal/ui/lib/select/types";
 import { userDisplayName } from "@humansignal/core/lib/utils/helpers";
@@ -72,7 +72,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
         label: (
           <Tooltip title={optionLabel} alignment="top-left">
             <div className="flex gap-2 w-full items-center">
-              <Userpic user={displayUser} size={16} key={`user-${user.id}`} showName={true} />
+              <Avatar user={displayUser} size="xsmall" key={`user-${user.id}`} showName={true} />
               <Typography as="span" size="smallest" className="text-ellipsis text-nowrap overflow-hidden w-full">
                 {optionLabel}
               </Typography>
@@ -128,7 +128,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
           className="flex min-w-0 max-w-full items-center gap-1 overflow-hidden"
           data-testid="user-select-trigger-summary"
         >
-          {firstUser ? <Userpic user={firstUser} size={16} /> : null}
+          {firstUser ? <Avatar user={firstUser} size="xsmall" /> : null}
           <Typography as="span" size="smallest" className="min-w-0 truncate">
             {primaryLabel}
           </Typography>

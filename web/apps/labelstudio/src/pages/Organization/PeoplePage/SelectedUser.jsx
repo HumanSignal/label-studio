@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { NavLink } from "react-router-dom";
 import { IconCross } from "@humansignal/icons";
-import { Userpic, Button } from "@humansignal/ui";
+import { Avatar, Button } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
 import "./SelectedUser.prefix.css";
 
@@ -40,7 +40,7 @@ export const SelectedUser = ({ user, onClose }) => {
       </Button>
 
       <div className={cn("user-info").elem("header").toClassName()}>
-        <Userpic user={user} style={{ width: 64, height: 64, fontSize: 28 }} />
+        <Avatar user={user} size="xlarge" />
         <div className={cn("user-info").elem("info-wrapper").toClassName()}>
           {fullName && <div className={cn("user-info").elem("full-name").toClassName()}>{fullName}</div>}
           <p className={cn("user-info").elem("email").toClassName()}>{user.email}</p>
