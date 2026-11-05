@@ -60,7 +60,7 @@ When you filter or sort the data before you label it, you modify which tasks and
 
 You can filter tasks by the results of their annotations. In the filter list, select a control tag from your labeling configuration under **Annotations**, then select the value to look for. If the project has predictions, its control tags are also listed under **Predictions**.
 
-An annotation results filter comes with an **Annotators** child filter, so you can look only at annotations by specific annotators. For more information, see [Use child filters](#Use-child-filters).
+A filter on a control tag under **Annotations** comes with an **Annotators** child filter, so you can look only at annotations by specific annotators. For more information, see [Use child filters](#Use-child-filters).
 
 !!! note
     In Label Studio Community, the `Annotation results` filter is an unstructured text search across all annotations for the task, so you can't filter by the values of a control tag.
@@ -78,7 +78,7 @@ The following tags are supported:
 
 Child filters let you filter tasks by conditions that must all apply to the _same_ annotation, review, or prediction, rather than to the task as a whole. For example, you can find tasks where a single annotation was both completed by a specific annotator and accepted, rather than tasks where one annotation matches one condition and a different annotation matches the other.
 
-Filters on annotation results, prediction results, and reviews can have child filters. To add one, select **Add Child Filter** under the filter.
+Filters on control tags under **Annotations** and **Predictions**, and filters under **Reviews**, can have child filters. To add one, select **Add Child Filter** under the filter. The **Annotation results** field under **Task** is a text search and doesn't have child filters.
 
 #### Example: Find tasks where an annotator chose a label
 
