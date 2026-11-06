@@ -24,18 +24,20 @@ import type { Finding, ManifestSlice } from "./types";
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
 const repoRoot = path.resolve(lsoWebRoot, "../../..");
 
-const args = process.argv.slice(2);
-const flag = (name: string) => args.includes(name);
-const valueOf = (name: string) => (flag(name) ? args[args.indexOf(name) + 1] : undefined);
-const web = valueOf("--web") ?? (process.cwd().includes(`${path.sep}lse${path.sep}`) ? "lse" : "lso");
-if (web !== "lso" && web !== "lse") throw new Error(`--web must be lso or lse, got ${web}`);
-const webRoot = path.join(repoRoot, "services", web, "web");
-const positional = args.filter((arg, i) => !arg.startsWith("--") && !["--web", "--base"].includes(args[i - 1]));
-
 const fail = (message: string): never => {
   console.error(`[ds-check] ${message}`);
   process.exit(2);
 };
+// Exit 1 means regressions and nothing else; anything unexpected is a tool error (2).
+process.on("uncaughtException", (error) => fail(error.message));
+
+const args = process.argv.slice(2);
+const flag = (name: string) => args.includes(name);
+const valueOf = (name: string) => (flag(name) ? args[args.indexOf(name) + 1] : undefined);
+const web = valueOf("--web") ?? (process.cwd().includes(`${path.sep}lse${path.sep}`) ? "lse" : "lso");
+if (web !== "lso" && web !== "lse") fail(`--web must be lso or lse, got ${web}`);
+const webRoot = path.join(repoRoot, "services", web, "web");
+const positional = args.filter((arg, i) => !arg.startsWith("--") && !["--web", "--base"].includes(args[i - 1]));
 
 const manifest = JSON.parse(
   fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8"),
