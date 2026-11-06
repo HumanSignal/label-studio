@@ -207,6 +207,8 @@ After adding the storage, click **Sync**.
 
 In Label Studio Enterprise, you can use Azure Service Principal authentication to securely connect Label Studio to Azure Blob Storage without using storage account access keys.
 
+Label Studio Enterprise also supports secretless authentication, using workload identity or an Azure managed identity instead of a client secret.
+
 For more information, see [Azure Blob Storage with Service Principal](https://docs.humansignal.com/guide/storage_azure.html#Azure-Blob-Storage-with-Service-Principal) in our Enterprise documentation.
 
 </div>
@@ -214,6 +216,8 @@ For more information, see [Azure Blob Storage with Service Principal](https://do
 <div class="enterprise-only">
 
 You can use Azure Service Principal authentication to securely connect Label Studio Enterprise to Azure Blob Storage without using storage account access keys. 
+
+You can authenticate with a client secret, as described in the steps below, or without any stored secret by using workload identity or a managed identity. See [Secretless authentication with workload identity](#Secretless-authentication-with-workload-identity).
 
 Service Principal authentication provides enhanced security through Entra (formerly "Azure Active Directory") identity and access management, allowing for fine-grained permissions and audit capabilities.
 
@@ -358,6 +362,132 @@ After adding, click **Sync** to push exports.
   - Storage account and container names (case-sensitive)
   - Role assignment: App Registration has Storage Blob Data Contributor on the Storage Account
   - CORS is set when using pre-signed URLs; try proxy mode if testing
+
+### Secretless authentication with workload identity
+
+With workload identity authentication, Label Studio Enterprise uses the Azure identity attached to its deployment to access your container, so no client secret is created, stored, or rotated. This is available for self-hosted Label Studio Enterprise. Label Studio does not need to run in Azure: any Kubernetes cluster that can federate with Microsoft Entra ID (AKS, EKS, or another cluster) works, as does any Azure host with a managed identity, such as a VM running Label Studio in Docker.
+
+How it works:
+
+1. Label Studio gets a token from Microsoft Entra ID using only workload identity or managed identity, never environment secrets or developer credentials.
+2. It uses that token to list, read, and write blobs.
+3. For pre-signed URLs, it signs short-lived, read-only SAS URLs with a user delegation key that it refreshes automatically.
+
+!!! note
+    One Azure identity serves the whole deployment, so scope its role assignments to the storage accounts Label Studio should reach.
+
+#### Prerequisites
+
+- Self-hosted Label Studio Enterprise on a Kubernetes cluster whose OIDC issuer Microsoft Entra ID can reach (AKS with the OIDC issuer enabled, EKS, or another cluster), or on any Azure host with a managed identity.
+- An Azure storage account with a private container, and permission to create a managed identity, add federated credentials, and assign roles on it.
+- CORS on the Blob service if you use pre-signed URLs. See [Set up CORS for Azure blob storage](#Set-up-CORS-for-Azure-blob-storage).
+
+The built-in **Storage Blob Data Contributor** role covers every permission needed, including the user delegation key action for pre-signed URLs.
+
+#### Set up the identity in Azure
+
+Replace the values in `<>` with your own.
+
+1. Create a user-assigned managed identity and note its `clientId` and `principalId`:
+
+    ```bash
+    az identity create --name lse-storage-identity --resource-group <RESOURCE_GROUP>
+    ```
+
+2. Assign **Storage Blob Data Contributor** on the storage account. If you scope it to a single container instead, also assign **Storage Blob Delegator** at the account level for pre-signed URLs.
+
+    ```bash
+    az role assignment create \
+      --assignee-object-id <PRINCIPAL_ID> \
+      --assignee-principal-type ServicePrincipal \
+      --role "Storage Blob Data Contributor" \
+      --scope /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.Storage/storageAccounts/<STORAGE_ACCOUNT>
+    ```
+
+3. **Kubernetes only:** Add a federated credential for each Label Studio service account (app, rqworker, and rqcron if enabled). The names below are the chart defaults; if you set `serviceAccount.name`, use that name. On EKS or another cluster, set `ISSUER` to that cluster's OIDC issuer URL instead (for EKS: `aws eks describe-cluster --name <CLUSTER> --query "cluster.identity.oidc.issuer" --output text`).
+
+    ```bash
+    ISSUER=$(az aks show -n <CLUSTER> -g <RESOURCE_GROUP> --query "oidcIssuerProfile.issuerUrl" -o tsv)
+
+    for SA in <RELEASE_NAME>-ls-app <RELEASE_NAME>-ls-rqworker <RELEASE_NAME>-ls-rqcron; do
+      az identity federated-credential create \
+        --name "$SA" \
+        --identity-name lse-storage-identity \
+        --resource-group <RESOURCE_GROUP> \
+        --issuer "$ISSUER" \
+        --subject "system:serviceaccount:<NAMESPACE>:$SA" \
+        --audience api://AzureADTokenExchange
+    done
+    ```
+
+4. **Azure host only:** Attach the identity to the host that runs Label Studio. For a VM:
+
+    ```bash
+    az vm identity assign -g <RESOURCE_GROUP> -n <VM_NAME> --identities lse-storage-identity
+    ```
+
+#### Configure the Label Studio deployment
+
+##### Kubernetes with Helm
+
+These steps assume Label Studio is installed with Helm ([Install using Kubernetes](install_enterprise_k8s), [Available Helm values](helm_values)). Each pod that reaches Azure needs three environment variables and a projected service account token. Add this to `ls-values.yaml`, merging with any values you already set, and upgrade the release:
+
+```yaml
+global:
+  extraEnvironmentVars:
+    AZURE_CLIENT_ID: "<CLIENT_ID>"
+    AZURE_TENANT_ID: "<TENANT_ID>"
+    AZURE_FEDERATED_TOKEN_FILE: "/var/run/secrets/azure/tokens/azure-identity-token"
+
+app:
+  extraVolumes:
+    - name: azure-federated-token
+      projected:
+        sources:
+          - serviceAccountToken:
+              path: azure-identity-token
+              expirationSeconds: 3600
+              audience: api://AzureADTokenExchange
+  extraVolumeMounts:
+    - name: azure-federated-token
+      mountPath: /var/run/secrets/azure/tokens
+      readOnly: true
+```
+
+Add the same `extraVolumes` and `extraVolumeMounts` under `rqworker`, and under `rqcron` if it's enabled. The app validates connections and signs URLs, and the RQ workers run syncs and exports, so all of them need the identity.
+
+**On AKS**, you can use the Azure Workload Identity webhook instead (Workload Identity must be enabled on the cluster). It injects the same variables and token, so skip the values above and set:
+
+```yaml
+app:
+  podLabels:
+    azure.workload.identity/use: "true"
+  serviceAccount:
+    annotations:
+      azure.workload.identity/client-id: "<CLIENT_ID>"
+```
+
+Repeat this under `rqworker` and `rqcron`. Leave **Client ID** blank on the storage connection; a value there is treated as a managed identity client ID.
+
+##### Any Azure host with a managed identity (VM, Docker)
+
+No environment variables are needed: the Azure SDK gets tokens from the host's instance metadata endpoint, so the `app` and `rqworkers` containers only need network access to it. With a system-assigned identity, leave **Client ID** blank. With a user-assigned identity, enter its client ID on each connection or set `AZURE_CLIENT_ID` on the containers.
+
+#### Create a storage connection with workload identity
+
+From your project, select **Settings > Cloud Storage > Add Source Storage** (or **Add Target Storage**), choose **Azure Blob Storage with Service Principal**, and set **Authentication Method** to **Workload identity / managed identity (no secret)**. Tenant ID and Client Secret are hidden. Client ID is optional: enter a user-assigned managed identity's client ID, or leave it blank to use the deployment default.
+
+With the API, set `auth_mode` to `workload_identity` and omit `client_secret` ([create](https://api.labelstud.io/api-reference/api-reference/import-storage/azure-spi/create)). Existing Service Principal connections aren't migrated; [update](https://api.labelstud.io/api-reference/api-reference/import-storage/azure-spi/update) one with `{"auth_mode": "workload_identity"}` and Label Studio removes its stored secret. To switch back, set `auth_mode` to `service_principal` and supply `tenant_id`, `client_id`, and `client_secret`.
+
+#### Troubleshoot workload identity
+
+| Symptom | Fix |
+| --- | --- |
+| `Workload identity authentication is not enabled for this organization.` | `FF_AZURE_SPI_WORKLOAD_IDENTITY` is off (it's on by default for on-prem). Set it to `true` and restart Label Studio. |
+| Connection check fails with `DefaultAzureCredential failed to retrieve a token` | With the AKS webhook, check the pod label and service account annotation; otherwise, check the three `AZURE_*` variables and the projected token. Also check that the federated credential subject is `system:serviceaccount:<NAMESPACE>:<SERVICE_ACCOUNT>`. |
+| Connection check passes but sync or export fails | Apply the same setup to the rqworker (and rqcron) pods. |
+| `AuthorizationPermissionMismatch` (403) | Confirm **Storage Blob Data Contributor** on the account or container; assignments can take several minutes to apply. |
+| Media fails to load only with pre-signed URLs | Grant **Storage Blob Delegator** at the account level if the role is container-scoped, and check CORS. Try proxy mode to isolate the issue. |
 
 </div>
 
