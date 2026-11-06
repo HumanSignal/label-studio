@@ -99,19 +99,23 @@ class FSMStateQuerySetMixin:
             logger.debug(f'No state model registered for {entity_name}, skipping annotation')
             return self
 
-        # Get the foreign key field name on the state model
-        # e.g., 'task_id' for TaskState
-        entity_field_name = state_model._get_entity_field_name()
-        fk_field = f'{entity_field_name}_id'
-
-        # Create subquery to get current state using UUID7 natural ordering
-        # This is extremely efficient because:
-        # 1. UUID7 provides natural time ordering (latest = highest ID)
-        # 2. We only fetch the state column, not the entire record
-        # 3. Django optimizes this into a single JOIN or lateral subquery
-        lookup = {fk_field: OuterRef('pk')}
-        lookup.update({field: OuterRef(field) for field in state_model.latest_state_scope_fields})
-        current_state_subquery = Subquery(state_model.objects.filter(**lookup).order_by('-id').values('state')[:1])
-
         # Annotate the queryset with the current state
-        return self.annotate(current_state=current_state_subquery)
+        return self.annotate(current_state=latest_state_subquery(state_model))
+
+
+def latest_state_subquery(state_model):
+    """Correlated subquery for the current state value of each entity row, matching ``latest_state_scope_fields``."""
+    # Get the foreign key field name on the state model
+    # e.g., 'task_id' for TaskState
+    entity_field_name = state_model._get_entity_field_name()
+    fk_field = f'{entity_field_name}_id'
+
+    # Create subquery to get current state using UUID7 natural ordering
+    # This is extremely efficient because:
+    # 1. UUID7 provides natural time ordering (latest = highest ID)
+    # 2. We only fetch the state column, not the entire record
+    # 3. Django optimizes this into a single JOIN or lateral subquery
+    lookup = {fk_field: OuterRef('pk')}
+    lookup.update({field: OuterRef(field) for field in state_model.latest_state_scope_fields})
+    current_state_subquery = Subquery(state_model.objects.filter(**lookup).order_by('-id').values('state')[:1])
+    return current_state_subquery
