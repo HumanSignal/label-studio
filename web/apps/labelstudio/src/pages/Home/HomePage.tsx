@@ -13,6 +13,7 @@ import { useUpdatePageTitle } from "@humansignal/core";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
+import { absoluteURL } from "../../utils/helpers";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { InviteLink } from "../Organization/PeoplePage/InviteLink";
 import type { Page } from "../types/Page";
@@ -170,7 +171,7 @@ export const HomePage: Page = () => {
               data && data?.count > 0 ? (
                 <>
                   Recent Projects{" "}
-                  <a href="/projects" className="text-lg font-normal hover:underline">
+                  <a href={absoluteURL("/projects")} className="text-lg font-normal hover:underline">
                     View All
                   </a>
                 </>
