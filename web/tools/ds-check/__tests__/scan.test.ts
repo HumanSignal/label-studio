@@ -143,6 +143,22 @@ describe("ds-check scanner", () => {
     expect(rules(`import { X } from "@phosphor-icons/react";`)).toEqual(["phosphor-import"]);
   });
 
+  test("path imports of @humansignal/ui internals", () => {
+    expect(rules(`import { Modal, confirm } from "@humansignal/ui/lib/modal";`)).toEqual(["internal-import"]);
+    expect(rules(`import { Card } from "@humansignal/ui/lib/card-new/card";`)).toEqual(["internal-import"]);
+    expect(rules(`import type { SelectOption } from "@humansignal/ui/lib/select/types";`)).toEqual(["internal-import"]);
+    expect(rules(`import { Button } from "@humansignal/ui";`)).toEqual([]);
+    expect(rules(`import { Tabs } from "@humansignal/ui/shad/tabs";`)).toEqual(["shad-import"]);
+    // stylesheet entry points and asset files are not component internals
+    expect(rules(`import "@humansignal/ui/src/tailwind.css";`)).toEqual([]);
+    expect(rules(`import "@humansignal/ui/src/styles.prefix.css";`)).toEqual([]);
+    expect(rules(`import Star from "@humansignal/ui/src/assets/icons/star.svg";`)).toEqual([]);
+    const inside = path.join(webRoot, "libs/ui/src/lib/dropdown/dropdown.tsx");
+    expect(rules(`import { Modal } from "@humansignal/ui/lib/modal";`, inside)).toEqual([]);
+    const [finding] = scanSource(file, `import { Modal } from "@humansignal/ui/lib/modal";`, ctx);
+    expect(finding.message).toContain(`"@humansignal/ui"`);
+  });
+
   test("findings carry the line and a message naming the replacement", () => {
     const [finding] = scanSource(file, `\n\nimport { Tag } from "../components/Tag/Tag";`, ctx);
     expect(finding.line).toBe(3);

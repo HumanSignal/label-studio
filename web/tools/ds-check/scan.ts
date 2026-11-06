@@ -85,6 +85,8 @@ const lineAt = (source: string, index: number) => source.slice(0, index).split("
 const HEX = /(?<![&\w])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g;
 const COLOR_FN = /\b(?:rgba?|hsla?)\(/g;
 const TOKEN_REFERENCE = /var\(\s*(--(?:color|spacing|corner-radius|font)-[\w-]+)/g;
+/** Stylesheets and asset files under @humansignal/ui are entry points, not component internals. */
+const NON_CODE_SPEC = /\.(s?css|svg|png|jpe?g|gif|webp|json|woff2?)$/;
 const IMPORT_SPEC = /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*|^\s*import\s+)["']([^"']+)["']/gm;
 const NAMED_IMPORT = /\b(?:import|export)\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?\{([^}]*)\}\s*from\s*["']([^"']+)["']/g;
 const BARREL_EXPORT = /\bexport\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']([^"']+)["']/g;
@@ -225,6 +227,13 @@ function moduleImports(file: string, source: string, ctx: ScanContext): Finding[
         line,
         rule: "shad-import",
         message: `${spec} bypasses the public API: import from @humansignal/ui.`,
+      });
+    } else if (spec.startsWith("@humansignal/ui/") && !file.startsWith("libs/ui/") && !NON_CODE_SPEC.test(spec)) {
+      out.push({
+        file,
+        line,
+        rule: "internal-import",
+        message: `${spec} reaches into @humansignal/ui internals: import from "@humansignal/ui" (export it there if it is missing).`,
       });
     } else if (spec === "@phosphor-icons/react" || spec.startsWith("@phosphor-icons/react/")) {
       out.push({
