@@ -145,7 +145,7 @@ One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that al
 2. Sign up for a free ngrok account at [ngrok.com](https://dashboard.ngrok.com/signup).
 3. When you log in to your ngrok account, you will open [a dashboard with instructions](https://dashboard.ngrok.com/get-started/setup) to install ngrok and authenticate it. Complete both these steps:
 
-    ![Ngrok authentication](images/install/ngrok-dashboard.png)  
+    ![Ngrok authentication](/images/install/ngrok-dashboard.png)  
 
 4. Start ngrok and point it at Label Studio: 
 
@@ -154,7 +154,7 @@ One way to do that is to use [ngrok](https://ngrok.io/), a reverse proxy that al
     ```
 5. This will output a randomly generated URL. Copy this URL:
 
-    ![Ngrok URL](images/install/ngrok-url.png)
+    ![Ngrok URL](/images/install/ngrok-url.png)
 
 5. Run the following commands (replace `your-subdomain.ngrok-free.app` with your actual ngrok URL as copied in step 5):
 
