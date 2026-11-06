@@ -50,7 +50,7 @@ from .functions import (
     set_import_background_failure,
     set_reimport_background_failure,
 )
-from .models import FileUpload
+from .models import FileUpload, get_readable_file_upload
 from .serializers import FileUploadSerializer, ImportApiSerializer, PredictionSerializer
 from .uploader import create_file_uploads, load_tasks
 
@@ -1065,9 +1065,8 @@ class DownloadStorageData(APIView):
         file_obj = None
         if filepath.startswith(settings.UPLOAD_DIR):
             logger.debug(f'Fetch uploaded file by user {request.user} => {filepath}')
-            file_upload = FileUpload.objects.filter(file=filepath).last()
-
-            if file_upload is not None and file_upload.has_permission(request.user):
+            file_upload = get_readable_file_upload(request.user, filepath)
+            if file_upload is not None:
                 file_obj = file_upload.file
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
