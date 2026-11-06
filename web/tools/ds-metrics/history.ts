@@ -1,4 +1,4 @@
-/** The series on main: one NDJSON line per merge commit, kept on the orphan branch `ds-metrics`. */
+/** The series on main: one NDJSON line per commit (label-studio-sandbox keeps it as ds-metrics/data.ndjson). */
 import fs from "node:fs";
 import type { Snapshot } from "./snapshot";
 

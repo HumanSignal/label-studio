@@ -97,6 +97,16 @@ describe("buildSeries", () => {
     expect(series.week.rules["raw-control"]).toBe(469 - 480);
   });
 
+  test("snapshots are ordered by time, whatever timezone offset their dates carry", () => {
+    // 17:10+01:00 is 16:10Z, earlier than 16:34Z, although it sorts later as text
+    const mixed = buildSeries([
+      snap("bbbb", "2026-11-06T16:34:41Z", 200),
+      snap("aaaa", "2026-11-06T17:10:00+01:00", 100),
+    ]);
+    expect(mixed.points.map((p) => p.commit)).toEqual(["aaaa", "bbbb"]);
+    expect(mixed.week.latest?.commit).toBe("bbbb");
+  });
+
   test("a single point has no week delta and an empty history is empty", () => {
     const one = buildSeries([history[0]]);
     expect(one.week.since).toBeNull();

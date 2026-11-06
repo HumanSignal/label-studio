@@ -38,7 +38,8 @@ const toPoint = (s: Snapshot): PointRow => ({
 });
 
 export function buildSeries(history: Snapshot[]): Series {
-  const ordered = [...history].sort((a, b) => a.date.localeCompare(b.date));
+  // by time, not as text: commit dates keep their committer's timezone offset
+  const ordered = [...history].sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
   const points = ordered.map(toPoint);
 
   const clusterNames = [...new Set(ordered.flatMap((s) => Object.keys(s.clusters)))].sort((a, b) => a.localeCompare(b));
