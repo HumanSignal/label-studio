@@ -183,17 +183,45 @@ class ContextLogMiddleware(CommonMiddleware):
         self.get_response = get_response
         self.log = ContextLog()
 
-    def __call__(self, request):
-        body = None
+    def _read_body(self, request):
+        """Read the request body for the analytics payload, or return None.
+
+        Reading request.body consumes the request's data stream, so it must
+        never happen for bodies the view still needs to parse itself:
+
+        - multipart/form-data uploads carry raw file bytes (nothing useful to
+          log, and up to DATA_UPLOAD_MAX_MEMORY_SIZE read into memory per
+          request just to be discarded);
+        - bodies over DATA_UPLOAD_MAX_MEMORY_SIZE can't be read at all: the
+          read raises before a cached body is stored, which leaves the request
+          marked as read, and the view then fails with RawPostDataException
+          ("You cannot access body after reading from request's data stream").
+        """
+        if not settings.COLLECT_ANALYTICS:
+            return None
+        if request.content_type == 'multipart/form-data':
+            return None
         try:
-            body = json.loads(request.body)
+            content_length = int(request.META.get('CONTENT_LENGTH') or 0)
+        except ValueError:
+            content_length = 0
+        if content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE:
+            return None
+
+        try:
+            return json.loads(request.body)
         except:  # noqa: E722
             try:
-                body = request.body.decode('utf-8')
+                return request.body.decode('utf-8')
             except:  # noqa: E722
-                pass
+                return None
 
-        if 'server_id' not in request:
+    def __call__(self, request):
+        body = self._read_body(request)
+
+        # hasattr, not `in`: HttpRequest has no __contains__, so the membership
+        # test falls back to __iter__ and consumes the request's data stream.
+        if not hasattr(request, 'server_id'):
             setattr(request, 'server_id', self.log._get_server_id())
 
         response = self.get_response(request)
@@ -202,7 +230,7 @@ class ContextLogMiddleware(CommonMiddleware):
         return response
 
     def process_request(self, request):
-        if 'server_id' not in request:
+        if not hasattr(request, 'server_id'):
             setattr(request, 'server_id', self.log._get_server_id())
 
 
