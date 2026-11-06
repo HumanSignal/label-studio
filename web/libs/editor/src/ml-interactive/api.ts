@@ -7,6 +7,7 @@
  * backend now short-circuits before any task/control lookup.
  */
 
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import type { Capabilities } from "./types";
 
 const API_BASE = window.APP_SETTINGS?.hostname ?? "";
@@ -37,7 +38,7 @@ export async function fetchInteractiveBackends(projectId: number): Promise<Inter
  * the task — it's purely a carrier. Pass any current task id from the view.
  */
 export async function fetchCapabilities(backendId: number, taskId: number): Promise<Capabilities | null> {
-  const res = await fetch(`${API_BASE}/api/ml/${backendId}/interactive-annotating`, {
+  const res = await sameOriginFetch(`${API_BASE}/api/ml/${backendId}/interactive-annotating`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

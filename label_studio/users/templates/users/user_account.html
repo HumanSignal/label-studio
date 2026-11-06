@@ -282,7 +282,7 @@
         const input = document.getElementById("access_token");
         const example = document.getElementById("example_fetch");
 
-        fetch("{% url 'current-user-reset-token' %}", { method: "POST" })
+        fetch("{% url 'current-user-reset-token' %}", { method: "POST", headers: { 'X-Requested-With': 'XMLHttpRequest' } })
           .then(res => res.json())
           .then(res => {
             input.value = res.token;
@@ -300,7 +300,8 @@
         try {
           const response = await fetch("{% url 'user-avatar' pk=user.pk %}", {
             method: "post",
-            body: formData
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
           });
 
           if (!response.ok) {
@@ -316,7 +317,8 @@
       $('[name=delete-avatar]').on('click', async (e) => {
         try {
           const response = await fetch("{% url 'user-avatar' pk=user.pk %}", {
-            method: "delete"
+            method: "delete",
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
           })
 
           if (!response.ok) {

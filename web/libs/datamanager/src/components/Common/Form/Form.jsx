@@ -2,6 +2,7 @@ import { Component, createRef, forwardRef, useCallback, useContext, useEffect, u
 import { shallowEqualObjects } from "shallow-equal";
 import { cn } from "../../../utils/bem";
 import { objectClean } from "../../../utils/helpers";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";
 import { Space } from "../Space/Space";
@@ -265,7 +266,7 @@ export default class Form extends Component {
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
     const method = (this.props.method ?? "POST").toUpperCase();
-    const response = await fetch(action, { method, body });
+    const response = await sameOriginFetch(action, { method, body });
 
     try {
       const result = await response.json();

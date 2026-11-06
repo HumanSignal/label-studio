@@ -11,6 +11,7 @@
 
 import { confirm } from "@humansignal/ui/lib/modal";
 import { IconWarning } from "@humansignal/icons";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import type { AnnotatorInfo, DimensionInfo, GroundTruthCell, RawResult, SummaryAnnotation } from "./types";
 import type { GroundTruthSummary } from "./use-ground-truth";
 
@@ -235,7 +236,7 @@ export async function commitGroundTruth(
     started_at: new Date().toISOString(),
   };
 
-  const annotationResponse = await fetch(`/api/tasks/${taskId}/annotations/`, {
+  const annotationResponse = await sameOriginFetch(`/api/tasks/${taskId}/annotations/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(annotationBody),

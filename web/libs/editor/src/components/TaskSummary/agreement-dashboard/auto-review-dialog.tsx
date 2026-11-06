@@ -11,6 +11,7 @@
  */
 
 import { confirm } from "@humansignal/ui/lib/modal";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { cnm, Avatar } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { computeReviewDecisions } from "./annotation-review-logic";
@@ -198,7 +199,7 @@ interface CommitAutoReviewOptions {
 async function commitAutoReview({ decisions }: CommitAutoReviewOptions): Promise<void> {
   const reviewPromises = [...decisions.entries()].map(async ([annotationPk, accepted]) => {
     try {
-      const response = await fetch("/api/annotation-reviews/", {
+      const response = await sameOriginFetch("/api/annotation-reviews/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ annotation: annotationPk, accepted }),
