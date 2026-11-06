@@ -426,7 +426,7 @@ class OrganizationResetTokenAPI(APIView):
     def post(self, request, *args, **kwargs):
         org = request.user.active_organization
         org.reset_token()
-        logger.debug(f'New token for organization {org.pk} is {org.token}')
+        logger.debug(f'Token reset for organization {org.pk}')
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
         serializer = OrganizationInviteSerializer(
             {
