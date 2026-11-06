@@ -1,0 +1,27 @@
+or {
+  `<Badge $attrs>$children</Badge>` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `look="outline"`,
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is always the filled default, never outline.", severity="warn")
+  },
+  `<Badge $attrs />` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `look="outline"`,
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is always the filled default, never outline.", severity="warn")
+  },
+  `<Badge $attrs>$children</Badge>` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `icon={$_}`,
+    register_diagnostic(span=$attrs, message="[ds/badge-props] No icons inside a Badge: the label and colour carry the meaning.", severity="warn")
+  },
+  `<Avatar $attrs />` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `size={$n}` where { $n <: r"[0-9]+" },
+    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (xsmall, small, medium, large, xlarge), never a px number.", severity="warn")
+  },
+  `<Avatar $attrs>$children</Avatar>` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `size={$n}` where { $n <: r"[0-9]+" },
+    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (xsmall, small, medium, large, xlarge), never a px number.", severity="warn")
+  }
+}

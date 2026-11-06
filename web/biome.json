@@ -1,6 +1,11 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
-  "plugins": ["./tools/biome/plugins/cn-to-classname.grit"],
+  "plugins": [
+    "./tools/biome/plugins/cn-to-classname.grit",
+    "./tools/biome/plugins/ds-raw-control.grit",
+    "./tools/biome/plugins/ds-inline-style.grit",
+    "./tools/biome/plugins/ds-props.grit"
+  ],
   "assist": {
     "actions": {
       "source": {
