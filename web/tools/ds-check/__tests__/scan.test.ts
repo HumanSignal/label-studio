@@ -65,6 +65,12 @@ describe("ds-check scanner", () => {
     expect(rules(`import { Tag } from "../components/Tagger";`)).toEqual([]);
   });
 
+  test("imports through the app alias @/", () => {
+    expect(rules(`import { Tag } from "@/components/Tag/Tag";`)).toEqual(["replaced-import"]);
+    expect(rules(`import { Menu } from "@/components/Menu";`)).toEqual(["replaced-import"]);
+    expect(rules(`import { x } from "@/utils/x";`)).toEqual([]);
+  });
+
   test("imports inside a replaced directory", () => {
     expect(rules(`import { Menu } from "../components/Menu/Menu";`)).toEqual(["replaced-import"]);
     expect(rules(`import { Menu } from "../components/Menu";`)).toEqual(["replaced-import"]);

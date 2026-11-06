@@ -198,7 +198,11 @@ function matchesReplaced(file: string, spec: string, ctx: ScanContext) {
       (entry) => !isOwn(entry) && (target === entry.key || (entry.isDir && target.startsWith(`${entry.key}/`))),
     );
   }
-  const aliased = spec.startsWith("@humansignal/") ? `libs/${spec.slice("@humansignal/".length)}` : spec;
+  const aliased = spec.startsWith("@humansignal/")
+    ? `libs/${spec.slice("@humansignal/".length)}`
+    : spec.startsWith("@/")
+      ? `apps/labelstudio/src/${spec.slice(2)}`
+      : spec;
   if (aliased.startsWith("@") || !aliased.includes("/")) return undefined;
   const parts = normal(aliased).split("/");
   return ctx.replaced.find((entry) => {

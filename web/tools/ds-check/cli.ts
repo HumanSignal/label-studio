@@ -15,6 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { countFindings } from "./baseline";
+import { annotate } from "./findings";
 import { runBiomePlugins } from "./biome";
 import { checkChanges, removeStaleMirrors } from "./check";
 import { type Change, changedFiles, mergeBase, prefetchBaseBlobs, readAtBase } from "./git";
@@ -62,7 +63,13 @@ if (flag("--all")) {
   const counts = countFindings(findings);
   if (flag("--json")) {
     const totals = { violations: findings.length, files: Object.keys(counts).length, scanned: files.length };
-    console.log(JSON.stringify({ web, scope: "all", totals, rules: byRule(findings), files: counts }, null, 2));
+    console.log(
+      JSON.stringify(
+        { web, scope: "all", totals, rules: byRule(findings), files: counts, findings: findings.map(annotate) },
+        null,
+        2,
+      ),
+    );
   } else {
     console.log(
       `[ds-check] ${web}: ${findings.length} violations in ${Object.keys(counts).length} of ${files.length} files.`,
@@ -105,9 +112,9 @@ const prefetched = prefetchBaseBlobs(
   base,
   changes.filter((c) => c.baseFile && inScope(c.file)).map((c) => c.baseFile as string),
 );
-if (prefetched) console.log(`[ds-check] fetched ${prefetched} base version(s) in one request (partial clone).`);
-for (const name of removeStaleMirrors(webRoot))
-  console.log(`[ds-check] removed a mirror left by an interrupted run: ${name}`);
+const note = flag("--json") ? console.error : console.log;
+if (prefetched) note(`[ds-check] fetched ${prefetched} base version(s) in one request (partial clone).`);
+for (const name of removeStaleMirrors(webRoot)) note(`[ds-check] removed a mirror left by an interrupted run: ${name}`);
 const result = checkChanges({
   webRoot,
   changes,
@@ -130,6 +137,7 @@ if (flag("--json")) {
         files: result.current,
         regressions,
         improvements,
+        findings: findings.map(annotate),
       },
       null,
       2,
