@@ -25,6 +25,9 @@ export class DOMWatcher {
 
   destroy() {
     window.removeEventListener("resize", this.onUpdate);
-    this.observer.disconnect();
+    // `handleUpdate` bails out when the region has no DOM element yet,
+    // so there is not always an observer to disconnect.
+    this.observer?.disconnect();
+    this.observer = null;
   }
 }
