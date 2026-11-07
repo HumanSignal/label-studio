@@ -548,17 +548,20 @@ describe("Controls", () => {
 
   test("moves focus between dropdown rows with the arrow keys", async () => {
     const { getByTestId } = renderRejectMenu();
+    // Compare test ids, not elements: a failing `toBe(element)` pretty-prints whole happy-dom trees, which takes
+    // seconds on a loaded CI runner and starves the focus effect this test is waiting for.
+    const focused = () => document.activeElement?.getAttribute("data-testid");
 
     fireEvent.click(getByTestId("bottombar-reject-menu"));
     const menu = getByTestId("reject-action-menu");
-    await waitFor(() => expect(document.activeElement).toBe(getByTestId("bottombar-custom-remove-button")));
+    await waitFor(() => expect(focused()).toBe("bottombar-custom-remove-button"));
 
     fireEvent.keyDown(menu, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(getByTestId("bottombar-custom-requeue-button"));
+    expect(focused()).toBe("bottombar-custom-requeue-button");
 
     // Wraps back around to the first row.
     fireEvent.keyDown(menu, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(getByTestId("bottombar-custom-remove-button"));
+    expect(focused()).toBe("bottombar-custom-remove-button");
   });
 
   test("keeps Update enabled when viewing submitted while a draft exists (BROS-1477 QA 93973)", () => {
