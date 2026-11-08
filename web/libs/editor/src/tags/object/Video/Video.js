@@ -142,6 +142,14 @@ const Model = types
       return states ? states.filter((c) => c.isSelected === true) : null;
     },
 
+    /**
+     * Active states that can label a shape drawn on the video. TimelineLabels label frame ranges only,
+     * so they are left out; otherwise the shape gets an extra `timelinelabels` result.
+     */
+    activeShapeStates() {
+      return self.activeStates()?.filter((state) => !state.type.includes("timeline")) ?? null;
+    },
+
     get hasStates() {
       const states = self.states();
 
@@ -357,7 +365,7 @@ const Model = types
           },
         ];
 
-        const activeStates = self.activeStates();
+        const activeStates = self.activeShapeStates();
         const area = self.annotation.createResult({ sequence }, {}, control, self, false, activeStates);
         return area;
       },
@@ -378,7 +386,7 @@ const Model = types
           },
         ];
 
-        const activeStates = self.activeStates();
+        const activeStates = self.activeShapeStates();
         const area = self.annotation.createResult({ sequence }, {}, control, self, true, activeStates);
         return area;
       },
