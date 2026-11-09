@@ -191,6 +191,10 @@ class LSAPITokenView(generics.ListCreateAPIView):
 
 
 class LSTokenBlacklistView(TokenViewBase):
+    # TokenViewBase disables auth; set it explicitly so only the token owner can revoke it
+    authentication_classes = [JWTAuthentication, TokenAuthenticationPhaseout, SessionAuthentication]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    permission_required = all_permissions.users_token_any
     _serializer_class = 'jwt_auth.serializers.LSAPITokenBlacklistSerializer'
 
     @extend_schema(
