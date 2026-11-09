@@ -319,3 +319,9 @@ export const FF_UTC_1446_ASK_AI_IN_COMMENTS = "fflag_feat_utc_1446_ask_ai_in_com
  * UTC-1459: Managers+ can mark a project as Done from the project actions menu and reset its state later.
  */
 export const FF_MANUAL_PROJECT_DONE = "fflag_feat_utc_1459_manual_project_done";
+
+/**
+ * Reviewed status follows the project's review criteria everywhere, including rejections with no rework.
+ * Read by the backend for the Data Manager column; the review settings label follows it.
+ */
+export const FF_UNIFIED_REVIEWED_STATUS = "fflag_fix_utc_1339_unified_reviewed_status_short";
