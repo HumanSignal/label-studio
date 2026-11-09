@@ -15,6 +15,7 @@ from botocore.awsrequest import (
     AWSHTTPSConnectionPool,
 )
 from botocore.exceptions import ClientError
+from core.utils.exceptions import SsrfBlockedUrlError
 from core.utils.io import _SsrfGuardedConnectionMixin, validate_url_for_ssrf
 from core.utils.params import get_env
 from django.conf import settings
@@ -23,9 +24,23 @@ from tldextract import TLDExtract
 logger = logging.getLogger(__name__)
 
 
+def custom_endpoint_needs_own_keys():
+    # On a cloud instance the app's credentials (AWS_* env, instance role, IRSA) belong to the platform, not to the
+    # user, so they must never be sent to a user-supplied endpoint. Self-hosted operators own both, and may keep
+    # S3-compatible keys in env with blank storage fields.
+    return settings.SSRF_PROTECTION_ENABLED and getattr(settings, 'CLOUD_INSTANCE', False)
+
+
+def check_custom_endpoint_has_own_keys(s3_endpoint, aws_access_key_id):
+    """Refuse a user-supplied s3_endpoint without its own access key, so the app's credentials are never sent there."""
+    if s3_endpoint and not aws_access_key_id and custom_endpoint_needs_own_keys():
+        raise SsrfBlockedUrlError('A custom S3 endpoint requires an access key ID and secret access key.')
+
+
 def get_client_and_resource(
     aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region_name=None, s3_endpoint=None
 ):
+    check_custom_endpoint_has_own_keys(s3_endpoint, aws_access_key_id)
     aws_access_key_id = aws_access_key_id or get_env('AWS_ACCESS_KEY_ID')
     aws_secret_access_key = aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY')
     aws_session_token = aws_session_token or get_env('AWS_SESSION_TOKEN')
