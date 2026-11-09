@@ -1,7 +1,7 @@
 import logging
-from datetime import datetime
 
 from core.permissions import ViewClassPermission, all_permissions
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from jwt_auth.auth import TokenAuthenticationPhaseout
@@ -149,10 +149,10 @@ class LSAPITokenView(generics.ListCreateAPIView):
         # Would be ideal to just add a "blacklisted" attr to our own subclass of
         # OutstandingToken so we can check at that level, or just clean up
         # OutstandingTokens that have been blacklisted every so often.
-        current_blacklisted_tokens = BlacklistedToken.objects.filter(token__expires_at__gt=datetime.now()).values_list(
+        current_blacklisted_tokens = BlacklistedToken.objects.filter(token__expires_at__gt=timezone.now()).values_list(
             'token_id', flat=True
         )
-        return OutstandingToken.objects.filter(user_id=self.request.user.id, expires_at__gt=datetime.now()).exclude(
+        return OutstandingToken.objects.filter(user_id=self.request.user.id, expires_at__gt=timezone.now()).exclude(
             id__in=current_blacklisted_tokens
         )
 
