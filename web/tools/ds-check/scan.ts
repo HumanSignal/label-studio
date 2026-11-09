@@ -257,6 +257,49 @@ function moduleImports(file: string, source: string, ctx: ScanContext): Finding[
   return out;
 }
 
+// Tailwind classes that reach past the semantic tokens: a palette stop on a colour utility (bg-grape-600,
+// text-red-500) or a number on a spacing utility (p-4, gap-2, p-200, p-[12px]). Width, height, z-index, grid
+// counts and type sizes are not spacing and stay allowed; so does zero. The optional prefix keeps variants
+// (md:, hover:, dark:) and the negative sign in the reported class.
+const PALETTES =
+  "sand|grape|blueberry|kale|kiwi|mango|canteloupe|persimmon|plum|fig|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose";
+const COLOR_UTILITIES =
+  "bg|text|border|ring|fill|stroke|outline|from|to|via|divide|placeholder|shadow|decoration|accent|caret";
+const SPACING_UTILITIES = "p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y";
+const TAILWIND_COLOR = new RegExp(
+  `(?<![\\w-])(?:[a-z-]+:)*(?:${COLOR_UTILITIES})-(?:${PALETTES})-\\d{2,3}(?![\\w-])`,
+  "g",
+);
+const TAILWIND_SPACING = new RegExp(
+  `(?<![\\w-])(?:[a-z-]+:)*-?(?:${SPACING_UTILITIES})-(?:\\d*[1-9]\\d*(?:\\.\\d+)?|0\\.\\d+|\\[[^\\]\\s]+\\])(?![\\w-])`,
+  "g",
+);
+const COMMENT_LINE = /^\s*(\/\/|\/?\*)/;
+
+function tailwindPrimitives(file: string, source: string): Finding[] {
+  const out: Finding[] = [];
+  source.split("\n").forEach((line, index) => {
+    if (COMMENT_LINE.test(line)) return;
+    for (const match of line.matchAll(TAILWIND_COLOR)) {
+      out.push({
+        file,
+        line: index + 1,
+        rule: "tailwind-primitive",
+        message: `Tailwind primitive colour class ${match[0]}: use a semantic colour class (bg-primary-background, text-neutral-content, border-neutral-border…).`,
+      });
+    }
+    for (const match of line.matchAll(TAILWIND_SPACING)) {
+      out.push({
+        file,
+        line: index + 1,
+        rule: "tailwind-primitive",
+        message: `Tailwind numeric spacing class ${match[0]}: use a spacing token class (p-tight, gap-base, m-wide…).`,
+      });
+    }
+  });
+  return out;
+}
+
 /** All structural findings for one file. `absPath` is absolute; findings carry the path relative to the web root. */
 export function scanSource(absPath: string, source: string, ctx: ScanContext): Finding[] {
   const file = path.relative(ctx.webRoot, absPath).split(path.sep).join("/");
@@ -265,6 +308,7 @@ export function scanSource(absPath: string, source: string, ctx: ScanContext): F
   if (!SOURCE_EXT.test(absPath)) return [];
   return [
     ...colorLiterals(file, source, false),
+    ...tailwindPrimitives(file, source),
     ...namedImports(file, source, ctx),
     ...moduleImports(file, source, ctx),
   ];

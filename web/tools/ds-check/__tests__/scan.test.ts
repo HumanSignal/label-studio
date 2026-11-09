@@ -159,6 +159,23 @@ describe("ds-check scanner", () => {
     expect(finding.message).toContain(`"@humansignal/ui"`);
   });
 
+  test("Tailwind primitive palette and numeric spacing classes", () => {
+    expect(rules('<div className="bg-grape-600 p-4" />')).toEqual(["tailwind-primitive", "tailwind-primitive"]);
+    expect(
+      rules('<div className="bg-primary-background p-tight w-4 h-4 z-10 grid-cols-2 md:p-base gap-0 m-0 text-2xl" />'),
+    ).toEqual([]);
+    expect(
+      rules('cn("text-red-500", open && "hover:bg-blue-100", `-mt-1 gap-x-2.5 p-[12px] bg-sand-200`)'),
+    ).toHaveLength(6);
+    expect(rules("// text-red-500 in a comment\n/* p-4 */")).toEqual([]);
+    const out = scanSource(file, '<div className="dark:text-neutral-800 gap-2" />', ctx);
+    expect(out.map((f) => f.message)).toEqual([
+      "Tailwind primitive colour class dark:text-neutral-800: use a semantic colour class (bg-primary-background, text-neutral-content, border-neutral-border…).",
+      "Tailwind numeric spacing class gap-2: use a spacing token class (p-tight, gap-base, m-wide…).",
+    ]);
+    expect(rules("a { @apply p-4 bg-red-500; }", path.join(webRoot, "apps/labelstudio/src/a.css"))).toEqual([]);
+  });
+
   test("findings carry the line and a message naming the replacement", () => {
     const [finding] = scanSource(file, `\n\nimport { Tag } from "../components/Tag/Tag";`, ctx);
     expect(finding.line).toBe(3);
