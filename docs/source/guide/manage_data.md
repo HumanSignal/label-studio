@@ -138,8 +138,6 @@ You can create tabs on the data manager to [split your dataset](#Example-Split-a
 
 Tabs that you create depend on your [labeling configuration setup](setup.html), because the labeling configuration defines the data fields available for filtering and sorting. 
 
-!!! note 
-    If you make changes to the labeling configuration, any tabs in your data manager are removed. Make sure to finish the project setup before setting up complex tabs in the Data Manager.
 
 <div class="enterprise-only">
 
