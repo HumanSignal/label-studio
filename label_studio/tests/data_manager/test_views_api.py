@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 from data_manager.models import View
+from projects.tests.factories import ProjectFactory
 from rest_framework import status
 
 from ..utils import project_id  # noqa
@@ -1148,3 +1149,35 @@ def test_view_update_reraises_other_operational_errors(business_client, project_
         response = _patch_view_filters(business_client, view_id, project_id, 'and', [_wire_filter('lost')])
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, response.content
+
+
+def test_views_api_rejects_project_of_other_organization(business_client, project_id):
+    other_project = ProjectFactory()
+
+    # create a view in another organization's project
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=other_project.id, data={'title': 'x'})),
+        content_type='application/json',
+    )
+    assert response.status_code == 400, response.content
+    assert 'object does not exist' in str(response.json())
+    assert not View.objects.filter(project=other_project).exists()
+
+    # move an own view into another organization's project
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'own'})),
+        content_type='application/json',
+    )
+    assert response.status_code == 201, response.content
+    view_id = response.json()['id']
+
+    for method in ('patch', 'put'):
+        response = getattr(business_client, method)(
+            f'/api/dm/views/{view_id}/',
+            data=json.dumps(dict(project=other_project.id, data={'title': 'moved'})),
+            content_type='application/json',
+        )
+        assert response.status_code == 400, (method, response.content)
+    assert View.objects.get(id=view_id).project_id == project_id

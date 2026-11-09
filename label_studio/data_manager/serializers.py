@@ -316,6 +316,20 @@ class ViewSerializer(serializers.ModelSerializer):
         model = View
         fields = '__all__'
 
+    def validate_project(self, project):
+        """Only allow a project the requesting user can access in their active organization.
+
+        Without this the primary-key field accepts any project id, so a view could be created in (or moved to)
+        a project of another organization. The error matches a missing project, so existence is not revealed.
+        """
+        request = self.context.get('request')
+        if request is None or project is None:
+            return project
+        user = request.user
+        if project.organization_id != user.active_organization_id or not project.has_permission(user):
+            raise serializers.ValidationError(f'Invalid pk "{project.pk}" - object does not exist.')
+        return project
+
     @extend_schema_field(
         {
             'type': 'object',
