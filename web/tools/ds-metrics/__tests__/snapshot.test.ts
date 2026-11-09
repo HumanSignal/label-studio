@@ -82,6 +82,7 @@ const input: SnapshotInput = {
   commit: "abc123",
   date: "2026-11-06T12:00:00Z",
   pr: 3780,
+  prs: [{ number: 3780, title: "Example change", commit: "abc123" }],
   manifest,
   webs: { lso, lse },
   renderFiles: [
@@ -118,7 +119,13 @@ describe("buildSnapshot", () => {
   const snap = buildSnapshot(input);
 
   test("identity and totals", () => {
-    expect(snap).toMatchObject({ version: 1, commit: "abc123", date: "2026-11-06T12:00:00Z", pr: 3780 });
+    expect(snap).toMatchObject({
+      version: 1,
+      commit: "abc123",
+      date: "2026-11-06T12:00:00Z",
+      pr: 3780,
+      prs: [{ number: 3780, title: "Example change", commit: "abc123" }],
+    });
     expect(snap.totals).toEqual({ violations: 9, files_with_violations: 6 });
   });
 
@@ -144,8 +151,8 @@ describe("buildSnapshot", () => {
       value: 2,
       target: TARGETS.primitive_implementations_outside_ds,
     });
-    expect(snap.goals.ds_exports).toEqual({ value: 4, target: TARGETS.ds_exports });
-    expect(snap.goals.raw_buttons_lse_app).toEqual({ value: 2, target: 0 });
+    expect(snap.goals.ds_components).toEqual({ value: 3, target: TARGETS.ds_components });
+    expect(snap.goals.raw_controls_lse_app).toEqual({ value: 3, target: 0 });
     expect(snap.goals.legacy_icons).toEqual({ value: 2, target: 0 });
     expect(snap.goals.ds_render_share_lse).toEqual({ value: 0.6, target: TARGETS.ds_render_share_lse });
     expect(snap.goals.ds_render_share_lso).toEqual({ value: 0.5, target: TARGETS.ds_render_share_lso });

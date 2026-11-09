@@ -3,7 +3,8 @@ import type { Finding } from "./types";
 
 export type AnnotatedFinding = Finding & { element?: string; component?: string };
 
-const ELEMENTS = ["button", "select", "table", "checkbox", "radio"] as const;
+// Only tags with a design-system replacement; radio joins when libs/ui ships Radio.
+const ELEMENTS = ["button", "select", "table", "checkbox"] as const;
 
 /** Adds the raw element kind and the design-system component the message names, when it names one. */
 export function annotate(finding: Finding): AnnotatedFinding {

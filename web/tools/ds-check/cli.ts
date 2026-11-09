@@ -7,6 +7,7 @@
  *   bun run ds:check --all           report the whole web (totals for the metrics); never fails
  *   --base <ref>                     compare with another branch (default: $DS_CHECK_BASE, else origin/main)
  *   --json                           machine-readable counts and deltas
+ *   --repo <path>                    another checkout, measured with this tool's rules and manifest (metrics backfill)
  *
  * The baseline is the target branch itself, so there is nothing to update or commit: a file fails when a rule's
  * count rises against its merge-base version (a new file must be clean), and improvements are locked in on merge.
@@ -23,7 +24,6 @@ import { buildContext, inScope, listScanFiles, loadTokenNames, scanSource } from
 import type { Finding, ManifestSlice } from "./types";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
-const repoRoot = path.resolve(lsoWebRoot, "../../..");
 
 const fail = (message: string): never => {
   console.error(`[ds-check] ${message}`);
@@ -35,10 +35,25 @@ process.on("uncaughtException", (error) => fail(error.message));
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(name);
 const valueOf = (name: string) => (flag(name) ? args[args.indexOf(name) + 1] : undefined);
+const toolRepoRoot = path.resolve(lsoWebRoot, "../../..");
+const repoRoot = valueOf("--repo") ? path.resolve(valueOf("--repo") as string) : toolRepoRoot;
 const web = valueOf("--web") ?? (process.cwd().includes(`${path.sep}lse${path.sep}`) ? "lse" : "lso");
 if (web !== "lso" && web !== "lse") fail(`--web must be lso or lse, got ${web}`);
 const webRoot = path.join(repoRoot, "services", web, "web");
-const positional = args.filter((arg, i) => !arg.startsWith("--") && !["--web", "--base"].includes(args[i - 1]));
+// Another checkout is linted with this checkout's Biome config and plugins (Biome processes no file outside its
+// config's project, so they are copied in). The checkout is disposable: a sparse worktree of the metrics backfill.
+if (repoRoot !== toolRepoRoot) {
+  fs.copyFileSync(path.join(toolRepoRoot, "services", web, "web/biome.json"), path.join(webRoot, "biome.json"));
+  const plugins = path.join(toolRepoRoot, "services/lso/web/tools/biome/plugins");
+  const mirror = path.join(repoRoot, "services/lso/web/tools/biome/plugins");
+  fs.mkdirSync(mirror, { recursive: true });
+  for (const name of fs.readdirSync(plugins)) {
+    if (name.endsWith(".grit")) fs.copyFileSync(path.join(plugins, name), path.join(mirror, name));
+  }
+}
+const positional = args.filter(
+  (arg, i) => !arg.startsWith("--") && !["--web", "--base", "--repo"].includes(args[i - 1]),
+);
 
 const manifest = JSON.parse(
   fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8"),

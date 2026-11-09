@@ -2,12 +2,15 @@
  * The dashboard's data: the history as three row tables (one file each on the dashboard), the targets, and the
  * change over the last week for the weekly note.
  */
-import { TARGETS, type Snapshot } from "./snapshot";
+import { type PrRef, TARGETS, type Snapshot } from "./snapshot";
 
-export type PointRow = { date: string; commit: string; violations: number; files_with_violations: number } & Record<
-  string,
-  number | string
->;
+export type PointRow = {
+  date: string;
+  commit: string;
+  violations: number;
+  files_with_violations: number;
+  prs: PrRef[];
+} & Record<string, number | string | PrRef[]>;
 export type ClusterRow = { date: string; commit: string; cluster: string; importers: number; paths_remaining: number };
 export type AreaRow = {
   date: string;
@@ -33,6 +36,8 @@ const toPoint = (s: Snapshot): PointRow => ({
   commit: s.commit,
   violations: s.totals.violations,
   files_with_violations: s.totals.files_with_violations,
+  // points written before the field existed have none
+  prs: s.prs ?? [],
   ...Object.fromEntries(Object.entries(s.rules).map(([rule, n]) => [`rule_${rule}`, n])),
   ...Object.fromEntries(Object.entries(s.goals).map(([goal, g]) => [`goal_${goal}`, g.value])),
 });

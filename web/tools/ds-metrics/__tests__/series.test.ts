@@ -7,6 +7,7 @@ const snap = (commit: string, date: string, violations: number, extra: Partial<S
   commit,
   date,
   pr: null,
+  prs: [],
   totals: { violations, files_with_violations: Math.round(violations / 5) },
   rules: { "raw-control": Math.round(violations / 10), "color-literal": violations - Math.round(violations / 10) },
   clusters: { Dropdown: { paths_remaining: 5, importers: 50 }, Spinner: { paths_remaining: 5, importers: 54 } },
@@ -15,8 +16,8 @@ const snap = (commit: string, date: string, violations: number, extra: Partial<S
     editor: { violations: 100, render_files: 200, ds_import_share: 0.4 },
   },
   goals: {
-    raw_buttons_lse_app: { value: Math.round(violations / 40), target: 0 },
-    ds_exports: { value: 96, target: 30 },
+    raw_controls_lse_app: { value: Math.round(violations / 40), target: 0 },
+    ds_components: { value: 96, target: 30 },
   },
   ...extra,
 });
@@ -46,7 +47,7 @@ describe("buildSeries", () => {
       ["c3", 4688],
     ]);
     expect(series.points[2]["rule_raw-control"]).toBe(469);
-    expect(series.points[2].goal_raw_buttons_lse_app).toBe(117);
+    expect(series.points[2].goal_raw_controls_lse_app).toBe(117);
     expect(series.points[2].files_with_violations).toBe(938);
   });
 
@@ -85,7 +86,7 @@ describe("buildSeries", () => {
   });
 
   test("targets carry the scoreboard values and the 90-day total", () => {
-    expect(series.targets.raw_buttons_lse_app).toBe(0);
+    expect(series.targets.raw_controls_lse_app).toBe(0);
     expect(series.targets.ds_render_share_lse).toBe(0.95);
     expect(series.targets.total_90d).toBe(1000);
   });

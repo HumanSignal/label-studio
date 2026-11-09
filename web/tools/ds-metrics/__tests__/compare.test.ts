@@ -11,7 +11,7 @@ const base: Snapshot = {
   rules: { "raw-control": 10, "color-literal": 90 },
   clusters: { Dropdown: { paths_remaining: 4, importers: 50 }, Spinner: { paths_remaining: 1, importers: 3 } },
   areas: { "lse/app": { violations: 100, render_files: 200, ds_import_share: 0.8 } },
-  goals: { raw_buttons_lse_app: { value: 10, target: 0 }, ds_exports: { value: 96, target: 30 } },
+  goals: { raw_controls_lse_app: { value: 10, target: 0 }, ds_components: { value: 96, target: 30 } },
 };
 
 const head: Snapshot = {
@@ -22,7 +22,7 @@ const head: Snapshot = {
   rules: { "raw-control": 10, "color-literal": 82, "legacy-icon": 1 },
   clusters: { Dropdown: { paths_remaining: 4, importers: 48 } },
   areas: { "lse/app": { violations: 93, render_files: 201, ds_import_share: 0.81 } },
-  goals: { raw_buttons_lse_app: { value: 10, target: 0 }, ds_exports: { value: 95, target: 30 } },
+  goals: { raw_controls_lse_app: { value: 10, target: 0 }, ds_components: { value: 95, target: 30 } },
 };
 
 describe("compare", () => {
@@ -33,7 +33,7 @@ describe("compare", () => {
     expect(d.rules["legacy-icon"]).toEqual({ base: 0, head: 1, delta: 1 });
     expect(d.clusters.Spinner).toEqual({ base: 1, head: 0, delta: -1, importers: { base: 3, head: 0, delta: -3 } });
     expect(d.clusters.Dropdown.importers.delta).toBe(-2);
-    expect(d.goals.ds_exports).toEqual({ base: 96, head: 95, delta: -1, target: 30 });
+    expect(d.goals.ds_components).toEqual({ base: 96, head: 95, delta: -1, target: 30 });
     expect(d.areas["lse/app"].violations.delta).toBe(-7);
   });
 });

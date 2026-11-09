@@ -25,14 +25,7 @@ describe("annotate", () => {
         finding("raw-control", "Use Checkbox from @humansignal/ui (Toggle for a setting), not a raw checkbox input."),
       ),
     ).toMatchObject({ element: "checkbox", component: "Checkbox" });
-    expect(
-      annotate(
-        finding(
-          "raw-control",
-          "Radio is a design-system gap: add it to libs/ui (or use MultiStateToggle) instead of a raw radio input.",
-        ),
-      ),
-    ).toMatchObject({ element: "radio" });
+    expect(annotate(finding("raw-control", "something about a raw radio input")).element).toBeUndefined();
   });
 
   test("replaced and deprecated imports carry the component", () => {
@@ -70,7 +63,7 @@ describe("ds:check --all --json", () => {
     expect(out.findings.length).toBe(out.totals.violations);
     const raw = out.findings.filter((f: { rule: string }) => f.rule === "raw-control");
     expect(raw.length).toBeGreaterThan(0);
-    for (const f of raw) expect(["button", "select", "table", "checkbox", "radio"]).toContain(f.element);
+    for (const f of raw) expect(["button", "select", "table", "checkbox"]).toContain(f.element);
     expect(out.findings.every((f: { file: string; line: number }) => typeof f.file === "string" && f.line >= 0)).toBe(
       true,
     );

@@ -22,7 +22,6 @@ describe("design-system Biome plugins", () => {
         "8 raw-control",
         "9 raw-control",
         "10 raw-control",
-        "11 raw-control",
         "12 badge-props",
         "15 badge-props",
         "18 avatar-size",

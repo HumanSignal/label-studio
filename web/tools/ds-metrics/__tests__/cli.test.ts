@@ -25,6 +25,7 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
       "commit",
       "date",
       "pr",
+      "prs",
       "totals",
       "rules",
       "clusters",
@@ -35,8 +36,8 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
     expect(snap.totals.violations).toBe(Object.values(snap.rules as Record<string, number>).reduce((a, b) => a + b, 0));
     expect(Object.keys(snap.goals)).toEqual([
       "primitive_implementations_outside_ds",
-      "ds_exports",
-      "raw_buttons_lse_app",
+      "ds_components",
+      "raw_controls_lse_app",
       "legacy_icons",
       "ds_render_share_lse",
       "ds_render_share_lso",

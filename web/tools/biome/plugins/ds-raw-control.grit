@@ -27,10 +27,5 @@ or {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `type="checkbox"`,
     register_diagnostic(span=$el, message="[ds/raw-control] Use Checkbox from @humansignal/ui (Toggle for a setting), not a raw checkbox input.", severity="warn")
-  },
-  `<input $attrs />` as $el where {
-    $filename <: not r".*libs/ui/.*",
-    $attrs <: contains `type="radio"`,
-    register_diagnostic(span=$el, message="[ds/raw-control] Radio is a design-system gap: add it to libs/ui (or use MultiStateToggle) instead of a raw radio input.", severity="warn")
   }
 }

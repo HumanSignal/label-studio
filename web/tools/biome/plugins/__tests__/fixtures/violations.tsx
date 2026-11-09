@@ -1,4 +1,4 @@
-// Fixture for ds-plugins.test.ts: each element below is one design-system violation (lines asserted there).
+// Fixture for ds-plugins.test.ts: one violation per element (lines asserted there); the radio input is allowed (no DS Radio yet).
 export const Violations = ({ u, onPick }: { u: unknown; onPick: () => void }) => (
   <div>
     <div style={{ color: "red", position: "absolute" }} />

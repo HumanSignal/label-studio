@@ -28,6 +28,7 @@ export type SnapshotInput = {
   commit: string;
   date: string;
   pr: number | null;
+  prs: PrRef[];
   manifest: Manifest;
   webs: Record<Web, CheckAll>;
   renderFiles: RenderFile[];
@@ -36,11 +37,14 @@ export type SnapshotInput = {
 };
 
 export type Goal = { value: number; target: number };
+/** A pull request merged into main by (or since the previous point before) the snapshot's commit. */
+export type PrRef = { number: number; title: string; commit: string };
 export type Snapshot = {
   version: 1;
   commit: string;
   date: string;
   pr: number | null;
+  prs: PrRef[];
   totals: { violations: number; files_with_violations: number };
   rules: Record<string, number>;
   clusters: Record<string, { paths_remaining: number; importers: number }>;
@@ -51,8 +55,8 @@ export type Snapshot = {
 /** The scoreboard targets (Design System Adoption Report, board 07). Shares are fractions of render files. */
 export const TARGETS = {
   primitive_implementations_outside_ds: 10,
-  ds_exports: 30,
-  raw_buttons_lse_app: 0,
+  ds_components: 30,
+  raw_controls_lse_app: 0,
   legacy_icons: 0,
   ds_render_share_lse: 0.95,
   ds_render_share_lso: 0.7,
@@ -110,7 +114,6 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     const files = input.renderFiles.filter((r) => r.web === web);
     return files.length ? round(files.filter((r) => r.importsDs).length / files.length) : 0;
   };
-  const nonComponents = new Set(input.manifest.nonComponents);
   const goals: Snapshot["goals"] = {
     primitive_implementations_outside_ds: {
       value: input.manifest.components
@@ -118,19 +121,13 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
         .filter((p) => !p.startsWith("jsx:") && input.exists(p)).length,
       target: TARGETS.primitive_implementations_outside_ds,
     },
-    // The manifest's exports are index.ts minus nonComponents and the entries marked internal (contexts, helpers).
-    ds_exports: {
-      value: input.manifest.components
-        .flatMap((c) => c.exports)
-        .filter((e) => /^[A-Z]/.test(e) && !nonComponents.has(e)).length,
-      target: TARGETS.ds_exports,
-    },
-    raw_buttons_lse_app: {
-      value: findings.filter(
-        (f) =>
-          f.web === "lse" && f.rule === "raw-control" && f.element === "button" && areaOf("lse", f.file) === "lse/app",
-      ).length,
-      target: TARGETS.raw_buttons_lse_app,
+    // One per manifest entry: sub-parts (AccordionItem, AvatarBadge) count with their parent, not as components.
+    ds_components: { value: input.manifest.components.length, target: TARGETS.ds_components },
+    // Every raw tag the rule flags (button, select, table, checkbox): each has a design-system replacement.
+    raw_controls_lse_app: {
+      value: findings.filter((f) => f.web === "lse" && f.rule === "raw-control" && areaOf("lse", f.file) === "lse/app")
+        .length,
+      target: TARGETS.raw_controls_lse_app,
     },
     legacy_icons: { value: rules["legacy-icon"] ?? 0, target: TARGETS.legacy_icons },
     ds_render_share_lse: { value: share("lse"), target: TARGETS.ds_render_share_lse },
@@ -142,6 +139,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     commit: input.commit,
     date: input.date,
     pr: input.pr,
+    prs: input.prs,
     totals: {
       violations: findings.length,
       files_with_violations: new Set(findings.map((f) => `${f.web}:${f.file}`)).size,
