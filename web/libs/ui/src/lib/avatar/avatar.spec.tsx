@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Avatar, Userpic } from "./avatar";
+import { Avatar } from "./avatar";
 
 describe("Avatar", () => {
   it("draws the initials of the person", () => {
@@ -32,10 +32,6 @@ describe("Avatar", () => {
     render(<Avatar addCount="+12" />);
 
     expect(screen.getByTestId("userpic")).toHaveTextContent("+12");
-  });
-
-  it("keeps Userpic as an alias of the same component", () => {
-    expect(Userpic).toBe(Avatar);
   });
 
   it("opens the name tooltip on the side it is given", () => {

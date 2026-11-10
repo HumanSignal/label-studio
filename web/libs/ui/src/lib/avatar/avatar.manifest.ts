@@ -15,17 +15,4 @@ export default defineManifest([
     props_rules: ["size is a name (xsmall, small, medium, large, xlarge), never a px number or CSS size"],
     replaces: ["services/lse/web/apps/labelstudio/src/pages/Organization/Models/@components/RunHistory/RunHistory.tsx"],
   },
-  {
-    name: "Userpic",
-    tier: 1,
-    exports: ["Userpic"],
-    intent: [],
-    use_when: "",
-    never_when: [],
-    replaces: [],
-    deprecated: {
-      replaced_by: "Avatar",
-      reason: "Renamed to Avatar; same component, the old name is kept for one release.",
-    },
-  },
 ]);

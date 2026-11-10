@@ -61,7 +61,6 @@ export const manifestConfig: ManifestConfig = {
     "SIZES",
     "CONTEXT_MENU_KEYS",
     "TAXONOMY_TREE_SCHEMA",
-    "CalloutVariants",
     "ToastType",
     "SelectSize",
     "FILTER_SHELL_TREE_DROPDOWN_CLASS",

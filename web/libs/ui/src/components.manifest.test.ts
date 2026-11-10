@@ -63,7 +63,6 @@ describe("component manifests", () => {
 
   test("a deprecated entry never answers a lookup and names a live replacement", () => {
     const deprecated = Object.values(manifest.components).filter((c) => c.deprecated);
-    expect(deprecated.map((c) => c.name)).toContain("Callout");
     for (const c of deprecated) {
       expect(c.intent, `${c.name} must not carry an intent`).toEqual([]);
       const target = manifest.components[c.deprecated?.replaced_by ?? ""];

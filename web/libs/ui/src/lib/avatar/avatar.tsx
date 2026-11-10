@@ -237,6 +237,3 @@ export const Avatar = forwardRef(
 );
 
 Avatar.displayName = "Avatar";
-
-/** @deprecated Renamed to `Avatar`; the alias goes away next release. */
-export const Userpic = Avatar;

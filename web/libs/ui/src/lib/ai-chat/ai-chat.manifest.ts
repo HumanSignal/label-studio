@@ -10,8 +10,6 @@ export default defineManifest({
     "AiChatStreamingMessage",
     "AiChatThinking",
     "AiChatToolActivity",
-    "AiChatLoading",
-    "AiChatLoadingIcon",
   ],
   intent: [],
   use_when: "Chat surfaces that talk to an assistant: prompt bar, streaming messages, approvals.",

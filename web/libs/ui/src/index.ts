@@ -1,4 +1,3 @@
-export * from "./lib/Card/Card";
 export * from "./lib/InputFile/InputFile";
 export * from "./lib/MultiStateToggle/MultiStateToggle";
 export * from "./lib/ThemeToggle/ThemeToggle";
@@ -7,7 +6,6 @@ export * from "./lib/avatar";
 export * from "./lib/badge/badge";
 export * from "./lib/badge-group";
 export * from "./lib/button/button";
-export * from "./lib/callout/callout";
 export * from "./lib/checkbox/checkbox";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
@@ -72,12 +70,12 @@ export * from "./lib/space/space";
 export * from "./lib/spinner/spinner";
 export * from "./lib/sparkles/sparkles";
 export * from "./lib/ai-chat";
-export * from "./lib/popover/popover";
+export { Popover, type PopoverProps } from "./lib/popover/popover";
 export * from "./lib/tree-select";
 export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
-export * from "./lib/drawer";
+export { Drawer, type DrawerProps } from "./lib/drawer";
 export * from "./lib/date-range-picker";
 export * from "./lib/modal-window";
 

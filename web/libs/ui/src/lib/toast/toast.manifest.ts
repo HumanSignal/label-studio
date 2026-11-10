@@ -6,6 +6,6 @@ export default defineManifest({
   exports: ["Toast", "ToastAction", "ToastProvider", "ToastViewport"],
   intent: ["the result of an action, shown briefly"],
   use_when: "Confirmation or failure of an action the user just took, through useToast.",
-  never_when: ["persistent information (use Message or Callout)", "alert() or a hand-made notification bar"],
+  never_when: ["persistent information (use Message)", "alert() or a hand-made notification bar"],
   replaces: [],
 });
