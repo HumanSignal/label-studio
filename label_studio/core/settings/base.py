@@ -689,6 +689,13 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # dir for delayed export
 DELAYED_EXPORT_DIR = 'export'
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
+# Ephemeral incremental exports (FIT-3092): TTL for rqcron GC sweep (LSE cron_config).
+# Without rqcron (default on-prem), ephemeral rows stay unlisted until explicit DELETE.
+EPHEMERAL_EXPORT_TTL_HOURS = int(get_env('EPHEMERAL_EXPORT_TTL_HOURS', 24))
+# Subtract from server-defaulted `until` so long-running writes that commit after the
+# export query starts but stamp Task.updated_at before wall-clock now() are less likely
+# to fall into the gap between consecutive [since, until) windows.
+INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS = int(get_env('INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS', 5))
 
 # file / task size limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))

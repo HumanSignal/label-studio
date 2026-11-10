@@ -337,7 +337,21 @@ class ProjectExportFilesAuthCheck(APIView):
     decorator=extend_schema(
         tags=['Export'],
         summary='Create new export snapshot',
-        description='Create a new export request to start a background task and generate an export file for a specific project by ID.',
+        description=(
+            'Create a new export request to start a background task and generate an export file '
+            'for a specific project by ID. Optional `since` / `until` limit the snapshot to tasks '
+            'with `updated_at` in the half-open window `[since, until)`. `since` must be in the past; an '
+            'omitted or later `until` becomes create/request time minus INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS. '
+            'Set `ephemeral=true` to omit the snapshot from list endpoints. '
+            'On deployments that run the RQ cron scheduler (SaaS; on-prem with `rqcron.enabled`), '
+            'ephemeral exports older than EPHEMERAL_EXPORT_TTL_HOURS (default 24) are deleted by a '
+            'daily low-queue sweep; otherwise they remain unlisted until explicitly deleted. '
+            'Use the resolved `until` from the response as `since` on the next incremental create. '
+            'Task deletions are not represented in incremental snapshots (only surviving tasks with '
+            'bumped `updated_at`). Rows committed after the export query starts but stamped with '
+            '`updated_at` before `until` can fall outside both consecutive windows; the default '
+            '`until` lag mitigates long transactions.'
+        ),
         parameters=[
             OpenApiParameter(
                 name='id',
@@ -396,7 +410,7 @@ class ExportListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project = self._get_project()
-        return super().get_queryset().filter(project=project)
+        return super().get_queryset().filter(project=project).exclude(ephemeral=True)
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
