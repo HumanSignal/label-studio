@@ -13,7 +13,7 @@ from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
 from rq.job import Job
-from tasks.functions import update_tasks_counters
+from tasks.functions import touch_tasks_updated_at, update_tasks_counters
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
@@ -220,6 +220,9 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     real_task_ids = list(predictions.order_by().values_list('task_id', flat=True).distinct())
 
     count = predictions.count()
+    # QuerySet.delete skips Prediction.delete() -> update_task(); bump Task.updated_at for incremental
+    # exports (FIT-3092). Runs before the delete, while real_task_ids still resolves to these tasks.
+    touch_tasks_updated_at(real_task_ids)
     predictions.delete()
     start_job_async_or_sync(update_tasks_counters_by_ids, real_task_ids, job_tenant=project.organization_id)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}

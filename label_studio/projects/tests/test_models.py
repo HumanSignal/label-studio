@@ -1,9 +1,12 @@
 """Tests for projects.models (Project model and related logic)."""
 
+from datetime import timedelta
+
 from django.test import TestCase
+from django.utils import timezone
 from projects.models import Project
 from projects.tests.factories import ProjectFactory
-from tasks.models import Task
+from tasks.models import Prediction, Task
 from tasks.tests.factories import AnnotationFactory, TaskFactory
 from users.tests.factories import UserFactory
 
@@ -145,3 +148,22 @@ class TestProjectHasPermission(TestCase):
         user = UserFactory()
 
         assert project.has_permission(user) is True
+
+
+class TestDeletePredictionsBumpsTaskUpdatedAt(TestCase):
+    def test_delete_model_version_predictions_bumps_only_affected_tasks(self):
+        """FIT-3092: QuerySet.delete skips Prediction.delete(); incremental exports need updated_at to move."""
+        project = ProjectFactory()
+        affected = TaskFactory(project=project)
+        other_version = TaskFactory(project=project)
+        Prediction.objects.create(task=affected, project=project, result=[], model_version='v1')
+        Prediction.objects.create(task=other_version, project=project, result=[], model_version='v2')
+        stale = timezone.now() - timedelta(days=3)
+        Task.objects.filter(id__in=[affected.id, other_version.id]).update(updated_at=stale)
+
+        assert project.delete_predictions(model_version='v1') == {'deleted_predictions': 1}
+
+        affected.refresh_from_db()
+        other_version.refresh_from_db()
+        assert affected.updated_at > stale
+        assert other_version.updated_at == stale

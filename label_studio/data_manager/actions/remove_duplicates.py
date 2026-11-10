@@ -105,6 +105,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
 def move_annotations(duplicates):
     """Move annotations to the first task from duplicated tasks"""
     total_moved_annotations = 0
+    destination_task_ids = set()
 
     for data in duplicates:
         root = duplicates[data]
@@ -122,12 +123,19 @@ def move_annotations(duplicates):
         for task in root[i + 1 :]:
             if task['total_annotations'] + task['cancelled_annotations'] > 0:
                 Task.objects.get(id=task['id']).annotations.update(task_id=first['id'])
+                destination_task_ids.add(first['id'])
                 total_moved_annotations += task['total_annotations'] + task['cancelled_annotations']
                 logger.info(
                     f'Moved {task["total_annotations"]} annotations from task {task["id"]} to task {first["id"]}'
                 )
                 task['total_annotations'] = 0
                 task['cancelled_annotations'] = 0
+
+    if destination_task_ids:
+        # annotations.update(task_id=…) skips Annotation.save()→update_task() (FIT-3092).
+        from tasks.functions import touch_tasks_updated_at
+
+        touch_tasks_updated_at(destination_task_ids)
 
 
 def restore_storage_links_for_duplicated_tasks(duplicates) -> None:

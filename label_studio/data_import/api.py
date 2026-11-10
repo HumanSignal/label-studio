@@ -34,7 +34,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
-from tasks.functions import update_tasks_counters
+from tasks.functions import touch_tasks_updated_at, update_tasks_counters
 from tasks.models import Prediction, Task
 from tasks.serializers import sanitize_prediction_import_payload
 from users.models import User
@@ -608,6 +608,9 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             # Bulk create this batch with the configured batch size
             batch_created = Prediction.objects.bulk_create(batch_predictions, batch_size=settings.BATCH_SIZE)
             total_created += len(batch_created)
+            # bulk_create skips Prediction.save()->update_task(); bump per batch for incremental export
+            # (FIT-3092) so tasks of committed batches are covered even if a later batch fails validation.
+            touch_tasks_updated_at(p.task_id for p in batch_created)
 
             logger.debug(
                 f'Processed batch {batch_start}-{batch_end - 1}: created {len(batch_created)} predictions '
@@ -696,7 +699,10 @@ class ImportPredictionsAPI(generics.CreateAPIView):
             else:
                 logger.error(f'Prediction validation failed ({len(validation_errors)} errors):\n{validation_errors}')
 
+        affected_task_ids = {p.task_id for p in predictions if p.task_id}
         predictions_obj = Prediction.objects.bulk_create(predictions, batch_size=settings.BATCH_SIZE)
+        # bulk_create skips Prediction.save()→update_task(); bump for incremental export (FIT-3092).
+        touch_tasks_updated_at(affected_task_ids)
         start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
         return Response({'created': len(predictions_obj)}, status=status.HTTP_201_CREATED)
 

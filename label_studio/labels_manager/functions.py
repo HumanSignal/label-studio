@@ -1,3 +1,4 @@
+from core.utils.iterators import iterate_queryset
 from django.db import transaction
 from tasks.models import Annotation
 
@@ -17,7 +18,7 @@ def bulk_update_label(old_label, new_label, organization, project=None, project_
     updated_count = 0
     with transaction.atomic():
         update_annotations = []
-        for annotation in annotations.only('result').all():
+        for annotation in iterate_queryset(annotations.only('result', 'task_id')):
             result = annotation.result
 
             updated_result = []
@@ -38,4 +39,9 @@ def bulk_update_label(old_label, new_label, organization, project=None, project_
 
         if update_annotations:
             Annotation.objects.bulk_update(update_annotations, ['result'])
+            # bulk_update skips Annotation.save() -> update_task(); the rewritten results are exported, so bump
+            # Task.updated_at for incremental exports (FIT-3092).
+            from tasks.functions import touch_tasks_updated_at
+
+            touch_tasks_updated_at(annotation.task_id for annotation in update_annotations)
     return updated_count
