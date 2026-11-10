@@ -215,16 +215,23 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     """
     task_ids = queryset.values_list('id', flat=True)
     predictions = Prediction.objects.filter(task__id__in=task_ids)
-    real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+    # Materialize before the delete: a lazy queryset would become a subquery over Prediction that the
+    # counters job evaluates after the predictions are gone, so it would match no tasks.
+    real_task_ids = list(predictions.order_by().values_list('task_id', flat=True).distinct())
 
     count = predictions.count()
     predictions.delete()
-    start_job_async_or_sync(
-        update_tasks_counters,
-        Task.objects.filter(id__in=real_task_ids),
-        job_tenant=project.organization_id,
-    )
+    start_job_async_or_sync(update_tasks_counters_by_ids, real_task_ids, job_tenant=project.organization_id)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
+
+
+def update_tasks_counters_by_ids(task_ids):
+    """Job: recompute the counters of the given tasks.
+
+    Takes ids rather than a Task queryset: RQ pickles job arguments, and pickling a queryset evaluates it,
+    which would put every Task row in the job payload.
+    """
+    return update_tasks_counters(Task.objects.filter(id__in=task_ids))
 
 
 def async_project_summary_recalculation(tasks_ids_list, project_id):
