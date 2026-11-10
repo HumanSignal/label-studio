@@ -1527,10 +1527,13 @@ def update_task_counters_after_annotation_delete(sender, instance, **kwargs):
     task.cancelled_annotations = task.annotations.filter(was_cancelled=True).count()
     task.update_is_labeled()
     # Use .update() (not .save()) to avoid re-triggering Task save signals / summary recounting.
+    # Explicit updated_at: QuerySet.update() does not honor auto_now, and incremental exports
+    # key off Task.updated_at (FIT-3092).
     Task.objects.filter(id=task_id).update(
         total_annotations=task.total_annotations,
         cancelled_annotations=task.cancelled_annotations,
         is_labeled=task.is_labeled,
+        updated_at=now(),
     )
     logger.debug(f'post_delete recomputed counters for task {task_id} after annotation deletion.')
 
