@@ -1,7 +1,7 @@
 import { SampleDatasetSelect } from "@humansignal/app-common/blocks/SampleDatasetSelect/SampleDatasetSelect";
 import { ff, formatFileSize } from "@humansignal/core";
 import { IconErrorAlt, IconFileUpload, IconInfoOutline, IconTrash, IconUpload } from "@humansignal/icons";
-import { cn as scn } from "@humansignal/shad/utils";
+import { cn as scn } from "@humansignal/ui";
 import Input from "libs/datamanager/src/components/Common/Input/Input";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useAPI } from "../../../providers/ApiProvider";

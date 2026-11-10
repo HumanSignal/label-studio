@@ -12,7 +12,7 @@ import { Phrases } from "./Phrases";
 import { IconHelp } from "@humansignal/icons";
 import { Toggle, Tooltip } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
-import { cnm } from "@humansignal/shad/utils";
+import { cnm } from "@humansignal/ui";
 import { useHotkey } from "../../../hooks/useHotkey";
 
 const audioDefaultProps = { crossOrigin: "anonymous" };

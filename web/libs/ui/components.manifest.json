@@ -323,6 +323,24 @@
       ],
       "dir": "lib/data-table"
     },
+    "DateRangePicker": {
+      "name": "DateRangePicker",
+      "tier": 2,
+      "exports": [
+        "DateRangePicker",
+        "DateRangePickerTrigger"
+      ],
+      "intent": [
+        "pick a date or date-time range"
+      ],
+      "use_when": "Filtering or scoping by a period: a calendar with preset ranges and optional times, opened from DateRangePickerTrigger.",
+      "never_when": [
+        "a single date with no range",
+        "raw <input type=date> pairs"
+      ],
+      "replaces": [],
+      "dir": "lib/date-range-picker"
+    },
     "Drawer": {
       "name": "Drawer",
       "tier": 1,
@@ -1044,6 +1062,7 @@
     "TAXONOMY_TREE_SCHEMA",
     "CalloutVariants",
     "ToastType",
+    "SelectSize",
     "FILTER_SHELL_TREE_DROPDOWN_CLASS",
     "IdDelimiter",
     "IndexedSymbol",

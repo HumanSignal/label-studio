@@ -63,6 +63,7 @@ export const manifestConfig: ManifestConfig = {
     "TAXONOMY_TREE_SCHEMA",
     "CalloutVariants",
     "ToastType",
+    "SelectSize",
     "FILTER_SHELL_TREE_DROPDOWN_CLASS",
     "IdDelimiter",
     "IndexedSymbol",

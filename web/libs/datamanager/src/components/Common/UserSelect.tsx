@@ -4,7 +4,7 @@ import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { useDataManagerUsers } from "../../hooks/useUsers";
 import { Select, Tooltip, Typography, Avatar } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import { SelectSize } from "@humansignal/ui/lib/select/types";
+import { SelectSize } from "@humansignal/ui";
 import { userDisplayName } from "@humansignal/core/lib/utils/helpers";
 import "./UserSelect.prefix.css";
 

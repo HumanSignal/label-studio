@@ -28,6 +28,7 @@ export * from "./lib/json-viewer";
 export * from "./lib/label/label";
 export * from "./lib/message/message";
 export * from "./lib/select/select";
+export { SelectSize, type SelectOption, type SelectOptionData } from "./lib/select/types";
 export * from "./lib/search-input/search-input";
 export * from "./lib/tag-autocomplete";
 // Named exports only — avoid `export *` so MultiTreeSelect's internal TreeSelect
@@ -77,6 +78,7 @@ export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
 export * from "./lib/drawer";
+export * from "./lib/date-range-picker";
 export * from "./lib/modal-window";
 
 export * from "./utils/utils";

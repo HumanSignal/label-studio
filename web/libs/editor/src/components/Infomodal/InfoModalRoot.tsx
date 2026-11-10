@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Dialog, Message, Typography } from "@humansignal/ui";
-import type { MessageVariant } from "@humansignal/ui/lib/message/message";
+import type { MessageVariant } from "@humansignal/ui";
 import { registerInfoModalDispatch, type InfoModalPayload, type InfoModalVariant } from "./infomodal-dispatch";
 
 /** Maps legacy Infomodal API variants to `Message` variants (icons + surface colors). */

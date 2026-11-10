@@ -8,4 +8,4 @@ import { Modal, modal, info, confirm, useModalControls } from "@humansignal/ui/l
 
 export { modal as standaloneModal, modal, info, confirm, useModalControls, Modal };
 
-export type { ButtonProps as ButtonVariant } from "@humansignal/ui/lib/button/button";
+export type { ButtonProps as ButtonVariant } from "@humansignal/ui";

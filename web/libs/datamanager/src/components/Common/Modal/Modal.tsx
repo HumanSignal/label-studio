@@ -14,4 +14,4 @@ Object.assign(Modal, {
 
 export { modal as standaloneModal, modal, info, confirm, useModalControls, Modal };
 
-export type { ButtonProps as ButtonVariant } from "@humansignal/ui/lib/button/button";
+export type { ButtonProps as ButtonVariant } from "@humansignal/ui";

@@ -32,7 +32,7 @@ import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
-import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
+import { ToastProvider, ToastViewport } from "@humansignal/ui";
 
 /**
  * Components

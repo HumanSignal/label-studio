@@ -16,11 +16,11 @@ import {
 import { ApiProvider } from "../../providers/ApiProvider";
 import { AuthProvider } from "@humansignal/core/providers/AuthProvider";
 import { ConfigProvider } from "../../providers/ConfigProvider";
-import { ToastProvider } from "@humansignal/ui/lib/toast/toast";
+import { ToastProvider } from "@humansignal/ui";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "../../utils/query-client";
 
-export type { ButtonProps as ButtonVariant } from "@humansignal/ui/lib/button/button";
+export type { ButtonProps as ButtonVariant } from "@humansignal/ui";
 
 /**
  * Get the default LS providers for modals

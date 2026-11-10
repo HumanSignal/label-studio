@@ -10,7 +10,7 @@ import {
   CardContent as ShadCardContent,
   CardHeader as ShadCardHeader,
 } from "@humansignal/shad/components/ui/card";
-import { Skeleton } from "@humansignal/shad/components/ui/skeleton";
+import { Skeleton } from "@humansignal/ui";
 import {
   Dialog,
   DialogContent,
