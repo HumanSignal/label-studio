@@ -201,15 +201,6 @@ export const FF_PROJECT_DM_COLUMN_ACCESS = "fflag_feat_all_fit_2808_dm_column_ac
 export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";
 
 /**
- * Host-side protection against duplicate ReactCode regions: accept postMessage
- * mutations only from the instance's own iframe (tag names repeat across
- * projects, so tag-only matching let a lingering second editor session write
- * other tasks' regions into its annotation) and echo regions back after each
- * mutation. Gated for per-org rollout (affected orgs first).
- */
-export const FF_BROS_1486_REACTCODE_DUP_REGIONS = "fflag_fix_bros_1486_react_code_external_apps_duplicate_regions";
-
-/**
  * View-Only users: free, bounded read-only billing seat type.
  * Rollout flag for the backend foundation (membership type,
  * `max_view_only_users` entitlement, paid-seat exclusion, reporting).
