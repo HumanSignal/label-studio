@@ -43,7 +43,7 @@ dependencies = [
     "ordered-set (==4.0.2)",
     "pandas (>=2.2.3)",
     "psycopg[binary] (>=3.2.0,<4.0.0)",
-    "pyarrow (>=24.0.0,<25.0.0)",
+    "pyarrow (>=26.0.1,<27.0.0)",
     "pydantic (>=2.9.2)",
     "python-dateutil (>=2.8.1)",
     "pytz (>=2022.1,<2023.0)",
@@ -72,7 +72,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "222dc95465eedc6b10d12bf6c212e3143fadb90c" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "99d9123c556d868868d28271613ed5b91184ae02" }
 
 [project.optional-dependencies]
 uwsgi = [
