@@ -752,6 +752,14 @@ export const AppStore = types
           return result;
         }
 
+        // Done is not an "Errors occurred" chip. The app keeps an open stream, or sends the user home.
+        const displayReason =
+          result?.response && typeof result.response === "object" ? result.response.display_context?.reason : undefined;
+        if (resultStatusCode === 403 && displayReason === "PROJECT_DONE") {
+          self.SDK.invoke("error", result);
+          return result;
+        }
+
         if (result.response) {
           try {
             self.serverError.set(methodName, {

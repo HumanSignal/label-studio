@@ -16,6 +16,7 @@ from io_storages.localfiles.functions import build_local_files_path, is_within_s
 from io_storages.localfiles.models import LocalFilesImportStorage
 from ranged_fileresponse import RangedFileResponse
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger(__name__)
@@ -72,6 +73,16 @@ def build_localfile_response(
     return response
 
 
+def _storage_grants_access(storage: LocalFilesImportStorage, user, full_path_dir: str) -> bool:
+    if not is_within_storage(full_path_dir, storage.path):
+        return False
+    try:
+        return storage.project.has_permission(user)
+    except PermissionDenied:
+        # Done or paused LSE projects refuse by raising; another project on the same root may still grant access.
+        return False
+
+
 """
 Main view for serving files residing under LocalFilesImportStorage roots with ETag support
 """
@@ -102,8 +113,7 @@ def localfiles_data(request):
         ).filter(_full_path__startswith=F('path'))
         if localfiles_storage.exists():
             user_has_permissions = any(
-                is_within_storage(full_path_dir, storage.path) and storage.project.has_permission(request.user)
-                for storage in localfiles_storage
+                _storage_grants_access(storage, request.user, full_path_dir) for storage in localfiles_storage
             )
 
         # Check user permissions for this file and if it exists
