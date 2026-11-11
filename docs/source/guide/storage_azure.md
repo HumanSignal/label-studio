@@ -483,7 +483,7 @@ With the API, set `auth_mode` to `workload_identity` and omit `client_secret` ([
 
 | Symptom | Fix |
 | --- | --- |
-| `Workload identity authentication is not enabled for this organization.` | `FF_AZURE_SPI_WORKLOAD_IDENTITY` is off (it's on by default for on-prem). Set it to `true` and restart Label Studio. |
+| `Workload identity authentication is not enabled for this organization.` | `fflag_feat_back_fit_2608_azure_spi_workload_identity_short` is off (it's on by default for on-prem). Set it to `true` (with Helm: `global.featureFlags`) and restart Label Studio. |
 | Connection check fails with `DefaultAzureCredential failed to retrieve a token` | With the AKS webhook, check the pod label and service account annotation; otherwise, check the three `AZURE_*` variables and the projected token. Also check that the federated credential subject is `system:serviceaccount:<NAMESPACE>:<SERVICE_ACCOUNT>`. |
 | Connection check passes but sync or export fails | Apply the same setup to the rqworker (and rqcron) pods. |
 | `AuthorizationPermissionMismatch` (403) | Confirm **Storage Blob Data Contributor** on the account or container; assignments can take several minutes to apply. |
