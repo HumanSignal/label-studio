@@ -1,5 +1,6 @@
 import { defaultTipsCollection } from "./content";
 import type { Tip, TipsCollection } from "./types";
+import { absoluteURL } from "../../utils/helpers";
 
 const STORE_KEY = "heidi_ignored_tips";
 const EVENT_NAMESPACE_KEY = "heidi_tips";
@@ -58,7 +59,7 @@ export const loadLiveTipsCollection = () => {
   const abortTimeout = setTimeout(abortController.abort, MAX_TIMEOUT);
 
   // Fetch from github raw liveContent.json proxied through the server
-  fetch("/heidi-tips", {
+  fetch(absoluteURL("/heidi-tips/"), {
     headers: {
       "Cache-Control": "no-cache",
       "Content-Type": "application/json",
