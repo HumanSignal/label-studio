@@ -24,7 +24,7 @@ import {
 } from "@humansignal/icons";
 import { Badge, Button, Dropdown, Label, Message, Tooltip, type DropdownRef } from "@humansignal/ui";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/ui/shad/components/ui/popover";
-import { Tabs, TabsList, TabsTrigger } from "@humansignal/ui/lib/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import {
   DEFAULT_ANNOTATIONS_LIST_FILTER,

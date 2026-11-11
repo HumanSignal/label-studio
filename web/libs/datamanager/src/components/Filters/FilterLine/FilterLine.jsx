@@ -31,6 +31,15 @@ export const UnavailableFilterNotice = ({ reason }) => (
   </Typography>
 );
 
+/** Child filters hold on the same review, annotation or prediction as their parent filter, not on any one of the task. */
+export const childFilterScopeHint = (field) => {
+  if (field?.isReviewsFilterColumn) return "Applies to the same review as the filter above";
+  if (field?.isAnnotationResultsFilterColumn) {
+    return `Applies to the same ${field.id.includes("predictions_") ? "prediction" : "annotation"} as the filter above`;
+  }
+  return null;
+};
+
 const ConjunctionLabel = ({ children }) => (
   <Typography as="span" variant="body" size="smaller" className="block w-full text-right">
     {children}
@@ -68,7 +77,7 @@ const Conjunction = observer(({ index, view, disabled }) => {
  * filtersToPickerGroups always gets {id, field, ...} objects.
  */
 const FilterColumnPicker = observer(
-  ({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace, disabled }) => {
+  ({ filter, pickerFilters, recentEntries, onSaveOnSwitch, onSaveInPlace, disabled, onOpen, onClose }) => {
     const handleChange = (id) => {
       const departingId = filter.filter.id;
       const departingOperator = filter.operator;
@@ -97,6 +106,8 @@ const FilterColumnPicker = observer(
         placeholder={filter.field?.title || "Column"}
         size="small"
         disabled={disabled || isFilterEditingDisabled(filter.field)}
+        onOpen={onOpen}
+        onClose={onClose}
         renderSelected={(selectedOptions, placeholder) => {
           const opt = selectedOptions?.[0];
           if (!opt)
@@ -202,6 +213,9 @@ export const FilterLine = observer(
     }, [filterId, filterOperator, filterValue, isValid, onSaveOnSwitch]);
 
     const showNest = childFilters.length > 0 || canConfigureChildren;
+    const childScopeHint = childFilterScopeHint(filter.field);
+    // Hide the help tooltip while the picker is open so it does not cover the column list.
+    const [isPickerOpen, setPickerOpen] = React.useState(false);
 
     return (
       <div
@@ -218,16 +232,20 @@ export const FilterLine = observer(
           )}
         </div>
 
-        <div className={cn("filterLine").elem("column").mix("field").toClassName()} data-testid="filter-line-column">
-          <FilterColumnPicker
-            filter={filter}
-            pickerFilters={pickerFilters}
-            recentEntries={recentEntries}
-            onSaveOnSwitch={onSaveOnSwitch}
-            onSaveInPlace={onSaveInPlace}
-            disabled={disabled}
-          />
-        </div>
+        <Tooltip title={filter.field.help} disabled={!filter.field.help || isPickerOpen}>
+          <div className={cn("filterLine").elem("column").mix("field").toClassName()} data-testid="filter-line-column">
+            <FilterColumnPicker
+              filter={filter}
+              pickerFilters={pickerFilters}
+              recentEntries={recentEntries}
+              onSaveOnSwitch={onSaveOnSwitch}
+              onSaveInPlace={onSaveInPlace}
+              disabled={disabled}
+              onOpen={() => setPickerOpen(true)}
+              onClose={() => setPickerOpen(false)}
+            />
+          </div>
+        </Tooltip>
 
         <FilterOperation
           filter={filter}
@@ -272,9 +290,14 @@ export const FilterLine = observer(
 
               return (
                 <React.Fragment key={childFilter.id}>
-                  <div className={cn("filterLine").elem("column").mix("conjunction").toClassName()}>
-                    <ConjunctionLabel>And</ConjunctionLabel>
-                  </div>
+                  <Tooltip title={childScopeHint} disabled={!childScopeHint}>
+                    <div
+                      className={cn("filterLine").elem("column").mix("conjunction").toClassName()}
+                      data-testid="filter-line-child-conjunction"
+                    >
+                      <ConjunctionLabel>And</ConjunctionLabel>
+                    </div>
+                  </Tooltip>
 
                   <Tooltip title={childFilter.field.help}>
                     <div className={cn("filterLine").elem("column").mix("field").toClassName()}>

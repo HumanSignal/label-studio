@@ -97,40 +97,48 @@ class ExportMixin:
             annotated: optional None or str:("include|exclude")
             task_ids: optional list of task ids, internal use only (not exposed by the export API)
         })
+        Incremental window uses Export.since / Export.until (half-open [since, until)) even when
+        task_filter_options is omitted.
         """
-        if not isinstance(task_filter_options, dict):
-            return tasks
-        if 'task_ids' in task_filter_options:
-            tasks = tasks.filter(id__in=task_filter_options['task_ids'])
-        if 'view' in task_filter_options:
-            try:
-                value = int(task_filter_options['view'])
-                prepare_params = View.objects.get(project=self.project, id=value).get_prepare_tasks_params(
-                    add_selected_items=True
-                )
-                tab_tasks = Task.prepared.only_filtered(prepare_params=prepare_params).values_list('id', flat=True)
-                tasks = tasks.filter(id__in=tab_tasks)
-            except (ValueError, View.DoesNotExist) as exc:
-                logger.warning(f'Incorrect view params {exc}')
-        if 'skipped' in task_filter_options:
-            value = task_filter_options['skipped']
-            if value == ONLY:
-                tasks = tasks.filter(annotations__was_cancelled=True)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(annotations__was_cancelled=True)
-        if 'finished' in task_filter_options:
-            value = task_filter_options['finished']
-            if value == ONLY:
-                tasks = tasks.filter(is_labeled=True)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(is_labeled=True)
-        if 'annotated' in task_filter_options:
-            value = task_filter_options['annotated']
-            # if any annotation exists and is not cancelled
-            if value == ONLY:
-                tasks = tasks.filter(annotations__was_cancelled=False)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(annotations__was_cancelled=False)
+        if isinstance(task_filter_options, dict):
+            if 'task_ids' in task_filter_options:
+                tasks = tasks.filter(id__in=task_filter_options['task_ids'])
+            if 'view' in task_filter_options:
+                try:
+                    value = int(task_filter_options['view'])
+                    prepare_params = View.objects.get(project=self.project, id=value).get_prepare_tasks_params(
+                        add_selected_items=True
+                    )
+                    tab_tasks = Task.prepared.only_filtered(prepare_params=prepare_params).values_list('id', flat=True)
+                    tasks = tasks.filter(id__in=tab_tasks)
+                except (ValueError, View.DoesNotExist) as exc:
+                    logger.warning(f'Incorrect view params {exc}')
+            if 'skipped' in task_filter_options:
+                value = task_filter_options['skipped']
+                if value == ONLY:
+                    tasks = tasks.filter(annotations__was_cancelled=True)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(annotations__was_cancelled=True)
+            if 'finished' in task_filter_options:
+                value = task_filter_options['finished']
+                if value == ONLY:
+                    tasks = tasks.filter(is_labeled=True)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(is_labeled=True)
+            if 'annotated' in task_filter_options:
+                value = task_filter_options['annotated']
+                # if any annotation exists and is not cancelled
+                if value == ONLY:
+                    tasks = tasks.filter(annotations__was_cancelled=False)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(annotations__was_cancelled=False)
+
+        since = getattr(self, 'since', None)
+        until = getattr(self, 'until', None)
+        if since is not None:
+            tasks = tasks.filter(updated_at__gte=since)
+        if until is not None:
+            tasks = tasks.filter(updated_at__lt=until)
 
         return tasks
 

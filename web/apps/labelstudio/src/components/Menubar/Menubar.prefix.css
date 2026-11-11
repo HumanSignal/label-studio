@@ -95,16 +95,6 @@
     align-items: center;
     justify-content: center;
   }
-
-  &__userpic-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--primary_link);
-  }
 }
 
 .newsletter-menu-item {

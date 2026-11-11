@@ -14,7 +14,6 @@
   --comment-item-content-font-size: 14px;
   --comment-item-content-line-height: 20px;
   --comment-item-content-letter-spacing: 0.25px;
-  --comment-item-avatar-size: 24px;
   --comment-item-name-color: var(--color-neutral-content);
   --comment-item-content-color: var(--color-neutral-content-subtle);
   --comment-item-content-color-resolved: var(--color-neutral-content-subtler);
@@ -28,11 +27,6 @@
 
   & > * + * {
     margin-top: var(--comment-item-spacing);
-  }
-
-  &__userpic {
-    width: var(--comment-item-avatar-size);
-    height: var(--comment-item-avatar-size);
   }
 
   &__name {

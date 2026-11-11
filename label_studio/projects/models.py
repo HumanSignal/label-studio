@@ -843,7 +843,13 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                 self.model_version = None
                 self.save(update_fields=['model_version'])
 
+            task_ids = list(predictions.order_by().values_list('task_id', flat=True).distinct())
             _, deleted_map = predictions.delete()
+            # QuerySet.delete skips Prediction.delete() -> update_task(); predictions are exported, so bump
+            # Task.updated_at for incremental exports (FIT-3092).
+            from tasks.functions import touch_tasks_updated_at
+
+            touch_tasks_updated_at(task_ids)
 
         count = deleted_map.get('tasks.Prediction', 0)
         return {'deleted_predictions': count}

@@ -1,5 +1,5 @@
 import { Button, Typography } from "@humansignal/ui";
-import { Space } from "@humansignal/ui/lib/space/space";
+import { Space } from "@humansignal/ui";
 import { cn } from "apps/labelstudio/src/utils/bem";
 import { Modal } from "apps/labelstudio/src/components/Modal/ModalPopup";
 import { API } from "apps/labelstudio/src/providers/ApiProvider";

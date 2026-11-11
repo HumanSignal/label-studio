@@ -32,7 +32,7 @@ import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
-import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
+import { ToastProvider, ToastViewport } from "@humansignal/ui";
 
 /**
  * Components
@@ -46,6 +46,7 @@ import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Settings from "../Settings/Settings";
 import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
 import { TopBar } from "../TopBar/TopBar";
+import { ClassicVerticalLayoutNudge } from "../TopBar/ClassicVerticalLayoutNudge";
 import { CompareAllHeader } from "../TopBar/CompareAllHeader";
 import { ClassicAnnotationsSidebar } from "./ClassicAnnotationsSidebar";
 import { ViewAll } from "./ViewAll";
@@ -300,42 +301,44 @@ class App extends Component {
         <QueryClientProvider client={queryClient}>
           <Settings store={store} />
           <Provider store={store}>
-            <ToastProvider>
-              {ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME) ? <InfoModalRoot /> : null}
-              <InstructionsModal
-                visible={store.showingDescription}
-                onCancel={() => store.toggleDescription()}
-                title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
-              >
-                {store.description}
-              </InstructionsModal>
+            <ClassicVerticalLayoutNudge store={store}>
+              <ToastProvider>
+                {ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME) ? <InfoModalRoot /> : null}
+                <InstructionsModal
+                  visible={store.showingDescription}
+                  onCancel={() => store.toggleDescription()}
+                  title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
+                >
+                  {store.description}
+                </InstructionsModal>
 
-              {isDefined(store) &&
-                store.hasInterface("topbar") &&
-                (isVertical && viewingAll ? (
-                  <CompareAllHeader store={store} />
-                ) : !showVerticalSidebar ? (
-                  <TopBar store={store} />
-                ) : null)}
-              <div
-                className={cn("wrapper")
-                  .mod({
-                    viewAll: viewingAll,
-                    bsp: settings.effectiveBottomSidePanel,
-                    showingBottomBar: true,
-                    annotationsSidebar: showVerticalSidebar,
-                  })
-                  .toClassName()}
-              >
-                {showVerticalSidebar && <ClassicAnnotationsSidebar store={store} />}
-                {showVerticalSidebar ? (
-                  <div className={cn("wrapper").elem("main").toClassName()}>{wrapperContent}</div>
-                ) : (
-                  wrapperContent
-                )}
-              </div>
-              <ToastViewport />
-            </ToastProvider>
+                {isDefined(store) &&
+                  store.hasInterface("topbar") &&
+                  (isVertical && viewingAll ? (
+                    <CompareAllHeader store={store} />
+                  ) : !showVerticalSidebar ? (
+                    <TopBar store={store} />
+                  ) : null)}
+                <div
+                  className={cn("wrapper")
+                    .mod({
+                      viewAll: viewingAll,
+                      bsp: settings.effectiveBottomSidePanel,
+                      showingBottomBar: true,
+                      annotationsSidebar: showVerticalSidebar,
+                    })
+                    .toClassName()}
+                >
+                  {showVerticalSidebar && <ClassicAnnotationsSidebar store={store} />}
+                  {showVerticalSidebar ? (
+                    <div className={cn("wrapper").elem("main").toClassName()}>{wrapperContent}</div>
+                  ) : (
+                    wrapperContent
+                  )}
+                </div>
+                <ToastViewport />
+              </ToastProvider>
+            </ClassicVerticalLayoutNudge>
           </Provider>
           {store.hasInterface("debug") && <Debug store={store} />}
         </QueryClientProvider>

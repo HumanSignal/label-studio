@@ -420,6 +420,24 @@ class FileUpload(models.Model):
             yield [], dict(Counter(fileformats)), common_data_fields
 
 
+def find_file_upload(filepath):
+    """The FileUpload stored at `filepath`, or None. Pure lookup, no permission check."""
+    return FileUpload.objects.filter(file=filepath).last()
+
+
+def get_readable_file_upload(user, filepath):
+    """`find_file_upload(filepath)` if it exists and `user` may read it; None otherwise.
+
+    "Missing" and "not permitted" are deliberately indistinguishable. Shared by DownloadStorageData
+    (serving) and LSE's course asset import (copying), so there is one place deciding who may read
+    a FileUpload by its stored path.
+    """
+    file_upload = find_file_upload(filepath)
+    if file_upload is not None and file_upload.has_permission(user):
+        return file_upload
+    return None
+
+
 def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, current_file):
     new_data_keys_list = ','.join(new_data_keys)
     old_data_keys_list = ','.join(old_data_keys)

@@ -95,6 +95,15 @@ class ProjectUsersOptionsAPI(UserListMixin, generics.ListAPIView):
         return queryset.filter(pk__in=user_ids)
 
 
+def _accessible_projects(user):
+    """Projects whose Data Manager tabs this user may read or change.
+
+    ``Project.objects.for_user`` is only the active organization. Project access,
+    including enterprise role and workspace rules, is ``ACCESSIBLE_PROJECTS_FUNCTION``.
+    """
+    return load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(user).distinct()
+
+
 @method_decorator(
     name='list',
     decorator=extend_schema(
@@ -244,8 +253,9 @@ class ViewAPI(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         project = generics.get_object_or_404(
-            Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id
+            _accessible_projects(request.user), pk=serializer.validated_data['project'].id
         )
+        self.check_object_permissions(request, project)
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         queryset.all().delete()
         return Response(status=204)
@@ -270,7 +280,8 @@ class ViewAPI(viewsets.ModelViewSet):
         project_id = serializer.validated_data['project']
         view_ids = serializer.validated_data['ids']
 
-        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=project_id)
+        project = generics.get_object_or_404(_accessible_projects(request.user), pk=project_id)
+        self.check_object_permissions(request, project)
 
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         views = list(queryset.filter(id__in=view_ids))
@@ -287,7 +298,8 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')
+        accessible_ids = _accessible_projects(self.request.user).values('id')
+        return View.objects.filter(project_id__in=accessible_ids).order_by('order', 'id')
 
 
 def _paginator_with_known_count(paginator_class, count):

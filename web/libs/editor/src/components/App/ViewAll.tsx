@@ -1,6 +1,6 @@
 import { usePersistentState, usePersistentJSONState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { emitCompareAllViewSelected } from "../../utils/labelingTelemetry";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui/lib/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui";
 import { Toggle } from "@humansignal/ui";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import TaskSummary from "../TaskSummary/TaskSummary";

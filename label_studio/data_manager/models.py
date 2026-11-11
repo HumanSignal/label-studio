@@ -73,10 +73,15 @@ class ProjectViewMixin(models.Model):
     )
 
     def has_permission(self, user):
+        """Allow the view only when the caller can access its project.
+
+        Same-organization membership is not enough. ``Project.has_permission`` is the
+        project-access check (enterprise overrides it with role and workspace rules).
+        """
         user.project = self.project  # link for activity log
-        if self.project.organization == user.active_organization:
-            return True
-        return False
+        if self.project.organization_id != user.active_organization_id:
+            return False
+        return self.project.has_permission(user)
 
     class Meta:
         abstract = True

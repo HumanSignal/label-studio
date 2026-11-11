@@ -9,7 +9,7 @@ import { SyncableMixin } from "../../../mixins/Syncable";
 import { ParagraphsRegionModel } from "../../../regions/ParagraphsRegion";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import { FF_DEV_2918, FF_LSDV_E_278, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2918, isFF } from "../../../utils/feature-flags";
 import messages from "../../../utils/messages";
 import { clamp, isDefined, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -122,24 +122,19 @@ const Model = types
         const seed = data[self.namekey];
         const color = ColorScheme.make_color({ seed })[0];
 
-        if (isFF(FF_LSDV_E_278)) {
-          return {
-            phrase: {
-              "--highlight-color": color,
-              "--background-color": "#FFF",
-            },
-            name: { color },
-            inactive: {
-              phrase: {
-                "--highlight-color": Utils.Colors.convertToRGBA(color, 0.4),
-                "--background-color": "#FAFAFA",
-              },
-              name: { color: Utils.Colors.convertToRGBA(color, 0.9) },
-            },
-          };
-        }
         return {
-          phrase: { backgroundColor: Utils.Colors.convertToRGBA(color, 0.25) },
+          phrase: {
+            "--highlight-color": color,
+            "--background-color": "#FFF",
+          },
+          name: { color },
+          inactive: {
+            phrase: {
+              "--highlight-color": Utils.Colors.convertToRGBA(color, 0.4),
+              "--background-color": "#FAFAFA",
+            },
+            name: { color: Utils.Colors.convertToRGBA(color, 0.9) },
+          },
         };
       }
 
@@ -552,7 +547,7 @@ const ParagraphsLoadingModel = types.model().actions((self) => ({
       ]);
       return;
     }
-    const contextScroll = isFF(FF_LSDV_E_278) && self.contextscroll;
+    const contextScroll = self.contextscroll;
 
     const value = contextScroll
       ? val.sort((a, b) => {

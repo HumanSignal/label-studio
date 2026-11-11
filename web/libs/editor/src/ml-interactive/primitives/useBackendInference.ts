@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { ToastType, useToast } from "@humansignal/ui";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import type { InteractiveController } from "../controller";
 import type { PromptBox, PromptPoint } from "./types";
 import { findVideoElement } from "./utils";
@@ -171,7 +172,7 @@ export function useBackendInference(item: InteractiveController | null): {
 
       const context = { event, ...extra };
       try {
-        await fetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
+        await sameOriginFetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
           credentials: "same-origin",
@@ -240,7 +241,7 @@ export function useBackendInference(item: InteractiveController | null): {
       }
 
       try {
-        const res = await fetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
+        const res = await sameOriginFetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
           credentials: "same-origin",
@@ -323,7 +324,7 @@ export function useBackendInference(item: InteractiveController | null): {
       const taskId = store?.task?.id;
       if (!taskId) return null;
 
-      const res = await fetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
+      const res = await sameOriginFetch(`${API_BASE}/api/ml/${pk}/interactive-annotating`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
         credentials: "same-origin",

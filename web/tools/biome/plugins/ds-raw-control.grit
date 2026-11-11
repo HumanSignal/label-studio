@@ -1,0 +1,31 @@
+or {
+  `<button $attrs>$children</button>` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or string; aria-label when icon-only), not a raw <button>.", severity="warn")
+  },
+  `<button $attrs />` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or string; aria-label when icon-only), not a raw <button>.", severity="warn")
+  },
+  `<select $attrs>$children</select>` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Select from @humansignal/ui, not a raw <select>.", severity="warn")
+  },
+  `<select $attrs />` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Select from @humansignal/ui, not a raw <select>.", severity="warn")
+  },
+  `<table $attrs>$children</table>` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use DataTable from @humansignal/ui, not a raw <table>.", severity="warn")
+  },
+  `<table $attrs />` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    register_diagnostic(span=$el, message="[ds/raw-control] Use DataTable from @humansignal/ui, not a raw <table>.", severity="warn")
+  },
+  `<input $attrs />` as $el where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: contains `type="checkbox"`,
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Checkbox from @humansignal/ui (Toggle for a setting), not a raw checkbox input.", severity="warn")
+  }
+}

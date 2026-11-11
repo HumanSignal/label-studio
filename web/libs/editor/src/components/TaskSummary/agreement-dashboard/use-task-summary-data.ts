@@ -16,6 +16,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userDisplayName } from "@humansignal/core";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { buildDimensionInfoList, buildDimensionScores, countConflicts, isPerfectAgreement } from "./agreement-utils";
 import type {
   AgreementMethod,
@@ -66,7 +67,7 @@ const fetchGroundTruthInference = async (
   taskId: number | string,
   includePredictions: boolean,
 ): Promise<GroundTruthInferenceResponse> => {
-  const response = await fetch(`/api/tasks/${taskId}/ground-truth-inference/`, {
+  const response = await sameOriginFetch(`/api/tasks/${taskId}/ground-truth-inference/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ include_predictions: includePredictions }),

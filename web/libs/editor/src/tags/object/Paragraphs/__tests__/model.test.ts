@@ -1,5 +1,5 @@
 import { types } from "mobx-state-tree";
-import { isFF, FF_LSDV_E_278 } from "../../../../utils/feature-flags";
+import { isFF } from "../../../../utils/feature-flags";
 import type { Mock } from "bun:test";
 
 const createMockStoreType = (paragraphsModel: any, typesApi = types) => {
@@ -67,11 +67,6 @@ describe("Paragraphs phrases", () => {
     if (realIsFF && typeof (isFF as any).mockImplementation === "function") {
       (isFF as Mock<any>).mockImplementation((...args: any[]) => realIsFF(...args));
     }
-
-    (window as any).APP_SETTINGS = {
-      ...((window as any).APP_SETTINGS ?? {}),
-      feature_flags: { ...((window as any).APP_SETTINGS?.feature_flags ?? {}), [FF_LSDV_E_278]: true },
-    };
 
     const mod = await import("../model");
     ParagraphsModel = mod.ParagraphsModel;

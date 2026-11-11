@@ -8,6 +8,7 @@ from botocore.handlers import validate_bucket_name
 from core.utils.io import validate_url_for_ssrf
 from django.conf import settings
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
+from io_storages.s3.utils import custom_endpoint_needs_own_keys
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -55,6 +56,10 @@ class S3StorageSerializerMixin:
                 for attr in self.secure_fields:
                     data[attr] = data.get(attr) or getattr(storage_object, attr)
             storage = self.Meta.model(**data)
+        if storage.s3_endpoint and not storage.aws_access_key_id and custom_endpoint_needs_own_keys():
+            raise ValidationError(
+                {'aws_access_key_id': ['A custom S3 endpoint requires an access key ID and secret access key.']}
+            )
         try:
             storage.validate_connection()
         except ParamValidationError:

@@ -16,7 +16,7 @@ import {
   IconSparks,
   IconHistoryRewind,
 } from "@humansignal/icons";
-import { Tooltip, Userpic } from "@humansignal/ui";
+import { Tooltip, Avatar } from "@humansignal/ui";
 import { Space } from "../../common/Space/Space";
 import { cn } from "../../utils/bem";
 import { userDisplayName } from "@humansignal/core";
@@ -306,14 +306,15 @@ const HistoryItemComponent: FC<{
     <div className={cn("history-item").mod({ inline, selected, disabled }).toClassName()} onClick={handleClick}>
       <Space spread size="medium" truncated>
         <Space size="small" truncated>
-          <Userpic
+          <Avatar
+            size="medium"
             className={cn("history-item").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
             user={user}
             showUsernameTooltip
             username={isPrediction ? entity.createdBy : null}
           >
             {isPrediction && <IconSparks style={{ width: 16, height: 16 }} />}
-          </Userpic>
+          </Avatar>
           <span className={cn("history-item").elem("name").toClassName()}>
             {isPrediction ? entity.createdBy : userDisplayName(user)}
           </span>

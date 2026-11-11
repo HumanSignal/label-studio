@@ -1,9 +1,8 @@
 import { observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { Button, Tooltip } from "@humansignal/ui";
-import { PauseCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import styles from "./Paragraphs.module.css";
-import { FF_LSDV_E_278, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
+import { FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
 import { IconPause, IconPlay, IconLsLabeling } from "@humansignal/icons";
 import { useRef, useCallback, useEffect, useState } from "react";
 
@@ -60,7 +59,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
   // default function to animate the reading line
   const animateElement = useCallback(
     (element, start, duration, isPlaying = true) => {
-      if (!element || !isFF(FF_LSDV_E_278) || !item.contextscroll) return;
+      if (!element || !item.contextscroll) return;
 
       const _animationKeyFrame = element.animate([{ top: `${start}%` }, { top: "100%" }], {
         easing: "linear",
@@ -78,7 +77,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
   // this function is used to animate the reading line when user seek audio
   const setSeekAnimation = useCallback(
     (isSeeking) => {
-      if (!isFF(FF_LSDV_E_278) || !item.contextscroll) return;
+      if (!item.contextscroll) return;
 
       const phrase = item._value[playingId];
       const { start, end, duration } = getPhraseTiming(phrase);
@@ -123,7 +122,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
   );
 
   useEffect(() => {
-    if (!isFF(FF_LSDV_E_278) || !item.contextscroll) return;
+    if (!item.contextscroll) return;
 
     item.syncHandlers?.set("seek", (seek) => {
       item.handleSyncPlay(seek);
@@ -150,7 +149,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
 
   // when user click on play/pause button, the useEffect will be triggered and pause or play the reading line animation
   useEffect(() => {
-    if (!isFF(FF_LSDV_E_278) || !item.contextscroll) return;
+    if (!item.contextscroll) return;
 
     if (item.playing) animationKeyFrame?.play();
     else animationKeyFrame?.pause();
@@ -169,13 +168,8 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
   const val = item._value.map((v, idx) => {
     const isActive = playingId === idx;
     const isPlaying = isActive && item.playing;
-    const style = isFF(FF_LSDV_E_278) && !isActive ? item.layoutStyles(v).inactive : item.layoutStyles(v);
-    const classNames = [cls.phrase];
-
-    // Add newUI class when FF_LSDV_E_278 is enabled
-    if (isFF(FF_LSDV_E_278)) {
-      classNames.push(styles.newUI);
-    }
+    const style = !isActive ? item.layoutStyles(v).inactive : item.layoutStyles(v);
+    const classNames = [cls.phrase, styles.newUI];
 
     // Add extra padding class when select all button is present (FF_NER_SELECT_ALL)
     if (isFF(FF_NER_SELECT_ALL)) {
@@ -211,22 +205,10 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
         {isContentVisible && !isNaN(v.start) && (
           <Button
             look="string"
-            className={isFF(FF_LSDV_E_278) ? styles.playNewUi : styles.play}
+            className={styles.playNewUi}
             aria-label={isPlaying ? "pause" : "play"}
             disabled={!withAudio}
-            icon={
-              isPlaying ? (
-                isFF(FF_LSDV_E_278) ? (
-                  <IconPause />
-                ) : (
-                  <PauseCircleOutlined />
-                )
-              ) : isFF(FF_LSDV_E_278) ? (
-                <IconPlay />
-              ) : (
-                <PlayCircleOutlined />
-              )
-            }
+            icon={isPlaying ? <IconPause /> : <IconPlay />}
             onClick={(e) => {
               e.stopPropagation();
               setIsInViewPort(true);
@@ -274,29 +256,19 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
             </Tooltip>
           )}
 
-          {isFF(FF_LSDV_E_278) ? (
-            <span className={styles.titleWrapper} data-skip-node="true">
-              <span className={cls?.name} style={style?.name}>
-                {v[item.namekey]}
-              </span>
-              <span className={styles.time}>{withFormattedTime(item)}</span>
-            </span>
-          ) : (
-            <span className={cls?.name} data-skip-node="true" style={style?.name}>
+          <span className={styles.titleWrapper} data-skip-node="true">
+            <span className={cls?.name} style={style?.name}>
               {v[item.namekey]}
             </span>
-          )}
+            <span className={styles.time}>{withFormattedTime(item)}</span>
+          </span>
 
-          {isFF(FF_LSDV_E_278) ? (
-            <span className={styles.wrapperText}>
-              {isActive && (
-                <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node="true" />
-              )}
-              <span className={`${cls?.text}`}>{v[item.textkey]}</span>
-            </span>
-          ) : (
+          <span className={styles.wrapperText}>
+            {isActive && (
+              <span ref={readingLineRef} className={`${styles.readingLine} reading-line`} data-skip-node="true" />
+            )}
             <span className={`${cls?.text}`}>{v[item.textkey]}</span>
-          )}
+          </span>
         </div>
       </div>
     );

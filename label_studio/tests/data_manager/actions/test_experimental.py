@@ -124,6 +124,34 @@ def test_update_column_leaves_unselected_tasks_unchanged(mock_flag_set, business
 
 @pytest.mark.django_db
 @patch('data_manager.actions.data_columns.flag_set', return_value=True)
+def test_update_column_bumps_task_updated_at_for_incremental_export(mock_flag_set, business_client):
+    """DM column writes skip Task.save(); they must still bump updated_at for FIT-3092."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    project = Project.objects.create(title='Column watermark', created_by=business_client.user)
+    task = Task.objects.create(project=project, data={'priority': 'low'})
+    project.summary.update_data_columns(project.tasks.all())
+    old = timezone.now() - timedelta(days=7)
+    Task.objects.filter(pk=task.pk).update(updated_at=old)
+
+    add_data_field(
+        project,
+        Task.objects.filter(id=task.id),
+        request=RequestStub(
+            business_client.user,
+            {'column_mode': 'update', 'existing_column': 'priority', 'value_type': 'String', 'value': 'high'},
+        ),
+    )
+
+    task.refresh_from_db()
+    assert task.data['priority'] == 'high'
+    assert task.updated_at > old
+
+
+@pytest.mark.django_db
+@patch('data_manager.actions.data_columns.flag_set', return_value=True)
 def test_update_column_does_not_clear_unselected_tasks_when_summary_is_stale(mock_flag_set, business_client):
     project = Project.objects.create(title='Stale column summary', created_by=business_client.user)
     selected_task = Task.objects.create(project=project, data={'priority': 'low'})

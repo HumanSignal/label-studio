@@ -146,3 +146,66 @@ def test_s3_client_allows_local_endpoint_when_ssrf_protection_disabled(boto_env)
 
     for s3_client in (client, resource.meta.client):
         assert s3_client._endpoint.http_session._manager.pool_classes_by_scheme['http'] is AWSHTTPConnectionPool
+
+
+# Credential gate: on a cloud instance a custom endpoint never gets the app's own credentials (PLT-1802).
+
+
+@override_settings(SSRF_PROTECTION_ENABLED=True, CLOUD_INSTANCE=True)
+@pytest.mark.parametrize('env_key', [None, 'app-env-key'])
+def test_s3_client_refuses_custom_endpoint_without_keys_on_cloud(boto_env, monkeypatch, env_key):
+    # blank row keys would fall back to the AWS_* env or the instance role, which belong to the platform
+    if env_key:
+        monkeypatch.setenv('AWS_ACCESS_KEY_ID', env_key)
+        monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'app-env-secret')
+    with pytest.raises(SsrfBlockedUrlError):
+        get_client_and_resource(None, None, None, 'us-east-1', PUBLIC_S3_ENDPOINT)
+
+
+@override_settings(SSRF_PROTECTION_ENABLED=True, CLOUD_INSTANCE=True)
+def test_s3_client_allows_custom_endpoint_with_own_keys_on_cloud(boto_env):
+    client, _ = _make_s3_client_and_resource(PUBLIC_S3_ENDPOINT)
+    assert client.meta.endpoint_url == PUBLIC_S3_ENDPOINT
+
+
+@override_settings(SSRF_PROTECTION_ENABLED=True, CLOUD_INSTANCE=True)
+def test_s3_client_allows_blank_keys_without_custom_endpoint_on_cloud(boto_env, monkeypatch):
+    # AWS's own endpoint keeps the app's credentials (IRSA / instance role / env)
+    monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'app-env-key')
+    monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'app-env-secret')
+    client, _ = get_client_and_resource(None, None, None, 'us-east-1', None)
+    assert 'amazonaws.com' in client.meta.endpoint_url
+
+
+@pytest.mark.parametrize(
+    'ssrf_enabled, cloud_instance',
+    [(True, False), (False, True)],
+    ids=['self-hosted', 'ssrf-protection-disabled'],
+)
+def test_s3_client_allows_custom_endpoint_without_keys_off_cloud(boto_env, monkeypatch, ssrf_enabled, cloud_instance):
+    # self-hosted operators may keep S3-compatible keys in env with blank storage fields
+    monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'operator-env-key')
+    monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'operator-env-secret')
+    with override_settings(SSRF_PROTECTION_ENABLED=ssrf_enabled, CLOUD_INSTANCE=cloud_instance):
+        client, _ = get_client_and_resource(None, None, None, 'us-east-1', PUBLIC_S3_ENDPOINT)
+    assert client.meta.endpoint_url == PUBLIC_S3_ENDPOINT
+
+
+@pytest.mark.django_db
+@override_settings(SSRF_PROTECTION_ENABLED=True, CLOUD_INSTANCE=True)
+@pytest.mark.parametrize('url', ['/api/storages/s3/', '/api/storages/export/s3', '/api/storages/s3/validate'])
+def test_s3_storages_reject_custom_endpoint_without_keys_on_cloud(business_client, url):
+    project = make_project({}, business_client.user, use_ml_backend=False)
+    payload = {
+        'project': project.id,
+        'title': 'S3 storage',
+        'bucket': 'pytest-s3-images',
+        's3_endpoint': PUBLIC_S3_ENDPOINT,
+    }
+
+    with patch('io_storages.s3.models.S3StorageMixin.validate_connection') as mock_validate_connection:
+        response = business_client.post(url, data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == 400, response.content
+    assert 'aws_access_key_id' in response.json()['validation_errors']
+    mock_validate_connection.assert_not_called()

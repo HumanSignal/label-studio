@@ -2,7 +2,7 @@
  * StateHistoryTimeline - Reusable timeline component for displaying state history
  */
 
-import { Userpic, cn, Typography } from "@humansignal/ui";
+import { Avatar, cn, Typography } from "@humansignal/ui";
 import type { StateHistoryItem } from "../../hooks/useStateHistory";
 import { formatStateName, formatTimestamp, formatUserName } from "./utils";
 import { getStateVisuals } from "./state-visuals";
@@ -95,7 +95,7 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
           {!isSystem && (
             <>
               <div className="flex items-center gap-1 shrink-0">
-                <Userpic size={20} user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
+                <Avatar size="small" user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
                 <Typography variant="body" size="smaller">
                   {userName}
                 </Typography>

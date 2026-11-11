@@ -10,8 +10,8 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
-import { cnm, Tooltip, Userpic } from "@humansignal/ui";
-import { IconAnnotationGroundTruth, IconCheckAlt, IconCrossAlt, IconInfoOutline, IconSparks } from "@humansignal/icons";
+import { cnm, Tooltip, Avatar, AvatarBadge } from "@humansignal/ui";
+import { CheckIcon, IconAnnotationGroundTruth, IconInfoOutline, IconSparks, XIcon } from "@humansignal/icons";
 import { formatMetricType } from "./agreement-utils";
 import { DistributionRow } from "./distribution-row";
 import { GroundTruthRow, MajorityVoteRow } from "./ground-truth-row";
@@ -29,14 +29,6 @@ import type {
   SummaryPrediction,
 } from "./types";
 import type { ValueCount } from "./use-ground-truth";
-
-// ---------------------------------------------------------------------------
-// Review badge styling constants
-// ---------------------------------------------------------------------------
-
-const REVIEW_BADGE_SIZE = 10;
-const REVIEW_BADGE_BORDER_RADIUS = 2;
-const REVIEW_BADGE_OFFSET = "translate(2px, 2px)";
 
 // ---------------------------------------------------------------------------
 // Table row type (annotator rows only — special rows rendered manually)
@@ -253,24 +245,11 @@ export const AnnotatorsDimensionsTable = ({
               const lastReview = ann?.reviews?.at?.(-1) ?? null;
 
               const reviewBadge = lastReview ? (
-                <div
-                  style={{
-                    width: REVIEW_BADGE_SIZE,
-                    height: REVIEW_BADGE_SIZE,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: REVIEW_BADGE_BORDER_RADIUS,
-                    color: "var(--color-neutral-background)",
-                    backgroundColor: lastReview.accepted
-                      ? "var(--color-accent-kale-base)"
-                      : "var(--color-accent-persimmon-base)",
-                    boxShadow: "0 0 0 2px var(--color-neutral-background)",
-                    transform: REVIEW_BADGE_OFFSET,
-                  }}
-                >
-                  {lastReview.accepted ? <IconCheckAlt /> : <IconCrossAlt />}
-                </div>
+                <AvatarBadge
+                  variant={lastReview.accepted ? "kale" : "persimmon"}
+                  icon={lastReview.accepted ? <CheckIcon weight="bold" /> : <XIcon weight="bold" />}
+                  label={lastReview.accepted ? "Accepted review" : "Rejected review"}
+                />
               ) : null;
 
               const isClickable = !!(ann?.id && onAnnotationClick);
@@ -290,13 +269,14 @@ export const AnnotatorsDimensionsTable = ({
                     onClick={isClickable ? () => onAnnotationClick(ann.id) : undefined}
                   >
                     <div className="flex gap-tight items-center">
-                      <Userpic
+                      <Avatar
+                        size="large"
                         user={annotator.user}
-                        badge={reviewBadge ? { bottomRight: reviewBadge } : undefined}
+                        badge={reviewBadge}
                         className={annotator.isPrediction ? "!bg-accent-plum-subtle text-accent-plum-bold" : undefined}
                       >
                         {annotator.isPrediction && <IconSparks size={18} />}
-                      </Userpic>
+                      </Avatar>
                       <span className="text-label-small font-medium flex-1 truncate">{annotator.displayName}</span>
                       {ann?.ground_truth && (
                         <Tooltip title="Ground Truth">

@@ -14,6 +14,7 @@ from data_manager.prepare_params import PrepareParams
 from django.conf import settings
 from django.db.models import Case, F, Func, JSONField, Value, When
 from django.db.models.functions import Cast, Coalesce
+from django.utils.timezone import now
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from tasks.models import Task
 
@@ -61,10 +62,15 @@ def _set_data_value_in_batches(queryset, value_name, postgres_value, sqlite_valu
         updated_count = 0
         task_iterator = iterate_queryset(queryset.only('id', 'data'), chunk_size=settings.UPDATE_COLUMN_BATCH_SIZE)
         for task_batch in batched_iterator(task_iterator, settings.UPDATE_COLUMN_BATCH_SIZE):
+            touched_at = now()
             for task in task_batch:
                 task.data = task.data or {}
                 task.data[value_name] = sqlite_value(task)
-            Task.objects.bulk_update(task_batch, fields=['data'], batch_size=settings.UPDATE_COLUMN_BATCH_SIZE)
+                # QuerySet/bulk_update skip auto_now; incremental export keys off Task.updated_at.
+                task.updated_at = touched_at
+            Task.objects.bulk_update(
+                task_batch, fields=['data', 'updated_at'], batch_size=settings.UPDATE_COLUMN_BATCH_SIZE
+            )
             updated_count += len(task_batch)
         return updated_count
 
@@ -77,7 +83,9 @@ def _set_data_value_in_batches(queryset, value_name, postgres_value, sqlite_valu
                 Value([value_name]),
                 postgres_value,
                 function='jsonb_set',
-            )
+            ),
+            # Explicit updated_at: QuerySet.update() does not honor auto_now (FIT-3092).
+            updated_at=now(),
         )
     return updated_count
 
@@ -316,26 +324,42 @@ def add_expression(queryset, size, value, value_name):
     offset = 0
     task_iterator = iterate_queryset(queryset.only('id', 'data'), chunk_size=settings.UPDATE_COLUMN_BATCH_SIZE)
     for task_batch in batched_iterator(task_iterator, settings.UPDATE_COLUMN_BATCH_SIZE):
+        touched_at = now()
         if command == 'range':
             for index, task in enumerate(task_batch):
                 task.data[value_name] = start + offset + index
+                task.updated_at = touched_at
         elif command == 'sample':
             for task in task_batch:
                 task.data[value_name] = next(sample_values)
+                task.updated_at = touched_at
         elif command == 'random':
             for task in task_batch:
                 task.data[value_name] = random.randint(minimum, maximum)
+                task.updated_at = touched_at
         elif command == 'choices':
             for task, selected_value in zip(
                 task_batch, random.choices(population=choices, weights=weights, k=len(task_batch))
             ):
                 task.data[value_name] = selected_value
+                task.updated_at = touched_at
         elif command == 'replace':
+            changed = []
             for task in task_batch:
                 if value_name in task.data:
                     task.data[value_name] = task.data[value_name].replace(old_value, new_value)
+                    task.updated_at = touched_at
+                    changed.append(task)
+            if changed:
+                Task.objects.bulk_update(
+                    changed, fields=['data', 'updated_at'], batch_size=settings.UPDATE_COLUMN_BATCH_SIZE
+                )
+            offset += len(task_batch)
+            continue
 
-        Task.objects.bulk_update(task_batch, fields=['data'], batch_size=settings.UPDATE_COLUMN_BATCH_SIZE)
+        Task.objects.bulk_update(
+            task_batch, fields=['data', 'updated_at'], batch_size=settings.UPDATE_COLUMN_BATCH_SIZE
+        )
         offset += len(task_batch)
 
 

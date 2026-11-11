@@ -13,7 +13,7 @@ from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
 from rq.job import Job
-from tasks.functions import update_tasks_counters
+from tasks.functions import touch_tasks_updated_at, update_tasks_counters
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
@@ -215,16 +215,26 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     """
     task_ids = queryset.values_list('id', flat=True)
     predictions = Prediction.objects.filter(task__id__in=task_ids)
-    real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+    # Materialize before the delete: a lazy queryset would become a subquery over Prediction that the
+    # counters job evaluates after the predictions are gone, so it would match no tasks.
+    real_task_ids = list(predictions.order_by().values_list('task_id', flat=True).distinct())
 
     count = predictions.count()
+    # QuerySet.delete skips Prediction.delete() -> update_task(); bump Task.updated_at for incremental
+    # exports (FIT-3092). Runs before the delete, while real_task_ids still resolves to these tasks.
+    touch_tasks_updated_at(real_task_ids)
     predictions.delete()
-    start_job_async_or_sync(
-        update_tasks_counters,
-        Task.objects.filter(id__in=real_task_ids),
-        job_tenant=project.organization_id,
-    )
+    start_job_async_or_sync(update_tasks_counters_by_ids, real_task_ids, job_tenant=project.organization_id)
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
+
+
+def update_tasks_counters_by_ids(task_ids):
+    """Job: recompute the counters of the given tasks.
+
+    Takes ids rather than a Task queryset: RQ pickles job arguments, and pickling a queryset evaluates it,
+    which would put every Task row in the job payload.
+    """
+    return update_tasks_counters(Task.objects.filter(id__in=task_ids))
 
 
 def async_project_summary_recalculation(tasks_ids_list, project_id):

@@ -99,8 +99,8 @@
   }
 
   &__filterPopover {
-    width: 360px;
-    max-width: min(360px, calc(100vw - 2 * var(--spacing-base)));
+    width: 460px;
+    max-width: min(460px, calc(100vw - 2 * var(--spacing-base)));
     padding: var(--spacing-base);
     border: 1px solid var(--color-neutral-border);
     border-radius: var(--corner-radius-small);
@@ -139,7 +139,7 @@
     min-width: 0;
     font-size: var(--font-size-label-smallest);
     line-height: 16px;
-    padding: 4px var(--spacing-tightest);
+    padding: var(--spacing-tighter) var(--spacing-tightest);
     white-space: nowrap;
   }
 
@@ -225,7 +225,7 @@
   &__booleanTabs &__booleanTab {
     min-width: 36px;
     line-height: 16px;
-    padding: 3px var(--spacing-tightest);
+    padding: var(--spacing-tighter) var(--spacing-tightest);
     display: flex;
     align-items: center;
     justify-content: center;

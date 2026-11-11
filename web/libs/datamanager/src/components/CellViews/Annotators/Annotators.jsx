@@ -1,16 +1,21 @@
 import { inject } from "mobx-react";
-import clsx from "clsx";
 import { useMemo, useRef } from "react";
 import { useSDK } from "../../../providers/SDKProvider";
 import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Space } from "../../Common/Space/Space";
-import { IconCheckAlt, IconCrossAlt } from "@humansignal/icons";
-import { Tooltip, Userpic } from "@humansignal/ui";
+import { CheckIcon, XIcon } from "@humansignal/icons";
+import { Tooltip, Avatar, AvatarBadge } from "@humansignal/ui";
 import { Common } from "../../Filters/types";
 import { useAvatarOverflow } from "../../../hooks/useAvatarOverflow";
 import "./Annotators.prefix.css";
 import { UserSelect } from "../../Common/UserSelect";
+
+export const REVIEW_BADGES = {
+  accepted: { variant: "kale", icon: <CheckIcon weight="bold" />, label: "Accepted review" },
+  rejected: { variant: "persimmon", icon: <XIcon weight="bold" />, label: "Rejected review" },
+  fixed: { variant: "grape", icon: <CheckIcon weight="bold" />, label: "Fixed review" },
+};
 
 export const Annotators = (cell) => {
   const { value, column, original: task } = cell;
@@ -29,7 +34,6 @@ export const Annotators = (cell) => {
   const effectiveVisibleCount = visibleAvatarCount ?? (maxUsersToDisplay > 0 ? maxUsersToDisplay : value.length);
   const userList = Array.from(value).slice(0, effectiveVisibleCount);
 
-  const userPickBadge = cn("userpic-badge");
   const annotatorsCN = cn("annotators");
   const isEnterprise = window.APP_SETTINGS.billing?.enterprise;
 
@@ -72,18 +76,11 @@ export const Annotators = (cell) => {
             }}
           >
             <Tooltip title={user.fullName || user.email}>
-              <Userpic
+              <Avatar
                 user={user}
+                size="large"
                 faded={userpicIsFaded}
-                badge={{
-                  bottomRight: review && (
-                    <div
-                      className={clsx(userPickBadge.toClassName(), userPickBadge.mod({ [review]: true }).toClassName())}
-                    >
-                      {review === "rejected" ? <IconCrossAlt /> : <IconCheckAlt />}
-                    </div>
-                  ),
-                }}
+                badge={review && REVIEW_BADGES[review] && <AvatarBadge {...REVIEW_BADGES[review]} />}
               />
             </Tooltip>
           </div>
@@ -98,7 +95,7 @@ export const Annotators = (cell) => {
             sdk.invoke("userCellCounterClick", e, column.alias, task, userList);
           }}
         >
-          <Userpic addCount={`+${extraCount}`} />
+          <Avatar addCount={`+${extraCount}`} size="large" />
         </div>
       )}
     </div>
@@ -123,7 +120,7 @@ Annotators.FilterItem = UsersInjector(({ item }) => {
 
   return user ? (
     <Space size="small">
-      <Userpic user={user} size={16} key={`user-${item}`} />
+      <Avatar user={user} size="xsmall" key={`user-${item}`} />
       {user.displayName}
     </Space>
   ) : null;

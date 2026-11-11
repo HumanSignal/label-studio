@@ -14,7 +14,7 @@ import {
   IconSlack,
 } from "@humansignal/icons";
 import { LSLogo } from "../../assets/images";
-import { Button, Userpic, ThemeToggle } from "@humansignal/ui";
+import { Button, Avatar, AvatarBadge, ThemeToggle } from "@humansignal/ui";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -60,6 +60,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
   const _config = useConfig();
   const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
   const [sidebarPinned, setSidebarPinned] = useState(defaultPinned ?? false);
+  const [accountMenuOpened, setAccountMenuOpened] = useState(false);
   const [PageContext, setPageContext] = useState({
     Component: null,
     props: {},
@@ -176,6 +177,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
           <Dropdown.Trigger
             ref={useMenuRef}
             align="right"
+            onToggle={setAccountMenuOpened}
             content={
               <Menu>
                 <Menu.Item
@@ -201,8 +203,22 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
             }
           >
             <div title={user?.email} className={menubarClass.elem("user").toClassName()}>
-              <Userpic user={user} isInProgress={isLoading} />
-              {showNewsletterDot && <div className={menubarClass.elem("userpic-badge").toClassName()} />}
+              <Button
+                type="button"
+                variant="neutral"
+                look="string"
+                aria-label={`${accountMenuOpened ? "Close" : "Open"} account menu`}
+                aria-haspopup="menu"
+                aria-expanded={accountMenuOpened}
+              >
+                <Avatar
+                  size="large"
+                  user={user}
+                  isInProgress={isLoading}
+                  badge={showNewsletterDot && <AvatarBadge shape="dot" variant="primary" label="Newsletter sign-up" />}
+                  badgePosition="topRight"
+                />
+              </Button>
             </div>
           </Dropdown.Trigger>
         </div>

@@ -93,6 +93,7 @@
 
 .profilePhotoControls {
   grid-area: controls;
+  gap: var(--spacing-tight);
 }
 
 .profilePhotoDelete {

@@ -1,4 +1,5 @@
 import { useCopyText } from "@humansignal/core";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { ArrowSquareOutIcon, CopyIcon } from "@humansignal/icons";
 import { Button, Label, Typography } from "@humansignal/ui";
 /**
@@ -21,7 +22,7 @@ const tokenAtom = atomWithQuery(() => ({
 const resetTokenAtom = atomWithMutation(() => ({
   mutationKey: ["reset-token"],
   mutationFn: async () => {
-    const result = await fetch("/api/current-user/reset-token", {
+    const result = await sameOriginFetch("/api/current-user/reset-token", {
       method: "post",
     });
     return result.json();

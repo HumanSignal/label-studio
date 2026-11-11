@@ -88,7 +88,6 @@ describe("Sync: Video Paragraphs", () => {
   beforeEach(() => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       ff_front_dev_2715_audio_3_280722_short: true,
-      fflag_feat_front_lsdv_e_278_contextual_scrolling_short: true,
     });
     // expect uncaught exception for fast play/pause
     cy.on("uncaught:exception", () => false);

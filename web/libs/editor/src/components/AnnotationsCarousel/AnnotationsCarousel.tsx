@@ -22,6 +22,7 @@ import {
   type AnnotationsListLayout,
   type SharedAnnotation,
   resolveClassicEntityReviewState,
+  useCarouselNavigationIntent,
 } from "@humansignal/core";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { AnnotationButton } from "./AnnotationButton";
@@ -65,6 +66,7 @@ function entityToSummary(entity: any, store: any): SharedAnnotation {
 
 export const AnnotationsCarousel = observer(
   ({ store, annotationStore, layout, entities: entitiesOverride, emptyState }: AnnotationsCarouselInterface) => {
+    const onNavigationIntent = useCarouselNavigationIntent();
     const enableAnnotations = store.hasInterface("annotations:tabs");
     const enablePredictions = store.hasInterface("predictions:tabs");
     const enableCreateAnnotation = store.hasInterface("annotations:add-new");
@@ -192,6 +194,7 @@ export const AnnotationsCarousel = observer(
         showAddNew={layout === "vertical" && enableCreateAnnotation}
         onAddNew={handleAddNew}
         emptyState={emptyState}
+        onNavigationIntent={onNavigationIntent}
       />
     );
   },

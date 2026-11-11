@@ -2,7 +2,7 @@ import React, { Component, useCallback } from "react";
 import { inject, observer } from "mobx-react";
 
 import ObjectTag from "../../../components/Tags/Object";
-import { FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2918, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
 import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/html";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { isSelectionContainsSpan } from "../../../utils/selection-tools";
@@ -12,7 +12,7 @@ import { Phrases } from "./Phrases";
 import { IconHelp } from "@humansignal/icons";
 import { Toggle, Tooltip } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
-import { cnm } from "@humansignal/shad/utils";
+import { cnm } from "@humansignal/ui";
 import { useHotkey } from "../../../hooks/useHotkey";
 
 const audioDefaultProps = { crossOrigin: "anonymous" };
@@ -106,7 +106,6 @@ class HtxParagraphsView extends Component {
   // Helper method to check if scrolling should happen
   shouldScroll() {
     return (
-      isFF(FF_LSDV_E_278) &&
       this.props.item.contextscroll &&
       this.props.item.playingId >= 0 &&
       this.lastPlayingId !== this.props.item.playingId &&
@@ -757,8 +756,7 @@ class HtxParagraphsView extends Component {
   }
 
   componentDidMount() {
-    if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(this.mainContentSelector));
+    if (this.props.item.contextscroll) this._resizeObserver.observe(document.querySelector(this.mainContentSelector));
     this._handleUpdate();
 
     // Set default selection to first phrase when there's no audio
@@ -973,9 +971,9 @@ class HtxParagraphsView extends Component {
   render() {
     const { item } = this.props;
     const withAudio = !!item.audio;
-    const contextScroll = isFF(FF_LSDV_E_278) && this.props.item.contextscroll;
+    const contextScroll = this.props.item.contextscroll;
 
-    if (!item.playing && isFF(FF_LSDV_E_278)) this._disposeTimeout(); // dispose scroll timeout when the audio is not playing
+    if (!item.playing) this._disposeTimeout(); // dispose scroll timeout when the audio is not playing
 
     // current way to not render when we wait for data
     if (!item._value) return null;
@@ -985,7 +983,7 @@ class HtxParagraphsView extends Component {
         <ParagraphHotkeys item={item} />
         <ObjectTag item={item} className={cnm(cn("paragraphs").toClassName(), styles.paragraphs)}>
           {withAudio && <ParagraphAudio item={item} />}
-          {isFF(FF_LSDV_E_278) ? this.renderWrapperHeader() : <AuthorFilter item={item} />}
+          {this.renderWrapperHeader()}
           <div
             ref={this.myRef}
             data-testid="phrases-wrapper"
@@ -999,7 +997,7 @@ class HtxParagraphsView extends Component {
               item={item}
               playingId={item.playingId}
               hasSelectedLabels={this.hasSelectedLabels}
-              {...(isFF(FF_LSDV_E_278) ? { activeRef: this.activeRef } : {})}
+              activeRef={this.activeRef}
             />
           </div>
         </ObjectTag>

@@ -5,7 +5,7 @@ import logging
 import os
 import shutil
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ujson as json
 from core.utils.common import load_func
@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
@@ -81,6 +82,80 @@ class Export(ExportMixin, models.Model):
         null=True,
         verbose_name=_('created by'),
     )
+    since = models.DateTimeField(
+        _('since'),
+        null=True,
+        blank=True,
+        help_text='Inclusive lower bound for Task.updated_at when this snapshot is incremental',
+    )
+    until = models.DateTimeField(
+        _('until'),
+        null=True,
+        blank=True,
+        help_text='Exclusive upper bound for Task.updated_at; use as next since for cron hops',
+    )
+    ephemeral = models.BooleanField(
+        _('ephemeral'),
+        default=False,
+        null=True,
+        db_default=False,
+        help_text='When true, excluded from list endpoints; TTL GC via RQ cron when enabled',
+    )
+
+    def _detach_shared_files(self):
+        """Blank this export's file fields whose blob another export still uses.
+
+        ``delete_export_file_on_commit`` removes the file of every deleted Export / ConvertedFormat row. Blanking a
+        shared field first (in the same transaction as the row delete) makes that receiver skip the blob, so the
+        export that still points at it keeps its file.
+        """
+        for converted in self.converted_formats.all():
+            if converted.file and self._blob_referenced_elsewhere(converted.file.name):
+                ConvertedFormat.objects.filter(pk=converted.pk).update(file='')
+        if self.file and self._blob_referenced_elsewhere(self.file.name):
+            Export.objects.filter(pk=self.pk).update(file='')
+            self.file = ''
+
+    def _blob_referenced_elsewhere(self, name):
+        """True when another export (or another export's converted format) points at the same blob.
+
+        Export file names are ``project-<id>-at-<minute>-<md5[:8]>``, so a listed export and an ephemeral one
+        with identical content finished in the same minute share a key: the sweep must not delete it. The key
+        embeds the project id, so only this project's rows can share it; filtering by project keeps the lookup
+        on the project index instead of scanning the unindexed ``file`` columns.
+        """
+        return (
+            Export.objects.filter(project_id=self.project_id, file=name).exclude(pk=self.pk).exists()
+            or ConvertedFormat.objects.filter(export__project_id=self.project_id, file=name)
+            .exclude(export_id=self.pk)
+            .exists()
+        )
+
+    @classmethod
+    def cleanup_expired_ephemeral(cls, ttl_hours=None):
+        """Delete ephemeral exports older than TTL (default settings.EPHEMERAL_EXPORT_TTL_HOURS).
+
+        Intended for the LSE RQ cron sweep (``htx.cron_jobs.cleanup_expired_ephemeral_exports``).
+        Not invoked from export list/create request paths. Files are removed on commit by
+        ``delete_export_file_on_commit``, like any export delete, except blobs another export still uses.
+        One export's failure is logged and the sweep moves on.
+        """
+        from core.utils.iterators import iterate_queryset
+
+        if ttl_hours is None:
+            ttl_hours = getattr(settings, 'EPHEMERAL_EXPORT_TTL_HOURS', 24)
+        cutoff = timezone.now() - timedelta(hours=ttl_hours)
+        deleted = 0
+        qs = cls.objects.filter(ephemeral=True, created_at__lt=cutoff)
+        for export in iterate_queryset(qs):
+            try:
+                with transaction.atomic():
+                    export._detach_shared_files()
+                    export.delete()
+                deleted += 1
+            except Exception:
+                logger.exception('Failed to delete expired ephemeral export id=%s', export.id)
+        return deleted
 
 
 @receiver(post_save, sender=Export)

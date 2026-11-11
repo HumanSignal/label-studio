@@ -54,7 +54,7 @@ describe("DateRangePickerTrigger", () => {
     });
   });
 
-  it("keeps standalone h-10 chrome when className is decorative, and drops it only for ownChrome", () => {
+  it("keeps standalone chrome (height, border, radius) when className is decorative, and drops it only for ownChrome", () => {
     const { rerender } = render(
       <DateRangePickerTrigger selected={null} inline dataTestId="date-range-trigger">
         <div>Picker panel</div>
@@ -62,6 +62,8 @@ describe("DateRangePickerTrigger", () => {
     );
 
     expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bh-10\b/);
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/(^|\s)border(\s|$)/);
+    expect(screen.getByTestId("date-range-trigger").className).toMatch(/(^|\s)rounded-smaller(\s|$)/);
 
     rerender(
       <DateRangePickerTrigger selected={null} inline dataTestId="date-range-trigger" className="custom-trigger">
@@ -85,6 +87,11 @@ describe("DateRangePickerTrigger", () => {
     );
 
     expect(screen.getByTestId("date-range-trigger").className).not.toMatch(/\bh-10\b/);
+    // The pill shape (flush left, round right) belongs to FilterShell's `.filterShellValueTrigger`; a
+    // standalone border/radius utility here ties with it and can win depending on stylesheet order.
+    expect(screen.getByTestId("date-range-trigger").className).not.toMatch(/(^|\s)border(\s|$)/);
+    expect(screen.getByTestId("date-range-trigger").className).not.toMatch(/(^|\s)border-neutral-border(\s|$)/);
+    expect(screen.getByTestId("date-range-trigger").className).not.toMatch(/(^|\s)rounded-smaller(\s|$)/);
     expect(screen.getByTestId("date-range-trigger").className).toMatch(/\bcustom-trigger\b/);
   });
 });

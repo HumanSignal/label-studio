@@ -1,0 +1,34 @@
+`style={$value}` where {
+  $filename <: not r".*libs/ui/.*",
+  $value <: contains `$key: $_` where {
+    $key <: or {
+      `color`,
+      `background`,
+      `backgroundColor`,
+      `borderColor`,
+      `padding`,
+      `paddingTop`,
+      `paddingRight`,
+      `paddingBottom`,
+      `paddingLeft`,
+      `paddingInline`,
+      `paddingBlock`,
+      `margin`,
+      `marginTop`,
+      `marginRight`,
+      `marginBottom`,
+      `marginLeft`,
+      `marginInline`,
+      `marginBlock`,
+      `gap`,
+      `rowGap`,
+      `columnGap`,
+      `fontSize`,
+      `fontWeight`,
+      `fontFamily`,
+      `lineHeight`,
+      `borderRadius`
+    }
+  },
+  register_diagnostic(span=$value, message="[ds/inline-style-token] Colour, spacing, type and radius come from tokens (Tailwind token classes or var(--…)), not inline style. Position and size stay allowed.", severity="warn")
+}

@@ -1,4 +1,3 @@
-import type { CalloutVariant } from "@humansignal/ui/lib/callout/callout";
 import type { FC } from "react";
 import type { z } from "zod";
 
@@ -41,7 +40,7 @@ export interface MessageDefinition {
   type: "message";
   content: JSX.Element | FC;
   gridCols?: number;
-  variant?: CalloutVariant;
+  variant?: "warning";
   visibleWhen?: VisibleWhen;
 }
 

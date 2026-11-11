@@ -1,3 +1,4 @@
+import pickle
 from unittest.mock import patch
 
 from data_manager.actions.basic import (
@@ -5,13 +6,17 @@ from data_manager.actions.basic import (
     delete_tasks_annotations,
     delete_tasks_annotations_form,
     delete_tasks_annotations_job,
+    delete_tasks_predictions,
+    update_tasks_counters_by_ids,
 )
+from django.db import connection
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from projects.tests.factories import ProjectFactory
 from rq.job import Job
-from tasks.models import Annotation, AnnotationDraft, Task
-from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, TaskFactory
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.tests.factories import AnnotationDraftFactory, AnnotationFactory, PredictionFactory, TaskFactory
 from users.tests.factories import UserFactory
 
 
@@ -192,3 +197,81 @@ class TestDeleteTasks(TestCase):
         result = delete_tasks(self.project, queryset)
 
         assert result['reload'] is True
+
+
+class TestDeleteTasksPredictions(TestCase):
+    """FIT-3400: the Delete predictions action must recompute the counters of the tasks it touched.
+
+    Each selected task has two predictions on purpose: the per-instance ``pre_delete`` signal computes
+    ``count - 1`` against rows that are still present, so it leaves ``total_predictions`` at 1. Only the
+    counters job brings it back to 0, and it must target the tasks whose predictions were deleted.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.task_1 = TaskFactory(project=cls.project)
+        cls.task_2 = TaskFactory(project=cls.project)
+        cls.untouched_task = TaskFactory(project=cls.project)
+        for task in (cls.task_1, cls.task_2):
+            PredictionFactory.create_batch(2, task=task)
+        PredictionFactory(task=cls.untouched_task)
+
+    def selected(self):
+        return Task.objects.filter(id__in=[self.task_1.id, self.task_2.id])
+
+    def assert_counters_recomputed(self):
+        for task in (self.task_1, self.task_2):
+            task.refresh_from_db()
+            assert task.total_predictions == 0, (task.id, task.total_predictions)
+        self.untouched_task.refresh_from_db()
+        assert self.untouched_task.total_predictions == 1
+        assert Prediction.objects.filter(task=self.untouched_task).count() == 1
+
+    @patch('core.redis.redis_connected', return_value=False)
+    def test_sync_path_recomputes_counters(self, _mock_redis_connected):
+        result = delete_tasks_predictions(self.project, self.selected())
+
+        assert result['processed_items'] == 4
+        assert not Prediction.objects.filter(task__in=[self.task_1, self.task_2]).exists()
+        self.assert_counters_recomputed()
+
+    @patch('data_manager.actions.basic.start_job_async_or_sync')
+    def test_async_path_recomputes_counters(self, mock_start_job_async_or_sync):
+        """RQ pickles the job arguments at enqueue and the worker runs the job later, after the delete."""
+        enqueued = []
+
+        def enqueue(job, *args, **kwargs):
+            kwargs.pop('job_tenant', None)
+            enqueued.append((job, pickle.loads(pickle.dumps(args)), kwargs))
+
+        mock_start_job_async_or_sync.side_effect = enqueue
+
+        delete_tasks_predictions(self.project, self.selected())
+
+        assert len(enqueued) == 1
+        job, args, kwargs = enqueued[0]
+        assert job is update_tasks_counters_by_ids
+        job(*args, **kwargs)
+        self.assert_counters_recomputed()
+
+    @patch('data_manager.actions.basic.start_job_async_or_sync')
+    def test_job_gets_task_ids_materialized_with_one_query(self, mock_start_job_async_or_sync):
+        """The ids are read once, before the delete, and the job payload is those ids.
+
+        Not a Prediction subquery (empty by the time it runs), and not a Task queryset: RQ pickles job
+        arguments, and pickling a queryset evaluates it, which would put full Task rows in the payload.
+        """
+        with CaptureQueriesContext(connection) as ctx:
+            delete_tasks_predictions(self.project, self.selected())
+
+        materializations = [
+            q['sql'] for q in ctx.captured_queries if 'DISTINCT' in q['sql'] and '"prediction"' in q['sql']
+        ]
+        assert len(materializations) == 1, materializations
+
+        (job, task_ids), kwargs = mock_start_job_async_or_sync.call_args
+        assert job is update_tasks_counters_by_ids
+        assert kwargs == {'job_tenant': self.project.organization_id}
+        assert isinstance(task_ids, list)
+        assert sorted(task_ids) == sorted([self.task_1.id, self.task_2.id])

@@ -79,4 +79,18 @@ describe("alignElements side placements", () => {
     expect(flippedLeft.align).toBe("left-center");
     expect(flippedLeft.left).toBe(940 - 80 - 8 + 5000);
   });
+
+  it("keeps a top placement on a scrolled page when it fits in the viewport", () => {
+    // Trigger 100px from the top of the viewport, page scrolled 500px: a 20px tooltip fits above it.
+    setWindow(0, 500);
+    const top = alignElements(trigger(), tooltip(), "top-center", 10);
+    expect(top.align).toBe("top-center");
+    expect(top.top).toBe(100 - 20 - 10 + 500);
+
+    // Trigger hugging the top viewport edge: no room above, opens below.
+    const nearTop = withRect({ top: 5, left: 200, width: 40, height: 40 });
+    const flipped = alignElements(nearTop, tooltip(), "top-center", 10);
+    expect(flipped.align).toBe("bottom-center");
+    expect(flipped.top).toBe(5 + 40 + 10 + 500);
+  });
 });

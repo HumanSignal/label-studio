@@ -11,11 +11,18 @@ interface TourProps extends BaseProps {
   autoStart?: boolean;
   /** Delay in milliseconds before the tour starts when autoStart is true. Defaults to 0 */
   delay?: number;
+  /**
+   * Called when the user advances with the primary button, with the index of the step they are leaving
+   * (also fires for the last step's button). The tour moves on once it settles, so a side effect (e.g.
+   * applying a setting that re-renders the page) can finish before the next step looks up its target; a
+   * failure is logged and the tour still advances. Not called for skip / close.
+   */
+  onStepNext?: (stepIndex: number) => void | Promise<void>;
 
   /* Check all other props here https://docs.react-joyride.com/props */
 }
 
-export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, ...props }) => {
+export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, onStepNext, ...props }) => {
   const tourContext = useContext(TourContext);
   if (!tourContext) {
     console.error("Tour context not found");
@@ -124,13 +131,23 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
       const isStepChange = type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND;
       if (isStepChange) {
         const nextIndex = index + (action === ACTIONS.PREV ? -1 : 1);
-        dispatch({
-          type: "GOTO",
-          payload: { stepIndex: nextIndex },
-        });
+        const goToStep = () => dispatch({ type: "GOTO", payload: { stepIndex: nextIndex } });
+
+        if (onStepNext && type === EVENTS.STEP_AFTER && action === ACTIONS.NEXT) {
+          void (async () => {
+            try {
+              await onStepNext(index);
+            } catch (error) {
+              console.error(`Tour "${name}" onStepNext failed`, error);
+            }
+            goToStep();
+          })();
+        } else {
+          goToStep();
+        }
       }
     },
-    [name, state.run, tourContext],
+    [name, state.run, tourContext, onStepNext],
   );
 
   const { key, ...joyrideState } = state;
