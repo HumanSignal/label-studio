@@ -19,7 +19,7 @@
 
 import { observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
-import { Button, MultiStateToggle, Typography } from "@humansignal/ui";
+import { Button, SegmentedControl, Typography } from "@humansignal/ui";
 
 import { useInteractiveCapabilities } from "./hooks";
 import { resolveActiveBinding } from "./resolve";
@@ -190,7 +190,7 @@ export const InteractiveActionsBar = observer(({ objectTag }: InteractiveActions
           the text changes. */}
       <div className="flex items-center gap-base">
         {showPromptToggle && !tracking && (
-          <MultiStateToggle
+          <SegmentedControl
             selectedOption={promptMode}
             options={[
               { value: "points", label: "Points" },

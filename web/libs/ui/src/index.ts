@@ -1,5 +1,5 @@
 export * from "./lib/InputFile/InputFile";
-export * from "./lib/MultiStateToggle/MultiStateToggle";
+export * from "./lib/segmented-control/segmented-control";
 export * from "./lib/ThemeToggle/ThemeToggle";
 export * from "./lib/Tooltip/Tooltip";
 export * from "./lib/avatar";

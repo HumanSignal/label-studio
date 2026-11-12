@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MultiStateToggle } from "../MultiStateToggle/MultiStateToggle";
+import { SegmentedControl } from "../segmented-control/segmented-control";
 import { Select } from "../select/select";
 import { FilterShell } from "./filter-shell";
 import styles from "./filter-shell.module.css";
@@ -320,7 +320,7 @@ describe("FilterShell", () => {
                 triggerClassName={styles.filterShellValueTrigger}
                 triggerProps={{ id: "filter-shell-labels-control", "aria-label": "Labels filter" }}
                 header={
-                  <MultiStateToggle
+                  <SegmentedControl
                     aria-label="Labels operator"
                     data-testid="labels-operator"
                     selectedOption="any"

@@ -9,7 +9,7 @@ export default defineManifest({
     "A setting that is either on or off and takes effect as a preference (auto-save, notifications, a feature switch).",
   never_when: [
     "selecting items (use Checkbox)",
-    "choosing one of several named options (use MultiStateToggle or Select)",
+    "choosing one of several named options (use SegmentedControl or Select)",
   ],
   replaces: [
     "services/lso/web/apps/labelstudio/src/components/Form/Elements/Toggle/Toggle.jsx",

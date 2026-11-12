@@ -1,15 +1,15 @@
 import { clsx } from "clsx";
-import styles from "./MultiStateToggle.module.css";
+import styles from "./segmented-control.module.css";
 import { useMemo, useRef, type KeyboardEvent } from "react";
 
-export interface MultiStateToggleOption {
+export interface SegmentedControlOption {
   label?: string | JSX.Element;
   value: string;
 }
 
-export interface MultiStateToggleProps {
+export interface SegmentedControlProps {
   selectedOption: string;
-  options?: MultiStateToggleOption[];
+  options?: SegmentedControlOption[];
   onChange?: (option: string) => void;
   /** Stretches the control (and its options evenly) to fill the width of its container, e.g. a filter dropdown. */
   fullWidth?: boolean;
@@ -19,7 +19,7 @@ export interface MultiStateToggleProps {
   "data-testid"?: string;
 }
 
-export const MultiStateToggle = ({
+export const SegmentedControl = ({
   options = [],
   selectedOption,
   onChange,
@@ -28,10 +28,10 @@ export const MultiStateToggle = ({
   className,
   "aria-label": ariaLabel,
   "data-testid": dataTestId,
-}: MultiStateToggleProps) => {
+}: SegmentedControlProps) => {
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const selectedIndex = useMemo(() => {
-    return options.findIndex((option: MultiStateToggleOption) => option.value === selectedOption);
+    return options.findIndex((option: SegmentedControlOption) => option.value === selectedOption);
   }, [options, selectedOption]);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -48,7 +48,7 @@ export const MultiStateToggle = ({
 
   return (
     <div
-      className={clsx(styles.multiStateToggle, { [styles.multiStateToggle_fullWidth]: fullWidth }, className)}
+      className={clsx(styles.segmentedControl, { [styles.segmentedControl_fullWidth]: fullWidth }, className)}
       role="radiogroup"
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
@@ -60,8 +60,8 @@ export const MultiStateToggle = ({
           ref={(element) => {
             optionRefs.current[index] = element;
           }}
-          className={clsx(styles.multiStateToggle__option, {
-            [styles.multiStateToggle__option_selected]: selectedIndex === index,
+          className={clsx(styles.segmentedControl__option, {
+            [styles.segmentedControl__option_selected]: selectedIndex === index,
           })}
           onClick={() => onChange?.(option.value)}
           onKeyDown={(event) => handleKeyDown(event, index)}
@@ -79,4 +79,11 @@ export const MultiStateToggle = ({
   );
 };
 
-export default MultiStateToggle;
+/** @deprecated Use `SegmentedControl`. */
+export const MultiStateToggle = SegmentedControl;
+/** @deprecated Use `SegmentedControlOption`. */
+export type MultiStateToggleOption = SegmentedControlOption;
+/** @deprecated Use `SegmentedControlProps`. */
+export type MultiStateToggleProps = SegmentedControlProps;
+
+export default SegmentedControl;

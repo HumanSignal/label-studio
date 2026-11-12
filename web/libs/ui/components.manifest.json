@@ -503,26 +503,6 @@
       ],
       "dir": "lib/modal-window"
     },
-    "MultiStateToggle": {
-      "name": "MultiStateToggle",
-      "tier": 1,
-      "exports": [
-        "MultiStateToggle"
-      ],
-      "intent": [
-        "pick one of up to five visible options"
-      ],
-      "use_when": "A segmented control for a small, always-visible set of mutually exclusive options (view modes, density, a short filter).",
-      "never_when": [
-        "more than five options (use Select)",
-        "options that need descriptions (use Radio once it exists)"
-      ],
-      "replaces": [
-        "services/lso/web/apps/labelstudio/src/components/ToggleItems/ToggleItems.tsx",
-        "services/lse/web/apps/labelstudio/src/components/ToggleItems/ToggleItems.tsx"
-      ],
-      "dir": "lib/MultiStateToggle"
-    },
     "MultiTreeSelect": {
       "name": "MultiTreeSelect",
       "tier": 2,
@@ -608,6 +588,29 @@
       ],
       "replaces": [],
       "dir": "lib/search-input"
+    },
+    "SegmentedControl": {
+      "name": "SegmentedControl",
+      "tier": 1,
+      "exports": [
+        "SegmentedControl",
+        "MultiStateToggle"
+      ],
+      "intent": [
+        "switch the view or format of the same content",
+        "pick one of up to five visible options"
+      ],
+      "use_when": "Switching views, filtering the same data or showing the same content in another format (list or grid, form or JSON, a short filter). MultiStateToggle is its deprecated old name.",
+      "never_when": [
+        "moving between sub-sections whose content differs (use Tabs)",
+        "more than five options (use Select)",
+        "options that need descriptions (use Radio once it exists)"
+      ],
+      "replaces": [
+        "services/lso/web/apps/labelstudio/src/components/ToggleItems/ToggleItems.tsx",
+        "services/lse/web/apps/labelstudio/src/components/ToggleItems/ToggleItems.tsx"
+      ],
+      "dir": "lib/segmented-control"
     },
     "Select": {
       "name": "Select",
@@ -773,10 +776,11 @@
         "TabsContent"
       ],
       "intent": [
-        "switch between views of the same thing"
+        "move between sub-sections of one section"
       ],
-      "use_when": "Peer views of one subject, selected one at a time.",
+      "use_when": "Navigating between sub-sections of a parent section whose content differs but sits at the same level.",
       "never_when": [
+        "switching the view, format or filter of the same content (use SegmentedControl)",
         "a row of Buttons with an active class",
         "role=tablist built by hand",
         "navigation between pages"
@@ -871,7 +875,7 @@
       "use_when": "A setting that is either on or off and takes effect as a preference (auto-save, notifications, a feature switch).",
       "never_when": [
         "selecting items (use Checkbox)",
-        "choosing one of several named options (use MultiStateToggle or Select)"
+        "choosing one of several named options (use SegmentedControl or Select)"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/Toggle/Toggle.jsx",
