@@ -385,6 +385,11 @@ def custom_filter_expressions(*args, **kwargs):
     pass
 
 
+def combined_filter_expression(*args, **kwargs):
+    """Returns (Q, consumed parent filters) to answer several filter lines at once, or None."""
+    return None
+
+
 def preprocess_filter(_filter, *_):
     return _filter
 

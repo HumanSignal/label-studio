@@ -953,7 +953,19 @@ def apply_filters(queryset, filters, project, request, exists_result_filters=Fal
     # Result-parent hooks consume this complete line and compile one correlated
     # expression; the generic path remains for legacy/non-result filter trees.
     filter_line_expressions: list[list[Q]] = []
+
+    # A backend may answer several filter lines with one expression; the lines it took are skipped below.
+    combined_filter_expression = load_func(settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION)
+    combined = combined_filter_expression(filters, project, request)
+    consumed_filter_ids = set()
+    if combined is not None:
+        expression, consumed_filters = combined
+        filter_line_expressions.append([expression])
+        consumed_filter_ids = {id(_filter) for _filter in consumed_filters}
+
     for parent_filter in filters.items:
+        if id(parent_filter) in consumed_filter_ids:
+            continue
         child_filters = list(parent_filter.child_filters)
         filter_line = [parent_filter, *child_filters]
         filter_expressions: list[Q] = []

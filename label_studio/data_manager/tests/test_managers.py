@@ -510,6 +510,8 @@ class TestApplyFiltersStaleAgreementFields(TestCase):
         )
 
         def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
             if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
                 return lambda *_args, **_kwargs: None
             if path == settings.PREPROCESS_FIELD_NAME:
@@ -585,6 +587,8 @@ class TestApplyFiltersCustomResult(TestCase):
         custom_hook = Mock(return_value=CustomFilterResult(Q(id=123), consume_child_filter=True))
 
         def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
             if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
                 return custom_hook
             if path == settings.PREPROCESS_FIELD_NAME:
@@ -1116,6 +1120,8 @@ class TestApplyFiltersInList(TestCase):
         filters = Filters(conjunction=conjunction, items=[_filter])
 
         def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
             if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
                 return lambda *_args, **_kwargs: None
             if path == settings.PREPROCESS_FIELD_NAME:
