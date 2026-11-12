@@ -16,9 +16,7 @@ def _prefix(size):
 
 
 def _upload(project, raw, name='tasks.json'):
-    return FileUpload.objects.create(
-        user=project.created_by, project=project, file=ContentFile(raw, name=name)
-    )
+    return FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile(raw, name=name))
 
 
 @pytest.mark.parametrize('prefix_size', [0, 4095, 4096, 4097, 16389])
@@ -45,9 +43,7 @@ def test_streaming_reader_accepts_leading_json_whitespace(prefix_size, container
 
 @pytest.mark.parametrize('prefix_size', [4096, 8193, 65536])
 @pytest.mark.parametrize('entry', ['file_loader', 'async_loader'])
-def test_streaming_loaders_preserve_batches_and_upload_metadata(
-    prefix_size, entry, settings, tmp_path
-):
+def test_streaming_loaders_preserve_batches_and_upload_metadata(prefix_size, entry, settings, tmp_path):
     settings.MEDIA_ROOT = str(tmp_path)
     project = ProjectFactory()
     data = [{'text': f'row-{index}'} for index in range(7)]
@@ -55,19 +51,13 @@ def test_streaming_loaders_preserve_batches_and_upload_metadata(
     second = _upload(project, _prefix(prefix_size) + json.dumps(data[6]).encode(), 'object.json')
     ids = [first.id, second.id]
     if entry == 'file_loader':
-        batches = list(
-            FileUpload.load_tasks_from_uploaded_files_streaming(
-                project, file_upload_ids=ids, batch_size=3
-            )
-        )
+        batches = list(FileUpload.load_tasks_from_uploaded_files_streaming(project, file_upload_ids=ids, batch_size=3))
         for _, formats, columns in batches:
             assert formats['.json'] in (1, 2)
             assert set(columns) == {'text'}
     else:
         project_import = ProjectImport.objects.create(project=project, file_upload_ids=ids)
-        batches = list(
-            load_tasks_for_async_import_streaming(project_import, project.created_by, batch_size=3)
-        )
+        batches = list(load_tasks_for_async_import_streaming(project_import, project.created_by, batch_size=3))
         for _, upload_ids, formats, columns in batches:
             assert upload_ids == ids
             assert formats['.json'] in (1, 2)
