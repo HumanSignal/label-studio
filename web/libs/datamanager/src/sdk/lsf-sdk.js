@@ -229,6 +229,10 @@ export class LSFWrapper {
       user: options.user,
       config: this.lsfConfig,
       task: taskToLSFormat(this.task),
+      // Review already passes this (ReviewPage). Without it the editor never
+      // sets store.project, and the task model drops task.project, so Chat
+      // cannot tell the completions API which project the annotator is in.
+      ...(this.project?.id != null ? { project: { id: this.project.id } } : {}),
       description: this.instruction,
       interfaces,
       users: dm.store.users.map((u) => u.toJSON()),
