@@ -86,3 +86,32 @@ def test_empty_header_keeps_the_default_separator(settings, tmp_path):
         project=project, user=project.created_by, file=ContentFile(b'', name='empty.csv')
     )
     assert upload._detect_csv_separator() == ','
+
+
+@pytest.mark.parametrize('delimiter', [',', ';'])
+def test_literal_quotes_inside_unquoted_fields_remain_readable(delimiter, settings, tmp_path):
+    settings.MEDIA_ROOT = str(tmp_path)
+    project = ProjectFactory()
+    content = f'a"b{delimiter}c{delimiter}d\none{delimiter}two{delimiter}three\n'
+    rows = list(csv.reader(io.StringIO(content), delimiter=delimiter))
+    upload = FileUpload.objects.create(
+        project=project,
+        user=project.created_by,
+        file=ContentFile(content.encode(), name='literal-quotes.csv'),
+    )
+    assert upload._detect_csv_separator() == delimiter
+    assert upload.read_tasks() == [{'data': dict(zip(rows[0], rows[1]))}]
+
+
+@pytest.mark.parametrize('delimiter', [',', ';'])
+def test_utf8_bom_does_not_hide_a_quoted_header(delimiter, settings, tmp_path):
+    settings.MEDIA_ROOT = str(tmp_path)
+    project = ProjectFactory()
+    other = ';' if delimiter == ',' else ','
+    headers = [f'text{other}one{other}two', 'id']
+    content = b'\xef\xbb\xbf' + _csv_bytes(headers, [['value', 'row01']], delimiter)
+    upload = FileUpload.objects.create(
+        project=project, user=project.created_by, file=ContentFile(content, name='bom.csv')
+    )
+    assert upload._detect_csv_separator() == delimiter
+    assert upload.read_tasks() == [{'data': {headers[0]: 'value', 'id': 'row01'}}]

@@ -90,15 +90,20 @@ class FileUpload(models.Model):
             with self.file.open() as f:
                 comma_count = semicolon_count = 0
                 in_quotes = False
-                for line in f:
+                at_field_start = True
+                for line_number, line in enumerate(f):
                     if isinstance(line, bytes):
                         line = line.decode('utf-8')
+                    if line_number == 0:
+                        line = line.removeprefix('\ufeff')
                     for char in line:
-                        if char == '"':
+                        if char == '"' and (in_quotes or at_field_start):
                             in_quotes = not in_quotes
+                            at_field_start = not in_quotes
                         elif not in_quotes:
                             comma_count += char == ','
                             semicolon_count += char == ';'
+                            at_field_start = char in ',;'
                     if not in_quotes:
                         break
 
