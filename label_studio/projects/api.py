@@ -616,22 +616,19 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class _ProjectImportJobMixin:
+class _ProjectImportJobMixin(GetParentObjectMixin):
     """Shared helpers for project-scoped import/reimport status views."""
 
-    project_model = Project
+    parent_lookup_url_kwarg = 'pk'
     # Disable LSE default OrderingFilter — list order is fixed (created_at DESC, -id).
     filter_backends = []
 
-    def _get_project(self):
-        project_pk = self.kwargs.get('pk')
-        return generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
-            pk=project_pk,
-        )
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
 
     def get_queryset(self):
-        return super().get_queryset().filter(project=self._get_project())
+        return super().get_queryset().filter(project=self.parent_object)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -953,7 +950,6 @@ class ProjectReimportAPI(_ProjectImportJobMixin, generics.RetrieveAPIView):
 class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, generics.DestroyAPIView):
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
-    parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -963,6 +959,10 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return TaskSimpleSerializer
@@ -970,7 +970,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             return TaskSerializer
 
     def filter_queryset(self, queryset):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        project = self.parent_object
         # ordering is deprecated here
         tasks = Task.objects.filter(project=project).order_by('-updated_at')
         page = paginator(tasks, self.request)
@@ -980,7 +980,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
         task_ids = list(Task.objects.filter(project=project).values('id'))
         Task.delete_tasks_without_signals(Task.objects.filter(project=project))
         logger.info(f'calling reset project_id={project.id} ProjectTaskListAPI.delete()')

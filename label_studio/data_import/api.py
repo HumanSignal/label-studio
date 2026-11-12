@@ -9,6 +9,7 @@ from urllib.parse import unquote, urlparse
 
 from core.decorators import override_report_only_csp
 from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
@@ -261,17 +262,21 @@ task_create_response_scheme = {
     ),
 )
 # Import
-class ImportAPI(generics.CreateAPIView):
+class ImportAPI(GetParentObjectMixin, generics.CreateAPIView):
     permission_required = all_permissions.projects_change
     permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = ImportApiSerializer
     queryset = Task.objects.all()
 
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
+
     def get_serializer_context(self):
         project_id = self.kwargs.get('pk')
         if project_id:
-            project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=project_id)
+            project = self.parent_object
         else:
             project = None
         return {'project': project, 'user': self.request.user}
@@ -283,7 +288,7 @@ class ImportAPI(generics.CreateAPIView):
         serializer = self.get_serializer(data=tasks, many=True)
         serializer.is_valid(raise_exception=True)
         task_instances = serializer.save(project_id=self.kwargs['pk'])
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
         emit_webhooks_for_instance(
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances
         )
@@ -456,8 +461,7 @@ class ImportAPI(generics.CreateAPIView):
         return_task_ids = bool_from_request(request.query_params, 'return_task_ids', False)
         preannotated_from_fields = list_of_strings_from_request(request.query_params, 'preannotated_from_fields', None)
 
-        # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
 
         if settings.VERSION_EDITION != 'Community':
             return self.async_import(request, project, preannotated_from_fields, commit_to_project, return_task_ids)
@@ -803,8 +807,7 @@ class ReImportAPI(ImportAPI):
         files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
         file_upload_ids = self.request.data.get('file_upload_ids')
 
-        # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
 
         if not file_upload_ids:
             return Response(
@@ -882,7 +885,9 @@ class ReImportAPI(ImportAPI):
         },
     ),
 )
-class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyModelMixin, generics.GenericAPIView):
+class FileUploadListAPI(
+    GetParentObjectMixin, generics.mixins.ListModelMixin, generics.mixins.DestroyModelMixin, generics.GenericAPIView
+):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = FileUploadSerializer
     permission_required = ViewClassPermission(
@@ -891,8 +896,12 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     )
     queryset = FileUpload.objects.all()
 
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
+
     def get_queryset(self):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        project = self.parent_object
         if project.is_draft or bool_from_request(self.request.query_params, 'all', False):
             # If project is in draft state, we return all uploaded files, ignoring queried ids
             logger.debug(f'Return all uploaded files for draft project {project}')
@@ -907,7 +916,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         return self.list(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
         ids = self.request.data.get('file_upload_ids')
         if ids is None:
             deleted, _ = FileUpload.objects.filter(project=project).delete()

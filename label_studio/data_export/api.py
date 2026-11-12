@@ -7,6 +7,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
@@ -307,7 +308,8 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=pk)
+        self.check_object_permissions(request, project)
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
@@ -367,9 +369,8 @@ class ProjectExportFilesAuthCheck(APIView):
         },
     ),
 )
-class ExportListAPI(generics.ListCreateAPIView):
+class ExportListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     queryset = Export.objects.all().order_by('-created_at')
-    project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
@@ -385,20 +386,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         context['user'] = self.request.user
         return context
 
-    def _get_project(self):
-        project_pk = self.kwargs.get('pk')
-        project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
-            pk=project_pk,
-        )
-        return project
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
 
     def perform_create(self, serializer):
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
 
-        project = self._get_project()
+        project = self.parent_object
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -409,7 +406,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         )
 
     def get_queryset(self):
-        project = self._get_project()
+        project = self.parent_object
         return super().get_queryset().filter(project=project).exclude(ephemeral=True)
 
     def filter_queryset(self, queryset):
