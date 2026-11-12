@@ -1582,9 +1582,11 @@ class ProjectSummary(models.Model):
         self.save()
 
     def update_data_columns(self, tasks):
-        common_data_columns = set()
+        common_data_columns = None
+        task_count = 0
         all_data_columns = dict(self.all_data_columns)
         for task in tasks:
+            task_count += 1
             try:
                 task_data = get_attr_or_item(task, 'data')
             except KeyError:
@@ -1592,16 +1594,20 @@ class ProjectSummary(models.Model):
             task_data_keys = task_data.keys()
             for column in task_data_keys:
                 all_data_columns[column] = all_data_columns.get(column, 0) + 1
-            if not common_data_columns:
+            if common_data_columns is None:
                 common_data_columns = set(task_data_keys)
             else:
                 common_data_columns &= set(task_data_keys)
 
+        if common_data_columns is not None:
+            # An empty intersection is a valid result, not an uninitialized summary.
+            # When no columns have been seen, earlier tasks may still have empty data.
+            has_previous_tasks = bool(self.all_data_columns) or self.project.tasks.count() > task_count
+            if has_previous_tasks:
+                self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
+            else:
+                self.common_data_columns = list(sorted(common_data_columns))
         self.all_data_columns = all_data_columns
-        if not self.common_data_columns:
-            self.common_data_columns = list(sorted(common_data_columns))
-        else:
-            self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
         self.save(update_fields=['all_data_columns', 'common_data_columns'])
 
     def remove_data_columns(self, tasks):
