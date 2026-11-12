@@ -21,6 +21,15 @@ class DataManagerException(Exception):
     pass
 
 
+def accessible_projects(user):
+    """Projects whose Data Manager tabs this user may read or change.
+
+    ``Project.objects.for_user`` is only the active organization. Project access,
+    including enterprise role and workspace rules, is ``ACCESSIBLE_PROJECTS_FUNCTION``.
+    """
+    return load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(user).distinct()
+
+
 def noop_validate_column_access(project, user, column_refs=None, payload=None, message=None):
     """OSS no-op for DATA_MANAGER_VALIDATE_COLUMN_ACCESS."""
     return None

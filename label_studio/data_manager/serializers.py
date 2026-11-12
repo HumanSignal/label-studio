@@ -317,17 +317,21 @@ class ViewSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_project(self, project):
-        """Only allow a project the requesting user can access in their active organization.
+        """Only allow a project the requesting user can access, the same scope as the other view routes.
 
         Without this the primary-key field accepts any project id, so a view could be created in (or moved to)
         a project of another organization. The error matches a missing project, so existence is not revealed.
         """
+        from data_manager.functions import accessible_projects
+
         request = self.context.get('request')
         if request is None or project is None:
             return project
-        user = request.user
-        if project.organization_id != user.active_organization_id or not project.has_permission(user):
-            raise serializers.ValidationError(f'Invalid pk "{project.pk}" - object does not exist.')
+        if self.instance is not None and self.instance.project_id == project.pk:
+            # get_object() already scoped the view to accessible projects
+            return project
+        if not accessible_projects(request.user).filter(pk=project.pk).exists():
+            self.fields['project'].fail('does_not_exist', pk_value=project.pk)
         return project
 
     @extend_schema_field(
@@ -962,7 +966,7 @@ class SelectedItemsSerializer(serializers.Serializer):
 
 
 class ViewResetSerializer(serializers.Serializer):
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
+    project = serializers.IntegerField()
 
 
 class ViewOrderSerializer(serializers.Serializer):

@@ -7,7 +7,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
-from data_manager.functions import evaluate_predictions, get_prepare_params
+from data_manager.functions import accessible_projects, evaluate_predictions, get_prepare_params
 from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
 from data_manager.models import View
 from data_manager.serializers import (
@@ -93,15 +93,6 @@ class ProjectUsersOptionsAPI(UserListMixin, generics.ListAPIView):
         get_user_ids_in_projects = load_func(settings.DATA_MANAGER_GET_PROJECT_USER_IDS)
         user_ids = get_user_ids_in_projects([project.id], project.organization_id)
         return queryset.filter(pk__in=user_ids)
-
-
-def _accessible_projects(user):
-    """Projects whose Data Manager tabs this user may read or change.
-
-    ``Project.objects.for_user`` is only the active organization. Project access,
-    including enterprise role and workspace rules, is ``ACCESSIBLE_PROJECTS_FUNCTION``.
-    """
-    return load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(user).distinct()
 
 
 @method_decorator(
@@ -220,6 +211,7 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
+        self.check_object_permissions(self.request, project)
         max_order = View.objects.filter(project=project).aggregate(Max('order'))['order__max']
         order = (max_order if max_order is not None else -1) + 1
         serializer.save(user=self.request.user, order=order)
@@ -253,7 +245,7 @@ class ViewAPI(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         project = generics.get_object_or_404(
-            _accessible_projects(request.user), pk=serializer.validated_data['project'].id
+            accessible_projects(request.user), pk=serializer.validated_data['project']
         )
         self.check_object_permissions(request, project)
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
@@ -280,7 +272,7 @@ class ViewAPI(viewsets.ModelViewSet):
         project_id = serializer.validated_data['project']
         view_ids = serializer.validated_data['ids']
 
-        project = generics.get_object_or_404(_accessible_projects(request.user), pk=project_id)
+        project = generics.get_object_or_404(accessible_projects(request.user), pk=project_id)
         self.check_object_permissions(request, project)
 
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
@@ -298,7 +290,7 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        accessible_ids = _accessible_projects(self.request.user).values('id')
+        accessible_ids = accessible_projects(self.request.user).values('id')
         return View.objects.filter(project_id__in=accessible_ids).order_by('order', 'id')
 
 
