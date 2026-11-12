@@ -5,6 +5,7 @@ from django.conf import settings
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from ml.models import MLBackend, MLBackendAuth
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 # Server-managed / response-only fields. Excluded from OpenAPI *request* schemas only —
 # do not put these on Meta.read_only_fields (that would change runtime PATCH/POST behavior).
@@ -49,6 +50,16 @@ class MLBackendSerializer(serializers.ModelSerializer):
         validate_upload_url(value, block_local_urls=settings.ML_BLOCK_LOCAL_IP)
 
         return value
+
+    def validate_project(self, project):
+        # Runs before validate(), which sends this project's labeling config to the backend URL via /setup.
+        if self.instance is not None and project.id != self.instance.project_id:
+            raise serializers.ValidationError('An ML backend cannot be moved to another project.')
+
+        request = self.context.get('request')
+        if request is not None and not project.has_permission(request.user):
+            raise PermissionDenied('You do not have permission to use ML backends for this project.')
+        return project
 
     def _validate_authentication(self, attrs):
         if attrs.get('auth_method') == MLBackendAuth.BASIC_AUTH:
