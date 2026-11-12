@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 from organizations.models import OrganizationMember
+from organizations.tests.factories import OrganizationFactory
 from projects.api import ProjectListAPI
 from projects.models import ProjectManager, ProjectQuerySetWithFSM
 from projects.tests.factories import ProjectFactory
@@ -225,3 +226,35 @@ class TestProjectAnnotatorsAPI(APITestCase):
 
         assert response.status_code == 200
         assert [user['id'] for user in response.json()] == [visible.id]
+
+
+class TestProjectOrganizationIsReadOnly(APITestCase):
+    """organization is set from the caller's active organization at creation and never from the request body"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user = cls.project.created_by
+        cls.own_organization = cls.project.organization
+        cls.foreign_organization = OrganizationFactory()
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_patch_cannot_move_project_into_another_organization(self):
+        response = self.client.patch(
+            f'/api/projects/{self.project.id}/', {'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 200
+        assert response.json()['organization'] == self.own_organization.id
+        self.project.refresh_from_db()
+        assert self.project.organization_id == self.own_organization.id
+
+    def test_create_ignores_organization_in_body(self):
+        response = self.client.post(
+            '/api/projects/', {'title': 'Created', 'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 201
+        assert response.json()['organization'] == self.own_organization.id

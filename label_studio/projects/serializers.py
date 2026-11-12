@@ -97,6 +97,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     make sure, that you use correct one(Project.objects.with_counts())
     """
 
+    # Set from the caller's active organization at creation; never writable, or a PATCH moves the project cross-tenant
+    organization = serializers.PrimaryKeyRelatedField(read_only=True)
     task_number = serializers.IntegerField(default=None, read_only=True, help_text='Total task number in project')
     total_annotations_number = serializers.IntegerField(
         default=None,
