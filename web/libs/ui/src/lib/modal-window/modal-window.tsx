@@ -1,6 +1,6 @@
 "use client";
 
-import { IconClose } from "@humansignal/icons";
+import { XIcon } from "@humansignal/icons";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { CSSProperties, ReactNode } from "react";
 import { cnm } from "../../utils/utils";
@@ -58,6 +58,10 @@ export interface ModalWindowProps {
    */
   footer?: ReactNode;
   /**
+   * Status text on the left of the footer, next to the actions (e.g. "12 tasks selected").
+   */
+  footerMeta?: ReactNode;
+  /**
    * Show dimmed scrim behind the panel.
    * @default true
    */
@@ -67,6 +71,11 @@ export interface ModalWindowProps {
    * @default true
    */
   closeOnScrimClick?: boolean;
+  /**
+   * Close when focus moves to the page behind the panel (the panel has no focus trap).
+   * @default true
+   */
+  closeOnFocusOutside?: boolean;
   /**
    * Show the header close button.
    * @default true
@@ -132,8 +141,10 @@ export function ModalWindow({
   header,
   children,
   footer,
+  footerMeta,
   showScrim = true,
   closeOnScrimClick = true,
+  closeOnFocusOutside = true,
   showCloseButton = true,
   hideHeader = false,
   contentClassName,
@@ -161,12 +172,12 @@ export function ModalWindow({
         ]
       : isDialogVariant
         ? [
-            "fixed z-[2001] left-1/2 top-1/2 w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-lg",
+            "fixed z-[2001] left-1/2 top-1/2 w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-medium",
             !animate && "-translate-x-1/2 -translate-y-1/2",
             animate && styles.withAnimationDialog,
           ]
         : [
-            "fixed z-[2001] left-1/2 top-widest w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-lg",
+            "fixed z-[2001] left-1/2 top-widest w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-medium",
             !animate && "-translate-x-1/2",
             animate && styles.withAnimation,
           ],
@@ -207,6 +218,7 @@ export function ModalWindow({
           tabIndex={-1}
           onPointerDownOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
           onInteractOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
+          onFocusOutside={closeOnFocusOutside ? undefined : (e) => e.preventDefault()}
           onOpenAutoFocus={onOpenAutoFocus}
           onCloseAutoFocus={onCloseAutoFocus}
         >
@@ -277,7 +289,7 @@ export function ModalWindow({
                     look="string"
                     size="small"
                     className="shrink-0"
-                    leading={<IconClose />}
+                    leading={<XIcon size={16} weight="bold" />}
                     aria-label="Close"
                     data-testid="modal-window-close-button"
                   />
@@ -296,16 +308,30 @@ export function ModalWindow({
             {children}
           </div>
 
-          {footer ? (
+          {footer || footerMeta ? (
             <div
               className={cnm(
                 "shrink-0 border-t bg-neutral-surface rounded-b-medium border-neutral-border px-wide py-base",
+                footerMeta && "flex items-center justify-between gap-base",
                 footerClassName,
               )}
               data-slot="modal-window-footer"
               data-testid="modal-window-footer"
             >
-              {footer}
+              {footerMeta ? (
+                <>
+                  <div
+                    className="min-w-0 text-neutral-content-subtle"
+                    data-slot="modal-window-footer-meta"
+                    data-testid="modal-window-footer-meta"
+                  >
+                    {footerMeta}
+                  </div>
+                  <div className="shrink-0">{footer}</div>
+                </>
+              ) : (
+                footer
+              )}
             </div>
           ) : null}
         </DialogPrimitive.Content>

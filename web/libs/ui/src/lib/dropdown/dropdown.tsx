@@ -84,6 +84,8 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
     const { children } = props;
     const [currentVisible, setVisible] = useState(visible);
+    // The state last asked for, so a close while the menu is still opening is not dropped.
+    const requestedVisible = useRef(visible);
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(visible ? "visible" : null);
     const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
@@ -241,7 +243,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
               setVisibility(visible ? "before-appear" : "before-disappear");
             },
             afterTransition: () => {
-              setVisibility(visible ? "visible" : null);
+              setVisibility(requestedVisible.current ? "visible" : null);
               resolve();
             },
           });
@@ -252,16 +254,18 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
     const toggle = useCallback(
       async (updatedState?: boolean, disableAnimation?: boolean) => {
-        const newState = updatedState ?? !currentVisible;
+        const newState = updatedState ?? !requestedVisible.current;
+        if (requestedVisible.current === newState) return;
 
-        if (currentVisible !== newState) {
-          props.onToggle?.(newState);
-          await performAnimation(newState, disableAnimation);
-          setVisible(newState);
-          props.onVisibilityChanged?.(newState);
-        }
+        requestedVisible.current = newState;
+        props.onToggle?.(newState);
+        await performAnimation(newState, disableAnimation);
+        if (requestedVisible.current !== newState) return;
+
+        setVisible(newState);
+        props.onVisibilityChanged?.(newState);
       },
-      [currentVisible, performAnimation, props],
+      [performAnimation, props],
     );
 
     const close = useCallback(
@@ -297,6 +301,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     }, [close, open, ref, toggle, dropdown, visibility]);
 
     useEffect(() => {
+      requestedVisible.current = visible;
       setVisible(visible);
     }, [visible]);
 

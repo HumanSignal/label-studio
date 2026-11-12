@@ -11,7 +11,11 @@ export default defineManifest({
     "an app-local Modal re-export",
     "side editing that keeps the page visible (use Drawer)",
   ],
-  props_rules: ["destructive confirmations use a negative Button and, for high impact, typed validation"],
+  props_rules: [
+    "destructive confirmations use a negative Button and, for high impact, typed validation",
+    "one-line confirmations and notices open with confirm() / info() from @humansignal/ui, never a hand-built Dialog",
+    "status text next to the actions goes in footerMeta, left of the buttons",
+  ],
   replaces: [
     "services/lso/web/apps/labelstudio/src/components/Modal/Modal.tsx",
     "services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx",

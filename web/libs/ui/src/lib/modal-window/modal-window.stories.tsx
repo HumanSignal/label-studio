@@ -14,6 +14,7 @@ import { EmptyState } from "../empty-state/empty-state";
 import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
+import { confirm, info } from "./confirm";
 import { ModalWindow } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
@@ -550,5 +551,37 @@ export const CustomWidthEscapeHatch: Story = {
         Prefer `size` presets. Combining `contentClassName` with `size` is for migration or exceptional layouts only.
       </Message>
     </ModalStoryShell>
+  ),
+};
+
+/**
+ * `confirm()` and `info()` open a centred Dialog imperatively, for one-line decisions and notices.
+ * Destructive actions pass `buttonLook: "negative"`. The X, Escape and a click outside mean Cancel.
+ */
+export const ImperativeConfirm: Story = {
+  render: () => (
+    <div className="flex gap-tight">
+      <Button
+        variant="negative"
+        onClick={() =>
+          confirm({
+            title: "Delete 12 tasks?",
+            body: "Their annotations are deleted too. This cannot be undone.",
+            okText: "Delete",
+            buttonLook: "negative",
+            footerMeta: "12 tasks selected",
+          })
+        }
+      >
+        Open confirm()
+      </Button>
+      <Button
+        look="outlined"
+        variant="neutral"
+        onClick={() => info({ title: "Seats added", body: "Your organization now has 25 seats.", okText: "Got it" })}
+      >
+        Open info()
+      </Button>
+    </div>
   ),
 };

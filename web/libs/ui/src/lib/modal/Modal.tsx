@@ -1,7 +1,8 @@
-import { createRef, type ReactElement } from "react";
+import { createElement, createRef, type FC, type ReactElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { cnb as cn } from "@humansignal/core/lib/utils/bem";
-import { Button, type ButtonProps } from "../button/button";
+import type { ButtonProps } from "../button/button";
+import { confirm as confirmDialog, info as infoDialog } from "../modal-window/confirm";
 import { Modal, type ModalProps } from "./ModalPopup";
 import { ToastViewport } from "../toast/toast";
 
@@ -134,70 +135,70 @@ const standaloneModal = <T,>({ simple = true, ...props }: ModalProps<T> & ExtraP
   return modalControls;
 };
 
+/** Legacy dialogs were 600 px wide by default; the narrow ones they were given become `small`. */
+function legacyDialogSize(width: unknown): "small" | "medium" {
+  const px = typeof width === "number" ? width : Number.parseFloat(String(width ?? ""));
+  return Number.isFinite(px) && px <= 520 ? "small" : "medium";
+}
+
+/**
+ * Maps legacy modal props onto the public dialog options. Legacy confirmations could not be dismissed and legacy
+ * notices could; a call that passes `allowClose` keeps its choice.
+ */
+function toDialogOptions<T>(props: ModalProps<T> & ExtraProps, dismissibleByDefault: boolean) {
+  const {
+    title,
+    body,
+    children,
+    bodyProps,
+    width,
+    style,
+    allowClose,
+    unique,
+    onHidden,
+    simple = true,
+    providers,
+  } = props;
+  return {
+    title,
+    body: typeof body === "function" ? createElement(body as FC<unknown>, bodyProps as never) : (body ?? children),
+    dataTestId: props["data-testid"],
+    size: legacyDialogSize(width ?? style?.width),
+    allowClose: allowClose ?? dismissibleByDefault,
+    unique,
+    onHidden,
+    providers: simple ? [] : providers,
+  };
+}
+
 /**
  * Creates a confirmation modal with OK and Cancel buttons.
+ * @deprecated Use `confirm` from `@humansignal/ui`; this one forwards to it.
  */
 export const confirm = <T,>({ okText, onOk, cancelText, onCancel, buttonLook, ...props }: ConfirmProps<T>) => {
-  const modal = standaloneModal({
-    ...props,
-    allowClose: false,
-    footer: (
-      <div className="flex gap-2 justify-end">
-        <Button
-          onClick={() => {
-            onCancel?.();
-            modal.close();
-          }}
-          look="outlined"
-          variant="neutral"
-          autoFocus
-          aria-label={cancelText ?? "Cancel"}
-          data-testid="dialog-cancel-button"
-        >
-          {cancelText ?? "Cancel"}
-        </Button>
-
-        <Button
-          onClick={() => {
-            onOk?.();
-            modal.close();
-          }}
-          variant={buttonLook ?? "primary"}
-          aria-label={okText ?? "Confirm"}
-          data-testid="dialog-ok-button"
-        >
-          {okText ?? "OK"}
-        </Button>
-      </div>
-    ),
-  });
-
-  return modal;
+  const dialog = confirmDialog({ ...toDialogOptions(props, false), okText, onOk, cancelText, onCancel, buttonLook });
+  return {
+    update: (next: Partial<ConfirmProps<T>>) => dialog.update(toDialogOptions({ ...props, ...next }, false)),
+    close: () => dialog.close(),
+    get visible() {
+      return dialog.visible;
+    },
+  } satisfies ModalUpdate<T, ConfirmProps<T>>;
 };
 
 /**
  * Creates an informational modal with a single OK button.
+ * @deprecated Use `info` from `@humansignal/ui`; this one forwards to it.
  */
 export const info = <T,>({ okText, onOkPress, ...props }: InfoProps<T>) => {
-  const modal = standaloneModal({
-    ...props,
-    footer: (
-      <div className="flex gap-2 justify-end">
-        <Button
-          onClick={() => {
-            onOkPress?.();
-            modal.close();
-          }}
-          aria-label={okText ?? "OK"}
-          data-testid="dialog-ok-button"
-        >
-          {okText ?? "OK"}
-        </Button>
-      </div>
-    ),
-  });
-
-  return modal;
+  const dialog = infoDialog({ ...toDialogOptions(props, true), okText, onOkPress });
+  return {
+    update: (next: Partial<InfoProps<T>>) => dialog.update(toDialogOptions({ ...props, ...next }, true)),
+    close: () => dialog.close(),
+    get visible() {
+      return dialog.visible;
+    },
+  } satisfies ModalUpdate<T, InfoProps<T>>;
 };
 
 /**

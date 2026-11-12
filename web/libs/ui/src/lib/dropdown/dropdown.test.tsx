@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { useRef, useEffect } from "react";
 import { Dropdown, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
@@ -331,6 +331,47 @@ describe("Dropdown - Cursor Position Support", () => {
 
       // Dropdown renders (content is only in DOM after open)
       expect(screen.getByTestId("dropdown")).toBeInTheDocument();
+    });
+
+    it("stays closed when closed while it is still opening", async () => {
+      const pending: Array<() => void> = [];
+      aroundTransitionSpy?.mockImplementation(
+        mock(
+          (_element: any, callbacks: any) =>
+            new Promise<void>((resolve) => {
+              callbacks.beforeTransition?.();
+              callbacks.transition?.();
+              pending.push(() => {
+                callbacks.afterTransition?.();
+                resolve();
+              });
+            }),
+        ),
+      );
+      const onVisibilityChanged = mock();
+      const dropdownRef = { current: null as DropdownRef | null };
+      render(
+        <Dropdown ref={dropdownRef} onVisibilityChanged={onVisibilityChanged} dataTestId="dropdown">
+          <div>Content</div>
+        </Dropdown>,
+      );
+
+      let opening: Promise<void> | undefined;
+      let closing: Promise<void> | undefined;
+      act(() => {
+        opening = dropdownRef.current?.open();
+      });
+      act(() => {
+        closing = dropdownRef.current?.close();
+      });
+      await act(async () => {
+        for (const finish of pending.splice(0)) finish();
+        await Promise.all([opening, closing]);
+      });
+
+      expect(screen.getByTestId("dropdown")).not.toHaveClass("ls-visible");
+      expect(onVisibilityChanged).toHaveBeenCalledTimes(1);
+      expect(onVisibilityChanged).toHaveBeenLastCalledWith(false);
     });
 
     it("should call onVisibilityChanged callback when visibility changes", () => {
