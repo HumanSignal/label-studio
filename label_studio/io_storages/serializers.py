@@ -122,7 +122,15 @@ def reset_secrets_on_endpoint_change(storage, data, endpoint_fields, secret_fiel
     return True
 
 
-class ImportStorageSerializer(serializers.ModelSerializer):
+class StorageProjectValidationMixin:
+    def validate_project(self, project):
+        stored = get_stored_storage(self)
+        if stored is not None and getattr(project, 'id', None) != stored.project_id:
+            raise ValidationError('A storage cannot be moved to another project.')
+        return project
+
+
+class ImportStorageSerializer(StorageProjectValidationMixin, serializers.ModelSerializer):
     type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 
@@ -138,7 +146,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExportStorageSerializer(serializers.ModelSerializer):
+class ExportStorageSerializer(StorageProjectValidationMixin, serializers.ModelSerializer):
     type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 

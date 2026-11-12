@@ -5,6 +5,8 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from io_storages.base_models import ImportStorage
+from projects.models import Project
+from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
@@ -13,6 +15,16 @@ from .redis.api import RedisExportStorageListAPI, RedisImportStorageListAPI
 from .s3.api import S3ExportStorageListAPI, S3ImportStorageListAPI
 
 logger = logging.getLogger(__name__)
+
+
+def check_storage_project_permission(user, project_id):
+    """Deny before serializer/connection work if the caller cannot use this project."""
+    if project_id is None:
+        return
+    # DRF's get_object_or_404 turns a malformed pk ("abc", an object) into a 404 instead of a 500
+    project = generics.get_object_or_404(Project, pk=project_id)
+    if not project.has_permission(user):
+        raise PermissionDenied('You do not have permission to use storages for this project.')
 
 
 def validate_storage_instance(request, serializer_class):
@@ -45,14 +57,19 @@ def validate_storage_instance(request, serializer_class):
         if not instance.has_permission(request.user):
             raise PermissionDenied()
 
+    # Before is_valid(): concrete serializers often call validate_connection() inside validate().
+    check_storage_project_permission(request.user, request.data.get('project'))
+
     # combine instance fields with request.data
     serializer = serializer_class(data=request.data, context={'request': request})
     serializer.is_valid(raise_exception=True)
 
     # if storage exists, we have to use instance from DB,
-    # because instance from serializer won't have credentials, they were popped intentionally
+    # because instance from serializer won't have credentials, they were popped intentionally.
+    # Apply the request data in memory only: validating a connection must never save the storage.
     if instance:
-        instance = serializer.update(instance, serializer.validated_data)
+        for attr, value in serializer.validated_data.items():
+            setattr(instance, attr, value)
     else:
         instance = serializer_class.Meta.model(**serializer.validated_data)
 

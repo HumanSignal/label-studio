@@ -28,6 +28,10 @@ class StorageCreateMixin:
             storage = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not storage.has_permission(request.user):
                 raise PermissionDenied()
+        # Before is_valid()/validate_connection(): same project gate as validate + /files.
+        from io_storages.functions import check_storage_project_permission
+
+        check_storage_project_permission(request.user, request.data.get('project'))
         return super().create(request, *args, **kwargs)
 
 
