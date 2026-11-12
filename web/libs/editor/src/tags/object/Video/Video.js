@@ -74,7 +74,7 @@ import { isDefined } from "../../../utils/utilities";
  * @param {string} [sync] object name to sync with
  * @param {boolean} [muted=false] muted video
  * @param {number} [height=600] height of the video player
- * @param {number} [timelineHeight=64] height of the timeline with regions
+ * @param {number} [timelineHeight] explicit height of the timeline with regions in pixels; defaults to 20vh, clamped to 144-320px
  * @param {number} [defaultPlaybackSpeed=1] default playback speed the player should start with when loaded
  * @param {number} [minPlaybackSpeed=1] minimum allowed playback speed; defaultPlaybackSpeed cannot be set below this value
  */
