@@ -21,7 +21,7 @@ from rest_framework.test import APIRequestFactory
     [
         {'text': "don't replace apostrophes"},
         {"author's name": 'Ada'},
-        {'text': "'quoted' and \"double quoted\" with \\slashes"},
+        {'text': '\'quoted\' and "double quoted" with \\slashes'},
         [{'text': "l'été"}, {'text': "用户's text"}],
         {'text': 'ordinary', 'metadata': {'count': 3, 'active': True, 'score': 0.25}},
         [],
@@ -52,7 +52,7 @@ def test_legacy_single_quotes_and_non_json_inputs(encoded, expected):
 def test_inline_json_import_preserves_tasks_and_uploaded_bytes(mode, apostrophes, settings, tmp_path):
     settings.MEDIA_ROOT = str(tmp_path)
     project = ProjectFactory(label_config='<View><Text name="text" value="$text"/></View>')
-    texts = ["don't", "l'été", "'quoted' and \"double quoted\""] if apostrophes else ['one', 'two', 'three']
+    texts = ["don't", "l'été", '\'quoted\' and "double quoted"'] if apostrophes else ['one', 'two', 'three']
     key = "author's note" if apostrophes else 'note'
     expected = [{'text': text, key: index} for index, text in enumerate(texts)]
     encoded = json.dumps([{'data': data} for data in expected], ensure_ascii=False)
@@ -69,13 +69,9 @@ def test_inline_json_import_preserves_tasks_and_uploaded_bytes(mode, apostrophes
     else:
         project_import = ProjectImport.objects.create(project=project, url=encoded)
         if mode == 'async':
-            tasks, upload_ids, formats, data_keys = load_tasks_for_async_import(
-                project_import, project.created_by
-            )
+            tasks, upload_ids, formats, data_keys = load_tasks_for_async_import(project_import, project.created_by)
         else:
-            batches = list(
-                load_tasks_for_async_import_streaming(project_import, project.created_by, batch_size=2)
-            )
+            batches = list(load_tasks_for_async_import_streaming(project_import, project.created_by, batch_size=2))
             assert [len(batch[0]) for batch in batches] == [2, 1]
             tasks = [task for batch in batches for task in batch[0]]
             _, upload_ids, formats, data_keys = batches[-1]
