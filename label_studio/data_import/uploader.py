@@ -16,6 +16,7 @@ from core.utils.exceptions import extract_message
 from core.utils.io import ssrf_safe_get
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.datastructures import MultiValueDict
 from rest_framework.exceptions import ValidationError
 
 from .models import FileUpload
@@ -48,15 +49,23 @@ def check_tasks_max_file_size(value):
         )
 
 
+def _iter_uploaded_files(files):
+    if isinstance(files, MultiValueDict):
+        for _, uploads in files.lists():
+            yield from uploads
+    else:
+        yield from files.values()
+
+
 def check_extensions(files):
-    for filename, file_obj in files.items():
+    for file_obj in _iter_uploaded_files(files):
         _, ext = os.path.splitext(file_obj.name)
         if ext.lower() not in settings.SUPPORTED_EXTENSIONS:
             raise ValidationError(f'{ext} extension is not supported')
 
 
 def check_request_files_size(files):
-    total = sum([file.size for _, file in files.items()])
+    total = sum(file.size for file in _iter_uploaded_files(files))
 
     check_tasks_max_file_size(total)
 
@@ -170,7 +179,7 @@ def create_file_uploads(user, project, FILES):
     file_upload_ids = []
     check_request_files_size(FILES)
     check_extensions(FILES)
-    for _, file in FILES.items():
+    for file in _iter_uploaded_files(FILES):
         file_upload = create_file_upload(user, project, file)
         if file_upload.format_could_be_tasks_list:
             could_be_tasks_list = True
@@ -335,7 +344,7 @@ def load_tasks(request, project):
     if len(request.FILES) > 0:
         check_request_files_size(request.FILES)
         check_extensions(request.FILES)
-        for filename, file in request.FILES.items():
+        for file in _iter_uploaded_files(request.FILES):
             file_upload = create_file_upload(request.user, project, file)
             if file_upload.format_could_be_tasks_list:
                 could_be_tasks_list = True
