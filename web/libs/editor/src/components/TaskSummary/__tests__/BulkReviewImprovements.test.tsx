@@ -22,7 +22,7 @@
 import { render, screen } from "@testing-library/react";
 import { TaskSummaryControlPanel } from "../agreement-dashboard/task-summary-control-panel";
 import { openAutoReviewDialog } from "../agreement-dashboard/auto-review-dialog";
-import * as modal from "@humansignal/ui/lib/modal";
+import * as modal from "@humansignal/ui";
 import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth, GroundTruthCell } from "../agreement-dashboard/types";
 import type { MSTAnnotation } from "../../../stores/types";
 

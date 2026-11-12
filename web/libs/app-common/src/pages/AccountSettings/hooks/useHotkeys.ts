@@ -1,4 +1,4 @@
-import { confirm } from "@humansignal/ui/lib/modal";
+import { confirm } from "@humansignal/ui";
 import { ToastType, useToast } from "@humansignal/ui";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
@@ -304,7 +304,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
             : "Are you sure you want to reset only this project's hotkey override? Your account defaults and other projects will not be changed.",
         okText: projectId === undefined ? "Reset to Defaults" : "Reset Project Override",
         buttonLook: "negative",
-        style: { width: 500 },
+        size: "small",
         onOk: async () => {
           setIsLoading(true);
 

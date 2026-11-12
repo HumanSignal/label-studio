@@ -9,7 +9,7 @@
  * by auto-review-dialog.tsx.
  */
 
-import { confirm } from "@humansignal/ui/lib/modal";
+import { confirm } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import type { AnnotatorInfo, DimensionInfo, GroundTruthCell, RawResult, SummaryAnnotation } from "./types";

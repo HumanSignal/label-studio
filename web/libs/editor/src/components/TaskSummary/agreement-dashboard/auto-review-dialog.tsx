@@ -10,7 +10,7 @@
  * Comparison logic lives in annotation-review-logic.ts.
  */
 
-import { confirm } from "@humansignal/ui/lib/modal";
+import { confirm } from "@humansignal/ui";
 import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { cnm, Avatar } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";

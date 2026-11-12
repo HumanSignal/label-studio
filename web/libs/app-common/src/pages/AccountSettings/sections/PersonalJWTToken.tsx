@@ -11,7 +11,7 @@ import { Button, Message } from "@humansignal/ui";
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { modal, confirm } from "@humansignal/ui/lib/modal";
+import { confirm, modal } from "@humansignal/ui";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
@@ -131,10 +131,10 @@ export function PersonalJWTToken() {
     if (dialogOpened) return;
     setDialogOpened(true);
     modal({
-      visible: true,
       title: "New Auth Token",
-      style: { width: 680 },
-      body: CreateTokenForm,
+      size: "medium",
+      body: <CreateTokenForm />,
+      allowClose: true,
       closeOnClickOutside: false,
       onHidden: () => {
         setDialogOpened(false);

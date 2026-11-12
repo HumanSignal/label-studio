@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { modal } from "@humansignal/ui/lib/modal";
+import { modal } from "@humansignal/ui";
 import clsx from "clsx";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
@@ -167,12 +167,9 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
 
   const modalContent = useMemo(
     () => (
-      <div className="max-w-3xl max-h-[90vh] h-full overflow-hidden w-full mx-4 flex flex-col">
+      <div className="flex flex-col">
         <div className="px-wide py-base border-b border-neutral-border">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Keyboard Shortcuts</h2>
-          </div>
-          <p className="text-sm text-neutral-content-subtler mt-1">
+          <p className="text-sm text-neutral-content-subtler">
             View all available keyboard shortcuts.&nbsp;
             <a
               href={customizationPath}
@@ -250,15 +247,10 @@ export const openHotkeyHelp = (sectionOrUrl?: string | string[]): ModalReturn =>
 
   const modalInstance = modal({
     title: "Keyboard Shortcuts",
-    body: () => <HotkeyHelpModal sectionsToShow={sectionsToShow} />,
-    bare: true,
+    body: <HotkeyHelpModal sectionsToShow={sectionsToShow} />,
+    size: "large",
+    bodyClassName: "!p-0",
     allowClose: true,
-    width: 768,
-    style: {
-      maxWidth: "90vw",
-      maxHeight: "90vh",
-      height: "auto",
-    },
   });
 
   return {

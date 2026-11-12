@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { Badge, Button, cnm, Message, ToastType, Typography, useToast } from "@humansignal/ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
-import { confirm } from "@humansignal/ui/lib/modal";
+import { confirm } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { useLocation } from "react-router-dom";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";

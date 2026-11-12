@@ -1,6 +1,6 @@
 import { ApiContext, type ApiContextType } from "@humansignal/core";
 import { ToastProvider } from "@humansignal/ui";
-import * as modalModule from "@humansignal/ui/lib/modal";
+import * as modalModule from "@humansignal/ui";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import type { PropsWithChildren } from "react";

@@ -2,7 +2,7 @@ import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { createContext, type ReactNode, useContext } from "react";
 import { confirm as legacyConfirm, info as legacyInfo } from "../modal/Modal";
-import { confirm, info } from "./confirm";
+import { confirm, info, modal } from "./confirm";
 
 const Flavor = createContext("none");
 const FlavorProvider = ({ children }: { children?: ReactNode }) => (
@@ -183,5 +183,36 @@ describe("focus leaving a confirmation", () => {
     expect(onCancel).not.toHaveBeenCalled();
     await act(() => handle.close());
     outside.remove();
+  });
+});
+
+describe("modal", () => {
+  it("opens a workflow ModalWindow with its footer and closes from the X", async () => {
+    const onHidden = mock();
+    act(() => {
+      modal({
+        title: "Keyboard Shortcuts",
+        body: "Shortcut list",
+        footer: <span>Footer</span>,
+        onHidden,
+        allowClose: true,
+      });
+    });
+
+    const dialog = await screen.findByRole("dialog", { name: "Keyboard Shortcuts" });
+    expect(dialog).toHaveAttribute("data-variant", "workflow");
+    expect(screen.getByTestId("modal-window-footer")).toHaveTextContent("Footer");
+    fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    await gone();
+    await waitFor(() => expect(onHidden).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the X but ignores clicks outside when closeOnClickOutside is off", async () => {
+    const handle = modal({ title: "New token", body: "Copy it now", allowClose: true, closeOnClickOutside: false });
+    await screen.findByRole("dialog");
+    fireEvent.pointerDown(screen.getByTestId("modal-window-scrim"));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByTestId("modal-window-close-button")).toBeInTheDocument();
+    await act(() => handle.close());
   });
 });

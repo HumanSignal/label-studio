@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { Button, type ButtonProps } from "../button/button";
 import { ToastViewport } from "../toast/toast";
-import { Dialog, type ModalWindowSize } from "./modal-window";
+import { ModalWindow, type ModalWindowSize, type ModalWindowVariant } from "./modal-window";
 
 /** Close animation of ModalWindow (fade out), so the node is removed after it ends. */
 const CLOSE_DELAY_MS = 150;
@@ -16,12 +16,16 @@ type DialogBaseOptions = {
   size?: ModalWindowSize;
   /** Close with the X button, Escape and a click outside. The feature opening the dialog decides. @default false */
   allowClose?: boolean;
+  /** With `allowClose`, also close on a click outside. Turn off when closing by accident loses something. @default true */
+  closeOnClickOutside?: boolean;
   /** Reuse the open dialog with this key instead of opening a second one. */
   unique?: string;
   /** Called after the dialog closed and left the page. */
   onHidden?: () => void;
   /** App providers to wrap the dialog with (API, auth, toasts...), outermost first. */
   providers?: ReactElement[];
+  /** Classes for the body region; `p-0` removes the default padding. */
+  bodyClassName?: string;
   dataTestId?: string;
 };
 
@@ -38,6 +42,12 @@ export type ConfirmDialogOptions = DialogBaseOptions & {
 export type InfoDialogOptions = DialogBaseOptions & {
   okText?: string;
   onOkPress?: () => void;
+};
+
+export type ModalOptions = DialogBaseOptions & {
+  footer?: ReactNode;
+  /** @default "workflow" */
+  variant?: ModalWindowVariant;
 };
 
 export type DialogHandle<Options> = {
@@ -65,6 +75,7 @@ function openDialog<Options extends DialogBaseOptions>(
   initial: Options,
   renderFooter: (options: Options, close: (cancelled: boolean) => void) => ReactNode,
   onDismiss?: (options: Options) => void,
+  variant: ModalWindowVariant = "dialog",
 ): DialogHandle<Options> {
   const existing = initial.unique ? UNIQUE_DIALOGS.get(initial.unique) : undefined;
   if (existing) return existing as DialogHandle<Options>;
@@ -102,7 +113,8 @@ function openDialog<Options extends DialogBaseOptions>(
     root.render(
       withProviders(
         <>
-          <Dialog
+          <ModalWindow
+            variant={variant}
             open={open}
             onOpenChange={(next) => {
               if (!next && allowClose) finish(true);
@@ -110,14 +122,15 @@ function openDialog<Options extends DialogBaseOptions>(
             size={options.size ?? "medium"}
             title={options.title}
             showCloseButton={allowClose}
-            closeOnScrimClick={allowClose}
+            closeOnScrimClick={allowClose && (options.closeOnClickOutside ?? true)}
             closeOnFocusOutside={false}
             footer={renderFooter(options, finish)}
             footerMeta={options.footerMeta}
+            bodyClassName={options.bodyClassName}
             dataTestId={options.dataTestId}
           >
             {options.body}
-          </Dialog>
+          </ModalWindow>
           {hasToastProvider(options.providers) && <ToastViewport />}
         </>,
         options.providers,
@@ -195,4 +208,9 @@ export function info(options: InfoDialogOptions): DialogHandle<InfoDialogOptions
       </Button>
     </div>
   ));
+}
+
+/** Opens a ModalWindow imperatively, for surfaces opened from code that holds no React state. */
+export function modal(options: ModalOptions): DialogHandle<ModalOptions> {
+  return openDialog(options, ({ footer }) => footer, undefined, options.variant ?? "workflow");
 }

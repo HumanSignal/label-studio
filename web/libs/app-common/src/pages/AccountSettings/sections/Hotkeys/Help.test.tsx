@@ -51,6 +51,13 @@ describe("Hotkey Help customization link", () => {
     expect(link).toHaveAttribute("href", "/user/account/hotkeys?project=123");
   });
 
+  it("shows the title once, in the dialog header", async () => {
+    openModal = openHotkeyHelp("annotation");
+
+    expect(await screen.findByRole("dialog", { name: "Keyboard Shortcuts" })).toBeInTheDocument();
+    expect(screen.getAllByText("Keyboard Shortcuts")).toHaveLength(1);
+  });
+
   it("links to account hotkeys outside a project", async () => {
     window.history.pushState({}, "", "/user/account/hotkeys");
     openModal = openHotkeyHelp();

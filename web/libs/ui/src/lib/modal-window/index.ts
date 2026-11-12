@@ -8,7 +8,9 @@ export {
 export {
   confirm,
   info,
+  modal,
   type ConfirmDialogOptions,
   type DialogHandle,
   type InfoDialogOptions,
+  type ModalOptions,
 } from "./confirm";
