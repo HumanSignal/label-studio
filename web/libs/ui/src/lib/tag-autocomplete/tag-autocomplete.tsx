@@ -330,7 +330,7 @@ export const TagAutocomplete = forwardRef(
             >
               {isLoading ? (
                 <div className={styles.loadingContainer}>
-                  <Spinner size={20} />
+                  <Spinner size="smaller" />
                 </div>
               ) : (
                 <>

@@ -23,7 +23,7 @@ describe("Avatar", () => {
   });
 
   it("keeps initials legible on small avatars", () => {
-    render(<Avatar user={{ id: 3, first_name: "Ada", last_name: "Lovelace" }} size={16} />);
+    render(<Avatar user={{ id: 3, first_name: "Ada", last_name: "Lovelace" }} size="smaller" />);
 
     expect(screen.getByTestId("userpic").style.fontSize).toBe("8px");
   });
@@ -58,11 +58,11 @@ describe("Avatar", () => {
   });
 
   it.each([
-    ["xsmall", "16px", "8px"],
+    ["smaller", "16px", "8px"],
     ["small", "20px", "8px"],
     ["medium", "24px", "10px"],
     ["large", "28px", "12px"],
-    ["xlarge", "64px", "26px"],
+    ["larger", "64px", "26px"],
   ] as const)("draws the %s size at %s with %s initials", (size, width, fontSize) => {
     render(<Avatar user={{ id: 7, first_name: "Ada", last_name: "Lovelace" }} size={size} />);
 

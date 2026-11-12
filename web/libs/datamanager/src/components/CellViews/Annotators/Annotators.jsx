@@ -120,7 +120,7 @@ Annotators.FilterItem = UsersInjector(({ item }) => {
 
   return user ? (
     <Space size="small">
-      <Avatar user={user} size="xsmall" key={`user-${item}`} />
+      <Avatar user={user} size="smaller" key={`user-${item}`} />
       {user.displayName}
     </Space>
   ) : null;

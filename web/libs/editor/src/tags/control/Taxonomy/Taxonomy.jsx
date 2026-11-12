@@ -679,7 +679,7 @@ const HtxTaxonomy = observer(({ item }) => {
     return (
       <div className={className} style={visibleStyle}>
         <div className={cn("taxonomy").elem("loading").toClassName()} data-testid="taxonomy-loading">
-          <Spinner size={20} />
+          <Spinner size="smaller" />
         </div>
       </div>
     );

@@ -24,14 +24,14 @@ export const avatarInitials = (user: Record<string, any> | null | undefined, dis
 };
 
 /** The five avatar diameters, in px. `medium` is the default. */
-export const AVATAR_SIZES = { xsmall: 16, small: 20, medium: 24, large: 28, xlarge: 64 } as const;
+export const AVATAR_SIZES = { smaller: 16, small: 20, medium: 24, large: 28, larger: 64 } as const;
 export type AvatarSize = keyof typeof AVATAR_SIZES;
-const INITIALS_FONT_SIZE: Record<AvatarSize, number> = { xsmall: 8, small: 8, medium: 10, large: 12, xlarge: 26 };
+const INITIALS_FONT_SIZE: Record<AvatarSize, number> = { smaller: 8, small: 8, medium: 10, large: 12, larger: 26 };
 
-const resolveSize = (size: AvatarSize | number | undefined) =>
-  typeof size === "number"
-    ? { width: size, fontSize: Math.max(size * 0.4, 8) }
-    : { width: AVATAR_SIZES[size ?? "medium"], fontSize: INITIALS_FONT_SIZE[size ?? "medium"] };
+const resolveSize = (size: AvatarSize = "medium") => {
+  const name = size in AVATAR_SIZES ? size : "medium";
+  return { width: AVATAR_SIZES[name], fontSize: INITIALS_FONT_SIZE[name] };
+};
 
 export type AvatarProps = {
   /** A status marker pinned to a corner, usually an `AvatarBadge`. */
@@ -47,8 +47,8 @@ export type AvatarProps = {
   tooltipAlignment?: Align;
   /** Display name next to the avatar. */
   showUsername?: boolean;
-  /** xsmall 16, small 20, medium 24 (default), large 28, xlarge 64. A number in px still works for one release; use a name. */
-  size?: AvatarSize | number;
+  /** smaller 16, small 20, medium 24 (default), large 28, larger 64. */
+  size?: AvatarSize;
   /** Image URL when there is no `user.avatar`. */
   src?: string;
   style?: CSSProperties;

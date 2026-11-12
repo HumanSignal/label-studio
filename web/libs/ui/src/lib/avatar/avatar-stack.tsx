@@ -21,7 +21,7 @@ export interface AvatarStackProps {
   /** Ring colour between overlapping avatars; defaults to the page background. */
   overlayColor?: string | null;
   /** Avatar size for every avatar and the +N tile (default medium). */
-  size?: AvatarSize | number;
+  size?: AvatarSize;
   showUsernameTooltip?: boolean;
   showUsername?: boolean;
   useRandomBackground?: boolean;

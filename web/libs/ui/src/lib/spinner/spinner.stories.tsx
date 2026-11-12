@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Spinner } from "./spinner";
+import { SPINNER_SIZES, Spinner } from "./spinner";
 
 const meta: Meta<typeof Spinner> = {
   component: Spinner,
   title: "UI/Spinner",
   argTypes: {
-    size: { control: "number" },
+    size: { control: "select", options: Object.keys(SPINNER_SIZES), table: { defaultValue: { summary: "medium" } } },
     stopped: { control: "boolean" },
   },
 };
@@ -18,7 +18,7 @@ export const Default: Story = {
 };
 
 export const Small: Story = {
-  args: { size: 16 },
+  args: { size: "smaller" },
 };
 
 export const Stopped: Story = {

@@ -72,7 +72,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
         label: (
           <Tooltip title={optionLabel} alignment="top-left">
             <div className="flex gap-2 w-full items-center">
-              <Avatar user={displayUser} size="xsmall" key={`user-${user.id}`} showName={true} />
+              <Avatar user={displayUser} size="smaller" key={`user-${user.id}`} showName={true} />
               <Typography as="span" size="smallest" className="text-ellipsis text-nowrap overflow-hidden w-full">
                 {optionLabel}
               </Typography>
@@ -128,7 +128,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
           className="flex min-w-0 max-w-full items-center gap-1 overflow-hidden"
           data-testid="user-select-trigger-summary"
         >
-          {firstUser ? <Avatar user={firstUser} size="xsmall" /> : null}
+          {firstUser ? <Avatar user={firstUser} size="smaller" /> : null}
           <Typography as="span" size="smallest" className="min-w-0 truncate">
             {primaryLabel}
           </Typography>

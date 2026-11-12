@@ -101,7 +101,7 @@ export const MachineLearningSettings = () => {
         <Typography variant="headline" size="medium" className="mb-base">
           Model
         </Typography>
-        {loading && <Spinner size={32} />}
+        {loading && <Spinner size="medium" />}
         {loaded && backends.length === 0 && (
           <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
             <EmptyState

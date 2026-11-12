@@ -31,7 +31,7 @@ const meta: Meta<typeof AvatarStack> = {
     max: { control: { type: "number", min: 1, max: 12 } },
     size: {
       control: "select",
-      options: ["xsmall", "small", "medium", "large", "xlarge"],
+      options: ["smaller", "small", "medium", "large", "larger"],
       table: { defaultValue: { summary: "medium" } },
     },
     overlap: { control: "boolean" },

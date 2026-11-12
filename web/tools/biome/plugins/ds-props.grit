@@ -17,11 +17,11 @@ or {
   `<Avatar $attrs />` where {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `size={$n}` where { $n <: r"[0-9]+" },
-    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (xsmall, small, medium, large, xlarge), never a px number.", severity="warn")
+    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (smaller, small, medium, large, larger), never a px number.", severity="warn")
   },
   `<Avatar $attrs>$children</Avatar>` where {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `size={$n}` where { $n <: r"[0-9]+" },
-    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (xsmall, small, medium, large, xlarge), never a px number.", severity="warn")
+    register_diagnostic(span=$attrs, message="[ds/avatar-size] Avatar size is a name (smaller, small, medium, large, larger), never a px number.", severity="warn")
   }
 }

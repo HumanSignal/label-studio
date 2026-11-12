@@ -166,7 +166,7 @@ export const PersonalInfo = () => {
     <div className={styles.section} id="personal-info">
       <div className={styles.sectionContent}>
         <div className={styles.profilePhotoRow}>
-          <Avatar user={user} isInProgress={userInProgress} size="xlarge" className={styles.userPic} />
+          <Avatar user={user} isInProgress={userInProgress} size="larger" className={styles.userPic} />
           <div className={`${styles.sectionContent} ${styles.profilePhotoControls}`}>
             <Typography className={styles.profilePhotoLabel} variant="label" size="medium">
               Profile Photo

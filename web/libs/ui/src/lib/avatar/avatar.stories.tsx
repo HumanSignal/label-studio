@@ -48,7 +48,7 @@ export const Initials: Story = {};
 
 export const WithImage: Story = { args: { user: grace } };
 
-/** The five sizes. medium is the default; large is cards, stacks and the top bar; xlarge is one person as the page's subject. */
+/** The five sizes. medium is the default; large is cards, stacks and the top bar; larger is one person as the page's subject. */
 export const Sizes: Story = {
   render: (args) => (
     <div className="flex items-end gap-wider">

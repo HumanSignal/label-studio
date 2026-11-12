@@ -12,7 +12,7 @@ export default defineManifest([
       "a badge drawn on an avatar by hand",
       "userpic classes mixed onto Avatar",
     ],
-    props_rules: ["size is a name (xsmall, small, medium, large, xlarge), never a px number or CSS size"],
+    props_rules: ["size is a name (smaller, small, medium, large, larger), never a px number or CSS size"],
     replaces: ["services/lse/web/apps/labelstudio/src/pages/Organization/Models/@components/RunHistory/RunHistory.tsx"],
   },
 ]);

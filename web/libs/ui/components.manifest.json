@@ -70,7 +70,7 @@
         "userpic classes mixed onto Avatar"
       ],
       "props_rules": [
-        "size is a name (xsmall, small, medium, large, xlarge), never a px number or CSS size"
+        "size is a name (smaller, small, medium, large, larger), never a px number or CSS size"
       ],
       "replaces": [
         "services/lse/web/apps/labelstudio/src/pages/Organization/Models/@components/RunHistory/RunHistory.tsx"
@@ -707,7 +707,8 @@
       "name": "Spinner",
       "tier": 1,
       "exports": [
-        "Spinner"
+        "Spinner",
+        "SPINNER_SIZES"
       ],
       "intent": [
         "an action in progress"
@@ -716,6 +717,9 @@
       "never_when": [
         "loading a layout that will be filled (use Skeleton)",
         "an app-local spinner or CSS animation"
+      ],
+      "props_rules": [
+        "size is a name (smallest, smaller, small, medium, large, larger, largest), never a px number"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Spinner/Spinner.jsx",

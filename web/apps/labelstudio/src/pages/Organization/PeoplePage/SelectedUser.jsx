@@ -40,7 +40,7 @@ export const SelectedUser = ({ user, onClose }) => {
       </Button>
 
       <div className={cn("user-info").elem("header").toClassName()}>
-        <Avatar user={user} size="xlarge" />
+        <Avatar user={user} size="larger" />
         <div className={cn("user-info").elem("info-wrapper").toClassName()}>
           {fullName && <div className={cn("user-info").elem("full-name").toClassName()}>{fullName}</div>}
           <p className={cn("user-info").elem("email").toClassName()}>{user.email}</p>
