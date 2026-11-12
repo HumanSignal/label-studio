@@ -239,10 +239,13 @@ export default class Form extends React.Component {
 
   async submitWithAPI(action, body) {
     const urlParams = objectClean(this.props.params ?? {});
-    const response = await this.api.callApi(action, {
-      params: urlParams,
-      body,
-    });
+    const send = () =>
+      this.api.callApi(action, {
+        params: urlParams,
+        body,
+      });
+    // e.g. withStepUp from @humansignal/app-common, for forms that save a step-up protected setting
+    const response = await (this.props.sendRequest ? this.props.sendRequest(send) : send());
 
     this.setState({ lastResponse: response });
 

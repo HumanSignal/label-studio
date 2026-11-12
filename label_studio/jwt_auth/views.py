@@ -24,6 +24,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenBackendError, TokenError
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.views import TokenRefreshView, TokenViewBase
+from users.step_up import require_step_up
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,7 @@ class JWTSettingsAPI(CreateAPIView):
         return Response(self.get_serializer(jwt_settings).data)
 
     def post(self, request, *args, **kwargs):
+        require_step_up(request)
         jwt_settings = self.get_object()
         serializer = self.get_serializer(data=request.data, instance=jwt_settings)
         serializer.is_valid(raise_exception=True)
@@ -179,6 +181,10 @@ class LSAPITokenView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return LSAPITokenCreateSerializer
         return LSAPITokenListSerializer
+
+    def create(self, request, *args, **kwargs):
+        require_step_up(request)
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         # Check for existing valid tokens

@@ -797,6 +797,12 @@ POST_PROCESS_REIMPORT = 'core.utils.common.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 WHOAMI_USER_SERIALIZER = 'users.serializers.BaseWhoAmIUserSerializer'
 USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
+# Step-up authentication (users/step_up.py): how long a sign-in or password confirmation unlocks
+# credential and privilege actions on a cookie session, and the per-edition hooks
+STEP_UP_MAX_AGE_SECONDS = int(get_env('STEP_UP_MAX_AGE_SECONDS', 300))
+STEP_UP_METHOD = 'users.step_up.step_up_method'
+STEP_UP_CHECK_PASSWORD = 'users.step_up.check_password'
+STEP_UP_REAUTHENTICATE_URL = 'users.step_up.reauthenticate_url'
 ANNOTATOR_REVIEWER_FIREWALL = 'users.firewall.AnnotatorReviewerFirewall'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'

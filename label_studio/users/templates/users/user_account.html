@@ -157,45 +157,6 @@
       </footer>
     </form>
 
-    <!-- Token -->
-    <form action="" class="access_token__info">
-      <header>Access Token</header>
-      <div class="field field--wide">
-        <label for="access_token">Use this token to authenticate with our API:</label>
-        <input id="access_token" class="lsf-input-ls" name="access_token" type="text" value="{{token}}" readonly />
-        <p class="actions">
-          <button type="button" class="blinking-status lsf-button-ls" data-copy="access_token">Copy</button>
-          <button type="button" class="blinking-status lsf-button-ls" name="renew">Renew</button>
-        </p>
-      </div>
-      <!-- Example -->
-      <div class="field field--wide">
-        <label for="example_fetch">Example fetch projects data:</label>
-        <textarea id="example_fetch" class="example_code ls-textarea" type="text" readonly
-                  style="height: 92px; font-size: 14px; padding: 9px 16px">
-          {% if settings.HOSTNAME %}
-            curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token {{token}}'
-          {% else %}
-          curl -X GET {{ request.scheme }}://{{ request.get_host }}/api/projects/ -H 'Authorization: Token {{token}}'
-          {% endif %}
-        </textarea>
-        <p class="actions">
-          <button type="button" class="blinking-status lsf-button-ls" data-copy="example_fetch">Copy</button>
-
-          {% block api_docs %}
-          <a
-            class="lsf-button-ls"
-            href="https://labelstud.io/guide/api.html"
-            target="_blank"
-          >
-            Documentation
-          </a>
-          {% endblock %}
-        </p>
-      </div>
-    </form>
-
-
     <!-- Organization -->
     <form action="" class="organization block-info" id="organization">
       <header>
@@ -259,39 +220,6 @@
 
   <script>
     (() => {
-      {% if settings.HOSTNAME %}
-      const hostname = '{{ settings.HOSTNAME }}';
-      {% else %}
-      const hostname = '{{ request.scheme }}://{{ request.get_host }}';
-      {% endif %}
-
-      document.querySelectorAll('[data-copy]').forEach(button => {
-        button.onclick = e => {
-          const input = document.getElementById(e.target.dataset.copy);
-          input.select();
-          document.execCommand("copy");
-          input.setSelectionRange(0, 0);
-          input.blur();
-          button.classList.add('blink');
-          setTimeout(() => button.classList.remove('blink'))
-        }
-      });
-
-      document.querySelector('[name=renew]').onclick = e => {
-        const button = e.target;
-        const input = document.getElementById("access_token");
-        const example = document.getElementById("example_fetch");
-
-        fetch("{% url 'current-user-reset-token' %}", { method: "POST", headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-          .then(res => res.json())
-          .then(res => {
-            input.value = res.token;
-            example.value = `curl -X GET ${hostname}/api/projects/ -H 'Authorization: Token ${res.token}'`
-            button.classList.add('blink');
-            setTimeout(() => button.classList.remove('blink'))
-          });
-      };
-
       $('[name=avatar]').on('change', async (e) => {
         const formData = new FormData;
 

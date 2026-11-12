@@ -20,6 +20,7 @@ from users.functions import check_avatar
 from users.hotkeys import get_hotkey_project
 from users.models import User
 from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerUpdate, WhoAmIUserSerializer
+from users.step_up import require_step_up, verify_password
 
 logger = logging.getLogger(__name__)
 
@@ -243,6 +244,7 @@ class UserResetTokenAPI(APIView):
     permission_required = all_permissions.users_token_any
 
     def post(self, request, *args, **kwargs):
+        require_step_up(request)
         user = request.user
         token = user.reset_token()
         logger.debug(f'New token for user {user.pk} is {token.key}')
@@ -277,9 +279,22 @@ class UserGetTokenAPI(APIView):
     permission_required = all_permissions.users_token_any
 
     def get(self, request, *args, **kwargs):
+        require_step_up(request)
         user = request.user
         token = Token.objects.get(user=user)
         return Response({'token': str(token)}, status=200)
+
+
+@extend_schema(exclude=True)
+class UserStepUpAPI(APIView):
+    """Confirm the current password to unlock step-up protected actions for this browser session."""
+
+    parser_classes = (JSONParser,)
+    permission_required = all_permissions.users_token_any
+
+    def post(self, request, *args, **kwargs):
+        verify_password(request, request.data.get('current_password'))
+        return Response(status=204)
 
 
 @method_decorator(

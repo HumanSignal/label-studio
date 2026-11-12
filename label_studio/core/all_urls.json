@@ -510,6 +510,12 @@
         "decorators": ""
     },
     {
+        "url": "/user/reauthenticate/",
+        "module": "users.views.user_reauthenticate",
+        "name": "user-reauthenticate",
+        "decorators": ""
+    },
+    {
         "url": "/user/account/<sub_path>",
         "module": "users.views.user_account",
         "name": "user-account-anything",
@@ -531,6 +537,12 @@
         "url": "/api/current-user/token",
         "module": "users.api.UserGetTokenAPI",
         "name": "current-user-token",
+        "decorators": ""
+    },
+    {
+        "url": "/api/current-user/step-up",
+        "module": "users.api.UserStepUpAPI",
+        "name": "current-user-step-up",
         "decorators": ""
     },
     {

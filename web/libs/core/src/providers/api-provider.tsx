@@ -11,6 +11,7 @@ import {
 import type { ApiResponse, WrappedResponse } from "../lib/api-proxy/types";
 import { getApiInstance } from "../lib/api-provider/api-instance";
 import type { ApiCallOptions, ApiContextType, ErrorHandlerOptions, FormattedError } from "../lib/api-provider/types";
+import { stepUpChallengeOf } from "../lib/utils/step-up";
 
 export const ApiContext = createContext<ApiContextType | null>(null);
 ApiContext.displayName = "ApiContext";
@@ -113,6 +114,11 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<ApiProvi
         const result = await api.invoke<T>(method, params, rest);
 
         if (result?.error) {
+          // The caller answers a step-up challenge with withStepUp (@humansignal/app-common): not an error to show
+          if (stepUpChallengeOf(result)) {
+            return result;
+          }
+
           const shouldShowGlobalError = !errorFilter || errorFilter(result) === false;
 
           if (suppressError !== true) {

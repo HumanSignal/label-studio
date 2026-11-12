@@ -7,3 +7,4 @@ export { useStateHistory, type StateHistoryItem, type StateHistoryResponse } fro
 
 // Components
 export * from "./components/state-chips";
+export { withStepUp } from "./components/step-up/with-step-up";

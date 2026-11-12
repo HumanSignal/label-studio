@@ -16,6 +16,7 @@ export * from "./lib/utils/bem";
 export * from "./lib/utils/visitedProjects";
 export * from "./lib/utils/billing";
 export * from "./lib/utils/user-role";
+export * from "./lib/utils/step-up";
 export * from "./hooks/useAbortController";
 export * from "./hooks/useResolveUser";
 export * from "./lib/hooks/useCopyText";

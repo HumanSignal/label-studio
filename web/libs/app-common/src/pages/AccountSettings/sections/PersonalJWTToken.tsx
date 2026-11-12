@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
+import { withStepUp } from "../../../components/step-up/with-step-up";
 import { Button, Message } from "@humansignal/ui";
 
 /**
@@ -44,7 +45,7 @@ const refreshTokenAtom = atomWithMutation((get) => {
     mutationKey: ["refresh-token"],
     async mutationFn() {
       const api = getApiInstance();
-      const token = await api.invoke("accessTokenGetRefreshToken");
+      const token = await withStepUp("Create an access token", () => api.invoke("accessTokenGetRefreshToken"));
       if (!token.$meta.ok) {
         console.error(token.error);
         return "";
