@@ -555,13 +555,15 @@ class RichTextPieceView extends Component {
         onMouseMove: this._onMouseMove,
         onMouseUp: this._onMouseUp,
         onMouseOverCapture: this._onRegionMouseOver,
+        // Task HTML may contain forms; submitting one navigates the labeling app away (iframe mode: sandbox has no allow-forms)
+        onSubmitCapture: (ev) => ev.preventDefault(),
       };
 
       return (
         <ObjectTag item={item} className={cn("richtext").toClassName()}>
           <div
             key="root"
-            className={cn("richtext").elem("container").mix("htx-richtext").toClassName()}
+            className={cn("richtext").elem("container").mod({ hypertext: !isText }).mix("htx-richtext").toClassName()}
             ref={(el) => {
               item.mountNodeRef.current = el;
               el && this.markObjectAsLoaded();

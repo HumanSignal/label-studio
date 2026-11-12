@@ -106,6 +106,55 @@ describe("Helper function html sanitize", () => {
     expect(sanitizeHtml(input)).toBe(input);
   });
 
+  // INT-30729: a <button formaction="javascript:..."> stretched over the viewport ran script on any click
+  test("strips javascript: formaction but keeps the button and its style", () => {
+    const style = "position:fixed;top:0;left:0;width:100vw;height:100vh;opacity:0.01;z-index:99999";
+    const input = `<form><button formaction="javascript:alert('XSS-'+document.domain)" style="${style}">x</button></form>`;
+    expect(sanitizeHtml(input)).toBe(`<form><button style="${style}">x</button></form>`);
+  });
+
+  test.each([
+    ['<form action="javascript:alert(1)"><button>x</button></form>', "<form><button>x</button></form>"],
+    ['<input type="submit" formaction="javascript:alert(1)">', '<input type="submit" />'],
+    ['<button formaction="JaVaScRiPt:alert(1)">x</button>', "<button>x</button>"],
+    ['<button formaction=" \tjava&#x09;script:alert(1)">x</button>', "<button>x</button>"],
+    ['<button formaction="&#106;avascript:alert(1)">x</button>', "<button>x</button>"],
+    ['<button formaction="vbscript:msgbox(1)">x</button>', "<button>x</button>"],
+    ['<button formaction="data:text/html,<script>alert(1)</script>">x</button>', "<button>x</button>"],
+    ['<svg><a xlink:href="javascript:alert(1)"><text>x</text></a></svg>', "<svg><a><text>x</text></a></svg>"],
+    ['<object data="javascript:alert(1)"></object>', "<object></object>"],
+    ['<a href="/x" ping="javascript:alert(1)">x</a>', '<a href="/x">x</a>'],
+    ['<table background="javascript:alert(1)"><tr><td>x</td></tr></table>', "<table><tr><td>x</td></tr></table>"],
+    ['<video poster="javascript:alert(1)"></video>', "<video></video>"],
+  ])("strips script-capable URLs from every URL attribute: %s", (input, expected) => {
+    expect(sanitizeHtml(input)).toBe(expected);
+  });
+
+  test.each([
+    '<form action="https://example.com/submit"><button formaction="https://example.com/b">x</button></form>',
+    '<svg><a xlink:href="https://example.com"><text>x</text></a></svg>',
+    '<video poster="https://example.com/p.png"></video>',
+  ])("keeps http(s) URL attributes: %s", (input) => {
+    expect(sanitizeHtml(input)).toBe(input);
+  });
+
+  test.each([
+    [
+      '<svg><a><animate attributeName="href" values="javascript:alert(1)"></animate><text>x</text></a></svg>',
+      '<svg><a><animate attributename="href"></animate><text>x</text></a></svg>',
+    ],
+    [
+      '<svg><a><set attributeName="xlink:href" to="javascript:alert(1)"></set><text>x</text></a></svg>',
+      '<svg><a><set attributename="xlink:href"></set><text>x</text></a></svg>',
+    ],
+    [
+      '<svg><a><animate attributeName=" HREF " from="javascript:alert(1)" to="x" by="y"></animate></a></svg>',
+      '<svg><a><animate attributename=" HREF "></animate></a></svg>',
+    ],
+  ])("drops SVG animation values that would rewrite href: %s", (input, expected) => {
+    expect(sanitizeHtml(input)).toBe(expected);
+  });
+
   test("strips invalid iframe src (bad URL)", () => {
     expect(sanitizeHtml('<iframe src="not-a-url"></iframe>')).toBe("");
   });
