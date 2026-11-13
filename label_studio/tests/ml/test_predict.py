@@ -1,6 +1,9 @@
 import json
+from types import SimpleNamespace
 
 import pytest
+from ml.api_connector import MLApiResult
+from ml.models import MLBackend
 
 from label_studio.tests.utils import make_project, make_task
 
@@ -89,3 +92,31 @@ def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_p
     assert payload['predictions'][0]['model_version'] == 'ModelA'
     assert payload['predictions'][1]['result'][0]['value']['choices'][0] == 'label_B'
     assert payload['predictions'][1]['model_version'] == 'ModelB'
+
+
+@pytest.mark.parametrize(
+    'invalid_response',
+    [None, 42, 'invalid', [None], [42], ['invalid'], ['result'], [{'score': 0.5}]],
+)
+def test_invalid_ml_prediction_does_not_discard_other_tasks(invalid_response, caplog):
+    tasks = [{'id': 1, 'project': 10}, {'id': 2, 'project': 10}]
+    valid_response = {'result': [{'value': {'choices': ['label_A']}}], 'score': 0.9}
+    api_result = MLApiResult(response={'results': [invalid_response, valid_response]})
+    backend = SimpleNamespace(
+        api=SimpleNamespace(make_predictions=lambda tasks, project: api_result),
+        project=object(),
+        model_version='test-version',
+    )
+
+    predictions = MLBackend._get_predictions_from_ml_backend(backend, tasks)
+
+    assert predictions == [
+        {
+            'task': 2,
+            'result': valid_response['result'],
+            'score': 0.9,
+            'model_version': 'test-version',
+            'project': 10,
+        }
+    ]
+    assert 'incorrect prediction' in caplog.text
