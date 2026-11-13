@@ -674,17 +674,21 @@ class temporary_disconnect_list_signal:
 
     def __init__(self, signals):
         self.signals = signals
+        self._disconnected_signals = []
 
     def __enter__(self):
+        disconnected_signals = []
+        self._disconnected_signals.append(disconnected_signals)
         for signal in self.signals:
             sig = signal[0]
             receiver = signal[1]
             sender = signal[2]
             dispatch_uid = signal[3] if len(signal) > 3 else None
-            sig.disconnect(receiver=receiver, sender=sender, dispatch_uid=dispatch_uid)
+            if sig.disconnect(receiver=receiver, sender=sender, dispatch_uid=dispatch_uid):
+                disconnected_signals.append(signal)
 
     def __exit__(self, type_, value, traceback):
-        for signal in self.signals:
+        for signal in self._disconnected_signals.pop():
             sig = signal[0]
             receiver = signal[1]
             sender = signal[2]
