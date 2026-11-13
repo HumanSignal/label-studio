@@ -90,9 +90,7 @@ def test_export_archive_has_only_the_returned_temporary_file(export_project, exp
     tasks = _tasks(count)
     before = copy.deepcopy(tasks)
 
-    output, content_type, filename = DataExport.generate_export_file(
-        export_project, tasks, output_format, False, {}
-    )
+    output, content_type, filename = DataExport.generate_export_file(export_project, tasks, output_format, False, {})
 
     with output:
         assert content_type == 'application/zip'
