@@ -459,7 +459,7 @@ stages:
     url: "{django_live_url}{invite_url}"
     data:
       email: other_user@heartex.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302

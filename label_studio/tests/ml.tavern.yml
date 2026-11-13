@@ -12,7 +12,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -98,7 +98,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -239,7 +239,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -360,7 +360,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'

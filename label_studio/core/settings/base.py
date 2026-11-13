@@ -364,6 +364,8 @@ AUTH_PASSWORD_VALIDATORS = [
             'max_length': AUTH_PASSWORD_MAX_LENGTH,
         },
     },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Django templates

@@ -95,7 +95,7 @@ def test_user_info(business_client):
 @pytest.mark.parametrize(
     'command_line, result',
     [
-        (['label-studio', 'user', '--username', 'test@test.com', '--password', '12345678'], None),
+        (['label-studio', 'user', '--username', 'test@test.com', '--password', 'qNpC-opxvYm.ttg4'], None),
     ],
 )
 @pytest.mark.django_db

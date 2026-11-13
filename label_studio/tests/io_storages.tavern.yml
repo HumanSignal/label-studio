@@ -1137,7 +1137,7 @@ stages:
   request:
     data:
       email: test_export_gcs_storage@test.com
-      password: 12345678
+      password: StrongPassw0rd
       title: test_export_gcs_storage
     method: POST
     url: '{django_live_url}/user/signup'

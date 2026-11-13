@@ -11,7 +11,7 @@ stages:
       url: "{django_live_url}/user/signup"
       data:
         email: test_suites_user@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302
@@ -21,7 +21,7 @@ stages:
       url: "{django_live_url}/user/login"
       data:
         email: test_suites_user@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302
