@@ -24,7 +24,7 @@ import {
 } from "@humansignal/icons";
 import { Badge, Button, Dropdown, Label, Message, Tooltip, type DropdownRef } from "@humansignal/ui";
 import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/ui/shad/components/ui/popover";
-import { Tabs, TabsList, TabsTrigger } from "@humansignal/ui";
+import { SegmentedControl } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import {
   DEFAULT_ANNOTATIONS_LIST_FILTER,
@@ -208,21 +208,19 @@ interface TypeFilterControlProps {
 function TypeFilterControl({ value, onChange }: TypeFilterControlProps) {
   return (
     <Label text="Result type" flat simple className={cn("annotations-list-filter").elem("typeFilter").toClassName()}>
-      <Tabs value={value} variant="default" className={cn("annotations-list-filter").elem("typeTabs").toClassName()}>
-        <TabsList className={cn("annotations-list-filter").elem("typeTabsList").toClassName()}>
-          {TYPE_FILTER_OPTIONS.map((option) => (
-            <TabsTrigger
-              key={option.value}
-              value={option.value}
-              className={cn("annotations-list-filter").elem("typeTab").toClassName()}
-              onClick={() => onChange(option.value)}
-              data-testid={`annotations-list-filter-type-${option.value}`}
-            >
-              {option.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <SegmentedControl
+        fullWidth
+        aria-label="Result type"
+        className={cn("annotations-list-filter").elem("typeTabsList").toClassName()}
+        selectedOption={value}
+        onChange={(next) => onChange(next as AnnotationsListTypeFilter)}
+        options={TYPE_FILTER_OPTIONS.map((option) => ({
+          value: option.value,
+          label: option.label,
+          className: cn("annotations-list-filter").elem("typeTab").toClassName(),
+          "data-testid": `annotations-list-filter-type-${option.value}`,
+        }))}
+      />
     </Label>
   );
 }
@@ -230,54 +228,54 @@ function TypeFilterControl({ value, onChange }: TypeFilterControlProps) {
 interface BooleanFilterControlProps {
   value: AnnotationsListBooleanFilter;
   onChange: (value: AnnotationsListBooleanFilter) => void;
+  label: string;
   testIdPrefix: string;
   disabled?: boolean;
 }
 
 const FILTER_ICON_SIZE = 12;
 
-function BooleanFilterControl({ value, onChange, testIdPrefix, disabled = false }: BooleanFilterControlProps) {
+function BooleanFilterControl({ value, onChange, label, testIdPrefix, disabled = false }: BooleanFilterControlProps) {
   const tabValue = value === true ? "is" : value === false ? "not" : "any";
 
+  const handleChange = (next: string) => {
+    if (next === "any") onChange(null);
+    else if (next === "is") onChange(value === true ? null : true);
+    else onChange(value === false ? null : false);
+  };
+  const tab = cn("annotations-list-filter").elem("booleanTab");
+
   return (
-    <Tabs
-      value={tabValue}
-      variant="default"
-      className={cn("annotations-list-filter").elem("booleanTabs").toClassName()}
-    >
-      <TabsList className={cn("annotations-list-filter").elem("booleanTabsList").toClassName()}>
-        <TabsTrigger
-          value="any"
-          aria-label="Any"
-          disabled={disabled}
-          className={cn("annotations-list-filter").elem("booleanTab").mod({ any: true }).toClassName()}
-          onClick={() => onChange(null)}
-          data-testid={`${testIdPrefix}-any`}
-        >
-          <MinusIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />
-        </TabsTrigger>
-        <TabsTrigger
-          value="is"
-          aria-label="Show"
-          disabled={disabled}
-          className={cn("annotations-list-filter").elem("booleanTab").mod({ is: true }).toClassName()}
-          onClick={() => onChange(value === true ? null : true)}
-          data-testid={`${testIdPrefix}-is`}
-        >
-          <CheckIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />
-        </TabsTrigger>
-        <TabsTrigger
-          value="not"
-          aria-label="Hide"
-          disabled={disabled}
-          className={cn("annotations-list-filter").elem("booleanTab").mod({ not: true }).toClassName()}
-          onClick={() => onChange(value === false ? null : false)}
-          data-testid={`${testIdPrefix}-not`}
-        >
-          <XIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <SegmentedControl
+      aria-label={label}
+      className={cn("annotations-list-filter").elem("booleanTabsList").toClassName()}
+      selectedOption={tabValue}
+      onChange={handleChange}
+      disabled={disabled}
+      options={[
+        {
+          value: "any",
+          "aria-label": "Any",
+          label: <MinusIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />,
+          className: tab.mod({ any: true }).toClassName(),
+          "data-testid": `${testIdPrefix}-any`,
+        },
+        {
+          value: "is",
+          "aria-label": "Show",
+          label: <CheckIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />,
+          className: tab.mod({ is: true }).toClassName(),
+          "data-testid": `${testIdPrefix}-is`,
+        },
+        {
+          value: "not",
+          "aria-label": "Hide",
+          label: <XIcon size={FILTER_ICON_SIZE} aria-hidden="true" weight="bold" />,
+          className: tab.mod({ not: true }).toClassName(),
+          "data-testid": `${testIdPrefix}-not`,
+        },
+      ]}
+    />
   );
 }
 
@@ -463,6 +461,7 @@ export function AnnotationsListFilter({
                       <BooleanFilterControl
                         value={filter.statuses[row.field] ?? null}
                         onChange={(value) => setStatus(row.field, value)}
+                        label={row.label}
                         testIdPrefix={`annotations-list-filter-status-${row.field}`}
                         disabled={disabled}
                       />

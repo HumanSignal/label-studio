@@ -2,7 +2,7 @@ import { type FC, useState, useMemo } from "react";
 import sanitizeHtml from "sanitize-html";
 import { Markdown } from "../../../../editor/src/components/Markdown/Markdown";
 import { Modal } from "../modal";
-import { Tabs, TabsList, TabsTrigger } from "../tabs/tabs";
+import { SegmentedControl } from "../segmented-control/segmented-control";
 import styles from "./reader-view-modal.module.css";
 
 type ContentFormat = "plain" | "markdown" | "html";
@@ -65,13 +65,16 @@ export const ReaderViewModal: FC<ReaderViewModalProps> = ({ content, isOpen, onC
   };
 
   const headerContent = (
-    <Tabs value={format} onValueChange={(v) => setFormat(v as ContentFormat)} variant="default">
-      <TabsList>
-        <TabsTrigger value="plain">Plain Text</TabsTrigger>
-        <TabsTrigger value="markdown">Markdown</TabsTrigger>
-        <TabsTrigger value="html">HTML</TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <SegmentedControl
+      aria-label="Format"
+      selectedOption={format}
+      onChange={(v) => setFormat(v as ContentFormat)}
+      options={[
+        { value: "plain", label: "Plain Text" },
+        { value: "markdown", label: "Markdown" },
+        { value: "html", label: "HTML" },
+      ]}
+    />
   );
 
   return (

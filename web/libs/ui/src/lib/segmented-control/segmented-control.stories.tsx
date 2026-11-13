@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { ListIcon, SquaresFourIcon } from "@humansignal/icons";
 import { useState } from "react";
 import { SegmentedControl, type SegmentedControlOption } from "./segmented-control";
 
@@ -39,6 +40,18 @@ export const ThreeOptions: Story = {
         { value: "day", label: "Day" },
         { value: "week", label: "Week" },
         { value: "month", label: "Month" },
+      ]}
+    />
+  ),
+};
+
+/** Icon-only options take a `tooltip`, which is also their accessible name. */
+export const IconOptions: Story = {
+  render: () => (
+    <Controlled
+      options={[
+        { value: "cards", label: <SquaresFourIcon />, tooltip: "Switch to Cards View" },
+        { value: "table", label: <ListIcon />, tooltip: "Switch to List View" },
       ]}
     />
   ),

@@ -124,17 +124,13 @@
     }
   }
 
-  &__typeTabs {
-    width: 100%;
-  }
-
   &__typeTabsList {
     width: 100%;
     gap: 2px;
     padding: 2px;
   }
 
-  &__typeTab {
+  &__typeTabsList &__typeTab {
     flex: 1;
     min-width: 0;
     font-size: var(--font-size-label-smallest);
@@ -212,17 +208,13 @@
     }
   }
 
-  &__booleanTabs {
-    flex-shrink: 0;
-  }
-
   &__booleanTabsList {
     min-width: 120px;
     gap: 2px;
     padding: 2px;
   }
 
-  &__booleanTabs &__booleanTab {
+  &__booleanTabsList &__booleanTab {
     min-width: 36px;
     line-height: 16px;
     padding: var(--spacing-tighter) var(--spacing-tightest);
@@ -232,12 +224,12 @@
   }
 
   &__booleanTab {
-    &_is[data-state="active"] {
+    &_is[aria-checked="true"] {
       background-color: var(--color-positive-surface);
       color: var(--color-positive-surface-content);
     }
 
-    &_not[data-state="active"] {
+    &_not[aria-checked="true"] {
       background-color: var(--color-negative-surface);
       color: var(--color-negative-surface-content);
     }
