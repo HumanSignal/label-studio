@@ -31,7 +31,7 @@
   {% endblock %}
 
   {% block theme_colors %}
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
       function handleThemeColor() {
         let themeColor = window.localStorage.getItem("preferred-color-scheme");
         if (themeColor === "Auto") {
