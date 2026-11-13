@@ -89,7 +89,7 @@ def _assert_upload(project, file_ids, extension):
 @pytest.mark.parametrize('suffix', ['', '?token=example', '?signature=abc/def&expires=123#download'])
 def test_url_import_uses_path_without_changing_request_query(text_project, file_server, extension, redirect, suffix):
     base_url, received = file_server
-    path = f"{'/redirect' if redirect else ''}/tasks.{extension}{suffix}"
+    path = f'{"/redirect" if redirect else ""}/tasks.{extension}{suffix}'
     keys, formats, tasks, ids, could_be_list = tasks_from_url(
         [], text_project, text_project.created_by, base_url + path, False
     )
@@ -98,9 +98,7 @@ def test_url_import_uses_path_without_changing_request_query(text_project, file_
     assert set(keys) == {'text'}
     assert formats == {f'.{extension}': 1}
     assert could_be_list == (extension == 'csv')
-    assert received == [path.split('#')[0]] + (
-        [path.removeprefix('/redirect').split('#')[0]] if redirect else []
-    )
+    assert received == [path.split('#')[0]] + ([path.removeprefix('/redirect').split('#')[0]] if redirect else [])
     _assert_upload(text_project, ids, extension)
 
 
@@ -108,7 +106,7 @@ def test_url_import_uses_path_without_changing_request_query(text_project, file_
 @pytest.mark.parametrize('redirect', [False, True])
 def test_encoded_path_names_select_parser_after_decoding(text_project, file_server, filename, redirect):
     base_url, _ = file_server
-    path = f"{'/redirect' if redirect else ''}/{filename}?token=example"
+    path = f'{"/redirect" if redirect else ""}/{filename}?token=example'
     _, _, tasks, ids, _ = tasks_from_url([], text_project, text_project.created_by, base_url + path, False)
     assert [task['data'] for task in tasks] == EXPECTED
     _assert_upload(text_project, ids, 'json')
@@ -148,7 +146,7 @@ def test_saved_project_import_url_uses_the_same_filename_rules(text_project, fil
 @pytest.mark.parametrize('redirect', [False, True])
 def test_query_cannot_override_unsupported_path_extension(text_project, file_server, redirect):
     base_url, _ = file_server
-    path = f"{'/redirect' if redirect else ''}/tasks.exe?filename=tasks.json"
+    path = f'{"/redirect" if redirect else ""}/tasks.exe?filename=tasks.json'
     with pytest.raises(ValidationError, match='extension is not supported'):
         tasks_from_url([], text_project, text_project.created_by, base_url + path, False)
     assert text_project.file_uploads.count() == 0
