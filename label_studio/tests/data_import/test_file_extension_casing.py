@@ -79,7 +79,9 @@ def test_file_format_case_selects_same_native_parser(text_project, extension, ca
 @pytest.mark.django_db
 @pytest.mark.parametrize('extension', ['json', 'csv', 'tsv'])
 @pytest.mark.parametrize('casing', ['upper', 'mixed'])
-def test_native_import_api_persists_rows_for_supported_extension_casing(business_client, text_project, extension, casing):
+def test_native_import_api_persists_rows_for_supported_extension_casing(
+    business_client, text_project, extension, casing
+):
     content, expected = _contents(extension)
     response = business_client.post(
         f'/api/projects/{text_project.id}/import',
@@ -87,7 +89,9 @@ def test_native_import_api_persists_rows_for_supported_extension_casing(business
     )
 
     assert response.status_code == 201, response.content
-    assert list(text_project.tasks.order_by('id').values_list('data', flat=True)) == [task['data'] for task in expected]
+    assert list(text_project.tasks.order_by('id').values_list('data', flat=True)) == [
+        task['data'] for task in expected
+    ]
     assert text_project.file_uploads.count() == 1
 
 
