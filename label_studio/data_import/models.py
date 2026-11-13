@@ -58,7 +58,7 @@ class FileUpload(models.Model):
     def format(self):
         file_format = None
         try:
-            file_format = os.path.splitext(self.filepath)[-1]
+            file_format = os.path.splitext(self.filepath)[-1].lower()
         except:  # noqa: E722
             pass
         finally:
