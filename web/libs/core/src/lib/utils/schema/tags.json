@@ -836,10 +836,9 @@
       },
       "timelineHeight": {
         "name": "timelineHeight",
-        "description": "height of the timeline with regions",
+        "description": "explicit height of the timeline with regions in pixels; defaults to 20vh, clamped to 144-320px",
         "type": "number",
-        "required": false,
-        "default": 64
+        "required": false
       },
       "defaultPlaybackSpeed": {
         "name": "defaultPlaybackSpeed",
