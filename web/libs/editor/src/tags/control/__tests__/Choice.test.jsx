@@ -641,6 +641,23 @@ describe("HtxChoice view", () => {
     expect(bold).toHaveTextContent("Bold");
   });
 
+  it("removes srcdoc and re-parsable markup from item.html", () => {
+    const item = createMockItem({
+      _value: "V",
+      html: '<iframe src="https://www.youtube.com/embed/x" srcdoc="<script>alert(1)</script>"></iframe><option>&lt;img src=x onerror=alert(1)&gt;</option><b>Bold</b>',
+    });
+    const store = createMockStore();
+    render(
+      <Provider store={store}>
+        <HtxChoice item={item} />
+      </Provider>,
+    );
+    expect(document.querySelector("iframe[srcdoc]")).toBeNull();
+    expect(document.querySelector("[onerror]")).toBeNull();
+    expect(document.querySelector("iframe[src]")).toBeInTheDocument();
+    expect(document.querySelector("b")).toBeInTheDocument();
+  });
+
   it("renders as radio when isCheckbox is false (single-radio)", () => {
     const item = createMockItem({ _value: "R", isCheckbox: false });
     const store = createMockStore();

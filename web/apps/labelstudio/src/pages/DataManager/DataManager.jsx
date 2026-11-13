@@ -16,6 +16,7 @@ import { ExportPage } from "../ExportPage/ExportPage";
 import { clearProjectHotkeysRuntime } from "@humansignal/app-common/pages/AccountSettings/hooks/useHotkeys";
 import { initializeDataManager } from "./initializeDataManager";
 import { useReloadDataManagerOnProjectChange } from "./useReloadDataManagerOnProjectChange";
+import { sanitizeHtml } from "../../../../../libs/editor/src/utils/sanitizeHtml";
 
 import "./DataManager.prefix.css";
 
@@ -265,7 +266,7 @@ DataManagerPage.context = ({ dmRef }) => {
     if (isLabelStream && show_instruction && expert_instruction) {
       modal({
         title: "Labeling Instructions",
-        body: <div dangerouslySetInnerHTML={{ __html: expert_instruction }} />,
+        body: <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(expert_instruction) }} />,
         style: { width: 680 },
       });
     }
@@ -299,7 +300,7 @@ DataManagerPage.context = ({ dmRef }) => {
               body: () => (
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: project.expert_instruction,
+                    __html: sanitizeHtml(project.expert_instruction),
                   }}
                 />
               ),

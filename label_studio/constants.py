@@ -182,3 +182,5 @@ UNSAFE_HTML_TAGS = [
 ]
 
 SAFE_INSTRUCTION_HTML_TAGS = [tag for tag in SAFE_HTML_TAGS if tag not in UNSAFE_HTML_TAGS]
+
+SAFE_HTML_PROTOCOLS = ['http', 'https', 'mailto']
