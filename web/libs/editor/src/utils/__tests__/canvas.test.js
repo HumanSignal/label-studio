@@ -14,7 +14,7 @@ const svgs = {
     "'data:image/svg+xml,",
     '%3Csvg xmlns="http://www.w3.org/2000/svg" height="16" width="2"%3E',
     '%3Ctext x="0" y="11" style="font-size: 9.5px; font-weight: bold; font-family: var(--font-mono);"%3E',
-    "A&lt;/text%3E B",
+    "A&lt;/text&gt; B",
     "%3C/text%3E%3C/svg%3E'",
   ].join(""),
   score: [
@@ -39,8 +39,51 @@ describe("Helper function labelToSVG", () => {
   });
 
   test("Complex label", () => {
-    // labels will be already escaped
-    expect(Canvas.labelToSVG({ label: "A&lt;/text>   B" })).toBe(svgs.complex);
+    expect(Canvas.labelToSVG({ label: "A</text>   B" })).toBe(svgs.complex);
+  });
+
+  test("measures label markup as text", () => {
+    const label = '<img src="x" onerror="window.__labelToSvgXss = 1">';
+    const appendChild = spyOn(document.body, "appendChild");
+
+    try {
+      Canvas.labelToSVG({ label });
+
+      const captured = appendChild.mock.calls.map(([node]) => node).find((node) => node.localName === "svg");
+
+      expect(captured).toBeDefined();
+      expect(captured.querySelector("img")?.outerHTML).toBeUndefined();
+      expect(captured.textContent).toBe(label);
+    } finally {
+      appendChild.mockRestore();
+    }
+  });
+
+  test("XML-escapes label markup in the SVG", () => {
+    const label = 'A</text><image href="x"/>\'B"&';
+    const out = Canvas.labelToSVG({ label });
+    const inner = out.slice(1, -1);
+
+    expect(inner).not.toContain("'");
+
+    const svg = decodeURIComponent(inner.slice("data:image/svg+xml,".length));
+    const doc = new DOMParser().parseFromString(svg, "image/svg+xml");
+
+    expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+    expect(doc.getElementsByTagName("text")).toHaveLength(1);
+    expect(doc.getElementsByTagName("text")[0].textContent).toBe(label);
+    expect(doc.getElementsByTagName("image")).toHaveLength(0);
+  });
+
+  test("renders labels with XML special characters", () => {
+    const out = Canvas.labelToSVG({ label: "R&D" });
+    const svg = decodeURIComponent(out.slice(1, -1).slice("data:image/svg+xml,".length));
+    const doc = new DOMParser().parseFromString(svg, "image/svg+xml");
+
+    expect(out).toContain("R&amp;D");
+    expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+    expect(doc.getElementsByTagName("text")).toHaveLength(1);
+    expect(doc.getElementsByTagName("text")[0].textContent).toBe("R&D");
   });
 
   test("With score", () => {
