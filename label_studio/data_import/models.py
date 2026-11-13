@@ -77,25 +77,35 @@ class FileUpload(models.Model):
 
     def _detect_csv_separator(self):
         """
-        Detect the CSV separator by analyzing the first line of the file.
+        Detect the CSV separator from the first logical record.
 
-        This method implements a reliable heuristic:
-        1. If semicolons are more frequent than commas in the first line, use semicolon
-        2. Otherwise, default to comma
+        Count commas and semicolons outside double-quoted fields, including
+        fields with escaped quotes or embedded newlines. Prefer semicolon
+        only when it is more frequent; otherwise, default to comma.
 
         Returns:
             str: The detected separator (',' or ';')
         """
         try:
-            # Read the first line to analyze separators
             with self.file.open() as f:
-                first_line = f.readline()
-                if isinstance(first_line, bytes):
-                    first_line = first_line.decode('utf-8')
-
-                # Count potential separators
-                comma_count = first_line.count(',')
-                semicolon_count = first_line.count(';')
+                comma_count = semicolon_count = 0
+                in_quotes = False
+                at_field_start = True
+                for line_number, line in enumerate(f):
+                    if isinstance(line, bytes):
+                        line = line.decode('utf-8')
+                    if line_number == 0:
+                        line = line.removeprefix('\ufeff')
+                    for char in line:
+                        if char == '"' and (in_quotes or at_field_start):
+                            in_quotes = not in_quotes
+                            at_field_start = not in_quotes
+                        elif not in_quotes:
+                            comma_count += char == ','
+                            semicolon_count += char == ';'
+                            at_field_start = char in ',;'
+                    if not in_quotes:
+                        break
 
                 # Use semicolon if it's clearly indicated by higher frequency
                 if semicolon_count > comma_count:
@@ -116,9 +126,9 @@ class FileUpload(models.Model):
         """
         Read tasks from a CSV file with automatic separator detection.
 
-        The separator is automatically detected by analyzing the first line:
-        - If semicolons are clearly indicated (more frequent than commas), use semicolon
-        - Otherwise, use the default comma separator
+        The separator is detected from commas and semicolons outside quoted
+        fields in the first logical record. Semicolon is selected only when
+        it is more frequent; otherwise, comma is used.
 
         Returns:
             list: List of tasks in the format [{'data': {...}}, ...]
