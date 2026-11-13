@@ -99,13 +99,11 @@ def test_native_import_api_persists_rows_for_supported_extension_casing(text_pro
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('extension', ['txt', 'html'])
+@pytest.mark.parametrize('extension', ['txt', 'csv'])
 def test_explicit_file_as_asset_keeps_original_url_and_bytes(text_project, extension):
     content, _ = _contents(extension)
     filename = _filename(extension, 'upper')
-    file_upload = create_file_upload(
-        text_project.created_by, text_project, SimpleUploadedFile(filename, content)
-    )
+    file_upload = create_file_upload(text_project.created_by, text_project, SimpleUploadedFile(filename, content))
 
     expected = [{'data': {settings.DATA_UNDEFINED_NAME: file_upload.url}}]
     assert file_upload.read_tasks(file_as_tasks_list=False) == expected
