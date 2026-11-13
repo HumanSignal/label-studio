@@ -224,24 +224,24 @@ describe("Stepper", () => {
     expect(await screen.findByTestId("tooltip-body")).toHaveTextContent("Complete the previous step first");
   });
 
-  it("applies stepLayoutCompact when size is compact", () => {
-    render(<Stepper steps={steps} currentStepIndex={0} size="compact" onStepSelect={() => {}} data-testid="stepper" />);
+  it("applies stepLayoutCompact when size is small", () => {
+    render(<Stepper steps={steps} currentStepIndex={0} size="small" onStepSelect={() => {}} data-testid="stepper" />);
     expect(screen.getByTestId("stepper-step-0").className).toContain("stepLayoutCompact");
     expect(screen.getByTestId("stepper-step-0").className).not.toContain("stepLayoutDefault");
   });
 
-  it("applies stepLayoutDefault by default for horizontal variant", () => {
+  it("applies stepLayoutDefault by default for horizontal orientation", () => {
     render(<Stepper steps={steps} currentStepIndex={0} onStepSelect={() => {}} data-testid="stepper" />);
     expect(screen.getByTestId("stepper-step-0").className).toContain("stepLayoutDefault");
   });
 
-  it("renders vertical connectors in the badge column when variant is vertical", () => {
+  it("renders vertical connectors in the badge column when orientation is vertical", () => {
     render(
       <Stepper
         steps={steps}
         currentStepIndex={1}
-        variant="vertical"
-        size="compact"
+        orientation="vertical"
+        size="small"
         onStepSelect={() => {}}
         data-testid="stepper"
       />,

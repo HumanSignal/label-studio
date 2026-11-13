@@ -60,7 +60,7 @@ function Browser({ withActions = false, withFooter = false }: { withActions?: bo
   const actions = (node: Node) => (
     <Button
       variant="neutral"
-      look="string"
+      look="ghost"
       size="small"
       leading={<DotsThreeVerticalIcon weight="bold" />}
       aria-label={`Actions for ${node.label}`}
@@ -77,7 +77,7 @@ function Browser({ withActions = false, withFooter = false }: { withActions?: bo
           count={column.items.length}
           footer={
             withFooter && (
-              <Button variant="neutral" look="string" size="small" leading={<PlusIcon size={16} weight="bold" />}>
+              <Button variant="neutral" look="ghost" size="small" leading={<PlusIcon size={16} weight="bold" />}>
                 Add item
               </Button>
             )
@@ -132,7 +132,7 @@ export const SingleColumn: Story = {
         title="Catalog"
         count={3}
         footer={
-          <Button variant="neutral" look="string" size="small" leading={<PlusIcon size={16} weight="bold" />}>
+          <Button variant="neutral" look="ghost" size="small" leading={<PlusIcon size={16} weight="bold" />}>
             Add item
           </Button>
         }

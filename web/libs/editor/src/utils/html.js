@@ -535,6 +535,39 @@ const DEFAULT_ALLOWED_IFRAME_DOMAINS = [
   "canva.com",
 ];
 
+/**
+ * Attributes whose value the browser loads or navigates to as a URL. sanitize-html only checks
+ * `href`, `src` and `cite` by default, so `<button formaction="javascript:...">` ran script on click.
+ * Every attribute here keeps only the http(s)/ftp/mailto/tel schemes; javascript:, vbscript: and data: are dropped.
+ */
+const URL_ATTRIBUTES = [
+  "href",
+  "src",
+  "cite",
+  "action",
+  "formaction",
+  "xlink:href",
+  "background",
+  "poster",
+  "data",
+  "ping",
+  "codebase",
+  "longdesc",
+  "usemap",
+  "lowsrc",
+  "dynsrc",
+  "manifest",
+  "icon",
+  "profile",
+  "classid",
+  "archive",
+];
+
+// SVG <animate>/<set> can rewrite href at runtime (`values="javascript:..."`), past the attribute check above
+const SVG_ANIMATION_TAGS = ["animate", "set"];
+const SVG_ANIMATION_VALUE_ATTRIBUTES = ["values", "to", "from", "by"];
+const isUrlAttributeName = (name) => /^(xlink:)?href$/i.test(String(name ?? "").trim());
+
 function getAllowedIframeDomains() {
   const fromSettings =
     (typeof window !== "undefined" && window.APP_SETTINGS && window.APP_SETTINGS.allowed_iframe_domains) || null;
@@ -583,6 +616,7 @@ function sanitizeHtml(html = []) {
     allowedAttributes: false,
     disallowedTagsMode: "discard",
     allowVulnerableTags: true,
+    allowedSchemesAppliedToAttributes: URL_ATTRIBUTES,
     exclusiveFilter(frame) {
       // For iframes, only block if NOT from whitelisted domain
       if (frame.tag === "iframe") {
@@ -608,6 +642,9 @@ function sanitizeHtml(html = []) {
             delete attribs[attr];
           }
         });
+        if (SVG_ANIMATION_TAGS.includes(tagName.toLowerCase()) && isUrlAttributeName(attribs.attributename)) {
+          SVG_ANIMATION_VALUE_ATTRIBUTES.forEach((attr) => delete attribs[attr]);
+        }
         return {
           tagName,
           attribs,

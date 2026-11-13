@@ -116,7 +116,7 @@ export const EnterpriseUpgradeOverlay = forwardRef<HTMLDivElement, EnterpriseUpg
           {onClose && (
             <Button
               className={styles.closeButton}
-              look="string"
+              look="ghost"
               variant="neutral"
               size="small"
               onClick={onClose}

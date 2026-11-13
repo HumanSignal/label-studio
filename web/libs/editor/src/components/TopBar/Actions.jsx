@@ -29,7 +29,7 @@ export const Actions = ({ store }) => {
             aria-label="Compare all annotations"
             onClick={() => onToggleVisibility()}
             variant={isViewAll ? "primary" : "neutral"}
-            look={isViewAll ? "filled" : "string"}
+            look={isViewAll ? "filled" : "ghost"}
             style={{
               height: 36,
               width: 36,
@@ -48,7 +48,7 @@ export const Actions = ({ store }) => {
           <Button
             icon={<IconTrash />}
             variant="negative"
-            look="string"
+            look="ghost"
             type="text"
             aria-label="Delete"
             onClick={() => {
@@ -74,7 +74,7 @@ export const Actions = ({ store }) => {
           <Button
             icon={<IconCopy style={{ width: 36, height: 36 }} />}
             variant="neutral"
-            look="string"
+            look="ghost"
             type="text"
             aria-label="Copy Annotation"
             onClick={(ev) => {
@@ -100,7 +100,7 @@ export const Actions = ({ store }) => {
       <Button
         icon={<IconSettings />}
         variant="neutral"
-        look="string"
+        look="ghost"
         aria-label="Settings"
         onClick={() => store.toggleSettings()}
         style={{
@@ -114,7 +114,7 @@ export const Actions = ({ store }) => {
         <Button
           icon={<IconInfo style={{ width: 16, height: 16 }} />}
           variant={store.showingDescription ? "primary" : "neutral"}
-          look={store.showingDescription ? "filled" : "string"}
+          look={store.showingDescription ? "filled" : "ghost"}
           aria-label="Instructions"
           onClick={() => store.toggleDescription()}
           style={{

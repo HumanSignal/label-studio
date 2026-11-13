@@ -1,10 +1,17 @@
 import { clsx } from "clsx";
 import styles from "./segmented-control.module.css";
 import { useMemo, useRef, type KeyboardEvent } from "react";
+import { Tooltip } from "../Tooltip/Tooltip";
 
 export interface SegmentedControlOption {
   label?: string | JSX.Element;
   value: string;
+  /** Shown on hover. Also the option's accessible name when the label is only an icon. */
+  tooltip?: string;
+  "aria-label"?: string;
+  /** Overrides the default `${data-testid}-${value}` id. */
+  "data-testid"?: string;
+  className?: string;
 }
 
 export interface SegmentedControlProps {
@@ -54,36 +61,41 @@ export const SegmentedControl = ({
       aria-disabled={disabled || undefined}
       data-testid={dataTestId}
     >
-      {options?.map((option, index) => (
-        <button
-          key={option.value}
-          ref={(element) => {
-            optionRefs.current[index] = element;
-          }}
-          className={clsx(styles.segmentedControl__option, {
-            [styles.segmentedControl__option_selected]: selectedIndex === index,
-          })}
-          onClick={() => onChange?.(option.value)}
-          onKeyDown={(event) => handleKeyDown(event, index)}
-          type="button"
-          disabled={disabled}
-          role="radio"
-          aria-checked={selectedIndex === index}
-          tabIndex={selectedIndex === index || (selectedIndex === -1 && index === 0) ? 0 : -1}
-          data-testid={dataTestId ? `${dataTestId}-${option.value}` : undefined}
-        >
-          {option?.label ?? option.value}
-        </button>
-      ))}
+      {options?.map((option, index) => {
+        const button = (
+          <button
+            key={option.value}
+            ref={(element) => {
+              optionRefs.current[index] = element;
+            }}
+            className={clsx(
+              styles.segmentedControl__option,
+              { [styles.segmentedControl__option_selected]: selectedIndex === index },
+              option.className,
+            )}
+            onClick={() => onChange?.(option.value)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
+            type="button"
+            disabled={disabled}
+            role="radio"
+            aria-checked={selectedIndex === index}
+            aria-label={option["aria-label"] ?? option.tooltip}
+            tabIndex={selectedIndex === index || (selectedIndex === -1 && index === 0) ? 0 : -1}
+            data-testid={option["data-testid"] ?? (dataTestId ? `${dataTestId}-${option.value}` : undefined)}
+          >
+            {option.label ?? option.value}
+          </button>
+        );
+        return option.tooltip ? (
+          <Tooltip key={option.value} title={option.tooltip}>
+            {button}
+          </Tooltip>
+        ) : (
+          button
+        );
+      })}
     </div>
   );
 };
-
-/** @deprecated Use `SegmentedControl`. */
-export const MultiStateToggle = SegmentedControl;
-/** @deprecated Use `SegmentedControlOption`. */
-export type MultiStateToggleOption = SegmentedControlOption;
-/** @deprecated Use `SegmentedControlProps`. */
-export type MultiStateToggleProps = SegmentedControlProps;
 
 export default SegmentedControl;

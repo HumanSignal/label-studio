@@ -60,7 +60,7 @@ const TwoColumns = ({ children }: { children: ReactNode[] }) => (
   <div className={children.length > 1 ? "grid grid-cols-2 gap-base" : "flex flex-col"}>{children}</div>
 );
 
-/** "anything clickable (use Button look=string or Toggle)" → the rule plus the replacement in bold. */
+/** "anything clickable (use Button look=ghost or Toggle)" → the rule plus the replacement in bold. */
 const NeverItem = ({ text }: { text: string }) => {
   const match = text.match(/^(.*?)\s*\(use ([^)]+)\)\s*$/);
   return (

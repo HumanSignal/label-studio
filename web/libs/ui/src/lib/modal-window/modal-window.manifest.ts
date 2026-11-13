@@ -12,6 +12,7 @@ export default defineManifest({
     "side editing that keeps the page visible (use Drawer)",
   ],
   props_rules: [
+    "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",
     "destructive confirmations use a negative Button and, for high impact, typed validation",
     "one-line confirmations and notices open with confirm() / info() from @humansignal/ui, never a hand-built Dialog",
     "status text next to the actions goes in footerMeta, left of the buttons",

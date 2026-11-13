@@ -553,6 +553,50 @@ describe("RichText view", () => {
       expect(ev.preventDefault).toHaveBeenCalled();
     });
 
+    // INT-30729: a form in task HTML must never submit (a submit navigates away from, or reloads, the labeling app)
+    it("prevents form submission from task content in inline mode", () => {
+      const mockItem = createMockItem({
+        _value: "<form><button>x</button></form>",
+        type: "richtext",
+        inline: true,
+      });
+      const store = { settings: {} };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+
+      const { container } = render(
+        <Provider store={store}>
+          <HyperTextView item={mockItem} store={store} />
+        </Provider>,
+      );
+
+      const form = container.querySelector("form");
+      expect(form).toBeInTheDocument();
+      const ev = new Event("submit", { bubbles: true, cancelable: true });
+      form.dispatchEvent(ev);
+      expect(ev.defaultPrevented).toBe(true);
+    });
+
+    it("adds the containment modifier to the inline container for HyperText only", () => {
+      const store = { settings: {} };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+      const TextView = Registry.getViewByTag("text");
+
+      const hyper = render(
+        <Provider store={store}>
+          <HyperTextView item={createMockItem({ _value: "<p>x</p>", type: "richtext", inline: true })} store={store} />
+        </Provider>,
+      );
+      expect(hyper.container.querySelector("[class*='richtext__container_hypertext']")).toBeInTheDocument();
+
+      const text = render(
+        <Provider store={store}>
+          <TextView item={createMockItem({ _value: "Hello", type: "text", inline: true })} store={store} />
+        </Provider>,
+      );
+      expect(text.container.querySelector("[class*='richtext__container']")).toBeInTheDocument();
+      expect(text.container.querySelector("[class*='richtext__container_hypertext']")).toBeNull();
+    });
+
     it("calls addRegion when mouseup triggers captureSelection with valid range", () => {
       const addRegion = mock();
       const mockItem = createMockItem({

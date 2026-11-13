@@ -206,7 +206,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
               <Button
                 type="button"
                 variant="neutral"
-                look="string"
+                look="ghost"
                 aria-label={`${accountMenuOpened ? "Close" : "Open"} account menu`}
                 aria-haspopup="menu"
                 aria-expanded={accountMenuOpened}

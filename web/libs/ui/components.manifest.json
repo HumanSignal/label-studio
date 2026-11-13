@@ -90,12 +90,12 @@
       "use_when": "A short label that states an attribute (Required, Inherited, a count) or a status of an item.",
       "never_when": [
         "booleans or attributes most rows share (use Typography)",
-        "anything clickable (use Button look=string or Toggle)",
+        "anything clickable (use Button look=ghost or Toggle)",
         "an icon, dot, check or cross inside",
         "a local span with rounded-full classes"
       ],
       "props_rules": [
-        "look is always the filled default, never outline",
+        "look is always the filled default; outlined only on selection controls, where it means not selected",
         "shape=rounded for lifecycle states, square for attributes",
         "state colours follow the registry table: neutral initial, primary in process, warning needs attention, plum in review, positive done, negative failed",
         "size via the size prop only, never className overrides"
@@ -141,7 +141,7 @@
         "more than one filled primary Button per screen"
       ],
       "props_rules": [
-        "look=filled only for the single main action; outlined or string for the rest",
+        "look=filled only for the single main action; outlined or ghost for the rest; no other look",
         "icon-only buttons pass aria-label",
         "variant negative only for destructive actions, which also confirm"
       ],
@@ -467,6 +467,9 @@
         "custom coloured info boxes",
         "transient results (use Toast)"
       ],
+      "props_rules": [
+        "variant is a colour (primary, neutral, positive, negative, warning, enterprise); look is filled or ghost"
+      ],
       "replaces": [
         "services/lse/web/apps/labelstudio/src/components_lse/Warning/Warning.jsx",
         "services/lso/web/libs/editor/src/components/ErrorMessage/ErrorMessage.jsx"
@@ -490,6 +493,7 @@
         "side editing that keeps the page visible (use Drawer)"
       ],
       "props_rules": [
+        "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",
         "destructive confirmations use a negative Button and, for high impact, typed validation",
         "one-line confirmations and notices open with confirm() / info() from @humansignal/ui, never a hand-built Dialog",
         "status text next to the actions goes in footerMeta, left of the buttons"
@@ -593,14 +597,13 @@
       "name": "SegmentedControl",
       "tier": 1,
       "exports": [
-        "SegmentedControl",
-        "MultiStateToggle"
+        "SegmentedControl"
       ],
       "intent": [
         "switch the view or format of the same content",
         "pick one of up to five visible options"
       ],
-      "use_when": "Switching views, filtering the same data or showing the same content in another format (list or grid, form or JSON, a short filter). MultiStateToggle is its deprecated old name.",
+      "use_when": "Switching views, filtering the same data or showing the same content in another format (list or grid, form or JSON, a short filter).",
       "never_when": [
         "moving between sub-sections whose content differs (use Tabs)",
         "more than five options (use Select)",
@@ -762,6 +765,9 @@
       "never_when": [
         "numbered Badges in a row",
         "Tabs used as steps"
+      ],
+      "props_rules": [
+        "orientation sets the direction (horizontal, vertical); size is medium or small"
       ],
       "replaces": [],
       "dir": "lib/stepper"

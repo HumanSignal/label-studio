@@ -75,7 +75,7 @@ export const CollectionHeader = ({
         <Tooltip title="Grid view">
           <Button
             size="small"
-            look={view === "grid" ? "filled" : "string"}
+            look={view === "grid" ? "filled" : "ghost"}
             variant={view === "grid" ? "primary" : "neutral"}
             aria-label="Grid view"
             aria-pressed={view === "grid"}
@@ -86,7 +86,7 @@ export const CollectionHeader = ({
         <Tooltip title="List view">
           <Button
             size="small"
-            look={view === "list" ? "filled" : "string"}
+            look={view === "list" ? "filled" : "ghost"}
             variant={view === "list" ? "primary" : "neutral"}
             aria-label="List view"
             aria-pressed={view === "list"}

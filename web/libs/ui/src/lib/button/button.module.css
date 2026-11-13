@@ -79,7 +79,7 @@
   }
 }
 
-.look-string {
+.look-ghost {
   &:not(:disabled),
   &.waiting {
     --border-color: transparent;
@@ -376,7 +376,7 @@
   }
 }
 
-.base.variant-gradient.look-string {
+.base.variant-gradient.look-ghost {
   &:not(:disabled) {
     --text-color: var(--color-primary-content);
     --text-outline: var(--color-primary-content);

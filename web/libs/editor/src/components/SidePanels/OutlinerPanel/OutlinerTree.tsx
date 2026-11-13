@@ -559,7 +559,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
                 locked={item?.locked}
                 onClick={onToggleLocked}
                 variant="neutral"
-                look="string"
+                look="ghost"
                 tooltip={item?.locked ? "Unlock Region" : "Lock Region"}
               />
             </div>
@@ -568,7 +568,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
             <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
               <RegionControlButton
                 variant="neutral"
-                look="string"
+                look="ghost"
                 onClick={onToggleHidden}
                 aria-label={hidden ? "Show" : "Hide"}
                 title={hidden ? "Show" : "Hide"}
@@ -583,7 +583,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
           )}
           {hasControls && (
             <div className={cn("outliner-item").elem("control").mod({ type: "visibility" }).toClassName()}>
-              <RegionControlButton variant="neutral" look="string" onClick={onToggleCollapsed}>
+              <RegionControlButton variant="neutral" look="ghost" onClick={onToggleCollapsed}>
                 <IconChevronLeft
                   style={{
                     transform: `rotate(${collapsed ? -90 : 90}deg)`,

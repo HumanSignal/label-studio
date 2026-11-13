@@ -301,7 +301,7 @@ export const MediaCard = ({
   const rowActions = editable && state !== "readonly" && (
     <span className="ml-auto flex flex-none items-center gap-tight">
       {state === "uploading" && onCancel ? (
-        <Button size="small" look="string" variant="negative" onClick={onCancel}>
+        <Button size="small" look="ghost" variant="negative" onClick={onCancel}>
           Cancel
         </Button>
       ) : null}
@@ -325,7 +325,7 @@ export const MediaCard = ({
         <Tooltip title="Remove this file">
           <Button
             size="small"
-            look="string"
+            look="ghost"
             variant="negative"
             aria-label="Remove this file"
             leading={<TrashIcon />}
@@ -650,7 +650,7 @@ export const MediaCard = ({
         <div className="mt-auto flex overflow-x-auto border-neutral-border-subtle border-t p-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <span className="ml-auto flex flex-none items-center gap-tight">
             {state === "uploading" && onCancel ? (
-              <Button size="small" look="string" variant="negative" onClick={onCancel}>
+              <Button size="small" look="ghost" variant="negative" onClick={onCancel}>
                 Cancel
               </Button>
             ) : null}
@@ -670,7 +670,7 @@ export const MediaCard = ({
               </Button>
             ) : null}
             {state !== "uploading" && onRemove ? (
-              <Button size="small" look="string" variant="negative" leading={<TrashIcon />} onClick={onRemove}>
+              <Button size="small" look="ghost" variant="negative" leading={<TrashIcon />} onClick={onRemove}>
                 Remove
               </Button>
             ) : null}
@@ -702,7 +702,7 @@ function PdfPager({
     >
       <Button
         size="small"
-        look="string"
+        look="ghost"
         aria-label="Previous page"
         leading={<CaretLeftIcon />}
         disabled={page <= 1}
@@ -713,7 +713,7 @@ function PdfPager({
       </span>
       <Button
         size="small"
-        look="string"
+        look="ghost"
         aria-label="Next page"
         leading={<CaretRightIcon />}
         disabled={page >= pageCount}

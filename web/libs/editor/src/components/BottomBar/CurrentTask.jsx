@@ -84,7 +84,7 @@ export const CurrentTask = observer(({ store }) => {
               <Button
                 data-testid="prev-task"
                 aria-label={prevButtonMessage}
-                look="string"
+                look="ghost"
                 disabled={!historyEnabled || !store.canGoPrevTask}
                 onClick={store.prevTask}
                 variant="neutral"
@@ -96,7 +96,7 @@ export const CurrentTask = observer(({ store }) => {
               <Button
                 data-testid="next-task"
                 aria-label={nextButtonMessage}
-                look="string"
+                look="ghost"
                 disabled={!canNavigateNext && !canPostponeTask}
                 onClick={canNavigateNext ? store.nextTask : store.postponeTask}
                 variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}

@@ -11,15 +11,15 @@ const meta: Meta<typeof Stepper> = {
     docs: {
       description: {
         component:
-          'Linear progress navigation for wizards and sidebars. **`variant`** controls step list direction (`horizontal` row vs `vertical` stack). **`size`** controls per-step density (`default` badge above label vs `compact` badge beside label). Vertical lists always use compact per-step layout — prefer `variant="vertical"` with `size="compact"`. The connector fill follows `currentStepIndex` only. The check appears when `completed: true`. With `onStepSelect`, `canNavigate: true` allows activation; `canNavigate: false` blocks without greyed-out styling (`disabled: true` for that). Optional per-step **`description`** renders below the label. Optional **`tooltip`** explains locked steps.',
+          'Linear progress navigation for wizards and sidebars. **`orientation`** controls step list direction (`horizontal` row vs `vertical` stack). **`size`** controls per-step density (`medium` badge above label vs `small` badge beside label). Vertical lists always use the small per-step layout: prefer `orientation="vertical"` with `size="small"`. The connector fill follows `currentStepIndex` only. The check appears when `completed: true`. With `onStepSelect`, `canNavigate: true` allows activation; `canNavigate: false` blocks without greyed-out styling (`disabled: true` for that). Optional per-step **`description`** renders below the label. Optional **`tooltip`** explains locked steps.',
       },
     },
   },
   argTypes: {
     steps: { control: "object" },
     currentStepIndex: { control: { type: "number", min: 0 } },
-    variant: { control: "radio", options: ["horizontal", "vertical"] },
-    size: { control: "radio", options: ["default", "compact"] },
+    orientation: { control: "radio", options: ["horizontal", "vertical"] },
+    size: { control: "radio", options: ["medium", "small"] },
     onStepSelect: { action: "stepSelect" },
   },
 };
@@ -47,7 +47,7 @@ export const HorizontalDefault: Story = {
 export const HorizontalCompact: Story = {
   name: "Horizontal Compact",
   args: {
-    size: "compact",
+    size: "small",
     currentStepIndex: 1,
     steps: [
       { label: "Select", canNavigate: true, completed: true },
@@ -62,8 +62,8 @@ export const HorizontalCompact: Story = {
 export const VerticalStacked: Story = {
   name: "Vertical Stacked",
   args: {
-    variant: "vertical",
-    size: "compact",
+    orientation: "vertical",
+    size: "small",
     currentStepIndex: 1,
     steps: [
       { id: "intro", label: "Introduction", canNavigate: true, completed: true },
@@ -84,8 +84,8 @@ export const VerticalStacked: Story = {
 export const VerticalStackedWithDescriptions: Story = {
   name: "Vertical Stacked With Descriptions",
   args: {
-    variant: "vertical",
-    size: "compact",
+    orientation: "vertical",
+    size: "small",
     currentStepIndex: 0,
     steps: [
       {

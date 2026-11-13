@@ -21,15 +21,15 @@ const meta: Meta<typeof ModalWindow> = {
   component: ModalWindow,
   title: "UI/ModalWindow",
   args: {
-    variant: "workflow",
+    placement: "top",
     size: "medium",
   },
   argTypes: {
-    variant: {
+    placement: {
       control: "select",
-      options: ["workflow", "dialog"],
+      options: ["top", "center"],
       description:
-        "workflow: top-anchored (stable when content height changes). dialog: vertically centered for short prompts.",
+        "top: top-anchored (stable when content height changes). center: vertically centered for short prompts.",
     },
     size: {
       control: "select",
@@ -114,13 +114,13 @@ export const Small: Story = {
 };
 
 /**
- * **Dialog use** — `variant="dialog"` vertically centers the panel for short, blocking prompts (confirmations,
+ * **Dialog use** — `placement="center"` vertically centers the panel for short, blocking prompts (confirmations,
  * acknowledgements). Uses the dialog title scale; combine with `size="small"` or `medium` and footer actions.
  */
 export const DialogUse: Story = {
   name: "Dialog use",
   args: {
-    variant: "dialog",
+    placement: "center",
     size: "small",
     title: "Delete project?",
   },
@@ -423,7 +423,7 @@ function WizardTopAlignedDemo() {
       >
         <div className="border-b border-neutral-border px-wide pb-tight pt-wide">
           <Stepper
-            size="compact"
+            size="small"
             aria-label="Wizard progress"
             steps={WIZARD_STEPS.map((s, i) => ({
               id: s.id,
@@ -499,7 +499,7 @@ export const CustomHeaderContent: Story = {
               Built from UI primitives instead of the default title row.
             </Typography>
           </div>
-          <Button look="string" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
+          <Button look="ghost" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
         </div>
       }
     >

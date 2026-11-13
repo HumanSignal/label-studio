@@ -100,15 +100,15 @@ export const FromLeft: Story = {
         <Drawer open={open} onOpenChange={setOpen} side="left" title="Navigation" description="Main navigation menu">
           <div className="p-base">
             <nav className="flex flex-col gap-2">
-              <Button variant="neutral" look="string" align="left" className="justify-start">
+              <Button variant="neutral" look="ghost" align="left" className="justify-start">
                 <IconPersonInCircle className="mr-2" />
                 Profile
               </Button>
-              <Button variant="neutral" look="string" align="left" className="justify-start">
+              <Button variant="neutral" look="ghost" align="left" className="justify-start">
                 <IconSettings className="mr-2" />
                 Settings
               </Button>
-              <Button variant="neutral" look="string" align="left" className="justify-start">
+              <Button variant="neutral" look="ghost" align="left" className="justify-start">
                 <IconTrash className="mr-2" />
                 Delete
               </Button>

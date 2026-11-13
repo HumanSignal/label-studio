@@ -170,10 +170,10 @@ const AccountMenu = (args: Story["args"]) => {
       onToggle={setOpened}
       content={
         <div className="p-tight flex flex-col gap-tightest w-max">
-          <Button look="string" variant="neutral" size="small" align="left">
+          <Button look="ghost" variant="neutral" size="small" align="left">
             Account &amp; Settings
           </Button>
-          <Button look="string" variant="neutral" size="small" align="left">
+          <Button look="ghost" variant="neutral" size="small" align="left">
             Log Out
           </Button>
         </div>
@@ -181,7 +181,7 @@ const AccountMenu = (args: Story["args"]) => {
     >
       <Button
         type="button"
-        look="string"
+        look="ghost"
         variant="neutral"
         aria-label={`${opened ? "Close" : "Open"} account menu`}
         aria-haspopup="menu"

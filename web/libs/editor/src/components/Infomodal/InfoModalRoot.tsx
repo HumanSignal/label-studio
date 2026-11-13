@@ -5,10 +5,10 @@ import { registerInfoModalDispatch, type InfoModalPayload, type InfoModalVariant
 
 /** Maps legacy Infomodal API variants to `Message` variants (icons + surface colors). */
 const INFO_MODAL_TO_MESSAGE_VARIANT: Record<InfoModalVariant, MessageVariant> = {
-  error: "error",
+  error: "negative",
   warning: "warning",
-  success: "success",
-  info: "info",
+  success: "positive",
+  info: "primary",
 };
 
 export function InfoModalRoot() {

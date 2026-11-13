@@ -1,7 +1,6 @@
 import { usePersistentState, usePersistentJSONState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { emitCompareAllViewSelected } from "../../utils/labelingTelemetry";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@humansignal/ui";
-import { Toggle } from "@humansignal/ui";
+import { SegmentedControl, Toggle } from "@humansignal/ui";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import TaskSummary from "../TaskSummary/TaskSummary";
 import TaskSummaryV2 from "../TaskSummary/TaskSummaryV2";
@@ -33,35 +32,36 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
   if (annotationStore.store.hasInterface("annotations:summary")) {
     return (
       <div className="px-base pt-tighter mt-base">
-        <Tabs variant="default" value={tab} onValueChange={handleCompareViewChange}>
-          <div
-            className={
-              isAgreementV2
-                ? "flex items-center justify-between gap-base mb-tight"
-                : "flex items-center gap-base mb-tight"
-            }
-          >
-            <TabsList>
-              <TabsTrigger value="summary" data-testid="compare-all-summary-tab">
-                Summary
-              </TabsTrigger>
-              <TabsTrigger value="compare" data-testid="compare-all-side-by-side-tab">
-                Side-by-side
-              </TabsTrigger>
-            </TabsList>
+        <div
+          className={
+            isAgreementV2
+              ? "flex items-center justify-between gap-base mb-tight"
+              : "flex items-center gap-base mb-tight"
+          }
+        >
+          <SegmentedControl
+            aria-label="Annotations view"
+            selectedOption={tab}
+            onChange={handleCompareViewChange}
+            options={[
+              { value: "summary", label: "Summary", "data-testid": "compare-all-summary-tab" },
+              { value: "compare", label: "Side-by-side", "data-testid": "compare-all-side-by-side-tab" },
+            ]}
+          />
 
-            {isAgreementV2 && (
-              <Toggle
-                checked={includePredictions}
-                onChange={(e) => setIncludePredictions(Boolean(e.target.checked))}
-                label="Include Predictions"
-                data-testid="compare-all-include-predictions-toggle"
-              />
-            )}
-          </div>
+          {isAgreementV2 && (
+            <Toggle
+              checked={includePredictions}
+              onChange={(e) => setIncludePredictions(Boolean(e.target.checked))}
+              label="Include Predictions"
+              data-testid="compare-all-include-predictions-toggle"
+            />
+          )}
+        </div>
 
-          <TabsContent value="summary">
-            {isAgreementV2 ? (
+        <div className="mt-tight">
+          {tab === "summary" ? (
+            isAgreementV2 ? (
               <TaskSummaryV2
                 key={includePredictions ? "summary-with-predictions" : "summary-annotations-only"}
                 store={annotationStore}
@@ -70,10 +70,8 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
               />
             ) : (
               <TaskSummary store={annotationStore} annotations={annotations} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="compare">
+            )
+          ) : (
             <Grid
               key={effectiveIncludePredictions ? "grid-with-predictions" : "grid-annotations-only"}
               store={annotationStore}
@@ -81,8 +79,8 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
               root={root}
               includePredictions={effectiveIncludePredictions}
             />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     );
   }

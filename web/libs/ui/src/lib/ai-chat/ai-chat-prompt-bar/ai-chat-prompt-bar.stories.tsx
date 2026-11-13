@@ -31,7 +31,7 @@ export const Rounded: Story = {
     placeholder: "Ask the Interfaces agent…",
     shape: "rounded",
     leadingSlot: (
-      <Button type="button" size="smaller" variant="neutral" look="string" aria-label="Attach">
+      <Button type="button" size="smaller" variant="neutral" look="ghost" aria-label="Attach">
         +
       </Button>
     ),
@@ -72,7 +72,7 @@ export const WithPlanToggle: Story = {
         status={status}
         placeholder="Compose a message…"
         leadingSlot={
-          <Button type="button" size="smaller" variant="neutral" look="string" aria-label="Attach">
+          <Button type="button" size="smaller" variant="neutral" look="ghost" aria-label="Attach">
             +
           </Button>
         }

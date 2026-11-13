@@ -365,7 +365,7 @@ const VirtualizedGrid = observer(({ store, annotations, root, includePredictions
         <>
           <Button
             size="small"
-            look="string"
+            look="ghost"
             onClick={scrollLeft}
             className={styles.left}
             aria-label="Move left"
@@ -375,7 +375,7 @@ const VirtualizedGrid = observer(({ store, annotations, root, includePredictions
           </Button>
           <Button
             size="small"
-            look="string"
+            look="ghost"
             onClick={scrollRight}
             className={styles.right}
             aria-label="Move right"

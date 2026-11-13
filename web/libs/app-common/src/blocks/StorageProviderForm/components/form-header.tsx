@@ -15,7 +15,7 @@ export const FormHeader = ({ title, onClose }: FormHeaderProps) => {
           Import your data from cloud storage providers
         </div>
       </div>
-      <Button leading={<IconCross />} look="string" onClick={onClose} />
+      <Button leading={<IconCross />} look="ghost" onClick={onClose} />
     </div>
   );
 };

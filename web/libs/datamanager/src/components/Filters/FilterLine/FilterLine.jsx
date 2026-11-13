@@ -257,7 +257,7 @@ export const FilterLine = observer(
 
         <div className={cn("filterLine").elem("remove").toClassName()}>
           <Button
-            look="string"
+            look="ghost"
             variant="negative"
             size="smaller"
             disabled={disabled}
@@ -322,7 +322,7 @@ export const FilterLine = observer(
 
                   <div className={cn("filterLine").elem("remove").toClassName()}>
                     <Button
-                      look="string"
+                      look="ghost"
                       variant="negative"
                       size="smaller"
                       disabled={disabled}
@@ -345,7 +345,7 @@ export const FilterLine = observer(
             {canConfigureChildren && (
               <div className={cn("filterLine").elem("child-actions").toClassName()}>
                 <Button
-                  look="string"
+                  look="ghost"
                   size="smaller"
                   disabled={isDisabled || !defaultChildFilterType}
                   tooltip={disabled ? lockTooltip : unavailableReason}

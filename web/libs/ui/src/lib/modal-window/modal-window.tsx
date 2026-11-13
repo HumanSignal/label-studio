@@ -14,7 +14,7 @@ export type ModalWindowSize = "small" | "medium" | "large" | "larger" | "fullscr
  * - `workflow` — Top-aligned panel: when body content height changes, the panel stays anchored so the layout does not jump vertically. Use for multi-step flows, long forms, and substantial content.
  * - `dialog` — Vertically centered: suited to short, stable-height confirmations, acknowledgements, and simple actions.
  */
-export type ModalWindowVariant = "workflow" | "dialog";
+export type ModalWindowPlacement = "top" | "center";
 
 export interface ModalWindowProps {
   /**
@@ -27,9 +27,9 @@ export interface ModalWindowProps {
   onOpenChange?: (open: boolean) => void;
   /**
    * Layout intent: top-anchored workflow surface vs vertically centered dialog. Ignored when `size` is `fullscreen`.
-   * @default 'workflow'
+   * @default 'top'
    */
-  variant?: ModalWindowVariant;
+  placement?: ModalWindowPlacement;
   /**
    * Primary width preset (`max-w-*`). Below the viewport width, the panel is full width (caps only apply on wider viewports).
    * Prefer this over custom width overrides.
@@ -125,7 +125,7 @@ const sizeToMaxWidthClass: Record<Exclude<ModalWindowSize, "fullscreen">, string
 /**
  * ModalWindow — Radix Dialog–based overlay with optional header, scrollable body, and footer.
  *
- * Use `variant="workflow"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `variant="dialog"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
+ * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
  *
  * **Migration from legacy `modal()` / `Modal`:**
  * - Gate with `ff.isActive(...)` next to each modal, not via a global switch in app `Modal.tsx`.
@@ -134,7 +134,7 @@ const sizeToMaxWidthClass: Record<Exclude<ModalWindowSize, "fullscreen">, string
 export function ModalWindow({
   open,
   onOpenChange,
-  variant = "workflow",
+  placement = "top",
   size = "medium",
   title,
   description,
@@ -159,18 +159,18 @@ export function ModalWindow({
   onCloseAutoFocus,
 }: ModalWindowProps) {
   const isFullscreen = size === "fullscreen";
-  const isDialogVariant = !isFullscreen && variant === "dialog";
+  const isCentered = !isFullscreen && placement === "center";
 
   const panelClassName = cnm(
     "flex min-h-0 flex-col bg-neutral-background outline-none",
-    isDialogVariant ? "origin-center" : "origin-top",
+    isCentered ? "origin-center" : "origin-top",
     styles.panel,
     isFullscreen
       ? [
           "fixed z-[2001] inset-0 m-0 max-h-none h-screen w-full rounded-none",
           animate && styles.withAnimationFullscreen,
         ]
-      : isDialogVariant
+      : isCentered
         ? [
             "fixed z-[2001] left-1/2 top-1/2 w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-medium",
             !animate && "-translate-x-1/2 -translate-y-1/2",
@@ -213,7 +213,7 @@ export function ModalWindow({
           className={panelClassName}
           style={contentStyle}
           data-slot="modal-window-content"
-          data-variant={isFullscreen ? undefined : variant}
+          data-placement={isFullscreen ? undefined : placement}
           data-testid={dataTestId}
           tabIndex={-1}
           onPointerDownOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
@@ -240,7 +240,7 @@ export function ModalWindow({
                       <DialogPrimitive.Title asChild>
                         <Typography
                           variant="title"
-                          size={isDialogVariant ? "medium" : "large"}
+                          size={isCentered ? "medium" : "large"}
                           className={cnm("text-neutral-content", !title && "sr-only")}
                           data-slot="modal-window-title"
                           data-testid="modal-window-title"
@@ -286,7 +286,7 @@ export function ModalWindow({
               {showCloseButton ? (
                 <DialogPrimitive.Close asChild>
                   <Button
-                    look="string"
+                    look="ghost"
                     size="small"
                     className="shrink-0"
                     leading={<XIcon size={16} weight="bold" />}
@@ -341,10 +341,10 @@ export function ModalWindow({
 }
 
 /**
- * Centered {@link ModalWindow} (`variant="dialog"`). Prefer for short confirmations and notices with stable height.
+ * Centered {@link ModalWindow} (`placement="center"`). Prefer for short confirmations and notices with stable height.
  *
  * For the Radix/shad compound primitive also named `Dialog`, import from `@humansignal/shad/components/ui/dialog`.
  */
 export function Dialog(props: ModalWindowProps) {
-  return <ModalWindow variant="dialog" {...props} />;
+  return <ModalWindow placement="center" {...props} />;
 }

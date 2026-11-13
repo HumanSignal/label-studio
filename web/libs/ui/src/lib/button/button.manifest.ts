@@ -12,7 +12,7 @@ export default defineManifest({
     "more than one filled primary Button per screen",
   ],
   props_rules: [
-    "look=filled only for the single main action; outlined or string for the rest",
+    "look=filled only for the single main action; outlined or ghost for the rest; no other look",
     "icon-only buttons pass aria-label",
     "variant negative only for destructive actions, which also confirm",
   ],

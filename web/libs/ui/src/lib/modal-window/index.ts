@@ -3,7 +3,7 @@ export {
   ModalWindow,
   type ModalWindowProps,
   type ModalWindowSize,
-  type ModalWindowVariant,
+  type ModalWindowPlacement,
 } from "./modal-window";
 export {
   confirm,

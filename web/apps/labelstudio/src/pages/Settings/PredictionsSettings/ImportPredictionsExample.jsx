@@ -306,7 +306,7 @@ ls.predictions.create(
           {ready && (
             <Button
               size="small"
-              look="string"
+              look="ghost"
               onClick={() => copyCode(currentCode)}
               style={{ position: "absolute", top: 8, right: 8, color: "#cdd6f4" }}
               aria-label="Copy code"

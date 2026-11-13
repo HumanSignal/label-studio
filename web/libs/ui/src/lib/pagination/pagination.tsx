@@ -195,7 +195,7 @@ export const Pagination: FC<PaginationProps> = ({
           <>
             <Button
               variant="neutral"
-              look="string"
+              look="ghost"
               className={cn(styles.button, styles["button-first"], currentPage === 1 && styles.disabled)}
               onClick={handleFirstPage}
               disabled={disabled || currentPage === 1}
@@ -208,7 +208,7 @@ export const Pagination: FC<PaginationProps> = ({
         )}
         <Button
           variant="neutral"
-          look="string"
+          look="ghost"
           className={cn(styles.button, styles["button-prev"], currentPage === 1 && styles.disabled)}
           onClick={handlePreviousPage}
           disabled={disabled || currentPage === 1}
@@ -260,7 +260,7 @@ export const Pagination: FC<PaginationProps> = ({
         </div>
         <Button
           variant="neutral"
-          look="string"
+          look="ghost"
           className={cn(styles.button, styles["button-next"], currentPage >= displayTotalPages && styles.disabled)}
           onClick={handleNextPage}
           disabled={disabled || currentPage >= displayTotalPages}
@@ -273,7 +273,7 @@ export const Pagination: FC<PaginationProps> = ({
             <div className={styles.divider} />
             <Button
               variant="neutral"
-              look="string"
+              look="ghost"
               className={cn(styles.button, styles["button-last"], currentPage >= displayTotalPages && styles.disabled)}
               onClick={handleLastPage}
               disabled={disabled || currentPage >= displayTotalPages}

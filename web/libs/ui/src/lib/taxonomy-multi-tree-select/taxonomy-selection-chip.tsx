@@ -26,14 +26,14 @@ export interface TaxonomySelectionChipProps {
 const getCompoundBadgeProps = (
   isComplete: boolean,
   highlightIncomplete: boolean,
-): { variant: BadgeVariant; look: "filled" | "outline" } => {
+): { variant: BadgeVariant; look: "filled" | "outlined" } => {
   if (isComplete) {
     return { variant: "primary", look: "filled" };
   }
   if (highlightIncomplete) {
-    return { variant: "negative", look: "outline" };
+    return { variant: "negative", look: "outlined" };
   }
-  return { variant: "warning", look: "outline" };
+  return { variant: "warning", look: "outlined" };
 };
 
 export const TaxonomySelectionChip = ({

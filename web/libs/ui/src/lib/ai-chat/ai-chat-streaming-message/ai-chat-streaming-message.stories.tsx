@@ -38,10 +38,10 @@ export const Complete: Story = {
     ),
     actions: (
       <>
-        <Button size="small" variant="neutral" look="string">
+        <Button size="small" variant="neutral" look="ghost">
           Copy
         </Button>
-        <Button size="small" variant="neutral" look="string">
+        <Button size="small" variant="neutral" look="ghost">
           Regenerate
         </Button>
       </>

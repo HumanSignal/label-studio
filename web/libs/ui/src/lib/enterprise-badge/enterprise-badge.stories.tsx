@@ -7,7 +7,7 @@ const meta: Meta<typeof EnterpriseBadge> = {
   argTypes: {
     look: {
       control: "select",
-      options: ["filled", "outline", "ghost", "solid"],
+      options: ["filled", "outlined", "ghost", "solid"],
     },
     shape: {
       control: "select",
@@ -44,7 +44,7 @@ export const Ghost: Story = {
 export const Outline: Story = {
   args: {
     children: "Enterprise",
-    look: "outline",
+    look: "outlined",
   },
 };
 
@@ -94,7 +94,7 @@ export const AllStyles: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3 items-center">
       <EnterpriseBadge>Enterprise</EnterpriseBadge>
-      <EnterpriseBadge look="outline">Enterprise</EnterpriseBadge>
+      <EnterpriseBadge look="outlined">Enterprise</EnterpriseBadge>
       <EnterpriseBadge look="ghost">Enterprise</EnterpriseBadge>
       <EnterpriseBadge look="solid">Enterprise</EnterpriseBadge>
     </div>

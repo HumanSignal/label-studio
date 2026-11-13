@@ -209,7 +209,7 @@ export const Table = observer(
 
         return (
           <Button
-            look="string"
+            look="ghost"
             className="w-6 p-0 text-primary-content hover:text-primary-content-hover"
             onClick={() => {
               const modalInstance = modal({

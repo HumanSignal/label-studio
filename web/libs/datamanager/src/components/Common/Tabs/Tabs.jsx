@@ -65,7 +65,7 @@ export const Tabs = ({
               <Button
                 className={tabsCN.elem("add").toClassName()}
                 size="smaller"
-                look="outline"
+                look="outlined"
                 variant="neutral"
                 onClick={onAdd}
                 aria-label="Open New Tab"
@@ -273,7 +273,7 @@ export const TabsItem = observer(
             >
               <div className={tabsCN.elem("item-right-button").toClassName()}>
                 <Button
-                  look="outline"
+                  look="outlined"
                   size="smaller"
                   variant="neutral"
                   aria-label="Tab options"

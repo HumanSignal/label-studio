@@ -290,7 +290,7 @@ export const SubmissionRuleBadges = ({
         <Badge
           key={rule.key}
           variant={BADGE_VARIANT[rule.status]}
-          shape="squared"
+          shape="square"
           data-testid={`submission-rule-${rule.key}-${rule.status}`}
           className="whitespace-nowrap"
         >

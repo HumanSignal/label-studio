@@ -5,7 +5,7 @@ const meta: Meta<typeof CodeBlock> = {
   component: CodeBlock,
   title: "UI/CodeBlock",
   argTypes: {
-    variant: { control: "select", options: ["default", "warning", "negative"] },
+    variant: { control: "select", options: ["neutral", "warning", "negative"] },
     allowCopy: { control: "boolean" },
   },
 };

@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from "@humansignal/ui";
+import { SegmentedControl } from "@humansignal/ui";
 
 export type ViewMode = "code" | "interactive";
 
@@ -16,11 +16,15 @@ interface ViewToggleProps {
  */
 export const ViewToggle = ({ view, onViewChange, className }: ViewToggleProps) => {
   return (
-    <Tabs value={view} onValueChange={(newValue: string) => onViewChange(newValue as ViewMode)} variant="default">
-      <TabsList className={className}>
-        <TabsTrigger value="interactive">Interactive</TabsTrigger>
-        <TabsTrigger value="code">Code</TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <SegmentedControl
+      className={className}
+      aria-label="View mode"
+      selectedOption={view}
+      onChange={(newValue) => onViewChange(newValue as ViewMode)}
+      options={[
+        { value: "interactive", label: "Interactive" },
+        { value: "code", label: "Code" },
+      ]}
+    />
   );
 };

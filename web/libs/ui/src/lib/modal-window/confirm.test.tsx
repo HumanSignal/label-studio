@@ -200,7 +200,7 @@ describe("modal", () => {
     });
 
     const dialog = await screen.findByRole("dialog", { name: "Keyboard Shortcuts" });
-    expect(dialog).toHaveAttribute("data-variant", "workflow");
+    expect(dialog).toHaveAttribute("data-placement", "top");
     expect(screen.getByTestId("modal-window-footer")).toHaveTextContent("Footer");
     fireEvent.click(screen.getByTestId("modal-window-close-button"));
     await gone();

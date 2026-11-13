@@ -25,6 +25,8 @@ describe("design-system Biome plugins", () => {
         "12 badge-props",
         "15 badge-props",
         "18 avatar-size",
+        "19 button-look",
+        "22 button-look",
       ].sort(),
     );
   });

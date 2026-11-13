@@ -71,7 +71,7 @@ export function AiChatThinking({
         onClick={() => setExpanded(!isExpanded)}
       >
         {isLoading ? (
-          <AiChatLoadingIcon variant="dots" className={styles.loadingIcon} />
+          <AiChatLoadingIcon animation="dots" className={styles.loadingIcon} />
         ) : (
           <IconSparkle className={cn(styles.icon, status === "complete" && styles.iconActive)} aria-hidden />
         )}

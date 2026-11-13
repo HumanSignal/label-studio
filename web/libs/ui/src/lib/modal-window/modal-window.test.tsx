@@ -208,32 +208,32 @@ describe("ModalWindow", () => {
     expect(screen.getByTestId("modal-window")).toHaveClass("max-w-6xl");
   });
 
-  it("sets data-variant and centered layout for variant dialog", async () => {
+  it("sets data-placement and centered layout for placement center", async () => {
     render(
-      <ControlledModal title="Confirm" variant="dialog" animate={false} initiallyOpen>
+      <ControlledModal title="Confirm" placement="center" animate={false} initiallyOpen>
         <div>OK</div>
       </ControlledModal>,
     );
 
     const panel = screen.getByTestId("modal-window");
-    expect(panel).toHaveAttribute("data-variant", "dialog");
+    expect(panel).toHaveAttribute("data-placement", "center");
     expect(panel).toHaveClass("top-1/2");
     expect(panel).toHaveClass("left-1/2");
     expect(panel).toHaveClass("-translate-x-1/2");
     expect(panel).toHaveClass("-translate-y-1/2");
   });
 
-  it("defaults to workflow variant on the panel", async () => {
+  it("defaults to the top placement on the panel", async () => {
     render(
       <ControlledModal title="Workflow" initiallyOpen>
         <div>Body</div>
       </ControlledModal>,
     );
 
-    expect(screen.getByTestId("modal-window")).toHaveAttribute("data-variant", "workflow");
+    expect(screen.getByTestId("modal-window")).toHaveAttribute("data-placement", "top");
   });
 
-  it("renders Dialog export as centered dialog variant", async () => {
+  it("renders the Dialog export centered", async () => {
     function ControlledDialog(
       props: Omit<ComponentProps<typeof Dialog>, "open" | "onOpenChange"> & { initiallyOpen?: boolean },
     ) {
@@ -256,7 +256,7 @@ describe("ModalWindow", () => {
     );
 
     const panel = screen.getByTestId("modal-window");
-    expect(panel).toHaveAttribute("data-variant", "dialog");
+    expect(panel).toHaveAttribute("data-placement", "center");
     expect(panel).toHaveClass("top-1/2");
   });
 });

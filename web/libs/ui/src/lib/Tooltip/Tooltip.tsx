@@ -197,11 +197,13 @@ const TooltipInner = forwardRef(
       child.props.onMouseLeave?.(e);
     };
 
+    const childRef = child.ref;
     const clone = cloneElement(child, {
       ...child.props,
       ref(el: any) {
         setRef(triggerElement, el);
         setRef(ref, el);
+        setRef(childRef, el);
       },
       ...(!needFallback ? { onMouseEnter, onMouseLeave } : {}),
     });

@@ -24,7 +24,7 @@ export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sid
           Filters
         </Typography>
         <Button
-          look="string"
+          look="ghost"
           size="small"
           className="!p-0"
           onClick={() => viewsStore.collapseFilters()}

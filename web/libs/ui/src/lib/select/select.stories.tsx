@@ -401,7 +401,7 @@ export const WithGroupByAndOptionRenderer: Story = {
       <span className="flex w-full items-center justify-between gap-2">
         <span>{option?.title ?? option?.label ?? option?.value}</span>
         {option?.readableType && (
-          <Badge variant="secondary" shape="squared" className="text-[10px]">
+          <Badge variant="neutral" shape="square" className="text-[10px]">
             {option.readableType}
           </Badge>
         )}
@@ -434,7 +434,7 @@ export const WithListHeader: Story = {
     optionRenderer: ({ option }) => (
       <span className="flex w-full items-center justify-between gap-2">
         <span>{option?.label}</span>
-        <Badge variant="secondary" shape="squared" className="text-[10px]">
+        <Badge variant="neutral" shape="square" className="text-[10px]">
           {option?.readableType}
         </Badge>
       </span>

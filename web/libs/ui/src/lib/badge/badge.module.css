@@ -35,7 +35,7 @@
   border-radius: var(--corner-radius-large);
 }
 
-.shape-squared {
+.shape-square {
   border-radius: var(--corner-radius-smaller);
 }
 
@@ -59,8 +59,7 @@
   }
 }
 
-.size-small,
-.size-compact {
+.size-small {
   padding: 0 var(--spacing-tighter);
   font-size: var(--font-size-label-smaller);
   height: 18px;
@@ -152,7 +151,7 @@
 }
 
 /* Outline look */
-.look-outline {
+.look-outlined {
   &.variant-grape {
     background: transparent;
     border-color: var(--color-accent-grape-subtle);
@@ -318,7 +317,7 @@
 /* Gradient variant (special handling) */
 .variant-gradient {
   display: inline-block;
-  border-radius: var(--corner-radius-smaller); /* Default squared shape */
+  border-radius: var(--corner-radius-smaller); /* Default square shape */
   background: linear-gradient(
     135deg,
     var(--color-accent-canteloupe-base) 0%,
@@ -339,7 +338,7 @@
     }
   }
 
-  &.shape-squared {
+  &.shape-square {
     border-radius: var(--corner-radius-smaller);
 
     .badge-content {
@@ -350,7 +349,7 @@
   .badge-content {
     margin: 1px;
     background: none;
-    border-radius: calc(var(--corner-radius-smaller) - 1px); /* Default squared shape */
+    border-radius: calc(var(--corner-radius-smaller) - 1px); /* Default square shape */
     font-size: var(--font-size-label-smaller);
     padding: 0 var(--spacing-tighter) 0 var(--spacing-tighter);
     display: flex;
@@ -391,14 +390,14 @@
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       .badge-content {
         border-radius: calc(var(--corner-radius-smaller) - 1px);
       }
     }
   }
 
-  &.look-outline {
+  &.look-outlined {
     .badge-content {
       background: var(--color-neutral-background);
       height: calc(100% - 2px);
@@ -411,7 +410,7 @@
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       .badge-content {
         border-radius: calc(var(--corner-radius-smaller) - 1px);
       }
@@ -446,7 +445,7 @@
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       .badge-content {
         border-radius: calc(var(--corner-radius-smaller) - 1px);
       }
@@ -465,7 +464,7 @@
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       border-radius: var(--corner-radius-smaller);
 
       .badge-content {
@@ -482,8 +481,7 @@
     }
   }
 
-  &.size-small,
-  &.size-compact {
+  &.size-small {
     .badge-content {
       font-size: var(--font-size-label-smallest);
       padding: var(--spacing-tightest);

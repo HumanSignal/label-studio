@@ -557,7 +557,7 @@ const convert = (
         <Button
           type="button"
           variant="neutral"
-          look="string"
+          look="ghost"
           size="smaller"
           className="shrink-0 rounded-smallest text-neutral-content-subtle"
           data-taxonomy-row-actions-trigger="true"
@@ -1066,7 +1066,7 @@ const TaxonomyEcho466 = ({
                   type="button"
                   size="small"
                   variant="neutral"
-                  look="string"
+                  look="ghost"
                   aria-label="Add new label"
                   onClick={() => setAddingRootLabel(true)}
                 >
@@ -1095,7 +1095,7 @@ const TaxonomyEcho466 = ({
                 type="button"
                 role="menuitem"
                 variant="neutral"
-                look="string"
+                look="ghost"
                 size="small"
                 align="left"
                 className="block h-auto w-full min-h-0 justify-start rounded-none border-0 px-tight py-tighter text-left text-body-small font-normal text-neutral-content shadow-none hover:bg-neutral-surface-hover [&>span]:w-full [&>span]:justify-start [&>span]:px-0"
@@ -1111,7 +1111,7 @@ const TaxonomyEcho466 = ({
                   type="button"
                   role="menuitem"
                   variant="neutral"
-                  look="string"
+                  look="ghost"
                   size="small"
                   align="left"
                   className="block h-auto w-full min-h-0 justify-start rounded-none border-0 px-tight py-tighter text-left text-body-small font-normal text-negative-content shadow-none hover:bg-neutral-surface-hover [&>span]:w-full [&>span]:justify-start [&>span]:px-0"

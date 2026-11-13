@@ -17,18 +17,23 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-tighter) var(--spacing-tighter);
+    padding: var(--spacing-tighter) var(--spacing-base);
     border: none;
     border-radius: var(--corner-radius-smaller);
     background: transparent;
     color: var(--color-neutral-content-subtler);
     font-family: inherit;
-    font-size: var(--font-size-body-small);
+    font-size: var(--font-size-label-small);
+    font-weight: var(--font-weight-medium);
     line-height: 1.2;
     cursor: pointer;
     transition:
       background-color 200ms ease-out,
       color 200ms ease-out;
+
+    &:has(> svg:only-child) {
+      padding: var(--spacing-tighter);
+    }
 
     &:hover:not(&_selected) {
       color: var(--color-neutral-content);

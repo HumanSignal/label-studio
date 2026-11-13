@@ -17,7 +17,7 @@ const variants = {
 
 const looks = {
   filled: styles["look-filled"],
-  string: styles["look-string"],
+  ghost: styles["look-ghost"],
   outlined: styles["look-outlined"],
 };
 

@@ -111,7 +111,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
       <RegionActionButton
         key="relation"
         variant={annotation.isLinkingMode ? "primary" : "neutral"}
-        look={annotation.isLinkingMode ? "filled" : "string"}
+        look={annotation.isLinkingMode ? "filled" : "ghost"}
         onClick={(_e: any, hotkey?: any) => {
           // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
           if (hotkey) return;
@@ -132,7 +132,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
     <WithHotkey binging="region:meta">
       <RegionActionButton
         key="meta"
-        look={editMode ? "filled" : "string"}
+        look={editMode ? "filled" : "ghost"}
         variant={editMode ? "primary" : "neutral"}
         onClick={() => onEditModeChange(!editMode)}
         aria-label="Edit region's meta"
@@ -164,7 +164,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
             }}
             displayedHotkey="region:lock"
             variant="neutral"
-            look="string"
+            look="ghost"
             aria-label="Unlock Region"
             tooltip="Unlock Region"
           />
@@ -173,7 +173,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
           <RegionActionButton
             aria-label={`${region.hidden ? "Show" : "Hide"} selected region`}
             variant="neutral"
-            look="string"
+            look="ghost"
             onClick={() => {
               const nextVisible = region.hidden;
               emitRegionVisibilityToggled(region.annotation?.store, region.annotation, {
@@ -190,7 +190,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         )}
         <RegionActionButton
           variant="negative"
-          look="string"
+          look="ghost"
           aria-label="Delete selected region"
           disabled={region.isReadOnly()}
           tooltip="Delete selected region"
@@ -211,7 +211,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
 
 const RegionActionButton: FC<ButtonProps> = forwardRef(({ children, ...props }, ref) => {
   return (
-    <Button ref={ref} variant="neutral" look="string" size="small" {...props}>
+    <Button ref={ref} variant="neutral" look="ghost" size="small" {...props}>
       {children}
     </Button>
   );

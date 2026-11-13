@@ -100,7 +100,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
         <Button
           type="button"
           align="left"
-          look="string"
+          look="ghost"
           size="small"
           onClick={onCustomTemplate}
           className="w-full"

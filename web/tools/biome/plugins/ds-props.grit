@@ -1,18 +1,30 @@
 or {
   `<Badge $attrs>$children</Badge>` where {
     $filename <: not r".*libs/ui/.*",
-    $attrs <: contains `look="outline"`,
-    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is always the filled default, never outline.", severity="warn")
+    $attrs <: contains `look="outlined"`,
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is the filled default; outlined is only for selection controls.", severity="warn")
   },
   `<Badge $attrs />` where {
     $filename <: not r".*libs/ui/.*",
-    $attrs <: contains `look="outline"`,
-    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is always the filled default, never outline.", severity="warn")
+    $attrs <: contains `look="outlined"`,
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is the filled default; outlined is only for selection controls.", severity="warn")
   },
   `<Badge $attrs>$children</Badge>` where {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `icon={$_}`,
     register_diagnostic(span=$attrs, message="[ds/badge-props] No icons inside a Badge: the label and colour carry the meaning.", severity="warn")
+  },
+  `<Button $attrs>$children</Button>` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: r"(?s).*\blook=\"[^\"]*\".*",
+    $attrs <: not r"(?s).*\blook=\"(?:filled|outlined|ghost)\".*",
+    register_diagnostic(span=$attrs, message="[ds/button-look] Button look is filled, outlined or ghost.", severity="warn")
+  },
+  `<Button $attrs />` where {
+    $filename <: not r".*libs/ui/.*",
+    $attrs <: r"(?s).*\blook=\"[^\"]*\".*",
+    $attrs <: not r"(?s).*\blook=\"(?:filled|outlined|ghost)\".*",
+    register_diagnostic(span=$attrs, message="[ds/button-look] Button look is filled, outlined or ghost.", severity="warn")
   },
   `<Avatar $attrs />` where {
     $filename <: not r".*libs/ui/.*",
