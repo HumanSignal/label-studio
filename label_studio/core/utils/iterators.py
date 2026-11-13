@@ -20,6 +20,15 @@ def iterate_queryset(queryset, chunk_size=None):
     if chunk_size <= 0:
         raise ValueError(f'chunk_size must be positive, got {chunk_size}')
 
+    # Django forbids adding filters to sliced and combined queries. Keep their
+    # original limits/UNION semantics and page without server-side cursors.
+    if queryset.query.is_sliced or queryset.query.combinator:
+        offset = 0
+        while batch := list(queryset[offset : offset + chunk_size]):
+            yield from batch
+            offset += chunk_size
+        return
+
     # Re-selecting the primary key below rewrites an explicit GROUP BY to the pk, which
     # silently collapses the aggregation and yields one row per underlying table row
     # instead of one row per group. Aggregates therefore have to stream as-is.
