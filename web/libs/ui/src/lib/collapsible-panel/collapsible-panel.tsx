@@ -5,7 +5,7 @@ import { Button } from "../button/button";
 
 export type CollapsiblePanelProps = {
   /** Visual variant of the panel */
-  variant?: "primary" | "default" | "positive";
+  variant?: "primary" | "neutral" | "positive";
   /** Panel title */
   title: ReactNode;
   /** Optional count badge/number to display */
@@ -31,7 +31,7 @@ export type CollapsiblePanelProps = {
 };
 
 export const CollapsiblePanel = ({
-  variant = "default",
+  variant = "neutral",
   title,
   count,
   actions,
@@ -68,7 +68,7 @@ export const CollapsiblePanel = ({
       container: "border-primary-border-subtlest",
       header: "bg-primary-background hover:bg-primary-background-hover",
     },
-    default: {
+    neutral: {
       container: "border-neutral-border",
       header: "bg-neutral-surface hover:bg-neutral-surface-hover",
     },

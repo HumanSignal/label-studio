@@ -12,7 +12,7 @@ const meta: Meta<typeof CollapsiblePanel> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "default", "positive"],
+      options: ["primary", "neutral", "positive"],
     },
     disableToggle: {
       control: "boolean",
@@ -33,7 +33,7 @@ type Story = StoryObj<typeof CollapsiblePanel>;
  */
 export const Default: Story = {
   args: {
-    variant: "default",
+    variant: "neutral",
     title: "Panel Title",
     children: (
       <div className="p-base">
@@ -149,7 +149,7 @@ export const ToggleDisabled: Story = {
  */
 export const StartsCollapsed: Story = {
   args: {
-    variant: "default",
+    variant: "neutral",
     title: "Advanced Settings",
     defaultExpanded: false,
     children: (
@@ -192,7 +192,7 @@ export const Controlled: Story = {
           </span>
         </div>
         <CollapsiblePanel
-          variant="default"
+          variant="neutral"
           title="Controlled Panel"
           expanded={isExpanded}
           onExpandedChange={setIsExpanded}
@@ -220,12 +220,12 @@ export const MultiplePanels: Story = {
             <p className="text-sm">John Doe, Jane Smith, Bob Johnson</p>
           </div>
         </CollapsiblePanel>
-        <CollapsiblePanel variant="default" title="Filters" defaultExpanded={false}>
+        <CollapsiblePanel variant="neutral" title="Filters" defaultExpanded={false}>
           <div className="p-base">
             <p className="text-sm">Filter options would go here</p>
           </div>
         </CollapsiblePanel>
-        <CollapsiblePanel variant="default" title="Settings" defaultExpanded={false}>
+        <CollapsiblePanel variant="neutral" title="Settings" defaultExpanded={false}>
           <div className="p-base">
             <p className="text-sm">Settings options would go here</p>
           </div>

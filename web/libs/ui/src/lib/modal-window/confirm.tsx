@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { Button, type ButtonProps } from "../button/button";
 import { ToastViewport } from "../toast/toast";
-import { ModalWindow, type ModalWindowSize, type ModalWindowVariant } from "./modal-window";
+import { ModalWindow, type ModalWindowSize, type ModalWindowPlacement } from "./modal-window";
 
 /** Close animation of ModalWindow (fade out), so the node is removed after it ends. */
 const CLOSE_DELAY_MS = 150;
@@ -46,8 +46,8 @@ export type InfoDialogOptions = DialogBaseOptions & {
 
 export type ModalOptions = DialogBaseOptions & {
   footer?: ReactNode;
-  /** @default "workflow" */
-  variant?: ModalWindowVariant;
+  /** @default "top" */
+  placement?: ModalWindowPlacement;
 };
 
 export type DialogHandle<Options> = {
@@ -75,7 +75,7 @@ function openDialog<Options extends DialogBaseOptions>(
   initial: Options,
   renderFooter: (options: Options, close: (cancelled: boolean) => void) => ReactNode,
   onDismiss?: (options: Options) => void,
-  variant: ModalWindowVariant = "dialog",
+  placement: ModalWindowPlacement = "center",
 ): DialogHandle<Options> {
   const existing = initial.unique ? UNIQUE_DIALOGS.get(initial.unique) : undefined;
   if (existing) return existing as DialogHandle<Options>;
@@ -114,7 +114,7 @@ function openDialog<Options extends DialogBaseOptions>(
       withProviders(
         <>
           <ModalWindow
-            variant={variant}
+            placement={placement}
             open={open}
             onOpenChange={(next) => {
               if (!next && allowClose) finish(true);
@@ -212,5 +212,5 @@ export function info(options: InfoDialogOptions): DialogHandle<InfoDialogOptions
 
 /** Opens a ModalWindow imperatively, for surfaces opened from code that holds no React state. */
 export function modal(options: ModalOptions): DialogHandle<ModalOptions> {
-  return openDialog(options, ({ footer }) => footer, undefined, options.variant ?? "workflow");
+  return openDialog(options, ({ footer }) => footer, undefined, options.placement ?? "top");
 }

@@ -19,15 +19,15 @@ const meta: Meta<typeof Message> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "neutral", "negative", "positive", "warning", "enterprise", "info", "success", "error"],
+      options: ["primary", "neutral", "negative", "positive", "warning", "enterprise"],
       description:
-        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning, enterprise. Aliases: info (→primary), success (→positive), error (→negative). Use enterprise exclusively for gated/enterprise-only feature callouts.",
+        "Visual variant of the message. Primary variants: primary, neutral, negative, positive, warning, enterprise. Use enterprise exclusively for gated/enterprise-only feature callouts.",
     },
     look: {
       control: "select",
-      options: ["card", "ghost"],
+      options: ["filled", "ghost"],
       description:
-        "Visual look of the message. card: default with background and border. ghost: minimal without card wrapper.",
+        "Visual look of the message. filled: default with background and border. ghost: minimal without card wrapper.",
     },
     size: {
       control: "select",
@@ -324,7 +324,7 @@ export const AllLooks: Story = {
         <Typography variant="label" size="medium" className="mb-tight">
           Card Look (Default)
         </Typography>
-        <Message variant="primary" look="card" title="Card">
+        <Message variant="primary" look="filled" title="Card">
           This message has a background, border and padding.
         </Message>
       </div>

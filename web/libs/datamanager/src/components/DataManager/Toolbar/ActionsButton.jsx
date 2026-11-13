@@ -120,7 +120,7 @@ const DialogContent = ({ text, details = [], form, formRef, store, action, valid
         </div>
       )}
       {errors.length > 0 && (
-        <Message variant="error" look="ghost" size="small" style={{ marginTop: 8 }}>
+        <Message variant="negative" look="ghost" size="small" style={{ marginTop: 8 }}>
           {errors.length === 1 ? (
             errors[0].messages[0]
           ) : (

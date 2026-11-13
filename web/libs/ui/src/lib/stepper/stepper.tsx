@@ -43,9 +43,9 @@ export interface StepperProps extends Omit<ComponentPropsWithoutRef<"nav">, "chi
   /** Invoked when a navigable step is activated (`canNavigate: true`, not `disabled`, and this handler is set). */
   onStepSelect?: (index: number) => void;
   /** Step list direction. @default 'horizontal' */
-  variant?: "horizontal" | "vertical";
-  /** Per-step badge/label density. Vertical lists always use compact layout. @default 'default' */
-  size?: "default" | "compact";
+  orientation?: "horizontal" | "vertical";
+  /** Per-step badge/label density. Vertical lists always use the small layout. @default 'medium' */
+  size?: "medium" | "small";
   className?: string;
   /** Accessible name for the progress navigation region */
   "aria-label"?: string;
@@ -126,8 +126,8 @@ export function Stepper({
   steps,
   currentStepIndex,
   onStepSelect,
-  variant = "horizontal",
-  size = "default",
+  orientation = "horizontal",
+  size = "medium",
   className,
   "aria-label": ariaLabel = "Progress",
   "data-testid": dataTestId = "stepper",
@@ -137,8 +137,8 @@ export function Stepper({
     return null;
   }
 
-  const isStacked = variant === "vertical";
-  const isCompact = isStacked || size === "compact";
+  const isStacked = orientation === "vertical";
+  const isCompact = isStacked || size === "small";
   const isHorizontalCompact = !isStacked && isCompact;
 
   return (

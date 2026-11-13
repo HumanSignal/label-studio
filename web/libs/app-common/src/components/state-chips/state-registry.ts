@@ -15,6 +15,8 @@
  * - LSE extension without modifying LSO code
  */
 
+import type { BadgeVariant } from "@humansignal/ui";
+
 /**
  * Semantic state categories that define the meaning and visual representation of states.
  *
@@ -72,7 +74,7 @@ const STATE_TYPE_STYLES: Record<StateType, string> = {
 /**
  * Badge variant for each state type (for use with @humansignal/ui Badge).
  */
-const STATE_TYPE_VARIANTS: Record<StateType, string> = {
+const STATE_TYPE_VARIANTS: Record<StateType, BadgeVariant> = {
   [StateType.INITIAL]: "sand",
   [StateType.IN_PROGRESS]: "grape",
   [StateType.ATTENTION]: "canteloupe",
@@ -184,7 +186,7 @@ class StateRegistry {
    * @param state - State constant
    * @returns Badge variant string (e.g. "sand", "grape", "canteloupe", "kale", "plum", "persimmon")
    */
-  getVariant(state: string): string {
+  getVariant(state: string): BadgeVariant {
     const stateType = this.getType(state);
     return STATE_TYPE_VARIANTS[stateType];
   }
@@ -336,7 +338,7 @@ export function getStateColorClass(state: string): string {
  * @param state - State constant (e.g., 'CREATED', 'COMPLETED')
  * @returns Badge variant string
  */
-export function getStateVariant(state: string): string {
+export function getStateVariant(state: string): BadgeVariant {
   return stateRegistry.getVariant(state);
 }
 

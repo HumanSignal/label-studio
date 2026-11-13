@@ -467,6 +467,9 @@
         "custom coloured info boxes",
         "transient results (use Toast)"
       ],
+      "props_rules": [
+        "variant is a colour (primary, neutral, positive, negative, warning, enterprise); look is filled or ghost"
+      ],
       "replaces": [
         "services/lse/web/apps/labelstudio/src/components_lse/Warning/Warning.jsx",
         "services/lso/web/libs/editor/src/components/ErrorMessage/ErrorMessage.jsx"
@@ -490,6 +493,7 @@
         "side editing that keeps the page visible (use Drawer)"
       ],
       "props_rules": [
+        "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",
         "destructive confirmations use a negative Button and, for high impact, typed validation",
         "one-line confirmations and notices open with confirm() / info() from @humansignal/ui, never a hand-built Dialog",
         "status text next to the actions goes in footerMeta, left of the buttons"
@@ -762,6 +766,9 @@
       "never_when": [
         "numbered Badges in a row",
         "Tabs used as steps"
+      ],
+      "props_rules": [
+        "orientation sets the direction (horizontal, vertical); size is medium or small"
       ],
       "replaces": [],
       "dir": "lib/stepper"
