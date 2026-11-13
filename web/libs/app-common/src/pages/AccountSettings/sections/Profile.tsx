@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@humansignal/ui";
 import { PersonalInfo } from "./PersonalInfo";
 import { getAccountSettingsProfileExtras } from "../extensions";
 import { ProfileDirtyProvider, useDiscardProfileDrafts, useProfileFormsDirty } from "../ProfileDirtyContext";
@@ -37,7 +37,7 @@ export const Profile = () => {
 
   return (
     <ProfileDirtyProvider>
-      <Card className="!w-full">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Account Details</CardTitle>
         </CardHeader>

@@ -1,13 +1,5 @@
 import clsx from "clsx";
-import { Button } from "@humansignal/ui";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@humansignal/shad/components/ui/card";
+import { Button, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@humansignal/ui";
 import { HotkeyItem } from "./Item";
 
 // Type definitions
@@ -122,7 +114,7 @@ export const HotkeySection = ({
         <CardDescription>{section.description}</CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pt-0">
         <div>
           {subgroups.map((subgroup: string) => (
             <div
@@ -149,11 +141,11 @@ export const HotkeySection = ({
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end">
+      <CardContent className="flex items-center pt-0 justify-end">
         <Button variant="primary" onClick={handleSaveSection} disabled={!hasChanges}>
           Save
         </Button>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

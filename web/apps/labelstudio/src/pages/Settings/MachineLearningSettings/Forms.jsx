@@ -71,7 +71,7 @@ const CustomBackendForm = ({ action, backend, project, onSubmit }) => {
       </Form.Row>
 
       <Form.Actions>
-        <Button type="submit" look="primary" onClick={() => setMLError(null)} aria-label="Save machine learning form">
+        <Button type="submit" onClick={() => setMLError(null)} aria-label="Save machine learning form">
           Validate and Save
         </Button>
       </Form.Actions>

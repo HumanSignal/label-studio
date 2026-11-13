@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, Typography, Spinner, EmptyState, SimpleCard } from "@humansignal/ui";
+import { Button, Typography, Spinner, EmptyState, Card } from "@humansignal/ui";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Form, Label, Toggle } from "../../../components/Form";
 import { modal } from "../../../components/Modal/Modal";
@@ -103,7 +103,7 @@ export const MachineLearningSettings = () => {
         </Typography>
         {loading && <Spinner size="medium" />}
         {loaded && backends.length === 0 && (
-          <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
+          <Card size="compact" title="" className="bg-primary-background border-primary-border-subtler p-base">
             <EmptyState
               size="medium"
               variant="primary"
@@ -138,7 +138,7 @@ export const MachineLearningSettings = () => {
                 )
               }
             />
-          </SimpleCard>
+          </Card>
         )}
         <MachineLearningList
           onEdit={(backend) => showMLFormModal(backend)}
@@ -200,7 +200,7 @@ export const MachineLearningSettings = () => {
               <Form.Indicator>
                 <span case="success">Saved!</span>
               </Form.Indicator>
-              <Button type="submit" look="primary" className="w-[120px]" aria-label="Save machine learning settings">
+              <Button type="submit" className="w-[120px]" aria-label="Save machine learning settings">
                 Save
               </Button>
             </Form.Actions>

@@ -1,6 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
-import { Button } from "@humansignal/ui";
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui";
 import { IconCheck, IconCopy } from "@humansignal/icons";
 import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
 import { ProjectContext } from "../../../providers/ProjectProvider";
@@ -242,7 +241,7 @@ ls.predictions.create(
   const displayCode = ready ? currentCode : "Loading project-specific example...";
 
   return (
-    <Card className="!w-full mt-wider">
+    <Card className="w-full mt-wider">
       <CardHeader>
         <div className="flex flex-col gap-tight">
           <CardTitle>Import predictions</CardTitle>

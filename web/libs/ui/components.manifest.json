@@ -151,6 +151,39 @@
       ],
       "dir": "lib/button"
     },
+    "Card": {
+      "name": "Card",
+      "tier": 1,
+      "exports": [
+        "Card",
+        "CardHeader",
+        "CardTitle",
+        "CardDescription",
+        "CardContent"
+      ],
+      "intent": [
+        "a titled surface grouping related content"
+      ],
+      "use_when": "A bordered surface with an optional title and description around a group of controls or data. Pass title and description for the simple case, or compose CardHeader, CardTitle, CardDescription and CardContent.",
+      "never_when": [
+        "an app-local Card",
+        "a div with border and shadow classes",
+        "nested cards",
+        "a footer part"
+      ],
+      "props_rules": [
+        "size=regular (the default) for page sections; size=compact for dense panels and dashboard tiles",
+        "takes the full width of its container; the container decides how many cards sit side by side",
+        "flat: no shadow; footer-like content goes at the end of the content"
+      ],
+      "replaces": [
+        "services/lso/web/apps/labelstudio/src/components/Card/Card.jsx",
+        "services/lse/web/apps/labelstudio/src/components/Card/Card.jsx",
+        "services/lse/web/apps/labelstudio/src/pages/ProjectDashboard/Card.jsx"
+      ],
+      "notes": "SimpleCard is now Card size=compact; card-new and the shadcn card are gone. Saved Screens still render SimpleCard.",
+      "dir": "lib/card"
+    },
     "Checkbox": {
       "name": "Checkbox",
       "tier": 1,
@@ -555,11 +588,12 @@
       "intent": [
         "rich content anchored to a trigger"
       ],
-      "use_when": "Interactive or formatted content that opens next to its trigger and closes on outside click or Escape.",
+      "use_when": "Interactive or formatted content that opens next to its trigger and closes on outside click or Escape. Pass trigger for the simple case; compose Popover.Root, Popover.Trigger and Popover.Content when the trigger sits inside other elements (a Tooltip, a badge).",
       "never_when": [
         "plain text (use Tooltip)",
         "a list of actions (use Dropdown)",
-        "a hand-rolled absolutely positioned panel"
+        "a hand-rolled absolutely positioned panel",
+        "the raw shadcn popover imported by path (use Popover.Root, Popover.Trigger and Popover.Content)"
       ],
       "replaces": [],
       "dir": "lib/popover"
@@ -638,29 +672,6 @@
         "services/lso/web/libs/datamanager/src/components/Common/Form/Elements/Select/Select.jsx"
       ],
       "dir": "lib/select"
-    },
-    "SimpleCard": {
-      "name": "SimpleCard",
-      "tier": 1,
-      "exports": [
-        "SimpleCard"
-      ],
-      "intent": [
-        "a titled surface grouping related content"
-      ],
-      "use_when": "A bordered surface with an optional title and description around a group of controls or data.",
-      "never_when": [
-        "an app-local Card",
-        "a div with border and shadow classes",
-        "nested cards"
-      ],
-      "replaces": [
-        "services/lso/web/apps/labelstudio/src/components/Card/Card.jsx",
-        "services/lse/web/apps/labelstudio/src/components/Card/Card.jsx",
-        "services/lse/web/apps/labelstudio/src/pages/ProjectDashboard/Card.jsx"
-      ],
-      "notes": "The product Card until the library's four card implementations collapse into one; lib/Card, card-new and the shad card are internal.",
-      "dir": "lib/simple-card"
     },
     "Skeleton": {
       "name": "Skeleton",

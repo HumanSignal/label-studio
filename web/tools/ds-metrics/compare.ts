@@ -70,6 +70,16 @@ export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): C
   };
 }
 
+/** The label that accepts a rule count increase on purpose, e.g. a new rule landing with tracked debt. */
+export const ACCEPT_LABEL = "ds-debt-accepted";
+
+/** Rules whose whole-repo count rose against the base; the PR gate fails on any of them. */
+export function ruleIncreases(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): ({ rule: string } & Delta)[] {
+  return Object.entries(compare(headIn, baseIn).rules)
+    .filter(([, d]) => d.delta > 0)
+    .map(([rule, d]) => ({ rule, ...d }));
+}
+
 const num = (n: number) => n.toLocaleString("en-US");
 const signed = (n: number) => (n > 0 ? `+${num(n)}` : num(n));
 const paren = (n: number) => (n === 0 ? "" : ` (${signed(n)})`);
@@ -101,6 +111,13 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
     lines.push(
       "",
       `<sub>the base snapshot is schema v${base.version}, this one v${head.version}; rows missing on one side count as 0</sub>`,
+    );
+  }
+  const increases = ruleIncreases(head, base);
+  if (increases.length) {
+    lines.push(
+      "",
+      `**Blocks the merge:** ${increases.map((r) => `\`${r.rule}\` ${signed(r.delta)}`).join(", ")} against the base branch. Fix the new findings, or, when the increase is intended (a new rule landing with tracked debt), add the \`${ACCEPT_LABEL}\` label and rerun the DS job.`,
     );
   }
   lines.push("");

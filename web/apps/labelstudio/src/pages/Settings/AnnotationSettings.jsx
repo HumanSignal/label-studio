@@ -74,7 +74,7 @@ export const AnnotationSettings = () => {
               <Form.Indicator>
                 <span case="success">Saved!</span>
               </Form.Indicator>
-              <Button type="submit" look="primary" className="w-[150px]" aria-label="Save annotation settings">
+              <Button type="submit" className="w-[150px]" aria-label="Save annotation settings">
                 Save
               </Button>
             </Form.Actions>

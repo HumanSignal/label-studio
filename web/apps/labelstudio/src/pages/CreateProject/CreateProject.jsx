@@ -214,7 +214,6 @@ export const CreateProject = ({ onClose }) => {
               Cancel
             </Button>
             <Button
-              look="primary"
               onClick={onCreate}
               waiting={waiting || uploading}
               waitingClickable={false}

@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@humansignal/ui/lib/card-new/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@humansignal/ui";
 import { useMemo, isValidElement } from "react";
 import { Redirect, Route, Switch, useParams, useRouteMatch } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
@@ -67,7 +67,7 @@ const AccountSettingsSection = () => {
 
   return currentSection ? (
     <div className={contentClassName}>
-      <Card key={currentSection.id} className="!w-full">
+      <Card className="w-full" key={currentSection.id}>
         <CardHeader>
           <div className="flex flex-col gap-tight">
             <CardTitle>{currentSection.title}</CardTitle>

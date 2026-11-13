@@ -14,7 +14,7 @@ import { EmptyState } from "../empty-state/empty-state";
 import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
-import { confirm, info } from "./confirm";
+import { confirm, info, modal } from "./confirm";
 import { ModalWindow } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
@@ -583,5 +583,39 @@ export const ImperativeConfirm: Story = {
         Open info()
       </Button>
     </div>
+  ),
+};
+
+/**
+ * `modal()` opens a ModalWindow from code that holds no React state, such as a menu command. It returns the
+ * same handle as `confirm()`: `update()` changes the open dialog and `close()` closes it.
+ */
+export const ImperativeModal: Story = {
+  render: () => (
+    <Button
+      onClick={() => {
+        const handle = modal({
+          title: "Keyboard shortcuts",
+          body: <Typography>Press ? anywhere to open this list.</Typography>,
+          size: "small",
+          footer: (
+            <div className="flex justify-end gap-tight">
+              <Button
+                look="outlined"
+                variant="neutral"
+                onClick={() =>
+                  handle.update({ body: <Typography>Shortcuts can be changed in your account settings.</Typography> })
+                }
+              >
+                More
+              </Button>
+              <Button onClick={() => handle.close()}>Done</Button>
+            </div>
+          ),
+        });
+      }}
+    >
+      Open modal()
+    </Button>
   ),
 };

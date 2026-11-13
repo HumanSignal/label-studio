@@ -5,7 +5,7 @@ import {
   IconHumanSignal,
   UserPlusIcon,
 } from "@humansignal/icons";
-import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
+import { Button, Spinner, Tooltip, Typography, Card } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -165,7 +165,8 @@ export const HomePage: Page = () => {
             })}
           </div>
 
-          <SimpleCard
+          <Card
+            size="compact"
             title={
               data && data?.count > 0 ? (
                 <>
@@ -209,11 +210,11 @@ export const HomePage: Page = () => {
                 })}
               </div>
             ) : null}
-          </SimpleCard>
+          </Card>
         </section>
         <section className="flex flex-col gap-6">
           <HeidiTips collection="projectSettings" />
-          <SimpleCard title="Resources" description="Learn, explore and get help" data-testid="resources-card">
+          <Card size="compact" title="Resources" description="Learn, explore and get help" data-testid="resources-card">
             <ul>
               {resources.map((link) => {
                 return (
@@ -231,7 +232,7 @@ export const HomePage: Page = () => {
                 );
               })}
             </ul>
-          </SimpleCard>
+          </Card>
           <div className="flex gap-2 items-center">
             <IconHumanSignal />
             <span className="text-neutral-content-subtle">Label Studio Version: Community</span>

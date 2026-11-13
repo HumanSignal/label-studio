@@ -267,7 +267,7 @@ export const RichContent: Story = {
               </div>
               <span className="text-sm">{name}</span>
             </div>
-            <Button size="smaller" variant="neutral" look="text">
+            <Button size="smaller" variant="neutral" look="ghost">
               Remove
             </Button>
           </div>

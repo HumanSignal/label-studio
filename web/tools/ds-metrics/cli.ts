@@ -5,6 +5,7 @@
  *   bun run ds:metrics                       human summary
  *   bun run ds:metrics --json                the snapshot (schema in snapshot.ts)
  *   bun run ds:metrics --compare base.json   the PR comment markdown: this checkout vs a base snapshot
+ *   bun run ds:metrics --gate base.json      exit 1 when a rule's whole-repo count rose against the base snapshot
  *   bun run ds:metrics --append history.ndjson   add this checkout to the series (one line per commit)
  *   bun run ds:metrics --series history.ndjson   the dashboard data (points, clusters, goals, week delta); no snapshot
  *   --pr <n> --commit <sha> --date <iso>     identity of the snapshot (defaults: null, HEAD, now)
@@ -18,7 +19,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { listScanFiles } from "../ds-check/scan";
-import { renderComparison } from "./compare";
+import { renderComparison, ruleIncreases } from "./compare";
 import { appendSnapshot, readHistory } from "./history";
 import { mergedPrs } from "./prs";
 import { buildSeries } from "./series";
@@ -119,6 +120,20 @@ if (baseFile) {
   const base = JSON.parse(fs.readFileSync(baseFile, "utf-8")) as Snapshot;
   console.log(renderComparison(snap, base));
   process.exit(0);
+}
+
+const gateFile = valueOf("--gate");
+if (gateFile) {
+  if (!fs.existsSync(gateFile)) fail(`base snapshot not found: ${gateFile}`);
+  const base = JSON.parse(fs.readFileSync(gateFile, "utf-8")) as Snapshot;
+  const increases = ruleIncreases(snap, base);
+  if (!increases.length) {
+    console.log(`[ds-metrics] no rule count rose against ${base.commit.slice(0, 10)}.`);
+    process.exit(0);
+  }
+  console.error(`[ds-metrics] rule counts rose against ${base.commit.slice(0, 10)}:`);
+  for (const r of increases) console.error(`  ${r.rule.padEnd(22)} ${r.base} -> ${r.head} (+${r.delta})`);
+  process.exit(1);
 }
 
 const historyFile = valueOf("--append");
