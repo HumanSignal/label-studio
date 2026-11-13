@@ -9,12 +9,16 @@ export const Violations = ({ u, onPick }: { u: unknown; onPick: () => void }) =>
     <table aria-label="rows" />
     <input type="checkbox" aria-label="on" />
     <input type="radio" aria-label="one" />
-    <Badge look="outline" variant="primary">
+    <Badge look="outlined" variant="primary">
       Draft
     </Badge>
     <Badge variant="primary" icon={<span />}>
       Draft
     </Badge>
     <Avatar size={24} user={u} />
+    <Button look="string" onClick={onPick}>
+      Go
+    </Button>
+    <Button look="outline" onClick={onPick} />
   </div>
 );

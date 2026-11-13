@@ -183,7 +183,7 @@ function TreeSelectBranch({
           <Button
             type="button"
             variant="neutral"
-            look="string"
+            look="ghost"
             size="smaller"
             align="center"
             className={cn(
@@ -222,7 +222,7 @@ function TreeSelectBranch({
             type="button"
             data-testid="taxonomy-tree-row-label"
             variant="neutral"
-            look="string"
+            look="ghost"
             size="small"
             align="left"
             className={cn(

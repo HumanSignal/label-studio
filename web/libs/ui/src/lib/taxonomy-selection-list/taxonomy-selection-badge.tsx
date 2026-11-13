@@ -12,7 +12,7 @@ export function TaxonomySelectionBadge({ item, onRemove }: TaxonomySelectionBadg
       variant="grape"
       look="filled"
       size="small"
-      shape="squared"
+      shape="square"
       className="htx-taxonomy-selection-item max-w-full min-w-0 shrink"
       maxWidth={220}
       closeLabel={`Remove ${item.label}`}

@@ -499,7 +499,7 @@ export const CustomHeaderContent: Story = {
               Built from UI primitives instead of the default title row.
             </Typography>
           </div>
-          <Button look="string" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
+          <Button look="ghost" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
         </div>
       }
     >

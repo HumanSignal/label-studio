@@ -43,7 +43,7 @@ const ToggleRelationsVisibilityButton = observer<FC<ToggleRelationsVisibilityBut
     <Button
       className={cn("relation-controls").mod({ hidden: isAllHidden }).toClassName()}
       variant="neutral"
-      look="string"
+      look="ghost"
       size="small"
       disabled={isDisabled}
       onClick={toggleRelationsVisibility}
@@ -84,7 +84,7 @@ const ToggleRelationsOrderButton = observer<FC<ToggleRelationsOrderButtonProps>>
     <Button
       className={cn("relation-controls").mod({ order: relationStore.order }).toClassName()}
       variant="neutral"
-      look="string"
+      look="ghost"
       size="small"
       onClick={toggleRelationsOrder}
       disabled={isDisabled}

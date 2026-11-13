@@ -105,7 +105,7 @@ const Label = ({ label, template, color }) => {
       </span>
       <Button
         type="button"
-        look="string"
+        look="ghost"
         size="smaller"
         variant="negative"
         onClick={() => template.removeLabel(label)}

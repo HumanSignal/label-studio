@@ -11,7 +11,7 @@ export const EditingHistory = observer(({ entity }) => {
     <div className={cn("history-buttons").toClassName()}>
       <Button
         variant="neutral"
-        look="string"
+        look="ghost"
         aria-label="Undo"
         className="!p-0"
         tooltip="Undo"
@@ -22,7 +22,7 @@ export const EditingHistory = observer(({ entity }) => {
       </Button>
       <Button
         variant="neutral"
-        look="string"
+        look="ghost"
         aria-label="Redo"
         className="!p-0"
         tooltip="Redo"
@@ -31,7 +31,7 @@ export const EditingHistory = observer(({ entity }) => {
         leading={<IconRedo />}
       />
       <Button
-        look="string"
+        look="ghost"
         variant="negative"
         aria-label="Reset"
         tooltip="Reset"

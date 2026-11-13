@@ -94,7 +94,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
             </Menu>
           }
         >
-          <Button look="string">
+          <Button look="ghost">
             <IconEllipsis />
           </Button>
         </Dropdown.Trigger>

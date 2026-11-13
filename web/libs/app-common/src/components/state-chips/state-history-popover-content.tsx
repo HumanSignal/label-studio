@@ -44,7 +44,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
                 onClose();
               }}
               leading={<IconCross />}
-              look="string"
+              look="ghost"
               size="small"
               aria-label="Close"
             />

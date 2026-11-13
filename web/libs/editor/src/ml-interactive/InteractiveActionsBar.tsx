@@ -211,14 +211,14 @@ export const InteractiveActionsBar = observer(({ objectTag }: InteractiveActions
       {/* Right: contextual actions (Reject / Accept / Track / Stop). */}
       <div className="flex items-center gap-tight">
         {tracking && (
-          <Button variant="negative" look="string" size="small" onClick={() => controller.cancelTracking()}>
+          <Button variant="negative" look="ghost" size="small" onClick={() => controller.cancelTracking()}>
             Stop
           </Button>
         )}
 
         {!tracking && hasMask && (
           <>
-            <Button variant="negative" look="string" size="small" onClick={handleReject} tooltip="Reject (Esc)">
+            <Button variant="negative" look="ghost" size="small" onClick={handleReject} tooltip="Reject (Esc)">
               Reject
             </Button>
             <Button variant="positive" look="filled" size="small" onClick={handleAccept} tooltip="Accept (Enter)">

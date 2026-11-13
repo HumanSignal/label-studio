@@ -48,7 +48,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange, disab
   if (disabled) {
     return (
       <Tooltip title={disabledTooltip}>
-        <Button look="string" variant="neutral" size="small" disabled>
+        <Button look="ghost" variant="neutral" size="small" disabled>
           {children}
         </Button>
       </Tooltip>
@@ -72,7 +72,7 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange, disab
         </Menu>
       }
     >
-      <Button look="string" variant="neutral" size="small">
+      <Button look="ghost" variant="neutral" size="small">
         {children}
       </Button>
     </Dropdown.Trigger>

@@ -238,7 +238,7 @@ const Grouping = <T extends string>({
         variant="neutral"
         size="smaller"
         data-testid={`grouping-${value}`}
-        look="string"
+        look="ghost"
         leading={readableValue.icon}
         trailing={extraIcon}
       >
@@ -309,7 +309,7 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
     <Button
       variant="neutral"
       size="smaller"
-      look="string"
+      look="ghost"
       disabled={isDisabled}
       onClick={toggleRegionsVisibility}
       aria-label={isAllHidden ? "Show all regions" : "Hide all regions"}

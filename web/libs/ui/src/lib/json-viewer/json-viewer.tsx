@@ -246,7 +246,7 @@ export const JsonViewer: FC<JsonViewerProps> = ({
                 {searchText && (
                   <Tooltip title="Clear Search">
                     <Button
-                      look="string"
+                      look="ghost"
                       variant="primary"
                       size="small"
                       onClick={() => setSearchText("")}

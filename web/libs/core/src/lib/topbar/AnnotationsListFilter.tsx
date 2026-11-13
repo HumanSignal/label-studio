@@ -377,7 +377,7 @@ export function AnnotationsListFilter({
             <Button
               type="button"
               variant="neutral"
-              look="string"
+              look="ghost"
               size="smaller"
               onClick={clearSearch}
               aria-label="Clear search"
@@ -396,7 +396,7 @@ export function AnnotationsListFilter({
                 <Button
                   type="button"
                   variant="neutral"
-                  look="string"
+                  look="ghost"
                   size="smaller"
                   aria-haspopup="dialog"
                   aria-expanded={filterOpen}
@@ -534,7 +534,7 @@ export function AnnotationsListFilter({
             <Button
               type="button"
               variant="neutral"
-              look="string"
+              look="ghost"
               size="smaller"
               aria-haspopup="listbox"
               aria-label={`Sort by ${currentSortLabel}, ${sortDirectionLabel}`}

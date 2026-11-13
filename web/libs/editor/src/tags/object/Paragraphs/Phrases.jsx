@@ -204,7 +204,7 @@ export const Phrases = observer(({ item, playingId, activeRef, setIsInViewPort, 
       <div className={styles.phraseContainer}>
         {isContentVisible && !isNaN(v.start) && (
           <Button
-            look="string"
+            look="ghost"
             className={styles.playNewUi}
             aria-label={isPlaying ? "pause" : "play"}
             disabled={!withAudio}

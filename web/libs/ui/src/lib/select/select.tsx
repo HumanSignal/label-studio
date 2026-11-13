@@ -175,7 +175,7 @@ const SelectedItemsGroup = ({
             onClick={handleSelectAllClick}
             disabled={disabled}
             aria-label={selectAllLabel}
-            look="string"
+            look="ghost"
             size="smaller"
           >
             Select All
@@ -1046,10 +1046,10 @@ const GroupActions = ({ groupItems, valueRef, setValue, onChange }: GroupActions
 
   return (
     <div className={styles.groupActions}>
-      <Button type="button" look="string" size="smaller" onClick={handleSelectAll}>
+      <Button type="button" look="ghost" size="smaller" onClick={handleSelectAll}>
         All
       </Button>
-      <Button type="button" look="string" size="smaller" onClick={handleSelectNone}>
+      <Button type="button" look="ghost" size="smaller" onClick={handleSelectNone}>
         None
       </Button>
     </div>

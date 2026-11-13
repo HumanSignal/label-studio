@@ -71,7 +71,7 @@ const ControlButton = observer(({ button, disabled, onClick, variant, look }: Co
     <Button
       {...button.props}
       variant={button.variant ?? variant}
-      look={button.look ?? look}
+      look={(button.look === "string" ? "ghost" : button.look) ?? look}
       tooltip={button.tooltip}
       className="w-[150px]"
       aria-label={button.ariaLabel}
@@ -407,7 +407,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           <div className="p-tighter rounded">
             <Button
               name="submit-option"
-              look="string"
+              look="ghost"
               size="small"
               className="w-[150px]"
               onClick={async (event) => {

@@ -28,7 +28,7 @@ export const Default: Story = {
 
 export const PerItemVariants: Story = {
   args: {
-    look: "outline",
+    look: "outlined",
     shape: "rounded",
     size: "small",
     badgeMaxWidth: 160,

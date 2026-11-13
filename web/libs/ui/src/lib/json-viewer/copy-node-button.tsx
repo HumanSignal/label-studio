@@ -25,7 +25,7 @@ export const CopyNodeButton: FC<CopyNodeButtonProps> = ({ value }) => {
   return (
     <Tooltip title={copied ? "Copied!" : "Copy value"}>
       <Button
-        look="string"
+        look="ghost"
         onClick={handleClick}
         className="jer-edit-button"
         size="small"

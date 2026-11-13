@@ -8,12 +8,12 @@ export default defineManifest({
   use_when: "A short label that states an attribute (Required, Inherited, a count) or a status of an item.",
   never_when: [
     "booleans or attributes most rows share (use Typography)",
-    "anything clickable (use Button look=string or Toggle)",
+    "anything clickable (use Button look=ghost or Toggle)",
     "an icon, dot, check or cross inside",
     "a local span with rounded-full classes",
   ],
   props_rules: [
-    "look is always the filled default, never outline",
+    "look is always the filled default; outlined only on selection controls, where it means not selected",
     "shape=rounded for lifecycle states, square for attributes",
     "state colours follow the registry table: neutral initial, primary in process, warning needs attention, plum in review, positive done, negative failed",
     "size via the size prop only, never className overrides",

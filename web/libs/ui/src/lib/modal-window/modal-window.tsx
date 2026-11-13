@@ -286,7 +286,7 @@ export function ModalWindow({
               {showCloseButton ? (
                 <DialogPrimitive.Close asChild>
                   <Button
-                    look="string"
+                    look="ghost"
                     size="small"
                     className="shrink-0"
                     leading={<XIcon size={16} weight="bold" />}

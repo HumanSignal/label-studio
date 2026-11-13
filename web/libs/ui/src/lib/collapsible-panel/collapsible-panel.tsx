@@ -99,7 +99,7 @@ export const CollapsiblePanel = ({
         <Button
           type="button"
           variant="neutral"
-          look="string"
+          look="ghost"
           size="small"
           className={cn(
             "flex items-center justify-center text-neutral-content-subtle transition-colors",

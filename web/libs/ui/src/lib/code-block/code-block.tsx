@@ -36,7 +36,7 @@ export function CodeBlock({
     >
       <pre className="whitespace-pre-wrap">{code.trim()}</pre>
       {allowCopy && (
-        <Button size="small" look="string" className="absolute top-1 right-2" onClick={() => copyCode(code)}>
+        <Button size="small" look="ghost" className="absolute top-1 right-2" onClick={() => copyCode(code)}>
           {isCopied ? <CheckIcon /> : <CopyIcon />}
         </Button>
       )}

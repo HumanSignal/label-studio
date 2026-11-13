@@ -1,11 +1,11 @@
 or {
   `<button $attrs>$children</button>` as $el where {
     $filename <: not r".*libs/ui/.*",
-    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or string; aria-label when icon-only), not a raw <button>.", severity="warn")
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or ghost; aria-label when icon-only), not a raw <button>.", severity="warn")
   },
   `<button $attrs />` as $el where {
     $filename <: not r".*libs/ui/.*",
-    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or string; aria-label when icon-only), not a raw <button>.", severity="warn")
+    register_diagnostic(span=$el, message="[ds/raw-control] Use Button from @humansignal/ui (look filled, outlined or ghost; aria-label when icon-only), not a raw <button>.", severity="warn")
   },
   `<select $attrs>$children</select>` as $el where {
     $filename <: not r".*libs/ui/.*",

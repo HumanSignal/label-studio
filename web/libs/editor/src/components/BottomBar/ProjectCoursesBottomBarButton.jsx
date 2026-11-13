@@ -21,7 +21,7 @@ export const ProjectCoursesBottomBarButton = observer(({ store }) => {
         aria-label="View project courses"
         size="small"
         variant="neutral"
-        look="string"
+        look="ghost"
         className="aspect-square"
         leading={<BookOpenTextIcon size={24} />}
         data-testid="bottombar-courses-button"

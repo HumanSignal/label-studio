@@ -247,7 +247,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
         {closable && (
           <Button
             variant="neutral"
-            look="string"
+            look="ghost"
             size="smaller"
             className={cn("message__close", styles.close)}
             onClick={onClose}

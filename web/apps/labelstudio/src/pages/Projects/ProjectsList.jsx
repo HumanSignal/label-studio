@@ -104,7 +104,7 @@ const ProjectCard = ({ project }) => {
                   </Menu>
                 }
               >
-                <Button size="smaller" look="string" aria-label="Project options">
+                <Button size="smaller" look="ghost" aria-label="Project options">
                   <DotsThreeIcon />
                 </Button>
               </Dropdown.Trigger>

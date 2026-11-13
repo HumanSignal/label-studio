@@ -7,17 +7,10 @@ import styles from "./badge.module.css";
 // Variant mapping: semantic names -> accent colors
 const VARIANT_MAP: Record<string, string> = {
   primary: "grape",
-  info: "grape",
   neutral: "sand",
-  secondary: "sand",
-  default: "sand",
   negative: "persimmon",
-  destructive: "persimmon",
-  error: "persimmon",
   positive: "kale",
-  success: "kale",
   warning: "canteloupe",
-  caution: "canteloupe",
   beta: "plum",
   enterprise: "gradient", // backwards compatibility alias
 };
@@ -39,25 +32,18 @@ const ACCENT_COLORS = [
 // Supported variants (semantic + accent colors + gradient)
 export type BadgeVariant =
   | "primary"
-  | "info"
   | "neutral"
-  | "secondary"
-  | "default"
   | "negative"
-  | "destructive"
-  | "error"
   | "positive"
-  | "success"
   | "warning"
-  | "caution"
   | "beta"
   | "enterprise"
   | "gradient"
   | (typeof ACCENT_COLORS)[number];
 
-export type BadgeLook = "filled" | "outline" | "ghost" | "solid";
-export type BadgeShape = "rounded" | "square" | "squared";
-export type BadgeSize = "large" | "medium" | "small" | "compact" | "default"; // "default" is deprecated, use "medium"; "compact" is deprecated, use "small"
+export type BadgeLook = "filled" | "outlined" | "ghost" | "solid";
+export type BadgeShape = "rounded" | "square";
+export type BadgeSize = "large" | "medium" | "small";
 
 export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   variant?: BadgeVariant;
@@ -103,8 +89,6 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
     ref,
   ) => {
     const normalizedVariant = normalizeVariant(variant);
-    // Map deprecated sizes for backwards compatibility
-    const normalizedSize = size === "compact" ? "small" : size === "default" ? "medium" : size;
     const isGradient = normalizedVariant === "gradient";
     const hasChildren = children != null && children !== "";
     const hasIcon = icon != null;
@@ -146,8 +130,8 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
           styles.badge,
           styles[`variant-${normalizedVariant}`],
           styles[`look-${look}`],
-          styles[`shape-${shape === "square" ? "squared" : shape}`],
-          normalizedSize !== "medium" && styles[`size-${normalizedSize}`],
+          styles[`shape-${shape}`],
+          size !== "medium" && styles[`size-${size}`],
           isIconOnly && styles["icon-only"],
           hasTrailingIcon && styles["has-trailing-icon"],
           className,

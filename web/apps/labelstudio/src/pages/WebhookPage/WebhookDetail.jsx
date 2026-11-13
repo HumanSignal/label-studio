@@ -78,7 +78,7 @@ const WebhookForm = ({
               <Button
                 type="button"
                 variant="primary"
-                look="string"
+                look="ghost"
                 onClick={onAddHeaderClick}
                 className="!p-0 [&_span]:!text-[var(--grape\_500)]"
                 leading={<IconPlus />}
@@ -103,7 +103,7 @@ const WebhookForm = ({
                   <div>
                     <Button
                       variant="negative"
-                      look="string"
+                      look="ghost"
                       className="h-8 w-8 !p-0"
                       type="button"
                       icon={<IconCross />}

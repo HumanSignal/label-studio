@@ -21,7 +21,7 @@ export const EditingHistory = observer(({ entity }) => {
           variant="neutral"
           size="small"
           aria-label="Undo"
-          look="string"
+          look="ghost"
           disabled={!history?.canUndo}
           onClick={() => entity.undo()}
           className="aspect-square"
@@ -33,7 +33,7 @@ export const EditingHistory = observer(({ entity }) => {
         <Button
           variant="neutral"
           size="small"
-          look="string"
+          look="ghost"
           aria-label="Redo"
           disabled={!history?.canRedo}
           onClick={() => entity.redo()}
@@ -45,7 +45,7 @@ export const EditingHistory = observer(({ entity }) => {
       <Tooltip title="Reset">
         <Button
           variant="negative"
-          look="string"
+          look="ghost"
           size="small"
           aria-label="Reset"
           disabled={!history?.canUndo}

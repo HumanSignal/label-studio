@@ -6,7 +6,7 @@ export const ModalCloseButton = () => {
   const modal = useModalControls();
   return (
     <Button
-      look="string"
+      look="ghost"
       className="!p-0 [&_svg]:!w-6 [&_svg]:!h-6"
       leading={<IconClose />}
       aria-label="Close modal"

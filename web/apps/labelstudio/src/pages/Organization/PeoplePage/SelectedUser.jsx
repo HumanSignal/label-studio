@@ -31,7 +31,7 @@ export const SelectedUser = ({ user, onClose }) => {
   return (
     <div className={cn("user-info").toClassName()}>
       <Button
-        look="string"
+        look="ghost"
         onClick={onClose}
         className="absolute top-[20px] right-[24px]"
         aria-label="Close user details"

@@ -48,7 +48,7 @@ describe("DateRangePicker nullMode", () => {
     render(<DateRangePicker initialDates={initialDates} setAppliedDates={mock()} nullMode={neverMode()} />);
 
     expect(nullButton()).toHaveTextContent("Never");
-    expect(nullButton()).toHaveClass("look-string");
+    expect(nullButton()).toHaveClass("look-ghost");
     expect(screen.getByTestId("days-selected")).toHaveTextContent("3 days");
     expect(screen.getByRole("button", { name: "Apply date" })).toBeDisabled();
   });
@@ -105,7 +105,7 @@ describe("DateRangePicker nullMode", () => {
 
     fireEvent.click(nullButton());
 
-    expect(nullButton()).toHaveClass("look-string");
+    expect(nullButton()).toHaveClass("look-ghost");
     expect(screen.getByTestId("days-selected")).toHaveTextContent("3 days");
 
     fireEvent.click(screen.getByRole("button", { name: "Apply date" }));
@@ -126,7 +126,7 @@ describe("DateRangePicker nullMode", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close date picker" }));
 
     expect(onChange).not.toHaveBeenCalled();
-    expect(nullButton()).toHaveClass("look-string");
+    expect(nullButton()).toHaveClass("look-ghost");
   });
 
   it("drops the selection when a range preset is picked", () => {
@@ -143,7 +143,7 @@ describe("DateRangePicker nullMode", () => {
 
     fireEvent.click(screen.getByTestId("datetime-sidebar-button-today"));
 
-    expect(nullButton()).toHaveClass("look-string");
+    expect(nullButton()).toHaveClass("look-ghost");
 
     fireEvent.click(screen.getByRole("button", { name: "Apply date" }));
 
@@ -157,7 +157,7 @@ describe("DateRangePicker nullMode", () => {
     fireEvent.click(nullButton());
     fireEvent.click(screen.getByRole("button", { name: "Reset date" }));
 
-    expect(nullButton()).toHaveClass("look-string");
+    expect(nullButton()).toHaveClass("look-ghost");
     expect(screen.getByRole("button", { name: "Apply date" })).toBeDisabled();
   });
 });

@@ -227,7 +227,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" leading={<TagIcon />}>
               Outlined
             </Button>
-            <Button variant="gradient" look="string" leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" leading={<TagIcon />}>
               String
             </Button>
           </div>
@@ -243,7 +243,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" waiting leading={<TagIcon />}>
               Outlined waiting
             </Button>
-            <Button variant="gradient" look="string" waiting leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" waiting leading={<TagIcon />}>
               String waiting
             </Button>
           </div>
@@ -259,7 +259,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" disabled leading={<TagIcon />}>
               Outlined disabled
             </Button>
-            <Button variant="gradient" look="string" disabled leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" disabled leading={<TagIcon />}>
               String disabled
             </Button>
           </div>
@@ -288,10 +288,10 @@ export const WithButtonGroup: Story = {
               alignment="bottom-right"
               content={
                 <Space direction="vertical" className="bg-neutral-background p-tight rounded">
-                  <Button align="left" look="string" size="small">
+                  <Button align="left" look="ghost" size="small">
                     Label tasks as displayed
                   </Button>
-                  <Button align="left" look="string" size="small">
+                  <Button align="left" look="ghost" size="small">
                     Skip all tasks
                   </Button>
                 </Space>

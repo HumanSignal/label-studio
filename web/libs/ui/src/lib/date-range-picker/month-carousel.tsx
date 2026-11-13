@@ -22,7 +22,7 @@ export const MonthCarousel = ({ month, year, changeMonth, neighboringCalendar }:
   return (
     <div className="flex justify-between items-center w-[280px] h-10">
       <Button
-        look="string"
+        look="ghost"
         data-testid="decrement-month"
         size="small"
         className="w-[32px]"
@@ -34,7 +34,7 @@ export const MonthCarousel = ({ month, year, changeMonth, neighboringCalendar }:
         {`${monthMap[month]} ${year}`}
       </Typography>
       <Button
-        look="string"
+        look="ghost"
         data-testid="increment-month"
         size="small"
         leading={<IconChevronRight />}

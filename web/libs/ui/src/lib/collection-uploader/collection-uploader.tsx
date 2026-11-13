@@ -364,7 +364,7 @@ export const CollectionUploader = ({
               </Button>
             ) : null}
             {(row.status === "uploading" || row.status === "pending" || row.status === "failed") && onCancel ? (
-              <Button size="small" look="string" variant="negative" onClick={() => onCancel(row.clientRef)}>
+              <Button size="small" look="ghost" variant="negative" onClick={() => onCancel(row.clientRef)}>
                 Remove
               </Button>
             ) : null}

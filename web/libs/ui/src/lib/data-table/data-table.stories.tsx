@@ -96,7 +96,7 @@ const baseColumns: ColumnDef<User>[] = [
     cell: ({ getValue }) => {
       const role = getValue() as string;
       return (
-        <Badge variant={role === "Admin" ? "primary" : role === "Editor" ? "success" : "info"} size="small">
+        <Badge variant={role === "Admin" ? "primary" : role === "Editor" ? "positive" : "primary"} size="small">
           {role}
         </Badge>
       );
@@ -108,7 +108,7 @@ const baseColumns: ColumnDef<User>[] = [
     cell: ({ getValue }) => {
       const status = getValue() as string;
       return (
-        <Badge variant={status === "active" ? "success" : "default"} size="small">
+        <Badge variant={status === "active" ? "positive" : "neutral"} size="small">
           {status}
         </Badge>
       );
@@ -746,7 +746,7 @@ export const WithCustomHeaders: Story = {
         cell: ({ getValue }) => {
           const role = getValue() as string;
           return (
-            <Badge variant={role === "Admin" ? "primary" : role === "Editor" ? "success" : "info"} size="small">
+            <Badge variant={role === "Admin" ? "primary" : role === "Editor" ? "positive" : "primary"} size="small">
               {role}
             </Badge>
           );
@@ -768,7 +768,7 @@ export const WithCustomHeaders: Story = {
           const sessions = getValue() as number;
           return (
             <div className="flex items-center justify-center">
-              <Badge variant={sessions > 1 ? "warning" : "default"} size="small">
+              <Badge variant={sessions > 1 ? "warning" : "neutral"} size="small">
                 {sessions}
               </Badge>
             </div>
