@@ -1,12 +1,14 @@
 import { useHotkeys } from "react-hotkeys-hook";
 import { pascalCase } from "@humansignal/core";
 import { keymap } from "./keymap";
+import { shortcutFilter, shouldYieldToEditor } from "./shortcut-guards";
 
 export type Hotkey = {
   title: string;
   shortcut?: string;
   macos?: string;
   other?: string;
+  yieldToEditor?: boolean;
 };
 
 const readableShortcut = (shortcut: string | null | undefined) => {
@@ -40,17 +42,25 @@ export const useShortcut = (
 
   useHotkeys(
     shortcut,
-    () => {
-      // Yield to editor (LSF) hotkeys when the labeling panel is active.
+    (event?: KeyboardEvent) => {
+      // Yield to editor (LSF) hotkeys when the labeling panel is active, but only for actions
+      // whose key the editor also uses (`yieldToEditor` in the keymap). Yielding every action
+      // made task navigation (Shift+Up/Down) dead whenever a task was open (#9639).
       // The flag is set by Label.jsx when labeling starts and toggled via
       // pointerdown tracking so clicks on the DM table re-enable DM shortcuts.
-      if (document.body.dataset.lsfLabeling === "true") return;
+      if (shouldYieldToEditor(action, document.body.dataset.lsfLabeling === "true")) return;
 
+      // Handled here, so skip the browser default too: e.g. Shift+Down on a focused radio
+      // button (a Choice the user just clicked) would otherwise also change the selected choice.
+      event?.preventDefault();
       callback();
     },
     {
       keyup: false,
       element: document.body,
+      // Ignore key presses only while typing. The hotkeys-js default also ignores radio buttons
+      // and checkboxes, so shortcuts stopped working after clicking a Choice.
+      filter: shortcutFilter,
     } as any,
     dependencies,
   );
