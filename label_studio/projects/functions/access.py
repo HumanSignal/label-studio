@@ -1,6 +1,8 @@
 from core.utils.common import load_func
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from projects.models import Project
+from rest_framework.exceptions import PermissionDenied
 
 
 def accessible_projects(user):
@@ -25,3 +27,16 @@ def filter_accessible(queryset, user, project_field='project'):
     """
     project_ids = load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(user).values('id')
     return queryset.filter(**{f'{project_field}__in': project_ids})
+
+
+def get_permitted_project(user, pk):
+    """The project ``pk`` in the user's active organization, if ``Project.has_permission`` allows the user.
+
+    ``Project.objects.for_user`` only filters by organization; endpoints that load a project from the URL
+    and then read or change its rows need the membership check too. Raises 404 for an unknown project and
+    DRF ``PermissionDenied`` (403) when the user may not access it, so call it from DRF views only.
+    """
+    project = get_object_or_404(Project.objects.for_user(user), pk=pk)
+    if not project.has_permission(user):
+        raise PermissionDenied(f"You don't have access to project {project.id}")
+    return project
