@@ -19,6 +19,7 @@ from django.utils.functional import cached_property
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from projects.functions.access import filter_accessible
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
@@ -1436,7 +1437,8 @@ class PredictionAPI(viewsets.ModelViewSet):
     filterset_fields = ['task', 'task__project', 'project']
 
     def get_queryset(self):
-        return Prediction.objects.filter(project__organization=self.request.user.active_organization)
+        # list() never runs Prediction.has_permission, so scope rows to accessible projects here
+        return filter_accessible(Prediction.objects.all(), self.request.user)
 
     def get_serializer(self, *args, **kwargs):
         serializer = super().get_serializer(*args, **kwargs)
