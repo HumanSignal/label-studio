@@ -1252,7 +1252,9 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         return task
 
     def get_queryset(self):
-        return AnnotationDraft.objects.filter(task=self.task)
+        drafts = AnnotationDraft.objects.filter(task=self.task)
+        # list() never runs AnnotationDraft.has_permission: annotators only list their own drafts
+        return Annotation.restrict_to_own_work(drafts, self.request.user, self.task.project, author_field='user')
 
     def perform_create(self, serializer):
         task = self.task

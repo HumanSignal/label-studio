@@ -1038,8 +1038,15 @@ class AnnotationDraft(FsmHistoryStateModel):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        """Project access; users restricted to their own work (LSE annotators) also need their own draft on a
+        task they can open. Beyond project access the task check only restricts those users, so others skip it."""
+        project = self.task.project
+        user.project = project  # link for activity log
+        if not project.has_permission(user):
+            return False
+        if Annotation.restricted_to_own_work(user, project):
+            return self.user_id == user.id and self.task.has_permission(user)
+        return True
 
     def save(self, *args, **kwargs):
         # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
