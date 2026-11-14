@@ -1134,13 +1134,17 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
     def get_queryset(self):
-        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+        user = self.request.user
+        task = generics.get_object_or_404(Task.objects.for_user(user), pk=self.kwargs.get('pk', 0))
+        # list() never runs Annotation.has_permission: check the task, then filter rows the same way
+        if not task.has_permission(user):
+            raise PermissionDenied(f"You don't have permission for task {task.id}")
+        annotations = Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+        return Annotation.restrict_to_own_work(annotations, user, task.project)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        # Only needed for annotation create/update validation; avoid parent_object
-        # permission checks on GET list (url_smoke expects annotator list = 200).
+        # Only needed for annotation create/update validation; GET checks the task in get_queryset.
         if self.request.method != 'GET':
             context['task'] = self.parent_object
         return context
