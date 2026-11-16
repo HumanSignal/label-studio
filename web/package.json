@@ -132,6 +132,7 @@
     "react-window": "^1.8.11",
     "react-window-infinite-loader": "^1.0.5",
     "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
     "sanitize-html": "^2.14.0",
     "shadcn": "^4.22.1",
     "simplify-js": "^1.2.4",

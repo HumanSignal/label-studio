@@ -57,9 +57,6 @@ Run everything from `services/lso/web` (the scripts resolve `.design-sync/` and 
   (`../button/button`), which the default rule-2 match (file name == export name) misses → they'd bundle a second
   source copy. Every libs/ui import shims to window.HumanSignalUI instead. Story-local helpers that are NOT public
   exports must be carved out with `storyImports.bundle` (currently `/date-range-picker/date-utils`).
-- MediaCard `PdfRealSample` story dynamically imports `pdfjs-dist` (whose node branch does `import("fs")`, fatal for
-  the preview compile). `pdfjs-dist` is shimmed (`storyImports.shim`) and the story skipped
-  (`overrides.MediaCard.skip`) — it needs a real pdf.js + worker at runtime.
 - No `.storybook/preview` decorators; theme is set by `preview-head.html` (`data-color-scheme` on <html>, light by
   default in headless capture). Tokens default to light on `:root`; dark lives under `[data-color-scheme="dark"]`.
 - `cardMode: "column"` for the 12 wide-story components validate flagged; Toast is `single` (portal viewport).
@@ -97,7 +94,7 @@ Run everything from `services/lso/web` (the scripts resolve `.design-sync/` and 
   two sides differently, so widths LOOK different on the sheet. Judge at native resolution (raw/ PNGs); crop each to
   its content bbox and compare sizes — identical bbox sizes are the norm for faithful renders.
 - [GENERAL] Storybook's own `preview.prefix.css` sets `body{height:100vh}` and `#storybook-root{height:100%}`.
-  Components whose root fills its parent's height (MediaCard, panels) stretch to the full frame in storybook but are
+  Components whose root fills its parent's height (panels) stretch to the full frame in storybook but are
   content-height in the preview. That is framing — grade the component, not the frame (`match` with a note).
 - Same for container WIDTH: preview frame is 16px narrower, so long text may wrap one word earlier. Framing.
 - Interaction-gated overlays: ModalWindow stories (and likely Drawer/Dropdown/Popover/ContextMenu) render only a
@@ -110,7 +107,7 @@ Run everything from `services/lso/web` (the scripts resolve `.design-sync/` and 
   storybook gets the same faces injected by `node .design-sync/build/inject-reference-fonts.mjs` — RE-RUN IT after
   every `storybook build` into .design-sync/sb-reference, or mono text compares Plex (preview) vs fallback (sb).
   JetBrains Mono is only a fallback behind Plex; it is never reached. Verified by CDP font probe: AiChatLoading
-  timer, DataTable mono cells, MultiTreeSelect `<code>`, MediaCard metadata render IBM Plex Mono on both sides.
+  timer, DataTable mono cells, MultiTreeSelect `<code>` render IBM Plex Mono on both sides.
 - JsonViewer's JSON tree is SYSTEM `monospace` on both sides (and in the app): json-edit-react's defaultTheme sets an
   inline `font-family: monospace` on `.jer-editor-container`, beating json-viewer.module.css's var(--font-family-mono).
   Only the FF_FIT_2007 virtualized path (`.rjv-container`, flag off in every story) uses Plex. A libs/ui fix, not sync.

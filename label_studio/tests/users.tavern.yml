@@ -72,7 +72,7 @@ stages:
       url: "{django_live_url}/user/signup?next=http://malicious.com"
       data:
         email: test_second_org@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302
@@ -84,7 +84,7 @@ stages:
       url: "{django_live_url}/user/login?next=http://malicious.com"
       data:
         email: test_second_org@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302

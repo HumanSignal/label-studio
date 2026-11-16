@@ -364,6 +364,8 @@ AUTH_PASSWORD_VALIDATORS = [
             'max_length': AUTH_PASSWORD_MAX_LENGTH,
         },
     },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Django templates
@@ -1021,7 +1023,7 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
 )
 
 # Hostnames whose iframes are allowed to survive the editor's HTML sanitizer
-# (see services/lso/web/libs/editor/src/utils/html.js: sanitizeHtml).
+# (see services/lso/web/libs/editor/src/utils/sanitizeHtml.js: sanitizeHtml).
 # Override with the LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS env var (comma-separated).
 ALLOWED_IFRAME_DOMAINS = get_env_list(
     'ALLOWED_IFRAME_DOMAINS',

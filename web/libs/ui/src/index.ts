@@ -5,17 +5,13 @@ export * from "./lib/Tooltip/Tooltip";
 export * from "./lib/avatar";
 export * from "./lib/badge/badge";
 export * from "./lib/badge-group";
+export * from "./lib/card";
 export * from "./lib/button/button";
 export * from "./lib/checkbox/checkbox";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
 export * from "./lib/column-browser";
-export * from "./lib/collection-uploader/collection-header";
-export * from "./lib/collection-uploader/collection-uploader";
-export * from "./lib/collection-uploader/media-card";
-export * from "./lib/collection-uploader/submission-rules";
-export * from "./lib/collection-uploader/use-collection-submission";
 export * from "./lib/context-menu";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
@@ -65,17 +61,17 @@ export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
 export * from "./lib/accordion/accordion";
 
-export * from "./lib/simple-card";
 export * from "./lib/space/space";
 export * from "./lib/spinner/spinner";
 export * from "./lib/sparkles/sparkles";
 export * from "./lib/ai-chat";
-export { Popover, type PopoverProps } from "./lib/popover/popover";
+export { Popover, type PopoverPanelProps, type PopoverProps } from "./lib/popover/popover";
 export * from "./lib/tree-select";
 export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
 export { Drawer, type DrawerProps } from "./lib/drawer";
+export * from "./lib/drop-zone";
 export * from "./lib/date-range-picker";
 export * from "./lib/modal-window";
 
@@ -85,4 +81,4 @@ export * from "./utils/getTokenColor";
 export * from "./hooks/useTokenColor";
 
 // TODO: Remove when DIA-2142 and DIA-2175 are delivered
-export * from "./shadcn";
+export { cn } from "./utils/utils";

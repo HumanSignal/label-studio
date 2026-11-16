@@ -13,7 +13,7 @@ const meta: Meta<typeof AiChatLoading> = {
     },
   },
   argTypes: {
-    variant: { control: "select", options: ["drive", "dots", "orbit"] },
+    animation: { control: "select", options: ["drive", "dots", "orbit"] },
     showElapsed: { control: "boolean" },
   },
 };
@@ -24,7 +24,7 @@ type Story = StoryObj<typeof AiChatLoading>;
 export const Drive: Story = {
   args: {
     label: "Churning",
-    variant: "drive",
+    animation: "drive",
     elapsed: "1.4s",
   },
 };
@@ -32,7 +32,7 @@ export const Drive: Story = {
 export const Dots: Story = {
   args: {
     label: "Working",
-    variant: "dots",
+    animation: "dots",
     elapsed: "0.8s",
   },
 };
@@ -40,7 +40,7 @@ export const Dots: Story = {
 export const Orbit: Story = {
   args: {
     label: "Generating",
-    variant: "orbit",
+    animation: "orbit",
     elapsed: "3.2s",
   },
 };
@@ -48,7 +48,7 @@ export const Orbit: Story = {
 export const WithoutElapsed: Story = {
   args: {
     label: "Preparing",
-    variant: "drive",
+    animation: "drive",
     showElapsed: false,
   },
 };

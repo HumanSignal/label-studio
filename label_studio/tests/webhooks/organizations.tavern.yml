@@ -45,7 +45,7 @@ stages:
     url: "{django_live_url}{invite_url}"
     data:
       email: test_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302
@@ -58,7 +58,7 @@ stages:
     url: "{django_live_url}{invite_url}"
     data:
       email: test_second_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302
@@ -87,7 +87,7 @@ stages:
     url: "{django_live_url}/user/login"
     data:
       email: test_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302

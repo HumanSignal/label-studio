@@ -3,6 +3,7 @@ import chroma from "chroma-js";
 import Constants from "../core/Constants";
 
 import * as Colors from "./colors";
+import { escapeHtml } from "./utilities";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -344,7 +345,7 @@ const labelToSVG = (() => {
     const svgText = document.createElement("text");
 
     svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: var(--font-mono);";
-    svgText.innerHTML = text;
+    svgText.textContent = text;
 
     svg.appendChild(svgText);
     document.body.appendChild(svg);
@@ -378,7 +379,7 @@ const labelToSVG = (() => {
 
     if (label) {
       items.push(
-        `<text x="${width}" y="11" style="font-size: 9.5px; font-weight: bold; font-family: var(--font-mono);">${label}</text>`,
+        `<text x="${width}" y="11" style="font-size: 9.5px; font-weight: bold; font-family: var(--font-mono);">${escapeHtml(label)}</text>`,
       );
       width = width + calculateTextWidth(label) + 2;
     }

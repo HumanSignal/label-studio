@@ -22,8 +22,7 @@ import {
   SortDescendingIcon,
   XIcon,
 } from "@humansignal/icons";
-import { Badge, Button, Dropdown, Label, Message, Tooltip, type DropdownRef } from "@humansignal/ui";
-import { Popover, PopoverContent, PopoverTrigger } from "@humansignal/ui/shad/components/ui/popover";
+import { Badge, Button, Dropdown, Label, Message, Popover, Tooltip, type DropdownRef } from "@humansignal/ui";
 import { SegmentedControl } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import {
@@ -389,10 +388,10 @@ export function AnnotationsListFilter({
           )}
         </div>
 
-        <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+        <Popover.Root open={filterOpen} onOpenChange={setFilterOpen}>
           <Tooltip title={filterTooltip} disabled={filterOpen}>
             <div className={cn("annotations-list-filter").elem("filterBtnWrapper").toClassName()}>
-              <PopoverTrigger asChild>
+              <Popover.Trigger asChild>
                 <Button
                   type="button"
                   variant="neutral"
@@ -408,7 +407,7 @@ export function AnnotationsListFilter({
                     .toClassName()}
                   leading={<FunnelSimpleIcon size={ICON_SIZE} weight="bold" />}
                 />
-              </PopoverTrigger>
+              </Popover.Trigger>
               {filterCount > 0 && (
                 <Badge
                   look="solid"
@@ -421,7 +420,7 @@ export function AnnotationsListFilter({
               )}
             </div>
           </Tooltip>
-          <PopoverContent
+          <Popover.Content
             side="right"
             align="start"
             sideOffset={4}
@@ -495,8 +494,8 @@ export function AnnotationsListFilter({
                 Clear Filters
               </Button>
             </div>
-          </PopoverContent>
-        </Popover>
+          </Popover.Content>
+        </Popover.Root>
 
         <Dropdown.Trigger
           content={

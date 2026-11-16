@@ -232,7 +232,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   <Button
                     onClick={() => deleteComment()}
                     size="small"
-                    look="danger"
+                    variant="negative"
                     autoFocus
                     aria-label="Delete comment"
                   >

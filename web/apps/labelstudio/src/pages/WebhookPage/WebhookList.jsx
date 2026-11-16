@@ -1,5 +1,5 @@
 import { IconCross, IconExternal, IconPencil, IconWebhook } from "@humansignal/icons";
-import { Button, EmptyState, SimpleCard, Typography } from "@humansignal/ui";
+import { Button, EmptyState, Typography, Card } from "@humansignal/ui";
 import clsx from "clsx";
 import { format } from "date-fns";
 import { useCallback } from "react";
@@ -99,7 +99,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
       </header>
       <div className="w-full">
         {webhooks.length === 0 ? (
-          <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
+          <Card size="compact" title="" className="bg-primary-background border-primary-border-subtler p-base">
             <EmptyState
               size="medium"
               variant="primary"
@@ -134,7 +134,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                 )
               }
             />
-          </SimpleCard>
+          </Card>
         ) : (
           <ul className="space-y-4 mt-wide">
             {webhooks.map((obj) => (

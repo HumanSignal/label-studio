@@ -2,7 +2,7 @@ import { ModalWindow } from "@humansignal/ui";
 import * as ff from "@humansignal/core/lib/utils/feature-flags";
 import { Modal } from "antd";
 import type React from "react";
-import { sanitizeHtml } from "../../utils/html";
+import { sanitizeInstructionsHtml } from "../../utils/sanitizeHtml";
 import "./InstructionsModal.prefix.css";
 
 export const InstructionsModal = ({
@@ -26,7 +26,7 @@ export const InstructionsModal = ({
     typeof children === "string" ? (
       <div
         className="whitespace-pre-wrap pb-wide text-neutral-content"
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(children) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeInstructionsHtml(children) }}
       />
     ) : (
       <div className="whitespace-pre-wrap pb-wide">{children}</div>
@@ -90,7 +90,7 @@ export const InstructionsModal = ({
           {title}
         </h2>
         {typeof children === "string" ? (
-          <p style={contentStyle} dangerouslySetInnerHTML={{ __html: sanitizeHtml(children) }} />
+          <p style={contentStyle} dangerouslySetInnerHTML={{ __html: sanitizeInstructionsHtml(children) }} />
         ) : (
           <p style={contentStyle}>{children}</p>
         )}

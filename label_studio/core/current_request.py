@@ -141,6 +141,24 @@ class CurrentContext:
     def get_request(cls):
         return getattr(_thread_locals, 'request', None)
 
+    @classmethod
+    def request_cache(cls, name: str) -> dict | None:
+        """Return a mutable per-request dict named ``name``, or None outside a request.
+
+        Use for memoizing repeated permission lookups (role, pause) within one HTTP
+        request. Cleared by ``request_finished`` via ``clear()``. Outside a request
+        (management commands, unit tests without middleware) returns None so callers
+        skip caching and still see mid-test mutations.
+        """
+        if cls.get_request() is None:
+            return None
+        cache = cls.get(name)
+        if cache is None:
+            cache = {}
+            # request-local only — do not share into spawned jobs
+            cls.set(name, cache, shared=False)
+        return cache
+
 
 def get_current_request():
     """returns the request object for this thread"""

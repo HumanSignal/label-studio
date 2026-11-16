@@ -1,5 +1,5 @@
 import { XCircleIcon } from "@humansignal/icons";
-import { Badge, Message, SimpleCard, Typography } from "@humansignal/ui";
+import { Badge, Message, Typography, Card } from "@humansignal/ui";
 import { Unstyled, useOf } from "@storybook/addon-docs/blocks";
 import type { ReactNode } from "react";
 import registry from "../../../ui/components.manifest.json";
@@ -128,7 +128,8 @@ export const WhenToUse = () => {
             {entry.deprecated.reason} Lint bans new imports.
           </Message>
         ) : null}
-        <SimpleCard
+        <Card
+          size="compact"
           title={
             <div className="flex w-full flex-wrap items-center gap-tight px-base py-base">
               <Badge variant="primary" size="small">
@@ -156,11 +157,11 @@ export const WhenToUse = () => {
         >
           {entry.intent.length ? (
             <Row label="Intent" tone="intent">
-              <div className="flex flex-wrap gap-tight">
+              <div className="flex flex-col gap-tightest">
                 {entry.intent.map((i) => (
-                  <Badge key={i} variant="primary" size="small">
+                  <Typography key={i} variant="body" size="small">
                     {i}
-                  </Badge>
+                  </Typography>
                 ))}
               </div>
             </Row>
@@ -209,7 +210,7 @@ export const WhenToUse = () => {
               </TwoColumns>
             </Row>
           ) : null}
-        </SimpleCard>
+        </Card>
       </div>
     </Unstyled>
   );

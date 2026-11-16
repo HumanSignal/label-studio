@@ -43,10 +43,6 @@
     "NumberInput": null
   },
   "overrides": {
-    "MediaCard": {
-      "skip": ["ui-mediacard--pdf-real-sample"],
-      "cardMode": "column"
-    },
     "BadgeGroup": {
       "cardMode": "column"
     },
@@ -54,12 +50,6 @@
       "cardMode": "column"
     },
     "CollapsiblePanel": {
-      "cardMode": "column"
-    },
-    "CollectionHeader": {
-      "cardMode": "column"
-    },
-    "CollectionUploader": {
       "cardMode": "column"
     },
     "Dropdown": {

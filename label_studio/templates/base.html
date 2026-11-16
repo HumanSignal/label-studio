@@ -24,7 +24,7 @@
   {% endblock %}
 
   {% block theme_colors %}
-  <script>
+  <script nonce="{{ request.csp_nonce }}">
     function handleThemeColor() {
       let themeColor = window.localStorage.getItem("preferred-color-scheme");
       if (themeColor === "Auto") {
@@ -153,13 +153,13 @@
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
   </script>
-  <script type="module" src="{{ settings.FRONTEND_HOSTNAME }}/react-app/@vite/client"></script>
+  <script nonce="{{ request.csp_nonce }}" type="module" src="{{ settings.FRONTEND_HOSTNAME }}/react-app/@vite/client"></script>
   {% endif %}
-  <script type="module" src="{% manifest_asset 'main.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}" type="module" src="{% manifest_asset 'main.js' %}"></script>
 {% endblock %}
 
 {% block bottomjs %}
-  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}" src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
   <script nonce="{{request.csp_nonce}}">
 
     // CSRF

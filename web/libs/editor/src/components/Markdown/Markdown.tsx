@@ -1,6 +1,41 @@
 import ReactMarkdown from "react-markdown";
-import type { Components } from "react-markdown";
+import type { Components, Options } from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+
+const htmlSchema: import("rehype-sanitize").Options = {
+  ...defaultSchema,
+  tagNames: [
+    ...(defaultSchema.tagNames ?? []),
+    "u",
+    "mark",
+    "small",
+    "abbr",
+    "cite",
+    "caption",
+    "colgroup",
+    "col",
+    "figure",
+    "figcaption",
+    "audio",
+    "video",
+  ],
+  attributes: {
+    ...(defaultSchema.attributes ?? {}),
+    a: [...(defaultSchema.attributes?.a ?? []), ["target", "_blank"]],
+    audio: ["src", "controls", "loop", "muted", "preload"],
+    video: ["src", "poster", "controls", "loop", "muted", "playsInline", "preload", "width", "height"],
+    source: [...(defaultSchema.attributes?.source ?? []), "src", "type"],
+  },
+  protocols: {
+    ...(defaultSchema.protocols ?? {}),
+    poster: ["http", "https"],
+  },
+  strip: [...(defaultSchema.strip ?? []), "style"],
+};
+
+// rehype-sanitize must run after rehype-raw so raw HTML is filtered as part of the tree.
+const htmlRehypePlugins: Options["rehypePlugins"] = [rehypeRaw, [rehypeSanitize, htmlSchema]];
 
 // Custom markdown components with Tailwind styling
 const markdownComponents: Components = {
@@ -82,7 +117,7 @@ interface MarkdownProps {
 
 export const Markdown = ({ text, allowHtml = false }: MarkdownProps) => {
   return (
-    <ReactMarkdown rehypePlugins={allowHtml ? [rehypeRaw] : undefined} components={markdownComponents}>
+    <ReactMarkdown rehypePlugins={allowHtml ? htmlRehypePlugins : undefined} components={markdownComponents}>
       {text}
     </ReactMarkdown>
   );

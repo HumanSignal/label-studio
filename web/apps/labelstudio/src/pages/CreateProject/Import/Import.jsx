@@ -1,14 +1,14 @@
 import { SampleDatasetSelect } from "@humansignal/app-common/blocks/SampleDatasetSelect/SampleDatasetSelect";
 import { ff, formatFileSize } from "@humansignal/core";
 import { IconErrorAlt, IconFileUpload, IconInfoOutline, IconTrash, IconUpload } from "@humansignal/icons";
-import { cn as scn } from "@humansignal/ui";
+import { cn as scn, Card } from "@humansignal/ui";
 import Input from "libs/datamanager/src/components/Common/Input/Input";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import { unique } from "../../../utils/helpers";
 import "./Import.prefix.css";
-import { Badge, Button, SimpleCard, Tooltip, Typography } from "@humansignal/ui";
+import { Badge, Button, Tooltip, Typography } from "@humansignal/ui";
 import truncate from "truncate-middle";
 import samples from "./samples.json";
 import { importFiles } from "./utils";
@@ -508,7 +508,8 @@ export const ImportPage = ({
 
             {showList && (
               <div className="w-full">
-                <SimpleCard
+                <Card
+                  size="compact"
                   title="Files"
                   className="w-full h-full"
                   contentClassName="overflow-y-auto h-[calc(100%-48px)]"
@@ -592,7 +593,7 @@ export const ImportPage = ({
                       })}
                     </tbody>
                   </table>
-                </SimpleCard>
+                </Card>
               </div>
             )}
           </div>

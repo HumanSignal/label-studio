@@ -51,7 +51,7 @@ export const WithVariants: Story = {
     <div className="flex flex-col gap-base w-[400px]">
       <div>
         <Typography variant="body" className="mb-tight font-semibold">
-          Info (default)
+          Primary (default)
         </Typography>
         <BadgeGroup
           items={[
@@ -59,12 +59,12 @@ export const WithVariants: Story = {
             { id: 2, label: "TypeScript" },
             { id: 3, label: "React" },
           ]}
-          variant="info"
+          variant="primary"
         />
       </div>
       <div>
         <Typography variant="body" className="mb-tight font-semibold">
-          Success
+          Positive
         </Typography>
         <BadgeGroup
           items={[
@@ -72,7 +72,7 @@ export const WithVariants: Story = {
             { id: 2, label: "TypeScript" },
             { id: 3, label: "React" },
           ]}
-          variant="success"
+          variant="positive"
         />
       </div>
       <div>
@@ -90,7 +90,7 @@ export const WithVariants: Story = {
       </div>
       <div>
         <Typography variant="body" className="mb-tight font-semibold">
-          Destructive
+          Negative
         </Typography>
         <BadgeGroup
           items={[
@@ -98,7 +98,7 @@ export const WithVariants: Story = {
             { id: 2, label: "TypeScript" },
             { id: 3, label: "React" },
           ]}
-          variant="destructive"
+          variant="negative"
         />
       </div>
       <div>

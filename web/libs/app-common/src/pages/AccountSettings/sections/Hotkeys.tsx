@@ -1,15 +1,25 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { Badge, Button, cnm, Message, ToastType, Typography, useToast } from "@humansignal/ui";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
+import {
+  Badge,
+  Button,
+  cnm,
+  Message,
+  ToastType,
+  Typography,
+  useToast,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Card as ShadCard,
+  CardContent as ShadCardContent,
+  CardHeader as ShadCardHeader,
+} from "@humansignal/ui";
 import { confirm } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { useLocation } from "react-router-dom";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
-import {
-  Card as ShadCard,
-  CardContent as ShadCardContent,
-  CardHeader as ShadCardHeader,
-} from "@humansignal/shad/components/ui/card";
 import { Skeleton } from "@humansignal/ui";
 import {
   Dialog,
@@ -86,7 +96,7 @@ export const HotkeysManager = () => {
         : null;
 
   return (
-    <Card className="!w-full">
+    <Card className="w-full">
       <CardHeader>
         <div className="flex flex-col gap-tight">
           <CardTitle>

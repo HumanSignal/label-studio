@@ -261,6 +261,28 @@ describe("RichText view", () => {
       expect(iframe).toBeInTheDocument();
     });
 
+    it("prefixes the HyperText iframe document with a script-blocking CSP", () => {
+      const mockItem = createMockItem({
+        _value: "<p>Hi</p>",
+        type: "richtext",
+        inline: false,
+      });
+      const store = { settings: { showLineNumbers: false } };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+
+      const { container } = render(
+        <Provider store={store}>
+          <HyperTextView item={mockItem} store={store} />
+        </Provider>,
+      );
+
+      const iframe = container.querySelector("iframe");
+      const srcdoc = iframe.getAttribute("srcdoc");
+      expect(srcdoc.startsWith(`<meta http-equiv="Content-Security-Policy" content="script-src 'none';`)).toBe(true);
+      expect(srcdoc.endsWith("<p>Hi</p>")).toBe(true);
+      expect(iframe.getAttribute("sandbox")).toBe("allow-same-origin allow-scripts allow-presentation");
+    });
+
     it("shows line numbers data attribute when settings.showLineNumbers is true", () => {
       const mockItem = createMockItem({ _value: "Hello" });
       const store = { settings: { showLineNumbers: true } };

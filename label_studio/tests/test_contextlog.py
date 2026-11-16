@@ -27,7 +27,7 @@ def _secured_view_payload(view_name):
         'view_name': view_name,
         'method': 'POST',
         'status_code': 200,
-        'json': {'email': 'worker@example.com', 'password': '12345678'},
+        'json': {'email': 'worker@example.com', 'password': 'qNpC-opxvYm.ttg4'},
     }
 
 
@@ -49,7 +49,7 @@ def test_contextlog_redacts_additional_secured_views_from_settings(monkeypatch):
     # Not redacted by OSS default.
     unregistered = _secured_view_payload('extra-secured-view')
     ContextLog()._secure_data(unregistered, request=None)
-    assert unregistered['json'] == {'email': 'worker@example.com', 'password': '12345678'}
+    assert unregistered['json'] == {'email': 'worker@example.com', 'password': 'qNpC-opxvYm.ttg4'}
 
     # Redacted once contributed via settings.
     with override_settings(ADDITIONAL_CONTEXTLOG_SECURED_VIEWS=('extra-secured-view',)):
