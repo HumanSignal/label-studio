@@ -1,14 +1,14 @@
-import { Button } from "@humansignal/ui";
+import { ConfirmDialog, Button } from "@humansignal/ui";
 import { IconCopy, IconInfo, IconViewAll, IconTrash, IconSettings } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { isStarterCloudPlan } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { GroundTruth } from "../CurrentEntity/GroundTruth";
 import { EditingHistory } from "./HistoryActions";
-import { confirm } from "../../common/Modal/Modal";
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 
 export const Actions = ({ store }) => {
+  const [pendingConfirm, setPendingConfirm] = useState(null);
   const annotationStore = store.annotationStore;
   const entity = annotationStore.selected;
   const saved = !entity.userGenerate || entity.sentUserGenerate;
@@ -52,9 +52,9 @@ export const Actions = ({ store }) => {
             type="text"
             aria-label="Delete"
             onClick={() => {
-              confirm({
+              setPendingConfirm({
                 title: "Delete annotation",
-                body: "This action cannot be undone",
+                children: "This action cannot be undone",
                 buttonLook: "destructive",
                 okText: "Proceed",
                 onOk: () => entity.list.deleteAnnotation(entity),
@@ -124,6 +124,13 @@ export const Actions = ({ store }) => {
           }}
         />
       )}
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
     </div>
   );
 };

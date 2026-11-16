@@ -3,7 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "ModalWindow",
   tier: 1,
-  exports: ["ModalWindow", "Dialog"],
+  exports: ["ModalWindow", "Dialog", "ConfirmDialog", "InfoDialog"],
   intent: ["a blocking decision or a focused task"],
   use_when: "A dialog the user must act on or dismiss: confirmations, forms, previews.",
   never_when: [
@@ -14,7 +14,8 @@ export default defineManifest({
   props_rules: [
     "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",
     "destructive confirmations use a negative Button and, for high impact, typed validation",
-    "one-line confirmations and notices open with confirm() / info() from @humansignal/ui, never a hand-built Dialog",
+    "one-line confirmations and notices use ConfirmDialog / InfoDialog, rendered by the owning component, never a hand-built Dialog",
+    "render every dialog as JSX in the component that owns it; never open one with confirm(), info() or modal()",
     "status text next to the actions goes in footerMeta, left of the buttons",
   ],
   replaces: [

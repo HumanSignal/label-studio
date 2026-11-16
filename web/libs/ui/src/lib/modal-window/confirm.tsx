@@ -1,7 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, type ButtonProps } from "../button/button";
+import type { ButtonProps } from "../button/button";
 import { ToastViewport } from "../toast/toast";
+import { ConfirmDialog, InfoDialog } from "./confirm-dialog";
 import { ModalWindow, type ModalWindowSize, type ModalWindowPlacement } from "./modal-window";
 
 /** Close animation of ModalWindow (fade out), so the node is removed after it ends. */
@@ -73,9 +74,7 @@ function hasToastProvider(providers: ReactElement[] = []): boolean {
 
 function openDialog<Options extends DialogBaseOptions>(
   initial: Options,
-  renderFooter: (options: Options, close: (cancelled: boolean) => void) => ReactNode,
-  onDismiss?: (options: Options) => void,
-  placement: ModalWindowPlacement = "center",
+  renderDialog: (options: Options, open: boolean, finish: () => void) => ReactElement,
 ): DialogHandle<Options> {
   const existing = initial.unique ? UNIQUE_DIALOGS.get(initial.unique) : undefined;
   if (existing) return existing as DialogHandle<Options>;
@@ -103,34 +102,11 @@ function openDialog<Options extends DialogBaseOptions>(
     return closing;
   };
 
-  const finish = (cancelled: boolean) => {
-    if (cancelled) onDismiss?.(options);
-    void close();
-  };
-
   function render() {
-    const allowClose = options.allowClose ?? false;
     root.render(
       withProviders(
         <>
-          <ModalWindow
-            placement={placement}
-            open={open}
-            onOpenChange={(next) => {
-              if (!next && allowClose) finish(true);
-            }}
-            size={options.size ?? "medium"}
-            title={options.title}
-            showCloseButton={allowClose}
-            closeOnScrimClick={allowClose && (options.closeOnClickOutside ?? true)}
-            closeOnFocusOutside={false}
-            footer={renderFooter(options, finish)}
-            footerMeta={options.footerMeta}
-            bodyClassName={options.bodyClassName}
-            dataTestId={options.dataTestId}
-          >
-            {options.body}
-          </ModalWindow>
+          {renderDialog(options, open, () => void close())}
           {hasToastProvider(options.providers) && <ToastViewport />}
         </>,
         options.providers,
@@ -155,62 +131,70 @@ function openDialog<Options extends DialogBaseOptions>(
   return handle;
 }
 
+const dialogProps = (options: DialogBaseOptions, open: boolean, finish: () => void) => ({
+  open,
+  onOpenChange: (next: boolean) => {
+    if (!next) finish();
+  },
+  title: options.title,
+  footerMeta: options.footerMeta,
+  size: options.size ?? "medium",
+  allowClose: options.allowClose ?? false,
+  closeOnClickOutside: options.closeOnClickOutside ?? true,
+  bodyClassName: options.bodyClassName,
+  dataTestId: options.dataTestId,
+});
+
 /** Opens a confirmation dialog with Cancel and a confirm action. */
 export function confirm(options: ConfirmDialogOptions): DialogHandle<ConfirmDialogOptions> {
-  return openDialog(
-    options,
-    ({ okText, cancelText, onOk, onCancel, buttonLook }, finish) => (
-      <div className="flex justify-end gap-tight">
-        <Button
-          look="outlined"
-          variant="neutral"
-          autoFocus
-          aria-label={cancelText ?? "Cancel"}
-          data-testid="dialog-cancel-button"
-          onClick={() => {
-            onCancel?.();
-            finish(false);
-          }}
-        >
-          {cancelText ?? "Cancel"}
-        </Button>
-        <Button
-          variant={buttonLook === "destructive" ? "negative" : (buttonLook ?? "primary")}
-          aria-label={okText ?? "OK"}
-          data-testid="dialog-ok-button"
-          onClick={() => {
-            onOk?.();
-            finish(false);
-          }}
-        >
-          {okText ?? "OK"}
-        </Button>
-      </div>
-    ),
-    (current) => current.onCancel?.(),
-  );
+  return openDialog(options, (current, open, finish) => (
+    <ConfirmDialog
+      {...dialogProps(current, open, finish)}
+      okText={current.okText}
+      cancelText={current.cancelText}
+      buttonLook={current.buttonLook}
+      onOk={() => {
+        current.onOk?.();
+      }}
+      onCancel={current.onCancel}
+    >
+      {current.body}
+    </ConfirmDialog>
+  ));
 }
 
 /** Opens a notice with a single OK button. */
 export function info(options: InfoDialogOptions): DialogHandle<InfoDialogOptions> {
-  return openDialog(options, ({ okText, onOkPress }, finish) => (
-    <div className="flex justify-end gap-tight">
-      <Button
-        variant="primary"
-        aria-label={okText ?? "OK"}
-        data-testid="dialog-ok-button"
-        onClick={() => {
-          onOkPress?.();
-          finish(false);
-        }}
-      >
-        {okText ?? "OK"}
-      </Button>
-    </div>
+  return openDialog(options, (current, open, finish) => (
+    <InfoDialog {...dialogProps(current, open, finish)} okText={current.okText} onOk={current.onOkPress}>
+      {current.body}
+    </InfoDialog>
   ));
 }
 
 /** Opens a ModalWindow imperatively, for surfaces opened from code that holds no React state. */
 export function modal(options: ModalOptions): DialogHandle<ModalOptions> {
-  return openDialog(options, ({ footer }) => footer, undefined, options.placement ?? "top");
+  return openDialog(options, (current, open, finish) => {
+    const allowClose = current.allowClose ?? false;
+    return (
+      <ModalWindow
+        placement={current.placement ?? "top"}
+        open={open}
+        onOpenChange={(next) => {
+          if (!next && allowClose) finish();
+        }}
+        size={current.size ?? "medium"}
+        title={current.title}
+        showCloseButton={allowClose}
+        closeOnScrimClick={allowClose && (current.closeOnClickOutside ?? true)}
+        closeOnFocusOutside={false}
+        footer={current.footer}
+        footerMeta={current.footerMeta}
+        bodyClassName={current.bodyClassName}
+        dataTestId={current.dataTestId}
+      >
+        {current.body}
+      </ModalWindow>
+    );
+  });
 }

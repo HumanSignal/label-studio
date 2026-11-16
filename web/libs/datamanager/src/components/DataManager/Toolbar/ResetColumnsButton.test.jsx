@@ -2,18 +2,16 @@ import { describe, expect, it, mock, spyOn, afterEach, beforeEach } from "bun:te
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "mobx-react";
 import * as coreFf from "@humansignal/core/lib/utils/feature-flags";
-import * as ModalModule from "../../Common/Modal/Modal";
 import * as SDKProvider from "../../../providers/SDKProvider";
 import { ResetColumnsButton, SAVE_AS_DEFAULT_EVENT } from "./ResetColumnsButton";
 
 /**
  * Prefer Provider + spyOn over mock.module.
- * Process-wide mock.module("mobx-react" / Modal) leaks across Bun's shared worker and
+ * Process-wide mock.module("mobx-react") leaks across Bun's shared worker and
  * breaks later suites (GridSelectAll Provider, Hotkey Help Modal).
  */
 describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
   let isActiveSpy;
-  let confirmSpy;
   let useSDKSpy;
   let previousAppSettings;
   const invoke = mock();
@@ -25,16 +23,11 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
       ...(previousAppSettings ?? {}),
       user: { ...(previousAppSettings?.user ?? {}), role: "OW" },
     };
-    confirmSpy = spyOn(ModalModule.Modal, "confirm").mockImplementation((props) => {
-      props?.onOk?.();
-      return { close: mock() };
-    });
     useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({ hasHandler, invoke });
   });
 
   afterEach(() => {
     isActiveSpy?.mockRestore();
-    confirmSpy?.mockRestore();
     useSDKSpy?.mockRestore();
     invoke.mockClear();
     hasHandler.mockClear();
@@ -97,16 +90,20 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
     expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
   });
 
-  it("opens a confirmation dialog before resetting the tab", () => {
+  it("opens a confirmation dialog before resetting the tab", async () => {
     isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
     const reset = mock(() => true);
     renderButton({ resetColumnsToProjectDefaults: reset });
 
     fireEvent.click(screen.getByTestId("dm-reset-columns"));
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(confirmSpy.mock.calls[0][0].okText).toBe("Reset");
-    expect(confirmSpy.mock.calls[0][0].buttonLook).toBe("negative");
-    expect(confirmSpy.mock.calls[0][0].body).toMatch(/order and visibility/i);
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(/order and visibility/i);
+    const ok = screen.getByTestId("dialog-ok-button");
+    expect(ok).toHaveTextContent("Reset");
+    expect(ok.className).toMatch(/negative/);
+    expect(reset).not.toHaveBeenCalled();
+
+    fireEvent.click(ok);
     expect(reset).toHaveBeenCalled();
   });
 
@@ -165,31 +162,32 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
     expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
   });
 
-  it("confirms before saving the tab layout as the project default", () => {
+  it("confirms before saving the tab layout as the project default", async () => {
     isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
     renderButton();
 
     fireEvent.click(screen.getByTestId("dm-save-as-default"));
-    expect(confirmSpy).toHaveBeenCalled();
-    const confirmArgs = confirmSpy.mock.calls[0][0];
-    expect(confirmArgs.title).toMatch(/Save as Default/i);
-    expect(confirmArgs.okText).toBe("Save as Default");
-    expect(confirmArgs.body).toMatch(/current tab/i);
-    expect(confirmArgs.body).toMatch(/column order and visibility/i);
-    expect(confirmArgs.body).toMatch(/default for this project/i);
+    const dialog = await screen.findByRole("dialog", { name: /Save as Default/i });
+    expect(dialog).toHaveTextContent(/current tab/i);
+    expect(dialog).toHaveTextContent(/column order and visibility/i);
+    expect(dialog).toHaveTextContent(/default for this project/i);
+    expect(invoke).not.toHaveBeenCalled();
+
+    const ok = screen.getByTestId("dialog-ok-button");
+    expect(ok).toHaveTextContent("Save as Default");
+    fireEvent.click(ok);
     expect(invoke).toHaveBeenCalledWith(SAVE_AS_DEFAULT_EVENT, {
       order: ["id", "agreement"],
       visibleIds: ["id"],
     });
   });
 
-  it("does not save when the confirmation is cancelled", () => {
+  it("does not save when the confirmation is cancelled", async () => {
     isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
-    confirmSpy.mockImplementation(() => ({ close: mock() }));
     renderButton();
 
     fireEvent.click(screen.getByTestId("dm-save-as-default"));
-    expect(confirmSpy).toHaveBeenCalled();
+    fireEvent.click(await screen.findByTestId("dialog-cancel-button"));
     expect(invoke).not.toHaveBeenCalled();
   });
 
@@ -202,7 +200,7 @@ describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
     expect(screen.getByTestId("dm-save-as-default")).toBeDisabled();
     fireEvent.click(screen.getByTestId("dm-reset-columns"));
     fireEvent.click(screen.getByTestId("dm-save-as-default"));
-    expect(confirmSpy).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(reset).not.toHaveBeenCalled();
     expect(invoke).not.toHaveBeenCalled();
   });

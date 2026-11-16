@@ -15,10 +15,10 @@
  * store, onAnnotationChange`) match the legacy API so the existing 774-line
  * `__tests__/AnnotationButton.test.tsx` continues to compile.
  */
-import { useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { inject, observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
-import { ToastType, useToast } from "@humansignal/ui";
+import { ConfirmDialog, type ConfirmDialogContent, ToastType, useToast } from "@humansignal/ui";
 import {
   AnnotationButton as SharedAnnotationButton,
   type AnnotationActionHandlers,
@@ -41,9 +41,6 @@ import {
 import { isUserComplete, useResolveUser } from "@humansignal/core/hooks/useResolveUser";
 import { isFF } from "../../utils/feature-flags";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
-// eslint-disable-next-line
-// @ts-ignore
-import { confirm } from "../../common/Modal/Modal";
 
 interface AnnotationButtonInterface {
   entity?: any;
@@ -113,6 +110,7 @@ function mapEntityToShared(entity: any, annotationStore: any, infoIsHidden: bool
 const AnnotationButtonInner = injector(
   observer(
     ({ entity, capabilities = {}, annotationStore, store, onAnnotationChange, layout }: AnnotationButtonInterface) => {
+      const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
       const buttonContainerRef = useRef<HTMLDivElement | null>(null);
       const toast = useToast();
       const { fetchAnnotationCached } = useAnnotationFetcher(store?.task?.id);
@@ -210,9 +208,9 @@ const AnnotationButtonInner = injector(
           onDelete: () => {
             if (!entityIsAlive) return;
             const isPredictionLocal = entity.type === "prediction";
-            confirm({
+            setPendingConfirm({
               title: isPredictionLocal ? "Delete prediction?" : "Delete annotation?",
-              body: (
+              children: (
                 <>
                   This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
                   <br />
@@ -268,13 +266,22 @@ const AnnotationButtonInner = injector(
       // shared `SharedAnnotationButton` accepts a `ref` to its outer container so
       // `useResolveUser`'s IntersectionObserver still has the correct target.
       return (
-        <SharedAnnotationButton
-          ref={buttonContainerRef as React.MutableRefObject<HTMLDivElement | null>}
-          annotation={sharedAnnotation}
-          capabilities={sharedCapabilities}
-          handlers={handlers}
-          layout={layout}
-        />
+        <>
+          <SharedAnnotationButton
+            ref={buttonContainerRef as React.MutableRefObject<HTMLDivElement | null>}
+            annotation={sharedAnnotation}
+            capabilities={sharedCapabilities}
+            handlers={handlers}
+            layout={layout}
+          />
+          <ConfirmDialog
+            {...pendingConfirm}
+            open={pendingConfirm !== null}
+            onOpenChange={(open) => {
+              if (!open) setPendingConfirm(null);
+            }}
+          />
+        </>
       );
     },
   ),

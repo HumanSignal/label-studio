@@ -15,6 +15,7 @@ import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
 import { confirm, info, modal } from "./confirm";
+import { ConfirmDialog, InfoDialog } from "./confirm-dialog";
 import { ModalWindow } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
@@ -555,8 +556,60 @@ export const CustomWidthEscapeHatch: Story = {
 };
 
 /**
- * `confirm()` and `info()` open a centred Dialog imperatively, for one-line decisions and notices.
- * Destructive actions pass `buttonLook: "negative"`. The X, Escape and a click outside mean Cancel.
+ * `ConfirmDialog` is a one-line decision rendered by the component that owns it: keep `open` in state and
+ * render the dialog next to the trigger. Destructive actions pass `buttonLook="negative"`. When `onOk` returns
+ * a promise the confirm button waits and the dialog closes once it resolves.
+ *
+ * **When to use:** Every confirmation. It renders inside the app tree, so the body gets the app's context.
+ */
+export const Confirmation: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="negative" onClick={() => setOpen(true)}>
+          Delete tasks
+        </Button>
+        <ConfirmDialog
+          open={open}
+          onOpenChange={setOpen}
+          title="Delete 12 tasks?"
+          okText="Delete"
+          buttonLook="negative"
+          footerMeta="12 tasks selected"
+          onOk={() => new Promise((resolve) => setTimeout(resolve, 800))}
+        >
+          Their annotations are deleted too. This cannot be undone.
+        </ConfirmDialog>
+      </>
+    );
+  },
+};
+
+/**
+ * `InfoDialog` is a notice with a single OK button, rendered by its owner like `ConfirmDialog`.
+ *
+ * **When to use:** A result the user must acknowledge before going on. Use a toast when nothing is blocked.
+ */
+export const Notice: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button look="outlined" variant="neutral" onClick={() => setOpen(true)}>
+          Add seats
+        </Button>
+        <InfoDialog open={open} onOpenChange={setOpen} title="Seats added" okText="Got it">
+          Your organization now has 25 seats.
+        </InfoDialog>
+      </>
+    );
+  },
+};
+
+/**
+ * Deprecated: `confirm()` and `info()` open the same dialogs imperatively, in a React root of their own, so
+ * app context does not reach them. Use `ConfirmDialog` and `InfoDialog`; these functions are being removed.
  */
 export const ImperativeConfirm: Story = {
   render: () => (
@@ -587,7 +640,7 @@ export const ImperativeConfirm: Story = {
 };
 
 /**
- * `modal()` opens a ModalWindow from code that holds no React state, such as a menu command. It returns the
+ * Deprecated, like `confirm()`: render `ModalWindow` in the owning component. `modal()` opens one from code; it returns the
  * same handle as `confirm()`: `update()` changes the open dialog and `close()` closes it.
  */
 export const ImperativeModal: Story = {

@@ -1,12 +1,12 @@
+import { useState } from "react";
 import { inject, observer } from "mobx-react";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
-import { Button } from "@humansignal/ui";
+import { ConfirmDialog, Button } from "@humansignal/ui";
 import {
   captureExploreDefaultsFromTab,
   currentUserIsManagingDmRole,
 } from "../../../stores/Tabs/project_column_defaults";
 import { useSDK } from "../../../providers/SDKProvider";
-import { Modal } from "../../Common/Modal/Modal";
 
 const MANAGE_DEFAULTS_EVENT = "dataManagerSettingsClicked";
 export const SAVE_AS_DEFAULT_EVENT = "saveColumnsAsProjectDefault";
@@ -29,6 +29,7 @@ const injector = inject(({ store }) => {
  */
 export const ResetColumnsButton = injector(
   observer(({ view, locked, enabled, enableSaveAsDefault = false }) => {
+    const [pendingConfirm, setPendingConfirm] = useState(null);
     const sdk = useSDK();
     if (!enabled || !currentUserIsManagingDmRole()) return null;
 
@@ -37,9 +38,9 @@ export const ResetColumnsButton = injector(
 
     const confirmResetTab = () => {
       if (locked || !view) return;
-      Modal.confirm({
+      setPendingConfirm({
         title: "Reset this tab’s columns?",
-        body: "This will reset the order and visibility of all columns on this tab to the project defaults.",
+        children: "This will reset the order and visibility of all columns on this tab to the project defaults.",
         okText: "Reset",
         cancelText: "Cancel",
         buttonLook: "negative",
@@ -51,9 +52,10 @@ export const ResetColumnsButton = injector(
 
     const confirmSaveAsDefault = () => {
       if (locked || !view || !canSaveAsDefault) return;
-      Modal.confirm({
+      setPendingConfirm({
         title: "Save as Default?",
-        body: "This will save the current tab’s column order and visibility as the default for this project. The saved layout applies to Managers+ only. Existing tabs keep their customizations. This does not change who can access columns.",
+        children:
+          "This will save the current tab’s column order and visibility as the default for this project. The saved layout applies to Managers+ only. Existing tabs keep their customizations. This does not change who can access columns.",
         okText: "Save as Default",
         cancelText: "Cancel",
         onOk() {
@@ -116,6 +118,13 @@ export const ResetColumnsButton = injector(
             Save as Default
           </Button>
         ) : null}
+        <ConfirmDialog
+          {...pendingConfirm}
+          open={pendingConfirm !== null}
+          onOpenChange={(open) => {
+            if (!open) setPendingConfirm(null);
+          }}
+        />
       </div>
     );
   }),

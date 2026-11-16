@@ -6,13 +6,13 @@ import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
 import { withStepUp } from "../../../components/step-up/with-step-up";
-import { Button, Message } from "@humansignal/ui";
+import { ConfirmDialog, type ConfirmDialogContent, Button, Message } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { confirm, modal } from "@humansignal/ui";
+import { modal } from "@humansignal/ui";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
@@ -97,6 +97,7 @@ const revokeTokenAtom = atomWithMutation((get) => {
 });
 
 export function PersonalJWTToken() {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const [dialogOpened, setDialogOpened] = useState(false);
   const tokens = useAtomValue(tokensListAtom);
   const revokeToken = useAtomValue(revokeTokenAtom);
@@ -109,9 +110,9 @@ export function PersonalJWTToken() {
 
   const revoke = useCallback(
     async (token: string) => {
-      confirm({
+      setPendingConfirm({
         title: "Revoke Token",
-        body: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
+        children: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
           window?.APP_SETTINGS?.app_name || "Label Studio"
         }`,
         okText: "Revoke",
@@ -183,6 +184,13 @@ export function PersonalJWTToken() {
           </Button>
         </div>
       </Tooltip>
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
     </div>
   );
 }

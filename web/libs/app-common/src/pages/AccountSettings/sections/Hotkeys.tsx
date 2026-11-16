@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import {
+  ConfirmDialog,
+  type ConfirmDialogContent,
   Badge,
   Button,
   cnm,
@@ -13,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@humansignal/ui";
-import { confirm } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { useLocation } from "react-router-dom";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
@@ -58,6 +59,7 @@ export const useHotkeySections = (scope?: HotkeyScope | null): Section[] => {
 };
 
 export const HotkeysManager = () => {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const location = useLocation();
   const [isDirty, setIsDirty] = useState(false);
   const [resolution, setResolution] = useState<ProjectHotkeyScopeResolution>(() =>
@@ -72,9 +74,9 @@ export const HotkeysManager = () => {
   }, []);
 
   const handleDirtyNavigation = useCallback(({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
-    confirm({
+    setPendingConfirm({
       title: "Discard unsaved hotkey changes?",
-      body: "Changing hotkey scope will discard your unsaved changes.",
+      children: "Changing hotkey scope will discard your unsaved changes.",
       okText: "Discard Changes",
       buttonLook: "negative",
       onOk: () => {
@@ -133,6 +135,13 @@ export const HotkeysManager = () => {
           )}
         </div>
       </CardContent>
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
     </Card>
   );
 };
@@ -156,6 +165,8 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
   });
 
   const {
+    resetConfirm,
+    closeResetConfirm,
     hotkeys,
     setHotkeys,
     isLoading,
@@ -445,6 +456,14 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        {...resetConfirm}
+        open={resetConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) closeResetConfirm();
+        }}
+      />
     </div>
   );
 };

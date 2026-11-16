@@ -1,10 +1,10 @@
 import { StorageProviderForm } from "@humansignal/app-common/blocks/StorageProviderForm";
 import { ff } from "@humansignal/core";
-import { Button } from "@humansignal/ui";
+import { ConfirmDialog, Button } from "@humansignal/ui";
 import { useAtomValue } from "jotai";
-import { forwardRef, useCallback, useContext, useImperativeHandle } from "react";
+import { useState, forwardRef, useCallback, useContext, useImperativeHandle } from "react";
 import { Columns } from "../../../components";
-import { confirm, modal } from "../../../components/Modal/Modal";
+import { modal } from "../../../components/Modal/Modal";
 import { Spinner } from "../../../components/Spinner/Spinner";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { projectAtom } from "../../../providers/ProjectProvider";
@@ -29,6 +29,7 @@ export const StorageSet = forwardRef(
     },
     ref,
   ) => {
+    const [pendingConfirm, setPendingConfirm] = useState(null);
     const api = useContext(ApiContext);
     const project = useAtomValue(projectAtom);
 
@@ -103,9 +104,9 @@ export const StorageSet = forwardRef(
 
     const onDeleteStorage = useCallback(
       async (storage) => {
-        confirm({
+        setPendingConfirm({
           title: "Deleting storage",
-          body: "This action cannot be undone. Are you sure?",
+          children: "This action cannot be undone. Are you sure?",
           buttonLook: "negative",
           onOk: async () => {
             const response = await api.callApi("deleteStorage", {
@@ -154,6 +155,13 @@ export const StorageSet = forwardRef(
             />
           ))
         )}
+        <ConfirmDialog
+          {...pendingConfirm}
+          open={pendingConfirm !== null}
+          onOpenChange={(open) => {
+            if (!open) setPendingConfirm(null);
+          }}
+        />
       </Columns.Column>
     );
   },
