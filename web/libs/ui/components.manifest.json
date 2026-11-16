@@ -13,12 +13,12 @@
         "AccordionContent"
       ],
       "intent": [
-        "stacked expandable sections"
+        "Stacked expandable sections"
       ],
       "use_when": "Several stacked sections where one or more can be open.",
       "never_when": [
-        "a single panel (use CollapsiblePanel)",
-        "importing the shad accordion directly"
+        "A single panel (use CollapsiblePanel)",
+        "Importing the shad accordion directly"
       ],
       "replaces": [],
       "dir": "lib/accordion"
@@ -60,13 +60,13 @@
         "AvatarStack"
       ],
       "intent": [
-        "a person or several people"
+        "A person or several people"
       ],
       "use_when": "One person (initials or photo, tooltip, a dot top right, a status bottom right) or a stack of people with a +N tile.",
       "never_when": [
-        "a hand-rolled row of avatars or +N tile",
-        "a badge drawn on an avatar by hand",
-        "userpic classes mixed onto Avatar"
+        "A hand-rolled row of avatars or +N tile",
+        "A badge drawn on an avatar by hand",
+        "Userpic classes mixed onto Avatar"
       ],
       "props_rules": [
         "size is a name (smaller, small, medium, large, larger), never a px number or CSS size",
@@ -84,15 +84,15 @@
         "Badge"
       ],
       "intent": [
-        "an attribute, type or count on an item",
-        "a lifecycle state not covered by the state registry"
+        "An attribute, type or count on an item",
+        "A lifecycle state not covered by the state registry"
       ],
       "use_when": "A short label that states an attribute (Required, Inherited, a count) or a status of an item.",
       "never_when": [
-        "booleans or attributes most rows share (use Typography)",
-        "anything clickable (use Button look=ghost or Toggle)",
-        "an icon, dot, check or cross inside",
-        "a local span with rounded-full classes"
+        "Booleans or attributes most rows share (use Typography)",
+        "Anything clickable (use Button look=ghost or Toggle)",
+        "An icon, dot, check or cross inside",
+        "A local span with rounded-full classes"
       ],
       "props_rules": [
         "look is always the filled default; a selection control shows not selected as the neutral filled Badge",
@@ -111,18 +111,6 @@
       ],
       "dir": "lib/badge"
     },
-    "BadgeGroup": {
-      "name": "BadgeGroup",
-      "tier": 2,
-      "exports": [
-        "BadgeGroup"
-      ],
-      "intent": [],
-      "use_when": "Several badges in one cell with overflow handling.",
-      "never_when": [],
-      "replaces": [],
-      "dir": "lib/badge-group"
-    },
     "Button": {
       "name": "Button",
       "tier": 1,
@@ -131,14 +119,14 @@
         "ButtonGroup"
       ],
       "intent": [
-        "something clickable that performs an action",
-        "a row of related actions"
+        "Something clickable that performs an action",
+        "A row of related actions"
       ],
       "use_when": "Any element the user clicks to do something: submit, open, navigate, toggle a panel, icon-only controls.",
       "never_when": [
-        "a raw <button>, <a onClick> or div with role=button",
-        "a Badge or chip made clickable",
-        "more than one filled primary Button per screen"
+        "A raw <button>, <a onClick> or div with role=button",
+        "A Badge or chip made clickable",
+        "More than one filled primary Button per screen"
       ],
       "props_rules": [
         "look=filled only for the single main action; outlined or ghost for the rest; no other look",
@@ -162,14 +150,14 @@
         "CardContent"
       ],
       "intent": [
-        "a titled surface grouping related content"
+        "A titled surface grouping related content"
       ],
       "use_when": "A bordered surface with an optional title and description around a group of controls or data. Pass title and description for the simple case, or compose CardHeader, CardTitle, CardDescription and CardContent.",
       "never_when": [
-        "an app-local Card",
-        "a div with border and shadow classes",
-        "nested cards",
-        "a footer part"
+        "An app-local Card",
+        "A div with border and shadow classes",
+        "Nested cards",
+        "A footer part"
       ],
       "props_rules": [
         "size=regular (the default) for page sections; size=compact for dense panels and dashboard tiles",
@@ -191,12 +179,12 @@
         "Checkbox"
       ],
       "intent": [
-        "select one or several items from a set"
+        "Select one or several items from a set"
       ],
       "use_when": "Selection of rows, options or items where several can be chosen at once, including indeterminate parents.",
       "never_when": [
-        "a raw <input type=checkbox>",
-        "an on/off setting (use Toggle)"
+        "A raw <input type=checkbox>",
+        "An on/off setting (use Toggle)"
       ],
       "replaces": [
         "services/lso/web/libs/datamanager/src/components/Common/Table/TableCheckbox.jsx",
@@ -211,12 +199,12 @@
         "CodeBlock"
       ],
       "intent": [
-        "read-only code or configuration"
+        "Read-only code or configuration"
       ],
       "use_when": "Showing a snippet, a config or an ID the user may copy.",
       "never_when": [
-        "a <pre> with mono classes",
-        "editable code (use CodeEditor)"
+        "A <pre> with mono classes",
+        "Editable code (use CodeEditor)"
       ],
       "replaces": [
         "jsx:<pre>"
@@ -242,12 +230,12 @@
         "CollapsiblePanel"
       ],
       "intent": [
-        "an expandable panel-style section"
+        "An expandable panel-style section"
       ],
       "use_when": "A single section the user expands or collapses, panel style.",
       "never_when": [
-        "a details element styled by hand",
-        "stacked sections (use Accordion)"
+        "A details element styled by hand",
+        "Stacked sections (use Accordion)"
       ],
       "replaces": [],
       "dir": "lib/collapsible-panel"
@@ -273,11 +261,11 @@
         "ContextMenu"
       ],
       "intent": [
-        "a right-click menu"
+        "A right-click menu"
       ],
       "use_when": "Actions on an item opened with a right click or a kebab on canvas-like surfaces.",
       "never_when": [
-        "a Dropdown opened by right click by hand"
+        "A Dropdown opened by right click by hand"
       ],
       "replaces": [],
       "dir": "lib/context-menu"
@@ -289,12 +277,12 @@
         "DataTable"
       ],
       "intent": [
-        "rows and columns of data"
+        "Rows and columns of data"
       ],
       "use_when": "Tabular data with sorting, selection, column sizing or virtualisation.",
       "never_when": [
-        "a raw <table>",
-        "a grid of divs styled as a table"
+        "A raw <table>",
+        "A grid of divs styled as a table"
       ],
       "replaces": [
         "services/lso/web/libs/datamanager/src/components/Common/Table/Table.jsx",
@@ -310,12 +298,12 @@
         "DateRangePickerTrigger"
       ],
       "intent": [
-        "pick a date or date-time range"
+        "Pick a date or date-time range"
       ],
       "use_when": "Filtering or scoping by a period: a calendar with preset ranges and optional times, opened from DateRangePickerTrigger.",
       "never_when": [
-        "a single date with no range",
-        "raw <input type=date> pairs"
+        "A single date with no range",
+        "Raw <input type=date> pairs"
       ],
       "replaces": [],
       "dir": "lib/date-range-picker"
@@ -327,12 +315,12 @@
         "Drawer"
       ],
       "intent": [
-        "side editing with the page still visible"
+        "Side editing with the page still visible"
       ],
       "use_when": "A panel sliding in from an edge for editing or details while the page context stays visible.",
       "never_when": [
-        "blocking decisions (use ModalWindow)",
-        "a fixed-position div animated by hand"
+        "Blocking decisions (use ModalWindow)",
+        "A fixed-position div animated by hand"
       ],
       "replaces": [],
       "dir": "lib/drawer"
@@ -345,13 +333,13 @@
         "DropdownTrigger"
       ],
       "intent": [
-        "a list of actions behind a trigger"
+        "A list of actions behind a trigger"
       ],
       "use_when": "A menu of actions or options that opens from a button, a cell or a card.",
       "never_when": [
-        "an app-local Menu",
-        "raw buttons styled as menu items",
-        "a Select for choosing values"
+        "An app-local Menu",
+        "Raw buttons styled as menu items",
+        "A Select for choosing values"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Menu/Menu.jsx",
@@ -369,13 +357,13 @@
         "DropZone"
       ],
       "intent": [
-        "a place to drop files or pick them from the file dialog"
+        "A place to drop files or pick them from the file dialog"
       ],
       "use_when": "Files can be dragged onto an area of the page or picked by clicking it: imports, uploads, attachments. The content says what to drop and that clicking browses.",
       "never_when": [
-        "a hand-built dashed div or button with onDrop and a hidden file input",
-        "a single file picker with no drop target (use InputFile)",
-        "the Data Collection submission flow (use CollectionUploader from Interface Components)"
+        "A hand-built dashed div or button with onDrop and a hidden file input",
+        "A single file picker with no drop target (use InputFile)",
+        "The Data Collection submission flow (use CollectionUploader from Interface Components)"
       ],
       "props_rules": [
         "onFiles receives a FileList for both a drop and a pick",
@@ -391,12 +379,12 @@
         "EmptyState"
       ],
       "intent": [
-        "nothing to show"
+        "Nothing to show"
       ],
       "use_when": "No data, no results or a first-run screen: icon, title, description and the action that fills it.",
       "never_when": [
-        "a bare 'No data' Typography",
-        "an app-local empty block"
+        "A bare 'No data' Typography",
+        "An app-local empty block"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/EmptyState/EmptyState.jsx",
@@ -449,13 +437,13 @@
         "IndicatorMark"
       ],
       "intent": [
-        "a status dot or count on the corner of something"
+        "A status dot or count on the corner of something"
       ],
       "use_when": "A dot, icon or count pinned to the corner of an avatar, an icon or a button: unread items, presence, a review result. On an avatar, use Avatar's indicator and badge props, which draw it.",
       "never_when": [
-        "a hand-built absolute span with a count or a dot on a button or icon",
-        "a label next to text (use Badge)",
-        "the only way a state is shown: the label is read by screen readers, so give it one"
+        "A hand-built absolute span with a count or a dot on a button or icon",
+        "A label next to text (use Badge)",
+        "The only way a state is shown: the label is read by screen readers, so give it one"
       ],
       "props_rules": [
         "label is required: a dot or a number alone says nothing",
@@ -473,12 +461,12 @@
         "InputFile"
       ],
       "intent": [
-        "pick a file from disk"
+        "Pick a file from disk"
       ],
       "use_when": "A control that opens the file picker for one or several files.",
       "never_when": [
-        "a raw <input type=file>",
-        "the full collection upload flow (use CollectionUploader from Interface Components)"
+        "A raw <input type=file>",
+        "The full collection upload flow (use CollectionUploader from Interface Components)"
       ],
       "replaces": [],
       "dir": "lib/InputFile"
@@ -502,11 +490,11 @@
         "Label"
       ],
       "intent": [
-        "a caption for a form control"
+        "A caption for a form control"
       ],
       "use_when": "The text, required marker and description attached to a control.",
       "never_when": [
-        "a bare <label> or Typography placed next to a control by hand"
+        "A bare <label> or Typography placed next to a control by hand"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/Label/Label.jsx",
@@ -523,13 +511,13 @@
         "Message"
       ],
       "intent": [
-        "an inline notice",
-        "a page-level notice with a title"
+        "An inline notice",
+        "A page-level notice with a title"
       ],
       "use_when": "Info, warning, error or success text placed inline with the content it refers to.",
       "never_when": [
-        "custom coloured info boxes",
-        "transient results (use Toast)"
+        "Custom coloured info boxes",
+        "Transient results (use Toast)"
       ],
       "props_rules": [
         "variant is a colour (primary, neutral, positive, negative, warning, enterprise); look is filled or ghost"
@@ -550,13 +538,13 @@
         "InfoDialog"
       ],
       "intent": [
-        "a blocking decision or a focused task"
+        "A blocking decision or a focused task"
       ],
       "use_when": "A dialog the user must act on or dismiss: confirmations, forms, previews.",
       "never_when": [
-        "modal over modal",
-        "an app-local Modal re-export",
-        "side editing that keeps the page visible (use Drawer)"
+        "Modal over modal",
+        "An app-local Modal re-export",
+        "Side editing that keeps the page visible (use Drawer)"
       ],
       "props_rules": [
         "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",
@@ -598,12 +586,12 @@
         "Pagination"
       ],
       "intent": [
-        "move through pages of a list"
+        "Move through pages of a list"
       ],
       "use_when": "Page controls for lists and tables, with page size where the list supports it.",
       "never_when": [
-        "an app-local Pagination",
-        "prev/next Buttons wired by hand"
+        "An app-local Pagination",
+        "Prev/next Buttons wired by hand"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Pagination/Pagination.tsx",
@@ -620,14 +608,14 @@
         "Popover"
       ],
       "intent": [
-        "rich content anchored to a trigger"
+        "Rich content anchored to a trigger"
       ],
       "use_when": "Interactive or formatted content that opens next to its trigger and closes on outside click or Escape. Pass trigger for the simple case; compose Popover.Root, Popover.Trigger and Popover.Content when the trigger sits inside other elements (a Tooltip, a badge).",
       "never_when": [
-        "plain text (use Tooltip)",
-        "a list of actions (use Dropdown)",
-        "a hand-rolled absolutely positioned panel",
-        "the raw shadcn popover imported by path (use Popover.Root, Popover.Trigger and Popover.Content)"
+        "Plain text (use Tooltip)",
+        "A list of actions (use Dropdown)",
+        "A hand-rolled absolutely positioned panel",
+        "The raw shadcn popover imported by path (use Popover.Root, Popover.Trigger and Popover.Content)"
       ],
       "replaces": [],
       "dir": "lib/popover"
@@ -651,12 +639,12 @@
         "SearchInput"
       ],
       "intent": [
-        "filter a list by typing"
+        "Filter a list by typing"
       ],
       "use_when": "A search box that narrows a list or table as the user types.",
       "never_when": [
-        "general text entry (Input gap)",
-        "a raw <input> with a magnifier icon"
+        "General text entry (Input gap)",
+        "A raw <input> with a magnifier icon"
       ],
       "replaces": [],
       "dir": "lib/search-input"
@@ -668,14 +656,14 @@
         "SegmentedControl"
       ],
       "intent": [
-        "switch the view or format of the same content",
-        "pick one of up to five visible options"
+        "Switch the view or format of the same content",
+        "Pick one of up to five visible options"
       ],
       "use_when": "Switching views, filtering the same data or showing the same content in another format (list or grid, form or JSON, a short filter).",
       "never_when": [
-        "moving between sub-sections whose content differs (use Tabs)",
-        "more than five options (use Select)",
-        "options that need descriptions (use Radio once it exists)"
+        "Moving between sub-sections whose content differs (use Tabs)",
+        "More than five options (use Select)",
+        "Options that need descriptions (use Radio once it exists)"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/ToggleItems/ToggleItems.tsx",
@@ -690,13 +678,13 @@
         "Select"
       ],
       "intent": [
-        "pick one or several values from a flat list"
+        "Pick one or several values from a flat list"
       ],
       "use_when": "Choosing from a flat list of options, single or multiple, searchable or not, with read-only display mode.",
       "never_when": [
-        "a raw <select>",
-        "hierarchies (use TreeSelect)",
-        "free text (use Input once it exists)"
+        "A raw <select>",
+        "Hierarchies (use TreeSelect)",
+        "Free text (use Input once it exists)"
       ],
       "replaces": [
         "services/lso/web/libs/datamanager/src/components/Common/Form/Elements/MultiSelect/MultiSelect.jsx",
@@ -714,12 +702,12 @@
         "Skeleton"
       ],
       "intent": [
-        "a layout still loading"
+        "A layout still loading"
       ],
       "use_when": "Placeholder blocks in the shape of the content that is about to appear.",
       "never_when": [
-        "an action in progress (use Spinner)",
-        "grey divs with a pulse class"
+        "An action in progress (use Spinner)",
+        "Grey divs with a pulse class"
       ],
       "replaces": [
         "services/lso/web/libs/datamanager/src/components/Common/SkeletonLoader/SkeletonLoader.tsx"
@@ -733,11 +721,11 @@
         "Space"
       ],
       "intent": [
-        "evenly spaced siblings"
+        "Evenly spaced siblings"
       ],
       "use_when": "A horizontal or vertical row of controls with design-system gaps.",
       "never_when": [
-        "margins on each child by hand"
+        "Margins on each child by hand"
       ],
       "replaces": [],
       "dir": "lib/space"
@@ -762,12 +750,12 @@
         "SPINNER_SIZES"
       ],
       "intent": [
-        "an action in progress"
+        "An action in progress"
       ],
       "use_when": "Something the user triggered is still running and has no layout to reserve.",
       "never_when": [
-        "loading a layout that will be filled (use Skeleton)",
-        "an app-local spinner or CSS animation"
+        "Loading a layout that will be filled (use Skeleton)",
+        "An app-local spinner or CSS animation"
       ],
       "props_rules": [
         "size is a name (smallest, smaller, small, medium, large, larger, largest), never a px number"
@@ -788,11 +776,11 @@
         "StateChip"
       ],
       "intent": [
-        "the lifecycle state of a task, project or annotation"
+        "The lifecycle state of a task, project or annotation"
       ],
       "use_when": "A state that comes from the state registry in @humansignal/app-common (TaskStateChip, AnnotationStateChip, ProjectStateChip wrap it).",
       "never_when": [
-        "a Badge with a colour picked at the call site for a registered state"
+        "A Badge with a colour picked at the call site for a registered state"
       ],
       "replaces": [],
       "dir": "lib/state-chip"
@@ -804,11 +792,11 @@
         "Stepper"
       ],
       "intent": [
-        "progress through a multi-step flow"
+        "Progress through a multi-step flow"
       ],
       "use_when": "Wizards and setup flows with ordered steps.",
       "never_when": [
-        "numbered Badges in a row",
+        "Numbered Badges in a row",
         "Tabs used as steps"
       ],
       "props_rules": [
@@ -816,6 +804,29 @@
       ],
       "replaces": [],
       "dir": "lib/stepper"
+    },
+    "SummaryLabel": {
+      "name": "SummaryLabel",
+      "tier": 1,
+      "exports": [
+        "SummaryLabel"
+      ],
+      "intent": [
+        "Several values in one line, then +N"
+      ],
+      "use_when": "A cell, trigger or summary lists values that may not fit: tags, skills, projects, selected options. Text by default, badges with `badges`.",
+      "never_when": [
+        "A hand-written +N or a local overflow hook",
+        "A row of avatars (use AvatarStack)",
+        "The count as a Badge: +N is always text"
+      ],
+      "props_rules": [
+        "counts go through formatCount: +1.2k from a thousand up",
+        "where values can be selected, countLabel says so: +3 selected",
+        "what clicking +N does belongs to the parent, never to SummaryLabel"
+      ],
+      "replaces": [],
+      "dir": "lib/summary-label"
     },
     "Tabs": {
       "name": "Tabs",
@@ -827,14 +838,14 @@
         "TabsContent"
       ],
       "intent": [
-        "move between sub-sections of one section"
+        "Move between sub-sections of one section"
       ],
       "use_when": "Navigating between sub-sections of a parent section whose content differs but sits at the same level.",
       "never_when": [
-        "switching the view, format or filter of the same content (use SegmentedControl)",
-        "a row of Buttons with an active class",
-        "role=tablist built by hand",
-        "navigation between pages"
+        "Switching the view, format or filter of the same content (use SegmentedControl)",
+        "A row of Buttons with an active class",
+        "Role=tablist built by hand",
+        "Navigation between pages"
       ],
       "replaces": [
         "services/lso/web/libs/datamanager/src/components/Common/Tabs/Tabs.jsx",
@@ -904,11 +915,11 @@
         "ToastViewport"
       ],
       "intent": [
-        "the result of an action, shown briefly"
+        "The result of an action, shown briefly"
       ],
       "use_when": "Confirmation or failure of an action the user just took, through useToast.",
       "never_when": [
-        "persistent information (use Message)",
+        "Persistent information (use Message)",
         "alert() or a hand-made notification bar"
       ],
       "replaces": [],
@@ -921,12 +932,12 @@
         "Toggle"
       ],
       "intent": [
-        "an on/off setting"
+        "An on/off setting"
       ],
       "use_when": "A setting that is either on or off and takes effect as a preference (auto-save, notifications, a feature switch).",
       "never_when": [
-        "selecting items (use Checkbox)",
-        "choosing one of several named options (use SegmentedControl or Select)"
+        "Selecting items (use Checkbox)",
+        "Choosing one of several named options (use SegmentedControl or Select)"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/Toggle/Toggle.jsx",
@@ -942,13 +953,13 @@
         "Tooltip"
       ],
       "intent": [
-        "a short explanation on hover or focus"
+        "A short explanation on hover or focus"
       ],
       "use_when": "Plain-text help attached to a control or a truncated value.",
       "never_when": [
-        "title attributes",
+        "Title attributes",
         "DOM-built tooltips",
-        "rich or interactive content (use Popover)"
+        "Rich or interactive content (use Popover)"
       ],
       "replaces": [
         "services/lso/web/libs/editor/src/lib/AudioUltra/Tooltip/Tooltip.ts",
@@ -979,12 +990,12 @@
         "Typography"
       ],
       "intent": [
-        "any product copy"
+        "Any product copy"
       ],
       "use_when": "Every piece of user-visible text: headings, body, labels, metadata, truncation.",
       "never_when": [
-        "bare <p>, <span> or <h*> with text utilities",
-        "inline colour or font styles"
+        "Bare <p>, <span> or <h*> with text utilities",
+        "Inline colour or font styles"
       ],
       "props_rules": [
         "disabled text uses text-neutral-content-subtlest"
@@ -999,7 +1010,7 @@
   "gaps": {
     "Input": {
       "intent": [
-        "free text entry"
+        "Free text entry"
       ],
       "use_when": "A single-line text field with leading or trailing elements and error state.",
       "replaces": [
@@ -1013,7 +1024,7 @@
     },
     "TextArea": {
       "intent": [
-        "multi-line text entry"
+        "Multi-line text entry"
       ],
       "use_when": "A resizable multi-line text field with error state.",
       "replaces": [
@@ -1026,7 +1037,7 @@
     },
     "Radio": {
       "intent": [
-        "pick one of several described options"
+        "Pick one of several described options"
       ],
       "use_when": "Mutually exclusive options that need a label and a description each.",
       "replaces": [
@@ -1039,7 +1050,7 @@
     },
     "FormField": {
       "intent": [
-        "bind a control to a form with label, description and error"
+        "Bind a control to a form with label, description and error"
       ],
       "use_when": "The wrapper that registers any control with a form and renders its Label, description and validation error.",
       "replaces": [

@@ -4,12 +4,12 @@ export default defineManifest({
   name: "ModalWindow",
   tier: 1,
   exports: ["ModalWindow", "Dialog", "ConfirmDialog", "InfoDialog"],
-  intent: ["a blocking decision or a focused task"],
+  intent: ["A blocking decision or a focused task"],
   use_when: "A dialog the user must act on or dismiss: confirmations, forms, previews.",
   never_when: [
-    "modal over modal",
-    "an app-local Modal re-export",
-    "side editing that keeps the page visible (use Drawer)",
+    "Modal over modal",
+    "An app-local Modal re-export",
+    "Side editing that keeps the page visible (use Drawer)",
   ],
   props_rules: [
     "placement=center (or Dialog) for short confirmations; top, the default, when the body height changes",

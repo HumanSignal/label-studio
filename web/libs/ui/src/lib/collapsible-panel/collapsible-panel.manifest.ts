@@ -4,8 +4,8 @@ export default defineManifest({
   name: "CollapsiblePanel",
   tier: 1,
   exports: ["CollapsiblePanel"],
-  intent: ["an expandable panel-style section"],
+  intent: ["An expandable panel-style section"],
   use_when: "A single section the user expands or collapses, panel style.",
-  never_when: ["a details element styled by hand", "stacked sections (use Accordion)"],
+  never_when: ["A details element styled by hand", "Stacked sections (use Accordion)"],
   replaces: [],
 });

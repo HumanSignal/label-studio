@@ -4,10 +4,10 @@ export default defineManifest({
   name: "Card",
   tier: 1,
   exports: ["Card", "CardHeader", "CardTitle", "CardDescription", "CardContent"],
-  intent: ["a titled surface grouping related content"],
+  intent: ["A titled surface grouping related content"],
   use_when:
     "A bordered surface with an optional title and description around a group of controls or data. Pass title and description for the simple case, or compose CardHeader, CardTitle, CardDescription and CardContent.",
-  never_when: ["an app-local Card", "a div with border and shadow classes", "nested cards", "a footer part"],
+  never_when: ["An app-local Card", "A div with border and shadow classes", "Nested cards", "A footer part"],
   props_rules: [
     "size=regular (the default) for page sections; size=compact for dense panels and dashboard tiles",
     "takes the full width of its container; the container decides how many cards sit side by side",

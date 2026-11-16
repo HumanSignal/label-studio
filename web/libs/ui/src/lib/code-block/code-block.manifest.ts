@@ -4,8 +4,8 @@ export default defineManifest({
   name: "CodeBlock",
   tier: 1,
   exports: ["CodeBlock"],
-  intent: ["read-only code or configuration"],
+  intent: ["Read-only code or configuration"],
   use_when: "Showing a snippet, a config or an ID the user may copy.",
-  never_when: ["a <pre> with mono classes", "editable code (use CodeEditor)"],
+  never_when: ["A <pre> with mono classes", "Editable code (use CodeEditor)"],
   replaces: ["jsx:<pre>"],
 });

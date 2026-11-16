@@ -4,9 +4,9 @@ export default defineManifest({
   name: "Label",
   tier: 1,
   exports: ["Label"],
-  intent: ["a caption for a form control"],
+  intent: ["A caption for a form control"],
   use_when: "The text, required marker and description attached to a control.",
-  never_when: ["a bare <label> or Typography placed next to a control by hand"],
+  never_when: ["A bare <label> or Typography placed next to a control by hand"],
   replaces: [
     "services/lso/web/apps/labelstudio/src/components/Form/Elements/Label/Label.jsx",
     "services/lse/web/apps/labelstudio/src/components/Form/Elements/Label/Label.tsx",

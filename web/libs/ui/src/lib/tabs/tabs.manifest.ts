@@ -4,13 +4,13 @@ export default defineManifest({
   name: "Tabs",
   tier: 1,
   exports: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  intent: ["move between sub-sections of one section"],
+  intent: ["Move between sub-sections of one section"],
   use_when: "Navigating between sub-sections of a parent section whose content differs but sits at the same level.",
   never_when: [
-    "switching the view, format or filter of the same content (use SegmentedControl)",
-    "a row of Buttons with an active class",
-    "role=tablist built by hand",
-    "navigation between pages",
+    "Switching the view, format or filter of the same content (use SegmentedControl)",
+    "A row of Buttons with an active class",
+    "Role=tablist built by hand",
+    "Navigation between pages",
   ],
   replaces: [
     "services/lso/web/libs/datamanager/src/components/Common/Tabs/Tabs.jsx",

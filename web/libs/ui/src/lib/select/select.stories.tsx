@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
 import { Badge } from "../badge/badge";
-import { BadgeGroup } from "../badge-group";
+import { SummaryLabel } from "../summary-label";
 import { Button } from "../button/button";
 
 const thousandOptions = (() => {
@@ -263,7 +263,8 @@ export const MultipleWithBadges: Story = {
           renderSelected={(selectedOptions) => {
             if (!selectedOptions || selectedOptions?.length === 0) return null;
             return (
-              <BadgeGroup
+              <SummaryLabel
+                badges
                 items={
                   selectedOptions?.map((opt: any) => ({
                     id: opt?.value ?? opt,

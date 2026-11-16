@@ -43,9 +43,6 @@
     "NumberInput": null
   },
   "overrides": {
-    "BadgeGroup": {
-      "cardMode": "column"
-    },
     "Button": {
       "cardMode": "column"
     },
