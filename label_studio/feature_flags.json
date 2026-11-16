@@ -3500,7 +3500,7 @@
     },
     "fflag_feat_utc_1407_verified_skills_and_onboarding": {
       "key": "fflag_feat_utc_1407_verified_skills_and_onboarding",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3522,7 +3522,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_utc_1423_create_project_from_tasks": {
