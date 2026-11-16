@@ -111,6 +111,11 @@ export interface ModalWindowProps {
    */
   animate?: boolean;
   onOpenAutoFocus?: (event: Event) => void;
+  /**
+   * Called on Escape before the dialog closes. `event.preventDefault()` keeps it open, e.g. for a dialog
+   * that lets the widgets inside use Escape first and handles it itself.
+   */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onCloseAutoFocus?: (event: Event) => void;
 }
 
@@ -156,6 +161,7 @@ export function ModalWindow({
   dataTestId = "modal-window",
   animate = true,
   onOpenAutoFocus,
+  onEscapeKeyDown,
   onCloseAutoFocus,
 }: ModalWindowProps) {
   const isFullscreen = size === "fullscreen";
@@ -220,6 +226,7 @@ export function ModalWindow({
           onInteractOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
           onFocusOutside={closeOnFocusOutside ? undefined : (e) => e.preventDefault()}
           onOpenAutoFocus={onOpenAutoFocus}
+          onEscapeKeyDown={onEscapeKeyDown}
           onCloseAutoFocus={onCloseAutoFocus}
         >
           {showHeaderChrome ? (

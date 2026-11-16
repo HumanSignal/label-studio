@@ -78,6 +78,22 @@ describe("ModalWindow", () => {
     );
   });
 
+  it("stays open on Escape when onEscapeKeyDown prevents it", async () => {
+    const onOpenChange = mock<(open: boolean) => void>();
+    const onEscapeKeyDown = mock((event: KeyboardEvent) => event.preventDefault());
+    render(
+      <ModalWindow open onOpenChange={onOpenChange} onEscapeKeyDown={onEscapeKeyDown} title="Keep me" animate={false}>
+        <div>Content</div>
+      </ModalWindow>,
+    );
+
+    fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape", bubbles: true, cancelable: true });
+
+    expect(onEscapeKeyDown).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole("dialog", { name: "Keep me" })).toBeInTheDocument();
+  });
+
   it("closes when close button is activated", async () => {
     render(
       <ControlledModal title="Closable" animate={false}>
