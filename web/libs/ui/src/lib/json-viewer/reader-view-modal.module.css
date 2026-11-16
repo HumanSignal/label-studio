@@ -1,25 +1,3 @@
-.readerViewModal {
-  background: blue;
-
-  /* Ensure modal takes full screen */
-  :global(.lsf-modal-ls__wrapper) {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
-    margin: 0;
-    background: red;
-  }
-
-  /* Center the tabs in the header */
-  :global(.lsf-modal-ls__header) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-base);
-  }
-}
-
 .contentContainer {
   flex: 1;
   overflow-y: scroll;

@@ -1,9 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Button, Typography, Spinner, EmptyState, Card } from "@humansignal/ui";
+import { Button, Typography, Spinner, EmptyState, Card, ModalWindow } from "@humansignal/ui";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Form, Label, Toggle } from "../../../components/Form";
-import { modal } from "../../../components/Modal/Modal";
 import { IconModels, IconExternal } from "@humansignal/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
@@ -36,58 +35,12 @@ export const MachineLearningSettings = () => {
     setLoaded(true);
   }, [project, setBackends]);
 
-  const startTrainingModal = useCallback(
-    (backend) => {
-      const modalProps = {
-        title: "Start Model Training",
-        style: { width: 760 },
-        closeOnClickOutside: true,
-        body: <StartModelTraining backend={backend} />,
-      };
-
-      modal(modalProps);
-    },
-    [project],
-  );
-
-  const showRequestModal = useCallback(
-    (backend) => {
-      const modalProps = {
-        title: "Test Request",
-        style: { width: 760 },
-        closeOnClickOutside: true,
-        body: <TestRequest backend={backend} />,
-      };
-
-      modal(modalProps);
-    },
-    [project],
-  );
-
-  const showMLFormModal = useCallback(
-    (backend) => {
-      const action = backend ? "updateMLBackend" : "addMLBackend";
-      const modalProps = {
-        title: `${backend ? "Edit" : "Connect"} Model`,
-        style: { width: 760 },
-        closeOnClickOutside: false,
-        body: (
-          <CustomBackendForm
-            action={action}
-            backend={backend}
-            project={project}
-            onSubmit={() => {
-              fetchBackends();
-              modalRef.close();
-            }}
-          />
-        ),
-      };
-
-      const modalRef = modal(modalProps);
-    },
-    [project, fetchBackends],
-  );
+  // One dialog at a time: start training, test request, or the connect/edit form.
+  const [mlDialog, setMlDialog] = useState(null);
+  const closeMlDialog = () => setMlDialog(null);
+  const startTrainingModal = useCallback((backend) => setMlDialog({ kind: "train", backend }), []);
+  const showRequestModal = useCallback((backend) => setMlDialog({ kind: "test", backend }), []);
+  const showMLFormModal = useCallback((backend) => setMlDialog({ kind: "form", backend }), []);
 
   useEffect(() => {
     if (project.id) {
@@ -207,6 +160,34 @@ export const MachineLearningSettings = () => {
           )}
         </Form>
       </div>
+      <ModalWindow
+        open={mlDialog !== null}
+        onOpenChange={(open) => !open && closeMlDialog()}
+        title={
+          mlDialog?.kind === "train"
+            ? "Start Model Training"
+            : mlDialog?.kind === "test"
+              ? "Test Request"
+              : `${mlDialog?.backend ? "Edit" : "Connect"} Model`
+        }
+        size="medium"
+        closeOnScrimClick={mlDialog?.kind !== "form"}
+        dataTestId="ml-settings-modal"
+      >
+        {mlDialog?.kind === "train" && <StartModelTraining backend={mlDialog.backend} />}
+        {mlDialog?.kind === "test" && <TestRequest backend={mlDialog.backend} />}
+        {mlDialog?.kind === "form" && (
+          <CustomBackendForm
+            action={mlDialog.backend ? "updateMLBackend" : "addMLBackend"}
+            backend={mlDialog.backend}
+            project={project}
+            onSubmit={() => {
+              fetchBackends();
+              closeMlDialog();
+            }}
+          />
+        )}
+      </ModalWindow>
     </section>
   );
 };

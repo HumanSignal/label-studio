@@ -1,9 +1,8 @@
-import { Button, buttonVariant, ToastContext, ToastType } from "@humansignal/ui";
+import { Button, buttonVariant, ModalWindow, ToastContext, ToastType } from "@humansignal/ui";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { generatePath, useHistory } from "react-router";
 import { Link, NavLink } from "react-router-dom";
 import { Spinner } from "../../components";
-import { modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
@@ -241,6 +240,7 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({ dmRef }) => {
   const { project } = useProject();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
+  const [instructionsTitle, setInstructionsTitle] = useState(null);
 
   const links = {
     "/settings": "Settings",
@@ -264,11 +264,7 @@ DataManagerPage.context = ({ dmRef }) => {
     const { expert_instruction, show_instruction } = project;
 
     if (isLabelStream && show_instruction && expert_instruction) {
-      modal({
-        title: "Labeling Instructions",
-        body: <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(expert_instruction) }} />,
-        style: { width: 680 },
-      });
+      setInstructionsTitle("Labeling Instructions");
     }
   };
 
@@ -291,22 +287,7 @@ DataManagerPage.context = ({ dmRef }) => {
   return project && project.id ? (
     <Space size="small">
       {project.expert_instruction && mode !== "explorer" && (
-        <Button
-          size="small"
-          look="outlined"
-          onClick={() => {
-            modal({
-              title: "Instructions",
-              body: () => (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(project.expert_instruction),
-                  }}
-                />
-              ),
-            });
-          }}
-        >
+        <Button size="small" look="outlined" onClick={() => setInstructionsTitle("Instructions")}>
           Instructions
         </Button>
       )}
@@ -322,6 +303,15 @@ DataManagerPage.context = ({ dmRef }) => {
           {label}
         </Link>
       ))}
+      <ModalWindow
+        open={instructionsTitle !== null}
+        onOpenChange={(open) => !open && setInstructionsTitle(null)}
+        title={instructionsTitle ?? "Instructions"}
+        size="medium"
+        dataTestId="labeling-instructions-modal"
+      >
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.expert_instruction ?? "") }} />
+      </ModalWindow>
     </Space>
   ) : null;
 };

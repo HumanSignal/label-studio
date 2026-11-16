@@ -1,10 +1,9 @@
 import { StorageProviderForm } from "@humansignal/app-common/blocks/StorageProviderForm";
 import { ff } from "@humansignal/core";
-import { ConfirmDialog, Button } from "@humansignal/ui";
+import { ConfirmDialog, Button, ModalWindow } from "@humansignal/ui";
 import { useAtomValue } from "jotai";
 import { useState, forwardRef, useCallback, useContext, useImperativeHandle } from "react";
 import { Columns } from "../../../components";
-import { modal } from "../../../components/Modal/Modal";
 import { Spinner } from "../../../components/Spinner/Spinner";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { projectAtom } from "../../../providers/ProjectProvider";
@@ -35,53 +34,16 @@ export const StorageSet = forwardRef(
 
     const useNewStorageScreen = ff.isActive(ff.FF_NEW_STORAGES);
 
+    const [storageDialog, setStorageDialog] = useState(null);
+    const closeStorageDialog = () => setStorageDialog(null);
+
     const showStorageFormModal = useCallback(
       (storage) => {
         const action = storage ? "Edit" : "Connect";
         const actionTarget = target === "export" ? "Target" : "Source";
         const title = `${action} ${actionTarget} Storage`;
 
-        const modalRef = modal({
-          title,
-          closeOnClickOutside: false,
-          style: { width: 840 },
-          bare: useNewStorageScreen,
-          onHidden: () => {
-            // Reset state when modal is closed (including Escape key)
-            // This ensures clean state for next modal open
-          },
-          body: useNewStorageScreen ? (
-            <StorageProviderForm
-              title={title}
-              target={target}
-              storage={storage}
-              project={project.id}
-              rootClass={rootClass}
-              storageTypes={storageTypes}
-              providers={providers}
-              onSubmit={async () => {
-                modalRef.close();
-                fetchStorages();
-              }}
-              onHide={() => {
-                // This will be called when the modal is closed via Escape key
-                // The state reset is handled inside StorageProviderForm
-              }}
-            />
-          ) : (
-            <StorageForm
-              target={target}
-              storage={storage}
-              project={project.id}
-              rootClass={rootClass}
-              storageTypes={storageTypes}
-              onSubmit={async () => {
-                await fetchStorages();
-                modalRef.close();
-              }}
-            />
-          ),
-        });
+        setStorageDialog({ storage, title });
       },
       [project, fetchStorages, target, rootClass],
     );
@@ -155,6 +117,45 @@ export const StorageSet = forwardRef(
             />
           ))
         )}
+        <ModalWindow
+          open={storageDialog !== null}
+          onOpenChange={(open) => !open && closeStorageDialog()}
+          title={storageDialog?.title}
+          hideHeader={useNewStorageScreen}
+          size="large"
+          closeOnScrimClick={false}
+          dataTestId="storage-form-modal"
+        >
+          {storageDialog &&
+            (useNewStorageScreen ? (
+              <StorageProviderForm
+                title={storageDialog.title}
+                target={target}
+                storage={storageDialog.storage}
+                project={project.id}
+                rootClass={rootClass}
+                storageTypes={storageTypes}
+                providers={providers}
+                onClose={closeStorageDialog}
+                onSubmit={async () => {
+                  closeStorageDialog();
+                  fetchStorages();
+                }}
+              />
+            ) : (
+              <StorageForm
+                target={target}
+                storage={storageDialog.storage}
+                project={project.id}
+                rootClass={rootClass}
+                storageTypes={storageTypes}
+                onSubmit={async () => {
+                  await fetchStorages();
+                  closeStorageDialog();
+                }}
+              />
+            ))}
+        </ModalWindow>
         <ConfirmDialog
           {...pendingConfirm}
           open={pendingConfirm !== null}

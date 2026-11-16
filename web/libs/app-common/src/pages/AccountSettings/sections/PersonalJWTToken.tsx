@@ -6,13 +6,12 @@ import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
 import { withStepUp } from "../../../components/step-up/with-step-up";
-import { ConfirmDialog, type ConfirmDialogContent, Button, Message } from "@humansignal/ui";
+import { ConfirmDialog, type ConfirmDialogContent, Button, Message, ModalWindow } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { modal } from "@humansignal/ui";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
@@ -132,17 +131,11 @@ export function PersonalJWTToken() {
   function openDialog() {
     if (dialogOpened) return;
     setDialogOpened(true);
-    modal({
-      title: "New Auth Token",
-      size: "medium",
-      body: <CreateTokenForm />,
-      allowClose: true,
-      closeOnClickOutside: false,
-      onHidden: () => {
-        setDialogOpened(false);
-        queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
-      },
-    });
+  }
+
+  function closeDialog() {
+    setDialogOpened(false);
+    queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
   }
 
   return (
@@ -191,6 +184,16 @@ export function PersonalJWTToken() {
           if (!open) setPendingConfirm(null);
         }}
       />
+      <ModalWindow
+        open={dialogOpened}
+        onOpenChange={(open) => !open && closeDialog()}
+        title="New Auth Token"
+        size="medium"
+        closeOnScrimClick={false}
+        dataTestId="new-auth-token-modal"
+      >
+        {dialogOpened && <CreateTokenForm />}
+      </ModalWindow>
     </div>
   );
 }
