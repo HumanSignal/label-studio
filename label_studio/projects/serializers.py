@@ -3,7 +3,12 @@
 from decimal import Decimal
 
 import bleach
-from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_PROTOCOLS, SAFE_HTML_TAGS, SAFE_INSTRUCTION_HTML_TAGS
+from constants import (
+    SAFE_HTML_ATTRIBUTES,
+    SAFE_HTML_PROTOCOLS,
+    SAFE_INSTRUCTION_HTML_TAGS,
+    UNSAFE_ALLOWED_INSTRUCTION_HTML_TAGS,
+)
 from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from fsm.serializer_fields import FSMStateField
@@ -80,7 +85,7 @@ class ControlTagWeightSerializer(serializers.Serializer):
 
 
 def sanitize_expert_instruction(html, allow_unsafe_tags):
-    tags = SAFE_HTML_TAGS if allow_unsafe_tags else SAFE_INSTRUCTION_HTML_TAGS
+    tags = UNSAFE_ALLOWED_INSTRUCTION_HTML_TAGS if allow_unsafe_tags else SAFE_INSTRUCTION_HTML_TAGS
     return bleach.clean(html, tags=tags, attributes=SAFE_HTML_ATTRIBUTES, protocols=SAFE_HTML_PROTOCOLS)
 
 
