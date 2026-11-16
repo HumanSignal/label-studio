@@ -94,19 +94,16 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
   const baseId = base.commit.slice(0, 10);
   const files = `${num(c.totals.files_with_violations.head)} files${paren(c.totals.files_with_violations.delta)}`;
   const lines = [MARKER, "## Design-system metrics", ""];
-  const rulesMoved = Object.values(c.rules).some((r) => r.delta !== 0);
-  if (total.delta === 0 && !rulesMoved) {
-    lines.push(`**${num(total.head)} violations, no change** against the base branch (\`${baseId}\`).`);
-  } else if (total.delta === 0) {
-    lines.push(
-      `**${num(total.head)} violations, same total as the base branch (\`${baseId}\`), with rules shifted**, in ${files}.`,
-    );
-  } else {
-    const verb = total.delta < 0 ? "fewer" : "more";
-    lines.push(
-      `**${num(total.head)} violations (${signed(total.delta)}, ${num(Math.abs(total.delta))} ${verb} than the base branch \`${baseId}\`)**, in ${files}.`,
-    );
-  }
+  const added = Object.values(c.rules).reduce((sum, r) => sum + Math.max(r.delta, 0), 0);
+  const net = total.delta === 0 ? (added ? "no net change: rules shifted" : "no change") : `${signed(total.delta)} net`;
+  // The first line answers "did this PR add any?", so the comment can be dismissed or acted on at a glance.
+  lines.push(
+    added
+      ? `**${num(added)} new ${added === 1 ? "violation" : "violations"}** (${net} against the base branch \`${baseId}\`)`
+      : `**No new violations** (${net} against the base branch \`${baseId}\`)`,
+    "",
+    `of ${num(total.head)} total violations, in ${files}.`,
+  );
   if (base.version !== head.version) {
     lines.push(
       "",

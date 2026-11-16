@@ -121,7 +121,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
         .filter((p) => !p.startsWith("jsx:") && input.exists(p)).length,
       target: TARGETS.primitive_implementations_outside_ds,
     },
-    // One per manifest entry: sub-parts (AccordionItem, AvatarBadge) count with their parent, not as components.
+    // One per manifest entry: sub-parts (AccordionItem, AvatarStack) count with their parent, not as components.
     ds_components: { value: input.manifest.components.length, target: TARGETS.ds_components },
     // Every raw tag the rule flags (button, select, table, checkbox): each has a design-system replacement.
     raw_controls_lse_app: {

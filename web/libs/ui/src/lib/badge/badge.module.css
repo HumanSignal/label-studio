@@ -150,69 +150,6 @@
   color: var(--color-accent-sand-bold);
 }
 
-/* Outline look */
-.look-outlined {
-  &.variant-grape {
-    background: transparent;
-    border-color: var(--color-accent-grape-subtle);
-    color: var(--color-accent-grape-bold);
-  }
-
-  &.variant-blueberry {
-    background: transparent;
-    border-color: var(--color-accent-blueberry-subtle);
-    color: var(--color-accent-blueberry-bold);
-  }
-
-  &.variant-kale {
-    background: transparent;
-    border-color: var(--color-accent-kale-subtle);
-    color: var(--color-accent-kale-bold);
-  }
-
-  &.variant-kiwi {
-    background: transparent;
-    border-color: var(--color-accent-kiwi-subtle);
-    color: var(--color-accent-kiwi-bold);
-  }
-
-  &.variant-mango {
-    background: transparent;
-    border-color: var(--color-accent-mango-subtle);
-    color: var(--color-accent-mango-bold);
-  }
-
-  &.variant-canteloupe {
-    background: transparent;
-    border-color: var(--color-accent-canteloupe-subtle);
-    color: var(--color-accent-canteloupe-bold);
-  }
-
-  &.variant-persimmon {
-    background: transparent;
-    border-color: var(--color-accent-persimmon-subtle);
-    color: var(--color-accent-persimmon-bold);
-  }
-
-  &.variant-plum {
-    background: transparent;
-    border-color: var(--color-accent-plum-subtle);
-    color: var(--color-accent-plum-bold);
-  }
-
-  &.variant-fig {
-    background: transparent;
-    border-color: var(--color-accent-fig-subtle);
-    color: var(--color-accent-fig-bold);
-  }
-
-  &.variant-sand {
-    background: transparent;
-    border-color: var(--color-neutral-border);
-    color: var(--color-accent-sand-bold);
-  }
-}
-
 /* Ghost look */
 .look-ghost {
   background: none !important;
@@ -384,26 +321,6 @@
     }
 
     /* Shape variants for filled look */
-    &.shape-rounded {
-      .badge-content {
-        border-radius: calc(var(--corner-radius-large) - 1px);
-      }
-    }
-
-    &.shape-square {
-      .badge-content {
-        border-radius: calc(var(--corner-radius-smaller) - 1px);
-      }
-    }
-  }
-
-  &.look-outlined {
-    .badge-content {
-      background: var(--color-neutral-background);
-      height: calc(100% - 2px);
-    }
-
-    /* Shape variants for outline look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);

@@ -5,7 +5,7 @@ import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Space } from "../../Common/Space/Space";
 import { CheckIcon, XIcon } from "@humansignal/icons";
-import { Tooltip, Avatar, AvatarBadge } from "@humansignal/ui";
+import { Tooltip, Avatar } from "@humansignal/ui";
 import { Common } from "../../Filters/types";
 import { useAvatarOverflow } from "../../../hooks/useAvatarOverflow";
 import "./Annotators.prefix.css";
@@ -76,12 +76,7 @@ export const Annotators = (cell) => {
             }}
           >
             <Tooltip title={user.fullName || user.email}>
-              <Avatar
-                user={user}
-                size="large"
-                faded={userpicIsFaded}
-                badge={review && REVIEW_BADGES[review] && <AvatarBadge {...REVIEW_BADGES[review]} />}
-              />
+              <Avatar user={user} size="large" faded={userpicIsFaded} badge={review && REVIEW_BADGES[review]} />
             </Tooltip>
           </div>
         );

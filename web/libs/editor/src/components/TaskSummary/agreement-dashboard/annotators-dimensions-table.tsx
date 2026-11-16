@@ -10,7 +10,7 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "@tanstack/react-table";
-import { cnm, Tooltip, Avatar, AvatarBadge } from "@humansignal/ui";
+import { cnm, Tooltip, Avatar } from "@humansignal/ui";
 import { CheckIcon, IconAnnotationGroundTruth, IconInfoOutline, IconSparks, XIcon } from "@humansignal/icons";
 import { formatMetricType } from "./agreement-utils";
 import { DistributionRow } from "./distribution-row";
@@ -244,13 +244,13 @@ export const AnnotatorsDimensionsTable = ({
               const ann = annotationForRow?.[annotator.index];
               const lastReview = ann?.reviews?.at?.(-1) ?? null;
 
-              const reviewBadge = lastReview ? (
-                <AvatarBadge
-                  variant={lastReview.accepted ? "kale" : "persimmon"}
-                  icon={lastReview.accepted ? <CheckIcon weight="bold" /> : <XIcon weight="bold" />}
-                  label={lastReview.accepted ? "Accepted review" : "Rejected review"}
-                />
-              ) : null;
+              const reviewBadge = lastReview
+                ? {
+                    variant: lastReview.accepted ? ("kale" as const) : ("persimmon" as const),
+                    icon: lastReview.accepted ? <CheckIcon weight="bold" /> : <XIcon weight="bold" />,
+                    label: lastReview.accepted ? "Accepted review" : "Rejected review",
+                  }
+                : null;
 
               const isClickable = !!(ann?.id && onAnnotationClick);
 

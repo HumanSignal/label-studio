@@ -70,15 +70,32 @@ describe("renderComparison", () => {
     const big: Snapshot = { ...base, totals: { violations: 1234567, files_with_violations: 20 } };
     const shifted: Snapshot = { ...big, rules: { "raw-control": 11, "color-literal": 89 } };
     const md = renderComparison(shifted, big);
-    expect(md).toContain("1,234,567 violations, same total");
+    expect(md).toContain("**1 new violation** (no net change: rules shifted");
+    expect(md).toContain("of 1,234,567 total violations");
     expect(md).toContain("| raw-control | 10 | 11 | +1 |");
     expect(md).not.toContain("0 more");
+  });
+
+  test("leads with the new violations, then the net change and the total", () => {
+    const md = renderComparison(head, base);
+    const [, , , headline, , total] = md.split("\n");
+    expect(headline).toBe("**1 new violation** (-7 net against the base branch `" + base.commit.slice(0, 10) + "`)");
+    expect(total).toBe("of 93 total violations, in 19 files (-1).");
+  });
+
+  test("says there are none when the PR only removes violations", () => {
+    const cleaner: Snapshot = {
+      ...base,
+      rules: { ...base.rules, "color-literal": 80 },
+      totals: { violations: 90, files_with_violations: 20 },
+    };
+    expect(renderComparison(cleaner, base)).toContain("**No new violations** (-10 net against the base branch");
   });
 
   test("says so when nothing changed", () => {
     const md = renderComparison(base, base);
     expect(md.startsWith(MARKER)).toBe(true);
-    expect(md).toContain("no change");
+    expect(md).toContain("**No new violations** (no change against the base branch");
     expect(md).not.toContain("| legacy-icon");
   });
 });

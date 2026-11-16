@@ -12,9 +12,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Card as ShadCard,
-  CardContent as ShadCardContent,
-  CardHeader as ShadCardHeader,
 } from "@humansignal/ui";
 import { confirm } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
@@ -362,36 +359,24 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
       >
         <div className={styles.sectionContent}>
           {isLoading && hotkeys.length === 0 ? (
-            <div className="flex flex-col gap-wide">
-              <ShadCard>
-                <ShadCardHeader className="pb-tight">
-                  <Skeleton className="h-wide w-[16rem]" />
-                  <Skeleton className="h-base w-[18rem]" />
-                </ShadCardHeader>
-                <ShadCardContent>
-                  <Skeleton className="h-5 w-44 mb-tight" />
-                  <Skeleton className="h-base w-[16rem]" />
-                </ShadCardContent>
-              </ShadCard>
-              {typedHotkeySections.map((section: Section) => (
-                <ShadCard key={section.id}>
-                  <ShadCardHeader className="pb-tight">
-                    <Skeleton className="h-wide w-[16rem]" />
+            <div className="flex flex-col gap-wide divide-y divide-neutral-border">
+              {[{ id: "loading" }, ...typedHotkeySections].map((section) => (
+                <section key={section.id} className="flex flex-col gap-base pt-wide first:pt-0">
+                  <div className="flex flex-col gap-tighter">
+                    <Skeleton className="h-base w-[16rem]" />
                     <Skeleton className="h-base w-[18rem]" />
-                  </ShadCardHeader>
-                  <ShadCardContent>
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
-                        <Skeleton className="h-5 w-44 mb-tight" />
-                        <Skeleton className="h-base w-[16rem]" />
-                      </div>
-                    ))}
-                  </ShadCardContent>
-                </ShadCard>
+                  </div>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
+                      <Skeleton className="h-5 w-44 mb-tight" />
+                      <Skeleton className="h-base w-[16rem]" />
+                    </div>
+                  ))}
+                </section>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col gap-wide">
+            <div className="flex flex-col gap-wide divide-y divide-neutral-border">
               {typedHotkeySections.map((section: Section) => (
                 <HotkeySection
                   key={section.id}

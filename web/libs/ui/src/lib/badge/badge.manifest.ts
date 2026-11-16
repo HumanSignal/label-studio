@@ -13,7 +13,7 @@ export default defineManifest({
     "a local span with rounded-full classes",
   ],
   props_rules: [
-    "look is always the filled default; outlined only on selection controls, where it means not selected",
+    "look is always the filled default; a selection control shows not selected as the neutral filled Badge",
     "shape=rounded for lifecycle states, square for attributes",
     "state colours follow the registry table: neutral initial, primary in process, warning needs attention, plum in review, positive done, negative failed",
     "size via the size prop only, never className overrides",

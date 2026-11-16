@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Button, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@humansignal/ui";
+import { Button, Typography } from "@humansignal/ui";
 import { HotkeyItem } from "./Item";
 
 // Type definitions
@@ -40,7 +40,7 @@ interface HotkeySectionProps {
 /**
  * HotkeySection Component
  *
- * Displays a section of hotkeys grouped by subgroups within a card layout.
+ * Displays a section of hotkeys grouped by subgroups, as a titled section of the Hotkeys card.
  * Provides functionality to edit, toggle, and save hotkeys within the section.
  *
  * @param {HotkeySectionProps} props - Component props
@@ -108,44 +108,48 @@ export const HotkeySection = ({
   };
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-2">
-        <CardTitle>{section.title}</CardTitle>
-        <CardDescription>{section.description}</CardDescription>
-      </CardHeader>
+    <section className="flex flex-col gap-base pt-wide first:pt-0" data-testid={`hotkey-section-${section.id}`}>
+      <div className="flex flex-col gap-tighter">
+        <Typography variant="title" size="medium">
+          {section.title}
+        </Typography>
+        {section.description && (
+          <Typography variant="body" size="small" className="text-neutral-content-subtle">
+            {section.description}
+          </Typography>
+        )}
+      </div>
 
-      <CardContent className="pt-0">
-        <div>
-          {subgroups.map((subgroup: string) => (
-            <div
-              key={subgroup}
-              className={clsx(subgroup !== "default" && "mt-4 pt-2 border rounded-md border-border p-3")}
-            >
-              {groupedHotkeys[subgroup].map((hotkey: Hotkey) => (
-                <HotkeyItem
-                  key={hotkey.id}
-                  hotkey={hotkey}
-                  onEdit={onEditHotkey}
-                  onToggle={onToggleHotkey}
-                  isEditing={editingHotkeyId === hotkey.id}
-                  onSave={onSaveHotkey}
-                  onCancel={onCancelEdit}
-                />
-              ))}
-            </div>
-          ))}
+      <div>
+        {subgroups.map((subgroup: string) => (
+          <div
+            key={subgroup}
+            className={clsx(subgroup !== "default" && "mt-4 pt-2 border rounded-md border-border p-3")}
+          >
+            {groupedHotkeys[subgroup].map((hotkey: Hotkey) => (
+              <HotkeyItem
+                key={hotkey.id}
+                hotkey={hotkey}
+                onEdit={onEditHotkey}
+                onToggle={onToggleHotkey}
+                isEditing={editingHotkeyId === hotkey.id}
+                onSave={onSaveHotkey}
+                onCancel={onCancelEdit}
+              />
+            ))}
+          </div>
+        ))}
 
-          {hotkeys.length === 0 && (
-            <div className="py-8 text-center text-muted-foreground italic">No hotkeys in this section</div>
-          )}
-        </div>
-      </CardContent>
+        {hotkeys.length === 0 && (
+          <div className="py-8 text-center text-muted-foreground italic">No hotkeys in this section</div>
+        )}
+      </div>
 
-      <CardContent className="flex items-center pt-0 justify-end">
+      <div className="flex items-center justify-end">
         <Button variant="primary" onClick={handleSaveSection} disabled={!hasChanges}>
           Save
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 };

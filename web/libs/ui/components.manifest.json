@@ -57,20 +57,20 @@
       "tier": 1,
       "exports": [
         "Avatar",
-        "AvatarStack",
-        "AvatarBadge"
+        "AvatarStack"
       ],
       "intent": [
         "a person or several people"
       ],
-      "use_when": "One person (initials or photo, tooltip, badge) or a stack of people with a +N tile.",
+      "use_when": "One person (initials or photo, tooltip, a dot top right, a status bottom right) or a stack of people with a +N tile.",
       "never_when": [
         "a hand-rolled row of avatars or +N tile",
         "a badge drawn on an avatar by hand",
         "userpic classes mixed onto Avatar"
       ],
       "props_rules": [
-        "size is a name (smaller, small, medium, large, larger), never a px number or CSS size"
+        "size is a name (smaller, small, medium, large, larger), never a px number or CSS size",
+        "indicator is the top-right dot (presence, something new); badge is the bottom-right status, usually with an icon"
       ],
       "replaces": [
         "services/lse/web/apps/labelstudio/src/pages/Organization/Models/@components/RunHistory/RunHistory.tsx"
@@ -95,7 +95,7 @@
         "a local span with rounded-full classes"
       ],
       "props_rules": [
-        "look is always the filled default; outlined only on selection controls, where it means not selected",
+        "look is always the filled default; a selection control shows not selected as the neutral filled Badge",
         "shape=rounded for lifecycle states, square for attributes",
         "state colours follow the registry table: neutral initial, primary in process, warning needs attention, plum in review, positive done, negative failed",
         "size via the size prop only, never className overrides"
@@ -440,6 +440,31 @@
       "never_when": [],
       "replaces": [],
       "dir": "lib/filter-shell"
+    },
+    "Indicator": {
+      "name": "Indicator",
+      "tier": 1,
+      "exports": [
+        "Indicator",
+        "IndicatorMark"
+      ],
+      "intent": [
+        "a status dot or count on the corner of something"
+      ],
+      "use_when": "A dot, icon or count pinned to the corner of an avatar, an icon or a button: unread items, presence, a review result. On an avatar, use Avatar's indicator and badge props, which draw it.",
+      "never_when": [
+        "a hand-built absolute span with a count or a dot on a button or icon",
+        "a label next to text (use Badge)",
+        "the only way a state is shown: the label is read by screen readers, so give it one"
+      ],
+      "props_rules": [
+        "label is required: a dot or a number alone says nothing",
+        "counts go through formatCount: 1.2k from a thousand up",
+        "overlap=circular on round hosts",
+        "position is one of the four corners; no free offsets"
+      ],
+      "replaces": [],
+      "dir": "lib/indicator"
     },
     "InputFile": {
       "name": "InputFile",

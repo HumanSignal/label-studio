@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CheckIcon } from "@humansignal/icons";
-import { AvatarBadge } from "./avatar-badge";
 import { AvatarStack } from "./avatar-stack";
 
 const names = [
@@ -89,7 +88,7 @@ export const PerAvatarProps: Story = {
       index === 1
         ? { faded: true }
         : index === 0
-          ? { badge: <AvatarBadge variant="kale" icon={<CheckIcon weight="bold" />} label="Accepted review" /> }
+          ? { badge: { variant: "kale", icon: <CheckIcon weight="bold" />, label: "Accepted review" } }
           : undefined,
   },
 };

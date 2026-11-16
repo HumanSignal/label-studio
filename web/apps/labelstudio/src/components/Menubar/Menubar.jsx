@@ -14,7 +14,7 @@ import {
   IconSlack,
 } from "@humansignal/icons";
 import { LSLogo } from "../../assets/images";
-import { Button, Avatar, AvatarBadge, ThemeToggle } from "@humansignal/ui";
+import { Button, Avatar, ThemeToggle } from "@humansignal/ui";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -215,8 +215,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                   size="large"
                   user={user}
                   isInProgress={isLoading}
-                  badge={showNewsletterDot && <AvatarBadge shape="dot" variant="primary" label="Newsletter sign-up" />}
-                  badgePosition="topRight"
+                  indicator={showNewsletterDot && { variant: "primary", label: "Newsletter sign-up" }}
                 />
               </Button>
             </div>

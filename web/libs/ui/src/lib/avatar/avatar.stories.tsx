@@ -4,8 +4,7 @@ import { CheckIcon, XIcon } from "@humansignal/icons";
 import { Button } from "../button/button";
 import { Dropdown } from "../dropdown/dropdown";
 import { Typography } from "../typography/typography";
-import { AVATAR_SIZES, Avatar, type AvatarSize } from "./avatar";
-import { AvatarBadge, type AvatarBadgeProps } from "./avatar-badge";
+import { AVATAR_SIZES, Avatar, type AvatarBadgeProps, type AvatarSize } from "./avatar";
 
 // A local drawing instead of a remote photo, so the story renders offline and in screenshot runs.
 const PORTRAIT = `data:image/svg+xml;utf8,${encodeURIComponent(
@@ -35,7 +34,7 @@ const meta: Meta<typeof Avatar> = {
     docs: {
       description: {
         component:
-          "One person: their photo, or their initials on a colour stable for that person. Several people: `AvatarStack`. A corner status: `AvatarBadge`.\n\nAvatar is not interactive. When clicking it should do something, such as open a menu, put it inside a `Button` with an `aria-label`, never a `div`, so keyboard and screen-reader users can reach it. See **As Menu Trigger**.",
+          "One person: their photo, or their initials on a colour stable for that person. Several people: `AvatarStack`. Corner marks: `indicator` (a dot, top right) and `badge` (a status, bottom right), both drawn with `Indicator`.\n\nAvatar is not interactive. When clicking it should do something, such as open a menu, put it inside a `Button` with an `aria-label`, never a `div`, so keyboard and screen-reader users can reach it. See **As Menu Trigger**.",
       },
     },
   },
@@ -96,8 +95,7 @@ export const CountTile: Story = {
   args: { user: undefined, addCount: "+12" },
 };
 
-type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
-type BadgeExample = { label: string; badge: AvatarBadgeProps; position?: Corner };
+type BadgeExample = { label: string; badge: AvatarBadgeProps };
 
 const check = <CheckIcon weight="bold" />;
 const BADGE_GROUPS: { title: string; where: string; items: BadgeExample[] }[] = [
@@ -120,23 +118,12 @@ const BADGE_GROUPS: { title: string; where: string; items: BadgeExample[] }[] = 
       { label: "Excluded", badge: { variant: "sand", label: "Excluded" } },
     ],
   },
-  {
-    title: "Dot",
-    where: "Top bar: unread notifications, newsletter sign-up",
-    items: [{ label: "Unread", badge: { shape: "dot", label: "Unread notifications" }, position: "topRight" }],
-  },
-  {
-    title: "Corners",
-    where: "badgePosition",
-    items: (["topLeft", "topRight", "bottomLeft", "bottomRight"] as const).map((position) => ({
-      label: position,
-      badge: { variant: "kale", icon: check, label: "Accepted review" },
-      position,
-    })),
-  },
 ];
 
-/** `AvatarBadge` in each place the app uses it. The avatar pins it to a corner; `badgePosition` picks which. */
+/**
+ * `badge` is a status in the bottom-right corner, usually with an icon. `indicator` is a dot in the top-right
+ * corner, for presence or something new. They can show together.
+ */
 export const WithBadge: Story = {
   render: (args) => (
     <div className="flex flex-col gap-wide p-base">
@@ -149,15 +136,37 @@ export const WithBadge: Story = {
             {group.where}
           </Typography>
           <div className="flex gap-wide">
-            {group.items.map(({ label, badge, position }) => (
+            {group.items.map(({ label, badge }) => (
               <div key={label} className="flex flex-col items-center gap-tight">
-                <Avatar {...args} badge={<AvatarBadge {...badge} />} badgePosition={position} />
+                <Avatar {...args} badge={badge} />
                 <Typography size="smaller">{label}</Typography>
               </div>
             ))}
           </div>
         </div>
       ))}
+      <div className="flex flex-col gap-tight">
+        <Typography variant="title" size="small">
+          Indicator
+        </Typography>
+        <Typography size="smaller" className="text-neutral-content-subtle">
+          Top bar: unread notifications, newsletter sign-up
+        </Typography>
+        <div className="flex gap-wide">
+          <div className="flex flex-col items-center gap-tight">
+            <Avatar {...args} indicator={{ label: "Unread notifications" }} />
+            <Typography size="smaller">Unread</Typography>
+          </div>
+          <div className="flex flex-col items-center gap-tight">
+            <Avatar
+              {...args}
+              indicator={{ label: "Online", variant: "positive" }}
+              badge={{ variant: "kale", icon: check, label: "Accepted review" }}
+            />
+            <Typography size="smaller">Both</Typography>
+          </div>
+        </div>
+      </div>
     </div>
   ),
 };
@@ -187,7 +196,7 @@ const AccountMenu = (args: Story["args"]) => {
         aria-haspopup="menu"
         aria-expanded={opened}
       >
-        <Avatar {...args} badge={<AvatarBadge shape="dot" label="Unread notifications" />} badgePosition="topRight" />
+        <Avatar {...args} indicator={{ label: "Unread notifications" }} />
       </Button>
     </Dropdown.Trigger>
   );
