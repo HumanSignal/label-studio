@@ -252,22 +252,6 @@
       "replaces": [],
       "dir": "lib/collapsible-panel"
     },
-    "CollectionUploader": {
-      "name": "CollectionUploader",
-      "tier": 2,
-      "exports": [
-        "CollectionUploader",
-        "CollectionHeader",
-        "MediaCard",
-        "SubmissionRuleBadges",
-        "SubmissionStatusChip"
-      ],
-      "intent": [],
-      "use_when": "The data-collection submission flow: upload, rules, status.",
-      "never_when": [],
-      "replaces": [],
-      "dir": "lib/collection-uploader"
-    },
     "ColumnBrowser": {
       "name": "ColumnBrowser",
       "tier": 2,
@@ -378,6 +362,28 @@
       ],
       "dir": "lib/dropdown"
     },
+    "DropZone": {
+      "name": "DropZone",
+      "tier": 1,
+      "exports": [
+        "DropZone"
+      ],
+      "intent": [
+        "a place to drop files or pick them from the file dialog"
+      ],
+      "use_when": "Files can be dragged onto an area of the page or picked by clicking it: imports, uploads, attachments. The content says what to drop and that clicking browses.",
+      "never_when": [
+        "a hand-built dashed div or button with onDrop and a hidden file input",
+        "a single file picker with no drop target (use InputFile)",
+        "the Data Collection submission flow (use CollectionUploader from Interface Components)"
+      ],
+      "props_rules": [
+        "onFiles receives a FileList for both a drop and a pick",
+        "active highlights the zone while a drag happens elsewhere on the page"
+      ],
+      "replaces": [],
+      "dir": "lib/drop-zone"
+    },
     "EmptyState": {
       "name": "EmptyState",
       "tier": 1,
@@ -447,7 +453,7 @@
       "use_when": "A control that opens the file picker for one or several files.",
       "never_when": [
         "a raw <input type=file>",
-        "the full collection upload flow (use CollectionUploader)"
+        "the full collection upload flow (use CollectionUploader from Interface Components)"
       ],
       "replaces": [],
       "dir": "lib/InputFile"
