@@ -826,7 +826,8 @@ export class LSFWrapper {
       const displayReason = result?.response?.display_context?.reason;
       const isPausedError = displayReason === "PAUSED";
       const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
-      if (isPausedError || isOverlapError) {
+      const isProjectDoneError = displayReason === "PROJECT_DONE";
+      if (isPausedError || isOverlapError || isProjectDoneError) {
         // Also update local state for overlap reached (only when feature flag is enabled)
         if (isOverlapError) {
           this.overlapReached = true;
