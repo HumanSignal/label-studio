@@ -333,12 +333,13 @@
         "DropdownTrigger"
       ],
       "intent": [
-        "A list of actions behind a trigger"
+        "A list of actions behind a trigger",
+        "An overflow or context menu of items with icons, hints and a danger action"
       ],
-      "use_when": "A menu of actions or options that opens from a button, a cell or a card.",
+      "use_when": "A menu of actions or options that opens from a button, a cell or a card. Build menu rows with Dropdown.Menu, Dropdown.Item and Dropdown.Divider.",
       "never_when": [
         "An app-local Menu",
-        "Raw buttons styled as menu items",
+        "Raw buttons styled as menu items (use Dropdown.Item)",
         "A Select for choosing values"
       ],
       "replaces": [
