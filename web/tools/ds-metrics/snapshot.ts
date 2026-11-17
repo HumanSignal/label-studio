@@ -34,7 +34,18 @@ export type SnapshotInput = {
   renderFiles: RenderFile[];
   /** Whether a repo-relative path (file or directory) exists in this checkout. */
   exists: (repoRelativePath: string) => boolean;
+  /**
+   * The built-in Custom Interface templates, measured apart from the webs: their raw controls are their own area
+   * and goal, and stay out of the rule counts the PR gate compares.
+   */
+  templates?: TemplateMeasure;
 };
+
+/** Template source files, how many reach EditorUI, and the raw controls found in them. */
+export type TemplateMeasure = { files: number; filesUsingEditorUi: number; rawControls: number };
+
+/** The dashboard area of the template catalog. */
+export const TEMPLATES_AREA = "lse/templates";
 
 export type Goal = { value: number; target: number };
 /** A pull request merged into main by (or since the previous point before) the snapshot's commit. */
@@ -62,6 +73,8 @@ export const TARGETS = {
   ds_render_share_lso: 0.7,
   /** Total violations on main 90 days after the gates went live. */
   total_90d: 1000,
+  /** Raw controls left in the built-in Custom Interface templates. */
+  raw_controls_templates: 0,
 } as const;
 
 /** The dashboard area a web-relative file belongs to. */
@@ -109,6 +122,14 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
   for (const [name, a] of Object.entries(areas)) {
     a.ds_import_share = a.render_files ? round((dsFiles[name] ?? 0) / a.render_files) : null;
   }
+  const templates = input.templates;
+  if (templates) {
+    areas[TEMPLATES_AREA] = {
+      violations: templates.rawControls,
+      render_files: templates.files,
+      ds_import_share: templates.files ? round(templates.filesUsingEditorUi / templates.files) : null,
+    };
+  }
 
   const share = (web: Web) => {
     const files = input.renderFiles.filter((r) => r.web === web);
@@ -132,6 +153,9 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     legacy_icons: { value: rules["legacy-icon"] ?? 0, target: TARGETS.legacy_icons },
     ds_render_share_lse: { value: share("lse"), target: TARGETS.ds_render_share_lse },
     ds_render_share_lso: { value: share("lso"), target: TARGETS.ds_render_share_lso },
+    ...(templates
+      ? { raw_controls_templates: { value: templates.rawControls, target: TARGETS.raw_controls_templates } }
+      : {}),
   };
 
   return {

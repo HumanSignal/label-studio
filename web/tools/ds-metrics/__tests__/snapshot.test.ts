@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { TARGETS, areaOf, buildSnapshot } from "../snapshot";
+import { TARGETS, TEMPLATES_AREA, areaOf, buildSnapshot } from "../snapshot";
 import type { CheckAll, Manifest, RenderFile, SnapshotInput } from "../snapshot";
 
 const manifest: Manifest = {
@@ -160,5 +160,24 @@ describe("buildSnapshot", () => {
 
   test("the snapshot is deterministic for the same input", () => {
     expect(JSON.stringify(buildSnapshot(input))).toBe(JSON.stringify(snap));
+  });
+});
+
+describe("buildSnapshot with the template catalog", () => {
+  const withTemplates = buildSnapshot({ ...input, templates: { files: 4, filesUsingEditorUi: 3, rawControls: 7 } });
+
+  test("the templates are their own area and goal", () => {
+    expect(withTemplates.areas[TEMPLATES_AREA]).toEqual({ violations: 7, render_files: 4, ds_import_share: 0.75 });
+    expect(withTemplates.goals.raw_controls_templates).toEqual({ value: 7, target: TARGETS.raw_controls_templates });
+  });
+
+  test("template raw controls stay out of the rule counts the PR gate compares", () => {
+    expect(withTemplates.rules).toEqual(buildSnapshot(input).rules);
+    expect(withTemplates.totals).toEqual(buildSnapshot(input).totals);
+  });
+
+  test("a checkout without the catalog has no template area or goal", () => {
+    expect(buildSnapshot(input).areas[TEMPLATES_AREA]).toBeUndefined();
+    expect(buildSnapshot(input).goals.raw_controls_templates).toBeUndefined();
   });
 });

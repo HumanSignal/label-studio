@@ -19,11 +19,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import { listScanFiles } from "../ds-check/scan";
+import { listTemplateFiles, scanTemplateSource, usesEditorUi } from "../ds-check/templates";
 import { renderComparison, ruleIncreases } from "./compare";
 import { appendSnapshot, readHistory } from "./history";
 import { mergedPrs } from "./prs";
 import { buildSeries } from "./series";
-import { type CheckAll, type Manifest, type RenderFile, type Snapshot, type Web, buildSnapshot } from "./snapshot";
+import {
+  type CheckAll,
+  type Manifest,
+  type RenderFile,
+  type Snapshot,
+  type TemplateMeasure,
+  type Web,
+  buildSnapshot,
+} from "./snapshot";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
 
@@ -66,6 +75,16 @@ function renderFiles(web: Web): RenderFile[] {
     .map((file) => ({ web, file, importsDs: DS_IMPORT.test(fs.readFileSync(path.join(root, file), "utf-8")) }));
 }
 
+function measureTemplates(): TemplateMeasure {
+  const files = listTemplateFiles(repoRoot);
+  const sources = files.map((file) => [file, fs.readFileSync(path.join(repoRoot, file), "utf-8")] as const);
+  return {
+    files: files.length,
+    filesUsingEditorUi: sources.filter(([, source]) => usesEditorUi(source)).length,
+    rawControls: sources.reduce((sum, [file, source]) => sum + scanTemplateSource(file, source).length, 0),
+  };
+}
+
 const git = (...cmd: string[]) => Bun.spawnSync(["git", ...cmd], { cwd: repoRoot, stdout: "pipe", stderr: "pipe" });
 const gitRunner = (args: string[]) => {
   const r = git(...args);
@@ -98,6 +117,7 @@ function snapshot(): Snapshot {
     webs: { lso: checkAll("lso"), lse: checkAll("lse") },
     renderFiles: [...renderFiles("lso"), ...renderFiles("lse")],
     exists: (p) => fs.existsSync(path.join(repoRoot, p)),
+    templates: measureTemplates(),
   });
 }
 
