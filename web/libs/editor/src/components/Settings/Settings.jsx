@@ -178,22 +178,30 @@ export default observer(({ store }) => {
     }, []);
   }, []);
 
+  const isModalWindow = ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME);
+  // ModalWindow's body is p-0 so the tab bar runs edge to edge; each pane adds the padding the
+  // legacy antd Modal body used to provide.
+  const paneProps = (key) =>
+    isModalWindow ? { className: "px-wide pb-wide", "data-testid": `editor-settings-tab-pane-${key}` } : {};
+
   const settingsTabs = (
     <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
       {Object.entries(Settings).map(([key, { name, component }]) => (
         <Tabs.TabPane tab={name} key={key}>
-          {React.createElement(component, { store })}
+          <div {...paneProps(key)}>{React.createElement(component, { store })}</div>
         </Tabs.TabPane>
       ))}
       {availableSettings.map((Page) => (
         <Tabs.TabPane tab={Page.title} key={Page.tagName}>
-          <Page store={store} />
+          <div {...paneProps(Page.tagName)}>
+            <Page store={store} />
+          </div>
         </Tabs.TabPane>
       ))}
     </Tabs>
   );
 
-  if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
+  if (isModalWindow) {
     return (
       <ModalWindow
         className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}

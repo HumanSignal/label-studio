@@ -88,6 +88,24 @@ describe("InstructionsModal Component", () => {
       expect(screen.getByText("Test Children")).toBeInTheDocument();
     });
 
+    it("pads the content inside the edge-to-edge ModalWindow body (FIT-3492)", () => {
+      // bodyClassName="min-h-0 p-0" strips ModalWindow's default px-wide pb-wide, so the content pads itself.
+      const { unmount } = render(
+        <InstructionsModal title="Test Title" visible={true} onCancel={() => {}}>
+          <span>Test Children</span>
+        </InstructionsModal>,
+      );
+      expect(screen.getByText("Test Children").parentElement?.className).toContain("px-wide");
+      unmount();
+
+      render(
+        <InstructionsModal title="Test Title" visible={true} onCancel={() => {}}>
+          {"<b>Html instructions</b>"}
+        </InstructionsModal>,
+      );
+      expect(screen.getByText("Html instructions").parentElement?.className).toContain("px-wide");
+    });
+
     it("calls onCancel when the close button is activated", () => {
       const onCancel = mock();
       render(

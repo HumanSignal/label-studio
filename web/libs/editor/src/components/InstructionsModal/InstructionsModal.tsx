@@ -22,14 +22,15 @@ export const InstructionsModal = ({
     color: "var(--color-neutral-content)",
   };
 
+  // The ModalWindow body below is p-0, so the content carries the side padding itself (FIT-3492).
   const body =
     typeof children === "string" ? (
       <div
-        className="whitespace-pre-wrap pb-wide text-neutral-content"
+        className="whitespace-pre-wrap px-wide pb-wide text-neutral-content"
         dangerouslySetInnerHTML={{ __html: sanitizeInstructionsHtml(children) }}
       />
     ) : (
-      <div className="whitespace-pre-wrap pb-wide">{children}</div>
+      <div className="whitespace-pre-wrap px-wide pb-wide">{children}</div>
     );
 
   if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
