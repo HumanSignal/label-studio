@@ -943,6 +943,8 @@ IMPORT_STALE_TIMEOUT = float(get_env('IMPORT_STALE_TIMEOUT', 300.0))
 # false fails when status is polled before Redis has registered the just-enqueued job.
 IMPORT_CREATED_NOT_FOUND_GRACE = float(get_env('IMPORT_CREATED_NOT_FOUND_GRACE', 60.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
+# Bounded wait for the project summary row after a task delete; on timeout the decrement goes to a background job.
+PROJECT_SUMMARY_LOCK_TIMEOUT = get_env('PROJECT_SUMMARY_LOCK_TIMEOUT', '500ms')
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
 STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
 

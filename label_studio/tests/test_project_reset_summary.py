@@ -152,7 +152,9 @@ def test_imported_annotations_update_project_summary_without_reset(business_clie
     assert project.summary.created_labels == {'animals': {'Cat': 1}}
 
 
-def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labels(business_client):
+def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labels(
+    business_client, django_capture_on_commit_callbacks
+):
     project = make_project(project_choices(), business_client.user, use_ml_backend=False)
 
     r = business_client.post(
@@ -187,7 +189,9 @@ def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labe
         setattr(s, field, {'garbled': field})
     s.save()
 
-    r = business_client.post(f'/api/dm/actions?id=delete_tasks_annotations&project={project.id}')
+    # the summary decrement runs after commit
+    with django_capture_on_commit_callbacks(execute=True):
+        r = business_client.post(f'/api/dm/actions?id=delete_tasks_annotations&project={project.id}')
     assert r.status_code == 200
 
     s.refresh_from_db()

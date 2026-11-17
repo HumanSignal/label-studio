@@ -1407,7 +1407,13 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
     but call only tasks_number_changed section
     """
     try:
-        instance.project.update_tasks_states(
+        from projects.functions.summary_delta import schedule_tasks_states_after_delete, use_summary_delta
+
+        project = instance.project
+        if use_summary_delta(project.organization_id):
+            schedule_tasks_states_after_delete(project.id, project.organization_id)
+            return
+        project.update_tasks_states(
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True,
@@ -1422,7 +1428,24 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
     """Reduce data column counters after removing task"""
-    instance.decrease_project_summary_counters()
+    from projects.functions.summary_delta import (
+        SummaryDelta,
+        add_annotation_results,
+        add_draft_results,
+        add_task_data,
+        schedule_summary_delta,
+        use_summary_delta,
+    )
+
+    project = instance.project
+    if project is None or not use_summary_delta(project.organization_id):
+        instance.decrease_project_summary_counters()
+        return
+    # the cascade does not call Annotation/AnnotationDraft.delete(), so their counters are dropped here too
+    delta = add_task_data(SummaryDelta(), [instance.data])
+    add_annotation_results(delta, Annotation.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    add_draft_results(delta, AnnotationDraft.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    schedule_summary_delta(project.id, project.organization_id, delta)
 
 
 def _task_data_is_not_updated(update_fields):
