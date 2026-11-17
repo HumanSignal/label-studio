@@ -382,4 +382,13 @@ function sanitizeInstructionsHtml(html = []) {
   });
 }
 
-export { DEFAULT_ALLOWED_IFRAME_DOMAINS, sanitizeHtml, sanitizeInstructionsHtml };
+/**
+ * Whether an iframe src is an https URL on an allowed iframe domain (`APP_SETTINGS.allowed_iframe_domains`)
+ * @param {string} src
+ * @returns {boolean}
+ */
+function isAllowedIframeDomainSrc(src) {
+  return isAllowedIframeSrc(src, getAllowedIframeDomains());
+}
+
+export { DEFAULT_ALLOWED_IFRAME_DOMAINS, isAllowedIframeDomainSrc, sanitizeHtml, sanitizeInstructionsHtml };
