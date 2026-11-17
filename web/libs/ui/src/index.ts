@@ -56,6 +56,7 @@ export * from "./lib/taxonomy-selection-list";
 export * from "./lib/skeleton/skeleton";
 export * from "./lib/state-chip/state-chip";
 export * from "./lib/stepper";
+export * from "./lib/timeline";
 export * from "./lib/tabs";
 export * from "./lib/toast/toast";
 export * from "./lib/toggle/toggle";
