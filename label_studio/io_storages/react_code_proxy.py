@@ -17,6 +17,7 @@ from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from users.functions import can_read_avatar
 
 from label_studio.io_storages.proxy_api import ResolveStorageUriAPIMixin
 
@@ -196,8 +197,8 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
     def _serve_avatar(self, request, url_path: str, requester) -> HttpResponse:
         """Serve a user avatar for sandboxed iframes (FIT-2832).
 
-        Mirrors DownloadStorageData's avatar branch: the requester must share an
-        organization with the avatar owner. Avatars are not project-scoped.
+        Same rule as DownloadStorageData's avatar branch (`can_read_avatar`).
+        Avatars are not project-scoped.
         """
         parts = url_path.lstrip('/').split('/')
         # /data/avatars/<filename...>
@@ -220,8 +221,7 @@ class ReactCodeResolveView(ResolveStorageUriAPIMixin, APIView):
             logger.error(f'Error looking up avatar owner for {url_path}: {exc}')
             return _add_cors_headers(HttpResponse(status=500))
 
-        org = getattr(requester, 'active_organization', None)
-        if owner is None or org is None or not org.has_user(owner):
+        if owner is None or not can_read_avatar(requester, owner):
             return _add_cors_headers(HttpResponse(status=403))
 
         try:
