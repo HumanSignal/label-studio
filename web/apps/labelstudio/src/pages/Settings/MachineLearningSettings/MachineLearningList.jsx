@@ -1,10 +1,9 @@
 import { formatDistanceToNow, format, parseISO } from "date-fns";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import truncate from "truncate-middle";
 import { Menu } from "../../../components";
-import { Button, Dropdown } from "@humansignal/ui";
-import { confirm } from "../../../components/Modal/Modal";
+import { Button, ConfirmDialog, Dropdown } from "@humansignal/ui";
 import { Oneof } from "../../../components/Oneof/Oneof";
 import { IconEllipsis } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
@@ -45,19 +44,9 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestReq
 };
 
 const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest }) => {
-  const confirmDelete = useCallback(
-    (backend) => {
-      confirm({
-        title: "Delete ML Backend",
-        body: "This action cannot be undone. Are you sure?",
-        buttonLook: "destructive",
-        onOk() {
-          onDelete?.(backend);
-        },
-      });
-    },
-    [backend, onDelete],
-  );
+  // The backend to delete once confirmed; the card's menu closes as soon as Delete is used.
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const confirmDelete = setPendingDelete;
 
   const rootClass = cn("backend-card");
 
@@ -104,6 +93,15 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
           </Tooltip>
         </div>
       </div>
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+        title="Delete ML Backend"
+        buttonLook="destructive"
+        onOk={() => onDelete?.(pendingDelete)}
+      >
+        This action cannot be undone. Are you sure?
+      </ConfirmDialog>
     </div>
   );
 };

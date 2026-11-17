@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import { modal } from "@humansignal/ui";
+import { ModalWindow } from "@humansignal/ui";
 import clsx from "clsx";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
@@ -16,10 +16,6 @@ interface UrlMapping {
 
 interface GroupedHotkeys {
   [subgroup: string]: Hotkey[];
-}
-
-interface ModalReturn {
-  close: () => void | Promise<void>;
 }
 
 interface HotkeyHelpModalProps {
@@ -242,18 +238,27 @@ const determineSectionsToShow = (sectionOrUrl?: string | string[]): string[] => 
   return sectionsToShow;
 };
 
-export const openHotkeyHelp = (sectionOrUrl?: string | string[]): ModalReturn => {
-  const sectionsToShow = determineSectionsToShow(sectionOrUrl);
-
-  const modalInstance = modal({
-    title: "Keyboard Shortcuts",
-    body: <HotkeyHelpModal sectionsToShow={sectionsToShow} />,
-    size: "large",
-    bodyClassName: "!p-0",
-    allowClose: true,
-  });
-
-  return {
-    close: () => modalInstance.close(),
-  };
-};
+/**
+ * The keyboard shortcuts reference. `sections` is a section id, a list of ids, or a URL to match;
+ * without it the dialog shows the sections for the current page.
+ */
+export const HotkeyHelpDialog = ({
+  open,
+  onOpenChange,
+  sections,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  sections?: string | string[];
+}) => (
+  <ModalWindow
+    open={open}
+    onOpenChange={onOpenChange}
+    title="Keyboard Shortcuts"
+    size="large"
+    bodyClassName="!p-0"
+    dataTestId="hotkey-help-modal"
+  >
+    {open && <HotkeyHelpModal sectionsToShow={determineSectionsToShow(sections)} />}
+  </ModalWindow>
+);

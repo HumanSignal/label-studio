@@ -21,8 +21,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { TaskSummaryControlPanel } from "../agreement-dashboard/task-summary-control-panel";
-import { openAutoReviewDialog } from "../agreement-dashboard/auto-review-dialog";
-import * as modal from "@humansignal/ui";
+import { autoReviewConfirmation } from "../agreement-dashboard/auto-review-dialog";
 import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth, GroundTruthCell } from "../agreement-dashboard/types";
 import type { MSTAnnotation } from "../../../stores/types";
 
@@ -97,22 +96,18 @@ const existingGt: ExistingGroundTruth = {
 const annotations: MSTAnnotation[] = [buildAnnotation(101, 1), buildAnnotation(102, 2), buildAnnotation(103, 3)];
 
 // ---------------------------------------------------------------------------
-// Dialog helper — spy on confirm() and capture the call
+// Dialog helper — build the confirmation and keep it for assertions
 // ---------------------------------------------------------------------------
 
-let lastConfirmCall: { title?: string; body?: React.ReactNode; okText?: string } | null = null;
+let lastConfirmCall: { title?: React.ReactNode; children?: React.ReactNode; okText?: string } | null = null;
 
 beforeEach(() => {
   lastConfirmCall = null;
-  spyOn(modal, "confirm").mockImplementation((args: any) => {
-    lastConfirmCall = args;
-    return { update: () => {}, close: () => {}, visible: false };
-  });
 });
 
-/** Call openAutoReviewDialog with default test fixtures + optional overrides. */
+/** Build the auto-review confirmation with default test fixtures + optional overrides. */
 const callDialog = (overrides?: Record<string, unknown>) => {
-  openAutoReviewDialog({
+  lastConfirmCall = autoReviewConfirmation({
     taskId: 1,
     existingGt,
     annotations,
@@ -127,7 +122,7 @@ const callDialog = (overrides?: Record<string, unknown>) => {
 /** Render the captured dialog body and return the container. */
 const renderDialogBody = () => {
   expect(lastConfirmCall).not.toBeNull();
-  return render(<>{lastConfirmCall!.body}</>);
+  return render(<>{lastConfirmCall!.children}</>);
 };
 
 // ===========================================================================

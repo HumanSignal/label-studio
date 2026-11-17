@@ -1,11 +1,10 @@
 import { IconCross, IconPlus } from "@humansignal/icons";
-import { Button, Typography } from "@humansignal/ui";
+import { Button, ConfirmDialog, Typography } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { Form, Input, Label, Toggle } from "../../components/Form";
 import { useAPI } from "../../providers/ApiProvider";
 import { cn } from "../../utils/bem";
 import { useProject } from "../../providers/ProjectProvider";
-import { WebhookDeleteModal } from "./WebhookDeleteModal";
 
 const WebhookForm = ({
   webhook,
@@ -29,6 +28,15 @@ const WebhookForm = ({
   api,
   rootClass,
 }) => {
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const onDelete = async () => {
+    await api.callApi("deleteWebhook", {
+      params: { pk: webhook.id },
+    });
+    onBack();
+    await fetchWebhooks();
+  };
+
   return (
     <Form
       action={webhook === null ? "createWebhook" : "updateWebhook"}
@@ -176,17 +184,7 @@ const WebhookForm = ({
             variant="negative"
             look="outlined"
             aria-label="Delete webhook"
-            onClick={() =>
-              WebhookDeleteModal({
-                onDelete: async () => {
-                  await api.callApi("deleteWebhook", {
-                    params: { pk: webhook.id },
-                  });
-                  onBack();
-                  await fetchWebhooks();
-                },
-              })
-            }
+            onClick={() => setConfirmDeleteOpen(true)}
           >
             Delete Webhook
           </Button>
@@ -211,6 +209,17 @@ const WebhookForm = ({
           {webhook === null ? "Add Webhook" : "Save Changes"}
         </Button>
       </div>
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete"
+        okText="Delete Webhook"
+        buttonLook="negative"
+        onOk={onDelete}
+        dataTestId="webhook-delete-modal"
+      >
+        Are you sure you want to delete the webhook? This action cannot be undone.
+      </ConfirmDialog>
     </Form>
   );
 };
