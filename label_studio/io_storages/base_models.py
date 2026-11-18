@@ -39,6 +39,7 @@ from tasks.serializers import (
     FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY,
     AnnotationSerializer,
     PredictionSerializer,
+    get_task_import_id,
     resolve_completed_by_id,
 )
 from webhooks.models import WebhookAction
@@ -519,7 +520,11 @@ class ImportStorage(Storage):
         if storage_task_data_validator:
             storage_task_data_validator(project, data)
 
+        # Only a task-format object ({"id": ..., "data": {...}}) has a task id; in a data-only object
+        # an "id" key is a data field and stays in task.data.
+        import_id = None
         if 'data' in data and isinstance(data['data'], dict):
+            import_id = get_task_import_id(data)
             if data['data'] is not None:
                 data = data['data']
             else:
@@ -535,6 +540,7 @@ class ImportStorage(Storage):
             cancelled_annotations=cancelled_annotations,
             inner_id=max_inner_id,
             allow_skip=allow_skip,
+            import_id=import_id,
         )
         return task, link_kwargs, annotations, predictions
 

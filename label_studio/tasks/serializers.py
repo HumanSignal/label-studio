@@ -454,6 +454,22 @@ class BaseTaskSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
 
 FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY = 'fflag_fix_back_bros_1092_import_unknown_completed_by_short'
 
+# Task.import_id is a BigIntegerField (Postgres bigint)
+_BIGINT_MIN, _BIGINT_MAX = -(2**63), 2**63 - 1
+
+
+def get_task_import_id(task: dict) -> int | None:
+    """Source task id to keep as ``Task.import_id``: the root ``id`` of an imported task.
+
+    Only a real integer that fits the column is kept. Imported JSON is often not ours: ``id`` can be a
+    string, a UUID, a float or a 64-bit unsigned number from another tool. Label Studio always ignored
+    a task ``id`` on import, so anything unusable is ignored again instead of failing the import.
+    """
+    value = task.get('id')
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value if _BIGINT_MIN <= value <= _BIGINT_MAX else None
+
 
 def resolve_completed_by_id(
     completed_by_value,
@@ -992,6 +1008,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
                 allow_skip=task.get('allow_skip', True),
+                import_id=get_task_import_id(task),
             )
             db_tasks.append(t)
 

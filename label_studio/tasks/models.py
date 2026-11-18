@@ -138,6 +138,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
         null=True,
         help_text='Internal task ID in the project, starts with 1',
     )
+    # Provenance, like Annotation.import_id: one hop back, never reused as this task's own id.
+    # No index on purpose: nothing filters by it, and `task` is too large for a synchronous index.
+    import_id = models.BigIntegerField(
+        _('import id'),
+        null=True,
+        blank=True,
+        help_text='Original task ID that was at the import step (the "id" of the task in the imported data, '
+        'or the source task when tasks are copied between projects), or NULL if there was none. '
+        'It points one step back, so for a copy of a copy it is the ID of the intermediate copy, not of the first task',
+    )
     updates = ['is_labeled']
     total_annotations = models.IntegerField(
         _('total_annotations'),

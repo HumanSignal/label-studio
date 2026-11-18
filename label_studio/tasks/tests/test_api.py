@@ -17,7 +17,7 @@ class TestTaskAPI(APITestCase):
         cls.user = cls.organization.created_by
 
     def test_get_task(self):
-        task = TaskFactory(project=self.project, data={'text': 'test'})
+        task = TaskFactory(project=self.project, data={'text': 'test'}, import_id=4242)
 
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{task.id}/')
@@ -50,6 +50,7 @@ class TestTaskAPI(APITestCase):
             'avg_lead_time': None,
             'cancelled_annotations': 0,
             'inner_id': task.inner_id,
+            'import_id': 4242,
             'storage_filename': None,
             'comment_authors': [],
             'comment_count': 0,
@@ -93,6 +94,7 @@ class TestTaskAPI(APITestCase):
             'total_predictions': 0,
             'cancelled_annotations': 0,
             'inner_id': task.inner_id,
+            'import_id': None,
             'comment_authors': [],
             'comment_count': 0,
             'last_comment_updated_at': None,

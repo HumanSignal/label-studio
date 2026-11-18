@@ -172,6 +172,9 @@ def reformat_predictions(tasks, preannotated_from_fields, project=None, raise_er
 
         # Create new task structure
         new_task = {'data': task_data, 'predictions': predictions}
+        # keep the source task id of a task-format item for Task.import_id
+        if isinstance(task, dict) and 'data' in task and 'id' in task:
+            new_task['id'] = task['id']
         new_tasks.append(new_task)
 
     # If there are validation errors, raise them
