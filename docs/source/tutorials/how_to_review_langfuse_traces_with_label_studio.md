@@ -568,6 +568,6 @@ Langfuse excels at typed observation storage and project-scoped API access durin
 
 - [Langfuse](https://langfuse.com/docs)
 - [Label Studio](https://docs.humansignal.com/guide/)
-- [Label Studio ReactCode Templates](https://docs.humansignal.com/guide/react_code)
+- [Label Studio ReactCode Templates](https://docs.humansignal.com/tags/reactcode)
 - [Label Studio SDK](https://labelstud.io/sdk/)
 - [Companion tutorials: Braintrust](how_to_review_braintrust_traces_with_label_studio.html) | [LangSmith](how_to_review_langsmith_traces_with_label_studio.html)

@@ -596,6 +596,6 @@ Braintrust excels at trace storage and BTQL-powered querying during development.
 
 - [Braintrust](https://www.braintrustdata.com/docs)
 - [Label Studio](https://docs.humansignal.com/guide/)
-- [Label Studio ReactCode Templates](https://docs.humansignal.com/guide/react_code)
+- [Label Studio ReactCode Templates](https://docs.humansignal.com/tags/reactcode)
 - [Label Studio SDK](https://labelstud.io/sdk/)
 - [Companion tutorials: LangSmith](how_to_review_langsmith_traces_with_label_studio.html) | [Langfuse](how_to_review_langfuse_traces_with_label_studio.html)
