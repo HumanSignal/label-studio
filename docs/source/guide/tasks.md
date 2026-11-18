@@ -357,7 +357,7 @@ If you're using [Source cloud storage](storage.html), you can also place multipl
 {% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}
 This example contains multiple text classification tasks with no annotations or predictions.
 
-The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required.
+The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required. If you include an integer "id", Label Studio does not use it as the ID of the new task; it stores it in the task's `import_id` field, so you can trace a task back to the task it was exported from. `import_id` points one step back: if a task is copied more than once, it holds the ID of the previous copy, not of the first task.
 
 {% codeblock lang:json %}
 [

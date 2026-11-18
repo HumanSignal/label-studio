@@ -166,6 +166,30 @@ If you have duplicate tasks, or want to remove annotations, you can delete tasks
 
 If you want to make changes to the labeling interface or perform a different type of data labeling, first select all the annotations for your dataset and delete the annotations.
 
+## Add or update data columns
+
+To add a field to the data of your tasks, or to change an existing field, select tasks in the Data Manager and choose **Add or Update Columns**. The action writes the same value into every selected task. When it adds a new column, the tasks that you did not select get the column with an empty (`null`) value.
+
+To give each task its own value instead, for example a customer's feedback on each delivered task, use the [Set a data column on tasks](https://api.labelstud.io/api-reference/api-reference/tasks/set-data-column) API. It requires the same permission as the action.
+
+```bash
+curl -X POST "https://your-label-studio-host/api/projects/42/tasks/data-column/" \
+  -H "Authorization: Token $LABEL_STUDIO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"column_name": "customer_feedback", "values": {"101": "Box 3 is missing", "102": "OK"}}'
+```
+
+The response lists the tasks that were updated and the IDs that are not tasks of this project:
+
+```json
+{"updated_task_ids": [101, 102], "not_found_task_ids": []}
+```
+
+- Only the listed tasks change, and only the column that you name. Other fields and other tasks stay as they are, and a new column is not added to the other tasks.
+- Send up to 1,000 tasks per request. A text value can be up to 65,536 characters. Set `"value_type": "Number"` to store numbers instead of text.
+- If any value is invalid, the request fails and nothing is written.
+- A new column name cannot contain spaces, quotation marks, brackets, semicolons, hashes, control characters, or SQL comments.
+
 <div class="enterprise-only">
 
 ## Agreement columns
