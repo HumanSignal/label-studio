@@ -109,10 +109,12 @@ def allowlist_svg(dirty_xml):
 
 def str_to_json(data):
     try:
-        json_acceptable_string = data.replace("'", '"')
-        return json.loads(json_acceptable_string)
+        return json.loads(data)
     except ValueError:
-        return None
+        try:
+            return json.loads(data.replace("'", '"'))
+        except ValueError:
+            return None
 
 
 def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
