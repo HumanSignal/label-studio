@@ -1,11 +1,11 @@
 import { observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
-import { createRef, forwardRef, PureComponent, useEffect, useRef } from "react";
+import { createRef, forwardRef, PureComponent, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
-import { isDefined } from "../../utils/utilities";
+import { isDefined, wrapArray } from "../../utils/utilities";
 import NodesConnector from "./NodesConnector";
 
 import styles from "./RelationsOverlay.module.css";
@@ -103,15 +103,33 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
   const hideConnection = nodesHidden || !visible;
   const [, forceUpdate] = useState();
 
-  const relation = NodesConnector.connect({ id, startNode, endNode, direction, labels }, root);
-  const { start, end } = NodesConnector.getNodesBBox({ root, ...relation });
-  const [path, textPosition] = NodesConnector.calculatePath(start, end);
+  // A connection owns a watcher per endpoint - a MutationObserver, or a set of
+  // MobX observers on the region and on its parent tag. Building it in the
+  // render body leaks a fresh set of those on every single render, so it is
+  // memoized on the identity of the two nodes. `direction` and `labels` are
+  // deliberately left out: they only change what we draw, not what we observe.
+  const connection = useMemo(
+    () => (root ? NodesConnector.connect({ id, startNode, endNode }, root) : null),
+    [id, startNode, endNode, root],
+  );
 
   useEffect(() => {
-    relation.onChange(() => forceUpdate({}));
-    return () => relation.destroy();
-  }, []);
+    if (!connection) return;
+
+    connection.onChange(() => forceUpdate({}));
+    return () => connection.destroy();
+  }, [connection]);
+
+  if (!connection) return null;
+
+  // Geometry stays in the render body on purpose: it reads live DOM and canvas
+  // state, and that is what makes the `shouldUpdate` scroll/resize signal work.
+  const { start, end } = NodesConnector.getNodesBBox({ root, ...connection });
+  const [path, textPosition] = NodesConnector.calculatePath(start, end);
+
   if (start.width < 1 || start.height < 1 || end.width < 1 || end.height < 1) return null;
+
+  const label = wrapArray(labels ?? []).join(", ");
 
   const itemStyles = [styles.relationItem];
   if (highlight) {
@@ -122,17 +140,16 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
     <g id={id} className={itemStyles.join(" ")} visibility={hideConnection ? "hidden" : "visible"}>
       <RelationItemRect {...start} />
       <RelationItemRect {...end} />
-      <RelationConnector
-        id={relation.id}
-        command={path}
-        color={relation.color}
-        direction={relation.direction}
-        highlight={highlight}
-      />
-      {relation.label && <RelationLabel label={relation.label} position={textPosition} />}
+      <RelationConnector id={id} command={path} color={connection.color} direction={direction} highlight={highlight} />
+      {label && <RelationLabel label={label} position={textPosition} />}
     </g>
   );
 };
+
+const regionElement = (node) => (node?.getRegionElement ? node.getRegionElement() : node);
+
+const nodesAreMounted = (startNode, endNode) =>
+  isDefined(regionElement(startNode)) && isDefined(regionElement(endNode));
 
 /**
  * @param {{
@@ -141,22 +158,21 @@ const RelationItem = ({ id, startNode, endNode, direction, rootRef, highlight, d
  * }}
  */
 const RelationItemObserver = observer(({ relation, startNode, endNode, visible, ...rest }) => {
-  const nodes = [
-    startNode.getRegionElement ? startNode.getRegionElement() : startNode,
-    endNode.getRegionElement ? endNode.getRegionElement() : endNode,
-  ];
-
-  const [render, setRender] = useState(nodes[0] && nodes[1]);
+  const [render, setRender] = useState(() => nodesAreMounted(startNode, endNode));
 
   useEffect(() => {
     let timer;
 
+    // Some regions hand out their element through a React ref or a DOM query
+    // (classifications, TextArea), which MobX cannot observe, so we poll until
+    // it shows up. The nodes have to be re-read inside the tick: a list
+    // captured at render time can never see the element appear.
     const watchRegionAppear = () => {
-      const nodesExist = isDefined(nodes[0]) && isDefined(nodes[1]);
+      const nodesExist = nodesAreMounted(startNode, endNode);
 
       if (render !== nodesExist) {
         setRender(nodesExist);
-      } else if (render === false) {
+      } else if (!nodesExist) {
         timer = setTimeout(watchRegionAppear, 30);
       }
     };
@@ -164,7 +180,7 @@ const RelationItemObserver = observer(({ relation, startNode, endNode, visible, 
     timer = setTimeout(watchRegionAppear, 30);
 
     return () => clearTimeout(timer);
-  }, [nodes, render]);
+  }, [startNode, endNode, render]);
 
   const visibility = visible && relation.visible;
 
@@ -187,10 +203,21 @@ class RelationsOverlay extends PureComponent {
   timer = null;
   state = {
     shouldRender: false,
-    shouldRenderConnections: Math.random(),
+    shouldRenderConnections: 0,
   };
 
+  // Children read `rootNode.current` during render, so they stay gated until the
+  // ref is attached. The overlay used to get that second pass for free, from
+  // being remounted on every App render; now it asks for it explicitly.
+  componentDidMount() {
+    this.flushShouldRender();
+  }
+
   componentDidUpdate() {
+    this.flushShouldRender();
+  }
+
+  flushShouldRender() {
     if (this.rootNode.current && !this.state.shouldRender) {
       this.setState({ shouldRender: true });
     }
@@ -257,14 +284,14 @@ class RelationsOverlay extends PureComponent {
   }
 
   onResize = () => {
-    this.setState({ shouldRenderConnections: Math.random() });
+    this.setState(({ shouldRenderConnections }) => ({ shouldRenderConnections: shouldRenderConnections + 1 }));
   };
 }
 
 const RelationObserverView = observer(RelationsOverlay);
 
 const RelationsOverlayObserver = observer(
-  forwardRef(({ store, tags }, ref) => {
+  forwardRef(({ store }, ref) => {
     const { relations, showConnections, highlighted } = store;
 
     return (
@@ -273,7 +300,6 @@ const RelationsOverlayObserver = observer(
         relations={Array.from(relations)}
         visible={showConnections}
         highlighted={highlighted}
-        tags={Array.from(tags?.values?.() ?? [])}
       />
     );
   }),
@@ -324,4 +350,4 @@ const EnsureTagsReady = observer(
   }),
 );
 
-export { EnsureTagsReady as RelationsOverlay };
+export { EnsureTagsReady as RelationsOverlay, RelationObserverView as RelationsOverlayView };
