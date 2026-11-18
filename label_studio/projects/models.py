@@ -509,7 +509,12 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         """
         # Async RQ jobs pickle the Project instance; refresh so concurrent settings
         # changes (e.g. during duplication) are not overwritten with stale values.
-        self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        try:
+            self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        except type(self).DoesNotExist:
+            # The project was deleted after this job was enqueued; there is nothing left to update.
+            logger.info(f'Skipping _update_tasks_states: project {self.pk} no longer exists')
+            return
         logger.info(
             f'Starting _update_tasks_states with params: Project {str(self)} maximum_annotations '
             f'{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}'

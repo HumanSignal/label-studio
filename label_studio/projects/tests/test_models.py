@@ -39,6 +39,23 @@ class TestUpdateTasksStatesStaleProjectInstance(TestCase):
         assert project.maximum_annotations == 2
         assert set(Task.objects.filter(project=project).values_list('overlap', flat=True)) == {2}
 
+    def test_update_tasks_states_returns_quietly_when_project_was_deleted(self):
+        project = ProjectFactory(maximum_annotations=3, overlap_cohort_percentage=100)
+        # In-memory instance, as unpickled by an RQ job that runs after the project was deleted.
+        stale_project = Project.objects.get(pk=project.pk)
+        project.delete()
+
+        with self.assertLogs('projects.models', level='INFO') as logs:
+            result = stale_project._update_tasks_states(
+                maximum_annotations_changed=True,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True,
+            )
+
+        assert result is None
+        assert any('no longer exists' in message for message in logs.output)
+        assert not Project.objects.filter(pk=project.pk).exists()
+
     def test_rearrange_overlap_cohort_uses_db_maximum_annotations(self):
         project = ProjectFactory(
             maximum_annotations=3,
