@@ -172,14 +172,16 @@ class FileUpload(models.Model):
 
         try:
             with self.file.open('rb') as file_handle:
-                # Peek a small prefix to detect top-level container ('[' array or '{' object)
-                sniff = file_handle.read(4096) or b''
-                # Find first non-whitespace byte
+                # Detect the container after any amount of leading JSON whitespace.
                 first_byte = None
-                for b in sniff:
-                    if b not in (0x20, 0x09, 0x0A, 0x0D):  # space, tab, lf, cr
-                        first_byte = b
+                while first_byte is None:
+                    sniff = file_handle.read(4096)
+                    if not sniff:
                         break
+                    for b in sniff:
+                        if b not in (0x20, 0x09, 0x0A, 0x0D):  # space, tab, lf, cr
+                            first_byte = b
+                            break
 
                 # Rewind after sniffing
                 file_handle.seek(0)
