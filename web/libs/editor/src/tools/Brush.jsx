@@ -134,7 +134,7 @@ const _Tool = types
       },
 
       addPoint(x, y) {
-        brush.addPoint(Math.floor(x), Math.floor(y));
+        brush.addPoint(x, y);
       },
 
       mouseupEv(_ev, _, [x, y]) {
@@ -234,7 +234,10 @@ const BrushCursorMixin = types
     get cursorStyleRule() {
       const scaleX = self.obj?.scaleX || 1;
       const stageScale = self.obj?.stageScale || 1;
-      const val = self.strokeWidth * scaleX * stageScale;
+      const fileWidth = self.obj?.naturalWidth;
+      const stageWidth = self.obj?.stageWidth;
+      const toFilePixel = fileWidth > 1 && stageWidth ? stageWidth / fileWidth : 1;
+      const val = self.strokeWidth * toFilePixel * scaleX * stageScale;
       return Canvas.createBrushSizeCircleCursor(val);
     },
   }))
