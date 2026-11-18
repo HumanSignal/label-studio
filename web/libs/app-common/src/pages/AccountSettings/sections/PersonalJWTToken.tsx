@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
-import { withStepUp } from "../../../components/step-up/with-step-up";
+import { useStepUp, type WithStepUp } from "../../../components/step-up/step-up-provider";
 import { ConfirmDialog, type ConfirmDialogContent, Button, Message, ModalWindow } from "@humansignal/ui";
 
 /**
@@ -42,7 +42,7 @@ const refreshTokenAtom = atomWithMutation((get) => {
   const queryClient = get(queryClientAtom);
   return {
     mutationKey: ["refresh-token"],
-    async mutationFn() {
+    async mutationFn(withStepUp: WithStepUp) {
       const api = getApiInstance();
       const token = await withStepUp("Create an access token", () => api.invoke("accessTokenGetRefreshToken"));
       if (!token.$meta.ok) {
@@ -200,10 +200,11 @@ export function PersonalJWTToken() {
 
 function CreateTokenForm() {
   const { data, mutate: createToken } = useAtomValue(refreshTokenAtom);
+  const withStepUp = useStepUp();
   const [copy, copied] = useCopyText({ defaultText: data ?? "" });
 
   useEffect(() => {
-    createToken();
+    createToken(withStepUp);
   }, []);
 
   return (

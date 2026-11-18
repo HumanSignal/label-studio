@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useEffect, forwardRef } from "react";
+import { type PropsWithChildren, useCallback, useEffect, forwardRef, useState } from "react";
 import {
   ApiProvider as CoreApiProvider,
   createApiInstance,
@@ -6,8 +6,8 @@ import {
   type FormattedError,
 } from "@humansignal/core";
 import type { ApiResponse } from "@humansignal/core/lib/api-proxy/types";
-import { ErrorWrapper } from "../components/Error/Error";
-import { modal } from "../components/Modal/Modal";
+import { StepUpProvider } from "@humansignal/app-common/components/step-up/step-up-provider";
+import { ErrorDialog, type ErrorDialogContent } from "../components/Error/ErrorDialog";
 import { API_CONFIG } from "../config/ApiConfig";
 import { absoluteURL, isDefined } from "../utils/helpers";
 import { ToastType, useToast } from "@humansignal/ui";
@@ -36,27 +36,19 @@ export type ApiEndpoints = keyof typeof API.methods;
 
 let apiLocked = false;
 
-/**
- * Displays an error modal with the error details.
- */
-const displayErrorModal = (errorDetails: FormattedError) => {
+/** What the error dialog shows for an API error, and whether the user can close it. */
+const apiErrorDialog = (
+  errorDetails: FormattedError | null,
+): { error: ErrorDialogContent | null; closable: boolean } => {
+  if (!errorDetails) return { error: null, closable: true };
   const { isShutdown, title, message, stacktrace, ...formattedError } = errorDetails;
-
-  modal({
-    unique: "network-error",
-    allowClose: !isShutdown,
-    body: isShutdown ? (
-      <ErrorWrapper
-        possum={false}
-        title={"Connection refused"}
-        message={"Server not responding. Is it still running?"}
-      />
-    ) : (
-      <ErrorWrapper {...formattedError} title={title} message={message} />
-    ),
-    simple: true,
-    style: { width: 680 },
-  });
+  if (isShutdown) {
+    return {
+      error: { possum: false, title: "Connection refused", message: "Server not responding. Is it still running?" },
+      closable: false,
+    };
+  }
+  return { error: { ...formattedError, title, message }, closable: true };
 };
 
 /**
@@ -65,6 +57,8 @@ const displayErrorModal = (errorDetails: FormattedError) => {
  */
 export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<string, never>>>(({ children }, ref) => {
   const toast = useToast();
+  const [apiError, setApiError] = useState<FormattedError | null>(null);
+  const errorDialog = apiErrorDialog(apiError);
 
   /**
    * Handles errors with Label Studio-specific logic including:
@@ -99,7 +93,8 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
         });
       } else {
         // Show modal for validation errors or non-4xx
-        displayErrorModal(errorDetails);
+        // One error dialog at a time: the first stays until the user closes it
+        setApiError((current) => current ?? errorDetails);
       }
     },
     [toast],
@@ -149,7 +144,12 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
 
   return (
     <CoreApiProvider ref={ref} onError={handleError} onFatalError={handleFatalError}>
-      {children}
+      <StepUpProvider>{children}</StepUpProvider>
+      <ErrorDialog
+        error={errorDialog.error}
+        onClose={errorDialog.closable ? () => setApiError(null) : undefined}
+        dataTestId="api-error-dialog"
+      />
     </CoreApiProvider>
   );
 });

@@ -2,7 +2,7 @@
  * Step-up authentication challenge (backend: services/lso/label_studio/users/step_up.py).
  *
  * Actions that hand out an API credential or a managing role answer a stale browser session with
- * 403 `step_up_required` and `display_context.step_up`. The UI answers it with `withStepUp` from
+ * 403 `step_up_required` and `display_context.step_up`. The UI answers it with `useStepUp` from
  * `@humansignal/app-common`, which asks the user to confirm their identity and retries the request.
  */
 export type StepUpChallenge = {

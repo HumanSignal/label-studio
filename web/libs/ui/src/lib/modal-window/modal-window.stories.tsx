@@ -608,6 +608,90 @@ export const Notice: Story = {
 };
 
 /**
+ * Only the modal on top is shown. A modal that opens another one stays mounted underneath, hidden, and comes
+ * back with its state when the one on top closes. The whole stack shares one scrim.
+ *
+ * **Try it:** type a title, press Close and cancel the confirmation: the editor returns with your text. Then
+ * press Save: the identity check opens over the editor, and its own "Forgot password?" goes one level deeper.
+ */
+export const Stacked: Story = {
+  render: function Render() {
+    const [editing, setEditing] = useState(false);
+    const [title, setTitle] = useState("");
+    const [discarding, setDiscarding] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [helping, setHelping] = useState(false);
+    const closeEditor = () => {
+      setEditing(false);
+      setTitle("");
+    };
+
+    return (
+      <>
+        <Button onClick={() => setEditing(true)}>Edit section</Button>
+        <ModalWindow
+          open={editing}
+          onOpenChange={(open) => {
+            if (open) return;
+            if (title) setDiscarding(true);
+            else closeEditor();
+          }}
+          title="Edit section"
+          description="Change the title, then try to close without saving."
+          footer={
+            <div className="flex justify-end gap-tight">
+              <Button look="outlined" variant="neutral" onClick={() => (title ? setDiscarding(true) : closeEditor())}>
+                Close
+              </Button>
+              <Button onClick={() => setVerifying(true)}>Save</Button>
+            </div>
+          }
+        >
+          <label className="flex flex-col gap-tight">
+            <Typography variant="label" size="small">
+              Section title
+            </Typography>
+            <input
+              className="rounded-smaller border border-neutral-border bg-neutral-background px-base py-tight"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Skills and expertise"
+            />
+          </label>
+          <ConfirmDialog
+            open={discarding}
+            onOpenChange={setDiscarding}
+            title="Discard changes?"
+            okText="Discard"
+            buttonLook="negative"
+            onOk={closeEditor}
+          >
+            Your edits to this section have not been saved and will be lost.
+          </ConfirmDialog>
+          <ConfirmDialog
+            open={verifying}
+            onOpenChange={setVerifying}
+            title="Confirm it's you"
+            okText="Confirm"
+            onOk={closeEditor}
+          >
+            <div className="flex flex-col items-start gap-tight">
+              <span>Saving this section needs your password.</span>
+              <Button look="string" onClick={() => setHelping(true)}>
+                Forgot password?
+              </Button>
+            </div>
+            <InfoDialog open={helping} onOpenChange={setHelping} title="Reset your password" okText="Got it">
+              Ask an organization owner to send you a reset link.
+            </InfoDialog>
+          </ConfirmDialog>
+        </ModalWindow>
+      </>
+    );
+  },
+};
+
+/**
  * Deprecated: `confirm()` and `info()` open the same dialogs imperatively, in a React root of their own, so
  * app context does not reach them. Use `ConfirmDialog` and `InfoDialog`; these functions are being removed.
  */

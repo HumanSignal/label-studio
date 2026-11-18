@@ -552,7 +552,8 @@
         "destructive confirmations use a negative Button and, for high impact, typed validation",
         "one-line confirmations and notices use ConfirmDialog / InfoDialog, rendered by the owning component, never a hand-built Dialog",
         "render every dialog as JSX in the component that owns it; never open one with confirm(), info() or modal()",
-        "status text next to the actions goes in footerMeta, left of the buttons"
+        "status text next to the actions goes in footerMeta, left of the buttons",
+        "a modal that opens another is hidden while the second is open and returns with its state; never close and reopen it by hand"
       ],
       "replaces": [
         "services/lso/web/apps/labelstudio/src/components/Modal/Modal.tsx",

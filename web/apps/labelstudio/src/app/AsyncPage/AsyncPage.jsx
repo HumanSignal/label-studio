@@ -1,11 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { ErrorWrapper } from "../../components/Error/Error";
-import { modal } from "../../components/Modal/Modal";
+import { ErrorDialog } from "../../components/Error/ErrorDialog";
 import { ConfigContext } from "../../providers/ConfigProvider";
 import { absoluteURL, removePrefix } from "../../utils/helpers";
 import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from "../../utils/scripts";
-import { UNBLOCK_HISTORY_MESSAGE } from "../App";
+import { UNBLOCK_HISTORY_MESSAGE } from "../constants";
 
 const pageCache = new Map();
 
@@ -15,7 +14,8 @@ const pageFromHTML = (html) => {
   return document;
 };
 
-const loadAsyncPage = async (url) => {
+/** Loads the page's HTML. A failure is reported through `onError` and resolves to nothing. */
+const loadAsyncPage = async (url, onError) => {
   try {
     if (pageCache.has(url)) {
       return pageCache.get(url);
@@ -29,16 +29,10 @@ const loadAsyncPage = async (url) => {
     }
 
     if (!response.ok) {
-      modal({
-        body: () => (
-          <ErrorWrapper
-            title={`Error ${response.status}: ${response.statusText}`}
-            errorId={response.status}
-            stacktrace={`Cannot load url ${url}\n\n${html}`}
-          />
-        ),
-        allowClose: false,
-        style: { width: 680 },
+      onError?.({
+        title: `Error ${response.status}: ${response.statusText}`,
+        errorId: response.status,
+        stacktrace: `Cannot load url ${url}\n\n${html}`,
       });
       return null;
     }
@@ -46,17 +40,10 @@ const loadAsyncPage = async (url) => {
     pageCache.set(url, html);
     return html;
   } catch (_err) {
-    modal({
-      body: () => (
-        <ErrorWrapper
-          possum={false}
-          title={"Connection refused"}
-          message={"Server not responding. Is it still running?"}
-        />
-      ),
-      simple: true,
-      allowClose: false,
-      style: { width: 680 },
+    onError?.({
+      possum: false,
+      title: "Connection refused",
+      message: "Server not responding. Is it still running?",
     });
     return null;
   }
@@ -178,20 +165,20 @@ const locationWithoutHash = () => {
   return href.replace(/#(.*)/g, "");
 };
 
-const fetchPage = async (locationUrl) => {
-  const html = await loadAsyncPage(locationUrl);
+const fetchPage = async (locationUrl, onError) => {
+  const html = await loadAsyncPage(locationUrl, onError);
   return html ? pageFromHTML(html) : null;
 };
 
 let currentLocation = locationWithoutHash();
 
-const useStaticContent = (initialContent, onContentLoad) => {
+const useStaticContent = (initialContent, onContentLoad, onError) => {
   const [staticContent, setStaticContent] = useState(initialContent);
 
   const fetchCallback = useCallback(async (locationUrl) => {
     currentLocation = locationUrl;
     clearScriptsCache();
-    const result = await fetchPage(locationUrl);
+    const result = await fetchPage(locationUrl, onError);
 
     if (result) {
       await swapPageParts(result, onContentLoad);
@@ -216,7 +203,10 @@ export const AsyncPage = ({ children }) => {
   const onLoadCallback = useCallback(() => {
     config.update(window.APP_SETTINGS);
   }, []);
-  const [staticContent, fetchStatic] = useStaticContent(initialContent, onLoadCallback);
+  // These errors cannot be dismissed: the page did not load. The first one stays.
+  const [pageError, setPageError] = useState(null);
+  const onPageError = useCallback((error) => setPageError((current) => current ?? error), []);
+  const [staticContent, fetchStatic] = useStaticContent(initialContent, onLoadCallback, onPageError);
 
   const onLinkClick = useCallback(async (e) => {
     /**@type {HTMLAnchorElement} */
@@ -267,5 +257,10 @@ export const AsyncPage = ({ children }) => {
     };
   }, []);
 
-  return <AsyncPageContext.Provider value={staticContent}>{children}</AsyncPageContext.Provider>;
+  return (
+    <AsyncPageContext.Provider value={staticContent}>
+      {children}
+      <ErrorDialog error={pageError} dataTestId="page-error-dialog" />
+    </AsyncPageContext.Provider>
+  );
 };

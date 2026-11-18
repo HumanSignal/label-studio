@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { cnm } from "../../utils/utils";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
+import { useModalStack } from "./modal-stack";
 import styles from "./modal-window.module.css";
 
 export type ModalWindowSize = "small" | "medium" | "large" | "larger" | "fullscreen";
@@ -165,6 +166,9 @@ export function ModalWindow({
   onCloseAutoFocus,
 }: ModalWindowProps) {
   const isFullscreen = size === "fullscreen";
+  const stack = useModalStack(Boolean(open), showScrim);
+  // A fullscreen workspace stays behind the dialog on top of it: hiding it would uncover the page.
+  const covered = stack.covered && !isFullscreen;
   const isCentered = !isFullscreen && placement === "center";
 
   const panelClassName = cnm(
@@ -195,13 +199,14 @@ export function ModalWindow({
   const showHeaderChrome = !hideHeader && Boolean(header || title || description || showCloseButton);
 
   /** Radix runs `onPointerDownOutside` before dismiss; blocking scrim close requires preventDefault there (see Radix Dialog docs), not only `onInteractOutside`. */
-  const blockDismissFromOutside = !closeOnScrimClick;
+  // A covered modal is not the one being used: focus and clicks in the dialog on top must not dismiss it.
+  const blockDismissFromOutside = !closeOnScrimClick || stack.covered;
 
   /* modal={false}: portaled overlays (e.g. UI Dropdown) stay interactive; Radix renders no Dialog.Overlay then — use a custom scrim. */
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPrimitive.Portal>
-        {showScrim ? (
+        {stack.ownsScrim ? (
           <div
             role="presentation"
             aria-hidden
@@ -217,14 +222,15 @@ export function ModalWindow({
         <DialogPrimitive.Content
           aria-describedby={undefined}
           className={panelClassName}
-          style={contentStyle}
+          style={covered ? { ...contentStyle, visibility: "hidden" } : contentStyle}
           data-slot="modal-window-content"
+          data-covered={covered || undefined}
           data-placement={isFullscreen ? undefined : placement}
           data-testid={dataTestId}
           tabIndex={-1}
           onPointerDownOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
           onInteractOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
-          onFocusOutside={closeOnFocusOutside ? undefined : (e) => e.preventDefault()}
+          onFocusOutside={closeOnFocusOutside && !stack.covered ? undefined : (e) => e.preventDefault()}
           onOpenAutoFocus={onOpenAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
           onCloseAutoFocus={onCloseAutoFocus}

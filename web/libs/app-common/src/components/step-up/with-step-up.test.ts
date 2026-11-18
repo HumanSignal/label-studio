@@ -1,5 +1,5 @@
 import type { StepUpChallenge } from "@humansignal/core";
-import { reauthenticateHref, withStepUp } from "./with-step-up";
+import { reauthenticateHref, runWithStepUp as withStepUp } from "./with-step-up";
 
 const CHALLENGE: StepUpChallenge = { method: "password", reauthenticate_url: "/user/reauthenticate/" };
 
@@ -20,7 +20,7 @@ const sequence = <T>(...results: T[]) => {
   return { request, calls: () => calls };
 };
 
-describe("withStepUp", () => {
+describe("runWithStepUp", () => {
   it("returns the result as is when the server does not ask for a step-up", async () => {
     const ok = apiResult(200, { token: "t" });
     const { request, calls } = sequence(ok);
