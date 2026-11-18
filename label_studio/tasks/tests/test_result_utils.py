@@ -10,6 +10,7 @@ yet - that is the initial RED.
 """
 
 # Import fails on baseline (module not yet created). That is the first red.
+import pytest
 from tasks.result_utils import dedupe_annotation_result_list, sanitize_null_bytes
 
 FIT_1669_DUPLICATE_RESULT = [
@@ -126,6 +127,31 @@ def test_sanitize_null_bytes_noop_when_clean():
     """Clean payloads are returned unchanged (and equal)."""
     payload = [{'id': 'r1', 'value': {'choices': ['neg']}}]
     assert sanitize_null_bytes(payload) == payload
+
+
+@pytest.mark.parametrize('text', [r'\u0000', r'\u0000n', r'\u0000t', r'\u0000b', r'\u0000a'])
+def test_sanitize_null_bytes_preserves_literal_escapes(text: str) -> None:
+    """Literal backslash text is clean and must retain its value and identity."""
+    payload = [{'id': 'r1', 'type': 'textarea', 'value': {'text': [text]}}]
+    cleaned = sanitize_null_bytes(payload)
+    assert cleaned[0]['value']['text'] == [text]
+    assert cleaned is payload
+
+
+@pytest.mark.parametrize('backslashes', [0, 1, 2, 3])
+def test_sanitize_null_bytes_removes_nul_after_backslashes(backslashes: int) -> None:
+    """Remove actual NUL characters without consuming neighboring backslashes."""
+    prefix = '\\' * backslashes
+    payload = {'text': 'before' + prefix + '\x00after'}
+    assert sanitize_null_bytes(payload) == {'text': 'before' + prefix + 'after'}
+
+
+def test_sanitize_null_bytes_preserves_escapes_in_mixed_keys_and_values() -> None:
+    """Only actual NULs are removed from mixed literal and escaped content."""
+    literal = r'JSON escape: \u0000n'
+    other = 'quotes: "\n雪'
+    payload = {r'key\u0000n' + '\x00': [literal, 'actual\x00NUL', other]}
+    assert sanitize_null_bytes(payload) == {r'key\u0000n': [literal, 'actualNUL', other]}
 
 
 def test_sanitize_null_bytes_passthrough_for_none_and_non_serializable():
