@@ -244,11 +244,6 @@ export const FF_ASK_AI_ANNOTATOR_MODE = "fflag_utc_1233_admin_sees_worker_toggle
 export const FF_ASK_AI_AGENT = "fflag_utc_1233_ask_ai_agent";
 
 /**
- * Configurable reject actions, including requeueing work to another annotator.
- */
-export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_short";
-
-/**
  * Manual payment batches (UTC-1260): an org admin creates, on a Program's Pay runs tab, a batch of
  * fixed-amount corrections (worker email + amount + note) as a draft, and approves it in a separate,
  * explicit step. Off everywhere until switched on per organization — an absent flag means OFF, so the
