@@ -42,7 +42,9 @@ async function verifyPassword(password: string): Promise<{ ok: true } | { ok: fa
   });
   if (response.ok) return { ok: true };
   const body = await response.json().catch(() => ({}));
-  const error = body?.validation_errors?.current_password?.[0] ?? body?.detail ?? "Could not confirm your password";
+  const fieldError = body?.validation_errors?.current_password;
+  const error =
+    (Array.isArray(fieldError) ? fieldError[0] : fieldError) ?? body?.detail ?? "Could not confirm your password";
   return { ok: false, error };
 }
 

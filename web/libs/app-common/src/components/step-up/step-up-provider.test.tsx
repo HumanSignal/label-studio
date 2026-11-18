@@ -171,33 +171,41 @@ describe("StepUpProvider", () => {
     });
   }
 
-  it("keeps the dialog up with the server's reason on a wrong password, then goes on once it is right", async () => {
-    verifyResponses = [
-      new Response(JSON.stringify({ validation_errors: { current_password: ["Wrong password"] } }), { status: 400 }),
-      new Response("{}", { status: 200 }),
-    ];
-    const request = sequence(challenged(), apiResult(201));
-    render(
-      <StepUpProvider>
-        <Screen action="Create an access token" request={request} />
-      </StepUpProvider>,
-    );
-    fireEvent.click(screen.getByTestId("run"));
-    await screen.findByText("Confirm it's you");
+  for (const [name, status, body, message] of [
+    ["a list", 400, { validation_errors: { current_password: ["Incorrect password"] } }, "Incorrect password"],
+    ["a string", 400, { validation_errors: { current_password: "Incorrect password" } }, "Incorrect password"],
+    [
+      "a lockout detail",
+      429,
+      { detail: "Too many wrong passwords. Try again later. Expected available in 900 seconds." },
+      "Too many wrong passwords. Try again later. Expected available in 900 seconds.",
+    ],
+  ] as const) {
+    it(`keeps the dialog up with the server's whole reason given as ${name}, then goes on once it is right`, async () => {
+      verifyResponses = [new Response(JSON.stringify(body), { status }), new Response("{}", { status: 200 })];
+      const request = sequence(challenged(), apiResult(201));
+      render(
+        <StepUpProvider>
+          <Screen action="Create an access token" request={request} />
+        </StepUpProvider>,
+      );
+      fireEvent.click(screen.getByTestId("run"));
+      await screen.findByText("Confirm it's you");
 
-    typePassword("nope");
-    fireEvent.click(screen.getByTestId("step-up-confirm"));
+      typePassword("nope");
+      fireEvent.click(screen.getByTestId("step-up-confirm"));
 
-    expect(await screen.findByTestId("step-up-error")).toHaveTextContent("Wrong password");
-    expect(request).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("run-outcome")).toHaveTextContent("waiting");
+      expect((await screen.findByTestId("step-up-error")).textContent).toBe(message);
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId("run-outcome")).toHaveTextContent("waiting");
 
-    typePassword("hunter2");
-    fireEvent.click(screen.getByTestId("step-up-confirm"));
+      typePassword("hunter2");
+      fireEvent.click(screen.getByTestId("step-up-confirm"));
 
-    await waitFor(() => expect(screen.getByTestId("run-outcome")).toHaveTextContent("ok"));
-    expect(request).toHaveBeenCalledTimes(2);
-  });
+      await waitFor(() => expect(screen.getByTestId("run-outcome")).toHaveTextContent("ok"));
+      expect(request).toHaveBeenCalledTimes(2);
+    });
+  }
 
   it("does not ask twice when the retried request is challenged again", async () => {
     const request = sequence(challenged(), challenged());
