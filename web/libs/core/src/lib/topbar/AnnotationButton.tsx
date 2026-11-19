@@ -9,7 +9,7 @@
  * wrapper's responsibility — by the time the wrapper renders <AnnotationButton/>
  * the SharedAnnotation it passes is fully populated.
  *
- * Delete confirmation lives in the classic wrapper (uses editor/common/Modal/Modal#confirm)
+ * Delete confirmation lives in the classic wrapper (a ConfirmDialog it renders)
  * — the shared component just calls `handlers.onDelete` and lets the wrapper decide
  * whether to confirm before invoking the real action.
  */

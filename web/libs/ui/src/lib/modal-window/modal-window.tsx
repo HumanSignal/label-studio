@@ -133,9 +133,7 @@ const sizeToMaxWidthClass: Record<Exclude<ModalWindowSize, "fullscreen">, string
  *
  * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
  *
- * **Migration from legacy `modal()` / `Modal`:**
- * - Gate with `ff.isActive(...)` next to each modal, not via a global switch in app `Modal.tsx`.
- * - Content that used `useModalControls()` from the legacy modal must lift state into the parent or use a compat layer — `ModalWindow` does not provide that React context.
+ * Content does not get a modal context: the owner passes it what it needs to close the dialog.
  */
 export function ModalWindow({
   open,

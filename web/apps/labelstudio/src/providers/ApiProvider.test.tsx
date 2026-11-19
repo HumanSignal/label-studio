@@ -3,7 +3,6 @@ import * as sameOriginFetchModule from "@humansignal/core/lib/api-proxy/same-ori
 import { useStepUp } from "@humansignal/app-common/components/step-up/step-up-provider";
 import * as uiModule from "@humansignal/ui";
 import type { ApiContextType } from "@humansignal/core";
-import * as ModalModule from "../components/Modal/Modal";
 import { ApiProvider, useAPI } from "./ApiProvider";
 
 const serverError = (detail: string, status = 500, response: Record<string, unknown> = {}) => {
@@ -16,7 +15,6 @@ describe("ApiProvider", () => {
   let api: ApiContextType;
   let withStepUp: ReturnType<typeof useStepUp>;
   let showToast: ReturnType<typeof mock>;
-  let imperativeModal: ReturnType<typeof spyOn>;
 
   const Probe = () => {
     api = useAPI();
@@ -37,14 +35,6 @@ describe("ApiProvider", () => {
   beforeEach(() => {
     showToast = mock();
     spyOn(uiModule, "useToast").mockReturnValue({ show: showToast } as never);
-    imperativeModal = spyOn(ModalModule, "modal");
-  });
-
-  afterEach(() => {
-    // The error dialog is rendered by the provider: nothing may open one in a React root of its own.
-    const calls = imperativeModal.mock.calls.length;
-    imperativeModal.mockRestore();
-    expect(calls).toBe(0);
   });
 
   it("shows no dialog while nothing has failed", () => {

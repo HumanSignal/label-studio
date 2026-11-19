@@ -1,5 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { Modal } from "../components/Common/Modal/Modal";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { AppStore } from "./AppStore";
 
 describe("AppStore dialogs", () => {
@@ -7,7 +6,6 @@ describe("AppStore dialogs", () => {
   let configured;
   let unsavedComments;
   let setTaskCalls;
-  let imperativeConfirm;
 
   const TestAppStore = AppStore.views(() => ({
     get labelingIsConfigured() {
@@ -29,7 +27,6 @@ describe("AppStore dialogs", () => {
     configured = true;
     unsavedComments = false;
     setTaskCalls = [];
-    imperativeConfirm = spyOn(Modal, "confirm");
     store = TestAppStore.create({ toolbar: "" });
     store._sdk = {
       setMode: mock(() => {}),
@@ -48,13 +45,6 @@ describe("AppStore dialogs", () => {
         },
       },
     };
-  });
-
-  afterEach(() => {
-    // Nothing here may open a dialog in a React root of its own.
-    const calls = imperativeConfirm.mock.calls.length;
-    imperativeConfirm.mockRestore();
-    expect(calls).toBe(0);
   });
 
   it("has no dialog to begin with", () => {

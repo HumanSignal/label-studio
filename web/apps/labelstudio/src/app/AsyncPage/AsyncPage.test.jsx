@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import { Router } from "react-router-dom";
-import * as ModalModule from "../../components/Modal/Modal";
 import { ConfigContext } from "../../providers/ConfigProvider";
 
 // AsyncPage reads the bare `location` while its module loads, which this app's test setup does not define.
@@ -11,7 +10,6 @@ const { AsyncPage } = await import("./AsyncPage");
 describe("AsyncPage load errors", () => {
   let history;
   let fetchSpy;
-  let imperativeModal;
   let page = 0;
 
   const renderPage = () => {
@@ -33,16 +31,8 @@ describe("AsyncPage load errors", () => {
     );
   };
 
-  beforeEach(() => {
-    imperativeModal = spyOn(ModalModule, "modal");
-  });
-
   afterEach(() => {
     fetchSpy?.mockRestore();
-    // The error dialog is rendered by AsyncPage: nothing may open one in a React root of its own.
-    const calls = imperativeModal.mock.calls.length;
-    imperativeModal.mockRestore();
-    expect(calls).toBe(0);
   });
 
   it("shows no dialog until a page fails to load", () => {

@@ -6,7 +6,7 @@
  *   - Lazy stub hydration via `useAnnotationFetcher` + `applyAnnotationHydrationFromApi` (B10).
  *   - User resolution via `useResolveUser` + `enrichUsers` for stub annotations.
  *   - Live MST → SharedAnnotation mapping (snake_case → camelCase, isAlive guard).
- *   - Delete confirmation via `editor/common/Modal/Modal#confirm` (B9).
+ *   - Delete confirmation via a `ConfirmDialog` rendered here (B9).
  *   - Performance Dashboard URL construction (LSE-only, capability-gated, B6/B13).
  *   - LSE review-status read from `task.source` (preserves existing tooltip
  *     accepted/rejected/fixed badges).

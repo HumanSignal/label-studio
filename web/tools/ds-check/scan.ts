@@ -315,6 +315,27 @@ function tailwindPrimitives(file: string, source: string): Finding[] {
   return out;
 }
 
+// A dialog opened from a function instead of rendered by its owner. A bare call needs an object argument, so the
+// browser's confirm("…") and member calls such as logger.info({…}) stay allowed.
+const IMPERATIVE_DIALOG =
+  /(?<![\w$.])(?<!\bfunction\s+)(?:confirm|info|modal)\(\s*\{|(?<![\w$.])standaloneModal\(|(?<![\w$.])Modal\.(?:confirm|info|modal)\(/g;
+
+function imperativeDialogs(file: string, source: string): Finding[] {
+  const out: Finding[] = [];
+  for (const match of source.matchAll(IMPERATIVE_DIALOG)) {
+    const index = match.index ?? 0;
+    if (COMMENT_LINE.test(source.slice(source.lastIndexOf("\n", index) + 1, index + match[0].length))) continue;
+    out.push({
+      file,
+      line: lineAt(source, index),
+      rule: "imperative-dialog",
+      message:
+        "Render ConfirmDialog, InfoDialog or ModalWindow from @humansignal/ui in the component that owns it: a dialog opened from a function runs in a React root of its own.",
+    });
+  }
+  return out;
+}
+
 /** All structural findings for one file. `absPath` is absolute; findings carry the path relative to the web root. */
 export function scanSource(absPath: string, source: string, ctx: ScanContext): Finding[] {
   const file = path.relative(ctx.webRoot, absPath).split(path.sep).join("/");
@@ -324,6 +345,7 @@ export function scanSource(absPath: string, source: string, ctx: ScanContext): F
   return [
     ...colorLiterals(file, source, false),
     ...tailwindPrimitives(file, source),
+    ...imperativeDialogs(file, source),
     ...namedImports(file, source, ctx),
     ...moduleImports(file, source, ctx),
   ];

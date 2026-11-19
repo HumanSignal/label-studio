@@ -128,7 +128,7 @@
     inset 0 -1px rgba(var(--color-neutral-shadow-raw) / 30%);
 }
 
-/* Match legacy .modal-ls stacking (z-index: 2000) so ModalWindow sits above app chrome. */
+/* z-index 2000 keeps ModalWindow above app chrome. */
 .scrim {
   z-index: 2000;
   background-color: rgba(var(--color-neutral-shadow-raw) / 70%);

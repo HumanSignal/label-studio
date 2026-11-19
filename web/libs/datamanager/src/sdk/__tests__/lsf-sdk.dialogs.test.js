@@ -1,18 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { Modal } from "../../components/Common/Modal/Modal";
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { LSFWrapper } from "../lsf-sdk";
 
 describe("LSFWrapper dialogs", () => {
   let wrapper;
   let store;
   let unsavedComments;
-  let imperativeConfirm;
-  let imperativeModal;
 
   beforeEach(() => {
     unsavedComments = false;
-    imperativeConfirm = spyOn(Modal, "confirm");
-    imperativeModal = spyOn(Modal, "modal");
     store = {
       showConfirm: mock(() => {}),
       showNotice: mock(() => {}),
@@ -33,14 +28,6 @@ describe("LSFWrapper dialogs", () => {
     };
     wrapper.withinLoadingState = mock((callback) => callback());
     wrapper.selectTask = mock(() => Promise.resolve());
-  });
-
-  afterEach(() => {
-    // Nothing here may open a dialog in a React root of its own.
-    const calls = imperativeConfirm.mock.calls.length + imperativeModal.mock.calls.length;
-    imperativeConfirm.mockRestore();
-    imperativeModal.mockRestore();
-    expect(calls).toBe(0);
   });
 
   describe("loadTask", () => {

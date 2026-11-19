@@ -144,7 +144,9 @@ describe("ds-check scanner", () => {
   });
 
   test("path imports of @humansignal/ui internals", () => {
-    expect(rules(`import { Modal, confirm } from "@humansignal/ui/lib/modal";`)).toEqual(["internal-import"]);
+    expect(rules(`import { ModalWindow, Dialog } from "@humansignal/ui/lib/modal-window/modal-window";`)).toEqual([
+      "internal-import",
+    ]);
     expect(rules(`import { Card } from "@humansignal/ui/lib/card-new/card";`)).toEqual(["internal-import"]);
     expect(rules(`import type { SelectOption } from "@humansignal/ui/lib/select/types";`)).toEqual(["internal-import"]);
     expect(rules(`import { Button } from "@humansignal/ui";`)).toEqual([]);
@@ -154,8 +156,12 @@ describe("ds-check scanner", () => {
     expect(rules(`import "@humansignal/ui/src/styles.prefix.css";`)).toEqual([]);
     expect(rules(`import Star from "@humansignal/ui/src/assets/icons/star.svg";`)).toEqual([]);
     const inside = path.join(webRoot, "libs/ui/src/lib/dropdown/dropdown.tsx");
-    expect(rules(`import { Modal } from "@humansignal/ui/lib/modal";`, inside)).toEqual([]);
-    const [finding] = scanSource(file, `import { Modal } from "@humansignal/ui/lib/modal";`, ctx);
+    expect(rules(`import { ModalWindow } from "@humansignal/ui/lib/modal-window/modal-window";`, inside)).toEqual([]);
+    const [finding] = scanSource(
+      file,
+      `import { ModalWindow } from "@humansignal/ui/lib/modal-window/modal-window";`,
+      ctx,
+    );
     expect(finding.message).toContain(`"@humansignal/ui"`);
   });
 
@@ -174,6 +180,37 @@ describe("ds-check scanner", () => {
       "Tailwind numeric spacing class gap-2: use a spacing token class (p-tight, gap-base, m-wide…).",
     ]);
     expect(rules("a { @apply p-4 bg-red-500; }", path.join(webRoot, "apps/labelstudio/src/a.css"))).toEqual([]);
+  });
+
+  test("dialogs opened from a function", () => {
+    expect(
+      rules(
+        [
+          'confirm({ title: "Delete?", onOk });',
+          'info({ title: "Saved" });',
+          "modal({",
+          '  title: "Shortcuts",',
+          "});",
+          'Modal.confirm({ title: "Delete?" });',
+          "standaloneModal(props);",
+        ].join("\n"),
+      ),
+    ).toEqual(Array(5).fill("imperative-dialog"));
+    expect(
+      rules(
+        [
+          'window.confirm("Leave this page?");',
+          'confirm("Leave this page?");',
+          "logger.info({ saved: true });",
+          "function info({ title }) {}",
+          "// confirm({ title }) in a comment",
+          "<ConfirmDialog open onConfirm={onOk} />",
+        ].join("\n"),
+      ),
+    ).toEqual([]);
+    const [finding] = scanSource(file, "\nconfirm({ title });", ctx);
+    expect(finding.line).toBe(2);
+    expect(finding.message).toContain("ConfirmDialog");
   });
 
   test("findings carry the line and a message naming the replacement", () => {

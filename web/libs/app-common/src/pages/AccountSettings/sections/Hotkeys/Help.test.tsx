@@ -35,7 +35,6 @@ describe("Hotkey Help customization link", () => {
     window.APP_SETTINGS.lookupHotkey = originalLookupHotkey;
     window.APP_SETTINGS.editor_keymap = originalEditorKeymap;
     document.body.style.overflow = "";
-    document.querySelectorAll(".ls-modal-ls").forEach((el) => el.remove());
     effectiveHotkeys.resetForTests();
   });
 

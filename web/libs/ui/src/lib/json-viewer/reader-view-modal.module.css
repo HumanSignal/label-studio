@@ -218,36 +218,3 @@
     }
   }
 }
-
-:global([data-testid="reader-view-modal"].lsf-modal-ls_fullscreen .lsf-modal-ls__wrapper) {
-  padding: 0;
-  margin: 0;
-}
-
-:global([data-testid="reader-view-modal"].lsf-modal-ls_fullscreen .lsf-modal-ls__content) {
-  background-color: rgba(var(--color-neutral-shadow-raw) / 20%);
-  backdrop-filter: blur(40px);
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 100vh;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-:global([data-testid="reader-view-modal"].lsf-modal-ls_fullscreen .lsf-modal-ls__header) {
-  width: 800px;
-  margin: 0 auto;
-
-  .lsf-modal-ls__title {
-    color: var(--color-neutral-on-dark-content);
-  }
-}
-
-:global([data-testid="reader-view-modal"].lsf-modal-ls_fullscreen .lsf-modal-ls__title) {
-  color: var(--color-neutral-on-dark-content);
-}
-
-:global([data-testid="reader-view-modal"].lsf-modal-ls_fullscreen .lsf-modal-ls__body) {
-  padding-bottom: 0;
-}

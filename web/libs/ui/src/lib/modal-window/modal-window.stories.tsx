@@ -14,7 +14,6 @@ import { EmptyState } from "../empty-state/empty-state";
 import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
-import { confirm, info, modal } from "./confirm";
 import { ConfirmDialog, InfoDialog } from "./confirm-dialog";
 import { ModalWindow } from "./modal-window";
 
@@ -689,70 +688,4 @@ export const Stacked: Story = {
       </>
     );
   },
-};
-
-/**
- * Deprecated: `confirm()` and `info()` open the same dialogs imperatively, in a React root of their own, so
- * app context does not reach them. Use `ConfirmDialog` and `InfoDialog`; these functions are being removed.
- */
-export const ImperativeConfirm: Story = {
-  render: () => (
-    <div className="flex gap-tight">
-      <Button
-        variant="negative"
-        onClick={() =>
-          confirm({
-            title: "Delete 12 tasks?",
-            body: "Their annotations are deleted too. This cannot be undone.",
-            okText: "Delete",
-            buttonLook: "negative",
-            footerMeta: "12 tasks selected",
-          })
-        }
-      >
-        Open confirm()
-      </Button>
-      <Button
-        look="outlined"
-        variant="neutral"
-        onClick={() => info({ title: "Seats added", body: "Your organization now has 25 seats.", okText: "Got it" })}
-      >
-        Open info()
-      </Button>
-    </div>
-  ),
-};
-
-/**
- * Deprecated, like `confirm()`: render `ModalWindow` in the owning component. `modal()` opens one from code; it returns the
- * same handle as `confirm()`: `update()` changes the open dialog and `close()` closes it.
- */
-export const ImperativeModal: Story = {
-  render: () => (
-    <Button
-      onClick={() => {
-        const handle = modal({
-          title: "Keyboard shortcuts",
-          body: <Typography>Press ? anywhere to open this list.</Typography>,
-          size: "small",
-          footer: (
-            <div className="flex justify-end gap-tight">
-              <Button
-                look="outlined"
-                variant="neutral"
-                onClick={() =>
-                  handle.update({ body: <Typography>Shortcuts can be changed in your account settings.</Typography> })
-                }
-              >
-                More
-              </Button>
-              <Button onClick={() => handle.close()}>Done</Button>
-            </div>
-          ),
-        });
-      }}
-    >
-      Open modal()
-    </Button>
-  ),
 };
