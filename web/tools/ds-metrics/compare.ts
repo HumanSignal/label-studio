@@ -9,9 +9,9 @@ export type Comparison = {
   totals: Record<"violations" | "files_with_violations", Delta>;
   rules: Record<string, Delta>;
   clusters: Record<string, Delta & { importers: Delta }>;
-  areas: Record<string, { violations: Delta; ds_import_share: Delta }>;
-  /** `isNew`: the base snapshot predates the goal, so its delta means nothing. */
-  goals: Record<string, Delta & { target: number | null; isNew: boolean }>;
+  areas: Record<string, { violations: Delta }>;
+  /** `isNew` / `isRemoved`: only one side has the goal, so its delta means nothing. */
+  goals: Record<string, Delta & { target: number | null; isNew: boolean; isRemoved: boolean }>;
 };
 
 const delta = (head: number, base: number): Delta => ({ base, head, delta: Math.round((head - base) * 1000) / 1000 });
@@ -46,11 +46,10 @@ export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): C
   }
   const areas: Comparison["areas"] = {};
   for (const k of keys(head.areas, base.areas)) {
-    const h = head.areas[k] ?? { violations: 0, ds_import_share: 0 };
-    const b = base.areas[k] ?? { violations: 0, ds_import_share: 0 };
+    const h = head.areas[k] ?? { violations: 0 };
+    const b = base.areas[k] ?? { violations: 0 };
     areas[k] = {
       violations: delta(h.violations, b.violations),
-      ds_import_share: delta(h.ds_import_share ?? 0, b.ds_import_share ?? 0),
     };
   }
   const goals: Comparison["goals"] = {};
@@ -61,6 +60,7 @@ export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): C
       ...delta(h?.value ?? 0, b?.value ?? 0),
       target: (h ?? b)?.target ?? null,
       isNew: b === undefined && h !== undefined,
+      isRemoved: h === undefined && b !== undefined,
     };
   }
   return {
@@ -148,12 +148,17 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
   }
 
   lines.push("| Goal | Head | Delta | Target |", "|---|---:|---:|---:|");
+  const removed = Object.keys(c.goals).filter((goal) => c.goals[goal].isRemoved);
   for (const [goal, d] of Object.entries(c.goals)) {
+    if (d.isRemoved) continue;
     const f = isShare(goal) ? pct : num;
     const change = d.isNew ? "new" : isShare(goal) ? `${signed(Math.round(d.delta * 100))}%` : signed(d.delta);
     lines.push(
       `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${change} | ${d.target === null ? "not set" : f(d.target)} |`,
     );
+  }
+  if (removed.length) {
+    lines.push("", `<sub>no longer measured: ${removed.map((goal) => goal.replace(/_/g, " ")).join(", ")}</sub>`);
   }
   lines.push(
     "",

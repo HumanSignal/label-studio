@@ -14,7 +14,10 @@ export type ScanContext = {
   deprecated: Map<string, string>;
   /** Source of `<dir>/index.*` when `dir` is a barrel, else null. */
   readBarrel: (absDir: string) => string | null;
-  barrels: Map<string, Map<string, string>>;
+  /** Whether the module at `absPath` (no extension) exports `name` itself. */
+  exportsName: (absPath: string, name: string) => boolean;
+  /** `<barrel dir>#<name>` → the DS component it re-exports a local copy of, or null. */
+  barrels: Map<string, string | null>;
 };
 
 const BARREL_INDEX = ["index.ts", "index.tsx", "index.js", "index.jsx"];
@@ -25,6 +28,19 @@ function defaultReadBarrel(absDir: string): string | null {
     if (fs.existsSync(candidate)) return fs.readFileSync(candidate, "utf-8");
   }
   return null;
+}
+
+const MODULE_EXT = [".tsx", ".ts", ".jsx", ".js"];
+
+function defaultExportsName(absPath: string, name: string): boolean {
+  const file = MODULE_EXT.map((ext) => absPath + ext).find((candidate) => fs.existsSync(candidate));
+  if (!file) return false;
+  const source = fs.readFileSync(file, "utf-8");
+  const escaped = name.replace(/\$/g, "\\$");
+  return (
+    new RegExp(`\\bexport\\s+(?:const|let|var|function|class)\\s+${escaped}\\b`).test(source) ||
+    new RegExp(`\\bexport\\s*\\{[^}]*\\b${escaped}\\b[^}]*\\}(?!\\s*from)`).test(source)
+  );
 }
 
 const SOURCE_EXT = /\.(tsx?|jsx?)$/;
@@ -41,6 +57,7 @@ export function buildContext({
   manifest,
   isDirectory = (abs) => fs.existsSync(abs) && fs.statSync(abs).isDirectory(),
   readBarrel = defaultReadBarrel,
+  exportsName = defaultExportsName,
 }: {
   repoRoot: string;
   webRoot: string;
@@ -48,6 +65,7 @@ export function buildContext({
   manifest: ManifestSlice;
   isDirectory?: (abs: string) => boolean;
   readBarrel?: (absDir: string) => string | null;
+  exportsName?: (absPath: string, name: string) => boolean;
 }): ScanContext {
   const replaced: ScanContext["replaced"] = [];
   const deprecated = new Map<string, string>();
@@ -59,7 +77,7 @@ export function buildContext({
       replaced.push({ key: normal(abs), isDir: isDirectory(abs), component: entry.name });
     }
   }
-  return { webRoot, tokenNames, replaced, deprecated, readBarrel, barrels: new Map() };
+  return { webRoot, tokenNames, replaced, deprecated, readBarrel, exportsName, barrels: new Map() };
 }
 
 /** Token names declared in `tokens.prefix.css`, including the unprefixed form components reference. */
@@ -90,6 +108,7 @@ const NON_CODE_SPEC = /\.(s?css|svg|png|jpe?g|gif|webp|json|woff2?)$/;
 const IMPORT_SPEC = /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*|^\s*import\s+)["']([^"']+)["']/gm;
 const NAMED_IMPORT = /\b(?:import|export)\s+(?:type\s+)?(?:[\w$]+\s*,\s*)?\{([^}]*)\}\s*from\s*["']([^"']+)["']/g;
 const BARREL_EXPORT = /\bexport\s+(?:type\s+)?\{([^}]*)\}\s*from\s*["']([^"']+)["']/g;
+const STAR_EXPORT = /\bexport\s*\*\s*from\s*["']([^"']+)["']/g;
 
 /** `{ A, B as C, default as D }` → [source name, exported name] pairs. */
 const specifiers = (list: string) =>
@@ -138,9 +157,9 @@ function namedImports(file: string, source: string, ctx: ScanContext): Finding[]
     const from = match[2];
     const line = lineAt(source, match.index ?? 0);
     const names = specifiers(match[1]).map(([name]) => name);
-    const viaBarrel = from.startsWith(".") ? barrelReplacements(path.join(ctx.webRoot, file), from, ctx) : undefined;
+    const abs = path.join(ctx.webRoot, file);
     for (const name of names) {
-      const component = viaBarrel?.get(name);
+      const component = barrelReplacement(abs, from, name, ctx);
       if (component) {
         out.push({
           file,
@@ -170,39 +189,56 @@ function namedImports(file: string, source: string, ctx: ScanContext): Finding[]
   return out;
 }
 
-/** For an import of a barrel directory, the imported names it re-exports from a replaced file. */
-function barrelReplacements(file: string, spec: string, ctx: ScanContext): Map<string, string> | undefined {
-  if (matchesReplaced(file, spec, ctx)) return undefined;
-  const dir = path.resolve(path.dirname(file), spec);
-  if (!ctx.barrels.has(dir)) {
-    const source = ctx.readBarrel(dir);
-    const map = new Map<string, string>();
-    if (source) {
-      const indexFile = path.join(dir, "index.js");
-      for (const match of source.matchAll(BARREL_EXPORT)) {
-        const hit = matchesReplaced(indexFile, match[2], ctx);
-        if (hit) for (const [, exported] of specifiers(match[1])) map.set(exported, hit.component);
-      }
-    }
-    ctx.barrels.set(dir, map);
-  }
-  const map = ctx.barrels.get(dir);
-  return map?.size ? map : undefined;
+/** The directory an import specifier points to inside the web: relative, the LSE app's `@/` alias, or baseUrl. */
+function specDir(file: string, spec: string, ctx: ScanContext): string | undefined {
+  if (spec.startsWith(".")) return path.resolve(path.dirname(file), spec);
+  if (spec.startsWith("@/")) return path.join(ctx.webRoot, "apps/labelstudio/src", spec.slice(2));
+  if (/^(apps|libs)\//.test(spec)) return path.join(ctx.webRoot, spec);
+  return undefined;
 }
 
+/** For a named import of a barrel directory, the DS component whose local copy the barrel re-exports as `name`. */
+function barrelReplacement(file: string, spec: string, name: string, ctx: ScanContext): string | undefined {
+  if (matchesReplaced(file, spec, ctx)) return undefined;
+  const dir = specDir(file, spec, ctx);
+  return dir ? barrelExport(dir, name, ctx, 0) : undefined;
+}
+
+const MAX_BARREL_DEPTH = 6;
+
 /**
- * The design-system component that an import replaces, the way the replaced-import rule sees it: the import names a
- * local copy directly, or names it through a barrel that re-exports it. `absFile` is the importing file.
+ * The DS component that barrel `dir` re-exports as `name`: through `export { a as name } from` and `export * from`,
+ * into nested barrels, until a local copy the manifest lists is reached.
  */
-export function replacedComponentOf(
-  absFile: string,
-  spec: string,
-  imported: string,
-  ctx: ScanContext,
-): string | undefined {
-  const direct = matchesReplaced(absFile, spec, ctx);
-  if (direct) return direct.component;
-  return spec.startsWith(".") ? barrelReplacements(absFile, spec, ctx)?.get(imported) : undefined;
+function barrelExport(dir: string, name: string, ctx: ScanContext, depth: number): string | undefined {
+  const key = `${dir}#${name}`;
+  if (ctx.barrels.has(key)) return ctx.barrels.get(key) ?? undefined;
+  ctx.barrels.set(key, null);
+  const source = depth < MAX_BARREL_DEPTH ? ctx.readBarrel(dir) : null;
+  let component: string | undefined;
+  if (source) {
+    const indexFile = path.join(dir, "index.js");
+    for (const match of source.matchAll(BARREL_EXPORT)) {
+      for (const [from, exported] of specifiers(match[1])) {
+        if (exported !== name || component) continue;
+        component =
+          matchesReplaced(indexFile, match[2], ctx)?.component ??
+          (match[2].startsWith(".") ? barrelExport(path.resolve(dir, match[2]), from, ctx, depth + 1) : undefined);
+      }
+    }
+    for (const match of source.matchAll(STAR_EXPORT)) {
+      if (component || !match[1].startsWith(".")) continue;
+      const target = path.resolve(dir, match[1]);
+      const direct = matchesReplaced(indexFile, match[1], ctx);
+      component = direct
+        ? ctx.exportsName(target, name)
+          ? direct.component
+          : undefined
+        : barrelExport(target, name, ctx, depth + 1);
+    }
+  }
+  ctx.barrels.set(key, component ?? null);
+  return component;
 }
 
 function matchesReplaced(file: string, spec: string, ctx: ScanContext) {

@@ -42,20 +42,11 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
       "ds_components",
       "raw_controls_lse_app",
       "legacy_icons",
-      "ds_render_share_lse",
-      "ds_render_share_lso",
       "raw_controls_templates",
-      "ds_element_share_lse",
-      "ds_element_share_lso",
-      "clean_file_share_lse",
-      "clean_file_share_lso",
     ]);
-    expect(snap.areas["lse/app"].render_files).toBeGreaterThan(0);
-    expect(snap.areas["lse/app"].ds_elements).toBeGreaterThan(0);
-    expect(snap.areas["lse/app"].ui_elements).toBeGreaterThanOrEqual(snap.areas["lse/app"].ds_elements);
-    expect(snap.goals.ds_element_share_lse.value).toBeGreaterThan(0);
-    expect(snap.goals.ds_element_share_lse.value).toBeLessThanOrEqual(1);
-    if (templateCatalog) expect(snap.areas["lse/templates"].render_files).toBeGreaterThan(0);
+    expect(snap.areas["lse/app"]).toEqual({ violations: expect.any(Number) });
+    expect(snap.areas["lse/app"].violations).toBeGreaterThan(0);
+    if (templateCatalog) expect(snap.areas["lse/templates"].violations).toBe(snap.goals.raw_controls_templates.value);
     expect(fs.existsSync(head)).toBe(true);
   }, 90_000);
 

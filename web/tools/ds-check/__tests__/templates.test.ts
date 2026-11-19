@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { TEMPLATE_CATALOG, TEMPLATE_RULE, listTemplateFiles, scanTemplateSource, usesEditorUi } from "../templates";
+import { TEMPLATE_CATALOG, TEMPLATE_RULE, listTemplateFiles, scanTemplateSource } from "../templates";
 
 const FILE = `${TEMPLATE_CATALOG}/example/Screen.jsx`;
 
@@ -57,9 +57,4 @@ describe("listTemplateFiles", () => {
       `${TEMPLATE_CATALOG}/plain/Screen.jsx`,
     ]);
   });
-});
-
-test("usesEditorUi looks for an EditorUI component", () => {
-  expect(usesEditorUi("React.createElement(EditorUI.Button, {})")).toBe(true);
-  expect(usesEditorUi("const ui = window.EditorUI;")).toBe(false);
 });

@@ -21,33 +21,8 @@ export type CheckAll = {
   findings: AnnotatedFinding[];
 };
 
-/**
- * A file the scan covers that can render UI (tsx or jsx): whether it imports from @humansignal/ui, and the JSX
- * elements it renders from the design system and from local look-alikes (null when it could not be read).
- */
-export type RenderFile = {
-  web: Web;
-  file: string;
-  importsDs: boolean;
-  elements?: { ds: number; local: number } | null;
-};
-
-/**
- * One dashboard area. `ui_elements` are the JSX elements that render a design-system component, a raw control the
- * design system replaces or a local look-alike; `element_share` is the design-system part of them. `ui_files` are
- * the files with at least one such element; `clean_files` are those with no raw control, local copy or old icon.
- */
-export type AreaMetrics = {
-  violations: number;
-  render_files: number;
-  ds_import_share: number | null;
-  ui_elements?: number;
-  ds_elements?: number;
-  element_share?: number | null;
-  ui_files?: number;
-  clean_files?: number;
-  clean_share?: number | null;
-};
+/** One dashboard area: the violations of its files. */
+export type AreaMetrics = { violations: number };
 
 export type SnapshotInput = {
   commit: string;
@@ -56,7 +31,6 @@ export type SnapshotInput = {
   prs: PrRef[];
   manifest: Manifest;
   webs: Record<Web, CheckAll>;
-  renderFiles: RenderFile[];
   /** Whether a repo-relative path (file or directory) exists in this checkout. */
   exists: (repoRelativePath: string) => boolean;
   /**
@@ -66,14 +40,13 @@ export type SnapshotInput = {
   templates?: TemplateMeasure;
 };
 
-/** Template source files, how many reach EditorUI, and the raw controls found in them. */
-export type TemplateMeasure = { files: number; filesUsingEditorUi: number; rawControls: number };
+/** The raw controls found in the template sources. */
+export type TemplateMeasure = { rawControls: number };
 
 /** The dashboard area of the template catalog. */
 export const TEMPLATES_AREA = "lse/templates";
 
-/** A goal without a target yet has `target: null`. */
-export type Goal = { value: number; target: number | null };
+export type Goal = { value: number; target: number };
 /** A pull request merged into main by (or since the previous point before) the snapshot's commit. */
 export type PrRef = { number: number; title: string; commit: string };
 export type Snapshot = {
@@ -89,23 +62,19 @@ export type Snapshot = {
   goals: Record<string, Goal>;
 };
 
-/** The scoreboard targets (Design System Adoption Report, board 07). Shares are fractions of render files. */
+/**
+ * The scoreboard targets (Design System Adoption Report, board 07). Adoption is measured by violations only: every
+ * place that does not use the design system is a violation, so zero violations is full adoption.
+ */
 export const TARGETS = {
   primitive_implementations_outside_ds: 10,
   ds_components: 30,
   raw_controls_lse_app: 0,
   legacy_icons: 0,
-  ds_render_share_lse: 0.95,
-  ds_render_share_lso: 0.7,
   /** Total violations on main 90 days after the gates went live. */
   total_90d: 1000,
   /** Raw controls left in the built-in Custom Interface templates. */
   raw_controls_templates: 0,
-  /** Element and clean-file shares: targets are set once their baseline is known. */
-  ds_element_share_lse: null,
-  ds_element_share_lso: null,
-  clean_file_share_lse: null,
-  clean_file_share_lso: null,
 } as const;
 
 /** The dashboard area a web-relative file belongs to. */
@@ -118,14 +87,6 @@ export function areaOf(web: Web, file: string): string {
 
 const sorted = <T>(record: Record<string, T>): Record<string, T> =>
   Object.fromEntries(Object.entries(record).sort(([a], [b]) => a.localeCompare(b)));
-
-const round = (n: number) => Math.round(n * 1000) / 1000;
-const ratio = (part = 0, whole = 0) => (whole ? round(part / whole) : null);
-
-/** A UI file with any of these findings is not clean, whatever else it renders from the design system. */
-const UNCLEAN_RULES = new Set(["raw-control", "replaced-import", "legacy-icon"]);
-type Tally = Pick<AreaMetrics, "ui_elements" | "ds_elements" | "ui_files" | "clean_files">;
-const emptyTally = (): Tally => ({ ui_elements: 0, ds_elements: 0, ui_files: 0, clean_files: 0 });
 
 export function buildSnapshot(input: SnapshotInput): Snapshot {
   const findings = (["lso", "lse"] as Web[]).flatMap((web) => input.webs[web].findings.map((f) => ({ web, ...f })));
@@ -148,65 +109,13 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
   }
 
   const areas: Snapshot["areas"] = {};
-  const area = (name: string) =>
-    (areas[name] ??= {
-      violations: 0,
-      render_files: 0,
-      ds_import_share: 0,
-      ui_elements: 0,
-      ds_elements: 0,
-      element_share: null,
-      ui_files: 0,
-      clean_files: 0,
-      clean_share: null,
-    });
-  for (const f of findings) area(areaOf(f.web, f.file)).violations += 1;
-
-  const fileKey = (web: Web, file: string) => `${web}:${file}`;
-  const rawControls = new Map<string, number>();
-  const unclean = new Set<string>();
   for (const f of findings) {
-    const k = fileKey(f.web, f.file);
-    if (f.rule === "raw-control") rawControls.set(k, (rawControls.get(k) ?? 0) + 1);
-    if (UNCLEAN_RULES.has(f.rule)) unclean.add(k);
-  }
-  const webTotals: Record<Web, Tally> = { lso: emptyTally(), lse: emptyTally() };
-  const dsFiles: Record<string, number> = {};
-  for (const r of input.renderFiles) {
-    const name = areaOf(r.web, r.file);
-    const a = area(name);
-    a.render_files += 1;
-    if (r.importsDs) dsFiles[name] = (dsFiles[name] ?? 0) + 1;
-    const k = fileKey(r.web, r.file);
-    const ds = r.elements?.ds ?? 0;
-    const ui = ds + (r.elements?.local ?? 0) + (rawControls.get(k) ?? 0);
-    if (!ui) continue;
-    const clean = unclean.has(k) ? 0 : 1;
-    for (const t of [a, webTotals[r.web]]) {
-      t.ui_elements = (t.ui_elements ?? 0) + ui;
-      t.ds_elements = (t.ds_elements ?? 0) + ds;
-      t.ui_files = (t.ui_files ?? 0) + 1;
-      t.clean_files = (t.clean_files ?? 0) + clean;
-    }
-  }
-  for (const [name, a] of Object.entries(areas)) {
-    a.ds_import_share = a.render_files ? round((dsFiles[name] ?? 0) / a.render_files) : null;
-    a.element_share = ratio(a.ds_elements, a.ui_elements);
-    a.clean_share = ratio(a.clean_files, a.ui_files);
+    const name = areaOf(f.web, f.file);
+    areas[name] = { violations: (areas[name]?.violations ?? 0) + 1 };
   }
   const templates = input.templates;
-  if (templates) {
-    areas[TEMPLATES_AREA] = {
-      violations: templates.rawControls,
-      render_files: templates.files,
-      ds_import_share: templates.files ? round(templates.filesUsingEditorUi / templates.files) : null,
-    };
-  }
+  if (templates) areas[TEMPLATES_AREA] = { violations: templates.rawControls };
 
-  const share = (web: Web) => {
-    const files = input.renderFiles.filter((r) => r.web === web);
-    return files.length ? round(files.filter((r) => r.importsDs).length / files.length) : 0;
-  };
   const goals: Snapshot["goals"] = {
     primitive_implementations_outside_ds: {
       value: input.manifest.components
@@ -223,27 +132,9 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
       target: TARGETS.raw_controls_lse_app,
     },
     legacy_icons: { value: rules["legacy-icon"] ?? 0, target: TARGETS.legacy_icons },
-    ds_render_share_lse: { value: share("lse"), target: TARGETS.ds_render_share_lse },
-    ds_render_share_lso: { value: share("lso"), target: TARGETS.ds_render_share_lso },
     ...(templates
       ? { raw_controls_templates: { value: templates.rawControls, target: TARGETS.raw_controls_templates } }
       : {}),
-    ds_element_share_lse: {
-      value: ratio(webTotals.lse.ds_elements, webTotals.lse.ui_elements) ?? 0,
-      target: TARGETS.ds_element_share_lse,
-    },
-    ds_element_share_lso: {
-      value: ratio(webTotals.lso.ds_elements, webTotals.lso.ui_elements) ?? 0,
-      target: TARGETS.ds_element_share_lso,
-    },
-    clean_file_share_lse: {
-      value: ratio(webTotals.lse.clean_files, webTotals.lse.ui_files) ?? 0,
-      target: TARGETS.clean_file_share_lse,
-    },
-    clean_file_share_lso: {
-      value: ratio(webTotals.lso.clean_files, webTotals.lso.ui_files) ?? 0,
-      target: TARGETS.clean_file_share_lso,
-    },
   };
 
   return {

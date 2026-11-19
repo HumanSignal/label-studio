@@ -125,6 +125,58 @@ describe("ds-check scanner", () => {
     ]);
   });
 
+  describe("names imported through nested barrels", () => {
+    const formManifest = {
+      components: {
+        Label: {
+          name: "Label",
+          exports: ["Label"],
+          replaces: ["services/lse/web/apps/labelstudio/src/components/Form/Elements/Label/Label.tsx"],
+        },
+        Space: {
+          name: "Space",
+          exports: ["Space"],
+          replaces: ["services/lse/web/apps/labelstudio/src/components/Space/Space.tsx"],
+        },
+      },
+    };
+    const barrels: Record<string, string> = {
+      "/src/components/Form": `export * from "./Elements";\nexport { default as Form } from "./Form";`,
+      "/src/components/Form/Elements": `export { default as Label } from "./Label/Label";\nexport { default as Input } from "./Input/Input";`,
+      "/src/components/layout": `export * from "../Space/Space";\nexport * from "./Columns";`,
+      "/src/components/loop-a": `export * from "../loop-b";`,
+      "/src/components/loop-b": `export * from "../loop-a";`,
+    };
+    const formCtx = buildContext({
+      repoRoot,
+      webRoot,
+      tokenNames: new Set(),
+      manifest: formManifest,
+      isDirectory: () => false,
+      readBarrel: (abs) => Object.entries(barrels).find(([dir]) => abs.endsWith(dir))?.[1] ?? null,
+      exportsName: (abs, name) => abs.endsWith("/components/Space/Space") && name === "Space",
+    });
+    const found = (source: string) =>
+      scanSource(file, source, formCtx).map((f) => `${f.rule} ${f.message.split(" ")[0]}`);
+
+    test("export * into a barrel that re-exports the copy as a default", () => {
+      expect(found(`import { Label, Input, Form } from "../components/Form";`)).toEqual(["replaced-import Label"]);
+    });
+
+    test("the barrel reached through the @/ and baseUrl aliases", () => {
+      expect(found(`import { Label } from "@/components/Form";`)).toEqual(["replaced-import Label"]);
+      expect(found(`import { Label } from "apps/labelstudio/src/components/Form";`)).toEqual(["replaced-import Label"]);
+    });
+
+    test("export * of the copy itself counts only the names that copy exports", () => {
+      expect(found(`import { Space, Columns } from "../components/layout";`)).toEqual(["replaced-import Space"]);
+    });
+
+    test("barrels that re-export each other end without a finding", () => {
+      expect(found(`import { Label } from "../components/loop-a";`)).toEqual([]);
+    });
+  });
+
   test("default and named imports together, and re-exports, are read", () => {
     expect(rules(`import Icons, { IconCross } from "@humansignal/icons";`)).toEqual(["legacy-icon"]);
     expect(rules(`export { IconCross } from "@humansignal/icons";`)).toEqual(["legacy-icon"]);

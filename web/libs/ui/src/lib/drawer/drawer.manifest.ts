@@ -7,5 +7,5 @@ export default defineManifest({
   intent: ["Side editing with the page still visible"],
   use_when: "A panel sliding in from an edge for editing or details while the page context stays visible.",
   never_when: ["Blocking decisions (use ModalWindow)", "A fixed-position div animated by hand"],
-  replaces: [],
+  replaces: ["services/lse/web/apps/labelstudio/src/components_lse/Drawer/Drawer.tsx"],
 });

@@ -18,23 +18,12 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { buildContext, listScanFiles, replacedComponentOf } from "../ds-check/scan";
-import type { ManifestSlice } from "../ds-check/types";
-import { listTemplateFiles, scanTemplateSource, usesEditorUi } from "../ds-check/templates";
+import { listTemplateFiles, scanTemplateSource } from "../ds-check/templates";
 import { renderComparison, ruleIncreases } from "./compare";
-import { countElements } from "./elements";
 import { appendSnapshot, readHistory } from "./history";
 import { mergedPrs } from "./prs";
 import { buildSeries } from "./series";
-import {
-  type CheckAll,
-  type Manifest,
-  type RenderFile,
-  type Snapshot,
-  type TemplateMeasure,
-  type Web,
-  buildSnapshot,
-} from "./snapshot";
+import { type CheckAll, type Manifest, type Snapshot, type TemplateMeasure, type Web, buildSnapshot } from "./snapshot";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
 
@@ -69,35 +58,19 @@ function checkAll(web: Web): CheckAll {
   return JSON.parse(result.stdout.toString()) as CheckAll;
 }
 
-const DS_IMPORT = /from\s+["']@humansignal\/ui(?:\/[^"']*)?["']/;
 const readRegistry = () =>
-  JSON.parse(fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8")) as ManifestSlice & {
+  JSON.parse(fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8")) as {
+    components: Record<string, Manifest["components"][number]>;
     nonComponents?: string[];
   };
-let unreadable = 0;
-function renderFiles(web: Web, registry: ManifestSlice): RenderFile[] {
-  const root = webRoot(web);
-  const ctx = buildContext({ repoRoot, webRoot: root, tokenNames: new Set(), manifest: registry });
-  return listScanFiles(root)
-    .filter((file) => /\.(tsx|jsx)$/.test(file))
-    .map((file) => {
-      const abs = path.join(root, file);
-      const source = fs.readFileSync(abs, "utf-8");
-      const elements = countElements(file, source, (spec, imported) =>
-        Boolean(replacedComponentOf(abs, spec, imported, ctx)),
-      );
-      if (!elements) unreadable += 1;
-      return { web, file, importsDs: DS_IMPORT.test(source), elements };
-    });
-}
 
 function measureTemplates(): TemplateMeasure {
   const files = listTemplateFiles(repoRoot);
-  const sources = files.map((file) => [file, fs.readFileSync(path.join(repoRoot, file), "utf-8")] as const);
   return {
-    files: files.length,
-    filesUsingEditorUi: sources.filter(([, source]) => usesEditorUi(source)).length,
-    rawControls: sources.reduce((sum, [file, source]) => sum + scanTemplateSource(file, source).length, 0),
+    rawControls: files.reduce(
+      (sum, file) => sum + scanTemplateSource(file, fs.readFileSync(path.join(repoRoot, file), "utf-8")).length,
+      0,
+    ),
   };
 }
 
@@ -124,20 +97,16 @@ function snapshot(): Snapshot {
   if (!commit) fail("cannot read HEAD; pass --commit <sha>");
   const pr = valueOf("--pr");
   if (pr !== undefined && !/^\d+$/.test(pr)) fail(`--pr must be a number, got ${pr}`);
-  const snap = buildSnapshot({
+  return buildSnapshot({
     commit,
     date: valueOf("--date") ?? new Date().toISOString(),
     pr: pr ? Number(pr) : null,
     prs: prsOf(commit, valueOf("--since")),
     manifest,
     webs: { lso: checkAll("lso"), lse: checkAll("lse") },
-    renderFiles: [...renderFiles("lso", registry), ...renderFiles("lse", registry)],
     exists: (p) => fs.existsSync(path.join(repoRoot, p)),
     templates: measureTemplates(),
   });
-  if (unreadable)
-    console.error(`[ds-metrics] ${unreadable} React files could not be transpiled; they count as rendering nothing`);
-  return snap;
 }
 
 const seriesFile = valueOf("--series");

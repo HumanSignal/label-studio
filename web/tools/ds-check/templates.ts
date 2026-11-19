@@ -80,6 +80,3 @@ export function scanTemplateSource(file: string, source: string): Finding[] {
   });
   return findings;
 }
-
-/** Whether a template source reaches the design system at all. */
-export const usesEditorUi = (source: string) => /\bEditorUI\.[A-Z]/.test(source);

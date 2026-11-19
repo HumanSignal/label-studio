@@ -12,8 +12,8 @@ const snap = (commit: string, date: string, violations: number, extra: Partial<S
   rules: { "raw-control": Math.round(violations / 10), "color-literal": violations - Math.round(violations / 10) },
   clusters: { Dropdown: { paths_remaining: 5, importers: 50 }, Spinner: { paths_remaining: 5, importers: 54 } },
   areas: {
-    "lse/app": { violations: violations - 100, render_files: 800, ds_import_share: 0.7 },
-    editor: { violations: 100, render_files: 200, ds_import_share: 0.4 },
+    "lse/app": { violations: violations - 100 },
+    editor: { violations: 100 },
   },
   goals: {
     raw_controls_lse_app: { value: Math.round(violations / 40), target: 0 },
@@ -27,8 +27,8 @@ const history = [
   snap("c3", "2026-11-06T10:00:00Z", 4688, {
     clusters: { Dropdown: { paths_remaining: 5, importers: 48 } },
     areas: {
-      "lse/app": { violations: 4588, render_files: 810, ds_import_share: 0.72 },
-      editor: { violations: 100, render_files: 200, ds_import_share: 0.4 },
+      "lse/app": { violations: 4588 },
+      editor: { violations: 100 },
     },
   }),
   snap("a1", "2026-10-26T10:00:00Z", 4800),
@@ -71,23 +71,19 @@ describe("buildSeries", () => {
         commit: "c3",
         area: "editor",
         violations: 100,
-        render_files: 200,
-        ds_import_share: 0.4,
       },
       {
         date: "2026-11-06T10:00:00Z",
         commit: "c3",
         area: "lse/app",
         violations: 4588,
-        render_files: 810,
-        ds_import_share: 0.72,
       },
     ]);
   });
 
   test("targets carry the scoreboard values and the 90-day total", () => {
     expect(series.targets.raw_controls_lse_app).toBe(0);
-    expect(series.targets.ds_render_share_lse).toBe(0.95);
+    expect(series.targets.legacy_icons).toBe(0);
     expect(series.targets.total_90d).toBe(1000);
   });
 

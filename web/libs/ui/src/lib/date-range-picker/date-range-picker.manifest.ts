@@ -8,5 +8,5 @@ export default defineManifest({
   use_when:
     "Filtering or scoping by a period: a calendar with preset ranges and optional times, opened from DateRangePickerTrigger.",
   never_when: ["A single date with no range", "Raw <input type=date> pairs"],
-  replaces: [],
+  replaces: ["services/lse/web/apps/labelstudio/src/components/DateTimePicker/DateRangePicker.tsx"],
 });

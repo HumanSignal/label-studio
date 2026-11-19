@@ -10,7 +10,7 @@ const base: Snapshot = {
   totals: { violations: 100, files_with_violations: 20 },
   rules: { "raw-control": 10, "color-literal": 90 },
   clusters: { Dropdown: { paths_remaining: 4, importers: 50 }, Spinner: { paths_remaining: 1, importers: 3 } },
-  areas: { "lse/app": { violations: 100, render_files: 200, ds_import_share: 0.8 } },
+  areas: { "lse/app": { violations: 100 } },
   goals: { raw_controls_lse_app: { value: 10, target: 0 }, ds_components: { value: 96, target: 30 } },
 };
 
@@ -21,7 +21,7 @@ const head: Snapshot = {
   totals: { violations: 93, files_with_violations: 19 },
   rules: { "raw-control": 10, "color-literal": 82, "legacy-icon": 1 },
   clusters: { Dropdown: { paths_remaining: 4, importers: 48 } },
-  areas: { "lse/app": { violations: 93, render_files: 201, ds_import_share: 0.81 } },
+  areas: { "lse/app": { violations: 93 } },
   goals: { raw_controls_lse_app: { value: 10, target: 0 }, ds_components: { value: 95, target: 30 } },
 };
 
@@ -33,7 +33,14 @@ describe("compare", () => {
     expect(d.rules["legacy-icon"]).toEqual({ base: 0, head: 1, delta: 1 });
     expect(d.clusters.Spinner).toEqual({ base: 1, head: 0, delta: -1, importers: { base: 3, head: 0, delta: -3 } });
     expect(d.clusters.Dropdown.importers.delta).toBe(-2);
-    expect(d.goals.ds_components).toEqual({ base: 96, head: 95, delta: -1, target: 30, isNew: false });
+    expect(d.goals.ds_components).toEqual({
+      base: 96,
+      head: 95,
+      delta: -1,
+      target: 30,
+      isNew: false,
+      isRemoved: false,
+    });
     expect(d.areas["lse/app"].violations.delta).toBe(-7);
   });
 });
@@ -92,29 +99,14 @@ describe("renderComparison", () => {
     expect(renderComparison(cleaner, base)).toContain("**No new violations** (-10 net against the base branch");
   });
 
-  test("element and clean-file shares render as percentages, and a goal without a target says so", () => {
-    const withShares = (element: number, clean: number): Snapshot => ({
-      ...base,
-      goals: {
-        ...base.goals,
-        ds_element_share_lse: { value: element, target: null },
-        clean_file_share_lse: { value: clean, target: null },
-      },
-    });
-    const md = renderComparison(withShares(0.52, 0.31), withShares(0.5, 0.3));
-    expect(md).toContain("| ds element share lse | 52% | +2% | not set |");
-    expect(md).toContain("| clean file share lse | 31% | +1% | not set |");
-  });
-
-  test("a goal the base snapshot does not have yet shows as new, not as a full-size change", () => {
-    const withShare: Snapshot = {
-      ...base,
-      goals: { ...base.goals, ds_element_share_lse: { value: 0.92, target: null } },
-    };
-    expect(compare(withShare, base).goals.ds_element_share_lse.isNew).toBe(true);
-    const md = renderComparison(withShare, base);
-    expect(md).toContain("| ds element share lse | 92% | new | not set |");
-    expect(md).not.toContain("+92%");
+  test("a goal only one side has shows as new or no longer measured, never as a full-size change", () => {
+    const withGoal: Snapshot = { ...base, goals: { ...base.goals, legacy_icons: { value: 780, target: 0 } } };
+    expect(compare(withGoal, base).goals.legacy_icons.isNew).toBe(true);
+    expect(renderComparison(withGoal, base)).toContain("| legacy icons | 780 | new | 0 |");
+    expect(compare(base, withGoal).goals.legacy_icons.isRemoved).toBe(true);
+    const md = renderComparison(base, withGoal);
+    expect(md).not.toContain("| legacy icons |");
+    expect(md).toContain("no longer measured: legacy icons");
   });
 
   test("says so when nothing changed", () => {
