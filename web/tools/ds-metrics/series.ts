@@ -2,7 +2,7 @@
  * The dashboard's data: the history as three row tables (one file each on the dashboard), the targets, and the
  * change over the last week for the weekly note.
  */
-import { type PrRef, TARGETS, type Snapshot } from "./snapshot";
+import { type AreaMetrics, type PrRef, TARGETS, type Snapshot } from "./snapshot";
 
 export type PointRow = {
   date: string;
@@ -12,14 +12,7 @@ export type PointRow = {
   prs: PrRef[];
 } & Record<string, number | string | PrRef[]>;
 export type ClusterRow = { date: string; commit: string; cluster: string; importers: number; paths_remaining: number };
-export type AreaRow = {
-  date: string;
-  commit: string;
-  area: string;
-  violations: number;
-  render_files: number;
-  ds_import_share: number;
-};
+export type AreaRow = { date: string; commit: string; area: string } & AreaMetrics;
 
 export type Series = {
   points: PointRow[];

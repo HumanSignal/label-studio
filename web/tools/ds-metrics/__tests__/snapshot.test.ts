@@ -70,8 +70,9 @@ const lse = check("lse", [
   { file: "libs/editor-shell/src/C.tsx", line: 1, rule: "legacy-icon", message: "" },
 ]);
 
-const render = (web: "lso" | "lse", files: [string, boolean][]): RenderFile[] =>
-  files.map(([file, importsDs]) => ({ web, file, importsDs }));
+type Elements = RenderFile["elements"];
+const render = (web: "lso" | "lse", files: [string, boolean, Elements?][]): RenderFile[] =>
+  files.map(([file, importsDs, elements]) => ({ web, file, importsDs, elements }));
 
 const existing = new Set([
   "services/lso/web/libs/editor/src/common/Button/Button.tsx",
@@ -87,17 +88,17 @@ const input: SnapshotInput = {
   webs: { lso, lse },
   renderFiles: [
     ...render("lso", [
-      ["libs/editor/src/A.tsx", false],
-      ["libs/editor/src/D.tsx", true],
-      ["apps/labelstudio/src/E.tsx", true],
-      ["libs/datamanager/src/B.jsx", false],
+      ["libs/editor/src/A.tsx", false, { ds: 0, local: 0 }],
+      ["libs/editor/src/D.tsx", true, { ds: 2, local: 0 }],
+      ["apps/labelstudio/src/E.tsx", true, { ds: 1, local: 0 }],
+      ["libs/datamanager/src/B.jsx", false, { ds: 0, local: 0 }],
     ]),
     ...render("lse", [
-      ["apps/labelstudio/src/pages/X.tsx", true],
-      ["apps/labelstudio/src/pages/Y.tsx", false],
-      ["apps/labelstudio/src/pages/Z.tsx", true],
-      ["apps/labelstudio/src/pages/W.tsx", true],
-      ["libs/editor-shell/src/C.tsx", false],
+      ["apps/labelstudio/src/pages/X.tsx", true, { ds: 1, local: 0 }],
+      ["apps/labelstudio/src/pages/Y.tsx", false, { ds: 0, local: 2 }],
+      ["apps/labelstudio/src/pages/Z.tsx", true, { ds: 3, local: 1 }],
+      ["apps/labelstudio/src/pages/W.tsx", true, { ds: 2, local: 0 }],
+      ["libs/editor-shell/src/C.tsx", false, null],
     ]),
   ],
   exists: (p) => existing.has(p),
@@ -139,11 +140,44 @@ describe("buildSnapshot", () => {
     expect(snap.clusters.Spinner).toBeUndefined();
   });
 
+  const noUi = { ui_elements: 0, ds_elements: 0, element_share: null, ui_files: 0, clean_files: 0, clean_share: null };
+
   test("areas carry violations and the share of render files importing the design system", () => {
-    expect(snap.areas["lse/app"]).toEqual({ violations: 5, render_files: 4, ds_import_share: 0.75 });
-    expect(snap.areas.editor).toEqual({ violations: 2, render_files: 2, ds_import_share: 0.5 });
-    expect(snap.areas.datamanager).toEqual({ violations: 1, render_files: 1, ds_import_share: 0 });
-    expect(snap.areas["lse/libs/editor-shell"]).toEqual({ violations: 1, render_files: 1, ds_import_share: 0 });
+    expect(snap.areas["lse/app"]).toMatchObject({ violations: 5, render_files: 4, ds_import_share: 0.75 });
+    expect(snap.areas.editor).toMatchObject({ violations: 2, render_files: 2, ds_import_share: 0.5 });
+    expect(snap.areas.datamanager).toEqual({ violations: 1, render_files: 1, ds_import_share: 0, ...noUi });
+    expect(snap.areas["lse/libs/editor-shell"]).toEqual({
+      violations: 1,
+      render_files: 1,
+      ds_import_share: 0,
+      ...noUi,
+    });
+  });
+
+  test("element share: DS elements over DS elements, raw controls and local look-alikes", () => {
+    // X: 1 DS + 2 raw; Y: 2 local + 1 raw; Z: 3 DS + 1 local; W: 2 DS
+    expect(snap.areas["lse/app"]).toMatchObject({ ui_elements: 12, ds_elements: 6, element_share: 0.5 });
+    // A: 1 raw; D: 2 DS
+    expect(snap.areas.editor).toMatchObject({ ui_elements: 3, ds_elements: 2, element_share: 0.667 });
+    expect(snap.areas["lso/app"]).toMatchObject({ ui_elements: 1, ds_elements: 1, element_share: 1 });
+  });
+
+  test("clean-file share: UI files with no raw control, local copy or old icon", () => {
+    expect(snap.areas["lse/app"]).toMatchObject({ ui_files: 4, clean_files: 1, clean_share: 0.25 });
+    expect(snap.areas.editor).toMatchObject({ ui_files: 2, clean_files: 1, clean_share: 0.5 });
+  });
+
+  test("a file that renders nothing the design system covers is in neither share", () => {
+    // B.jsx has a legacy icon but no elements; C.tsx could not be read
+    expect(snap.areas.datamanager.ui_files).toBe(0);
+    expect(snap.areas["lse/libs/editor-shell"].ui_files).toBe(0);
+  });
+
+  test("the element and clean-file shares are goals per web, without a target yet", () => {
+    expect(snap.goals.ds_element_share_lse).toEqual({ value: 0.5, target: null });
+    expect(snap.goals.ds_element_share_lso).toEqual({ value: 0.75, target: null });
+    expect(snap.goals.clean_file_share_lse).toEqual({ value: 0.25, target: null });
+    expect(snap.goals.clean_file_share_lso).toEqual({ value: 0.667, target: null });
   });
 
   test("goals carry the value and the target from the scoreboard", () => {

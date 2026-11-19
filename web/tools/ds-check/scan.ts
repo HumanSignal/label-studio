@@ -190,6 +190,21 @@ function barrelReplacements(file: string, spec: string, ctx: ScanContext): Map<s
   return map?.size ? map : undefined;
 }
 
+/**
+ * The design-system component that an import replaces, the way the replaced-import rule sees it: the import names a
+ * local copy directly, or names it through a barrel that re-exports it. `absFile` is the importing file.
+ */
+export function replacedComponentOf(
+  absFile: string,
+  spec: string,
+  imported: string,
+  ctx: ScanContext,
+): string | undefined {
+  const direct = matchesReplaced(absFile, spec, ctx);
+  if (direct) return direct.component;
+  return spec.startsWith(".") ? barrelReplacements(absFile, spec, ctx)?.get(imported) : undefined;
+}
+
 function matchesReplaced(file: string, spec: string, ctx: ScanContext) {
   const importer = normal(file);
   const isOwn = (entry: ScanContext["replaced"][number]) =>

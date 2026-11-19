@@ -10,7 +10,8 @@ export type Comparison = {
   rules: Record<string, Delta>;
   clusters: Record<string, Delta & { importers: Delta }>;
   areas: Record<string, { violations: Delta; ds_import_share: Delta }>;
-  goals: Record<string, Delta & { target: number }>;
+  /** `isNew`: the base snapshot predates the goal, so its delta means nothing. */
+  goals: Record<string, Delta & { target: number | null; isNew: boolean }>;
 };
 
 const delta = (head: number, base: number): Delta => ({ base, head, delta: Math.round((head - base) * 1000) / 1000 });
@@ -56,7 +57,11 @@ export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): C
   for (const k of keys(head.goals, base.goals)) {
     const h = head.goals[k];
     const b = base.goals[k];
-    goals[k] = { ...delta(h?.value ?? 0, b?.value ?? 0), target: (h ?? b)?.target ?? 0 };
+    goals[k] = {
+      ...delta(h?.value ?? 0, b?.value ?? 0),
+      target: (h ?? b)?.target ?? null,
+      isNew: b === undefined && h !== undefined,
+    };
   }
   return {
     totals: {
@@ -84,7 +89,7 @@ const num = (n: number) => n.toLocaleString("en-US");
 const signed = (n: number) => (n > 0 ? `+${num(n)}` : num(n));
 const paren = (n: number) => (n === 0 ? "" : ` (${signed(n)})`);
 const pct = (n: number) => `${Math.round(n * 100)}%`;
-const isShare = (goal: string) => goal.startsWith("ds_render_share");
+const isShare = (goal: string) => /_share_/.test(goal);
 
 export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): string {
   const head = complete(headIn);
@@ -145,8 +150,9 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
   lines.push("| Goal | Head | Delta | Target |", "|---|---:|---:|---:|");
   for (const [goal, d] of Object.entries(c.goals)) {
     const f = isShare(goal) ? pct : num;
+    const change = d.isNew ? "new" : isShare(goal) ? `${signed(Math.round(d.delta * 100))}%` : signed(d.delta);
     lines.push(
-      `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${isShare(goal) ? signed(Math.round(d.delta * 100)) + "%" : signed(d.delta)} | ${f(d.target)} |`,
+      `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${change} | ${d.target === null ? "not set" : f(d.target)} |`,
     );
   }
   lines.push(

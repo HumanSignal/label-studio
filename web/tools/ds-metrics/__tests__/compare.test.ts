@@ -33,7 +33,7 @@ describe("compare", () => {
     expect(d.rules["legacy-icon"]).toEqual({ base: 0, head: 1, delta: 1 });
     expect(d.clusters.Spinner).toEqual({ base: 1, head: 0, delta: -1, importers: { base: 3, head: 0, delta: -3 } });
     expect(d.clusters.Dropdown.importers.delta).toBe(-2);
-    expect(d.goals.ds_components).toEqual({ base: 96, head: 95, delta: -1, target: 30 });
+    expect(d.goals.ds_components).toEqual({ base: 96, head: 95, delta: -1, target: 30, isNew: false });
     expect(d.areas["lse/app"].violations.delta).toBe(-7);
   });
 });
@@ -90,6 +90,31 @@ describe("renderComparison", () => {
       totals: { violations: 90, files_with_violations: 20 },
     };
     expect(renderComparison(cleaner, base)).toContain("**No new violations** (-10 net against the base branch");
+  });
+
+  test("element and clean-file shares render as percentages, and a goal without a target says so", () => {
+    const withShares = (element: number, clean: number): Snapshot => ({
+      ...base,
+      goals: {
+        ...base.goals,
+        ds_element_share_lse: { value: element, target: null },
+        clean_file_share_lse: { value: clean, target: null },
+      },
+    });
+    const md = renderComparison(withShares(0.52, 0.31), withShares(0.5, 0.3));
+    expect(md).toContain("| ds element share lse | 52% | +2% | not set |");
+    expect(md).toContain("| clean file share lse | 31% | +1% | not set |");
+  });
+
+  test("a goal the base snapshot does not have yet shows as new, not as a full-size change", () => {
+    const withShare: Snapshot = {
+      ...base,
+      goals: { ...base.goals, ds_element_share_lse: { value: 0.92, target: null } },
+    };
+    expect(compare(withShare, base).goals.ds_element_share_lse.isNew).toBe(true);
+    const md = renderComparison(withShare, base);
+    expect(md).toContain("| ds element share lse | 92% | new | not set |");
+    expect(md).not.toContain("+92%");
   });
 
   test("says so when nothing changed", () => {
