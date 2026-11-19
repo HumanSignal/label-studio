@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const meta: Meta<typeof Message> = {
   component: Message,
-  title: "UI/Message",
+  title: "Feedback/Message",
   parameters: {
     docs: {
       description: {

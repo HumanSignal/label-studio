@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Card",
   tier: 1,
+  category: "Surfaces",
   exports: ["Card", "CardHeader", "CardTitle", "CardDescription", "CardContent"],
   intent: ["A titled surface grouping related content"],
   use_when:

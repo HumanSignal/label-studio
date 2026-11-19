@@ -6,7 +6,7 @@ import { Typography } from "../typography/typography";
 import { Indicator, type IndicatorPosition } from "./indicator";
 
 const meta = {
-  title: "UI/Indicator",
+  title: "Data display/Indicator",
   component: Indicator,
   parameters: {
     layout: "padded",

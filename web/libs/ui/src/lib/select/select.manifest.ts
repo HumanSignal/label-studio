@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Select",
   tier: 1,
+  category: "Inputs",
   exports: ["Select"],
   intent: ["Pick one or several values from a flat list"],
   use_when:

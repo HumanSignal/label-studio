@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "SummaryLabel",
   tier: 1,
+  category: "Data display",
   exports: ["SummaryLabel"],
   intent: ["Several values in one line, then +N"],
   use_when:

@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Indicator",
   tier: 1,
+  category: "Data display",
   exports: ["Indicator", "IndicatorMark"],
   intent: ["A status dot or count on the corner of something"],
   use_when:

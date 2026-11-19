@@ -9,7 +9,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
-  title: "UI/Badge",
+  title: "Data display/Badge",
   argTypes: {
     variant: {
       control: "select",

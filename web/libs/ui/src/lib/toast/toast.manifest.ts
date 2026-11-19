@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Toast",
   tier: 1,
+  category: "Feedback",
   exports: ["Toast", "ToastAction", "ToastProvider", "ToastViewport"],
   intent: ["The result of an action, shown briefly"],
   use_when: "Confirmation or failure of an action the user just took, through useToast.",

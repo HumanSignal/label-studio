@@ -13,7 +13,7 @@ const ToastStory = (props: ToastProps) => {
 };
 
 const meta: Meta<typeof Toast> = {
-  title: "UI/Toast",
+  title: "Feedback/Toast",
   component: ToastStory,
   argTypes: {
     type: {

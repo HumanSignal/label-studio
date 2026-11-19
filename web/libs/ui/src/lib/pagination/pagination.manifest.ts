@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Pagination",
   tier: 1,
+  category: "Navigation",
   exports: ["Pagination"],
   intent: ["Move through pages of a list"],
   use_when: "Page controls for lists and tables, with page size where the list supports it.",

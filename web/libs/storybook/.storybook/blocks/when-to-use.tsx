@@ -135,6 +135,7 @@ export const WhenToUse = () => {
               <Badge variant="primary" size="small">
                 Tier {entry.tier}
                 {entry.tier === 1 ? " · canonical" : " · pattern"}
+                {` · ${entry.category}`}
               </Badge>
               <Typography variant="label" size="smaller" className="text-neutral-content-subtle">
                 exports

@@ -6,7 +6,7 @@ import type { MultiTreeSelectSchema, TreeNodeProps } from "./tree-context";
 
 const meta: Meta<typeof MultiTreeSelectDropdown> = {
   component: MultiTreeSelectDropdown,
-  title: "UI/MultiTreeSelect",
+  title: "Inputs/MultiTreeSelect",
   parameters: {
     layout: "padded",
   },

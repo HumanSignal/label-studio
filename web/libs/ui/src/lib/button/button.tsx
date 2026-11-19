@@ -83,12 +83,12 @@ export function buttonVariant(
 export type ButtonProps = {
   /**
    * Controls the color variant of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   variant?: keyof typeof variants;
   /**
    * Controls the look of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   look?: keyof typeof looks;
   size?: keyof typeof sizes;

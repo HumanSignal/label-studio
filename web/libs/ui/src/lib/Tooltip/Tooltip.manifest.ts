@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Tooltip",
   tier: 1,
+  category: "Data display",
   exports: ["Tooltip"],
   intent: ["A short explanation on hover or focus"],
   use_when: "Plain-text help attached to a control or a truncated value.",

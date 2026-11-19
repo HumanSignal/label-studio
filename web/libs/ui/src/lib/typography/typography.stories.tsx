@@ -17,7 +17,7 @@ type TypographyStory = StoryObj<{
 }>;
 
 const meta: Meta<typeof Typography> = {
-  title: "UI/Typography",
+  title: "Data display/Typography",
   component: Typography,
   parameters: {
     layout: "padded",

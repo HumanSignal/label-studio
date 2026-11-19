@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "SegmentedControl",
   tier: 1,
+  category: "Inputs",
   exports: ["SegmentedControl"],
   intent: ["Switch the view or format of the same content", "Pick one of up to five visible options"],
   use_when:

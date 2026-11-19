@@ -4,7 +4,7 @@ import { TaxonomySelectionList } from "./taxonomy-selection-list";
 
 const meta: Meta<typeof TaxonomySelectionList> = {
   component: TaxonomySelectionList,
-  title: "UI/Taxonomy Selection List",
+  title: "Product/Taxonomy Selection List",
   decorators: [
     (Story) => (
       <div className="w-full max-w-md">

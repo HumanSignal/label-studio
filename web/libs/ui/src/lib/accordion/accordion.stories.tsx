@@ -3,7 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./
 
 const meta: Meta<typeof Accordion> = {
   component: Accordion,
-  title: "UI/Accordion",
+  title: "Surfaces/Accordion",
 };
 
 export default meta;

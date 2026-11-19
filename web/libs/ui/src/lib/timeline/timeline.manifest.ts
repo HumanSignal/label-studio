@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Timeline",
   tier: 1,
+  category: "Data display",
   exports: ["Timeline"],
   intent: ["a chronological, optionally expandable list of events"],
   use_when:

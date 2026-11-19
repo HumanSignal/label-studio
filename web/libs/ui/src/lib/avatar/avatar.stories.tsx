@@ -21,7 +21,7 @@ const grace = {
 
 const meta: Meta<typeof Avatar> = {
   component: Avatar,
-  title: "UI/Avatar/Avatar",
+  title: "Data display/Avatar/Avatar",
   argTypes: {
     size: { control: "select", options: Object.keys(AVATAR_SIZES), table: { defaultValue: { summary: "medium" } } },
     faded: { control: "boolean" },

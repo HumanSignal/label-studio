@@ -8,7 +8,7 @@ import { IconUserAdd } from "@humansignal/icons";
 
 const meta: Meta<typeof CollapsiblePanel> = {
   component: CollapsiblePanel,
-  title: "UI/CollapsiblePanel",
+  title: "Surfaces/CollapsiblePanel",
   argTypes: {
     variant: {
       control: "select",

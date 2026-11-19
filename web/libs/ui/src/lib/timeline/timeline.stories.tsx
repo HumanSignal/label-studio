@@ -17,7 +17,7 @@ import { Dropdown } from "../dropdown";
 import { Timeline } from "./timeline";
 
 const meta: Meta<typeof Timeline> = {
-  title: "UI/Timeline",
+  title: "Data display/Timeline",
   component: Timeline,
   parameters: {
     layout: "padded",

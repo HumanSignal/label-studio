@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "InputFile",
   tier: 1,
+  category: "Inputs",
   exports: ["InputFile"],
   intent: ["Pick a file from disk"],
   use_when: "A control that opens the file picker for one or several files.",

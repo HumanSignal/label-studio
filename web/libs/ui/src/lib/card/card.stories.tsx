@@ -3,7 +3,7 @@ import { Button } from "../button/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 
 const meta = {
-  title: "UI/Card",
+  title: "Surfaces/Card",
   component: Card,
   parameters: { layout: "padded" },
 } satisfies Meta<typeof Card>;

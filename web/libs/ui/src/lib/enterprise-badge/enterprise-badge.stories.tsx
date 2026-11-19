@@ -3,7 +3,7 @@ import { EnterpriseBadge } from "./enterprise-badge";
 
 const meta: Meta<typeof EnterpriseBadge> = {
   component: EnterpriseBadge,
-  title: "UI/EnterpriseBadge",
+  title: "Product/EnterpriseBadge",
   argTypes: {
     look: {
       control: "select",

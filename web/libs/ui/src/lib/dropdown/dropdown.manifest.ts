@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Dropdown",
   tier: 1,
+  category: "Navigation",
   exports: ["Dropdown", "DropdownTrigger"],
   intent: [
     "A list of actions behind a trigger",

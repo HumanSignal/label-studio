@@ -12,7 +12,7 @@ const STATES: SummaryLabelItem[] = [
 ];
 
 const meta = {
-  title: "UI/SummaryLabel",
+  title: "Data display/SummaryLabel",
   component: SummaryLabel,
   parameters: {
     layout: "padded",

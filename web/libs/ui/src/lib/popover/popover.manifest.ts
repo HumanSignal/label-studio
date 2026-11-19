@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Popover",
   tier: 1,
+  category: "Utilities",
   exports: ["Popover"],
   intent: ["Rich content anchored to a trigger"],
   use_when:

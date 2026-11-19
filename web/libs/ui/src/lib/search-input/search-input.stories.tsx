@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SearchInput } from "./search-input";
 
 const meta: Meta<typeof SearchInput> = {
-  title: "UI/SearchInput",
+  title: "Inputs/SearchInput",
   component: SearchInput,
   args: { "aria-label": "Search labels", placeholder: "Search labels..." },
   decorators: [

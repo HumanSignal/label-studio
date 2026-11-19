@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Skeleton",
   tier: 1,
+  category: "Feedback",
   exports: ["Skeleton"],
   intent: ["A layout still loading"],
   use_when: "Placeholder blocks in the shape of the content that is about to appear.",

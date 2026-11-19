@@ -4,6 +4,7 @@ export default defineManifest([
   {
     name: "Avatar",
     tier: 1,
+    category: "Data display",
     exports: ["Avatar", "AvatarStack"],
     intent: ["A person or several people"],
     use_when:

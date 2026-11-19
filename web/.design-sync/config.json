@@ -60,7 +60,7 @@
     },
     "Pagination": {
       "cardMode": "column",
-      "skip": ["ui-pagination--single-page"]
+      "skip": ["navigation-pagination--single-page"]
     },
     "Select": {
       "cardMode": "column"

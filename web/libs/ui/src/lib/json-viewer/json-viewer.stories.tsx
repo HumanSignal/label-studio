@@ -103,7 +103,7 @@ const complexNestedData = {
 
 const meta: Meta<typeof JsonViewer> = {
   component: JsonViewer,
-  title: "UI/JsonViewer",
+  title: "Data display/JsonViewer",
   argTypes: {
     data: { control: "object" },
     viewOnly: { control: "boolean" },

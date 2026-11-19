@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "DateRangePicker",
   tier: 2,
+  category: "Inputs",
   exports: ["DateRangePicker", "DateRangePickerTrigger"],
   intent: ["Pick a date or date-time range"],
   use_when:

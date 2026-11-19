@@ -22,7 +22,7 @@ import {
 
 const meta = {
   component: DropdownTrigger,
-  title: "UI/Dropdown",
+  title: "Navigation/Dropdown",
   parameters: {
     layout: "centered",
   },

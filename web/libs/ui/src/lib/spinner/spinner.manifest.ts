@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Spinner",
   tier: 1,
+  category: "Feedback",
   exports: ["Spinner", "SPINNER_SIZES"],
   intent: ["An action in progress"],
   use_when: "Something the user triggered is still running and has no layout to reserve.",

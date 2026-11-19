@@ -6,6 +6,7 @@
     "Accordion": {
       "name": "Accordion",
       "tier": 1,
+      "category": "Surfaces",
       "exports": [
         "Accordion",
         "AccordionItem",
@@ -26,6 +27,7 @@
     "AiChatShell": {
       "name": "AiChatShell",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "AiChatShell",
         "AiChatPromptBar",
@@ -43,6 +45,7 @@
     "AutoSizerTable": {
       "name": "AutoSizerTable",
       "tier": 2,
+      "category": "Data display",
       "exports": [
         "AutoSizerTable"
       ],
@@ -55,6 +58,7 @@
     "Avatar": {
       "name": "Avatar",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Avatar",
         "AvatarStack"
@@ -80,6 +84,7 @@
     "Badge": {
       "name": "Badge",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Badge"
       ],
@@ -114,6 +119,7 @@
     "Button": {
       "name": "Button",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "Button",
         "ButtonGroup"
@@ -142,6 +148,7 @@
     "Card": {
       "name": "Card",
       "tier": 1,
+      "category": "Surfaces",
       "exports": [
         "Card",
         "CardHeader",
@@ -175,6 +182,7 @@
     "Checkbox": {
       "name": "Checkbox",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "Checkbox"
       ],
@@ -195,6 +203,7 @@
     "CodeBlock": {
       "name": "CodeBlock",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "CodeBlock"
       ],
@@ -214,6 +223,7 @@
     "CodeEditor": {
       "name": "CodeEditor",
       "tier": 2,
+      "category": "Inputs",
       "exports": [
         "CodeEditor"
       ],
@@ -226,6 +236,7 @@
     "CollapsiblePanel": {
       "name": "CollapsiblePanel",
       "tier": 1,
+      "category": "Surfaces",
       "exports": [
         "CollapsiblePanel"
       ],
@@ -243,6 +254,7 @@
     "ColumnBrowser": {
       "name": "ColumnBrowser",
       "tier": 2,
+      "category": "Layout",
       "exports": [
         "ColumnBrowser",
         "ColumnBrowserColumn",
@@ -257,6 +269,7 @@
     "ContextMenu": {
       "name": "ContextMenu",
       "tier": 1,
+      "category": "Navigation",
       "exports": [
         "ContextMenu"
       ],
@@ -273,6 +286,7 @@
     "DataTable": {
       "name": "DataTable",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "DataTable"
       ],
@@ -294,6 +308,7 @@
     "DateRangePicker": {
       "name": "DateRangePicker",
       "tier": 2,
+      "category": "Inputs",
       "exports": [
         "DateRangePicker",
         "DateRangePickerTrigger"
@@ -314,6 +329,7 @@
     "Drawer": {
       "name": "Drawer",
       "tier": 1,
+      "category": "Surfaces",
       "exports": [
         "Drawer"
       ],
@@ -333,6 +349,7 @@
     "Dropdown": {
       "name": "Dropdown",
       "tier": 1,
+      "category": "Navigation",
       "exports": [
         "Dropdown",
         "DropdownTrigger"
@@ -359,6 +376,7 @@
     "DropZone": {
       "name": "DropZone",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "DropZone"
       ],
@@ -381,6 +399,7 @@
     "EmptyState": {
       "name": "EmptyState",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "EmptyState"
       ],
@@ -402,6 +421,7 @@
     "EnterpriseBadge": {
       "name": "EnterpriseBadge",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "EnterpriseBadge"
       ],
@@ -414,6 +434,7 @@
     "EnterpriseUpgradeOverlay": {
       "name": "EnterpriseUpgradeOverlay",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "EnterpriseUpgradeOverlay"
       ],
@@ -426,6 +447,7 @@
     "FilterShell": {
       "name": "FilterShell",
       "tier": 2,
+      "category": "Layout",
       "exports": [
         "FilterShell"
       ],
@@ -438,6 +460,7 @@
     "Indicator": {
       "name": "Indicator",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Indicator",
         "IndicatorMark"
@@ -463,6 +486,7 @@
     "InputFile": {
       "name": "InputFile",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "InputFile"
       ],
@@ -480,6 +504,7 @@
     "JsonViewer": {
       "name": "JsonViewer",
       "tier": 2,
+      "category": "Data display",
       "exports": [
         "JsonViewer"
       ],
@@ -492,6 +517,7 @@
     "Label": {
       "name": "Label",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "Label"
       ],
@@ -513,6 +539,7 @@
     "Message": {
       "name": "Message",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "Message"
       ],
@@ -537,6 +564,7 @@
     "ModalWindow": {
       "name": "ModalWindow",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "ModalWindow",
         "ModalWindowCloseButton",
@@ -575,6 +603,7 @@
     "MultiTreeSelect": {
       "name": "MultiTreeSelect",
       "tier": 2,
+      "category": "Inputs",
       "exports": [
         "MultiTreeSelect",
         "MultiTreeSelectDropdown",
@@ -592,6 +621,7 @@
     "Pagination": {
       "name": "Pagination",
       "tier": 1,
+      "category": "Navigation",
       "exports": [
         "Pagination"
       ],
@@ -614,6 +644,7 @@
     "Popover": {
       "name": "Popover",
       "tier": 1,
+      "category": "Utilities",
       "exports": [
         "Popover"
       ],
@@ -633,6 +664,7 @@
     "ResizeHandle": {
       "name": "ResizeHandle",
       "tier": 2,
+      "category": "Layout",
       "exports": [
         "ResizeHandle"
       ],
@@ -645,6 +677,7 @@
     "SearchInput": {
       "name": "SearchInput",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "SearchInput"
       ],
@@ -662,6 +695,7 @@
     "SegmentedControl": {
       "name": "SegmentedControl",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "SegmentedControl"
       ],
@@ -684,6 +718,7 @@
     "Select": {
       "name": "Select",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "Select"
       ],
@@ -710,6 +745,7 @@
     "Skeleton": {
       "name": "Skeleton",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "Skeleton"
       ],
@@ -729,6 +765,7 @@
     "Space": {
       "name": "Space",
       "tier": 1,
+      "category": "Layout",
       "exports": [
         "Space"
       ],
@@ -750,6 +787,7 @@
     "Sparkles": {
       "name": "Sparkles",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "Sparkles"
       ],
@@ -762,6 +800,7 @@
     "Spinner": {
       "name": "Spinner",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "Spinner",
         "SPINNER_SIZES"
@@ -789,6 +828,7 @@
     "StateChip": {
       "name": "StateChip",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "StateChip"
       ],
@@ -805,6 +845,7 @@
     "Stepper": {
       "name": "Stepper",
       "tier": 1,
+      "category": "Navigation",
       "exports": [
         "Stepper"
       ],
@@ -825,6 +866,7 @@
     "SummaryLabel": {
       "name": "SummaryLabel",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "SummaryLabel"
       ],
@@ -848,6 +890,7 @@
     "Tabs": {
       "name": "Tabs",
       "tier": 1,
+      "category": "Navigation",
       "exports": [
         "Tabs",
         "TabsList",
@@ -874,6 +917,7 @@
     "TagAutocomplete": {
       "name": "TagAutocomplete",
       "tier": 2,
+      "category": "Inputs",
       "exports": [
         "TagAutocomplete"
       ],
@@ -889,6 +933,7 @@
     "TaxonomyMultiTreeSelect": {
       "name": "TaxonomyMultiTreeSelect",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "TaxonomyMultiTreeSelect"
       ],
@@ -901,6 +946,7 @@
     "TaxonomySelectionList": {
       "name": "TaxonomySelectionList",
       "tier": 2,
+      "category": "Product",
       "exports": [
         "TaxonomySelectionList"
       ],
@@ -913,6 +959,7 @@
     "ThemeToggle": {
       "name": "ThemeToggle",
       "tier": 2,
+      "category": "Utilities",
       "exports": [
         "ThemeToggle"
       ],
@@ -925,6 +972,7 @@
     "Timeline": {
       "name": "Timeline",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Timeline"
       ],
@@ -942,6 +990,7 @@
     "Toast": {
       "name": "Toast",
       "tier": 1,
+      "category": "Feedback",
       "exports": [
         "Toast",
         "ToastAction",
@@ -962,6 +1011,7 @@
     "Toggle": {
       "name": "Toggle",
       "tier": 1,
+      "category": "Inputs",
       "exports": [
         "Toggle"
       ],
@@ -983,6 +1033,7 @@
     "Tooltip": {
       "name": "Tooltip",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Tooltip"
       ],
@@ -1007,6 +1058,7 @@
     "TreeSelect": {
       "name": "TreeSelect",
       "tier": 2,
+      "category": "Inputs",
       "exports": [
         "TreeSelect",
         "TreeSelectItem"
@@ -1020,6 +1072,7 @@
     "Typography": {
       "name": "Typography",
       "tier": 1,
+      "category": "Data display",
       "exports": [
         "Typography"
       ],

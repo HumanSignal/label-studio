@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "EmptyState",
   tier: 1,
+  category: "Feedback",
   exports: ["EmptyState"],
   intent: ["Nothing to show"],
   use_when: "No data, no results or a first-run screen: icon, title, description and the action that fills it.",

@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "StateChip",
   tier: 1,
+  category: "Data display",
   exports: ["StateChip"],
   intent: ["The lifecycle state of a task, project or annotation"],
   use_when:

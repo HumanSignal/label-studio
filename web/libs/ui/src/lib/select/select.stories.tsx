@@ -10,7 +10,7 @@ const thousandOptions = (() => {
 })();
 
 const meta = {
-  title: "UI/Select",
+  title: "Inputs/Select",
   component: Select,
   parameters: {
     layout: "centered",

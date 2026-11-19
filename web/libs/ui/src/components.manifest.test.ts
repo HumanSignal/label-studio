@@ -4,6 +4,7 @@ import { describe, expect, test } from "bun:test";
 import { loadManifest, registryPath, renderRegistry, skillPath } from "../../../tools/ds-manifest/load";
 import { extractSkillSection, renderSkillSection } from "../../../tools/ds-manifest/render-skill";
 import { manifestConfig } from "./ds-manifest/config";
+import { CATEGORIES } from "./ds-manifest/types";
 
 /**
  * Guards the component manifests: every component folder exported from index.ts carries a
@@ -66,6 +67,51 @@ describe("component manifests", () => {
       }
     }
     expect(manifest.components.ModalWindow.retired?.length).toBeGreaterThan(0);
+  });
+
+  test("every component declares a category from the fixed list", () => {
+    const uncategorised = Object.values(manifest.components)
+      .filter((c) => !CATEGORIES.includes(c.category))
+      .map((c) => c.name);
+    expect(uncategorised, `category must be one of: ${CATEGORIES.join(", ")}`).toEqual([]);
+    const used = new Set(Object.values(manifest.components).map((c) => c.category));
+    expect(
+      [...CATEGORIES].filter((category) => !used.has(category)),
+      "categories with no component",
+    ).toEqual([]);
+  });
+
+  test("every story of a component is titled <Category>/…, so Storybook lists it under that section", () => {
+    const misplaced: string[] = [];
+    for (const c of Object.values(manifest.components)) {
+      const dir = path.join(uiSrcDir, c.dir);
+      for (const file of fs.readdirSync(dir).filter((name) => name.endsWith(".stories.tsx"))) {
+        const title = fs.readFileSync(path.join(dir, file), "utf-8").match(/^\s*title:\s*"([^"]+)"/m)?.[1];
+        if (!title?.startsWith(`${c.category}/`)) misplaced.push(`${c.dir}/${file}: ${title}`);
+      }
+    }
+    expect(misplaced).toEqual([]);
+  });
+
+  test("the loader reports a story titled outside its component's category", async () => {
+    const story = path.join(uiSrcDir, "lib/button/button.stories.tsx");
+    const original = fs.readFileSync(story, "utf-8");
+    try {
+      fs.writeFileSync(story, original.replace(/title:\s*"[^"]+"/, 'title: "UI/Button"'));
+      const { problems } = await loadManifest();
+      expect(problems.some((problem) => problem.includes("button.stories.tsx") && problem.includes("Inputs/"))).toBe(
+        true,
+      );
+    } finally {
+      fs.writeFileSync(story, original);
+    }
+  });
+
+  test("Storybook lists the sections in the order of the category list", () => {
+    const preview = fs.readFileSync(path.resolve(uiSrcDir, "../../storybook/.storybook/preview.tsx"), "utf-8");
+    const order = preview.match(/order:\s*\[([^\]]+)\]/)?.[1] ?? "";
+    const sections = [...order.matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+    expect(sections.filter((section) => (CATEGORIES as readonly string[]).includes(section))).toEqual([...CATEGORIES]);
   });
 
   test("the generated registry matches the fragments", () => {

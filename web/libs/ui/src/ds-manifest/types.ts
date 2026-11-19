@@ -5,6 +5,23 @@
  */
 export type Tier = 1 | 2;
 
+/**
+ * The groups the components are listed under, in display order: the Storybook sidebar (one section
+ * heading per category), the skill and the docs. Grouping lives here, not in folders, so no import path depends on it.
+ * `Product` holds components that only make sense in Label Studio.
+ */
+export const CATEGORIES = [
+  "Inputs",
+  "Data display",
+  "Feedback",
+  "Surfaces",
+  "Navigation",
+  "Layout",
+  "Utilities",
+  "Product",
+] as const;
+export type Category = (typeof CATEGORIES)[number];
+
 export type Deprecation = {
   /** Name of the manifest entry that takes over. Must exist and must not be deprecated itself. */
   replaced_by: string;
@@ -16,6 +33,8 @@ export type ComponentManifest = {
   name: string;
   /** 1 = canonical primitive (the lookup answer), 2 = pattern composed from tier 1. */
   tier: Tier;
+  /** The group the component is listed under; every story of the folder is titled `<category>/…`. */
+  category: Category;
   /** Every capitalised export of the folder that `@humansignal/ui` re-exports. */
   exports: string[];
   /** What a caller needs, in their words. Each intent resolves to exactly one component. Empty when deprecated. */

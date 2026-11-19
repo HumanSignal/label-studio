@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "DropZone",
   tier: 1,
+  category: "Inputs",
   exports: ["DropZone"],
   intent: ["A place to drop files or pick them from the file dialog"],
   use_when:

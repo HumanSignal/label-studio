@@ -19,7 +19,7 @@ import { ModalWindow, ModalWindowCloseButton } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
   component: ModalWindow,
-  title: "UI/ModalWindow",
+  title: "Feedback/ModalWindow",
   args: {
     placement: "top",
     size: "medium",

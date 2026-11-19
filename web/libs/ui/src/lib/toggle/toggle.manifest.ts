@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Toggle",
   tier: 1,
+  category: "Inputs",
   exports: ["Toggle"],
   intent: ["An on/off setting"],
   use_when:

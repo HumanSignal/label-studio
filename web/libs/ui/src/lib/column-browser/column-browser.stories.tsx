@@ -8,7 +8,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof ColumnBrowser> = {
   component: ColumnBrowser,
-  title: "UI/ColumnBrowser",
+  title: "Layout/ColumnBrowser",
   parameters: {
     docs: {
       description: {

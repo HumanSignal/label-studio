@@ -3,7 +3,7 @@ import { Sparkles } from "./sparkles";
 import { IconAIAssistant } from "@humansignal/icons";
 
 const meta: Meta<typeof Sparkles> = {
-  title: "UI/Sparkles",
+  title: "Product/Sparkles",
   component: Sparkles,
   parameters: {
     layout: "centered",

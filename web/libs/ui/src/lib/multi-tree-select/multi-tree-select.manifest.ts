@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "MultiTreeSelect",
   tier: 2,
+  category: "Inputs",
   exports: [
     "MultiTreeSelect",
     "MultiTreeSelectDropdown",

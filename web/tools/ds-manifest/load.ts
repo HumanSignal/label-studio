@@ -1,12 +1,18 @@
 /**
  * Collects every `<folder>/<name>.manifest.ts` under libs/ui/src/lib into the registry and validates
  * the contract: a folder exported from index.ts has a manifest and a story, names and exports are
- * unique, intents resolve to one component, deprecations point at live entries, replaced paths exist.
+ * unique, intents resolve to one component, deprecations point at live entries, replaced paths exist,
+ * every entry has a category and its stories are titled under it.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { manifestConfig } from "../../libs/ui/src/ds-manifest/config";
-import type { ComponentManifest, Manifest, RegistryComponent } from "../../libs/ui/src/ds-manifest/types";
+import {
+  CATEGORIES,
+  type ComponentManifest,
+  type Manifest,
+  type RegistryComponent,
+} from "../../libs/ui/src/ds-manifest/types";
 
 export const REGISTRY_VERSION = 2;
 export const webRoot = path.resolve(import.meta.dir, "../..");
@@ -29,7 +35,9 @@ export function listFiles(dir: string, keep: (file: string) => boolean): string[
 }
 
 export const fragmentFiles = () => listFiles(libDir, (f) => f.endsWith(".manifest.ts"));
-export const hasStory = (dir: string) => listFiles(dir, (f) => /\.stories\.tsx$/.test(f)).length > 0;
+export const storyFiles = (dir: string) => listFiles(dir, (f) => /\.stories\.tsx$/.test(f));
+export const hasStory = (dir: string) => storyFiles(dir).length > 0;
+export const storyTitle = (file: string) => fs.readFileSync(file, "utf-8").match(/^\s*title:\s*"([^"]+)"/m)?.[1];
 
 /** `lib/<folder>` for every module index.ts re-exports from. */
 export function indexModuleDirs(): string[] {
@@ -62,12 +70,23 @@ export async function loadManifest(): Promise<LoadResult> {
     const entries = Array.isArray(mod.default) ? mod.default : mod.default ? [mod.default] : [];
     if (!entries.length) problems.push(`${label}: default export must be defineManifest(...)`);
     if (!hasStory(path.dirname(file))) problems.push(`${dir}: no *.stories.tsx; every component ships with a story`);
+    // the category is the first title segment, which Storybook renders as a section heading
+    const prefixes = [...new Set(entries.map((entry) => `${entry.category}/`))];
+    for (const story of storyFiles(path.dirname(file))) {
+      const title = storyTitle(story);
+      if (!title || !prefixes.some((prefix) => title.startsWith(prefix)))
+        problems.push(
+          `${path.relative(uiSrc, story)}: title "${title ?? ""}" must start with ${prefixes.join(" or ")}`,
+        );
+    }
     for (const entry of entries) {
       if (components[entry.name]) problems.push(`${label}: ${entry.name} is defined twice`);
       components[entry.name] = { ...entry, dir };
       if (!entry.exports.includes(entry.name))
         problems.push(`${entry.name}: the entry name must be one of its exports`);
       if (![1, 2].includes(entry.tier)) problems.push(`${entry.name}: tier must be 1 or 2`);
+      if (!CATEGORIES.includes(entry.category))
+        problems.push(`${entry.name}: category must be one of ${CATEGORIES.join(", ")}`);
       if (entry.deprecated) {
         if (entry.intent.length)
           problems.push(`${entry.name}: a deprecated entry must have no intent (it never answers a lookup)`);

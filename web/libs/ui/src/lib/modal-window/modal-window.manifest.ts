@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "ModalWindow",
   tier: 1,
+  category: "Feedback",
   exports: ["ModalWindow", "ModalWindowCloseButton", "Dialog", "ConfirmDialog", "InfoDialog"],
   intent: ["A blocking decision or a focused task"],
   use_when: "A dialog the user must act on or dismiss: confirmations, forms, previews.",

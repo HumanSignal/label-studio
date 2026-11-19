@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "DataTable",
   tier: 1,
+  category: "Data display",
   exports: ["DataTable"],
   intent: ["Rows and columns of data"],
   use_when: "Tabular data with sorting, selection, column sizing or virtualisation.",

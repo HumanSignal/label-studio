@@ -5,7 +5,7 @@ import { SegmentedControl, type SegmentedControlOption } from "./segmented-contr
 
 const meta: Meta<typeof SegmentedControl> = {
   component: SegmentedControl,
-  title: "UI/SegmentedControl",
+  title: "Inputs/SegmentedControl",
   parameters: {
     docs: {
       description: {

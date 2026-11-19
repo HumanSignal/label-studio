@@ -7,7 +7,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Button> = {
   component: Button,
-  title: "UI/Button",
+  title: "Inputs/Button",
   argTypes: {
     disabled: { control: "boolean" },
     waiting: { control: "boolean" },

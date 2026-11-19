@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Checkbox",
   tier: 1,
+  category: "Inputs",
   exports: ["Checkbox"],
   intent: ["Select one or several items from a set"],
   use_when: "Selection of rows, options or items where several can be chosen at once, including indeterminate parents.",

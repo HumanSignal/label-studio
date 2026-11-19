@@ -25,7 +25,7 @@ const people = names.map(([first_name, last_name], i) => ({
 
 const meta: Meta<typeof AvatarStack> = {
   component: AvatarStack,
-  title: "UI/Avatar/AvatarStack",
+  title: "Data display/Avatar/AvatarStack",
   argTypes: {
     max: { control: { type: "number", min: 1, max: 12 } },
     size: {

@@ -24,7 +24,7 @@ const item = (
 };
 
 const meta = {
-  title: "UI/FilterShell",
+  title: "Layout/FilterShell",
   component: FilterShell,
   parameters: {
     layout: "padded",

@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Badge",
   tier: 1,
+  category: "Data display",
   exports: ["Badge"],
   intent: ["An attribute, type or count on an item", "A lifecycle state not covered by the state registry"],
   use_when: "A short label that states an attribute (Required, Inherited, a count) or a status of an item.",

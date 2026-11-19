@@ -4,7 +4,7 @@ import { AutoSizerTable } from "./auto-sizer-table";
 
 const meta: Meta<typeof AutoSizerTable> = {
   component: AutoSizerTable,
-  title: "UI/AutoSizerTable",
+  title: "Data display/AutoSizerTable",
   parameters: { layout: "padded" },
 };
 

@@ -4,7 +4,7 @@ import { Pagination } from "./pagination";
 
 const meta: Meta<typeof Pagination> = {
   component: Pagination,
-  title: "UI/Pagination",
+  title: "Navigation/Pagination",
   argTypes: {
     currentPage: { control: "number" },
     totalPages: { control: "number" },

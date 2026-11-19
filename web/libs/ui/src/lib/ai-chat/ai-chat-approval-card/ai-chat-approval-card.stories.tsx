@@ -6,7 +6,7 @@ import { AiChatApprovalCard } from "./ai-chat-approval-card";
 
 const meta: Meta<typeof AiChatApprovalCard> = {
   component: AiChatApprovalCard,
-  title: "UI/AI Chat/Approval Card",
+  title: "Product/AI Chat/Approval Card",
   parameters: {
     docs: {
       description: {

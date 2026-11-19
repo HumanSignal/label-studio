@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "SearchInput",
   tier: 1,
+  category: "Inputs",
   exports: ["SearchInput"],
   intent: ["Filter a list by typing"],
   use_when: "A search box that narrows a list or table as the user types.",

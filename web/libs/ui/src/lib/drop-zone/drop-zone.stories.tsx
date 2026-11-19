@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DropZone } from "./drop-zone";
 
 const meta = {
-  title: "UI/DropZone",
+  title: "Inputs/DropZone",
   component: DropZone,
   parameters: { layout: "padded" },
 } satisfies Meta<typeof DropZone>;
