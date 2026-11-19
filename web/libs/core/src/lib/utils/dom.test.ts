@@ -93,4 +93,16 @@ describe("alignElements side placements", () => {
     expect(flipped.align).toBe("bottom-center");
     expect(flipped.top).toBe(5 + 40 + 10 + 500);
   });
+
+  it("keeps a top placement when a tall tooltip overflows above but has less space below", () => {
+    setWindow(0, 0, 1000, 800);
+    // Trigger near the bottom of the viewport (740px space above, 10px space below).
+    const nearBottom = withRect({ top: 740, left: 400, width: 80, height: 40 });
+    // Tooltip taller than the viewport height (overflows above, but far more room above than below).
+    const tallTooltip = withRect({ top: 0, left: 0, width: 250, height: 1000 });
+
+    const placed = alignElements(nearBottom, tallTooltip, "top-center", 10);
+    expect(placed.align).toBe("top-center");
+    expect(placed.top).toBe(740 - 1000 - 10);
+  });
 });
