@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { Select } from "./select";
 
 // Mock ResizeObserver which is used by cmdk
@@ -1461,5 +1461,135 @@ describe("Select Component", () => {
       expect(nativeSelect).toBeInTheDocument();
       expect(nativeSelect?.getAttribute("name")).toBe("fruit");
     });
+  });
+});
+
+describe("Select requireApply", () => {
+  const fruits = ["Apple", "Banana", "Cherry"] as any;
+
+  const openSelect = async () => {
+    fireEvent.click(screen.getByRole("button"));
+    await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+  };
+
+  const isChecked = (value: string) =>
+    (within(screen.getByTestId(`select-option-${value}`)).getByRole("checkbox") as HTMLInputElement).checked;
+
+  it("keeps picks pending and commits them once on Apply, then closes", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} multiple requireApply value={[]} onChange={onChange} placeholder="Fruits" />);
+    await openSelect();
+
+    fireEvent.click(screen.getByText("Apple"));
+    fireEvent.click(screen.getByText("Cherry"));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(isChecked("Apple")).toBe(true);
+    expect(isChecked("Cherry")).toBe(true);
+
+    fireEvent.click(screen.getByTestId("select-apply"));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith(["Apple", "Cherry"]);
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+  });
+
+  it("disables Apply until the pending picks differ from the value", async () => {
+    render(<Select options={fruits} multiple requireApply value={["Banana"]} onChange={mock()} placeholder="Fruits" />);
+    await openSelect();
+
+    const apply = screen.getByTestId("select-apply");
+    expect(apply).toBeDisabled();
+
+    fireEvent.click(screen.getByTestId("select-option-Apple"));
+    expect(apply).not.toBeDisabled();
+
+    fireEvent.click(screen.getByTestId("select-option-Apple"));
+    expect(apply).toBeDisabled();
+  });
+
+  it("discards pending picks when it closes without Apply", async () => {
+    const onChange = mock();
+    render(
+      <div data-testid="scroller">
+        <Select options={fruits} multiple requireApply value={["Banana"]} onChange={onChange} placeholder="Fruits" />
+      </div>,
+    );
+    await openSelect();
+    fireEvent.click(screen.getByText("Apple"));
+    expect(isChecked("Apple")).toBe(true);
+
+    fireEvent.scroll(screen.getByTestId("scroller"));
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+
+    await openSelect();
+    expect(isChecked("Apple")).toBe(false);
+    expect(isChecked("Banana")).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("calls onOpen and onClose, and onClose after Apply", async () => {
+    const onOpen = mock();
+    const onClose = mock();
+    render(
+      <Select
+        options={fruits}
+        multiple
+        requireApply
+        value={[]}
+        onChange={mock()}
+        onOpen={onOpen}
+        onClose={onClose}
+        placeholder="Fruits"
+      />,
+    );
+    await openSelect();
+    expect(onOpen).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByText("Apple"));
+    fireEvent.click(screen.getByTestId("select-apply"));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the caller's footer next to Apply and prefixes the Apply test id with dataTestid", async () => {
+    render(
+      <Select
+        options={fruits}
+        multiple
+        requireApply
+        value={[]}
+        onChange={mock()}
+        dataTestid="roles"
+        footer={<span data-testid="custom-footer">Footer</span>}
+        placeholder="Fruits"
+      />,
+    );
+    await openSelect();
+    expect(screen.getByTestId("custom-footer")).toBeInTheDocument();
+    expect(screen.getByTestId("roles-apply")).toBeInTheDocument();
+  });
+
+  it("works uncontrolled from defaultValue", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} multiple requireApply defaultValue={["Banana"]} onChange={onChange} />);
+    await openSelect();
+    expect(isChecked("Banana")).toBe(true);
+
+    fireEvent.click(screen.getByText("Cherry"));
+    fireEvent.click(screen.getByTestId("select-apply"));
+    expect(onChange).toHaveBeenCalledWith(["Banana", "Cherry"]);
+
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+    await openSelect();
+    expect(isChecked("Cherry")).toBe(true);
+  });
+
+  it("is ignored without multiple: a single select still commits on click", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} requireApply onChange={onChange} placeholder="Fruit" />);
+    await openSelect();
+    expect(screen.queryByTestId("select-apply")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Banana"));
+    expect(onChange).toHaveBeenCalledWith("Banana");
   });
 });
