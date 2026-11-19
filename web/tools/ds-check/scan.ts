@@ -71,7 +71,7 @@ export function buildContext({
   const deprecated = new Map<string, string>();
   for (const entry of Object.values(manifest.components)) {
     if (entry.deprecated) for (const name of entry.exports) deprecated.set(name, entry.deprecated.replaced_by);
-    for (const target of entry.replaces) {
+    for (const target of [...entry.replaces, ...(entry.retired ?? [])]) {
       if (target.startsWith("jsx:") || target.startsWith("css:")) continue;
       const abs = path.join(repoRoot, target);
       replaced.push({ key: normal(abs), isDir: isDirectory(abs), component: entry.name });

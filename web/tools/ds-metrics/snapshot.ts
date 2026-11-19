@@ -7,7 +7,8 @@ import type { AnnotatedFinding } from "../ds-check/findings";
 export type Web = "lso" | "lse";
 
 export type Manifest = {
-  components: { name: string; exports: string[]; replaces: string[] }[];
+  /** `retired`: copies a finished migration deleted; they still count where a commit has them. */
+  components: { name: string; exports: string[]; replaces: string[]; retired?: string[] }[];
   nonComponents: string[];
 };
 
@@ -96,7 +97,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
 
   const clusters: Snapshot["clusters"] = {};
   for (const component of input.manifest.components) {
-    const paths = component.replaces.filter((p) => !p.startsWith("jsx:"));
+    const paths = [...component.replaces, ...(component.retired ?? [])].filter((p) => !p.startsWith("jsx:"));
     if (!paths.length) continue;
     const remaining = paths.filter((p) => input.exists(p)).length;
     if (!remaining) continue;
@@ -119,7 +120,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
   const goals: Snapshot["goals"] = {
     primitive_implementations_outside_ds: {
       value: input.manifest.components
-        .flatMap((c) => c.replaces)
+        .flatMap((c) => [...c.replaces, ...(c.retired ?? [])])
         .filter((p) => !p.startsWith("jsx:") && input.exists(p)).length,
       target: TARGETS.primitive_implementations_outside_ds,
     },

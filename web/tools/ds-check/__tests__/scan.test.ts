@@ -76,6 +76,29 @@ describe("ds-check scanner", () => {
     expect(rules(`import { Menu } from "../components/Menu";`)).toEqual(["replaced-import"]);
   });
 
+  test("imports of a retired copy still count, so an older commit that has the file is measured", () => {
+    const retiredCtx = buildContext({
+      repoRoot,
+      webRoot,
+      tokenNames: new Set(),
+      manifest: {
+        components: {
+          ModalWindow: {
+            name: "ModalWindow",
+            exports: ["ModalWindow"],
+            replaces: [],
+            retired: ["services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx"],
+          },
+        },
+      },
+      isDirectory: () => false,
+    });
+    const found = scanSource(file, `import { Modal } from "../components/Modal/Modal";`, retiredCtx);
+    expect(found.map((f) => `${f.rule} ${f.message.split(" ")[0]}`)).toEqual([
+      "replaced-import ../components/Modal/Modal",
+    ]);
+  });
+
   test("the replaced file itself does not count its own sibling imports as replaced", () => {
     const self = path.join(webRoot, "apps/labelstudio/src/components/Menu/Menu.jsx");
     expect(rules(`import { MenuItem } from "./MenuItem";`, self)).toEqual([]);

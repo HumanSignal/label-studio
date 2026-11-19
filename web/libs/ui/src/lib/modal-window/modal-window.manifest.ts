@@ -20,4 +20,10 @@ export default defineManifest({
     "a modal that opens another is hidden while the second is open and returns with its state; never close and reopen it by hand",
   ],
   replaces: [],
+  retired: [
+    "services/lso/web/apps/labelstudio/src/components/Modal/Modal.tsx",
+    "services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx",
+    "services/lso/web/libs/datamanager/src/components/Common/Modal/Modal.tsx",
+    "services/lso/web/libs/editor/src/common/Modal/Modal.tsx",
+  ],
 });

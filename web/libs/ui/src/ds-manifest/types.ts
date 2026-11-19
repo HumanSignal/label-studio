@@ -25,6 +25,12 @@ export type ComponentManifest = {
   props_rules?: string[];
   /** Repo paths (from the monorepo root) or `jsx:`/`css:` patterns of the local look-alikes this replaces. */
   replaces: string[];
+  /**
+   * Repo paths of local look-alikes a finished migration deleted. When a migration deletes a copy, its path moves
+   * here from `replaces`: `ds:metrics` still counts it on older commits, so the adoption history keeps the
+   * cluster and its drop to zero. A retired path must no longer exist.
+   */
+  retired?: string[];
   notes?: string;
   /** A deprecated entry keeps its exports but never answers a lookup; lint bans new imports of it. */
   deprecated?: Deprecation;

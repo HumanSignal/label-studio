@@ -561,6 +561,12 @@
         "a modal that opens another is hidden while the second is open and returns with its state; never close and reopen it by hand"
       ],
       "replaces": [],
+      "retired": [
+        "services/lso/web/apps/labelstudio/src/components/Modal/Modal.tsx",
+        "services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx",
+        "services/lso/web/libs/datamanager/src/components/Common/Modal/Modal.tsx",
+        "services/lso/web/libs/editor/src/common/Modal/Modal.tsx"
+      ],
       "dir": "lib/modal-window"
     },
     "MultiTreeSelect": {
@@ -692,6 +698,9 @@
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/Select/Select.jsx",
         "services/lse/web/apps/labelstudio/src/components/Form/Elements/Select/Select.tsx",
         "services/lso/web/libs/datamanager/src/components/Common/Form/Elements/Select/Select.jsx"
+      ],
+      "retired": [
+        "services/lse/web/apps/labelstudio/src/components/MultiSelect/MultiSelect.tsx"
       ],
       "dir": "lib/select"
     },

@@ -17,6 +17,8 @@ export type ManifestSlice = {
       name: string;
       exports: string[];
       replaces: string[];
+      /** Copies a finished migration deleted; they still count on older commits (the history). */
+      retired?: string[];
       deprecated?: { replaced_by: string; reason: string };
     }
   >;

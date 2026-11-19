@@ -134,6 +134,17 @@ export async function loadManifest(): Promise<LoadResult> {
   for (const c of Object.values(components)) checkReplaces(c.name, c.replaces);
   for (const [name, gap] of Object.entries(manifestConfig.gaps)) checkReplaces(`gaps.${name}`, gap.replaces);
 
+  // retired paths are deleted look-alikes, kept for the history: real paths that no longer exist
+  for (const c of Object.values(components)) {
+    for (const retired of c.retired ?? []) {
+      if (seen.has(retired)) problems.push(`${retired} listed twice (${seen.get(retired)}, ${c.name} retired)`);
+      seen.set(retired, `${c.name} retired`);
+      if (!isPathLike(retired)) problems.push(`${c.name}: retired ${retired} must be a repo path, not a pattern`);
+      else if (checkedOut(retired) && fs.existsSync(path.join(repoRoot, retired)))
+        problems.push(`${c.name}: retired path ${retired} still exists: list it under replaces until it is deleted`);
+    }
+  }
+
   const sorted = Object.fromEntries(Object.entries(components).sort(([a], [b]) => a.localeCompare(b)));
   const manifest: Manifest = {
     version: REGISTRY_VERSION,

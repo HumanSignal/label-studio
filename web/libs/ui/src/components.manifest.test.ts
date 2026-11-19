@@ -55,6 +55,19 @@ describe("component manifests", () => {
     expect(promoted, "the library now exports these: move them from gaps to a manifest").toEqual([]);
   });
 
+  test("retired copies are deleted files, never also listed under replaces", async () => {
+    const { manifest } = await loadManifest();
+    const repo = path.resolve(uiSrcDir, "../../../../..");
+    for (const c of Object.values(manifest.components)) {
+      for (const retired of c.retired ?? []) {
+        expect(retired.startsWith("services/")).toBe(true);
+        expect(fs.existsSync(path.join(repo, retired))).toBe(false);
+        expect(c.replaces).not.toContain(retired);
+      }
+    }
+    expect(manifest.components.ModalWindow.retired?.length).toBeGreaterThan(0);
+  });
+
   test("the generated registry matches the fragments", () => {
     expect(fs.readFileSync(registryPath, "utf-8"), "run `bun run ds:manifest` in services/lso/web").toBe(
       renderRegistry(manifest),

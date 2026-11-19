@@ -14,4 +14,5 @@ export default defineManifest({
     "services/lse/web/apps/labelstudio/src/components/Form/Elements/Select/Select.tsx",
     "services/lso/web/libs/datamanager/src/components/Common/Form/Elements/Select/Select.jsx",
   ],
+  retired: ["services/lse/web/apps/labelstudio/src/components/MultiSelect/MultiSelect.tsx"],
 });

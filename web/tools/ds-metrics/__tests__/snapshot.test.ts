@@ -151,6 +151,45 @@ describe("buildSnapshot", () => {
   });
 });
 
+describe("buildSnapshot with retired copies", () => {
+  const modal = "services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx";
+  const withRetired: SnapshotInput = {
+    ...input,
+    manifest: {
+      ...manifest,
+      components: [
+        ...manifest.components,
+        { name: "ModalWindow", exports: ["ModalWindow"], replaces: [], retired: [modal] },
+      ],
+    },
+    webs: {
+      lso,
+      lse: check("lse", [
+        ...lse.findings,
+        {
+          file: "apps/labelstudio/src/pages/V.tsx",
+          line: 1,
+          rule: "replaced-import",
+          message: "",
+          component: "ModalWindow",
+        },
+      ]),
+    },
+  };
+
+  test("an older commit that still has the copy keeps its cluster and counts it as a local copy", () => {
+    const snap = buildSnapshot({ ...withRetired, exists: (p) => existing.has(p) || p === modal });
+    expect(snap.clusters.ModalWindow).toEqual({ paths_remaining: 1, importers: 1 });
+    expect(snap.goals.primitive_implementations_outside_ds.value).toBe(3);
+  });
+
+  test("a commit where the copy is gone has no cluster for it", () => {
+    const snap = buildSnapshot(withRetired);
+    expect(snap.clusters.ModalWindow).toBeUndefined();
+    expect(snap.goals.primitive_implementations_outside_ds.value).toBe(2);
+  });
+});
+
 describe("buildSnapshot with the template catalog", () => {
   const withTemplates = buildSnapshot({ ...input, templates: { rawControls: 7 } });
 
