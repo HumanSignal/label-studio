@@ -308,6 +308,7 @@ DataManagerPage.context = ({ dmRef }) => {
         onOpenChange={(open) => !open && setInstructionsTitle(null)}
         title={instructionsTitle ?? "Instructions"}
         size="medium"
+        closeOnFocusOutside={false}
         dataTestId="labeling-instructions-modal"
       >
         <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.expert_instruction ?? "") }} />

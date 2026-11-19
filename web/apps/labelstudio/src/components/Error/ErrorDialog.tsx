@@ -30,6 +30,7 @@ export const ErrorDialog = ({ error, onClose, dataTestId = "error-dialog" }: Err
       hideHeader={!onClose}
       header={onClose ? <span /> : undefined}
       showCloseButton={Boolean(onClose)}
+      closeOnFocusOutside={false}
       headerClassName="pb-0"
       placement="center"
       bodyClassName={onClose ? undefined : "p-wide"}

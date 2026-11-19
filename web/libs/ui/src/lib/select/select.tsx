@@ -944,7 +944,18 @@ const SelectBase = forwardRef(
                 </CommandGroup>
               </CommandList>
               {/* Outside CommandList so it stays pinned while the options scroll. */}
-              {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
+              {footer && (
+                <div
+                  className="p-tight border-t border-neutral-border flex"
+                  // A dialog opened from the footer is portaled, but its key events still bubble here through
+                  // React: keep them from the option list, which would take Enter as picking an option.
+                  onKeyDown={(e) => {
+                    if (!e.currentTarget.contains(e.target as Node)) e.stopPropagation();
+                  }}
+                >
+                  {footer}
+                </div>
+              )}
             </Command>
           )}
         </PopoverContent>
