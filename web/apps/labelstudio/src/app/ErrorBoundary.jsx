@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { ErrorWrapper } from "../components/Error/Error";
-import { Modal } from "../components/Modal/ModalPopup";
+import { ErrorDialog } from "../components/Error/ErrorDialog";
 import { captureException } from "../config/Sentry";
 
 export const ErrorContext = React.createContext();
@@ -49,11 +48,11 @@ export default class ErrorBoundary extends Component {
       // We will capture the stacktrace in Sentry, so we don't need to show it in the modal
       // It is not actionable to the user, let's not show it
       return (
-        <Modal onHide={() => location.reload()} style={{ width: "60vw" }} visible bare>
-          <div style={{ padding: 40 }}>
-            <ErrorWrapper title="Runtime error" message={error} onGoBack={goBack} onReload={() => location.reload()} />
-          </div>
-        </Modal>
+        <ErrorDialog
+          error={{ title: "Runtime error", message: error, onGoBack: goBack, onReload: () => location.reload() }}
+          onClose={() => location.reload()}
+          dataTestId="runtime-error-dialog"
+        />
       );
     }
 
