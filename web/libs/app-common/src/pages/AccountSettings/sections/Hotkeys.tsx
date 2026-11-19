@@ -15,18 +15,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@humansignal/ui";
-import { IconWarning } from "@humansignal/icons";
 import { useLocation } from "react-router-dom";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
 import { Skeleton } from "@humansignal/ui";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@humansignal/shad/components/ui/dialog";
 
 import { HotkeySection } from "./Hotkeys/Section";
 import { ImportDialog } from "./Hotkeys/Import";
@@ -407,15 +398,22 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
         </div>
       </fieldset>
 
-      <Dialog open={duplicateConfirmDialog.open} onOpenChange={handleCancelDuplicate}>
-        <DialogContent className="bg-neutral-surface">
-          <DialogHeader>
-            <DialogTitle>Warning: Duplicate Hotkey Detected</DialogTitle>
-            <DialogDescription>
-              The hotkey combination "<strong>{duplicateConfirmDialog.newKey}</strong>" is already being used by:
-            </DialogDescription>
-          </DialogHeader>
-
+      <ConfirmDialog
+        open={duplicateConfirmDialog.open}
+        onOpenChange={(open) => {
+          if (!open) handleCancelDuplicate();
+        }}
+        title="Duplicate hotkey"
+        okText="Allow Duplicate"
+        onOk={handleConfirmDuplicate}
+        onCancel={handleCancelDuplicate}
+        allowClose
+        dataTestId="hotkeys-duplicate-confirm"
+      >
+        <div className="flex flex-col gap-base">
+          <Typography variant="body" size="medium" className="m-0 text-neutral-content">
+            The hotkey combination "<strong>{duplicateConfirmDialog.newKey}</strong>" is already being used by:
+          </Typography>
           <div className="max-h-60 overflow-y-auto">
             <div className="flex flex-col gap-base">
               {duplicateConfirmDialog.conflictingHotkeys.map((conflictHotkey: Hotkey) => (
@@ -438,24 +436,11 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
               ))}
             </div>
           </div>
-
-          <DialogDescription className="text-warning-text bg-warning-background p-base rounded-small border border-warning-border-subtle flex items-start gap-tight">
-            <div>
-              <IconWarning className="text-warning-icon" />
-            </div>
-            <div>
-              Having duplicate hotkeys may cause conflicts and unexpected behavior. Are you sure you want to proceed?
-            </div>
-          </DialogDescription>
-
-          <DialogFooter>
-            <Button variant="neutral" onClick={handleCancelDuplicate}>
-              Cancel
-            </Button>
-            <Button onClick={handleConfirmDuplicate}>Allow Duplicate</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <Message variant="warning" size="small">
+            Having duplicate hotkeys may cause conflicts and unexpected behavior. Are you sure you want to proceed?
+          </Message>
+        </div>
+      </ConfirmDialog>
 
       <ConfirmDialog
         {...resetConfirm}

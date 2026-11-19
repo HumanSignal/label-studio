@@ -1,8 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { ff } from "@humansignal/core";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { Hotkey } from "../../core/Hotkey";
-import { FF_MODAL_WINDOW_APP_CHROME } from "@humansignal/core/lib/utils/feature-flags";
 import Settings from "./Settings";
 
 const createStore = () => ({
@@ -50,20 +48,13 @@ describe("classic editor hotkey settings", () => {
     );
   });
 
-  it("pads tab content inside the ModalWindow body (FIT-3492)", () => {
-    // Spy on the ff object Settings reads: earlier Bun files mockModule @humansignal/core with an
-    // ff.isActive stub that ignores window.APP_SETTINGS, so mockFF() has no effect in the full suite.
-    const isActive = spyOn(ff, "isActive").mockImplementation((flag) => flag === FF_MODAL_WINDOW_APP_CHROME);
-    try {
-      render(<Settings store={createStore()} />);
+  it("pads tab content inside the edge-to-edge dialog body", () => {
+    render(<Settings store={createStore()} />);
 
-      // ModalWindow's body is p-0 so the tab bar stays full-bleed; each pane must add its own padding.
-      const pane = screen.getByTestId("editor-settings-tab-pane-General");
-      expect(pane.className).toContain("px-wide");
-      expect(pane.className).toContain("pb-wide");
-    } finally {
-      isActive.mockRestore();
-    }
+    expect(screen.getByTestId("editor-settings-modal")).toBeInTheDocument();
+    const pane = screen.getByTestId("editor-settings-tab-pane-General");
+    expect(pane.className).toContain("px-wide");
+    expect(pane.className).toContain("pb-wide");
   });
 
   it("links to account hotkeys outside a project", async () => {

@@ -58,8 +58,6 @@ export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_sh
  */
 export const FF_FIT_1304_STRICT_OVERLAP = "fflag_feat_all_fit_1304_strict_overlap";
 
-export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
-
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

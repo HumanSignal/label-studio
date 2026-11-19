@@ -274,8 +274,6 @@ describe("ds-check scanner", () => {
     expect(
       rules(
         [
-          'window.confirm("Leave this page?");',
-          'confirm("Leave this page?");',
           "logger.info({ saved: true });",
           "function info({ title }) {}",
           "// confirm({ title }) in a comment",
@@ -286,6 +284,62 @@ describe("ds-check scanner", () => {
     const [finding] = scanSource(file, "\nconfirm({ title });", ctx);
     expect(finding.line).toBe(2);
     expect(finding.message).toContain("ConfirmDialog");
+  });
+
+  test("the antd Modal is replaced by the DS dialogs", () => {
+    expect(rules('import { Modal, Table } from "antd";')).toEqual(["replaced-import"]);
+    expect(rules('import Modal from "antd/es/modal";\nimport { Modal as M } from "antd/lib/modal";')).toEqual([
+      "replaced-import",
+      "replaced-import",
+    ]);
+    expect(rules('import { Table, Tabs } from "antd";')).toEqual([]);
+    const [finding] = scanSource(file, 'import { Modal } from "antd";', ctx);
+    expect(finding.message).toContain("ModalWindow");
+  });
+
+  test("Radix dialog primitives and native browser dialogs", () => {
+    expect(rules('import * as DialogPrimitive from "@radix-ui/react-dialog";')).toEqual(["replaced-import"]);
+    expect(rules('import { Root } from "@radix-ui/react-alert-dialog";')).toEqual(["replaced-import"]);
+    expect(rules('import * as Popover from "@radix-ui/react-popover";')).toEqual([]);
+    expect(rules('if (window.confirm("Delete?")) remove();\nwindow.alert("Saved");\nwindow.prompt("Name?");')).toEqual(
+      Array(3).fill("imperative-dialog"),
+    );
+    expect(rules('// window.confirm("in a comment")\nconst confirmed = settings.confirm;')).toEqual([]);
+    const router = path.join(webRoot, "apps/labelstudio/src/app/App.jsx");
+    expect(rules("callbackWrapper(window.confirm(message));", router)).toEqual([]);
+    const [finding] = scanSource(file, 'import * as D from "@radix-ui/react-dialog";', ctx);
+    expect(finding.message).toContain("ModalWindowCloseButton");
+  });
+
+  test("hand-built modal overlays", () => {
+    const css = path.join(webRoot, "apps/labelstudio/src/pages/Page.module.css");
+    const scrim = ".overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1000;\n  background: rgba(0, 0, 0, 0.4);\n}";
+    expect(rules(scrim, css)).toContain("hand-built-overlay");
+    expect(
+      rules(
+        ".mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: hsla(0, 0%, 0%, 0.5); }",
+        css,
+      ),
+    ).toContain("hand-built-overlay");
+    // A fullscreen panel with an opaque surface is not a modal backdrop.
+    expect(
+      rules(".full {\n  position: fixed;\n  inset: 0;\n  background: var(--color-neutral-surface);\n}", css),
+    ).not.toContain("hand-built-overlay");
+    expect(rules('<div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />')).toEqual([
+      "hand-built-overlay",
+    ]);
+    expect(rules('<div className="fixed inset-0 bg-neutral-surface" />')).toEqual([]);
+  });
+
+  test("bare native dialogs and hand-built modal dialogs", () => {
+    expect(
+      rules('if (confirm(\'Clear all regions?\')) clear();\nalert(`Saved ${n}`);\nconst v = prompt("Level?", "");'),
+    ).toEqual(Array(3).fill("imperative-dialog"));
+    expect(rules('function confirm(message) {}\nconst ok = confirm(options);\nthis.alert("x");')).toEqual([]);
+    expect(rules('<div role="dialog" aria-modal="true" />')).toEqual(["hand-built-overlay"]);
+    expect(rules('<div role="dialog" aria-modal={!floating} />')).toEqual(["hand-built-overlay"]);
+    expect(rules("React.createElement('div', { role: 'dialog', 'aria-modal': true })")).toEqual(["hand-built-overlay"]);
+    expect(rules('<div role="dialog" aria-modal="false" />')).toEqual([]);
   });
 
   test("findings carry the line and a message naming the replacement", () => {

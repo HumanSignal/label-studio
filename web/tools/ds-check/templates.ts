@@ -13,6 +13,26 @@ import type { Finding } from "./types";
 export const TEMPLATE_CATALOG = "services/lse/label_studio_enterprise/lse_interfaces/system_template_catalog";
 
 export const TEMPLATE_RULE = "template-raw-control";
+export const TEMPLATE_DIALOG_RULE = "template-dialog";
+
+// The template iframe is sandboxed without allow-modals: confirm and prompt return false / null and show nothing.
+const DIALOGS: { pattern: RegExp; message: string }[] = [
+  {
+    pattern:
+      /\b(?:window|globalThis|self)\.(?:confirm|alert|prompt)\(|(?<![\w$.])(?<!\bfunction\s+)(?:confirm|alert|prompt)\(\s*["'`]/g,
+    message:
+      "The sandbox blocks confirm, alert and prompt (they return false / null): render EditorUI.ConfirmDialog, EditorUI.InfoDialog or EditorUI.Dialog.",
+  },
+  {
+    pattern: /["']?aria-modal["']?\s*[:=]\s*(?:\{\s*)?(?!["']?false\b)(?!undefined\b)[^\s,}>]+/g,
+    message: "A hand-built modal dialog: render EditorUI.ModalWindow or EditorUI.Dialog, which draw the scrim.",
+  },
+  {
+    pattern:
+      /position:\s*["']?(?:fixed|absolute)\b(?=[^}\n]*\binset:\s*["']?0\b)(?=[^}\n]*\bbackground(?:-color)?:\s*["']?(?:rgba|hsla)\([^)]*,\s*0?\.\d+\s*\))/g,
+    message: "A hand-built modal backdrop: render EditorUI.ModalWindow or EditorUI.Dialog, which draw the scrim.",
+  },
+];
 
 const RAW_CONTROLS: { pattern: RegExp; message: string }[] = [
   {
@@ -71,12 +91,27 @@ export function scanTemplateSource(file: string, source: string): Finding[] {
   const lines = source.split("\n");
   const findings: Finding[] = [];
   lines.forEach((text, index) => {
+    const allowed = ALLOW.test(text) || (index > 0 && isComment(lines[index - 1]) && ALLOW.test(lines[index - 1]));
     for (const { pattern, message } of RAW_CONTROLS) {
       for (const _ of text.matchAll(pattern)) {
-        if (ALLOW.test(text) || (index > 0 && isComment(lines[index - 1]) && ALLOW.test(lines[index - 1]))) continue;
+        if (allowed) continue;
         findings.push({ file, line: index + 1, rule: TEMPLATE_RULE, message: `[ds/${TEMPLATE_RULE}] ${message}` });
       }
     }
   });
-  return findings;
+  // Dialogs are matched on the whole source: a call's message can start on the next line.
+  for (const { pattern, message } of DIALOGS) {
+    for (const match of source.matchAll(pattern)) {
+      const index = source.slice(0, match.index ?? 0).split("\n").length - 1;
+      const text = lines[index];
+      if (ALLOW.test(text) || (index > 0 && isComment(lines[index - 1]) && ALLOW.test(lines[index - 1]))) continue;
+      findings.push({
+        file,
+        line: index + 1,
+        rule: TEMPLATE_DIALOG_RULE,
+        message: `[ds/${TEMPLATE_DIALOG_RULE}] ${message}`,
+      });
+    }
+  }
+  return findings.sort((a, b) => a.line - b.line);
 }

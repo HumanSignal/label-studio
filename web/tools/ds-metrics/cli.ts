@@ -18,7 +18,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { listTemplateFiles, scanTemplateSource } from "../ds-check/templates";
+import { TEMPLATE_RULE, listTemplateFiles, scanTemplateSource } from "../ds-check/templates";
 import { renderComparison, ruleIncreases } from "./compare";
 import { appendSnapshot, readHistory } from "./history";
 import { mergedPrs } from "./prs";
@@ -68,7 +68,11 @@ function measureTemplates(): TemplateMeasure {
   const files = listTemplateFiles(repoRoot);
   return {
     rawControls: files.reduce(
-      (sum, file) => sum + scanTemplateSource(file, fs.readFileSync(path.join(repoRoot, file), "utf-8")).length,
+      (sum, file) =>
+        sum +
+        scanTemplateSource(file, fs.readFileSync(path.join(repoRoot, file), "utf-8")).filter(
+          (finding) => finding.rule === TEMPLATE_RULE,
+        ).length,
       0,
     ),
   };

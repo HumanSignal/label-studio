@@ -2,7 +2,13 @@ import { describe, expect, test } from "bun:test";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { TEMPLATE_CATALOG, TEMPLATE_RULE, listTemplateFiles, scanTemplateSource } from "../templates";
+import {
+  TEMPLATE_CATALOG,
+  TEMPLATE_DIALOG_RULE,
+  TEMPLATE_RULE,
+  listTemplateFiles,
+  scanTemplateSource,
+} from "../templates";
 
 const FILE = `${TEMPLATE_CATALOG}/example/Screen.jsx`;
 
@@ -21,6 +27,33 @@ describe("scanTemplateSource", () => {
     expect(findings.map((f) => f.line)).toEqual([1, 2, 3, 4, 5, 6, 7]);
     expect(new Set(findings.map((f) => f.rule))).toEqual(new Set([TEMPLATE_RULE]));
     expect(findings[0].file).toBe(FILE);
+  });
+
+  test("finds native dialogs, which the sandbox blocks, and hand-built modal dialogs", () => {
+    const source = [
+      "if (confirm('Clear all regions?')) clear();",
+      "const raw = window.prompt('Level?', '');",
+      '<div role="dialog" aria-modal={!props.floating}>',
+      "React.createElement('div', { role: 'dialog', 'aria-modal': true })",
+      ".kl-scrim { position: absolute; inset: 0; z-index: 80; background: rgba(2, 5, 10, 0.55); }",
+      ".full { position: fixed; inset: 0; background: var(--color-neutral-surface); }",
+      "const ok = confirm(options);",
+      '<div aria-modal="false" />',
+    ].join("\n");
+    const findings = scanTemplateSource(FILE, source);
+    expect(findings.map((f) => [f.line, f.rule])).toEqual([
+      [1, TEMPLATE_DIALOG_RULE],
+      [2, TEMPLATE_DIALOG_RULE],
+      [3, TEMPLATE_DIALOG_RULE],
+      [4, TEMPLATE_DIALOG_RULE],
+      [5, TEMPLATE_DIALOG_RULE],
+    ]);
+    expect(findings[0].message).toContain("EditorUI.ConfirmDialog");
+  });
+
+  test("finds a native dialog whose message starts on the next line", () => {
+    const findings = scanTemplateSource(FILE, "const ok = confirm(\n  'Clear all regions?',\n);");
+    expect(findings.map((f) => [f.line, f.rule])).toEqual([[1, TEMPLATE_DIALOG_RULE]]);
   });
 
   test("skips a control marked with a reason on its line or the line above", () => {

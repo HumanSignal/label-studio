@@ -15,7 +15,7 @@ import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
 import { ConfirmDialog, InfoDialog } from "./confirm-dialog";
-import { ModalWindow } from "./modal-window";
+import { ModalWindow, ModalWindowCloseButton } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
   component: ModalWindow,
@@ -505,6 +505,39 @@ export const CustomHeaderContent: Story = {
     >
       <Typography variant="body" size="small">
         The default title block is replaced by `header`; the `title` prop still supplies an accessible name.
+      </Typography>
+    </ModalStoryShell>
+  ),
+};
+
+/**
+ * Custom header that lays out its own controls, including the close button.
+ *
+ * **When to use:** A header that places the close button itself (e.g. next to a stepper). Set `showCloseButton={false}`
+ * and render `ModalWindowCloseButton` where it belongs; never import `@radix-ui/react-dialog` in a screen.
+ */
+export const CustomHeaderWithCloseButton: Story = {
+  args: {
+    title: "Import learners",
+    showCloseButton: false,
+  },
+  render: (args) => (
+    <ModalStoryShell
+      {...args}
+      header={
+        <div className="flex items-center gap-base">
+          <Typography variant="title" size="medium">
+            Import learners
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle mx-auto">
+            Step 1 of 3
+          </Typography>
+          <ModalWindowCloseButton />
+        </div>
+      }
+    >
+      <Typography variant="body" size="small">
+        The close button sits in the custom header and closes the dialog like the default one.
       </Typography>
     </ModalStoryShell>
   ),

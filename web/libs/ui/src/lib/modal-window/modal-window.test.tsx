@@ -276,3 +276,29 @@ describe("ModalWindow", () => {
     expect(panel).toHaveClass("top-1/2");
   });
 });
+
+describe("ModalWindowCloseButton", () => {
+  it("closes the dialog from a custom header", async () => {
+    const { ModalWindowCloseButton } = await import("./modal-window");
+    const onOpenChange = mock();
+    render(
+      <ModalWindow
+        open
+        onOpenChange={onOpenChange}
+        title="Import learners"
+        showCloseButton={false}
+        header={
+          <div>
+            Import learners
+            <ModalWindowCloseButton />
+          </div>
+        }
+      >
+        Body
+      </ModalWindow>,
+    );
+
+    fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});

@@ -163,3 +163,24 @@ describe("HotkeysManager dirty scope changes", () => {
     expect(screen.getByTestId("dialog-ok-button")).toHaveTextContent("Discard Changes");
   });
 });
+
+describe("HotkeysManager duplicate keys", () => {
+  it("asks in a confirm dialog before assigning a key another hotkey uses", async () => {
+    renderHotkeys({ initialPath: "/user/account/hotkeys" });
+    const toggle = await screen.findByLabelText(/Disable Submit Annotation|Enable Submit Annotation/);
+    const row = toggle.closest(".flex.items-center") as HTMLElement;
+    fireEvent.click(row.querySelector(".cursor-pointer") as HTMLElement);
+
+    const recorder = await screen.findByRole("button", { name: "Click to record keyboard shortcut" });
+    fireEvent.click(recorder);
+    fireEvent.keyDown(recorder, { key: "z", ctrlKey: true });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    const dialog = await screen.findByTestId("hotkeys-duplicate-confirm");
+    expect(dialog).toHaveTextContent("Undo");
+    expect(dialog).toHaveTextContent("Having duplicate hotkeys may cause conflicts");
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByTestId("hotkeys-duplicate-confirm")).toBeNull());
+  });
+});

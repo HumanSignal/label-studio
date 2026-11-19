@@ -69,13 +69,13 @@ export const canPlayUrl = async (url: string) => {
 
   // If the file is binary, we can't check if the browser can play it, so we just assume it can.
   const supported = isBinary(fileMimeType) || (!!fileMimeType && video.canPlayType(fileMimeType) !== "");
-  const modalExists = document.querySelector(".ant-modal");
+  const modalExists = document.querySelector('[data-testid="editor-info-modal"]');
 
   if (!supported && !modalExists) {
     try {
       InfoModal.error("There has been an error rendering your video, please check the format is supported", "");
     } catch {
-      /* headless / test env: antd or modal may throw; still return supported result for callers */
+      /* headless / test env: the dialog may throw; still return supported result for callers */
     }
   }
   return supported;

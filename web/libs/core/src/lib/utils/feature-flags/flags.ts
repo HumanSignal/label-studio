@@ -124,12 +124,6 @@ export const FF_SEGMENT_ANYTHING_ML_BACKEND = "fflag_feat_bros_951_ml_backend_sh
 export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxonomy_antd_removal_short";
 
 /**
- * Single feature flag for migrating app-chrome dialogs from legacy `modal()` / `Modal` to `ModalWindow`.
- * Use `ff.isActive(FF_MODAL_WINDOW_APP_CHROME)` next to each migrated modal (not a global switch in app Modal.tsx).
- */
-export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
-
-/**
  * New drafts + undo/redo architecture in the new editor (`editor-shell`).
  * When OFF, both editors behave exactly as today (existing draft / `screenHistoryAtom` path).
  * When ON, the editor-shell routes changes through the Canvas / UndoRedoStack / Draft / DraftBridge

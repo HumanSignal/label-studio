@@ -348,7 +348,7 @@ describe("Control Tags - TextArea - Duplicate prevention", () => {
       .clear()
       .type('The "H1" Header{enter}', { force: true });
     Modals.hasWarning(textareaSkipDuplicatesError);
-    cy.contains(".ant-modal.ant-modal-confirm-warning button", "OK").click();
+    Modals.closeWarning();
 
     cy.get('[data-testid="textarea-region-item"]')
       .eq(1)

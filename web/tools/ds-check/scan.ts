@@ -151,6 +151,13 @@ function unknownTokens(file: string, source: string, tokenNames: Set<string>): F
     }));
 }
 
+const ANTD_MODAL_MESSAGE =
+  "The antd Modal is replaced by ModalWindow, ConfirmDialog and InfoDialog from @humansignal/ui, rendered by the component that owns the dialog.";
+const ANTD_MODAL_MODULE = /^antd\/(?:es|lib)\/modal(?:\/|$)/;
+const RADIX_DIALOG_MODULE = /^@radix-ui\/react-(?:alert-)?dialog(?:\/|$)/;
+const RADIX_DIALOG_MESSAGE =
+  "Screens do not build dialogs from Radix: use ModalWindow, ConfirmDialog or InfoDialog from @humansignal/ui, and ModalWindowCloseButton for a close button in a custom header.";
+
 function namedImports(file: string, source: string, ctx: ScanContext): Finding[] {
   const out: Finding[] = [];
   for (const match of source.matchAll(NAMED_IMPORT)) {
@@ -167,6 +174,9 @@ function namedImports(file: string, source: string, ctx: ScanContext): Finding[]
           rule: "replaced-import",
           message: `${name} (via ${from}) is a local copy that ${component} replaces: import ${component} from @humansignal/ui.`,
         });
+      }
+      if (from === "antd" && name === "Modal") {
+        out.push({ file, line, rule: "replaced-import", message: ANTD_MODAL_MESSAGE });
       }
       if (from === "@humansignal/icons" && /^Icon[A-Z]/.test(name)) {
         out.push({
@@ -286,6 +296,10 @@ function moduleImports(file: string, source: string, ctx: ScanContext): Finding[
         rule: "internal-import",
         message: `${spec} reaches into @humansignal/ui internals: import from "@humansignal/ui" (export it there if it is missing).`,
       });
+    } else if (RADIX_DIALOG_MODULE.test(spec)) {
+      out.push({ file, line, rule: "replaced-import", message: RADIX_DIALOG_MESSAGE });
+    } else if (ANTD_MODAL_MODULE.test(spec)) {
+      out.push({ file, line, rule: "replaced-import", message: ANTD_MODAL_MESSAGE });
     } else if (spec === "@phosphor-icons/react" || spec.startsWith("@phosphor-icons/react/")) {
       out.push({
         file,
@@ -356,8 +370,21 @@ function tailwindPrimitives(file: string, source: string): Finding[] {
 const IMPERATIVE_DIALOG =
   /(?<![\w$.])(?<!\bfunction\s+)(?:confirm|info|modal)\(\s*\{|(?<![\w$.])standaloneModal\(|(?<![\w$.])Modal\.(?:confirm|info|modal)\(/g;
 
+// The browser's own blocking dialogs. The router's leave-page prompt (getUserConfirmation in the app root) is the
+// one allowed use: the browser asks before leaving the page.
+const NATIVE_DIALOG =
+  /\b(?:window|globalThis|self)\.(?:confirm|alert|prompt)\(|(?<![\w$.])(?<!\bfunction\s+)(?:confirm|alert|prompt)\(\s*["'`]/g;
+const NATIVE_DIALOG_ALLOWED = /^apps\/labelstudio\/src\/app\/App\.jsx$/;
+const NATIVE_DIALOG_MESSAGE =
+  "The browser's window.confirm, alert and prompt are not the design system: render ConfirmDialog or InfoDialog from @humansignal/ui instead.";
+
 function imperativeDialogs(file: string, source: string): Finding[] {
   const out: Finding[] = [];
+  for (const match of NATIVE_DIALOG_ALLOWED.test(file) ? [] : source.matchAll(NATIVE_DIALOG)) {
+    const index = match.index ?? 0;
+    if (COMMENT_LINE.test(source.slice(source.lastIndexOf("\n", index) + 1, index + match[0].length))) continue;
+    out.push({ file, line: lineAt(source, index), rule: "imperative-dialog", message: NATIVE_DIALOG_MESSAGE });
+  }
   for (const match of source.matchAll(IMPERATIVE_DIALOG)) {
     const index = match.index ?? 0;
     if (COMMENT_LINE.test(source.slice(source.lastIndexOf("\n", index) + 1, index + match[0].length))) continue;
@@ -372,16 +399,76 @@ function imperativeDialogs(file: string, source: string): Finding[] {
   return out;
 }
 
+// A modal backdrop built by hand: a full-viewport fixed layer with a see-through background (a scrim). Dialogs come
+// from ModalWindow, which draws the one shared scrim; an opaque fullscreen panel is not a backdrop.
+const HAND_BUILT_OVERLAY_MESSAGE =
+  "A hand-built modal backdrop: render ModalWindow, ConfirmDialog or InfoDialog from @humansignal/ui, which draw the scrim.";
+const HAND_BUILT_MODAL_MESSAGE =
+  "A hand-built modal dialog (aria-modal): render ModalWindow, ConfirmDialog or InfoDialog from @humansignal/ui.";
+const SEE_THROUGH =
+  /(?:rgba|hsla)\([^)]*,\s*(?:0?\.\d+|0)\s*\)|(?:rgb|hsl)\([^)]*\/\s*(?:0?\.\d+|\d{1,2}%)\s*\)|#[0-9a-fA-F]{6}(?![fF]{2})[0-9a-fA-F]{2}\b/;
+const FULL_VIEWPORT = (block: string) =>
+  /\binset:\s*0(?:px)?\s*(?:;|$)/m.test(block) ||
+  ["top", "right", "bottom", "left"].every((side) => new RegExp(`\\b${side}:\\s*0(?:px)?\\s*(?:;|$)`, "m").test(block));
+
+function handBuiltOverlays(file: string, source: string, isStyle: boolean): Finding[] {
+  const out: Finding[] = [];
+  if (isStyle) {
+    // Declarations of each block up to its first nested block or its end.
+    for (const match of source.matchAll(/\{([^{}]*)/g)) {
+      const block = match[1];
+      if (!/\bposition:\s*fixed\b/.test(block) || !FULL_VIEWPORT(block)) continue;
+      const background = block.match(/\bbackground(?:-color)?:\s*([^;]+)/)?.[1] ?? "";
+      if (!SEE_THROUGH.test(background)) continue;
+      out.push({
+        file,
+        line: lineAt(source, match.index ?? 0),
+        rule: "hand-built-overlay",
+        message: HAND_BUILT_OVERLAY_MESSAGE,
+      });
+    }
+    return out;
+  }
+  // A dialog that declares itself modal: only ModalWindow, inside the design system, may.
+  for (const match of source.matchAll(
+    /["']?aria-modal["']?\s*[:=]\s*(?:\{\s*)?(?!["']?false\b)(?!undefined\b)[^\s,}>]+/g,
+  )) {
+    out.push({
+      file,
+      line: lineAt(source, match.index ?? 0),
+      rule: "hand-built-overlay",
+      message: HAND_BUILT_MODAL_MESSAGE,
+    });
+  }
+  for (const match of source.matchAll(/(["'`])([^"'`\n]*)\1/g)) {
+    const classes = match[2].split(/\s+/);
+    if (!classes.includes("fixed") || !classes.includes("inset-0")) continue;
+    if (!classes.some((c) => /^bg-[\w-]+\/\d+$|^bg-\[(?:rgba|hsla)/.test(c))) continue;
+    out.push({
+      file,
+      line: lineAt(source, match.index ?? 0),
+      rule: "hand-built-overlay",
+      message: HAND_BUILT_OVERLAY_MESSAGE,
+    });
+  }
+  return out;
+}
+
 /** All structural findings for one file. `absPath` is absolute; findings carry the path relative to the web root. */
 export function scanSource(absPath: string, source: string, ctx: ScanContext): Finding[] {
   const file = path.relative(ctx.webRoot, absPath).split(path.sep).join("/");
   if (STYLE_EXT.test(absPath))
-    return [...colorLiterals(file, source, true), ...unknownTokens(file, source, ctx.tokenNames)];
+    return [
+      ...colorLiterals(file, source, true),
+      ...unknownTokens(file, source, ctx.tokenNames),
+      ...handBuiltOverlays(file, scannableCss(source), true),
+    ];
   if (!SOURCE_EXT.test(absPath)) return [];
   return [
     ...colorLiterals(file, source, false),
     ...tailwindPrimitives(file, source),
     ...imperativeDialogs(file, source),
+    ...handBuiltOverlays(file, source, false),
     ...namedImports(file, source, ctx),
     ...moduleImports(file, source, ctx),
   ];

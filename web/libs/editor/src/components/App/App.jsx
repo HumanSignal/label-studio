@@ -303,7 +303,7 @@ class App extends Component {
           <Provider store={store}>
             <ClassicVerticalLayoutNudge store={store}>
               <ToastProvider>
-                {ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME) ? <InfoModalRoot /> : null}
+                <InfoModalRoot />
                 <InstructionsModal
                   visible={store.showingDescription}
                   onCancel={() => store.toggleDescription()}
