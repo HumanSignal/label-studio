@@ -390,7 +390,7 @@
 }
 
 .headerBody {
-  @apply flex w-full min-w-0 flex-col items-start gap-tightest whitespace-normal break-words;
+  @apply flex w-full min-w-0 flex-col items-start gap-tightest whitespace-normal break-words text-left;
 }
 
 /* Title-only entries are as tall as every other entry, with the title centred against the marker. */
