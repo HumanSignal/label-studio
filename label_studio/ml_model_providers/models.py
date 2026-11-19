@@ -131,13 +131,18 @@ class ModelProviderConnection(models.Model):
         help_text='Budget alert threshold for the given provider connection',
     )
 
-    # Check if user is Admin or Owner
-    # This will need to be updated if we ever use this model in LSO as `is_owner` and
-    # `is_administrator` only exist in LSE
+    # Owner, Administrator or Manager of the connection's organization.
+    # This will need to be updated if we ever use this model in LSO: the role check only exists in LSE
     def has_permission(self, user):
-        return (
-            user.is_administrator or user.is_owner or user.is_manager
-        ) and user.active_organization_id == self.organization_id
+        from lse_organizations.models import OrganizationRole
+
+        if user.active_organization_id != self.organization_id:
+            return False
+        return user.get_role(user.active_organization_id) in (
+            OrganizationRole.OWNER,
+            OrganizationRole.ADMINISTRATOR,
+            OrganizationRole.MANAGER,
+        )
 
     def update_budget_total_spent_from_predictions_meta(self, predictions_meta: List[PredictionMeta]):
         total_cost = sum(meta.total_cost or 0 for meta in predictions_meta)

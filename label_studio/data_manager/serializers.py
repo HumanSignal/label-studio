@@ -60,7 +60,7 @@ def view_lock_project(instance_or_data):
     """Resolve a project for lock permission checks.
 
     ``View`` has ``project``; ``DatasetView`` has ``dataset`` only. Returning
-    ``None`` lets ``get_user_role`` fall back to an org-level role check.
+    ``None`` lets ``user.get_role`` fall back to an org-level role check.
     """
     if isinstance(instance_or_data, dict):
         return instance_or_data.get('project')
@@ -69,12 +69,11 @@ def view_lock_project(instance_or_data):
 
 def user_can_manage_view_lock(user, project):
     try:
-        from lse_organizations.functions import get_user_role
         from lse_organizations.models import OrganizationRole
     except ImportError:
         return True
 
-    role = get_user_role(user=user, organization_or_pk=user.active_organization_id, project=project)
+    role = user.get_role(user.active_organization_id, project)
     return role in (OrganizationRole.OWNER, OrganizationRole.ADMINISTRATOR, OrganizationRole.MANAGER)
 
 
