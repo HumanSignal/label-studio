@@ -3662,7 +3662,7 @@
     },
     "fflag_feat_utc_1459_manual_project_done": {
       "key": "fflag_feat_utc_1459_manual_project_done",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -3684,7 +3684,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_utc_161_bulk_queue_total_11072025_short": {
