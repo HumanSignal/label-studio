@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { TARGETS, areaOf, buildSnapshot } from "../snapshot";
-import type { CheckAll, Manifest, RenderFile, SnapshotInput } from "../snapshot";
+import { TARGETS, TEMPLATES_AREA, areaOf, buildSnapshot } from "../snapshot";
+import type { CheckAll, Manifest, SnapshotInput } from "../snapshot";
 
 const manifest: Manifest = {
   components: [
@@ -70,9 +70,6 @@ const lse = check("lse", [
   { file: "libs/editor-shell/src/C.tsx", line: 1, rule: "legacy-icon", message: "" },
 ]);
 
-const render = (web: "lso" | "lse", files: [string, boolean][]): RenderFile[] =>
-  files.map(([file, importsDs]) => ({ web, file, importsDs }));
-
 const existing = new Set([
   "services/lso/web/libs/editor/src/common/Button/Button.tsx",
   "services/lse/web/apps/labelstudio/src/components/Menu/Menu.jsx",
@@ -85,21 +82,6 @@ const input: SnapshotInput = {
   prs: [{ number: 3780, title: "Example change", commit: "abc123" }],
   manifest,
   webs: { lso, lse },
-  renderFiles: [
-    ...render("lso", [
-      ["libs/editor/src/A.tsx", false],
-      ["libs/editor/src/D.tsx", true],
-      ["apps/labelstudio/src/E.tsx", true],
-      ["libs/datamanager/src/B.jsx", false],
-    ]),
-    ...render("lse", [
-      ["apps/labelstudio/src/pages/X.tsx", true],
-      ["apps/labelstudio/src/pages/Y.tsx", false],
-      ["apps/labelstudio/src/pages/Z.tsx", true],
-      ["apps/labelstudio/src/pages/W.tsx", true],
-      ["libs/editor-shell/src/C.tsx", false],
-    ]),
-  ],
   exists: (p) => existing.has(p),
 };
 
@@ -139,11 +121,13 @@ describe("buildSnapshot", () => {
     expect(snap.clusters.Spinner).toBeUndefined();
   });
 
-  test("areas carry violations and the share of render files importing the design system", () => {
-    expect(snap.areas["lse/app"]).toEqual({ violations: 5, render_files: 4, ds_import_share: 0.75 });
-    expect(snap.areas.editor).toEqual({ violations: 2, render_files: 2, ds_import_share: 0.5 });
-    expect(snap.areas.datamanager).toEqual({ violations: 1, render_files: 1, ds_import_share: 0 });
-    expect(snap.areas["lse/libs/editor-shell"]).toEqual({ violations: 1, render_files: 1, ds_import_share: 0 });
+  test("areas carry the violations of their files, and only areas with violations are listed", () => {
+    expect(snap.areas).toEqual({
+      datamanager: { violations: 1 },
+      editor: { violations: 2 },
+      "lse/app": { violations: 5 },
+      "lse/libs/editor-shell": { violations: 1 },
+    });
   });
 
   test("goals carry the value and the target from the scoreboard", () => {
@@ -154,11 +138,73 @@ describe("buildSnapshot", () => {
     expect(snap.goals.ds_components).toEqual({ value: 3, target: TARGETS.ds_components });
     expect(snap.goals.raw_controls_lse_app).toEqual({ value: 3, target: 0 });
     expect(snap.goals.legacy_icons).toEqual({ value: 2, target: 0 });
-    expect(snap.goals.ds_render_share_lse).toEqual({ value: 0.6, target: TARGETS.ds_render_share_lse });
-    expect(snap.goals.ds_render_share_lso).toEqual({ value: 0.5, target: TARGETS.ds_render_share_lso });
+    expect(Object.keys(snap.goals)).toEqual([
+      "primitive_implementations_outside_ds",
+      "ds_components",
+      "raw_controls_lse_app",
+      "legacy_icons",
+    ]);
   });
 
   test("the snapshot is deterministic for the same input", () => {
     expect(JSON.stringify(buildSnapshot(input))).toBe(JSON.stringify(snap));
+  });
+});
+
+describe("buildSnapshot with retired copies", () => {
+  const modal = "services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx";
+  const withRetired: SnapshotInput = {
+    ...input,
+    manifest: {
+      ...manifest,
+      components: [
+        ...manifest.components,
+        { name: "ModalWindow", exports: ["ModalWindow"], replaces: [], retired: [modal] },
+      ],
+    },
+    webs: {
+      lso,
+      lse: check("lse", [
+        ...lse.findings,
+        {
+          file: "apps/labelstudio/src/pages/V.tsx",
+          line: 1,
+          rule: "replaced-import",
+          message: "",
+          component: "ModalWindow",
+        },
+      ]),
+    },
+  };
+
+  test("an older commit that still has the copy keeps its cluster and counts it as a local copy", () => {
+    const snap = buildSnapshot({ ...withRetired, exists: (p) => existing.has(p) || p === modal });
+    expect(snap.clusters.ModalWindow).toEqual({ paths_remaining: 1, importers: 1 });
+    expect(snap.goals.primitive_implementations_outside_ds.value).toBe(3);
+  });
+
+  test("a commit where the copy is gone has no cluster for it", () => {
+    const snap = buildSnapshot(withRetired);
+    expect(snap.clusters.ModalWindow).toBeUndefined();
+    expect(snap.goals.primitive_implementations_outside_ds.value).toBe(2);
+  });
+});
+
+describe("buildSnapshot with the template catalog", () => {
+  const withTemplates = buildSnapshot({ ...input, templates: { rawControls: 7 } });
+
+  test("the templates are their own area and goal", () => {
+    expect(withTemplates.areas[TEMPLATES_AREA]).toEqual({ violations: 7 });
+    expect(withTemplates.goals.raw_controls_templates).toEqual({ value: 7, target: TARGETS.raw_controls_templates });
+  });
+
+  test("template raw controls stay out of the rule counts the PR gate compares", () => {
+    expect(withTemplates.rules).toEqual(buildSnapshot(input).rules);
+    expect(withTemplates.totals).toEqual(buildSnapshot(input).totals);
+  });
+
+  test("a checkout without the catalog has no template area or goal", () => {
+    expect(buildSnapshot(input).areas[TEMPLATES_AREA]).toBeUndefined();
+    expect(buildSnapshot(input).goals.raw_controls_templates).toBeUndefined();
   });
 });

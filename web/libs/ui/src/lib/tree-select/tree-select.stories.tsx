@@ -4,7 +4,7 @@ import { TreeSelect, type TreeSelectNode } from "./tree-select";
 
 const meta: Meta<typeof TreeSelect> = {
   component: TreeSelect,
-  title: "UI/TreeSelect",
+  title: "Inputs/TreeSelect",
   parameters: { layout: "padded" },
 };
 

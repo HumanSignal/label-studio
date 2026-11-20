@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 const meta: Meta<typeof Tabs> = {
   component: Tabs,
-  title: "UI/Tabs",
+  title: "Navigation/Tabs",
   parameters: {
     docs: {
       description: {

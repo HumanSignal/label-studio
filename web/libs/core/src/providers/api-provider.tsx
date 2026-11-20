@@ -114,7 +114,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<ApiProvi
         const result = await api.invoke<T>(method, params, rest);
 
         if (result?.error) {
-          // The caller answers a step-up challenge with withStepUp (@humansignal/app-common): not an error to show
+          // The caller answers a step-up challenge with useStepUp (@humansignal/app-common): not an error to show
           if (stepUpChallengeOf(result)) {
             return result;
           }

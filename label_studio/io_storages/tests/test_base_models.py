@@ -1,7 +1,10 @@
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
+from io_storages.models import S3ImportStorage
+from io_storages.s3.models import S3ImportStorageLink
 from io_storages.tests.factories import AzureBlobExportStorageFactory, S3ImportStorageFactory
+from io_storages.utils import StorageObject
 from projects.tests.factories import ProjectFactory
 from tasks.models import Annotation
 from tasks.tests.factories import TaskFactory
@@ -126,6 +129,49 @@ class TestImportStorageResolveUris(TestCase):
         assert result is not None
         assert 's3://test-bucket/images/some directory/sub folder/img.jpg' not in result
         assert 'http://localhost:8080' in result
+
+
+class TestImportStorageTaskImportId(TestCase):
+    """Storage sync keeps the root id of a task-format JSON object as Task.import_id (ImportStorage._build_task)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.storage = S3ImportStorageFactory(bucket='test-bucket')
+        cls.project = cls.storage.project
+
+    def _add_task(self, task_data):
+        link_object = StorageObject(key='task.json', task_data=task_data)
+        task = S3ImportStorage.add_task(self.project, 1, 1, self.storage, link_object, S3ImportStorageLink)
+        task.refresh_from_db()
+        return task
+
+    def test_task_format_object_keeps_root_id(self):
+        task = self._add_task({'id': 4242, 'data': {'text': 'exported'}})
+
+        assert task.import_id == 4242
+        assert task.data == {'text': 'exported'}
+
+    def test_data_only_object_keeps_id_as_data(self):
+        task = self._add_task({'id': 4242, 'text': 'flat'})
+
+        assert task.import_id is None
+        assert task.data == {'id': 4242, 'text': 'flat'}
+
+    def test_root_id_that_is_not_an_integer_is_ignored(self):
+        task = self._add_task({'id': 'row-17', 'data': {'text': 'from another tool'}})
+
+        assert task.import_id is None
+
+    def test_bulk_insert_path_keeps_root_id(self):
+        link_object = StorageObject(key='bulk.json', task_data={'id': 7, 'data': {'text': 'bulk'}})
+        task, link_kwargs, _, _ = S3ImportStorage._build_task(self.project, 1, 1, link_object)
+
+        (created,) = S3ImportStorage.add_tasks_bulk(
+            self.project, self.storage, [(task, link_kwargs)], S3ImportStorageLink
+        )
+
+        created.refresh_from_db()
+        assert created.import_id == 7
 
 
 class TestExportStorageSaveAnnotationsStatus(TestCase):

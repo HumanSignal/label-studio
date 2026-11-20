@@ -6,7 +6,7 @@
  * `libs/core/src/lib/topbar/__tests__/`). The tests in this file remain as the
  * source of truth for the MST → props/handler mapping done by the wrapper —
  * lazy stub hydration, `useResolveUser`/`enrichUsers` plumbing, the
- * `Modal#confirm` delete dialog, LSE-specific review-status parsing from
+ * delete ConfirmDialog, LSE-specific review-status parsing from
  * `task.source`, and the wiring of MST actions onto SharedAnnotation handlers.
  *
  * If you need to add coverage for purely presentational behavior, prefer the
@@ -23,11 +23,9 @@ import * as useResolveUserModule from "@humansignal/core/hooks/useResolveUser";
 import * as coreModule from "@humansignal/core";
 import * as uiModule from "@humansignal/ui";
 import { ToastContext } from "@humansignal/ui";
-import * as modalModule from "../../../common/Modal/Modal";
 
 import { isAlive } from "mobx-state-tree";
 const mockIsAlive = isAlive as any;
-const mockModalConfirm = mock();
 const ff = mockFF();
 
 beforeEach(() => {
@@ -124,8 +122,6 @@ describe("AnnotationButton", () => {
 
     spyOn(uiModule, "useToast").mockReturnValue({ show: mockToastShow });
     spyOn(uiModule, "useDropdown").mockReturnValue({ close: mock() });
-
-    spyOn(modalModule, "confirm").mockImplementation(mockModalConfirm);
   });
 
   it("renders null when entity is not alive", () => {
@@ -524,7 +520,7 @@ describe("AnnotationButton", () => {
     expect(screen.queryByText("Compare All Annotations")).toBeNull();
   });
 
-  it("opens delete confirmation when Delete Annotation is clicked", () => {
+  it("opens delete confirmation when Delete Annotation is clicked", async () => {
     const entity = createEntity();
     const { container } = renderWithProviders(
       <Provider store={defaultStore}>
@@ -537,12 +533,8 @@ describe("AnnotationButton", () => {
     );
     fireEvent.click(container.querySelector(".ls-annotation-button__trigger")!);
     fireEvent.click(screen.getByText("Delete Annotation"));
-    expect(mockModalConfirm).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Delete annotation?",
-        okText: "Delete",
-      }),
-    );
+    expect(await screen.findByRole("dialog", { name: "Delete annotation?" })).toBeInTheDocument();
+    expect(screen.getByTestId("dialog-ok-button")).toHaveTextContent("Delete");
   });
 
   it("calls Copy Annotation ID and shows toast when menu item is clicked", () => {
@@ -793,7 +785,7 @@ describe("AnnotationButton", () => {
       );
     });
 
-    it("opens delete confirmation when Delete Prediction is clicked", () => {
+    it("opens delete confirmation when Delete Prediction is clicked", async () => {
       const entity = createEntity({ type: "prediction", pk: 1 });
       render(
         <Provider store={defaultStore}>
@@ -806,12 +798,8 @@ describe("AnnotationButton", () => {
       );
       fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
       fireEvent.click(screen.getByText("Delete Prediction"));
-      expect(mockModalConfirm).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Delete prediction?",
-          okText: "Delete",
-        }),
-      );
+      expect(await screen.findByRole("dialog", { name: "Delete prediction?" })).toBeInTheDocument();
+      expect(screen.getByTestId("dialog-ok-button")).toHaveTextContent("Delete");
     });
   });
 

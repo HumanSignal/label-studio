@@ -4,7 +4,7 @@ import { Space } from "./space";
 
 const meta: Meta<typeof Space> = {
   component: Space,
-  title: "UI/Space",
+  title: "Layout/Space",
   argTypes: {
     direction: { control: "select", options: ["horizontal", "vertical"] },
     size: { control: "select", options: ["small", "large"] },

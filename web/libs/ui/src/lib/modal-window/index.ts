@@ -1,16 +1,15 @@
 export {
   Dialog,
   ModalWindow,
+  ModalWindowCloseButton,
   type ModalWindowProps,
   type ModalWindowSize,
   type ModalWindowPlacement,
 } from "./modal-window";
 export {
-  confirm,
-  info,
-  modal,
-  type ConfirmDialogOptions,
-  type DialogHandle,
-  type InfoDialogOptions,
-  type ModalOptions,
-} from "./confirm";
+  ConfirmDialog,
+  InfoDialog,
+  type ConfirmDialogContent,
+  type ConfirmDialogProps,
+  type InfoDialogProps,
+} from "./confirm-dialog";

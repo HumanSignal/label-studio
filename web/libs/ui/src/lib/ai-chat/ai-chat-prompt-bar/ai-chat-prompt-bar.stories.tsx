@@ -7,7 +7,7 @@ import { AiChatPromptBar } from "./ai-chat-prompt-bar";
 
 const meta: Meta<typeof AiChatPromptBar> = {
   component: AiChatPromptBar,
-  title: "UI/AI Chat/Prompt Bar",
+  title: "Product/AI Chat/Prompt Bar",
   parameters: {
     docs: {
       description: {

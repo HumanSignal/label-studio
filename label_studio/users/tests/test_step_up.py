@@ -79,6 +79,7 @@ def test_password_confirmation_unlocks_the_session(owner):
 
     wrong = client.post('/api/current-user/step-up', {'current_password': 'nope'}, content_type='application/json')
     assert wrong.status_code == 400
+    assert wrong.json()['validation_errors'] == {'current_password': ['Incorrect password']}
     assert client.get('/api/current-user/token').status_code == 403
 
     right = client.post('/api/current-user/step-up', {'current_password': PASSWORD}, content_type='application/json')

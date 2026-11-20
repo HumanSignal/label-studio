@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "AutoSizerTable",
   tier: 2,
+  category: "Data display",
   exports: ["AutoSizerTable"],
   intent: [],
   use_when: "A DataTable that fills its container height.",

@@ -33,16 +33,21 @@ describe("sanitizeInstructionsHtml", () => {
     expect(div).toHaveTextContent("Guide");
   });
 
-  test("keeps stylesheets, embedded documents, https iframes and forms after the organization opts in", () => {
+  test("keeps https iframes, inputs and buttons after the organization opts in", () => {
     setOptIn(true);
     const div = render(PAYLOAD);
 
-    expect(div.querySelector('link[rel="stylesheet"][href="https://cdn.example.com/guide.css"]')).not.toBeNull();
-    expect(div.querySelector('embed[src="https://docs.example.com/a.pdf"]')).not.toBeNull();
-    expect(div.querySelector('object[data="https://docs.example.com/b.pdf"]')).not.toBeNull();
     expect(div.querySelector('iframe[src="https://docs.example.com/c.pdf"]')).not.toBeNull();
-    expect(div.querySelector('form[action="https://forms.example.com/x"] input[type="checkbox"]')).not.toBeNull();
+    expect(div.querySelector('input[type="checkbox"]')).not.toBeNull();
     expect(div.querySelector('button[type="submit"]')).not.toBeNull();
+  });
+
+  test("drops tags that act on the whole app document after the organization opts in", () => {
+    setOptIn(true);
+    const div = render(PAYLOAD);
+
+    expect(div.querySelector("link, embed, object, form")).toBeNull();
+    expect(div).toHaveTextContent("Guide");
   });
 
   test("still strips script-capable content after the organization opts in", () => {

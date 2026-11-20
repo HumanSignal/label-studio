@@ -43,9 +43,6 @@
     "NumberInput": null
   },
   "overrides": {
-    "BadgeGroup": {
-      "cardMode": "column"
-    },
     "Button": {
       "cardMode": "column"
     },
@@ -63,7 +60,7 @@
     },
     "Pagination": {
       "cardMode": "column",
-      "skip": ["ui-pagination--single-page"]
+      "skip": ["navigation-pagination--single-page"]
     },
     "Select": {
       "cardMode": "column"

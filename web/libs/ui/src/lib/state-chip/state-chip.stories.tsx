@@ -4,7 +4,7 @@ import { StateChip } from "./state-chip";
 
 const meta: Meta<typeof StateChip> = {
   component: StateChip,
-  title: "UI/StateChip",
+  title: "Data display/StateChip",
   argTypes: {
     variant: { control: "select", options: ["neutral", "primary", "warning", "plum", "positive", "negative"] },
     interactive: { control: "boolean" },

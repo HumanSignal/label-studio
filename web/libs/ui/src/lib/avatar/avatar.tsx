@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { Align } from "@humansignal/core/lib/utils/dom";
 import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
+import { IndicatorMark, type IndicatorMarkProps } from "../indicator/indicator";
 import { Tooltip } from "../Tooltip/Tooltip";
 import styles from "./avatar.module.css";
 import clsx from "clsx";
@@ -33,11 +34,14 @@ const resolveSize = (size: AvatarSize = "medium") => {
   return { width: AVATAR_SIZES[name], fontSize: INITIALS_FONT_SIZE[name] };
 };
 
+export type AvatarIndicatorProps = Pick<IndicatorMarkProps, "label" | "variant" | "data-testid">;
+export type AvatarBadgeProps = AvatarIndicatorProps & { icon?: ReactNode };
+
 export type AvatarProps = {
-  /** A status marker pinned to a corner, usually an `AvatarBadge`. */
-  badge?: ReactNode;
-  /** The corner the badge sits in (default bottomRight). */
-  badgePosition?: "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+  /** A dot in the top-right corner: presence, or something new such as unread notifications. */
+  indicator?: AvatarIndicatorProps | null | false;
+  /** A status in the bottom-right corner, such as a review result, usually with an icon. */
+  badge?: AvatarBadgeProps | null | false;
   className?: string;
   /** Dims the avatar, e.g. someone assigned who has not acted yet. */
   faded?: boolean;
@@ -74,8 +78,8 @@ const FALLBACK_IMAGE =
 export const Avatar = forwardRef(
   (
     {
+      indicator = null,
       badge = null,
-      badgePosition = "bottomRight",
       className,
       faded = false,
       showUsernameTooltip = false,
@@ -205,7 +209,10 @@ export const Avatar = forwardRef(
               {renderName()}
             </>
           )}
-          {badge && <div className={clsx(styles.badge, styles[badgePosition])}>{badge}</div>}
+          {indicator && <IndicatorMark {...indicator} position="topRight" overlap="circular" />}
+          {badge && (
+            <IndicatorMark {...badge} content={badge.icon} shape="square" position="bottomRight" overlap="circular" />
+          )}
         </div>
 
         {showUsername && <span className="text-sm text-gray-500 line-clamp-1">{displayName}</span>}

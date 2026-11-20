@@ -1,14 +1,5 @@
 import { useState } from "react";
 import { Button, ModalWindow, Message, Typography } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@humansignal/shad/components/ui/dialog";
 
 // Type definitions
 interface Hotkey {
@@ -189,68 +180,40 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
     </>
   );
 
-  if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
-    return (
-      <ModalWindow
-        open={open}
-        onOpenChange={onOpenChange}
-        size="small"
-        title="Import Hotkeys"
-        dataTestId="hotkeys-import-modal"
-        footer={
-          <div className="flex w-full justify-end gap-tight">
-            <Button variant="neutral" onClick={handleCancel} data-testid="hotkeys-import-cancel">
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleImport}
-              disabled={!importText.trim() || isImporting}
-              data-testid="hotkeys-import-submit"
-            >
-              Import Hotkeys
-            </Button>
-          </div>
-        }
-      >
-        <div className="grid gap-4">
-          <Typography
-            variant="body"
-            size="small"
-            className="text-neutral-content-subtle m-0"
-            id="hotkeys-import-instructions"
-          >
-            {importInstructions}
-          </Typography>
-          {importFormBody}
-        </div>
-      </ModalWindow>
-    );
-  }
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px] bg-neutral-surface" aria-describedby="hotkeys-import-instructions">
-        <DialogHeader>
-          <DialogTitle>Import Hotkeys</DialogTitle>
-        </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-          <div id="hotkeys-import-instructions">
-            <DialogDescription className="m-0">{importInstructions}</DialogDescription>
-          </div>
-          {importFormBody}
-        </div>
-
-        <DialogFooter>
-          <Button variant="neutral" onClick={handleCancel}>
+    <ModalWindow
+      open={open}
+      onOpenChange={onOpenChange}
+      size="small"
+      title="Import Hotkeys"
+      dataTestId="hotkeys-import-modal"
+      footer={
+        <div className="flex w-full justify-end gap-tight">
+          <Button variant="neutral" onClick={handleCancel} data-testid="hotkeys-import-cancel">
             Cancel
           </Button>
-          <Button onClick={handleImport} disabled={!importText.trim() || isImporting}>
+          <Button
+            variant="primary"
+            onClick={handleImport}
+            disabled={!importText.trim() || isImporting}
+            data-testid="hotkeys-import-submit"
+          >
             Import Hotkeys
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      }
+    >
+      <div className="grid gap-4">
+        <Typography
+          variant="body"
+          size="small"
+          className="text-neutral-content-subtle m-0"
+          id="hotkeys-import-instructions"
+        >
+          {importInstructions}
+        </Typography>
+        {importFormBody}
+      </div>
+    </ModalWindow>
   );
 };

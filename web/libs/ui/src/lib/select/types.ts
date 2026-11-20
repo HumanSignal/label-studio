@@ -104,6 +104,12 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   footer?: ReactNode;
   multiple?: boolean;
   /**
+   * With `multiple`, picks stay pending until the Apply button in the footer is clicked: `onChange` fires once,
+   * with the full list, on Apply. Closing without Apply discards the pending picks. Ignored without `multiple`.
+   * The Apply button's test id is `${dataTestid}-apply`, or `select-apply` without `dataTestid`.
+   */
+  requireApply?: boolean;
+  /**
    * In multiple mode, hide the checkbox at the start of every row. The row still toggles on click and a picked
    * row keeps the selected background and `aria-selected`, so a custom row only has to render its own controls.
    */

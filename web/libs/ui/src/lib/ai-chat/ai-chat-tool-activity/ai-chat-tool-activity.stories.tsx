@@ -4,7 +4,7 @@ import { AiChatToolActivity } from "./ai-chat-tool-activity";
 
 const meta: Meta<typeof AiChatToolActivity> = {
   component: AiChatToolActivity,
-  title: "UI/AI Chat/Tool Activity",
+  title: "Product/AI Chat/Tool Activity",
   parameters: {
     docs: {
       description: {

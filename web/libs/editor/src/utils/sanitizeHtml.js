@@ -259,15 +259,11 @@ const ALLOWED_SCHEMES = ["http", "https", "mailto", "tel"];
 const URL_ATTRIBUTES = ["background", "cite", "href", "poster", "src"];
 
 // Project instructions of an organization whose owner opted in to unsafe instruction tags (off by default):
-// the backend keeps these tags for that organization, so the instructions modal keeps the ones that only load
-// content or collect input. <base> and <meta> would retarget or navigate the whole app and scripts never run
-// through innerHTML, so they stay out; svg stays out because `style` raw text is only safe without it.
-const OPTED_IN_INSTRUCTION_TAGS = ["link", "embed", "object", "form", "input", "button"];
+// the backend keeps these tags for that organization. base, meta, link, embed, object and form act on the whole app
+// document or load active content, so the backend escapes them even after the opt-in and they stay out here too;
+// svg stays out because `style` raw text is only safe without it.
+const OPTED_IN_INSTRUCTION_TAGS = ["input", "button"];
 const OPTED_IN_INSTRUCTION_ATTRIBUTES = {
-  link: ["href", "media", "rel", "type"],
-  embed: ["src", "type"],
-  object: ["data", "type"],
-  form: ["action", "method"],
   input: ["checked", "disabled", "name", "placeholder", "type", "value"],
   button: ["disabled", "name", "type", "value"],
 };
@@ -370,8 +366,8 @@ const allowsUnsafeInstructionTags = () =>
 
 /**
  * Sanitize project instructions. Same as `sanitizeHtml` unless the organization opted in to unsafe instruction
- * tags (`APP_SETTINGS.allow_unsafe_instruction_tags`), which also keeps stylesheets, embedded documents, forms
- * and iframes from any https host.
+ * tags (`APP_SETTINGS.allow_unsafe_instruction_tags`), which also keeps inputs, buttons and iframes from any
+ * https host.
  * @param {string} html
  * @returns {string}
  */
@@ -381,9 +377,18 @@ function sanitizeInstructionsHtml(html = []) {
   return sanitizeWith(html, {
     allowedTags: [...ALLOWED_TAGS, ...OPTED_IN_INSTRUCTION_TAGS],
     allowedAttributes: { ...ALLOWED_ATTRIBUTES, ...OPTED_IN_INSTRUCTION_ATTRIBUTES },
-    urlAttributes: [...URL_ATTRIBUTES, "action", "data"],
+    urlAttributes: URL_ATTRIBUTES,
     isAllowedIframe: (src) => isHttpsUrl(src),
   });
 }
 
-export { DEFAULT_ALLOWED_IFRAME_DOMAINS, sanitizeHtml, sanitizeInstructionsHtml };
+/**
+ * Whether an iframe src is an https URL on an allowed iframe domain (`APP_SETTINGS.allowed_iframe_domains`)
+ * @param {string} src
+ * @returns {boolean}
+ */
+function isAllowedIframeDomainSrc(src) {
+  return isAllowedIframeSrc(src, getAllowedIframeDomains());
+}
+
+export { DEFAULT_ALLOWED_IFRAME_DOMAINS, isAllowedIframeDomainSrc, sanitizeHtml, sanitizeInstructionsHtml };

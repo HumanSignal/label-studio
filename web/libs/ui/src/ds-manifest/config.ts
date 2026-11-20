@@ -5,7 +5,7 @@ export const manifestConfig: ManifestConfig = {
   package: "@humansignal/ui",
   gaps: {
     Input: {
-      intent: ["free text entry"],
+      intent: ["Free text entry"],
       use_when: "A single-line text field with leading or trailing elements and error state.",
       replaces: [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/Input/Input.jsx",
@@ -17,7 +17,7 @@ export const manifestConfig: ManifestConfig = {
       ],
     },
     TextArea: {
-      intent: ["multi-line text entry"],
+      intent: ["Multi-line text entry"],
       use_when: "A resizable multi-line text field with error state.",
       replaces: [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/TextArea/TextArea.jsx",
@@ -28,7 +28,7 @@ export const manifestConfig: ManifestConfig = {
       ],
     },
     Radio: {
-      intent: ["pick one of several described options"],
+      intent: ["Pick one of several described options"],
       use_when: "Mutually exclusive options that need a label and a description each.",
       replaces: [
         "services/lso/web/apps/labelstudio/src/components/Form/Elements/RadioGroup/RadioGroup.jsx",
@@ -39,7 +39,7 @@ export const manifestConfig: ManifestConfig = {
       ],
     },
     FormField: {
-      intent: ["bind a control to a form with label, description and error"],
+      intent: ["Bind a control to a form with label, description and error"],
       use_when:
         "The wrapper that registers any control with a form and renders its Label, description and validation error.",
       replaces: [

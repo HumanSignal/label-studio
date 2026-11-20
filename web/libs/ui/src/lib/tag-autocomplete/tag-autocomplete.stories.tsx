@@ -7,7 +7,7 @@ import type { TagOption } from "./types";
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
-  title: "UI/TagAutocomplete",
+  title: "Inputs/TagAutocomplete",
   argTypes: {
     disabled: {
       control: "boolean",

@@ -9,7 +9,7 @@
  * by auto-review-dialog.tsx.
  */
 
-import { confirm } from "@humansignal/ui";
+import type { ConfirmDialogContent } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import type { AnnotatorInfo, DimensionInfo, GroundTruthCell, RawResult, SummaryAnnotation } from "./types";
@@ -150,7 +150,7 @@ const DialogBody = ({ reviewerName }: DialogBodyProps) => (
 );
 
 // ---------------------------------------------------------------------------
-// Open the confirmation dialog
+// The confirmation, rendered by the caller with ConfirmDialog
 // ---------------------------------------------------------------------------
 
 interface OpenCommitDialogOptions {
@@ -163,7 +163,7 @@ interface OpenCommitDialogOptions {
   onCommit: (payload: GroundTruthPayload) => void;
 }
 
-export function openCommitGroundTruthDialog({
+export function commitGroundTruthConfirmation({
   taskId,
   cells,
   summary,
@@ -171,7 +171,7 @@ export function openCommitGroundTruthDialog({
   dimensions,
   annotators,
   onCommit,
-}: OpenCommitDialogOptions): void {
+}: OpenCommitDialogOptions): ConfirmDialogContent {
   const currentUser = window.APP_SETTINGS?.user;
   const reviewer = currentUser
     ? {
@@ -197,15 +197,15 @@ export function openCommitGroundTruthDialog({
     annotators,
   });
 
-  confirm({
+  return {
     title: "Create Ground Truth",
-    body: <DialogBody reviewerName={reviewerName} />,
+    children: <DialogBody reviewerName={reviewerName} />,
     okText: "Confirm",
     cancelText: "Cancel",
     onOk: () => {
       onCommit(buildPayload());
     },
-  });
+  };
 }
 
 // ---------------------------------------------------------------------------

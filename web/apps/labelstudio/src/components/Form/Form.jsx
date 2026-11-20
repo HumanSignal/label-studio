@@ -244,7 +244,7 @@ export default class Form extends React.Component {
         params: urlParams,
         body,
       });
-    // e.g. withStepUp from @humansignal/app-common, for forms that save a step-up protected setting
+    // e.g. withStepUp from useStepUp (@humansignal/app-common), for forms that save a step-up protected setting
     const response = await (this.props.sendRequest ? this.props.sendRequest(send) : send());
 
     this.setState({ lastResponse: response });

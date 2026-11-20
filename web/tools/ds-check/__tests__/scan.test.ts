@@ -76,6 +76,29 @@ describe("ds-check scanner", () => {
     expect(rules(`import { Menu } from "../components/Menu";`)).toEqual(["replaced-import"]);
   });
 
+  test("imports of a retired copy still count, so an older commit that has the file is measured", () => {
+    const retiredCtx = buildContext({
+      repoRoot,
+      webRoot,
+      tokenNames: new Set(),
+      manifest: {
+        components: {
+          ModalWindow: {
+            name: "ModalWindow",
+            exports: ["ModalWindow"],
+            replaces: [],
+            retired: ["services/lse/web/apps/labelstudio/src/components/Modal/Modal.tsx"],
+          },
+        },
+      },
+      isDirectory: () => false,
+    });
+    const found = scanSource(file, `import { Modal } from "../components/Modal/Modal";`, retiredCtx);
+    expect(found.map((f) => `${f.rule} ${f.message.split(" ")[0]}`)).toEqual([
+      "replaced-import ../components/Modal/Modal",
+    ]);
+  });
+
   test("the replaced file itself does not count its own sibling imports as replaced", () => {
     const self = path.join(webRoot, "apps/labelstudio/src/components/Menu/Menu.jsx");
     expect(rules(`import { MenuItem } from "./MenuItem";`, self)).toEqual([]);
@@ -125,6 +148,58 @@ describe("ds-check scanner", () => {
     ]);
   });
 
+  describe("names imported through nested barrels", () => {
+    const formManifest = {
+      components: {
+        Label: {
+          name: "Label",
+          exports: ["Label"],
+          replaces: ["services/lse/web/apps/labelstudio/src/components/Form/Elements/Label/Label.tsx"],
+        },
+        Space: {
+          name: "Space",
+          exports: ["Space"],
+          replaces: ["services/lse/web/apps/labelstudio/src/components/Space/Space.tsx"],
+        },
+      },
+    };
+    const barrels: Record<string, string> = {
+      "/src/components/Form": `export * from "./Elements";\nexport { default as Form } from "./Form";`,
+      "/src/components/Form/Elements": `export { default as Label } from "./Label/Label";\nexport { default as Input } from "./Input/Input";`,
+      "/src/components/layout": `export * from "../Space/Space";\nexport * from "./Columns";`,
+      "/src/components/loop-a": `export * from "../loop-b";`,
+      "/src/components/loop-b": `export * from "../loop-a";`,
+    };
+    const formCtx = buildContext({
+      repoRoot,
+      webRoot,
+      tokenNames: new Set(),
+      manifest: formManifest,
+      isDirectory: () => false,
+      readBarrel: (abs) => Object.entries(barrels).find(([dir]) => abs.endsWith(dir))?.[1] ?? null,
+      exportsName: (abs, name) => abs.endsWith("/components/Space/Space") && name === "Space",
+    });
+    const found = (source: string) =>
+      scanSource(file, source, formCtx).map((f) => `${f.rule} ${f.message.split(" ")[0]}`);
+
+    test("export * into a barrel that re-exports the copy as a default", () => {
+      expect(found(`import { Label, Input, Form } from "../components/Form";`)).toEqual(["replaced-import Label"]);
+    });
+
+    test("the barrel reached through the @/ and baseUrl aliases", () => {
+      expect(found(`import { Label } from "@/components/Form";`)).toEqual(["replaced-import Label"]);
+      expect(found(`import { Label } from "apps/labelstudio/src/components/Form";`)).toEqual(["replaced-import Label"]);
+    });
+
+    test("export * of the copy itself counts only the names that copy exports", () => {
+      expect(found(`import { Space, Columns } from "../components/layout";`)).toEqual(["replaced-import Space"]);
+    });
+
+    test("barrels that re-export each other end without a finding", () => {
+      expect(found(`import { Label } from "../components/loop-a";`)).toEqual([]);
+    });
+  });
+
   test("default and named imports together, and re-exports, are read", () => {
     expect(rules(`import Icons, { IconCross } from "@humansignal/icons";`)).toEqual(["legacy-icon"]);
     expect(rules(`export { IconCross } from "@humansignal/icons";`)).toEqual(["legacy-icon"]);
@@ -144,7 +219,9 @@ describe("ds-check scanner", () => {
   });
 
   test("path imports of @humansignal/ui internals", () => {
-    expect(rules(`import { Modal, confirm } from "@humansignal/ui/lib/modal";`)).toEqual(["internal-import"]);
+    expect(rules(`import { ModalWindow, Dialog } from "@humansignal/ui/lib/modal-window/modal-window";`)).toEqual([
+      "internal-import",
+    ]);
     expect(rules(`import { Card } from "@humansignal/ui/lib/card-new/card";`)).toEqual(["internal-import"]);
     expect(rules(`import type { SelectOption } from "@humansignal/ui/lib/select/types";`)).toEqual(["internal-import"]);
     expect(rules(`import { Button } from "@humansignal/ui";`)).toEqual([]);
@@ -154,8 +231,12 @@ describe("ds-check scanner", () => {
     expect(rules(`import "@humansignal/ui/src/styles.prefix.css";`)).toEqual([]);
     expect(rules(`import Star from "@humansignal/ui/src/assets/icons/star.svg";`)).toEqual([]);
     const inside = path.join(webRoot, "libs/ui/src/lib/dropdown/dropdown.tsx");
-    expect(rules(`import { Modal } from "@humansignal/ui/lib/modal";`, inside)).toEqual([]);
-    const [finding] = scanSource(file, `import { Modal } from "@humansignal/ui/lib/modal";`, ctx);
+    expect(rules(`import { ModalWindow } from "@humansignal/ui/lib/modal-window/modal-window";`, inside)).toEqual([]);
+    const [finding] = scanSource(
+      file,
+      `import { ModalWindow } from "@humansignal/ui/lib/modal-window/modal-window";`,
+      ctx,
+    );
     expect(finding.message).toContain(`"@humansignal/ui"`);
   });
 
@@ -174,6 +255,91 @@ describe("ds-check scanner", () => {
       "Tailwind numeric spacing class gap-2: use a spacing token class (p-tight, gap-base, m-wide…).",
     ]);
     expect(rules("a { @apply p-4 bg-red-500; }", path.join(webRoot, "apps/labelstudio/src/a.css"))).toEqual([]);
+  });
+
+  test("dialogs opened from a function", () => {
+    expect(
+      rules(
+        [
+          'confirm({ title: "Delete?", onOk });',
+          'info({ title: "Saved" });',
+          "modal({",
+          '  title: "Shortcuts",',
+          "});",
+          'Modal.confirm({ title: "Delete?" });',
+          "standaloneModal(props);",
+        ].join("\n"),
+      ),
+    ).toEqual(Array(5).fill("imperative-dialog"));
+    expect(
+      rules(
+        [
+          "logger.info({ saved: true });",
+          "function info({ title }) {}",
+          "// confirm({ title }) in a comment",
+          "<ConfirmDialog open onConfirm={onOk} />",
+        ].join("\n"),
+      ),
+    ).toEqual([]);
+    const [finding] = scanSource(file, "\nconfirm({ title });", ctx);
+    expect(finding.line).toBe(2);
+    expect(finding.message).toContain("ConfirmDialog");
+  });
+
+  test("the antd Modal is replaced by the DS dialogs", () => {
+    expect(rules('import { Modal, Table } from "antd";')).toEqual(["replaced-import"]);
+    expect(rules('import Modal from "antd/es/modal";\nimport { Modal as M } from "antd/lib/modal";')).toEqual([
+      "replaced-import",
+      "replaced-import",
+    ]);
+    expect(rules('import { Table, Tabs } from "antd";')).toEqual([]);
+    const [finding] = scanSource(file, 'import { Modal } from "antd";', ctx);
+    expect(finding.message).toContain("ModalWindow");
+  });
+
+  test("Radix dialog primitives and native browser dialogs", () => {
+    expect(rules('import * as DialogPrimitive from "@radix-ui/react-dialog";')).toEqual(["replaced-import"]);
+    expect(rules('import { Root } from "@radix-ui/react-alert-dialog";')).toEqual(["replaced-import"]);
+    expect(rules('import * as Popover from "@radix-ui/react-popover";')).toEqual([]);
+    expect(rules('if (window.confirm("Delete?")) remove();\nwindow.alert("Saved");\nwindow.prompt("Name?");')).toEqual(
+      Array(3).fill("imperative-dialog"),
+    );
+    expect(rules('// window.confirm("in a comment")\nconst confirmed = settings.confirm;')).toEqual([]);
+    const router = path.join(webRoot, "apps/labelstudio/src/app/App.jsx");
+    expect(rules("callbackWrapper(window.confirm(message));", router)).toEqual([]);
+    const [finding] = scanSource(file, 'import * as D from "@radix-ui/react-dialog";', ctx);
+    expect(finding.message).toContain("ModalWindowCloseButton");
+  });
+
+  test("hand-built modal overlays", () => {
+    const css = path.join(webRoot, "apps/labelstudio/src/pages/Page.module.css");
+    const scrim = ".overlay {\n  position: fixed;\n  inset: 0;\n  z-index: 1000;\n  background: rgba(0, 0, 0, 0.4);\n}";
+    expect(rules(scrim, css)).toContain("hand-built-overlay");
+    expect(
+      rules(
+        ".mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: hsla(0, 0%, 0%, 0.5); }",
+        css,
+      ),
+    ).toContain("hand-built-overlay");
+    // A fullscreen panel with an opaque surface is not a modal backdrop.
+    expect(
+      rules(".full {\n  position: fixed;\n  inset: 0;\n  background: var(--color-neutral-surface);\n}", css),
+    ).not.toContain("hand-built-overlay");
+    expect(rules('<div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />')).toEqual([
+      "hand-built-overlay",
+    ]);
+    expect(rules('<div className="fixed inset-0 bg-neutral-surface" />')).toEqual([]);
+  });
+
+  test("bare native dialogs and hand-built modal dialogs", () => {
+    expect(
+      rules('if (confirm(\'Clear all regions?\')) clear();\nalert(`Saved ${n}`);\nconst v = prompt("Level?", "");'),
+    ).toEqual(Array(3).fill("imperative-dialog"));
+    expect(rules('function confirm(message) {}\nconst ok = confirm(options);\nthis.alert("x");')).toEqual([]);
+    expect(rules('<div role="dialog" aria-modal="true" />')).toEqual(["hand-built-overlay"]);
+    expect(rules('<div role="dialog" aria-modal={!floating} />')).toEqual(["hand-built-overlay"]);
+    expect(rules("React.createElement('div', { role: 'dialog', 'aria-modal': true })")).toEqual(["hand-built-overlay"]);
+    expect(rules('<div role="dialog" aria-modal="false" />')).toEqual([]);
   });
 
   test("findings carry the line and a message naming the replacement", () => {

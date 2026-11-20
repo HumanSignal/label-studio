@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
 import { Badge } from "../badge/badge";
-import { BadgeGroup } from "../badge-group";
+import { SummaryLabel } from "../summary-label";
 import { Button } from "../button/button";
 
 const thousandOptions = (() => {
@@ -10,7 +10,7 @@ const thousandOptions = (() => {
 })();
 
 const meta = {
-  title: "UI/Select",
+  title: "Inputs/Select",
   component: Select,
   parameters: {
     layout: "centered",
@@ -263,7 +263,8 @@ export const MultipleWithBadges: Story = {
           renderSelected={(selectedOptions) => {
             if (!selectedOptions || selectedOptions?.length === 0) return null;
             return (
-              <BadgeGroup
+              <SummaryLabel
+                badges
                 items={
                   selectedOptions?.map((opt: any) => ({
                     id: opt?.value ?? opt,
@@ -503,6 +504,44 @@ export const ControlledOpenWithFooterApply: Story = {
               Apply
             </Button>
           }
+        />
+        <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
+      </div>
+    );
+  },
+};
+
+/**
+ * `requireApply` on a multiple select: picks stay pending until Apply, closing without Apply discards them, and
+ * `onChange` fires once with the full list. Use it when the list is long or a change reloads data.
+ */
+export const RequireApply: Story = {
+  render: () => {
+    const options = [
+      { value: "AN", label: "Annotator" },
+      { value: "RE", label: "Reviewer" },
+      { value: "MA", label: "Manager" },
+      { value: "AD", label: "Administrator" },
+    ];
+    const [applied, setApplied] = useState<string[]>(["AN"]);
+
+    return (
+      <div className="flex flex-col gap-4 w-[350px]">
+        <Select
+          multiple
+          requireApply
+          value={applied}
+          options={options}
+          placeholder="Roles"
+          label="Enforced roles"
+          renderSelected={(picked, placeholder) =>
+            picked?.length ? (
+              <SummaryLabel items={picked.map((option: any) => ({ id: option.value, label: option.label }))} />
+            ) : (
+              placeholder
+            )
+          }
+          onChange={(values: any) => setApplied(values)}
         />
         <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
       </div>

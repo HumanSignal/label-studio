@@ -124,12 +124,6 @@ export const FF_SEGMENT_ANYTHING_ML_BACKEND = "fflag_feat_bros_951_ml_backend_sh
 export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxonomy_antd_removal_short";
 
 /**
- * Single feature flag for migrating app-chrome dialogs from legacy `modal()` / `Modal` to `ModalWindow`.
- * Use `ff.isActive(FF_MODAL_WINDOW_APP_CHROME)` next to each migrated modal (not a global switch in app Modal.tsx).
- */
-export const FF_MODAL_WINDOW_APP_CHROME = "fflag_feat_front_fit_1559_modal_window_short";
-
-/**
  * New drafts + undo/redo architecture in the new editor (`editor-shell`).
  * When OFF, both editors behave exactly as today (existing draft / `screenHistoryAtom` path).
  * When ON, the editor-shell routes changes through the Canvas / UndoRedoStack / Draft / DraftBridge
@@ -242,11 +236,6 @@ export const FF_ASK_AI_ANNOTATOR_MODE = "fflag_utc_1233_admin_sees_worker_toggle
  * a slower ordinary answer rather than a broken one.
  */
 export const FF_ASK_AI_AGENT = "fflag_utc_1233_ask_ai_agent";
-
-/**
- * Configurable reject actions, including requeueing work to another annotator.
- */
-export const FF_REJECT_REDISTRIBUTE = "fflag_feat_utc_1178_reject_requeue_other_short";
 
 /**
  * Manual payment batches (UTC-1260): an org admin creates, on a Program's Pay runs tab, a batch of

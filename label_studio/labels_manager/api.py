@@ -214,13 +214,17 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
-        return LabelLink.objects.filter(label__organization=self.request.user.active_organization).annotate(
-            annotations_count=Count(
-                'project__tasks__annotations',
-                filter=Q(
-                    project__tasks__annotations__result__icontains=Cast('label__value', output_field=CharField())
-                ),
+        return (
+            LabelLink.objects.filter(label__organization=self.request.user.active_organization)
+            .annotate(
+                annotations_count=Count(
+                    'project__tasks__annotations',
+                    filter=Q(
+                        project__tasks__annotations__result__icontains=Cast('label__value', output_field=CharField())
+                    ),
+                )
             )
+            .order_by('id')
         )
 
     @api_webhook('LABEL_LINK_UPDATED')

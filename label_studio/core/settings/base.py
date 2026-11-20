@@ -487,6 +487,10 @@ SPECTACULAR_SETTINGS = {
             ('requeue', 'Requeue'),
             ('redistribute', 'Redistribute'),
         ),
+        'TaskDataColumnValueTypeEnum': (
+            ('String', 'String'),
+            ('Number', 'Number'),
+        ),
         # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
         # FIT-2196), which can appear in responses but is never assignable via role APIs.
         'OrganizationRoleEnum': (
@@ -739,6 +743,9 @@ BATCH_SIZE = 1000
 ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD = int(get_env('ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD', 100))
 # Batch size for updating data columns in the DB using jsonb_set, to not timeout on large projects
 UPDATE_COLUMN_BATCH_SIZE = int(get_env('UPDATE_COLUMN_BATCH_SIZE', 100))
+# POST /api/projects/<id>/tasks/data-column/ writes one value per task synchronously, so each request is bounded
+TASK_DATA_COLUMN_MAX_TASKS = int(get_env('TASK_DATA_COLUMN_MAX_TASKS', 1000))
+TASK_DATA_COLUMN_MAX_VALUE_LENGTH = int(get_env('TASK_DATA_COLUMN_MAX_VALUE_LENGTH', 65536))
 # Maximum number of tasks to process in a single batch during export operations
 MAX_TASK_BATCH_SIZE = int(get_env('MAX_TASK_BATCH_SIZE', 1000))
 # Total size of task data (in bytes) to process per batch - used to calculate dynamic batch sizes
@@ -943,6 +950,8 @@ IMPORT_STALE_TIMEOUT = float(get_env('IMPORT_STALE_TIMEOUT', 300.0))
 # false fails when status is polled before Redis has registered the just-enqueued job.
 IMPORT_CREATED_NOT_FOUND_GRACE = float(get_env('IMPORT_CREATED_NOT_FOUND_GRACE', 60.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
+# Bounded wait for the project summary row after a task delete; on timeout the decrement goes to a background job.
+PROJECT_SUMMARY_LOCK_TIMEOUT = get_env('PROJECT_SUMMARY_LOCK_TIMEOUT', '500ms')
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
 STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
 

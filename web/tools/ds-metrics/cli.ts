@@ -18,12 +18,12 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { listScanFiles } from "../ds-check/scan";
+import { TEMPLATE_RULE, listTemplateFiles, scanTemplateSource } from "../ds-check/templates";
 import { renderComparison, ruleIncreases } from "./compare";
 import { appendSnapshot, readHistory } from "./history";
 import { mergedPrs } from "./prs";
 import { buildSeries } from "./series";
-import { type CheckAll, type Manifest, type RenderFile, type Snapshot, type Web, buildSnapshot } from "./snapshot";
+import { type CheckAll, type Manifest, type Snapshot, type TemplateMeasure, type Web, buildSnapshot } from "./snapshot";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
 
@@ -58,12 +58,24 @@ function checkAll(web: Web): CheckAll {
   return JSON.parse(result.stdout.toString()) as CheckAll;
 }
 
-const DS_IMPORT = /from\s+["']@humansignal\/ui(?:\/[^"']*)?["']/;
-function renderFiles(web: Web): RenderFile[] {
-  const root = webRoot(web);
-  return listScanFiles(root)
-    .filter((file) => /\.(tsx|jsx)$/.test(file))
-    .map((file) => ({ web, file, importsDs: DS_IMPORT.test(fs.readFileSync(path.join(root, file), "utf-8")) }));
+const readRegistry = () =>
+  JSON.parse(fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8")) as {
+    components: Record<string, Manifest["components"][number]>;
+    nonComponents?: string[];
+  };
+
+function measureTemplates(): TemplateMeasure {
+  const files = listTemplateFiles(repoRoot);
+  return {
+    rawControls: files.reduce(
+      (sum, file) =>
+        sum +
+        scanTemplateSource(file, fs.readFileSync(path.join(repoRoot, file), "utf-8")).filter(
+          (finding) => finding.rule === TEMPLATE_RULE,
+        ).length,
+      0,
+    ),
+  };
 }
 
 const git = (...cmd: string[]) => Bun.spawnSync(["git", ...cmd], { cwd: repoRoot, stdout: "pipe", stderr: "pipe" });
@@ -80,7 +92,7 @@ const prsOf = (commit: string, since: string | undefined) => {
 };
 
 function snapshot(): Snapshot {
-  const registry = JSON.parse(fs.readFileSync(path.join(lsoWebRoot, "libs/ui/components.manifest.json"), "utf-8"));
+  const registry = readRegistry();
   const manifest: Manifest = {
     components: Object.values(registry.components),
     nonComponents: registry.nonComponents ?? [],
@@ -96,8 +108,8 @@ function snapshot(): Snapshot {
     prs: prsOf(commit, valueOf("--since")),
     manifest,
     webs: { lso: checkAll("lso"), lse: checkAll("lse") },
-    renderFiles: [...renderFiles("lso"), ...renderFiles("lse")],
     exists: (p) => fs.existsSync(path.join(repoRoot, p)),
+    templates: measureTemplates(),
   });
 }
 

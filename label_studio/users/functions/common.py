@@ -55,6 +55,21 @@ def check_avatar(files):
     return avatar
 
 
+def can_read_avatar(requester, owner):
+    """Whether `requester` may read `owner`'s uploaded avatar file.
+
+    Allowed for the owner and for requesters whose active organization counts the owner among its
+    active members. `Organization.has_user` is not enough: it also matches removed members and, in
+    LSE, pending invites and deactivated members, which lets an unrelated organization read the file.
+    """
+    if requester.pk == owner.pk:
+        return True
+    organization = requester.active_organization
+    if organization is None:
+        return False
+    return organization.active_members.filter(user=owner, deleted_at__isnull=True).exists()
+
+
 def save_user(request, next_page, user_form):
     """Save user instance to DB"""
     user = user_form.save()

@@ -372,6 +372,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/projects/<int:pk>/tasks/data-column/",
+        "module": "data_manager.api.ProjectTaskDataColumnAPI",
+        "name": "data_manager:project-tasks-data-column",
+        "decorators": ""
+    },
+    {
         "url": "/projects/<int:pk>/",
         "module": "data_manager.views.task_page",
         "name": "data_manager:project-data",

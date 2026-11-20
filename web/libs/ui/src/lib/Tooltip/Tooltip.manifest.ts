@@ -3,10 +3,11 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Tooltip",
   tier: 1,
+  category: "Data display",
   exports: ["Tooltip"],
-  intent: ["a short explanation on hover or focus"],
+  intent: ["A short explanation on hover or focus"],
   use_when: "Plain-text help attached to a control or a truncated value.",
-  never_when: ["title attributes", "DOM-built tooltips", "rich or interactive content (use Popover)"],
+  never_when: ["Title attributes", "DOM-built tooltips", "Rich or interactive content (use Popover)"],
   replaces: [
     "services/lso/web/libs/editor/src/lib/AudioUltra/Tooltip/Tooltip.ts",
     "services/lse/web/libs/interface-components/src/components/AudioCanvas/audioultra/Tooltip/Tooltip.ts",

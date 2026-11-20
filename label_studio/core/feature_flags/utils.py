@@ -1,3 +1,21 @@
+from django.core.exceptions import ObjectDoesNotExist
+
+
+def _organization_owner_email(organization):
+    """Email of the organization's owner, or None when it has no owner.
+
+    created_by is SET_NULL, so an orphaned organization has no owner. The owner can also be deleted
+    after the organization was loaded (the row still holds the old created_by_id), which raises
+    DoesNotExist on access.
+    """
+    if organization.created_by_id is None:
+        return None
+    try:
+        return organization.created_by.email
+    except ObjectDoesNotExist:
+        return None
+
+
 def get_user_repr(user):
     """Turn user object into dict with required properties"""
     if user.is_anonymous:
@@ -6,7 +24,7 @@ def get_user_repr(user):
     user_data['key'] = user_data['email']
     if user.active_organization is not None:
         user_data['custom'] = {
-            'organization': user.active_organization.created_by.email,
+            'organization': _organization_owner_email(user.active_organization),
             'organization_id': user.active_organization.id,
         }
     else:
@@ -22,7 +40,7 @@ def get_user_repr_from_organization(organization):
             'custom': {'organization': None, 'organization_id': None},
         }
 
-    email = organization.created_by.email if organization.created_by else None
+    email = _organization_owner_email(organization)
     return {
         'key': email,
         'custom': {

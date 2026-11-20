@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { cnm } from "../../utils/utils";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
+import { useModalStack } from "./modal-stack";
 import styles from "./modal-window.module.css";
 
 export type ModalWindowSize = "small" | "medium" | "large" | "larger" | "fullscreen";
@@ -111,6 +112,11 @@ export interface ModalWindowProps {
    */
   animate?: boolean;
   onOpenAutoFocus?: (event: Event) => void;
+  /**
+   * Called on Escape before the dialog closes. `event.preventDefault()` keeps it open, e.g. for a dialog
+   * that lets the widgets inside use Escape first and handles it itself.
+   */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onCloseAutoFocus?: (event: Event) => void;
 }
 
@@ -123,13 +129,30 @@ const sizeToMaxWidthClass: Record<Exclude<ModalWindowSize, "fullscreen">, string
 };
 
 /**
+ * The ModalWindow close button. Use it inside a custom `header` (with `showCloseButton={false}`) so the dialog
+ * closes through ModalWindow instead of a Radix primitive imported by the screen.
+ */
+export function ModalWindowCloseButton({ className }: { className?: string }) {
+  return (
+    <DialogPrimitive.Close asChild>
+      <Button
+        look="ghost"
+        size="small"
+        className={cnm("shrink-0", className)}
+        leading={<XIcon size={16} weight="bold" />}
+        aria-label="Close"
+        data-testid="modal-window-close-button"
+      />
+    </DialogPrimitive.Close>
+  );
+}
+
+/**
  * ModalWindow — Radix Dialog–based overlay with optional header, scrollable body, and footer.
  *
  * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
  *
- * **Migration from legacy `modal()` / `Modal`:**
- * - Gate with `ff.isActive(...)` next to each modal, not via a global switch in app `Modal.tsx`.
- * - Content that used `useModalControls()` from the legacy modal must lift state into the parent or use a compat layer — `ModalWindow` does not provide that React context.
+ * Content does not get a modal context: the owner passes it what it needs to close the dialog.
  */
 export function ModalWindow({
   open,
@@ -156,9 +179,13 @@ export function ModalWindow({
   dataTestId = "modal-window",
   animate = true,
   onOpenAutoFocus,
+  onEscapeKeyDown,
   onCloseAutoFocus,
 }: ModalWindowProps) {
   const isFullscreen = size === "fullscreen";
+  const stack = useModalStack(Boolean(open), showScrim);
+  // A fullscreen workspace stays behind the dialog on top of it: hiding it would uncover the page.
+  const covered = stack.covered && !isFullscreen;
   const isCentered = !isFullscreen && placement === "center";
 
   const panelClassName = cnm(
@@ -189,13 +216,14 @@ export function ModalWindow({
   const showHeaderChrome = !hideHeader && Boolean(header || title || description || showCloseButton);
 
   /** Radix runs `onPointerDownOutside` before dismiss; blocking scrim close requires preventDefault there (see Radix Dialog docs), not only `onInteractOutside`. */
-  const blockDismissFromOutside = !closeOnScrimClick;
+  // A covered modal is not the one being used: focus and clicks in the dialog on top must not dismiss it.
+  const blockDismissFromOutside = !closeOnScrimClick || stack.covered;
 
   /* modal={false}: portaled overlays (e.g. UI Dropdown) stay interactive; Radix renders no Dialog.Overlay then — use a custom scrim. */
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPrimitive.Portal>
-        {showScrim ? (
+        {stack.ownsScrim ? (
           <div
             role="presentation"
             aria-hidden
@@ -211,15 +239,17 @@ export function ModalWindow({
         <DialogPrimitive.Content
           aria-describedby={undefined}
           className={panelClassName}
-          style={contentStyle}
+          style={covered ? { ...contentStyle, visibility: "hidden" } : contentStyle}
           data-slot="modal-window-content"
+          data-covered={covered || undefined}
           data-placement={isFullscreen ? undefined : placement}
           data-testid={dataTestId}
           tabIndex={-1}
           onPointerDownOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
           onInteractOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
-          onFocusOutside={closeOnFocusOutside ? undefined : (e) => e.preventDefault()}
+          onFocusOutside={closeOnFocusOutside && !stack.covered ? undefined : (e) => e.preventDefault()}
           onOpenAutoFocus={onOpenAutoFocus}
+          onEscapeKeyDown={onEscapeKeyDown}
           onCloseAutoFocus={onCloseAutoFocus}
         >
           {showHeaderChrome ? (
@@ -283,18 +313,7 @@ export function ModalWindow({
                   </>
                 )}
               </div>
-              {showCloseButton ? (
-                <DialogPrimitive.Close asChild>
-                  <Button
-                    look="ghost"
-                    size="small"
-                    className="shrink-0"
-                    leading={<XIcon size={16} weight="bold" />}
-                    aria-label="Close"
-                    data-testid="modal-window-close-button"
-                  />
-                </DialogPrimitive.Close>
-              ) : null}
+              {showCloseButton ? <ModalWindowCloseButton /> : null}
             </div>
           ) : (
             <DialogPrimitive.Title className="sr-only">{title ?? "Modal window"}</DialogPrimitive.Title>
@@ -342,8 +361,6 @@ export function ModalWindow({
 
 /**
  * Centered {@link ModalWindow} (`placement="center"`). Prefer for short confirmations and notices with stable height.
- *
- * For the Radix/shad compound primitive also named `Dialog`, import from `@humansignal/shad/components/ui/dialog`.
  */
 export function Dialog(props: ModalWindowProps) {
   return <ModalWindow placement="center" {...props} />;

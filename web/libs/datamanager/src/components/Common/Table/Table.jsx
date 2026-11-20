@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
-import { modal } from "../Modal/Modal";
 import { BracketsCurlyIcon } from "@humansignal/icons";
 import { AutoSizerTable, Button, useContextMenu } from "@humansignal/ui";
 import "./Table.prefix.css";
@@ -20,7 +19,7 @@ import {
   isActive,
 } from "@humansignal/core/lib/utils/feature-flags";
 import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
-import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
+import { TaskSourceDialog, getTaskSourceViewerStorageKey } from "../TaskSourceViewer";
 import {
   readPersonalColumnOrder,
   persistPersonalColumnOrderIfNeeded,
@@ -100,6 +99,7 @@ export const Table = observer(
     // Table-level context menu state (DM-local: x/y + row + column).
     // Positioning/open/close lives in useContextMenu; domain payload stays here.
     const [contextMenu, setContextMenu] = useState(null);
+    const [sourceTask, setSourceTask] = useState(null);
     const pendingContextRowRef = useRef(null);
     // Maintain hover appearance on row while its context menu is open for better visual feedback
     const contextMenuRowId = contextMenu?.row?.id ?? null;
@@ -211,24 +211,7 @@ export const Table = observer(
           <Button
             look="ghost"
             className="w-6 p-0 text-primary-content hover:text-primary-content-hover"
-            onClick={() => {
-              const modalInstance = modal({
-                title: `Source for task ${out?.id}`,
-                style: { width: 900 },
-                header: null, // Will be set by renderToggle
-                body: (
-                  <TaskSourceViewer
-                    content={out}
-                    onTaskLoad={onTaskLoad}
-                    storageKey={getTaskSourceViewerStorageKey(projectId)}
-                    renderToggle={(toggle) => {
-                      // Update modal header with toggle
-                      modalInstance?.update({ header: toggle });
-                    }}
-                  />
-                ),
-              });
-            }}
+            onClick={() => setSourceTask({ task: out, onTaskLoad })}
             leading={<BracketsCurlyIcon size={20} className="w-5 h-5 shrink-0" />}
             tooltip="View Task Source"
             data-testid="view-task-source"
@@ -295,6 +278,7 @@ export const Table = observer(
           projectId={projectId}
           onViewAnalytics={onViewAnalytics}
           onViewReviewerAnalytics={onViewReviewerAnalytics}
+          onViewSource={setSourceTask}
           onClose={closeContextMenu}
         />
       );
@@ -543,6 +527,11 @@ export const Table = observer(
           </TableContext.Provider>
         </div>
         {contextMenuPortal}
+        <TaskSourceDialog
+          source={sourceTask}
+          storageKey={getTaskSourceViewerStorageKey(projectId)}
+          onClose={() => setSourceTask(null)}
+        />
       </>
     );
   },

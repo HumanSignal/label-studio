@@ -1,7 +1,6 @@
 import { Button } from "@humansignal/ui";
 import { FF_DEV_1752, FF_DEV_2186, FF_FIT_1304_STRICT_OVERLAP, isFF } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
-import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
 import { errorHandlerAllowSpecialErrors } from "./special-errors";
 import { redistributedAnnotationDetail } from "./operation-error-toast";
@@ -311,9 +310,9 @@ export class LSFWrapper {
       const body = `Task #${taskID}${commentId ? ` with comment #${commentId}` : ""} was not found!`;
 
       if (noData) {
-        Modal.modal({
+        this.datamanager.store.showNotice({
           title: "Can't find task",
-          body,
+          children: body,
         });
         return false;
       }
@@ -361,9 +360,10 @@ export class LSFWrapper {
     };
 
     if (this.lsf?.commentStore?.hasUnsaved) {
-      Modal.confirm({
+      this.datamanager.store.showConfirm({
         title: "You have unsaved changes",
-        body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+        children:
+          "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
         onOk() {
           nextAction();
         },
@@ -826,7 +826,8 @@ export class LSFWrapper {
       const displayReason = result?.response?.display_context?.reason;
       const isPausedError = displayReason === "PAUSED";
       const isOverlapError = isFF(FF_FIT_1304_STRICT_OVERLAP) && displayReason === "OVERLAP_REACHED";
-      if (isPausedError || isOverlapError) {
+      const isProjectDoneError = displayReason === "PROJECT_DONE";
+      if (isPausedError || isOverlapError || isProjectDoneError) {
         // Also update local state for overlap reached (only when feature flag is enabled)
         if (isOverlapError) {
           this.overlapReached = true;

@@ -5,7 +5,7 @@ import type { TaxonomyOption, TaxonomySelection } from "./types";
 
 const meta: Meta<typeof TaxonomyMultiTreeSelect> = {
   component: TaxonomyMultiTreeSelect,
-  title: "UI/TaxonomyMultiTreeSelect",
+  title: "Product/TaxonomyMultiTreeSelect",
   parameters: { layout: "padded" },
 };
 

@@ -1,0 +1,655 @@
+/*
+ * Timeline — presentation
+ *
+ * The card is the box: every entry (an item's marker + header, LoadMore) owns its inline and block padding and a
+ * hairline border, and the hover/selected background and border are painted on that box itself. Nothing reaches
+ * outside it, so an entry is flush with the list and the list is exactly as wide as its container.
+ *
+ * Connector: three hairline segments per entry — above the marker (reaching back across the gap to the previous
+ * entry's box), below it, and alongside expanded content — each ending at a marker edge, so a line never draws
+ * over a marker and the markers can sit centred on their header block.
+ *
+ * Actions reveal: hover or focus-within the entry; `actionsForced` (driven by the consumer, e.g. while its
+ * own overflow menu is open) and coarse pointers (touch) always show them.
+ */
+
+/*
+ * Every measure the layout depends on, in one place and derived from the semantic spacing tokens wherever one
+ * matches. The rules below only ever refer to these names.
+ */
+.root {
+  /* The circular marker's diameter. Also the height of a title-only entry and the width of the marker column. */
+  --timeline-marker-size: 2rem;
+  /* Gap between the marker column and the content column. */
+  --timeline-gap: var(--spacing-tight);
+  /* Space between the pieces of a title row (the title and its badge), also between its lines when they wrap. */
+  --timeline-title-gap: var(--spacing-tightest);
+  /* Thickness of the connector line. */
+  --timeline-line-width: 1px;
+  /*
+   * The entry box's border: transparent while idle or hovered (the hover tint is clipped to the padding box, so it
+   * is a borderless card), a hairline in `neutral-border` — the connector line's colour — when selected.
+   */
+  --timeline-card-border-width: 1px;
+  /* How far a connector segment runs under a marker edge, so device-pixel rounding never leaves a gap. The marker
+     (or its opaque backing) hides it. LoadMore's marker is transparent, so it sets this to 0. */
+  --timeline-line-overlap: 1px;
+  /* The entry box's padding above and below its content... */
+  --timeline-card-pad-block: var(--spacing-tightest);
+  /* ...and to the left of the marker and the right of the content. */
+  --timeline-card-pad-inline: var(--spacing-tight);
+  /* From an entry's content to its box's outer edge, above and below: the block padding and the border. */
+  --timeline-card-inset-block: calc(var(--timeline-card-pad-block) + var(--timeline-card-border-width));
+  /*
+   * Space between the text of two entries. The boxes themselves sit closer, by their padding and border on the two
+   * facing sides (`--timeline-entry-gap`).
+   */
+  --timeline-entry-spacing: var(--spacing-wide);
+  /* Space between two entries' boxes: each entry's bottom margin, and how far a connector reaches back across it. */
+  --timeline-entry-gap: calc(var(--timeline-entry-spacing) - 2 * var(--timeline-card-inset-block));
+  /* Space from an entry's content to its first sub-row, and from its last sub-row to the end of the entry. */
+  --timeline-children-pad: var(--spacing-tight);
+  /* The same at the start, measured from the entry's box: the box already takes up its own inset. */
+  --timeline-children-gap: calc(var(--timeline-children-pad) - var(--timeline-card-inset-block));
+  /* And at the end: the body stands in for the box an entry has below it, so it ends with that inset too. */
+  --timeline-children-end: calc(var(--timeline-children-pad) + var(--timeline-card-inset-block));
+  /* The kebab button (a `smaller` Button: 24px, border included). */
+  --timeline-actions-size: var(--spacing-wide);
+  /* The space the header reserves for the actions: the button plus a little air, so hovering never reflows text. */
+  --timeline-actions-reserve: calc(var(--timeline-actions-size) + var(--spacing-tighter));
+  /* Where the revealed actions sit from the right edge of a sub-row (a header's sit flush with its content). */
+  --timeline-actions-inset: var(--spacing-tight);
+  /* How far the actions start outside their final place, so they slide in. Never more than the box's padding. */
+  --timeline-actions-slide: var(--timeline-card-pad-inline);
+  /* The right padding of a sub-row that has actions: the inset, the button and the gap to the text. */
+  --timeline-row-actions-pad: calc(var(--timeline-actions-inset) * 2 + var(--timeline-actions-size));
+  /*
+   * A neutral marker's fills while its card is hovered, and while the circle itself is: shared by the toggle and
+   * selectable markers of items and by LoadMore's marker, so they react the same way.
+   */
+  --timeline-marker-card-hover-bg: var(--color-neutral-background);
+  --timeline-marker-hover-bg: var(--color-primary-emphasis);
+  --timeline-marker-hover-fg: var(--color-primary-icon);
+  /* Focus ring of the marker toggle and LoadMore. */
+  --timeline-focus-width: 2px;
+  --timeline-focus-offset: 2px;
+  /* Duration of the hover, reveal and tint transitions. */
+  --timeline-transition: 150ms;
+  /* Easing of the same transitions. */
+  --timeline-easing: ease-out;
+  /* How far the expand caret turns when its entry is open. */
+  --timeline-caret-open-angle: 90deg;
+  /*
+   * Paint layers inside an item, back to front: the connector segments (and the marker's opaque backing), then
+   * everything in flow — the entry box with its hover/selected background, and its content — then the markers.
+   * They are explicit so no layer's paint order depends on whether it happens to be positioned. The connectors sit
+   * below the box's own background, so the hover tint and the selected fill cover them.
+   */
+  --timeline-z-connector: -2;
+  --timeline-z-marker: 1;
+  /*
+   * The height of every entry's content (header row, LoadMore, skeleton), however little it shows: a title line,
+   * the gap and a meta line, the content of a typical entry. Taller content grows past it; a marker (32px) always
+   * fits. The entry's box is this plus its block padding and border on each side.
+   */
+  --timeline-item-min-height: calc(var(--line-height-20) + var(--spacing-tightest) + var(--line-height-16));
+  /* Skeleton placeholder lines: a title-height line and a meta-height line, at about 60% and 40% of the column. */
+  --timeline-skeleton-title-width: 9rem;
+  --timeline-skeleton-meta-width: 6rem;
+
+  @apply m-0 flex list-none flex-col p-0;
+}
+
+/* An item: its entry box (marker + header) and, when expanded, the body below it. */
+.item {
+  @apply relative isolate;
+}
+
+.itemSpaced {
+  margin-bottom: var(--timeline-entry-gap);
+}
+
+/*
+ * The entry box, shared by an item's header and by LoadMore. It owns the padding around its content and a border that
+ * is transparent unless the entry is selected, and is the containing block of its connector segments, its
+ * click area and its actions. The background is clipped to the padding box, so the hover tint (which has no border)
+ * covers exactly the padding and the selected fill stops at the hairline.
+ *
+ * The outer radius is the card radius plus the border, so the padding box (where the fill is painted) has the
+ * card radius itself.
+ */
+.entry,
+.loadMoreBox {
+  @apply relative;
+  padding: var(--timeline-card-pad-block) var(--timeline-card-pad-inline);
+  border: var(--timeline-card-border-width) solid transparent;
+  border-radius: calc(var(--corner-radius-small) + var(--timeline-card-border-width));
+  background-clip: padding-box;
+  transition: background-color var(--timeline-transition) var(--timeline-easing);
+}
+
+/*
+ * An item's box is a two-column grid: the marker column and the content column. The marker slot and the header
+ * share grid row 1 and both stretch to it, so the marker is centred on the header block however tall that is (single
+ * line, two lines, wrapped), with the same space above and below it inside the box.
+ */
+.entry {
+  @apply grid items-stretch;
+  column-gap: var(--timeline-gap);
+  grid-template-columns: var(--timeline-marker-size) minmax(0, 1fr);
+}
+
+.loadMoreItem {
+  --timeline-line-overlap: 0px;
+
+  @apply relative isolate;
+}
+
+.marker {
+  @apply flex shrink-0 items-center justify-center rounded-full;
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+}
+
+/*
+ * The marker's cell: grid row 1, stretched to exactly the header's height (explicitly `stretch`, with no height
+ * of its own), with the marker centred in it. A translucent marker (the subtle emphasis, a caller's colours)
+ * sits on an opaque backing of the surface colour.
+ *
+ * It deliberately has no z-index: a stacking context here would lift the backing above the entry's own
+ * background, which must cover it. Pointer events pass through the slot to the header's overlay;
+ * only the expand toggle takes them (see `.markerButton`).
+ */
+.markerSlot {
+  @apply pointer-events-none relative col-start-1 row-start-1 flex items-center justify-center;
+  align-self: stretch;
+}
+
+/* The toggle must sit above the header button's overlay to stay the target of its own clicks. */
+.markerButton {
+  @apply relative;
+  z-index: var(--timeline-z-marker);
+  pointer-events: auto;
+}
+
+/*
+ * The expand toggle shows one right-pointing caret that turns a quarter turn when the entry opens, with the same
+ * duration and easing as the actions' slide-in. Rotation about the centre changes no layout, and
+ * `prefers-reduced-motion` gets the end state with no animation.
+ */
+.caret {
+  transform-origin: center;
+  transition: transform var(--timeline-transition) var(--timeline-easing);
+}
+
+.caretOpen {
+  transform: rotate(var(--timeline-caret-open-angle));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    transition: none;
+  }
+}
+
+.markerSlot::after {
+  content: "";
+  @apply pointer-events-none absolute rounded-full;
+  z-index: var(--timeline-z-connector);
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+  background-color: var(--color-neutral-surface);
+}
+
+.markerSubtle {
+  @apply opacity-80;
+}
+
+.toneNeutral {
+  @apply bg-neutral-emphasis text-neutral-icon;
+}
+
+.tonePrimary {
+  @apply bg-primary-emphasis text-primary-icon;
+}
+
+.tonePositive {
+  @apply bg-positive-emphasis text-positive-icon;
+}
+
+.toneWarning {
+  @apply bg-warning-emphasis text-warning-icon;
+}
+
+.toneNegative {
+  @apply bg-negative-emphasis text-negative-icon;
+}
+
+.markerDashed {
+  @apply border border-dashed border-neutral-border bg-transparent text-neutral-content-subtler;
+  transition:
+    background-color var(--timeline-transition) var(--timeline-easing),
+    color var(--timeline-transition) var(--timeline-easing),
+    border-color var(--timeline-transition) var(--timeline-easing);
+}
+
+/*
+ * Connector segments: hairlines on the connector layer, below the entry box's own background and every marker,
+ * ending at a marker edge. They are laid out against the entry box (their containing block is its padding box, so
+ * the border is added back wherever a segment must reach the box's outer edge) and run `--timeline-line-overlap`
+ * under the marker, so device-pixel rounding can never leave a gap; the opaque marker (or the slot's backing, for
+ * translucent ones) hides that overlap, so no line shows through a marker.
+ */
+.connector {
+  @apply pointer-events-none absolute bg-neutral-border;
+  z-index: var(--timeline-z-connector);
+  width: var(--timeline-line-width);
+  /* The marker's centre line: the box's inline padding, then half a marker, less half the line. */
+  left: calc(var(--timeline-card-pad-inline) + var(--timeline-marker-size) / 2 - var(--timeline-line-width) / 2);
+}
+
+/* From the previous entry's box, across the gap, to the top of this marker (which is centred in this box). */
+.connectorAbove {
+  top: calc((var(--timeline-entry-gap) + var(--timeline-card-border-width)) * -1);
+  bottom: calc(50% + var(--timeline-marker-size) / 2 - var(--timeline-line-overlap));
+}
+
+/* From the bottom of this marker to the outer edge of this box. */
+.connectorBelow {
+  bottom: calc(var(--timeline-card-border-width) * -1);
+  top: calc(50% + var(--timeline-marker-size) / 2 - var(--timeline-line-overlap));
+}
+
+/*
+ * Alongside expanded content, so the line runs on to the next entry: it picks up where the segment below ends (the
+ * bottom of the entry box, which is where the body starts) and runs on as far as the next entry's segment above
+ * reaches back. It sits on the connector layer like the other segments, so it never paints over a card.
+ */
+.connectorRail {
+  @apply pointer-events-none relative col-start-1 row-start-1 justify-self-center bg-neutral-border;
+  z-index: var(--timeline-z-connector);
+  width: var(--timeline-line-width);
+}
+
+/* The first entry has nothing above it to connect to. */
+.item:first-child .connectorAbove,
+.loadMoreItem:first-child .connectorAbove {
+  display: none;
+}
+
+.row {
+  @apply col-start-2 row-start-1 flex min-w-0 items-start gap-tightest;
+  min-height: var(--timeline-item-min-height);
+}
+
+/*
+ * Hover affordance of a selectable entry: its box takes a `primary-emphasis-subtle` tint, with no border (the tint
+ * is clipped to the padding box). It covers the marker, the gap and the padding around the text, so the text and
+ * markers never move. Hovering the circle (the toggle, or a selectable entry's static marker) is hovering the box.
+ */
+.entryInteractive:hover {
+  background-color: var(--color-primary-emphasis-subtle);
+}
+
+/*
+ * Selected entry: the same box, persistent, filled with `neutral-background` and bordered by a hairline in
+ * `neutral-border` (the connector line's colour). Hovering a selected entry keeps this style, so it never flickers
+ * to the borderless tint. The primary marker and the label-weight title stay.
+ */
+.item .entryInteractive.entrySelected,
+.item .entryInteractive.entrySelected:hover {
+  background-color: var(--color-neutral-background);
+  border-color: var(--color-neutral-border);
+}
+
+/*
+ * Expanded content: the marker column (for the rail) and the content column (for the sub-rows), laid out like the
+ * entry box above it, so the sub-rows' text lines up with the entry's. A sub-row is a card in the content column
+ * only, so it never reaches back over the marker column or the connector line: the column starts where the
+ * entry's card padding does (the gap, less that padding), and ends where the entry's tint does, one border short
+ * of the list's edge.
+ */
+.body {
+  @apply grid;
+  grid-template-columns: var(--timeline-marker-size) minmax(0, 1fr);
+  column-gap: calc(var(--timeline-gap) - var(--timeline-card-pad-inline));
+  padding-inline: calc(var(--timeline-card-pad-inline) + var(--timeline-card-border-width))
+    var(--timeline-card-border-width);
+}
+
+/* A sub-row: a card of its own in the content column of the body. */
+.rowWrap {
+  @apply relative min-w-0;
+}
+
+.markerButton {
+  @apply cursor-pointer border-0 p-0;
+  transition:
+    background-color var(--timeline-transition),
+    color var(--timeline-transition);
+}
+
+/*
+ * A selectable entry's static marker: it takes pointer events (above the header overlay) only so that hovering the
+ * circle can be styled; a click on it is forwarded to the header's select handler.
+ */
+.markerHit {
+  @apply relative cursor-pointer;
+  z-index: var(--timeline-z-marker);
+  pointer-events: auto;
+  transition:
+    background-color var(--timeline-transition),
+    color var(--timeline-transition);
+}
+
+/*
+ * Marker states on the hover card. Only the NEUTRAL marker changes: on the primary-tinted card it would wash out,
+ * so while the entry is hovered it takes `neutral-background`; hovering the circle itself (the toggle, or the
+ * circle of a selectable entry) takes `primary-emphasis` with the matching `primary-icon`. Coloured markers
+ * (positive, warning, negative, the selected primary one) keep their own colours.
+ */
+.entryInteractive:hover .toneNeutral {
+  background-color: var(--timeline-marker-card-hover-bg);
+}
+
+.item .toneNeutral.markerButton:hover,
+.item .toneNeutral.markerHit:hover {
+  background-color: var(--timeline-marker-hover-bg);
+  color: var(--timeline-marker-hover-fg);
+}
+
+.markerButton:focus-visible {
+  outline: var(--timeline-focus-width) solid var(--color-primary-border);
+  outline-offset: var(--timeline-focus-offset);
+}
+
+.headerWrap {
+  @apply flex min-w-0 flex-1;
+}
+
+.header {
+  @apply flex min-w-0 flex-col items-start gap-tightest text-left;
+}
+
+.headerButton {
+  @apply !h-auto w-full min-w-0 flex-col items-start gap-tightest whitespace-normal !bg-transparent !px-0 !py-0 text-left [&>span]:w-full [&>span]:min-w-0 [&>span]:!px-0;
+}
+
+/*
+ * Wherever the hover card is painted, the whole card is the header button's click target: this transparent
+ * overlay spans exactly the card (the marker column, the gap beside it, and the padding around the text), so
+ * the pointer cursor and the click never drop out over a padding region. Neither the button nor the wrappers
+ * between it and the entry box are positioned, so the box is the overlay's containing block. The expand toggle
+ * and the actions sit above it.
+ */
+.headerButton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--corner-radius-small);
+}
+
+.headerBody {
+  @apply flex w-full min-w-0 flex-col items-start gap-tightest whitespace-normal break-words text-left;
+}
+
+/* Title-only entries are as tall as every other entry, with the title centred against the marker. */
+.rowSingle {
+  @apply items-center;
+}
+
+.headerBodySingle {
+  @apply justify-center;
+  min-height: var(--timeline-item-min-height);
+}
+
+.titleRow {
+  @apply flex max-w-full min-w-0 items-center;
+  gap: var(--timeline-title-gap);
+}
+
+.titleRowWrap {
+  @apply flex-wrap;
+}
+
+.title {
+  @apply max-w-full min-w-0 truncate;
+}
+
+.titleWrap {
+  @apply whitespace-normal break-words;
+}
+
+.titleStrong {
+  @apply text-neutral-content;
+}
+
+.titleSubtle {
+  @apply text-neutral-content-subtle;
+}
+
+/* Bounded by its column, so a caller can truncate part of it (e.g. a long name) instead of overflowing. */
+.description {
+  @apply max-w-full min-w-0 text-neutral-content-subtler;
+}
+
+.meta {
+  @apply flex w-full min-w-0 items-center gap-tight text-neutral-content-subtler;
+}
+
+/* The primary tint is a little darker than the page in dark mode: step the secondary text up so it keeps AA. */
+.entryInteractive:not(.entrySelected) .row:hover .description,
+.entryInteractive:not(.entrySelected) .row:hover .meta {
+  color: var(--color-neutral-content-subtle);
+}
+
+/*
+ * Actions slot: pinned to the right edge of its header row (or sub-row), hidden and nudged outwards, then slid in
+ * and shown on hover or keyboard focus-within — the same reveal the course editor's page list uses for its
+ * item menus. Nothing sits behind the button; the header or row reserves room for it instead, so the
+ * revealed button never covers text.
+ *
+ * A header's slot is positioned against the entry box (nothing in between is positioned): it spans the row's
+ * height, starts at the box's inner edge — the padding is the room it slides through, so a hidden button never
+ * leaves the entry — and settles flush with the content. A sub-row's slot is positioned against the sub-row.
+ */
+.actions {
+  @apply pointer-events-none absolute flex items-center justify-center opacity-0;
+  transition:
+    opacity var(--timeline-transition) var(--timeline-easing),
+    right var(--timeline-transition) var(--timeline-easing);
+}
+
+.row > .actions {
+  top: var(--timeline-card-pad-block);
+  height: calc(100% - 2 * var(--timeline-card-pad-block));
+  right: calc(var(--timeline-card-pad-inline) - var(--timeline-actions-slide));
+}
+
+.rowWrap > .actions {
+  @apply top-0 h-full;
+  right: 0;
+}
+
+.row:hover > .actions,
+.row:focus-within > .actions,
+.row > .actionsForced {
+  @apply pointer-events-auto opacity-100;
+  right: var(--timeline-card-pad-inline);
+}
+
+.rowWrap:hover > .actions,
+.rowWrap:focus-within > .actions,
+.rowWrap > .actionsForced {
+  @apply pointer-events-auto opacity-100;
+  right: var(--timeline-actions-inset);
+}
+
+/* The button plus a little air; reserved at all times, so hovering never reflows the text. */
+.rowHasActions .headerWrap {
+  padding-right: var(--timeline-actions-reserve);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actions {
+    transition: none;
+  }
+}
+
+/* Touch has no hover; the actions slot must stay reachable without it. */
+@media (pointer: coarse) {
+  .actions {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .row > .actions {
+    right: var(--timeline-card-pad-inline) !important;
+  }
+
+  .rowWrap > .actions {
+    right: var(--timeline-actions-inset) !important;
+  }
+}
+
+/*
+ * The sub-rows, in the body's content column: a gap below the entry's own card, so the children's cards never
+ * touch it, and one after the last of them. The rail runs the column's whole height, so the end of it is where the
+ * next entry's segment above picks up.
+ */
+.children {
+  @apply col-start-2 row-start-1 flex min-w-0 flex-col gap-tightest;
+  padding-top: var(--timeline-children-gap);
+  padding-bottom: var(--timeline-children-end);
+}
+
+/*
+ * A sub-row's card: the entry's radius, its text one card padding in from the card's edge, which lines it up with
+ * the entry's text. Hover is the primary tint with no border; selected is `neutral-background` with the same
+ * hairline as a selected entry.
+ */
+.rowButton.rowButton {
+  --background-color-hover-outline: var(--color-primary-emphasis-subtle);
+  border-radius: var(--corner-radius-small);
+  padding-left: var(--timeline-card-pad-inline);
+  padding-right: var(--timeline-card-pad-inline);
+}
+
+.rowWrapHasActions .rowButton.rowButton {
+  padding-right: var(--timeline-row-actions-pad);
+}
+
+/*
+ * A row that cannot be clicked is laid out like a button but must not look like one: the string look's hover and
+ * pressed fills and its hover border would signal an action that is not there, so they stay as the idle look.
+ */
+.rowButton.rowStatic {
+  --background-color-hover-outline: transparent;
+  --background-color-active-outline: transparent;
+  --border-color-hover: transparent;
+}
+
+/*
+ * Selected sub-row: the selected entry's card. Its hairline is the button's own border, which the string look
+ * leaves transparent: an inset shadow would sit inside that border and leave a ring of the fill outside the line.
+ * Hovering it changes nothing, so it never flickers to the tint.
+ */
+.rowButton.rowButton[aria-current="true"],
+.rowButton.rowButton[aria-current="true"]:hover:not(:disabled) {
+  --background-color: var(--color-neutral-background);
+  --background-color-hover-outline: var(--color-neutral-background);
+  --border-color: var(--color-neutral-border);
+  --border-color-hover: var(--color-neutral-border);
+  background-color: var(--color-neutral-background);
+  border-color: var(--color-neutral-border);
+}
+
+.rowButton {
+  @apply w-full min-w-0 gap-tightest overflow-hidden [&>span]:min-w-0 [&>span]:overflow-hidden;
+}
+
+.rowLabel {
+  @apply min-w-0 flex-1 truncate;
+}
+
+/*
+ * The whole entry is one button inside the entry box; its content starts at the same x as every other entry's, with no
+ * padding of its own. The box's padding around it clicks and shows the pointer like the button does, through a
+ * transparent overlay over the button's box, below the marker (so hovering the circle still works).
+ */
+.loadMore {
+  @apply flex w-full cursor-pointer items-center border-0 bg-transparent p-0 text-left;
+  column-gap: var(--timeline-gap);
+  min-height: var(--timeline-item-min-height);
+  border-radius: var(--corner-radius-small);
+}
+
+.loadMore::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--corner-radius-small);
+}
+
+.loadMore .marker {
+  @apply relative;
+  z-index: var(--timeline-z-marker);
+}
+
+/* Outline sits outside the box, so neither hover nor focus moves any text. */
+.loadMore:focus-visible {
+  outline: var(--timeline-focus-width) solid var(--color-primary-border);
+  outline-offset: var(--timeline-focus-offset);
+}
+
+.loadMore:disabled {
+  @apply cursor-default;
+}
+
+.loadMoreText {
+  @apply flex min-w-0 flex-col gap-tightest;
+}
+
+.loadMoreLabel {
+  @apply text-neutral-content;
+}
+
+.loadMoreBox:has(.loadMore:hover:not(:disabled)) {
+  background-color: var(--color-primary-emphasis-subtle);
+}
+
+.loadMore:hover:not(:disabled) .markerDashed {
+  @apply border-neutral-border-bold text-neutral-content;
+  background-color: var(--timeline-marker-card-hover-bg);
+}
+
+/* The circle itself: the same fill and icon colour as an item's toggle, and the dashed border in the same family. */
+.loadMore:not(:disabled) .markerDashed:hover {
+  background-color: var(--timeline-marker-hover-bg);
+  color: var(--timeline-marker-hover-fg);
+  border-color: var(--color-primary-border);
+}
+
+.loadMoreCaption {
+  @apply text-neutral-content-subtler;
+}
+
+.loadMoreBusy {
+  @apply animate-pulse motion-reduce:animate-none;
+}
+
+/* Skeleton placeholder: a marker-sized circle and lines of the title's and the meta line's heights. */
+.skeletonMarker {
+  width: var(--timeline-marker-size);
+  height: var(--timeline-marker-size);
+}
+
+.skeletonTitle {
+  height: var(--line-height-20);
+  width: var(--timeline-skeleton-title-width);
+}
+
+.skeletonMeta {
+  height: var(--line-height-16);
+  width: var(--timeline-skeleton-meta-width);
+}

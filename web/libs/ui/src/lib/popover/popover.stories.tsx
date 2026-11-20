@@ -3,7 +3,7 @@ import { Popover } from "./popover";
 import { Button, Tooltip } from "@humansignal/ui";
 
 const meta = {
-  title: "UI/Popover",
+  title: "Utilities/Popover",
   component: Popover,
   parameters: {
     layout: "centered",

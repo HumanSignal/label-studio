@@ -16,6 +16,7 @@ import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { alignElements, type Align } from "@humansignal/core/lib/utils/dom";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { DropdownContext } from "./dropdown-context";
+import { DropdownDivider, DropdownItem, DropdownMenu } from "./dropdown-menu";
 import { DropdownTrigger } from "./dropdown-trigger";
 
 import "./dropdown.prefix.css";
@@ -490,7 +491,10 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
 
 DropdownComponent.displayName = "Dropdown";
 
-// Create properly typed Dropdown with static Trigger property
+// Create properly typed Dropdown with its static parts
 export const Dropdown = Object.assign(DropdownComponent, {
   Trigger: DropdownTrigger,
+  Menu: DropdownMenu,
+  Item: DropdownItem,
+  Divider: DropdownDivider,
 });

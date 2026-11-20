@@ -2,12 +2,12 @@ or {
   `<Badge $attrs>$children</Badge>` where {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `look="outlined"`,
-    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is the filled default; outlined is only for selection controls.", severity="warn")
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge has no outlined look: use the filled default (neutral for not selected).", severity="warn")
   },
   `<Badge $attrs />` where {
     $filename <: not r".*libs/ui/.*",
     $attrs <: contains `look="outlined"`,
-    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge look is the filled default; outlined is only for selection controls.", severity="warn")
+    register_diagnostic(span=$attrs, message="[ds/badge-props] Badge has no outlined look: use the filled default (neutral for not selected).", severity="warn")
   },
   `<Badge $attrs>$children</Badge>` where {
     $filename <: not r".*libs/ui/.*",

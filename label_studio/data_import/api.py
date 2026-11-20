@@ -38,6 +38,7 @@ from rest_framework.views import APIView
 from tasks.functions import touch_tasks_updated_at, update_tasks_counters
 from tasks.models import Prediction, Task
 from tasks.serializers import sanitize_prediction_import_payload
+from users.functions import can_read_avatar
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -1085,7 +1086,7 @@ class DownloadStorageData(APIView):
                 file_obj = file_upload.file
         elif filepath.startswith(settings.AVATAR_PATH):
             user = User.objects.filter(avatar=filepath).first()
-            if user is not None and request.user.active_organization.has_user(user):
+            if user is not None and can_read_avatar(request.user, user):
                 file_obj = user.avatar
 
         if file_obj is None:

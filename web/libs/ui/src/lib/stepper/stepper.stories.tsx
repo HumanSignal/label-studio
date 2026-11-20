@@ -4,7 +4,7 @@ import { Stepper } from "./stepper";
 import { Button } from "../button/button";
 
 const meta: Meta<typeof Stepper> = {
-  title: "UI/Stepper",
+  title: "Navigation/Stepper",
   component: Stepper,
   parameters: {
     layout: "padded",

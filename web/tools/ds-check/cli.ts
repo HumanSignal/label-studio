@@ -8,6 +8,8 @@
  *   --base <ref>                     compare with another branch (default: $DS_CHECK_BASE, else origin/main)
  *   --json                           machine-readable counts and deltas
  *   --repo <path>                    another checkout, measured with this tool's rules and manifest (metrics backfill)
+ *   --templates [files…]             the built-in Custom Interface templates (all, or those files): raw controls,
+ *                                    against their merge-base version like the rest; with --all, the totals only
  *
  * The baseline is the target branch itself, so there is nothing to update or commit: a file fails when a rule's
  * count rises against its merge-base version (a new file must be clean), and improvements are locked in on merge.
@@ -21,6 +23,7 @@ import { runBiomePlugins } from "./biome";
 import { checkChanges, removeStaleMirrors } from "./check";
 import { type Change, changedFiles, mergeBase, prefetchBaseBlobs, readAtBase } from "./git";
 import { buildContext, inScope, listScanFiles, loadTokenNames, scanSource } from "./scan";
+import { listTemplateFiles, scanTemplateSource } from "./templates";
 import type { Finding, ManifestSlice } from "./types";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../..");
@@ -69,6 +72,46 @@ const byRule = (findings: Finding[]) => {
   for (const f of findings) rules[f.rule] = (rules[f.rule] ?? 0) + 1;
   return Object.fromEntries(Object.entries(rules).sort(([a], [b]) => a.localeCompare(b)));
 };
+
+if (flag("--templates")) {
+  const toRepoRelative = (file: string) =>
+    path.relative(repoRoot, path.resolve(process.cwd(), file)).split(path.sep).join("/");
+  const files = positional.length ? positional.map(toRepoRelative) : listTemplateFiles(repoRoot);
+  const scanAt = (file: string, text: string | null) => (text === null ? [] : scanTemplateSource(file, text));
+  const current = files.flatMap((file) =>
+    scanAt(file, fs.existsSync(path.join(repoRoot, file)) ? fs.readFileSync(path.join(repoRoot, file), "utf-8") : null),
+  );
+  if (flag("--all")) {
+    console.log(JSON.stringify({ scope: "templates", files: files.length, violations: current.length }, null, 2));
+    process.exit(0);
+  }
+  const templateBaseRef = valueOf("--base") || process.env.DS_CHECK_BASE || "origin/main";
+  const templateBase = mergeBase(repoRoot, templateBaseRef);
+  const atBase = (file: string) => {
+    const shown = Bun.spawnSync(["git", "show", `${templateBase}:${file}`], {
+      cwd: repoRoot,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    return shown.exitCode === 0 ? shown.stdout.toString() : null;
+  };
+  const rose = files.filter((file) => {
+    const now = current.filter((f) => f.file === file).length;
+    return now > scanAt(file, atBase(file)).length;
+  });
+  if (rose.length) {
+    console.error(`[ds-check] templates: raw controls rose against ${templateBaseRef} in ${rose.length} file(s).\n`);
+    for (const f of current.filter((x) => rose.includes(x.file))) console.error(`  ${f.file}:${f.line}  ${f.message}`);
+    console.error(
+      "\n  Use the EditorUI component, or mark a control EditorUI cannot cover with `ds-allow-raw: <reason>`.",
+    );
+    process.exit(1);
+  }
+  console.log(
+    `[ds-check] templates: no regressions in ${files.length} file(s) (${current.length} known raw controls).`,
+  );
+  process.exit(0);
+}
 
 if (flag("--all")) {
   const files = listScanFiles(webRoot);

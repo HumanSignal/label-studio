@@ -3,6 +3,7 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "AiChatShell",
   tier: 2,
+  category: "Product",
   exports: [
     "AiChatShell",
     "AiChatPromptBar",

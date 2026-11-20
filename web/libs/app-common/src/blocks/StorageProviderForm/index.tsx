@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { Stepper, type StepperStep } from "@humansignal/ui";
-import { useModalControls } from "@humansignal/ui/lib/modal";
 import { ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
 import { FormHeader } from "./components/form-header";
 import { FormFooter } from "./components/form-footer";
@@ -33,7 +32,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     { onSubmit, target, project, storage, title, storageTypes, providers, defaultValues, onClose = () => {}, onHide },
     ref,
   ) => {
-    const modal = useModalControls();
     const [type, setType] = useState<string | undefined>(storage?.type || storage?.provider || "s3");
     const [filesPreview, setFilesPreview] = useState<any[] | null>(null);
     const [connectionChecked, setConnectionChecked] = useState(false);
@@ -44,7 +42,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       setConnectionChecked(false);
       setType("s3");
       onClose();
-      modal?.hide();
     };
 
     // Initialize providers first
@@ -193,7 +190,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
           setConnectionChecked(false);
           setType("s3");
           onClose();
-          modal?.hide();
         },
       });
 

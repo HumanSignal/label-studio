@@ -78,6 +78,22 @@ describe("ModalWindow", () => {
     );
   });
 
+  it("stays open on Escape when onEscapeKeyDown prevents it", async () => {
+    const onOpenChange = mock<(open: boolean) => void>();
+    const onEscapeKeyDown = mock((event: KeyboardEvent) => event.preventDefault());
+    render(
+      <ModalWindow open onOpenChange={onOpenChange} onEscapeKeyDown={onEscapeKeyDown} title="Keep me" animate={false}>
+        <div>Content</div>
+      </ModalWindow>,
+    );
+
+    fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape", bubbles: true, cancelable: true });
+
+    expect(onEscapeKeyDown).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole("dialog", { name: "Keep me" })).toBeInTheDocument();
+  });
+
   it("closes when close button is activated", async () => {
     render(
       <ControlledModal title="Closable" animate={false}>
@@ -258,5 +274,31 @@ describe("ModalWindow", () => {
     const panel = screen.getByTestId("modal-window");
     expect(panel).toHaveAttribute("data-placement", "center");
     expect(panel).toHaveClass("top-1/2");
+  });
+});
+
+describe("ModalWindowCloseButton", () => {
+  it("closes the dialog from a custom header", async () => {
+    const { ModalWindowCloseButton } = await import("./modal-window");
+    const onOpenChange = mock();
+    render(
+      <ModalWindow
+        open
+        onOpenChange={onOpenChange}
+        title="Import learners"
+        showCloseButton={false}
+        header={
+          <div>
+            Import learners
+            <ModalWindowCloseButton />
+          </div>
+        }
+      >
+        Body
+      </ModalWindow>,
+    );
+
+    fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

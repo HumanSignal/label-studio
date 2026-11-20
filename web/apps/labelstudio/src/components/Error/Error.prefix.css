@@ -97,8 +97,3 @@
     margin-inline: 0;
   }
 }
-
-.paused-error .modal-ls__content {
-  border-radius: 16px;
-  overflow: hidden;
-}

@@ -5,14 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
-import { withStepUp } from "../../../components/step-up/with-step-up";
-import { Button, Message } from "@humansignal/ui";
+import { useStepUp, type WithStepUp } from "../../../components/step-up/step-up-provider";
+import { ConfirmDialog, type ConfirmDialogContent, Button, Message, ModalWindow } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { confirm, modal } from "@humansignal/ui";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
@@ -43,7 +42,7 @@ const refreshTokenAtom = atomWithMutation((get) => {
   const queryClient = get(queryClientAtom);
   return {
     mutationKey: ["refresh-token"],
-    async mutationFn() {
+    async mutationFn(withStepUp: WithStepUp) {
       const api = getApiInstance();
       const token = await withStepUp("Create an access token", () => api.invoke("accessTokenGetRefreshToken"));
       if (!token.$meta.ok) {
@@ -97,6 +96,7 @@ const revokeTokenAtom = atomWithMutation((get) => {
 });
 
 export function PersonalJWTToken() {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const [dialogOpened, setDialogOpened] = useState(false);
   const tokens = useAtomValue(tokensListAtom);
   const revokeToken = useAtomValue(revokeTokenAtom);
@@ -109,9 +109,9 @@ export function PersonalJWTToken() {
 
   const revoke = useCallback(
     async (token: string) => {
-      confirm({
+      setPendingConfirm({
         title: "Revoke Token",
-        body: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
+        children: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
           window?.APP_SETTINGS?.app_name || "Label Studio"
         }`,
         okText: "Revoke",
@@ -131,17 +131,11 @@ export function PersonalJWTToken() {
   function openDialog() {
     if (dialogOpened) return;
     setDialogOpened(true);
-    modal({
-      title: "New Auth Token",
-      size: "medium",
-      body: <CreateTokenForm />,
-      allowClose: true,
-      closeOnClickOutside: false,
-      onHidden: () => {
-        setDialogOpened(false);
-        queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
-      },
-    });
+  }
+
+  function closeDialog() {
+    setDialogOpened(false);
+    queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
   }
 
   return (
@@ -183,16 +177,34 @@ export function PersonalJWTToken() {
           </Button>
         </div>
       </Tooltip>
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
+      <ModalWindow
+        open={dialogOpened}
+        onOpenChange={(open) => !open && closeDialog()}
+        title="New Auth Token"
+        size="medium"
+        closeOnScrimClick={false}
+        dataTestId="new-auth-token-modal"
+      >
+        {dialogOpened && <CreateTokenForm />}
+      </ModalWindow>
     </div>
   );
 }
 
 function CreateTokenForm() {
   const { data, mutate: createToken } = useAtomValue(refreshTokenAtom);
+  const withStepUp = useStepUp();
   const [copy, copied] = useCopyText({ defaultText: data ?? "" });
 
   useEffect(() => {
-    createToken();
+    createToken(withStepUp);
   }, []);
 
   return (

@@ -5,7 +5,7 @@ import { ResizeHandle } from "./resize-handle";
 
 const meta: Meta<typeof ResizeHandle> = {
   component: ResizeHandle,
-  title: "UI/ResizeHandle",
+  title: "Layout/ResizeHandle",
   parameters: { layout: "padded" },
 };
 

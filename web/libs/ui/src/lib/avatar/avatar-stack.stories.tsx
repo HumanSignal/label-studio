@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CheckIcon } from "@humansignal/icons";
-import { AvatarBadge } from "./avatar-badge";
 import { AvatarStack } from "./avatar-stack";
 
 const names = [
@@ -26,7 +25,7 @@ const people = names.map(([first_name, last_name], i) => ({
 
 const meta: Meta<typeof AvatarStack> = {
   component: AvatarStack,
-  title: "UI/Avatar/AvatarStack",
+  title: "Data display/Avatar/AvatarStack",
   argTypes: {
     max: { control: { type: "number", min: 1, max: 12 } },
     size: {
@@ -89,7 +88,7 @@ export const PerAvatarProps: Story = {
       index === 1
         ? { faded: true }
         : index === 0
-          ? { badge: <AvatarBadge variant="kale" icon={<CheckIcon weight="bold" />} label="Accepted review" /> }
+          ? { badge: { variant: "kale", icon: <CheckIcon weight="bold" />, label: "Accepted review" } }
           : undefined,
   },
 };

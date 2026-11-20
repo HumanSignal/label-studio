@@ -3,7 +3,7 @@ import { InputFile } from "./InputFile";
 
 const meta: Meta<typeof InputFile> = {
   component: InputFile,
-  title: "UI/InputFile",
+  title: "Inputs/InputFile",
   argTypes: {
     onChange: { action: "changed" },
   },

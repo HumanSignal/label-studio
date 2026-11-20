@@ -7,7 +7,8 @@ import type { AnnotatedFinding } from "../ds-check/findings";
 export type Web = "lso" | "lse";
 
 export type Manifest = {
-  components: { name: string; exports: string[]; replaces: string[] }[];
+  /** `retired`: copies a finished migration deleted; they still count where a commit has them. */
+  components: { name: string; exports: string[]; replaces: string[]; retired?: string[] }[];
   nonComponents: string[];
 };
 
@@ -21,8 +22,8 @@ export type CheckAll = {
   findings: AnnotatedFinding[];
 };
 
-/** A file the scan covers that can render UI (tsx or jsx), and whether it imports from @humansignal/ui. */
-export type RenderFile = { web: Web; file: string; importsDs: boolean };
+/** One dashboard area: the violations of its files. */
+export type AreaMetrics = { violations: number };
 
 export type SnapshotInput = {
   commit: string;
@@ -31,10 +32,20 @@ export type SnapshotInput = {
   prs: PrRef[];
   manifest: Manifest;
   webs: Record<Web, CheckAll>;
-  renderFiles: RenderFile[];
   /** Whether a repo-relative path (file or directory) exists in this checkout. */
   exists: (repoRelativePath: string) => boolean;
+  /**
+   * The built-in Custom Interface templates, measured apart from the webs: their raw controls are their own area
+   * and goal, and stay out of the rule counts the PR gate compares.
+   */
+  templates?: TemplateMeasure;
 };
+
+/** The raw controls found in the template sources. */
+export type TemplateMeasure = { rawControls: number };
+
+/** The dashboard area of the template catalog. */
+export const TEMPLATES_AREA = "lse/templates";
 
 export type Goal = { value: number; target: number };
 /** A pull request merged into main by (or since the previous point before) the snapshot's commit. */
@@ -48,20 +59,23 @@ export type Snapshot = {
   totals: { violations: number; files_with_violations: number };
   rules: Record<string, number>;
   clusters: Record<string, { paths_remaining: number; importers: number }>;
-  areas: Record<string, { violations: number; render_files: number; ds_import_share: number | null }>;
+  areas: Record<string, AreaMetrics>;
   goals: Record<string, Goal>;
 };
 
-/** The scoreboard targets (Design System Adoption Report, board 07). Shares are fractions of render files. */
+/**
+ * The scoreboard targets (Design System Adoption Report, board 07). Adoption is measured by violations only: every
+ * place that does not use the design system is a violation, so zero violations is full adoption.
+ */
 export const TARGETS = {
   primitive_implementations_outside_ds: 10,
   ds_components: 30,
   raw_controls_lse_app: 0,
   legacy_icons: 0,
-  ds_render_share_lse: 0.95,
-  ds_render_share_lso: 0.7,
   /** Total violations on main 90 days after the gates went live. */
   total_90d: 1000,
+  /** Raw controls left in the built-in Custom Interface templates. */
+  raw_controls_templates: 0,
 } as const;
 
 /** The dashboard area a web-relative file belongs to. */
@@ -75,8 +89,6 @@ export function areaOf(web: Web, file: string): string {
 const sorted = <T>(record: Record<string, T>): Record<string, T> =>
   Object.fromEntries(Object.entries(record).sort(([a], [b]) => a.localeCompare(b)));
 
-const round = (n: number) => Math.round(n * 1000) / 1000;
-
 export function buildSnapshot(input: SnapshotInput): Snapshot {
   const findings = (["lso", "lse"] as Web[]).flatMap((web) => input.webs[web].findings.map((f) => ({ web, ...f })));
 
@@ -85,7 +97,7 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
 
   const clusters: Snapshot["clusters"] = {};
   for (const component of input.manifest.components) {
-    const paths = component.replaces.filter((p) => !p.startsWith("jsx:"));
+    const paths = [...component.replaces, ...(component.retired ?? [])].filter((p) => !p.startsWith("jsx:"));
     if (!paths.length) continue;
     const remaining = paths.filter((p) => input.exists(p)).length;
     if (!remaining) continue;
@@ -98,30 +110,21 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
   }
 
   const areas: Snapshot["areas"] = {};
-  const area = (name: string) => (areas[name] ??= { violations: 0, render_files: 0, ds_import_share: 0 });
-  for (const f of findings) area(areaOf(f.web, f.file)).violations += 1;
-  const dsFiles: Record<string, number> = {};
-  for (const r of input.renderFiles) {
-    const name = areaOf(r.web, r.file);
-    area(name).render_files += 1;
-    if (r.importsDs) dsFiles[name] = (dsFiles[name] ?? 0) + 1;
+  for (const f of findings) {
+    const name = areaOf(f.web, f.file);
+    areas[name] = { violations: (areas[name]?.violations ?? 0) + 1 };
   }
-  for (const [name, a] of Object.entries(areas)) {
-    a.ds_import_share = a.render_files ? round((dsFiles[name] ?? 0) / a.render_files) : null;
-  }
+  const templates = input.templates;
+  if (templates) areas[TEMPLATES_AREA] = { violations: templates.rawControls };
 
-  const share = (web: Web) => {
-    const files = input.renderFiles.filter((r) => r.web === web);
-    return files.length ? round(files.filter((r) => r.importsDs).length / files.length) : 0;
-  };
   const goals: Snapshot["goals"] = {
     primitive_implementations_outside_ds: {
       value: input.manifest.components
-        .flatMap((c) => c.replaces)
+        .flatMap((c) => [...c.replaces, ...(c.retired ?? [])])
         .filter((p) => !p.startsWith("jsx:") && input.exists(p)).length,
       target: TARGETS.primitive_implementations_outside_ds,
     },
-    // One per manifest entry: sub-parts (AccordionItem, AvatarBadge) count with their parent, not as components.
+    // One per manifest entry: sub-parts (AccordionItem, AvatarStack) count with their parent, not as components.
     ds_components: { value: input.manifest.components.length, target: TARGETS.ds_components },
     // Every raw tag the rule flags (button, select, table, checkbox): each has a design-system replacement.
     raw_controls_lse_app: {
@@ -130,8 +133,9 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
       target: TARGETS.raw_controls_lse_app,
     },
     legacy_icons: { value: rules["legacy-icon"] ?? 0, target: TARGETS.legacy_icons },
-    ds_render_share_lse: { value: share("lse"), target: TARGETS.ds_render_share_lse },
-    ds_render_share_lso: { value: share("lso"), target: TARGETS.ds_render_share_lso },
+    ...(templates
+      ? { raw_controls_templates: { value: templates.rawControls, target: TARGETS.raw_controls_templates } }
+      : {}),
   };
 
   return {

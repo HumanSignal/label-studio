@@ -208,6 +208,31 @@ class TestProjectSerializerExpertInstruction(TestCase):
         project.refresh_from_db()
         assert self._read(project) == self.PAYLOAD
 
+    DOCUMENT_LEVEL_PAYLOAD = (
+        '<base href="https://example.com/"><link rel="stylesheet" href="https://example.com/a.css">'
+        '<meta http-equiv="refresh" content="0;url=https://example.com/">'
+        '<embed src="https://example.com/" type="text/html"><object data="https://example.com/"></object>'
+        '<form action="https://example.com/"></form><style>p{color:red}</style><p>hi</p>'
+    )
+    DOCUMENT_LEVEL_ESCAPED = (
+        '&lt;base href="https://example.com/"&gt;&lt;link rel="stylesheet" href="https://example.com/a.css"&gt;'
+        '&lt;meta http-equiv="refresh" content="0;url=https://example.com/"&gt;'
+        '&lt;embed src="https://example.com/" type="text/html"&gt;&lt;object data="https://example.com/"&gt;'
+        '&lt;/object&gt;&lt;form action="https://example.com/"&gt;&lt;/form&gt;<style>p{color:red}</style><p>hi</p>'
+    )
+
+    def test_write_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, self.DOCUMENT_LEVEL_PAYLOAD) == self.DOCUMENT_LEVEL_ESCAPED
+
+    def test_read_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.DOCUMENT_LEVEL_PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.DOCUMENT_LEVEL_ESCAPED
+
     def test_read_of_plain_text_does_not_query_organization(self):
         project = ProjectFactory(expert_instruction='Label all cats')
         with CaptureQueriesContext(connection) as captured_queries:

@@ -1,0 +1,45 @@
+.dropdown-menu {
+  /* Minimum width of the menu panel; Tailwind has no token for it. */
+  --dropdown-menu-min-width: 200px;
+
+  /* Icon column of an item: labels line up whether or not the item has an icon. */
+  --dropdown-menu-icon-size: var(--line-height-20);
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: var(--dropdown-menu-min-width);
+  padding: var(--spacing-tighter);
+  border-radius: var(--corner-radius-small);
+}
+
+/*
+ * `button.` raises specificity above Button's single-class rules (`.size-small`'s fixed height and `> em` slot
+ * size, Tailwind's `font-medium`), so these win without depending on CSS order or `!important`.
+ * Button does not merge Tailwind classes, hence the override lives here and consumers never set weight.
+ */
+button.dropdown-menu__item {
+  height: auto;
+  min-height: calc(var(--spacing-base) * 2);
+  font-weight: var(--font-weight-regular);
+}
+
+button.dropdown-menu__item > em {
+  height: auto;
+  min-width: var(--dropdown-menu-icon-size);
+}
+
+.dropdown-menu__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--dropdown-menu-icon-size);
+  height: var(--dropdown-menu-icon-size);
+}
+
+.dropdown-menu__divider {
+  height: 0;
+  margin: var(--spacing-tighter) 0;
+  border-top: 1px solid var(--color-neutral-border);
+}

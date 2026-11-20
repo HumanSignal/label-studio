@@ -1,5 +1,5 @@
 import { cn } from "../../../utils/bem";
-import { Tooltip, Avatar, AvatarBadge } from "@humansignal/ui";
+import { Tooltip, Avatar } from "@humansignal/ui";
 import "./PaymentStatus.prefix.css";
 
 // When one user has multiple line-level statuses, this order picks the most advanced for the badge.
@@ -98,7 +98,7 @@ export const PaymentStatus = (cell) => {
         return (
           <div key={`ps-${g.user_id}`} className={statusCN.elem("item").toClassName()}>
             <Tooltip title={tooltipText}>
-              <Avatar user={user} size="large" badge={<AvatarBadge variant={cfg.variant} label={cfg.label} />} />
+              <Avatar user={user} size="large" badge={{ variant: cfg.variant, label: cfg.label }} />
             </Tooltip>
           </div>
         );

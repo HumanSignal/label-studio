@@ -26,7 +26,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import batch_update_with_retry, fast_first, has_column_cached
+from core.utils.db import batch_update_with_retry, fast_first, has_column_cached, migrations_running
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -148,8 +148,12 @@ class ProjectVisibleManager(ProjectManager):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Avoid referencing columns that might not exist during early migrations
-        if has_column_cached(self.model._meta.db_table, 'deleted_at'):
+        # Avoid referencing deleted_at while migrations run on a database that may predate it.
+        # Outside migrate the column exists, so filter without introspecting: class-level
+        # `queryset = Project.objects.all()` in views and serializers is built once and kept,
+        # and an introspection at build time (during app init, or during migrate's checks on
+        # an empty database) would freeze the answer into it.
+        if not migrations_running() or has_column_cached(self.model._meta.db_table, 'deleted_at'):
             return qs.filter(deleted_at__isnull=True)
         return qs
 
@@ -505,7 +509,12 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         """
         # Async RQ jobs pickle the Project instance; refresh so concurrent settings
         # changes (e.g. during duplication) are not overwritten with stale values.
-        self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        try:
+            self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        except type(self).DoesNotExist:
+            # The project was deleted after this job was enqueued; there is nothing left to update.
+            logger.info(f'Skipping _update_tasks_states: project {self.pk} no longer exists')
+            return
         logger.info(
             f'Starting _update_tasks_states with params: Project {str(self)} maximum_annotations '
             f'{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}'

@@ -1,11 +1,10 @@
-import { Button, Typography } from "@humansignal/ui";
+import { Button, ModalWindow, Typography } from "@humansignal/ui";
 import { Space } from "@humansignal/ui";
 import { cn } from "apps/labelstudio/src/utils/bem";
-import { Modal } from "apps/labelstudio/src/components/Modal/ModalPopup";
 import { API } from "apps/labelstudio/src/providers/ApiProvider";
 import { useAtomValue } from "jotai";
 import { atomWithQuery } from "jotai-tanstack-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Input } from "../../../components/Form";
 
 const linkAtom = atomWithQuery(() => ({
@@ -27,27 +26,21 @@ export function InviteLink({
   onOpened?: () => void;
   onClosed?: () => void;
 }) {
-  const modalRef = useRef<Modal>();
   useEffect(() => {
-    if (modalRef.current && opened) {
-      modalRef.current?.show?.();
-    } else if (modalRef.current && modalRef.current.visible) {
-      modalRef.current?.hide?.();
-    }
+    if (opened) onOpened?.();
   }, [opened]);
 
   return (
-    <Modal
-      ref={modalRef}
+    <ModalWindow
+      open={opened}
+      onOpenChange={(open) => !open && onClosed?.()}
       title="Invite members"
-      opened={opened}
-      bareFooter={true}
-      body={<InvitationModal />}
-      footer={<InvitationFooter />}
-      style={{ width: 640, height: 472 }}
-      onHide={onClosed}
-      onShow={onOpened}
-    />
+      size="medium"
+      footer={opened && <InvitationFooter />}
+      dataTestId="invite-link-modal"
+    >
+      {opened && <InvitationModal />}
+    </ModalWindow>
   );
 }
 

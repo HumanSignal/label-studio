@@ -7,7 +7,7 @@ import { IconPersonInCircle, IconSettings, IconTrash } from "@humansignal/icons"
 
 const meta: Meta<typeof Drawer> = {
   component: Drawer,
-  title: "UI/Drawer",
+  title: "Surfaces/Drawer",
   argTypes: {
     side: {
       control: "select",

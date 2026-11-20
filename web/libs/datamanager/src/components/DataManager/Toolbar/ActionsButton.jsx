@@ -1,5 +1,5 @@
 import { CaretDownIcon, IconChevronRight, IconTrash } from "@humansignal/icons";
-import { Button, Spinner, EnterpriseBadge, Message, Typography } from "@humansignal/ui";
+import { Button, Spinner, EnterpriseBadge, Message, ModalWindow, Typography } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
@@ -7,7 +7,6 @@ import { cn } from "../../../utils/bem";
 import { Dropdown } from "@humansignal/ui";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
-import { modal, useModalControls } from "../../Common/Modal/Modal";
 import "./ActionsButton.prefix.css";
 
 const injector = inject(({ store }) => ({
@@ -141,8 +140,7 @@ const DialogContent = ({ text, details = [], form, formRef, store, action, valid
  * this runs the form's own client-side validation (e.g. required fields) and keeps the
  * dialog open when invalid, surfacing the form's existing validation messages.
  */
-const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk }) => {
-  const controls = useModalControls();
+const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk, onClose }) => {
   const [currentOkText, setCurrentOkText] = useState(okText);
 
   useEffect(() => {
@@ -163,13 +161,13 @@ const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk
       errorApi?.setErrors?.(result.errorMessages);
       return;
     }
-    controls?.hide();
+    onClose();
   };
 
   return (
     <div className="flex gap-2 justify-end">
       <Button
-        onClick={() => controls?.hide()}
+        onClick={onClose}
         look="outlined"
         variant="neutral"
         autoFocus
@@ -190,7 +188,7 @@ const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk
   );
 };
 
-const ActionButton = ({ action, parentRef, store, formRef }) => {
+const ActionButton = ({ action, parentRef, store, formRef, openDialog }) => {
   const isDeleteAction = action.id.includes("delete");
   const hasChildren = !!action.children?.length;
   const submenuRef = useRef();
@@ -201,10 +199,10 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
       if (action.disabled) return;
       action?.callback
         ? action?.callback(store.currentView?.selected?.snapshot, action)
-        : invokeAction(action, isDeleteAction, store, formRef);
+        : invokeAction(action, isDeleteAction, store, formRef, openDialog);
       parentRef?.current?.close?.();
     },
-    [store.currentView?.selected, action, isDeleteAction, parentRef, store, formRef],
+    [store.currentView?.selected, action, isDeleteAction, parentRef, store, formRef, openDialog],
   );
 
   const titleContainer = (
@@ -253,6 +251,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
                 parentRef={parentRef}
                 store={store}
                 formRef={formRef}
+                openDialog={openDialog}
               />
             ))}
           </ul>
@@ -287,7 +286,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
   );
 };
 
-const invokeAction = (action, destructive, store, formRef) => {
+const invokeAction = (action, destructive, store, formRef, openDialog) => {
   if (action.dialog) {
     const { text, form, title, details, ok_text: actionOkText } = action.dialog;
 
@@ -338,33 +337,10 @@ const invokeAction = (action, destructive, store, formRef) => {
     const ctaApi = { setText: null };
     const errorApi = { setErrors: null };
 
-    modal({
+    openDialog({
       title: dialogTitle ? dialogTitle : destructive ? "Destructive action" : "Confirm action",
-      body: (
-        <DialogContent
-          text={dialogText}
-          details={details}
-          form={form}
-          formRef={formRef}
-          store={store}
-          action={action}
-          validateApi={validateApi}
-          ctaApi={ctaApi}
-          errorApi={errorApi}
-        />
-      ),
-      footer: (
-        <DialogFooter
-          destructive={destructive}
-          okText={okButtonText}
-          validateApi={validateApi}
-          ctaApi={ctaApi}
-          errorApi={errorApi}
-          onOk={submit}
-        />
-      ),
-      allowClose: false,
-      closeOnClickOutside: false,
+      content: { text: dialogText, details, form, formRef, store, action, validateApi, ctaApi, errorApi },
+      footer: { destructive, okText: okButtonText, validateApi, ctaApi, errorApi, onOk: submit },
     });
   } else {
     store.invokeAction(action.id);
@@ -376,6 +352,8 @@ export const ActionsButton = injector(
     const formRef = useRef();
     const selectedCount = store.currentView.selectedCount;
     const [isOpen, setIsOpen] = useState(false);
+    const [actionDialog, setActionDialog] = useState(null);
+    const closeActionDialog = useCallback(() => setActionDialog(null), []);
 
     // Use TanStack Query hook for fetching actions
     const {
@@ -391,39 +369,60 @@ export const ActionsButton = injector(
       return [...store.availableActions, ...serverActions].filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
     }, [store.availableActions, serverActions]);
     const actionButtons = actions.map((action) => (
-      <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
+      <ActionButton
+        key={action.id}
+        action={action}
+        parentRef={formRef}
+        store={store}
+        formRef={formRef}
+        openDialog={setActionDialog}
+      />
     ));
 
     return (
-      <Dropdown.Trigger
-        content={
-          <Menu size="compact">
-            {isLoading || isFetching ? (
-              <Menu.Item data-testid="loading-actions" disabled>
-                Loading actions...
-              </Menu.Item>
-            ) : (
-              actionButtons
-            )}
-          </Menu>
-        }
-        openUpwardForShortViewport={false}
-        disabled={!hasSelected}
-        onToggle={setIsOpen}
-      >
-        <Button
-          size={size}
-          variant="neutral"
-          look="outlined"
+      <>
+        <Dropdown.Trigger
+          content={
+            <Menu size="compact">
+              {isLoading || isFetching ? (
+                <Menu.Item data-testid="loading-actions" disabled>
+                  Loading actions...
+                </Menu.Item>
+              ) : (
+                actionButtons
+              )}
+            </Menu>
+          }
+          openUpwardForShortViewport={false}
           disabled={!hasSelected}
-          trailing={<CaretDownIcon />}
-          aria-label="Tasks Actions"
-          data-testid="dm-actions-button"
-          {...rest}
+          onToggle={setIsOpen}
         >
-          {selectedCount > 0 ? `${selectedCount} Task${selectedCount > 1 ? "s" : ""}` : "Actions"}
-        </Button>
-      </Dropdown.Trigger>
+          <Button
+            size={size}
+            variant="neutral"
+            look="outlined"
+            disabled={!hasSelected}
+            trailing={<CaretDownIcon />}
+            aria-label="Tasks Actions"
+            data-testid="dm-actions-button"
+            {...rest}
+          >
+            {selectedCount > 0 ? `${selectedCount} Task${selectedCount > 1 ? "s" : ""}` : "Actions"}
+          </Button>
+        </Dropdown.Trigger>
+        <ModalWindow
+          open={actionDialog !== null}
+          onOpenChange={() => {}}
+          title={actionDialog?.title}
+          size="medium"
+          showCloseButton={false}
+          closeOnScrimClick={false}
+          dataTestId="dm-action-dialog"
+          footer={actionDialog && <DialogFooter {...actionDialog.footer} onClose={closeActionDialog} />}
+        >
+          {actionDialog && <DialogContent {...actionDialog.content} />}
+        </ModalWindow>
+      </>
     );
   }),
 );

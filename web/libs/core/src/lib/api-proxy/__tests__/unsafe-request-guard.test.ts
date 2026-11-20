@@ -62,6 +62,9 @@ const ALLOW_LISTED_FILES = new Set<string>([
   "services/lse/web/libs/editor-shell/src/sandbox/collection-upload-engine.ts",
   // Third-party (Hubspot) survey widget — cross-origin, not a Label Studio API call.
   "services/lse/web/apps/labelstudio/src/pages/BillingPage/CancelPlanModal/HubspotCancellationSurvey.tsx",
+  // Node CLI for the interface skill: refreshes a JWT against the Label Studio URL the user passes, with
+  // the token in the body. No browser session cookie is involved, so the same-origin header does not apply.
+  "services/lse/web/libs/interface-skills/src/local-skill.ts",
   // Dev-only local playground app — never runs against a real session-authenticated backend.
   "services/lse/web/apps/local-playground/src/save-gateway.ts",
   // Anonymous, unauthenticated analytics beacon (no session cookie / write) — see FIT-2968 for the

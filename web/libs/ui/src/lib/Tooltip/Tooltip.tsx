@@ -59,7 +59,8 @@ const TooltipInner = forwardRef(
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(defaultVisible ? "visible" : null);
     const [injected, setInjected] = useState(false);
-    const [align, setAlign] = useState(alignment ?? "top-center");
+    const requestedAlign = alignment ?? "top-center";
+    const [align, setAlign] = useState(requestedAlign);
 
     const clearHideTimeout = () => {
       if (hideTimeoutRef.current) {
@@ -73,12 +74,16 @@ const TooltipInner = forwardRef(
       const target = tooltipElement.current as HTMLElement | null;
 
       if (isDefined(parent) && isDefined(target)) {
-        const { left, top, align: resultAlign } = alignElements(parent, target, align, 10, false, !disableAutoFlip);
+        const {
+          left,
+          top,
+          align: resultAlign,
+        } = alignElements(parent, target, requestedAlign, 10, false, !disableAutoFlip);
 
         setOffset({ left, top });
         setAlign(resultAlign);
       }
-    }, [align, disableAutoFlip]);
+    }, [requestedAlign, disableAutoFlip]);
 
     // The alignment's pointer margin can push the box past the viewport edge once it keeps its full width.
     useLayoutEffect(() => {
@@ -168,7 +173,7 @@ const TooltipInner = forwardRef(
             </div>
           </div>
         ) : null,
-      [injected, offset, title, visibilityClasses, tooltipElement, performAnimation],
+      [injected, align, offset, title, visibilityClasses, tooltipElement, performAnimation],
     );
 
     useEffect(() => {

@@ -9,7 +9,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
-  title: "UI/Badge",
+  title: "Data display/Badge",
   argTypes: {
     variant: {
       control: "select",
@@ -34,7 +34,7 @@ const meta: Meta<typeof Badge> = {
     },
     look: {
       control: "select",
-      options: ["filled", "outlined", "ghost", "solid"],
+      options: ["filled", "ghost", "solid"],
     },
     shape: {
       control: "select",
@@ -63,10 +63,10 @@ export const Default: Story = {
 export const LargeSize: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
-      <Badge look="outlined" variant="neutral" shape="rounded" size="large">
+      <Badge variant="neutral" shape="rounded" size="large">
         English
       </Badge>
-      <Badge look="outlined" variant="neutral" shape="rounded" size="large">
+      <Badge variant="neutral" shape="rounded" size="large">
         <span>English</span>
         <span className="text-neutral-content-subtler">· Native</span>
       </Badge>
@@ -169,7 +169,8 @@ export const AccentColors: Story = {
 
 /**
  *
- * Badges support four styles: filled (default), outlined, ghost, and solid.
+ * Badges support three styles: filled (default), ghost, and solid. A selection control shows not selected as
+ * the neutral filled Badge.
  */
 export const StyleVariants: Story = {
   render: () => {
@@ -188,23 +189,6 @@ export const StyleVariants: Story = {
               Persimmon
             </Badge>
             <Badge variant="canteloupe" look="filled">
-              Canteloupe
-            </Badge>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Outline:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" look="outlined">
-              Grape
-            </Badge>
-            <Badge variant="kale" look="outlined">
-              Kale
-            </Badge>
-            <Badge variant="persimmon" look="outlined">
-              Persimmon
-            </Badge>
-            <Badge variant="canteloupe" look="outlined">
               Canteloupe
             </Badge>
           </div>

@@ -5,7 +5,7 @@ import { AiChatStreamingMessage } from "./ai-chat-streaming-message";
 
 const meta: Meta<typeof AiChatStreamingMessage> = {
   component: AiChatStreamingMessage,
-  title: "UI/AI Chat/Streaming Message",
+  title: "Product/AI Chat/Streaming Message",
   parameters: {
     docs: {
       description: {

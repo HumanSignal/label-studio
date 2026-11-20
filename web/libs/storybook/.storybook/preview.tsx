@@ -8,6 +8,26 @@ import { WhenToUse } from "./blocks/when-to-use";
 const preview: Preview = {
   tags: ["autodocs"],
   parameters: {
+    options: {
+      // One sidebar section per category. Storybook reads this statically, so the list is literal;
+      // the manifest guard test keeps the categories in it equal to CATEGORIES.
+      storySort: {
+        method: "alphabetical",
+        order: [
+          "Design",
+          "Inputs",
+          "Data display",
+          "Feedback",
+          "Surfaces",
+          "Navigation",
+          "Layout",
+          "Utilities",
+          "Product",
+          "Components",
+          "Editor",
+        ],
+      },
+    },
     docs: {
       page: () => (
         <>

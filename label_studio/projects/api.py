@@ -264,8 +264,11 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.with_counts(fields=fields).filter(
-            organization=self.request.user.active_organization
+        # Same order as ProjectListAPI: paginating an unordered queryset returns unstable pages.
+        projects = (
+            Project.objects.with_counts(fields=fields)
+            .filter(organization=self.request.user.active_organization)
+            .order_by(F('pinned_at').desc(nulls_last=True), '-created_at')
         )
 
         # Only annotate FSM state for UI/API consumption when FSM state fields are enabled

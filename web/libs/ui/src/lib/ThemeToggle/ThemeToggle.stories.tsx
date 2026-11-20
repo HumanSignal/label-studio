@@ -3,7 +3,7 @@ import { ThemeToggle } from "./ThemeToggle";
 
 const meta: Meta<typeof ThemeToggle> = {
   component: ThemeToggle,
-  title: "UI/ThemeToggle",
+  title: "Utilities/ThemeToggle",
 };
 
 export default meta;

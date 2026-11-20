@@ -155,6 +155,16 @@ describe.skipIf(!hookCheckedOut)("exit paths", () => {
     expect(r2.calls).toBe(`${lsoWebRoot} ${lsoCss}`);
   });
 
+  test("runs ds:check --templates in the LSE web for a built-in Custom Interface template", () => {
+    const template = path.join(
+      repoRoot,
+      "services/lse/label_studio_enterprise/lse_interfaces/system_template_catalog/pdf-ocr/Screen.jsx",
+    );
+    expect(run(claudeEdit(template)).calls).toBe(`${lseWebRoot} --templates ${template}`);
+    const scenarios = template.replace("Screen.jsx", "scenarios.js");
+    expect(run(claudeEdit(scenarios)).calls).toBe("");
+  });
+
   test("a clean file prints nothing", () => {
     const r = run(claudeEdit(lseFile), { exit: 0, message: "[ds-check] lse: no regressions in 1 changed file(s)" });
     expect(r.stdout).toBe("");

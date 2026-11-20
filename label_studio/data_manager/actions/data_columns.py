@@ -12,6 +12,7 @@ from data_manager.actions import DataManagerAction
 from data_manager.column_names import UNQUERYABLE_COLUMN_NAME_CHARACTERS, is_queryable_column_name
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Case, F, Func, JSONField, Value, When
 from django.db.models.functions import Cast, Coalesce
 from django.utils.timezone import now
@@ -23,6 +24,21 @@ all_permissions = AllPermissions()
 
 def add_or_modify_columns_enabled(project):
     return flag_set('fflag_utc_1012_add_or_modify_columns', organization=project.organization)
+
+
+def _column_mode(project, column_name):
+    """'update' when the project already has the column (summary or any task), else 'add'."""
+    column_exists = column_name in project.summary.all_data_columns
+    if not column_exists:
+        column_exists = project.tasks.filter(data__has_key=column_name).exists()
+    mode = 'update' if column_exists else 'add'
+    # Existing columns (e.g. imported spreadsheet headers) stay editable, but a new column must be
+    # one the Data Manager can filter and sort on.
+    if mode == 'add' and not is_queryable_column_name(column_name):
+        raise ValidationError(
+            {'column_name': f'Column name cannot contain {UNQUERYABLE_COLUMN_NAME_CHARACTERS}.'},
+        )
+    return mode
 
 
 def _validate_column_request(request_data, project):
@@ -39,16 +55,7 @@ def _validate_column_request(request_data, project):
         raise ValidationError({'column_name': 'Select an existing column or enter a new column name.'})
 
     value_name = value_name.strip()
-    column_exists = value_name in project.summary.all_data_columns
-    if not column_exists:
-        column_exists = project.tasks.filter(data__has_key=value_name).exists()
-    mode = 'update' if column_exists else 'add'
-    # Existing columns (e.g. imported spreadsheet headers) stay editable, but a new column must be
-    # one the Data Manager can filter and sort on.
-    if mode == 'add' and not is_queryable_column_name(value_name):
-        raise ValidationError(
-            {'column_name': f'Column name cannot contain {UNQUERYABLE_COLUMN_NAME_CHARACTERS}.'},
-        )
+    mode = _column_mode(project, value_name)
     try:
         value = {'String': str, 'Number': float, 'Expression': str}[value_type](value)
     except (TypeError, ValueError) as exc:
@@ -58,6 +65,11 @@ def _validate_column_request(request_data, project):
 
 
 def _set_data_value_in_batches(queryset, value_name, postgres_value, sqlite_value):
+    """Set task.data[value_name] on every task of `queryset`, one key per task, in batches.
+
+    `postgres_value` is the jsonb expression to store, or a function of a batch's task ids returning one (for
+    per-task values); `sqlite_value(task)` returns the Python value on SQLite.
+    """
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         updated_count = 0
         task_iterator = iterate_queryset(queryset.only('id', 'data'), chunk_size=settings.UPDATE_COLUMN_BATCH_SIZE)
@@ -77,11 +89,12 @@ def _set_data_value_in_batches(queryset, value_name, postgres_value, sqlite_valu
     updated_count = 0
     task_iterator = iterate_queryset(queryset.only('id', 'project_id'), chunk_size=settings.UPDATE_COLUMN_BATCH_SIZE)
     for task_batch in batched_iterator(task_iterator, settings.UPDATE_COLUMN_BATCH_SIZE):
-        updated_count += Task.objects.filter(id__in=[task.id for task in task_batch]).update(
+        task_ids = [task.id for task in task_batch]
+        updated_count += Task.objects.filter(id__in=task_ids).update(
             data=Func(
                 Coalesce(F('data'), Value({}, JSONField()), output_field=JSONField()),
                 Value([value_name]),
-                postgres_value,
+                postgres_value(task_ids) if callable(postgres_value) else postgres_value,
                 function='jsonb_set',
             ),
             # Explicit updated_at: QuerySet.update() does not honor auto_now (FIT-3092).
@@ -135,6 +148,83 @@ def _update_summary_for_new_column(project, value_name, task_count):
     summary.all_data_columns = all_data_columns
     summary.common_data_columns = sorted(set(summary.common_data_columns) | {value_name})
     summary.save(update_fields=['all_data_columns', 'common_data_columns'])
+
+
+def _record_data_column_in_summary(project, column_name, newly_keyed, updated_count, mode):
+    """List the column in the project summary after a per-task write, so the Data Manager shows it.
+
+    Runs after the task write has committed, in its own transaction: deleting or saving a task locks the summary
+    before the task row, so holding task rows while waiting for the summary could deadlock.
+    """
+    from projects.models import ProjectSummary
+
+    cached = project.summary
+    # Count for a summary without an entry: a new column is on exactly the updated tasks; a column the tasks
+    # already had but the summary lost (stale summary) is counted exactly.
+    if mode == 'update' and column_name not in cached.all_data_columns:
+        missing_entry_count = project.tasks.filter(data__has_key=column_name).count()
+    else:
+        missing_entry_count = updated_count
+    project_task_count = None if column_name in cached.common_data_columns else project.tasks.count()
+
+    with transaction.atomic():
+        summary = ProjectSummary.objects.select_for_update().get(pk=cached.pk)
+        all_data_columns = dict(summary.all_data_columns)
+        if column_name in all_data_columns:
+            all_data_columns[column_name] += newly_keyed
+        else:
+            all_data_columns[column_name] = missing_entry_count
+        update_fields = []
+        if all_data_columns != summary.all_data_columns:
+            summary.all_data_columns = all_data_columns
+            update_fields.append('all_data_columns')
+        # Common columns are on every task (custom-interface prompts read them). The locked count includes
+        # concurrent writers' increments and is a cheap gate; the exact check runs only when it passes.
+        if (
+            project_task_count is not None
+            and column_name not in summary.common_data_columns
+            and all_data_columns[column_name] >= project_task_count
+            and not project.tasks.exclude(data__has_key=column_name).exists()
+        ):
+            summary.common_data_columns = sorted(set(summary.common_data_columns) | {column_name})
+            update_fields.append('common_data_columns')
+        if update_fields:
+            summary.save(update_fields=update_fields)
+
+
+def set_task_data_column_values(project, column_name, values):
+    """Set `task.data[column_name]` to its own value for each listed task of the project.
+
+    `values` maps task id to an already validated value. One JSON key per task (jsonb_set), only the listed tasks,
+    synchronously and in one transaction. Unlike the Add or Update Columns action, a new column is not written into
+    the other tasks of the project. Returns the updated ids and the requested ids that are not tasks of the project.
+    """
+    mode = _column_mode(project, column_name)
+    newly_keyed = 0
+    with transaction.atomic():
+        # Lock the listed tasks in id order (overlapping requests then wait instead of deadlocking) before deciding
+        # what was updated: a task deleted concurrently is either kept until commit or reported as not found.
+        updated_ids = list(
+            project.tasks.filter(id__in=list(values)).order_by('id').select_for_update().values_list('id', flat=True)
+        )
+        if updated_ids:
+            tasks = Task.objects.filter(id__in=updated_ids)
+            newly_keyed = tasks.exclude(data__has_key=column_name).count()
+            _set_data_value_in_batches(
+                tasks,
+                column_name,
+                lambda task_ids: Case(
+                    *[When(id=task_id, then=_json_value(values[task_id])) for task_id in task_ids],
+                    output_field=JSONField(),
+                ),
+                sqlite_value=lambda task: values[task.id],
+            )
+    if updated_ids:
+        _record_data_column_in_summary(project, column_name, newly_keyed, len(updated_ids), mode)
+    return {
+        'updated_task_ids': updated_ids,
+        'not_found_task_ids': sorted(set(values) - set(updated_ids)),
+    }
 
 
 def _serialize_mutation_scope(prepare_params):

@@ -8,7 +8,7 @@ import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 
 const meta: Meta<typeof DateRangePicker> = {
   component: DateRangePicker,
-  title: "UI/DateRangePicker",
+  title: "Inputs/DateRangePicker",
   parameters: {
     layout: "centered",
   },

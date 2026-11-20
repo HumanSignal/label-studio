@@ -161,15 +161,15 @@ class TestDownloadStorageData:
         response = view.get(request)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @mock.patch('data_import.api.can_read_avatar', return_value=False)
     @mock.patch('data_import.api.User.objects.filter')
-    def test_avatar_user_no_organization_access_returns_403(self, mock_filter, api_factory, user, other_user, view):
+    def test_avatar_user_no_organization_access_returns_403(
+        self, mock_filter, mock_can_read_avatar, api_factory, user, other_user, view
+    ):
         """Test that avatar user from different organization returns 403"""
         mock_avatar_user = Mock()
         mock_avatar_user.avatar = Mock()
         mock_filter.return_value.first.return_value = mock_avatar_user
-
-        # Mock organization access check to return False
-        user.active_organization.has_user = Mock(return_value=False)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user
@@ -253,9 +253,10 @@ class TestDownloadStorageData:
 
         assert headers.get('Content-Security-Policy') == expected_csp
 
+    @mock.patch('data_import.api.can_read_avatar', return_value=True)
     @mock.patch('data_import.api.User.objects.filter')
     @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', True)
-    def test_avatar_file_nginx_serving(self, mock_filter, api_factory, user, view):
+    def test_avatar_file_nginx_serving(self, mock_filter, mock_can_read_avatar, api_factory, user, view):
         """Test avatar file serving through NGINX"""
         mock_avatar_user = Mock()
         mock_avatar_file = Mock()
@@ -265,9 +266,6 @@ class TestDownloadStorageData:
         mock_avatar_file.name = 'avatar.jpg'
         mock_avatar_user.avatar = mock_avatar_file
         mock_filter.return_value.first.return_value = mock_avatar_user
-
-        # Mock organization access check to return True
-        user.active_organization.has_user = Mock(return_value=True)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user
@@ -279,10 +277,13 @@ class TestDownloadStorageData:
         assert 'X-Accel-Redirect' in response
         assert 'Content-Disposition' in response
 
+    @mock.patch('data_import.api.can_read_avatar', return_value=True)
     @mock.patch('data_import.api.User.objects.filter')
     @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', False)
     @mock.patch('data_import.api.RangedFileResponse')
-    def test_avatar_file_direct_serving(self, mock_ranged_response, mock_filter, api_factory, user, view):
+    def test_avatar_file_direct_serving(
+        self, mock_ranged_response, mock_filter, mock_can_read_avatar, api_factory, user, view
+    ):
         """Test avatar file serving directly (without NGINX)"""
         mock_avatar_user = Mock()
         mock_avatar_file = Mock()
@@ -292,9 +293,6 @@ class TestDownloadStorageData:
         mock_response_instance = Mock()
         mock_response_instance.__setitem__ = Mock()  # Allow item assignment
         mock_ranged_response.return_value = mock_response_instance
-
-        # Mock organization access check to return True
-        user.active_organization.has_user = Mock(return_value=True)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user

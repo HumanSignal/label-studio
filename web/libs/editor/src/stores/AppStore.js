@@ -4,6 +4,7 @@ import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, w
 
 import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import InfoModal from "../components/Infomodal/Infomodal";
+import { showConfirmModal } from "../components/Infomodal/infomodal-dispatch";
 import { Hotkey } from "../core/Hotkey";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 import ToolsManager from "../tools/Manager";
@@ -482,6 +483,17 @@ export default types
       }
     }
 
+    function confirmDeleteAllRegions() {
+      const { selected } = self.annotationStore;
+
+      showConfirmModal({
+        title: "Delete all regions",
+        content: getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS,
+        okText: "Delete",
+        onOk: () => selected.deleteAllRegions(),
+      });
+    }
+
     function attachHotkeys() {
       // Unbind previous keys in case LS was re-initialized
       hotkeys.unbindAll();
@@ -505,13 +517,7 @@ export default types
       /**
        * Hotkey for delete
        */
-      hotkeys.addNamed("region:delete-all", () => {
-        const { selected } = self.annotationStore;
-
-        if (window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)) {
-          selected.deleteAllRegions();
-        }
-      });
+      hotkeys.addNamed("region:delete-all", self.confirmDeleteAllRegions);
 
       // create relation
       hotkeys.addNamed("region:relation", () => {
@@ -1222,6 +1228,7 @@ export default types
       setHistory,
       hydrateHistoryItem,
       attachHotkeys,
+      confirmDeleteAllRegions,
       attachRejectActionHotkeys,
       handleSubmitHotkey,
       handleSkipHotkey,

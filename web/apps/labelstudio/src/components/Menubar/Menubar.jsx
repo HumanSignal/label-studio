@@ -14,7 +14,7 @@ import {
   IconSlack,
 } from "@humansignal/icons";
 import { LSLogo } from "../../assets/images";
-import { Button, Avatar, AvatarBadge, ThemeToggle } from "@humansignal/ui";
+import { Button, Avatar, ThemeToggle } from "@humansignal/ui";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -29,9 +29,20 @@ import "./Menubar.prefix.css";
 import "./MenuContent.prefix.css";
 import "./MenuSidebar.prefix.css";
 import { pages } from "@humansignal/app-common";
-import { openHotkeyHelp } from "@humansignal/app-common/pages/AccountSettings/sections/Hotkeys/Help";
+import { HotkeyHelpDialog } from "@humansignal/app-common/pages/AccountSettings/sections/Hotkeys/Help";
 
 export const MenubarContext = createContext();
+
+const HOTKEY_HELP_SECTIONS = [
+  "annotation",
+  "data_manager",
+  "regions",
+  "tools",
+  "audio",
+  "video",
+  "timeseries",
+  "image_gallery",
+];
 
 const LeftContextMenu = ({ className }) => (
   <StaticContent id="context-menu-left" className={className}>
@@ -61,6 +72,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
   const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
   const [sidebarPinned, setSidebarPinned] = useState(defaultPinned ?? false);
   const [accountMenuOpened, setAccountMenuOpened] = useState(false);
+  const [hotkeyHelpOpen, setHotkeyHelpOpen] = useState(false);
   const [PageContext, setPageContext] = useState({
     Component: null,
     props: {},
@@ -155,19 +167,13 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 tooltip="Keyboard Shortcuts"
                 data-testid="hotkeys-button"
                 size="small"
-                onClick={() => {
-                  openHotkeyHelp([
-                    "annotation",
-                    "data_manager",
-                    "regions",
-                    "tools",
-                    "audio",
-                    "video",
-                    "timeseries",
-                    "image_gallery",
-                  ]);
-                }}
+                onClick={() => setHotkeyHelpOpen(true)}
                 icon={<IconHotkeys />}
+              />
+              <HotkeyHelpDialog
+                open={hotkeyHelpOpen}
+                onOpenChange={setHotkeyHelpOpen}
+                sections={HOTKEY_HELP_SECTIONS}
               />
             </div>
           </div>
@@ -215,8 +221,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                   size="large"
                   user={user}
                   isInProgress={isLoading}
-                  badge={showNewsletterDot && <AvatarBadge shape="dot" variant="primary" label="Newsletter sign-up" />}
-                  badgePosition="topRight"
+                  indicator={showNewsletterDot && { variant: "primary", label: "Newsletter sign-up" }}
                 />
               </Button>
             </div>

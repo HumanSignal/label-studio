@@ -6,11 +6,23 @@ import { Label } from "../label/label";
 import { Dropdown } from "./dropdown";
 import { DropdownTrigger } from "./dropdown-trigger";
 import type { Align } from "@humansignal/core/lib/utils/dom";
-import { IconUserEdit, IconSettings, IconCross, IconBell, IconChevronDown } from "@humansignal/icons";
+import {
+  CopyIcon,
+  DotsThreeIcon,
+  IconUserEdit,
+  IconSettings,
+  IconCross,
+  IconBell,
+  IconChevronDown,
+  PlayIcon,
+  PowerIcon,
+  SlidersHorizontalIcon,
+  TrashIcon,
+} from "@humansignal/icons";
 
 const meta = {
   component: DropdownTrigger,
-  title: "UI/Dropdown",
+  title: "Navigation/Dropdown",
   parameters: {
     layout: "centered",
   },
@@ -456,5 +468,152 @@ export const WithLabels: Story = {
         <Button>Open Menu</Button>
       </Dropdown.Trigger>
     </Space>
+  ),
+};
+
+// Menu of actions: Dropdown.Menu / Dropdown.Item / Dropdown.Divider
+const ActionsTrigger = () => <Button look="outlined" variant="neutral" aria-label="Actions" icon={<DotsThreeIcon />} />;
+
+export const ActionMenu: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      content={
+        <Dropdown.Menu aria-label="Course actions" data-testid="story-action-menu">
+          <Dropdown.Item icon={<SlidersHorizontalIcon size={20} />} onSelect={() => console.log("configure")}>
+            Configure
+          </Dropdown.Item>
+          <Dropdown.Item icon={<PlayIcon size={20} />} onSelect={() => console.log("preview")}>
+            Preview
+          </Dropdown.Item>
+          <Dropdown.Item icon={<CopyIcon size={20} />} onSelect={() => console.log("duplicate")}>
+            Duplicate
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item danger icon={<TrashIcon size={20} />} onSelect={() => console.log("delete")}>
+            Delete
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <ActionsTrigger />
+    </Dropdown.Trigger>
+  ),
+};
+
+export const ActionMenuWithDescription: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      content={
+        <Dropdown.Menu aria-label="Publishing actions">
+          <Dropdown.Item
+            icon={<PowerIcon size={20} />}
+            description="Make this course visible to learners"
+            onSelect={() => console.log("publish")}
+          >
+            Publish
+          </Dropdown.Item>
+          <Dropdown.Item icon={<CopyIcon size={20} />} onSelect={() => console.log("duplicate")}>
+            Duplicate
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <ActionsTrigger />
+    </Dropdown.Trigger>
+  ),
+};
+
+export const ActionMenuDisabledWithHint: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      content={
+        <Dropdown.Menu aria-label="Course actions">
+          <Dropdown.Item icon={<CopyIcon size={20} />} onSelect={() => console.log("duplicate")}>
+            Duplicate
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item
+            disabled
+            danger
+            icon={<TrashIcon size={20} />}
+            description="Unpublish the course before deleting it"
+          >
+            Delete
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <ActionsTrigger />
+    </Dropdown.Trigger>
+  ),
+};
+
+export const ActionMenuWithoutIcons: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      content={
+        <Dropdown.Menu aria-label="Sort by">
+          <Dropdown.Item onSelect={() => console.log("name")}>Name</Dropdown.Item>
+          <Dropdown.Item onSelect={() => console.log("date")}>Last updated</Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item icon={<IconSettings />} onSelect={() => console.log("settings")}>
+            With an icon, aligned to the rest
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <Button look="outlined" variant="neutral" trailing={<IconChevronDown />}>
+        Sort
+      </Button>
+    </Dropdown.Trigger>
+  ),
+};
+
+export const ActionMenuStayOpen: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      content={
+        <Dropdown.Menu aria-label="Notifications">
+          <Dropdown.Item icon={<IconBell />} closeOnSelect={false} onSelect={() => console.log("toggle")}>
+            Stays open on select
+          </Dropdown.Item>
+          <Dropdown.Item icon={<IconUserEdit />} onSelect={() => console.log("close")}>
+            Closes on select
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <Button look="outlined" variant="neutral">
+        Notifications
+      </Button>
+    </Dropdown.Trigger>
+  ),
+};
+
+export const ActionMenuContextMenu: Story = {
+  render: (args) => (
+    <Dropdown.Trigger
+      {...args}
+      triggerMode="contextmenu"
+      positionAtCursor
+      content={
+        <Dropdown.Menu aria-label="Card actions">
+          <Dropdown.Item icon={<PlayIcon size={20} />} onSelect={() => console.log("preview")}>
+            Preview
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item danger icon={<TrashIcon size={20} />} onSelect={() => console.log("delete")}>
+            Delete
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    >
+      <div className="p-loose border border-neutral-border rounded-base text-body-small">Right-click this card</div>
+    </Dropdown.Trigger>
   ),
 };

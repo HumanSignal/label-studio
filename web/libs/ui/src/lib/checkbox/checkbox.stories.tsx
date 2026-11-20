@@ -4,7 +4,7 @@ import { action } from "storybook/actions";
 
 const meta: Meta<typeof Checkbox> = {
   component: Checkbox,
-  title: "UI/Checkbox",
+  title: "Inputs/Checkbox",
   argTypes: {
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },

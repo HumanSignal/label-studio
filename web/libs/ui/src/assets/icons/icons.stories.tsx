@@ -471,7 +471,7 @@ const IconCatalogByCategory = () => {
 };
 
 const meta: Meta = {
-  title: "UI/Icons",
+  title: "Design/Icons",
   tags: ["!autodocs"],
   parameters: {
     layout: "fullscreen",

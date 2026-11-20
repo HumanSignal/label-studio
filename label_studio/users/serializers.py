@@ -132,8 +132,15 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
             if 'avatar' in representation:
                 representation['avatar'] = None
 
-        # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
         requester = self._get_requester()
+        if requester is not None and requester.pk != instance.pk:
+            # Membership in the viewer's organization must not reveal the user's other organizations
+            representation = self._hide_other_organizations(
+                dict(representation), instance, getattr(requester, 'active_organization_id', None)
+            )
+            is_modified = True
+
+        # Annotator/reviewer firewall: hide other users' identity entirely (id-less role stub)
         if AnnotatorReviewerFirewall.should_anonymize(user=instance, requester=requester):
             representation = AnnotatorReviewerFirewall.anonymize_user_data(
                 representation, user=instance, requester=requester
@@ -143,6 +150,14 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if is_modified:
             cache[shape] = representation
 
+        return representation
+
+    def _hide_other_organizations(self, representation, instance, organization_id):
+        if instance.active_organization_id != organization_id:
+            if 'active_organization' in representation:
+                representation['active_organization'] = None
+            if 'active_organization_meta' in representation:
+                representation['active_organization_meta'] = {'title': '', 'email': ''}
         return representation
 
     class Meta:

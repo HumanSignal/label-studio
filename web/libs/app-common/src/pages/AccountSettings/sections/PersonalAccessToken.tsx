@@ -9,13 +9,13 @@ import { Button, Label, Typography } from "@humansignal/ui";
 import { Input, TextArea } from "apps/labelstudio/src/components/Form";
 import { atom, useAtomValue } from "jotai";
 import { atomWithMutation } from "jotai-tanstack-query";
-import { withStepUp } from "../../../components/step-up/with-step-up";
+import { useStepUp, type WithStepUp } from "../../../components/step-up/step-up-provider";
 import styles from "./PersonalAccessToken.module.css";
 
 // The token is a credential: it is shown on request, after the user confirms their identity
 const revealTokenAtom = atomWithMutation(() => ({
   mutationKey: ["access-token"],
-  mutationFn: async () => {
+  mutationFn: async (withStepUp: WithStepUp) => {
     const result = await withStepUp("Show your access token", () => sameOriginFetch("/api/current-user/token"));
     return result.ok ? result.json() : {};
   },
@@ -23,7 +23,7 @@ const revealTokenAtom = atomWithMutation(() => ({
 
 const resetTokenAtom = atomWithMutation(() => ({
   mutationKey: ["reset-token"],
-  mutationFn: async () => {
+  mutationFn: async (withStepUp: WithStepUp) => {
     const result = await withStepUp("Reset your access token", () =>
       sameOriginFetch("/api/current-user/reset-token/", {
         method: "post",
@@ -48,6 +48,7 @@ const curlStringAtom = atom((get) => {
 
 export const PersonalAccessToken = () => {
   const token = useAtomValue(currentTokenAtom);
+  const withStepUp = useStepUp();
   const reveal = useAtomValue(revealTokenAtom);
   const reset = useAtomValue(resetTokenAtom);
   const curl = useAtomValue(curlStringAtom);
@@ -65,7 +66,7 @@ export const PersonalAccessToken = () => {
               <Button
                 variant="primary"
                 look="outlined"
-                onClick={() => reveal.mutate()}
+                onClick={() => reveal.mutate(withStepUp)}
                 waiting={reveal.isPending}
                 data-testid="access-token-show"
               >
@@ -82,7 +83,7 @@ export const PersonalAccessToken = () => {
             >
               {tokenCopied ? "Copied!" : "Copy"}
             </Button>
-            <Button variant="negative" look="outlined" onClick={() => reset.mutate()}>
+            <Button variant="negative" look="outlined" onClick={() => reset.mutate(withStepUp)}>
               Reset
             </Button>
           </div>

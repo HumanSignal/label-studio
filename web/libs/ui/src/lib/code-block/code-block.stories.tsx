@@ -3,7 +3,7 @@ import { CodeBlock } from "./code-block";
 
 const meta: Meta<typeof CodeBlock> = {
   component: CodeBlock,
-  title: "UI/CodeBlock",
+  title: "Data display/CodeBlock",
   argTypes: {
     variant: { control: "select", options: ["neutral", "warning", "negative"] },
     allowCopy: { control: "boolean" },

@@ -8,6 +8,9 @@ const lsoWebRoot = path.resolve(import.meta.dir, "../../..");
 const repoRoot = path.resolve(lsoWebRoot, "../../..");
 // The snapshot covers both webs; the LSO unit job checks out only services/lso/web.
 const bothWebs = fs.existsSync(path.join(repoRoot, "services/lse/web/package.json"));
+const templateCatalog = fs.existsSync(
+  path.join(repoRoot, "services/lse/label_studio_enterprise/lse_interfaces/system_template_catalog"),
+);
 
 const run = (...args: string[]) =>
   Bun.spawnSync(["bun", "tools/ds-metrics/cli.ts", ...args], { cwd: lsoWebRoot, stdout: "pipe", stderr: "pipe" });
@@ -39,10 +42,11 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
       "ds_components",
       "raw_controls_lse_app",
       "legacy_icons",
-      "ds_render_share_lse",
-      "ds_render_share_lso",
+      "raw_controls_templates",
     ]);
-    expect(snap.areas["lse/app"].render_files).toBeGreaterThan(0);
+    expect(snap.areas["lse/app"]).toEqual({ violations: expect.any(Number) });
+    expect(snap.areas["lse/app"].violations).toBeGreaterThan(0);
+    if (templateCatalog) expect(snap.areas["lse/templates"].violations).toBe(snap.goals.raw_controls_templates.value);
     expect(fs.existsSync(head)).toBe(true);
   }, 90_000);
 

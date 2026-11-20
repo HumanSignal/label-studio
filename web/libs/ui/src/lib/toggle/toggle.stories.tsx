@@ -3,7 +3,7 @@ import { Toggle } from "./toggle";
 
 const meta: Meta<typeof Toggle> = {
   component: Toggle,
-  title: "UI/Toggle",
+  title: "Inputs/Toggle",
   argTypes: {
     checked: { control: "boolean" },
     disabled: { control: "boolean" },

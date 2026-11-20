@@ -248,7 +248,7 @@ const SelectedItemsGroup = ({
  * tools.
  */
 
-export const Select = forwardRef(
+const SelectBase = forwardRef(
   <T, A extends SelectOption<T>[]>(
     {
       label,
@@ -944,7 +944,18 @@ export const Select = forwardRef(
                 </CommandGroup>
               </CommandList>
               {/* Outside CommandList so it stays pinned while the options scroll. */}
-              {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
+              {footer && (
+                <div
+                  className="p-tight border-t border-neutral-border flex"
+                  // A dialog opened from the footer is portaled, but its key events still bubble here through
+                  // React: keep them from the option list, which would take Enter as picking an option.
+                  onKeyDown={(e) => {
+                    if (!e.currentTarget.contains(e.target as Node)) e.stopPropagation();
+                  }}
+                >
+                  {footer}
+                </div>
+              )}
             </Command>
           )}
         </PopoverContent>
@@ -1005,6 +1016,83 @@ export const Select = forwardRef(
 ) as (<T, A extends SelectOption<T>[]>(props: SelectProps<T, A>) => React.ReactElement | null) & {
   displayName?: string;
 };
+
+const toValueList = (value: unknown): unknown[] => {
+  if (!isDefined(value)) return [];
+  const list = Array.isArray(value) ? value : [value];
+  return list.map((item: any) => item?.value ?? item);
+};
+
+const sameValues = (left: unknown[], right: unknown[]) =>
+  left.length === right.length && left.every((item) => right.includes(item));
+
+/**
+ * Multiple select whose picks stay pending until Apply. It drives SelectBase only through its public props
+ * (open, value, onChange, footer), so SelectBase itself is unchanged.
+ */
+const SelectWithApply = forwardRef((props: SelectProps<unknown, any[]>, ref: ForwardedRef<HTMLSelectElement>) => {
+  const { value, defaultValue, onChange, onOpen, onClose, footer, dataTestid, ...rest } = props;
+  const isControlled = value !== undefined;
+  const [uncontrolledValue, setUncontrolledValue] = useState<unknown[]>(() => toValueList(defaultValue));
+  const committed = useMemo(
+    () => (isControlled ? toValueList(value) : uncontrolledValue),
+    [isControlled, value, uncontrolledValue],
+  );
+  const [isOpen, setIsOpen] = useState(false);
+  const [pending, setPending] = useState<unknown[]>(committed);
+  const hasChanges = !sameValues(pending, committed);
+
+  const apply = () => {
+    if (!isControlled) setUncontrolledValue(pending);
+    onChange?.(pending);
+    setIsOpen(false);
+    onClose?.();
+  };
+
+  return (
+    <SelectBase
+      {...rest}
+      ref={ref}
+      multiple
+      dataTestid={dataTestid}
+      value={isOpen ? pending : committed}
+      open={isOpen}
+      onOpen={() => {
+        setPending(committed);
+        setIsOpen(true);
+        onOpen?.();
+      }}
+      onClose={() => {
+        setPending(committed);
+        setIsOpen(false);
+        onClose?.();
+      }}
+      onChange={(next: unknown) => setPending(toValueList(next))}
+      footer={
+        <>
+          {footer}
+          <Button
+            type="button"
+            variant="primary"
+            look="filled"
+            size="small"
+            className={footer ? undefined : "flex-1"}
+            disabled={!hasChanges}
+            data-testid={dataTestid ? `${dataTestid}-apply` : "select-apply"}
+            onClick={apply}
+          >
+            Apply
+          </Button>
+        </>
+      }
+    />
+  );
+});
+
+export const Select = forwardRef(
+  ({ requireApply, ...props }: SelectProps<unknown, any[]>, ref: ForwardedRef<HTMLSelectElement>) =>
+    requireApply && props.multiple ? <SelectWithApply {...props} ref={ref} /> : <SelectBase {...props} ref={ref} />,
+) as typeof SelectBase;
 
 type GroupActionsProps = {
   groupItems: any[];

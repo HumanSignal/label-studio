@@ -299,6 +299,35 @@ describe("AppStore", () => {
     });
   });
 
+  describe("region:delete-all hotkey", () => {
+    it("confirmDeleteAllRegions asks in the editor confirm dialog and deletes only when confirmed", async () => {
+      const { registerConfirmModalDispatch } = await import("../../components/Infomodal/infomodal-dispatch");
+      const confirms = [];
+      registerConfirmModalDispatch((payload) => payload && confirms.push(payload));
+      const confirmSpy = spyOn(window, "confirm");
+      try {
+        const store = createStore();
+        store.initializeStore({});
+        const annotation = store.annotationStore.addAnnotation({ userGenerate: true });
+        store.annotationStore.selectAnnotation(annotation.id);
+        const deleteAll = spyOn(store.annotationStore.selected, "deleteAllRegions").mockImplementation(() => {});
+
+        store.confirmDeleteAllRegions();
+
+        expect(confirmSpy).not.toHaveBeenCalled();
+        expect(confirms).toHaveLength(1);
+        expect(confirms[0]).toMatchObject({ title: "Delete all regions", content: "Delete all?", okText: "Delete" });
+        expect(deleteAll).not.toHaveBeenCalled();
+
+        confirms[0].onOk();
+        expect(deleteAll).toHaveBeenCalledTimes(1);
+      } finally {
+        registerConfirmModalDispatch(null);
+        confirmSpy.mockRestore();
+      }
+    });
+  });
+
   describe("toggle state", () => {
     it("toggleSettings flips showingSettings", () => {
       const store = createStore();

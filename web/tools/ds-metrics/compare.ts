@@ -9,8 +9,9 @@ export type Comparison = {
   totals: Record<"violations" | "files_with_violations", Delta>;
   rules: Record<string, Delta>;
   clusters: Record<string, Delta & { importers: Delta }>;
-  areas: Record<string, { violations: Delta; ds_import_share: Delta }>;
-  goals: Record<string, Delta & { target: number }>;
+  areas: Record<string, { violations: Delta }>;
+  /** `isNew` / `isRemoved`: only one side has the goal, so its delta means nothing. */
+  goals: Record<string, Delta & { target: number | null; isNew: boolean; isRemoved: boolean }>;
 };
 
 const delta = (head: number, base: number): Delta => ({ base, head, delta: Math.round((head - base) * 1000) / 1000 });
@@ -45,18 +46,22 @@ export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): C
   }
   const areas: Comparison["areas"] = {};
   for (const k of keys(head.areas, base.areas)) {
-    const h = head.areas[k] ?? { violations: 0, ds_import_share: 0 };
-    const b = base.areas[k] ?? { violations: 0, ds_import_share: 0 };
+    const h = head.areas[k] ?? { violations: 0 };
+    const b = base.areas[k] ?? { violations: 0 };
     areas[k] = {
       violations: delta(h.violations, b.violations),
-      ds_import_share: delta(h.ds_import_share ?? 0, b.ds_import_share ?? 0),
     };
   }
   const goals: Comparison["goals"] = {};
   for (const k of keys(head.goals, base.goals)) {
     const h = head.goals[k];
     const b = base.goals[k];
-    goals[k] = { ...delta(h?.value ?? 0, b?.value ?? 0), target: (h ?? b)?.target ?? 0 };
+    goals[k] = {
+      ...delta(h?.value ?? 0, b?.value ?? 0),
+      target: (h ?? b)?.target ?? null,
+      isNew: b === undefined && h !== undefined,
+      isRemoved: h === undefined && b !== undefined,
+    };
   }
   return {
     totals: {
@@ -84,7 +89,7 @@ const num = (n: number) => n.toLocaleString("en-US");
 const signed = (n: number) => (n > 0 ? `+${num(n)}` : num(n));
 const paren = (n: number) => (n === 0 ? "" : ` (${signed(n)})`);
 const pct = (n: number) => `${Math.round(n * 100)}%`;
-const isShare = (goal: string) => goal.startsWith("ds_render_share");
+const isShare = (goal: string) => /_share_/.test(goal);
 
 export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): string {
   const head = complete(headIn);
@@ -94,19 +99,16 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
   const baseId = base.commit.slice(0, 10);
   const files = `${num(c.totals.files_with_violations.head)} files${paren(c.totals.files_with_violations.delta)}`;
   const lines = [MARKER, "## Design-system metrics", ""];
-  const rulesMoved = Object.values(c.rules).some((r) => r.delta !== 0);
-  if (total.delta === 0 && !rulesMoved) {
-    lines.push(`**${num(total.head)} violations, no change** against the base branch (\`${baseId}\`).`);
-  } else if (total.delta === 0) {
-    lines.push(
-      `**${num(total.head)} violations, same total as the base branch (\`${baseId}\`), with rules shifted**, in ${files}.`,
-    );
-  } else {
-    const verb = total.delta < 0 ? "fewer" : "more";
-    lines.push(
-      `**${num(total.head)} violations (${signed(total.delta)}, ${num(Math.abs(total.delta))} ${verb} than the base branch \`${baseId}\`)**, in ${files}.`,
-    );
-  }
+  const added = Object.values(c.rules).reduce((sum, r) => sum + Math.max(r.delta, 0), 0);
+  const net = total.delta === 0 ? (added ? "no net change: rules shifted" : "no change") : `${signed(total.delta)} net`;
+  // The first line answers "did this PR add any?", so the comment can be dismissed or acted on at a glance.
+  lines.push(
+    added
+      ? `**${num(added)} new ${added === 1 ? "violation" : "violations"}** (${net} against the base branch \`${baseId}\`)`
+      : `**No new violations** (${net} against the base branch \`${baseId}\`)`,
+    "",
+    `of ${num(total.head)} total violations, in ${files}.`,
+  );
   if (base.version !== head.version) {
     lines.push(
       "",
@@ -146,11 +148,17 @@ export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snap
   }
 
   lines.push("| Goal | Head | Delta | Target |", "|---|---:|---:|---:|");
+  const removed = Object.keys(c.goals).filter((goal) => c.goals[goal].isRemoved);
   for (const [goal, d] of Object.entries(c.goals)) {
+    if (d.isRemoved) continue;
     const f = isShare(goal) ? pct : num;
+    const change = d.isNew ? "new" : isShare(goal) ? `${signed(Math.round(d.delta * 100))}%` : signed(d.delta);
     lines.push(
-      `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${isShare(goal) ? signed(Math.round(d.delta * 100)) + "%" : signed(d.delta)} | ${f(d.target)} |`,
+      `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${change} | ${d.target === null ? "not set" : f(d.target)} |`,
     );
+  }
+  if (removed.length) {
+    lines.push("", `<sub>no longer measured: ${removed.map((goal) => goal.replace(/_/g, " ")).join(", ")}</sub>`);
   }
   lines.push(
     "",

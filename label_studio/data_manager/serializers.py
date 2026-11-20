@@ -2,6 +2,7 @@
 
 import copy
 import os
+import re
 from typing import Any
 
 import ujson as json
@@ -59,7 +60,7 @@ def view_lock_project(instance_or_data):
     """Resolve a project for lock permission checks.
 
     ``View`` has ``project``; ``DatasetView`` has ``dataset`` only. Returning
-    ``None`` lets ``get_user_role`` fall back to an org-level role check.
+    ``None`` lets ``user.get_role`` fall back to an org-level role check.
     """
     if isinstance(instance_or_data, dict):
         return instance_or_data.get('project')
@@ -68,12 +69,11 @@ def view_lock_project(instance_or_data):
 
 def user_can_manage_view_lock(user, project):
     try:
-        from lse_organizations.functions import get_user_role
         from lse_organizations.models import OrganizationRole
     except ImportError:
         return True
 
-    role = get_user_role(user=user, organization_or_pk=user.active_organization_id, project=project)
+    role = user.get_role(user.active_organization_id, project)
     return role in (OrganizationRole.OWNER, OrganizationRole.ADMINISTRATOR, OrganizationRole.MANAGER)
 
 
@@ -1056,3 +1056,81 @@ class ViewRequestSerializer(serializers.Serializer):
 
     data = ViewDataRequestSerializer(required=False)
     project = serializers.IntegerField(required=False, help_text='Project ID')
+
+
+TASK_ID_KEY_PATTERN = re.compile(r'[1-9][0-9]{0,18}')
+
+
+class NumberValueField(serializers.FloatField):
+    """A JSON number (or numeric string) stored as a float, like the Add or Update Columns `Number` type.
+
+    FloatField already rejects NaN and Infinity; booleans are rejected too, since `float(True)` would store 1.0.
+    """
+
+    def to_internal_value(self, data):
+        if isinstance(data, bool):
+            self.fail('invalid')
+        return super().to_internal_value(data)
+
+
+class TaskDataColumnSerializer(serializers.Serializer):
+    column_name = serializers.CharField(
+        # Kept exactly as sent: an existing key with surrounding spaces stays addressable, and a new one is rejected.
+        trim_whitespace=False,
+        help_text=(
+            'Data column to set: the key in `task.data`, used exactly as sent. If no task of the project has it yet, '
+            'it is created on the listed tasks only. A new column name cannot contain whitespace, quotation marks, '
+            'brackets, semicolons, hashes, control characters, or SQL comments.'
+        ),
+    )
+    value_type = serializers.ChoiceField(
+        choices=['String', 'Number'],
+        default='String',
+        help_text='How the values are stored: `String` keeps the text exactly as sent; `Number` stores a number.',
+    )
+    values = serializers.DictField(
+        child=serializers.JSONField(),
+        allow_empty=False,
+        help_text=(
+            'Map of task ID to the value for that task, for example `{"101": "Missing box", "102": "OK"}`. '
+            'At most `TASK_DATA_COLUMN_MAX_TASKS` tasks per request (1000 by default).'
+        ),
+    )
+
+    def validate(self, attrs):
+        values = attrs['values']
+        max_tasks = settings.TASK_DATA_COLUMN_MAX_TASKS
+        if len(values) > max_tasks:
+            raise serializers.ValidationError({'values': f'Send at most {max_tasks} tasks per request.'})
+
+        if attrs['value_type'] == 'Number':
+            value_field = NumberValueField()
+        else:
+            value_field = serializers.CharField(
+                allow_blank=True, trim_whitespace=False, max_length=settings.TASK_DATA_COLUMN_MAX_VALUE_LENGTH
+            )
+
+        task_values, errors = {}, {}
+        for key, value in values.items():
+            if not TASK_ID_KEY_PATTERN.fullmatch(key):
+                errors[key] = ['Task IDs must be positive integers.']
+                continue
+            try:
+                task_values[int(key)] = value_field.run_validation(value)
+            except serializers.ValidationError as exc:
+                errors[key] = exc.detail
+        if errors:
+            raise serializers.ValidationError({'values': errors})
+
+        attrs['values'] = task_values
+        return attrs
+
+
+class TaskDataColumnResultSerializer(serializers.Serializer):
+    updated_task_ids = serializers.ListField(
+        child=serializers.IntegerField(), help_text='Tasks whose column value was set, in ascending order.'
+    )
+    not_found_task_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        help_text='Requested task IDs that are not tasks of this project (nothing was written for them).',
+    )

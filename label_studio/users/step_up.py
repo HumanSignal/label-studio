@@ -115,5 +115,5 @@ def verify_password(request, password):
     if challenge.display_context['step_up']['method'] != METHOD_PASSWORD:
         raise challenge
     if not load_func(settings.STEP_UP_CHECK_PASSWORD)(request.user, password):
-        raise serializers.ValidationError({'current_password': 'Incorrect password'})
+        raise serializers.ValidationError({'current_password': ['Incorrect password']})
     record_step_up(request)

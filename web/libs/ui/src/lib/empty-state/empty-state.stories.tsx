@@ -20,7 +20,7 @@ import { Tooltip } from "../Tooltip/Tooltip";
 
 const meta: Meta<typeof EmptyState> = {
   component: EmptyState,
-  title: "UI/Empty State",
+  title: "Feedback/Empty State",
   parameters: {
     docs: {
       description: {

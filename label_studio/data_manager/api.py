@@ -7,12 +7,15 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
+from data_manager.actions.data_columns import add_or_modify_columns_enabled, set_task_data_column_values
 from data_manager.functions import accessible_projects, evaluate_predictions, get_prepare_params
 from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
 from data_manager.models import View
 from data_manager.serializers import (
     DataManagerTaskSerializer,
     PrepareParamsRequestSerializer,
+    TaskDataColumnResultSerializer,
+    TaskDataColumnSerializer,
     ViewOrderSerializer,
     ViewRequestSerializer,
     ViewResetSerializer,
@@ -31,7 +34,9 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Annotation, Task
@@ -790,6 +795,79 @@ class ProjectActionsAPI(APIView):
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)
+
+
+@method_decorator(
+    name='post',
+    decorator=extend_schema(
+        tags=['Tasks'],
+        summary='Set a data column on tasks',
+        description=(
+            'Set one `task.data` key to a different value for each listed task of the project, in one synchronous '
+            'request. Only that key of the listed tasks is written: other keys and other tasks are not touched, and '
+            'a new column is created on the listed tasks only (the "Add or Update Columns" Data Manager action, in '
+            'contrast, writes `null` into every other task when it adds a column). The column then appears in the '
+            'Data Manager. All values are validated first; if any is invalid, nothing is written. The response lists '
+            'the tasks that were updated and the requested IDs that are not tasks of this project. Requires the '
+            'same permission and feature flag as the "Add or Update Columns" action. Values are not checked against '
+            'the labeling configuration or a custom interface input schema. If an "Add or Update Columns" action '
+            'that adds the same column is still running in the background, it can overwrite the values with `null`.'
+        ),
+        operation_id='api_projects_tasks_data_column_create',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location='path',
+                description='A unique integer value identifying this project.',
+            ),
+        ],
+        request=TaskDataColumnSerializer,
+        responses={
+            200: OpenApiResponse(response=TaskDataColumnResultSerializer, description='Values set'),
+            400: OpenApiResponse(description='Invalid column name or values; nothing was written'),
+            403: OpenApiResponse(description='No permission, or "Add or Update Columns" is disabled'),
+            404: OpenApiResponse(description='Project not found'),
+        },
+        examples=[
+            OpenApiExample(
+                name='request',
+                value={
+                    'column_name': 'customer_feedback',
+                    'value_type': 'String',
+                    'values': {'101': 'Box 3 is missing', '102': 'OK', '999': 'Unknown task'},
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                name='response',
+                value={'updated_task_ids': [101, 102], 'not_found_task_ids': [999]},
+                response_only=True,
+            ),
+        ],
+        extensions={
+            'x-fern-sdk-group-name': 'tasks',
+            'x-fern-sdk-method-name': 'set_data_column',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+class ProjectTaskDataColumnAPI(APIView):
+    parser_classes = (JSONParser,)
+    permission_required = ViewClassPermission(POST=all_permissions.projects_change)
+
+    def post(self, request, pk):
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=pk)
+        self.check_object_permissions(request, project)
+        if not add_or_modify_columns_enabled(project):
+            raise PermissionDenied('Add or Update Columns is not enabled for this organization.')
+
+        serializer = TaskDataColumnSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = set_task_data_column_values(
+            project, serializer.validated_data['column_name'], serializer.validated_data['values']
+        )
+        return Response(TaskDataColumnResultSerializer(result).data)
 
 
 @method_decorator(

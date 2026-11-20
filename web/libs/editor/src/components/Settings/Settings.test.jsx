@@ -48,6 +48,15 @@ describe("classic editor hotkey settings", () => {
     );
   });
 
+  it("pads tab content inside the edge-to-edge dialog body", () => {
+    render(<Settings store={createStore()} />);
+
+    expect(screen.getByTestId("editor-settings-modal")).toBeInTheDocument();
+    const pane = screen.getByTestId("editor-settings-tab-pane-General");
+    expect(pane.className).toContain("px-wide");
+    expect(pane.className).toContain("pb-wide");
+  });
+
   it("links to account hotkeys outside a project", async () => {
     window.history.pushState({}, "", "/user/account/hotkeys");
     render(<Settings store={createStore()} />);

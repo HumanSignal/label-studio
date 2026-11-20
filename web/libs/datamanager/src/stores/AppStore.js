@@ -5,7 +5,6 @@ import {
   emitDatamanagerTabEvent,
   labelingDisplayViewFromLsf,
 } from "../utils/datamanagerTelemetry";
-import { Modal } from "../components/Common/Modal/Modal";
 import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
@@ -135,6 +134,9 @@ export const AppStore = types
     backgroundActionPending: false,
     projectFetch: false,
     requestsInFlight: new Map(),
+    // The confirmation or notice the store is asking for: `{ kind: "confirm" | "notice", content }`, where
+    // `content` is the dialog's props. The Data Manager root renders it (components/App/StoreDialogs).
+    pendingDialog: null,
   }))
   .actions((self) => ({
     startPolling() {
@@ -366,9 +368,10 @@ export const AppStore = types
       };
 
       if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
-        Modal.confirm({
+        self.showConfirm({
           title: "You have unsaved changes",
-          body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+          children:
+            "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
           onOk() {
             nextAction();
           },
@@ -415,9 +418,10 @@ export const AppStore = types
       };
 
       if (self.LSF?.lsf?.annotationStore?.selected?.commentStore?.hasUnsaved) {
-        Modal.confirm({
+        self.showConfirm({
           title: "You have unsaved changes",
-          body: "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
+          children:
+            "There are comments which are not persisted. Please submit the annotation. Continuing will discard these comments.",
           onOk() {
             nextAction();
           },
@@ -429,11 +433,26 @@ export const AppStore = types
       nextAction();
     },
 
+    /** Ask the user to confirm. `content` is the props of a ConfirmDialog (title, children, okText, onOk...). */
+    showConfirm(content) {
+      self.pendingDialog = { kind: "confirm", content };
+    },
+
+    /** Tell the user something. `content` is the props of an InfoDialog (title, children...). */
+    showNotice(content) {
+      self.pendingDialog = { kind: "notice", content };
+    },
+
+    /** Clears `dialog` once it has closed. A dialog its confirm button queued in the meantime is kept. */
+    dismissDialog(dialog) {
+      if (self.pendingDialog === dialog) self.pendingDialog = null;
+    },
+
     confirmLabelingConfigured() {
       if (!self.labelingIsConfigured) {
-        Modal.confirm({
+        self.showConfirm({
           title: "You're almost there!",
-          body: "Before you can annotate the data, set up labeling configuration",
+          children: "Before you can annotate the data, set up labeling configuration",
           onOk() {
             self.SDK.invoke("settingsClicked");
           },

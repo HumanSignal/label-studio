@@ -3,10 +3,11 @@ import { defineManifest } from "../../ds-manifest";
 export default defineManifest({
   name: "Pagination",
   tier: 1,
+  category: "Navigation",
   exports: ["Pagination"],
-  intent: ["move through pages of a list"],
+  intent: ["Move through pages of a list"],
   use_when: "Page controls for lists and tables, with page size where the list supports it.",
-  never_when: ["an app-local Pagination", "prev/next Buttons wired by hand"],
+  never_when: ["An app-local Pagination", "Prev/next Buttons wired by hand"],
   replaces: [
     "services/lso/web/apps/labelstudio/src/components/Pagination/Pagination.tsx",
     "services/lse/web/apps/labelstudio/src/components/Pagination/Pagination.tsx",

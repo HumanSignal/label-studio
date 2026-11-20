@@ -9,7 +9,7 @@
  * wrapper's responsibility — by the time the wrapper renders <AnnotationButton/>
  * the SharedAnnotation it passes is fully populated.
  *
- * Delete confirmation lives in the classic wrapper (uses editor/common/Modal/Modal#confirm)
+ * Delete confirmation lives in the classic wrapper (a ConfirmDialog it renders)
  * — the shared component just calls `handlers.onDelete` and lets the wrapper decide
  * whether to confirm before invoking the real action.
  */
@@ -51,7 +51,7 @@ import {
   ToastContext,
   ToastType,
   Avatar,
-  AvatarBadge,
+  type AvatarBadgeProps,
   useDropdown,
 } from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
@@ -167,9 +167,9 @@ const REVIEW_BADGES = {
   fixed_and_accepted: { variant: "grape", icon: <CheckIcon weight="bold" />, label: "Fixed review" },
 } as const;
 
-function getReviewBadge(acceptedState: SharedAnnotation["acceptedState"]) {
+function getReviewBadge(acceptedState: SharedAnnotation["acceptedState"]): AvatarBadgeProps | null {
   if (!acceptedState) return null;
-  return <AvatarBadge {...REVIEW_BADGES[acceptedState]} data-testid="annotation-review-badge" />;
+  return { ...REVIEW_BADGES[acceptedState], "data-testid": "annotation-review-badge" };
 }
 
 interface TooltipProps {

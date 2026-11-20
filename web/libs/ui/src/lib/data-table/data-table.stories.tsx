@@ -10,7 +10,7 @@ import { IconEdit, IconTrash, IconMonitors } from "@humansignal/icons";
 
 const meta: Meta<typeof DataTable> = {
   component: DataTable,
-  title: "UI/DataTable",
+  title: "Data display/DataTable",
   argTypes: {
     selectable: { control: "boolean" },
     enableSorting: { control: "boolean" },

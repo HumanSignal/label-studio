@@ -41,7 +41,7 @@ export type BadgeVariant =
   | "gradient"
   | (typeof ACCENT_COLORS)[number];
 
-export type BadgeLook = "filled" | "outlined" | "ghost" | "solid";
+export type BadgeLook = "filled" | "ghost" | "solid";
 export type BadgeShape = "rounded" | "square";
 export type BadgeSize = "large" | "medium" | "small";
 

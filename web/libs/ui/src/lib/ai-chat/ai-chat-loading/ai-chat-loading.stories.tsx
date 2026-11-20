@@ -3,7 +3,7 @@ import { AiChatLoading } from "./ai-chat-loading";
 
 const meta: Meta<typeof AiChatLoading> = {
   component: AiChatLoading,
-  title: "UI/AI Chat/Loading",
+  title: "Product/AI Chat/Loading",
   parameters: {
     docs: {
       description: {

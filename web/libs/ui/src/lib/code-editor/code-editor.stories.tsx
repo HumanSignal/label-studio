@@ -3,7 +3,7 @@ import { CodeEditor } from "./code-editor";
 
 const meta: Meta<typeof CodeEditor> = {
   component: CodeEditor,
-  title: "UI/CodeEditor",
+  title: "Inputs/CodeEditor",
   parameters: { layout: "padded" },
 };
 

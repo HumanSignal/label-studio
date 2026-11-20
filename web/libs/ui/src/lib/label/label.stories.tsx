@@ -3,7 +3,7 @@ import { Label } from "./label";
 
 const meta: Meta<typeof Label> = {
   component: Label,
-  title: "UI/Label",
+  title: "Inputs/Label",
   argTypes: {
     required: { control: "boolean" },
     size: { control: "select", options: ["large", "small"] },
