@@ -11,7 +11,7 @@ export type CustomHotkey = { key: string; active: boolean; description?: string 
 export type CustomHotkeys = Record<string, CustomHotkey>;
 export type RuntimeKeymap = Record<string, Record<string, unknown>>;
 
-const EDITOR_PREFIX = /^(annotation|timeseries|audio|regions|video|image_gallery|tools):(.*)/;
+const EDITOR_PREFIX = /^(annotation|timeseries|audio|regions|video|image_gallery|tools|zoomed_image):(.*)/;
 
 export const mergeCustomHotkeys = (account: CustomHotkeys, project: CustomHotkeys): CustomHotkeys => ({
   ...account,
