@@ -275,6 +275,7 @@ const SelectBase = forwardRef(
       triggerProps,
       triggerClassName,
       contentClassName,
+      contentProps,
       size,
       searchFilter,
       onSearch,
@@ -822,7 +823,12 @@ const SelectBase = forwardRef(
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent align={align} data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
+        <PopoverContent
+          {...contentProps}
+          align={align}
+          data-testid="select-popup"
+          className={cnm("min-w-full", contentClassName)}
+        >
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...

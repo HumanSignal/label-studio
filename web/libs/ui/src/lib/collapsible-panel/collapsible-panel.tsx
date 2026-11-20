@@ -18,6 +18,8 @@ export type CollapsiblePanelProps = {
   className?: string;
   /** Whether the panel starts expanded */
   defaultExpanded?: boolean;
+  /** Keep controls mounted while collapsed to preserve drafts and expensive viewer state. */
+  keepMounted?: boolean;
   /** Controlled expanded state */
   expanded?: boolean;
   /** Callback when expanded state changes */
@@ -38,6 +40,7 @@ export const CollapsiblePanel = ({
   children,
   className,
   defaultExpanded = true,
+  keepMounted = false,
   expanded: controlledExpanded,
   onExpandedChange,
   disableToggle = false,
@@ -136,8 +139,8 @@ export const CollapsiblePanel = ({
       </div>
 
       {/* Content - Collapsible */}
-      {isExpanded && children && (
-        <div className="border-t border-inherit" data-testid="collapsible-panel-content">
+      {(isExpanded || keepMounted) && children && (
+        <div hidden={!isExpanded} className="border-t border-inherit" data-testid="collapsible-panel-content">
           {children}
         </div>
       )}

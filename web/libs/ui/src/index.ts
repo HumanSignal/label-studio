@@ -84,3 +84,5 @@ export * from "./hooks/useTokenColor";
 
 // TODO: Remove when DIA-2142 and DIA-2175 are delivered
 export { cn } from "./utils/utils";
+
+export * from "./lib/property-table";
