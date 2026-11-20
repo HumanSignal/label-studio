@@ -2,7 +2,7 @@
 
 import { XIcon } from "@humansignal/icons";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
 import { cnm } from "../../utils/utils";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
@@ -73,10 +73,15 @@ export interface ModalWindowProps {
    */
   closeOnScrimClick?: boolean;
   /**
-   * Close when focus moves to the page behind the panel (the panel has no focus trap).
+   * Close when focus moves to the page behind the panel (only without `trapFocus`, which pulls focus back instead).
    * @default true
    */
   closeOnFocusOutside?: boolean;
+  /**
+   * Keep keyboard focus inside the panel: focus that moves to the page behind comes back (Tab already cycles inside).
+   * For dialogs without portaled controls, since a Select or Dropdown inside opens outside the panel. @default false
+   */
+  trapFocus?: boolean;
   /**
    * Show the header close button.
    * @default true
@@ -150,7 +155,7 @@ export function ModalWindowCloseButton({ className }: { className?: string }) {
 /**
  * ModalWindow — Radix Dialog–based overlay with optional header, scrollable body, and footer.
  *
- * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
+ * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` for short, centered confirmations and notices.
  *
  * Content does not get a modal context: the owner passes it what it needs to close the dialog.
  */
@@ -168,6 +173,7 @@ export function ModalWindow({
   showScrim = true,
   closeOnScrimClick = true,
   closeOnFocusOutside = true,
+  trapFocus = false,
   showCloseButton = true,
   hideHeader = false,
   contentClassName,
@@ -186,6 +192,25 @@ export function ModalWindow({
   const stack = useModalStack(Boolean(open), showScrim);
   // A fullscreen workspace stays behind the dialog on top of it: hiding it would uncover the page.
   const covered = stack.covered && !isFullscreen;
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Radix runs the panel non-modal (portaled controls stay usable), so it never pulls focus back by itself.
+  useEffect(() => {
+    if (!open || !trapFocus || covered) return;
+    let lastInside: HTMLElement | null = null;
+    const onFocusIn = (event: FocusEvent) => {
+      const panel = panelRef.current;
+      const target = event.target as HTMLElement | null;
+      if (!panel || !target) return;
+      if (panel.contains(target)) {
+        lastInside = target;
+        return;
+      }
+      (lastInside && panel.contains(lastInside) ? lastInside : panel).focus();
+    };
+    document.addEventListener("focusin", onFocusIn);
+    return () => document.removeEventListener("focusin", onFocusIn);
+  }, [open, trapFocus, covered]);
   const isCentered = !isFullscreen && placement === "center";
 
   const panelClassName = cnm(
@@ -237,6 +262,7 @@ export function ModalWindow({
           />
         ) : null}
         <DialogPrimitive.Content
+          ref={panelRef}
           aria-describedby={undefined}
           className={panelClassName}
           style={covered ? { ...contentStyle, visibility: "hidden" } : contentStyle}
@@ -357,11 +383,4 @@ export function ModalWindow({
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );
-}
-
-/**
- * Centered {@link ModalWindow} (`placement="center"`). Prefer for short confirmations and notices with stable height.
- */
-export function Dialog(props: ModalWindowProps) {
-  return <ModalWindow placement="center" {...props} />;
 }

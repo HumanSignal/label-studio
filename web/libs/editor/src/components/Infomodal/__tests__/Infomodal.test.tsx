@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, mock } from "bun:test";
 
 // Other editor tests mock @humansignal/ui and Infomodal for the whole run; these tests need the real ones.
@@ -38,6 +38,25 @@ describe("InfoModalRoot", () => {
     });
 
     expect(screen.getByTestId("editor-info-modal")).toBeInTheDocument();
+  });
+
+  it("keeps keyboard focus inside the warning", async () => {
+    render(
+      <>
+        <button type="button" data-testid="behind-trap" />
+        <InfoModalRoot />
+      </>,
+    );
+    act(() => {
+      showInfoModal({ variant: "warning", content: "Taxonomy is required", title: "Warning" });
+    });
+    screen.getByTestId("editor-info-modal-ok").focus();
+
+    act(() => {
+      screen.getByTestId("behind-trap").focus();
+    });
+
+    await waitFor(() => expect(screen.getByTestId("editor-info-modal").contains(document.activeElement)).toBe(true));
   });
 
   it("asks in the confirm dialog and runs the action only on confirm", () => {

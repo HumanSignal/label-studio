@@ -21,16 +21,16 @@ const DIALOGS: { pattern: RegExp; message: string }[] = [
     pattern:
       /\b(?:window|globalThis|self)\.(?:confirm|alert|prompt)\(|(?<![\w$.])(?<!\bfunction\s+)(?:confirm|alert|prompt)\(\s*["'`]/g,
     message:
-      "The sandbox blocks confirm, alert and prompt (they return false / null): render EditorUI.ConfirmDialog, EditorUI.InfoDialog or EditorUI.Dialog.",
+      "The sandbox blocks confirm, alert and prompt (they return false / null): render EditorUI.ConfirmDialog, EditorUI.InfoDialog or EditorUI.ModalWindow.",
   },
   {
     pattern: /["']?aria-modal["']?\s*[:=]\s*(?:\{\s*)?(?!["']?false\b)(?!undefined\b)[^\s,}>]+/g,
-    message: "A hand-built modal dialog: render EditorUI.ModalWindow or EditorUI.Dialog, which draw the scrim.",
+    message: "A hand-built modal dialog: render EditorUI.ModalWindow, which draws the scrim.",
   },
   {
     pattern:
       /position:\s*["']?(?:fixed|absolute)\b(?=[^}\n]*\binset:\s*["']?0\b)(?=[^}\n]*\bbackground(?:-color)?:\s*["']?(?:rgba|hsla)\([^)]*,\s*0?\.\d+\s*\))/g,
-    message: "A hand-built modal backdrop: render EditorUI.ModalWindow or EditorUI.Dialog, which draw the scrim.",
+    message: "A hand-built modal backdrop: render EditorUI.ModalWindow, which draws the scrim.",
   },
 ];
 

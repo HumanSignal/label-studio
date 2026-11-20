@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, ConfirmDialog, Dialog, Message, Typography } from "@humansignal/ui";
+import { Button, ConfirmDialog, Message, Typography, ModalWindow } from "@humansignal/ui";
 import type { MessageVariant } from "@humansignal/ui";
 import {
   registerConfirmModalDispatch,
@@ -48,7 +48,8 @@ export function InfoModalRoot() {
           {confirm?.content}
         </Typography>
       </ConfirmDialog>
-      <Dialog
+      <ModalWindow
+        placement="center"
         open={state !== null}
         onOpenChange={(open) => {
           if (!open) setState(null);
@@ -56,6 +57,7 @@ export function InfoModalRoot() {
         title={state?.title ?? "Info"}
         size="small"
         closeOnFocusOutside={false}
+        trapFocus
         dataTestId="editor-info-modal"
         footer={
           <div className="flex w-full justify-end">
@@ -76,7 +78,7 @@ export function InfoModalRoot() {
             </Typography>
           </Message>
         ) : null}
-      </Dialog>
+      </ModalWindow>
     </>
   );
 }

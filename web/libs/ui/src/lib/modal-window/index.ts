@@ -1,5 +1,4 @@
 export {
-  Dialog,
   ModalWindow,
   ModalWindowCloseButton,
   type ModalWindowProps,
