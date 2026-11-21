@@ -36,7 +36,7 @@ def forward_migration_job(*, migration_name: str) -> None:
         migration.save()
 
     try:
-        views = iterate_queryset(View.objects.all())
+        views = iterate_queryset(View.objects.only('id', 'data'))
         updated_count = 0
 
         for view in views:
