@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Circle, Rect } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, hasParent, types } from "mobx-state-tree";
@@ -148,7 +147,6 @@ const PolygonPoint = types.compose("PolygonPoint", AnnotationMixin, PolygonPoint
 const PolygonPointView = observer(({ item, name }) => {
   if (!item.parent) return;
 
-  const [draggable, setDraggable] = useState(true);
   const regionStyles = useRegionStyles(item.parent);
   const sizes = {
     small: 4,
@@ -191,16 +189,15 @@ const PolygonPointView = observer(({ item, name }) => {
       shape.setAttr("y", item.canvasY);
     },
 
-    onDragStart: () => {
+    onDragStart: (e) => {
       if (item.getSkipInteractions()) {
-        setDraggable(false);
+        e.currentTarget.stopDrag(e.evt);
         return false;
       }
       item.annotation.history.freeze();
     },
 
     onDragEnd: (e) => {
-      setDraggable(true);
       item.annotation.history.unfreeze();
       e.cancelBubble = true;
     },
@@ -268,7 +265,7 @@ const PolygonPointView = observer(({ item, name }) => {
         }}
         {...dragOpts}
         {...startPointAttr}
-        draggable={!item.parent.isReadOnly() && draggable}
+        draggable={!item.parent.isReadOnly()}
       />
     );
   }
