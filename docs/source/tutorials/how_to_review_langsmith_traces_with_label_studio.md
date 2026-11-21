@@ -556,6 +556,6 @@ LangSmith excels at automatic trace instrumentation and hierarchical run inspect
 
 - [LangSmith](https://docs.langchain.com/langsmith/home)
 - [Label Studio](https://docs.humansignal.com/guide/)
-- [Label Studio ReactCode Templates](https://docs.humansignal.com/guide/react_code)
+- [Label Studio ReactCode Templates](https://docs.humansignal.com/tags/reactcode)
 - [Label Studio SDK](https://labelstud.io/sdk/)
 - [Companion tutorials: Braintrust](how_to_review_braintrust_traces_with_label_studio.html) | [Langfuse](how_to_review_langfuse_traces_with_label_studio.html)
