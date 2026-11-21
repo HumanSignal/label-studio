@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
+import { isTextEntryElement } from "../../../sdk/shortcut-guards";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
 import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
@@ -378,8 +379,10 @@ function DataViewInner({
       />
     );
 
+  // Skip only while the user is typing. Requiring focus on <body> made these dead right after
+  // clicking a control in the labeling panel, e.g. a Choice.
   useShortcut("dm.focus-previous", () => {
-    if (document.activeElement !== document.body) return;
+    if (isTextEntryElement(document.activeElement)) return;
 
     const task = dataStore.focusPrev();
 
@@ -387,7 +390,7 @@ function DataViewInner({
   });
 
   useShortcut("dm.focus-next", () => {
-    if (document.activeElement !== document.body) return;
+    if (isTextEntryElement(document.activeElement)) return;
 
     const task = dataStore.focusNext();
 
