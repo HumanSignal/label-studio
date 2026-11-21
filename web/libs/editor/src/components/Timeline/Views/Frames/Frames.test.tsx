@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as resizeObserverModule from "@humansignal/core/hooks/useResizeObserver";
 import * as keypointsModule from "./Keypoints";
 import { Frames } from "./Frames";
@@ -8,6 +8,8 @@ const sel = (block: string, elem?: string) => {
   const c = elem ? cn(block).elem(elem) : cn(block);
   return `.${c.toClassName().split(" ")[0]}`;
 };
+
+let mockViewportHeight = 64;
 
 const defaultProps = {
   step: 10,
@@ -32,13 +34,18 @@ const defaultProps = {
   onResize: mock(),
 };
 
-describe("Frames", () => {
-  beforeEach(() => {
-    mock.clearAllMocks();
-    spyOn(resizeObserverModule, "useResizeObserver").mockReturnValue({ width: 400 } as any);
-    spyOn(keypointsModule, "Keypoints").mockImplementation((() => <div data-testid="keypoints-mock" />) as any);
-  });
+beforeEach(() => {
+  mock.clearAllMocks();
+  mockViewportHeight = 64;
+  spyOn(resizeObserverModule, "useResizeObserver").mockImplementation(
+    () => ({ width: 400, height: mockViewportHeight }) as any,
+  );
+  spyOn(keypointsModule, "Keypoints").mockImplementation((({ region, renderable }: any) => (
+    <div data-testid="keypoints-mock" data-region-id={region.id} data-renderable={String(renderable)} />
+  )) as any);
+});
 
+describe("Frames", () => {
   it("renders timeline frames structure", () => {
     render(<Frames {...defaultProps} />);
     expect(document.querySelector(sel("timeline-frames"))).toBeInTheDocument();
@@ -239,5 +246,140 @@ describe("Frames", () => {
 
     expect(onStartDrawing).toHaveBeenCalledWith({ region: "r1", frame: 5 });
     expect(setRange).toHaveBeenCalledWith([1, 10], { mode: "edit" });
+  });
+});
+
+describe("Frames vertical navigation regressions", () => {
+  const tracks = (count: number) =>
+    Array.from({ length: count }, (_, index) => ({
+      ...defaultProps.regions[0],
+      id: `track-${index}`,
+      timeline: false,
+      sequence: [{ frame: index + 1, enabled: true }],
+    }));
+
+  it("does not allocate scroll space or shift virtual bounds for empty video tracks", () => {
+    const regions = tracks(16).map((region, index) => (index < 10 ? { ...region, sequence: [] } : region));
+    const { container } = render(<Frames {...defaultProps} regions={regions} />);
+    expect(screen.getAllByTestId("keypoints-mock")).toHaveLength(6);
+    expect(container.querySelector(sel("timeline-frames", "keypoints"))).toHaveStyle({ height: "144px" });
+    expect(container.querySelector('[data-region-id="track-15"]')).toHaveAttribute("data-renderable", "true");
+  });
+
+  it("renders keyframes throughout a tall viewport and responds to resizing", () => {
+    const regions = tracks(50);
+    const { container, rerender } = render(<Frames {...defaultProps} regions={regions} />);
+    expect(container.querySelector('[data-region-id="track-19"]')).toHaveAttribute("data-renderable", "false");
+    mockViewportHeight = 480;
+    rerender(<Frames {...defaultProps} regions={regions} />);
+    expect(container.querySelector('[data-region-id="track-19"]')).toHaveAttribute("data-renderable", "true");
+  });
+
+  it("updates virtual keyframes after native vertical scrolling", () => {
+    const { container } = render(<Frames {...defaultProps} regions={tracks(50)} />);
+    const scroll = container.querySelector(sel("timeline-frames", "scroll"))!;
+    fireEvent.scroll(scroll, { target: { scrollTop: 720 } });
+    expect(container.querySelector('[data-region-id="track-30"]')).toHaveAttribute("data-renderable", "true");
+    expect(container.querySelector('[data-region-id="track-0"]')).toHaveAttribute("data-renderable", "false");
+  });
+
+  it("keeps the empty timeline drawing row", () => {
+    const { container } = render(
+      <Frames
+        {...defaultProps}
+        regions={[
+          { ...tracks(1)[0], id: "empty-video", sequence: [] },
+          { ...defaultProps.regions[0], id: "new", timeline: true, sequence: [] },
+        ]}
+      />,
+    );
+    expect(container.querySelector('[data-region-id="empty-video"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-region-id="new"]')).toBeInTheDocument();
+  });
+
+  it("does not seek or draw when interacting with the native scrollbar", () => {
+    const onStartDrawing = mock();
+    const onPositionChange = mock();
+    const { container } = render(
+      <Frames {...defaultProps} onStartDrawing={onStartDrawing} onPositionChange={onPositionChange} />,
+    );
+    const scroll = container.querySelector(sel("timeline-frames", "scroll"))!;
+    Object.defineProperty(scroll, "offsetWidth", { value: 200, configurable: true });
+    Object.defineProperty(scroll, "clientWidth", { value: 190, configurable: true });
+    fireEvent.mouseMove(scroll, { clientX: 195, clientY: 40 });
+    fireEvent.mouseDown(scroll, { clientX: 195, clientY: 40 });
+    fireEvent.click(scroll, { clientX: 195, clientY: 40 });
+    expect(onPositionChange).not.toHaveBeenCalled();
+    expect(onStartDrawing).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { name: "above the first row", scrollHeight: 720, scrollTop: 0, deltaY: -120 },
+    { name: "below the last row", scrollHeight: 720, scrollTop: 624, deltaY: 120 },
+    { name: "up when all rows fit", scrollHeight: 96, scrollTop: 0, deltaY: -120 },
+    { name: "down when all rows fit", scrollHeight: 96, scrollTop: 0, deltaY: 120 },
+  ])("contains wheel input $name", ({ scrollHeight, scrollTop, deltaY }) => {
+    const parentWheel = mock();
+    const { container } = render(
+      <div onWheel={parentWheel}>
+        <Frames {...defaultProps} regions={tracks(30)} />
+      </div>,
+    );
+    const scroll = container.querySelector(sel("timeline-frames", "scroll"))!;
+    Object.defineProperty(scroll, "scrollHeight", { value: scrollHeight, configurable: true });
+    Object.defineProperty(scroll, "clientHeight", { value: 96, configurable: true });
+    fireEvent.scroll(scroll, { target: { scrollTop } });
+    const wheel = new WheelEvent("wheel", { deltaY, bubbles: true, cancelable: true });
+    act(() => {
+      scroll.dispatchEvent(wheel);
+    });
+    expect(wheel.defaultPrevented).toBe(true);
+    expect(parentWheel).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { name: "zoom in at the top", scrollTop: 0, deltaY: -120 },
+    { name: "zoom out at the bottom", scrollTop: 624, deltaY: 120 },
+    { name: "pinch in between rows", scrollTop: 120, deltaY: -24 },
+    { name: "pinch out between rows", scrollTop: 120, deltaY: 24 },
+  ])("preserves browser gestures: $name", ({ scrollTop, deltaY }) => {
+    const parentWheel = mock();
+    const onScroll = mock();
+    const { container } = render(
+      <div onWheel={parentWheel}>
+        <Frames {...defaultProps} regions={tracks(30)} onScroll={onScroll} />
+      </div>,
+    );
+    const scroll = container.querySelector(sel("timeline-frames", "scroll"))!;
+    Object.defineProperty(scroll, "scrollHeight", { value: 720, configurable: true });
+    Object.defineProperty(scroll, "clientHeight", { value: 96, configurable: true });
+    fireEvent.scroll(scroll, { target: { scrollTop } });
+    const wheel = new WheelEvent("wheel", { deltaY, ctrlKey: true, bubbles: true, cancelable: true });
+    act(() => {
+      scroll.dispatchEvent(wheel);
+    });
+    expect(wheel.defaultPrevented).toBe(false);
+    expect(parentWheel).toHaveBeenCalledTimes(1);
+    expect(scroll.scrollTop).toBe(scrollTop);
+    expect(onScroll).not.toHaveBeenCalled();
+  });
+
+  it("scrolls the timeline once without passing wheel input to its parent", () => {
+    const parentWheel = mock();
+    const { container } = render(
+      <div onWheel={parentWheel}>
+        <Frames {...defaultProps} regions={tracks(30)} />
+      </div>,
+    );
+    const scroll = container.querySelector(sel("timeline-frames", "scroll"))!;
+    Object.defineProperty(scroll, "scrollHeight", { value: 720, configurable: true });
+    Object.defineProperty(scroll, "clientHeight", { value: 96, configurable: true });
+    const wheel = new WheelEvent("wheel", { deltaY: 24, bubbles: true, cancelable: true });
+    act(() => {
+      scroll.dispatchEvent(wheel);
+    });
+    expect(scroll.scrollTop).toBe(30);
+    expect(wheel.defaultPrevented).toBe(true);
+    expect(parentWheel).not.toHaveBeenCalled();
   });
 });

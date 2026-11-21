@@ -8,7 +8,7 @@
 | [sync] | <code>string</code> |  | object name to sync with |
 | [muted] | <code>boolean</code> | <code>false</code> | muted video |
 | [height] | <code>number</code> | <code>600</code> | height of the video player |
-| [timelineHeight] | <code>number</code> | <code>64</code> | height of the timeline with regions |
+| [timelineHeight] | <code>number</code> |  | explicit height of the timeline with regions in pixels; defaults to 20vh, clamped to 144-320px |
 | [defaultPlaybackSpeed] | <code>number</code> | <code>1</code> | default playback speed the player should start with when loaded |
 | [minPlaybackSpeed] | <code>number</code> | <code>1</code> | minimum allowed playback speed; defaultPlaybackSpeed cannot be set below this value |
 
