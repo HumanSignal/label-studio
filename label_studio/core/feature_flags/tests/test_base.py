@@ -119,3 +119,25 @@ def test_user_repr_without_organization_owner():
 
     stale_member.active_organization = stale_org
     assert get_user_repr(stale_member)['custom'] == {'organization': None, 'organization_id': stale_org.id}
+
+
+@patch('label_studio.core.feature_flags.base.client.variation', return_value=True)
+def test_flag_set_organization_attributes_extend_the_organization_context(mock_variation, monkeypatch, settings):
+    settings.FEATURE_FLAGS_OFFLINE = False
+    settings.FEATURE_FLAGS_DEFAULT_VALUE = False
+    monkeypatch.delenv('fflag_feat_org_attributes', raising=False)
+
+    class Org:
+        id = 7
+        created_by_id = 1
+
+        class created_by:
+            email = 'owner@example.com'
+
+    assert flag_set('fflag_feat_org_attributes', organization=Org, organization_attributes={'early_adopter': False})
+    context = mock_variation.call_args.args[1]
+    assert context['early_adopter'] is False
+    assert context['custom'] == {'organization': 'owner@example.com', 'organization_id': 7}
+
+    flag_set('fflag_feat_org_attributes', organization=Org)
+    assert 'early_adopter' not in mock_variation.call_args.args[1]

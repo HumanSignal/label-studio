@@ -85,8 +85,13 @@ def _evaluate_flag(feature_flag, user_dict, override_system_default=None):
     return client.variation(feature_flag, user_dict, system_default)
 
 
-def flag_set(feature_flag, user=None, override_system_default=None, organization=None):
-    """Evaluate a feature flag for a user or organization context."""
+def flag_set(feature_flag, user=None, override_system_default=None, organization=None, organization_attributes=None):
+    """Evaluate a feature flag for a user or organization context.
+
+    ``organization_attributes`` adds top-level attributes to the organization context (e.g. ``early_adopter``) for
+    callers whose flag rules need them and who already pay for reading them. Plain organization evaluations stay
+    free of any extra lookup.
+    """
     if feature_flag in STALE_FEATURE_FLAGS:
         return STALE_FEATURE_FLAGS[feature_flag]
 
@@ -102,6 +107,8 @@ def flag_set(feature_flag, user=None, override_system_default=None, organization
         user_dict = get_user_repr(user)
     else:
         user_dict = get_user_repr_from_organization(organization)
+        if organization_attributes:
+            user_dict = {**user_dict, **organization_attributes}
 
     return _evaluate_flag(feature_flag, user_dict, override_system_default)
 
