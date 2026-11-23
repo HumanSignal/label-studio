@@ -301,6 +301,9 @@ const SelectBase = forwardRef(
       showGroupActions = false,
       open: controlledOpen,
       align = "start",
+      invalid,
+      error,
+      onBlur,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -792,6 +795,7 @@ const SelectBase = forwardRef(
                 [styles.isInline]: isInline,
                 [styles.isOpen]: isOpen,
                 [styles.isDisabled]: disabled,
+                [styles.isInvalid]: invalid || error,
                 [styles.sizeSmaller]: size === "smaller",
                 [styles.sizeSmall]: size === "small",
               },
@@ -808,6 +812,8 @@ const SelectBase = forwardRef(
             data-name={props?.name}
             data-value={value ?? ""}
             aria-readonly={readOnly || undefined}
+            aria-invalid={invalid || error || undefined}
+            onBlur={onBlur}
             {...triggerProps}
           >
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">

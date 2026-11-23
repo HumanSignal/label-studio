@@ -36,7 +36,7 @@
   font-weight: var(--font-weight-400);
   line-height: var(--select-trigger-line-height);
   letter-spacing: var(--letter-spacing-base);
-  border-radius: var(--corner-radius-smaller);
+  border-radius: var(--corner-radius-small);
   border: 1px solid var(--color-neutral-border);
   max-width: 100%;
 
@@ -44,12 +44,20 @@
     border: 1px solid var(--color-neutral-border-bold);
   }
 
-  &:focus-visible {
-    background-color: var(--color-neutral-surface-hover);
-    box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%) inset;
-    color: var(--color-neutral-content);
-    outline: 2px solid var(--color-primary-focus-outline);
+  /* Same focus rule as the text fields: darker border on any focus, outline only after keyboard focus. */
+  &:focus {
     border-color: var(--color-neutral-border-bold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &.isInvalid,
+  &.isInvalid:hover,
+  &.isInvalid:focus {
+    border-color: var(--color-negative-border);
   }
 
   &.isOpen {

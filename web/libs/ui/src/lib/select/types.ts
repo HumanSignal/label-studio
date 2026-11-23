@@ -83,7 +83,12 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   width?: string;
   icon?: any;
   fieldProps?: any;
+  /** @deprecated Use `invalid`. */
   error?: boolean;
+  /** Draws the error state and sets `aria-invalid` on the trigger. */
+  invalid?: boolean;
+  /** Fires when the trigger loses focus, for form libraries that validate on blur. */
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   autoSelectFirst?: boolean;
   searchable?: boolean;
   /** Allow a search value that does not match an option to be selected as a new option. */

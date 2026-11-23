@@ -1,0 +1,71 @@
+/* Same frame, states and focus rules as Input; the textarea inside is unstyled. */
+.field {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-small);
+  background: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body-medium);
+  line-height: var(--line-height-body-medium);
+  transition: border-color 150ms ease-out;
+
+  &:hover:not([data-disabled]),
+  &:focus-within {
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &[data-invalid],
+  &[data-invalid]:hover,
+  &[data-invalid]:focus-within {
+    border-color: var(--color-negative-border);
+  }
+
+  &[data-disabled] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtlest);
+    cursor: not-allowed;
+  }
+
+  &[data-readonly] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtler);
+  }
+}
+
+.textarea {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  min-height: var(--spacing-1000);
+  padding: var(--spacing-200) var(--spacing-300) var(--spacing-200) var(--spacing-400);
+  box-sizing: border-box;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+
+  [data-resize="none"] > & {
+    resize: none;
+  }
+
+  &::placeholder {
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

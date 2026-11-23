@@ -7,7 +7,7 @@
   padding: 0 var(--spacing-tight);
   box-sizing: border-box;
   border: 1px solid var(--color-neutral-border);
-  border-radius: var(--corner-radius-smaller);
+  border-radius: var(--corner-radius-small);
   background: var(--color-neutral-background);
   color: var(--color-neutral-content);
   font-family: var(--font-family-base);
@@ -18,7 +18,8 @@
   border-color: var(--color-neutral-border-bold);
 }
 
-.container:focus-within {
+/* Outline only after keyboard focus, as in Input; a click only darkens the border. */
+.container[data-focus-visible] {
   outline: 2px solid var(--color-primary-focus-outline);
   outline-offset: 1px;
 }

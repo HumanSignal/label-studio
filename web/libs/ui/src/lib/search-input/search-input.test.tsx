@@ -91,4 +91,37 @@ describe("SearchInput", () => {
     expect(ref.current).toBe(input);
     expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
   });
+
+  describe("focus outline", () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const setup = () => {
+      const { container } = render(<SearchInput aria-label="Filter" />);
+      return { wrapper: container.firstElementChild as HTMLElement, input: screen.getByLabelText("Filter") };
+    };
+
+    it("keeps the keyboard outline after a second click in the focused field", () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(input);
+      fireEvent.focus(input);
+      fireEvent.pointerDown(input);
+      fireEvent.blur(input);
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(true);
+    });
+
+    it("keeps the keyboard outline after a press on the icon that moved no focus", async () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(wrapper.querySelector("svg") as SVGElement);
+      await frame();
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(true);
+    });
+
+    it("draws no outline for a click", () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(input);
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(false);
+    });
+  });
 });

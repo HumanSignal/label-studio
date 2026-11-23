@@ -1,0 +1,112 @@
+/*
+ * The frame is the visible field; the native input inside it is unstyled. Sizes mirror Button and
+ * Select (40, 32, 24px). Pointer focus darkens the border; keyboard focus adds the outline.
+ */
+.field {
+  --field-height: var(--spacing-1000);
+  --field-padding-start: var(--spacing-400);
+  --field-padding-end: var(--spacing-300);
+  --field-font-size: var(--font-size-label-medium);
+  --field-line-height: var(--line-height-label-medium);
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  width: 100%;
+  min-width: 0;
+  height: var(--field-height);
+  padding: 0 var(--field-padding-end) 0 var(--field-padding-start);
+  box-sizing: border-box;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-small);
+  background: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-base);
+  font-size: var(--field-font-size);
+  line-height: var(--field-line-height);
+  transition: border-color 150ms ease-out;
+
+  &[data-size="small"] {
+    --field-height: var(--spacing-800);
+    --field-padding-start: var(--spacing-300);
+    --field-padding-end: var(--spacing-200);
+    --field-font-size: var(--font-size-label-small);
+    --field-line-height: var(--line-height-label-small);
+  }
+
+  &[data-size="smaller"] {
+    --field-height: var(--spacing-600);
+    --field-padding-start: var(--spacing-200);
+    --field-padding-end: var(--spacing-100);
+    --field-font-size: var(--font-size-label-smaller);
+    --field-line-height: var(--line-height-label-smaller);
+
+    gap: var(--spacing-tighter);
+  }
+
+  &:hover:not([data-disabled]),
+  &:focus-within {
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &[data-invalid],
+  &[data-invalid]:hover,
+  &[data-invalid]:focus-within {
+    border-color: var(--color-negative-border);
+  }
+
+  &[data-disabled] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtlest);
+    cursor: not-allowed;
+  }
+
+  &[data-readonly] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtler);
+  }
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+
+  &::placeholder {
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.affix {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--color-neutral-content-subtler);
+
+  & svg {
+    width: var(--spacing-400);
+    height: var(--spacing-400);
+    color: var(--color-neutral-icon);
+  }
+}
+
+.action {
+  flex: none;
+}

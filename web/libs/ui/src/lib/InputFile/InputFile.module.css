@@ -1,49 +1,46 @@
+.inputFile {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  min-width: 0;
+}
+
+.button {
+  position: relative;
+  gap: var(--spacing-tight);
+  cursor: pointer;
+
+  /* The native input stays focusable but invisible; the label is the visible button. */
+  &:has(:focus-visible) {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .input {
-  border: 0 none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
   padding: 0;
-  display: inline;
-  width: 100%;
-  cursor: pointer;
-  outline: none;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }
 
-.input::file-selector-button {
-  visibility: hidden;
-  width: 0;
-}
-
-.labelContent {
-  border: 1px solid var(--color-primary-border);
-  color: var(--color-primary-content);
-  border-radius: var(--corner-radius-smaller);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-tight);
-  transition: all 150ms ease-out;
-  outline: none;
-  flex-shrink: 0;
-}
-
-.inputWrapper {
-  display: flex;
-  width: auto;
-  height: 42px;
-  margin: 0;
-  cursor: pointer;
-  align-items: center;
-  outline: none;
-
-  & input::before {
-    visibility: hidden;
-  }
-
-  & .labelContent:hover {
-    color: var(--color-primary-surface-hover);
-    background-color: var(--color-primary-emphasis-subtle);
-  }
-
-  &:focus-within .labelContent {
-    box-shadow: 0 0 0 4px var(--color-primary-surface-content-subtle);
-  }
+.names {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-neutral-content-subtler);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

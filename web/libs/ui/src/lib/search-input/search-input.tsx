@@ -2,6 +2,7 @@ import { MagnifyingGlassIcon } from "@humansignal/icons";
 import { Slot } from "@radix-ui/react-slot";
 import { forwardRef, type InputHTMLAttributes } from "react";
 import clsx from "clsx";
+import { useFieldFocus } from "../input/use-field-focus";
 import styles from "./search-input.module.css";
 
 export interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -21,14 +22,22 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       className,
       placeholder,
       type,
+      onFocus,
+      onBlur,
       ...props
     },
     ref,
   ) => {
+    const { focusVisible, handlers } = useFieldFocus<HTMLInputElement>(onFocus, onBlur);
     const inputPlaceholder = placeholder ?? (asChild ? undefined : "Search...");
     const Input = asChild ? Slot : "input";
     return (
-      <div className={clsx(styles.container, wrapperClassName)} data-slot={wrapperDataSlot}>
+      <div
+        className={clsx(styles.container, wrapperClassName)}
+        data-slot={wrapperDataSlot}
+        data-focus-visible={focusVisible || undefined}
+        onPointerDown={handlers.onPointerDown}
+      >
         <MagnifyingGlassIcon className={styles.icon} aria-hidden="true" />
         <Input
           ref={ref}
@@ -38,6 +47,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             props["aria-labelledby"] ? undefined : (props["aria-label"] ?? (asChild ? undefined : inputPlaceholder))
           }
           {...props}
+          onFocus={handlers.onFocus}
+          onBlur={handlers.onBlur}
           className={clsx(styles.input, className)}
         />
       </div>

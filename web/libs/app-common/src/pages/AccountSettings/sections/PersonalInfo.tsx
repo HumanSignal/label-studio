@@ -93,7 +93,7 @@ export const PersonalInfo = () => {
   const isLastNameMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("last_name"), lname);
   const isPhoneMissing = hasAttemptedSave && isRequiredProfileValueMissing(isFieldRequired("phone"), phone);
   const canDeleteAvatar = Boolean(user?.avatar);
-  const avatarRef = useRef<HTMLInputElement>();
+  const avatarRef = useRef<HTMLInputElement>(null);
   const fileChangeHandler: FormEventHandler<HTMLInputElement> = useCallback(
     async (e) => {
       if (!user) return;

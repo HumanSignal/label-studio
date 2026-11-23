@@ -12,6 +12,7 @@ export default defineManifest({
     "Selecting items (use Checkbox)",
     "Choosing one of several named options (use SegmentedControl or Select)",
   ],
+  props_rules: ["the toggle sits before its label; align end only in narrow forms, where it stays close to the label"],
   replaces: [
     "services/lso/web/apps/labelstudio/src/components/Form/Elements/Toggle/Toggle.jsx",
     "services/lse/web/apps/labelstudio/src/components/Form/Elements/Toggle/Toggle.jsx",

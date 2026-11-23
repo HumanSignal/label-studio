@@ -1,0 +1,167 @@
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+
+  &[data-orientation="horizontal"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-tight) var(--spacing-wide);
+  }
+
+  /* Cards sit side by side and wrap; the same grid as the settings pages use. */
+  &[data-variant="card"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-base);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-tight);
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-base);
+  cursor: pointer;
+
+  &[data-disabled] {
+    color: var(--color-neutral-content-subtlest);
+    cursor: not-allowed;
+  }
+
+  /* A card is the whole target: icon on top, then title and description. The radio itself is hidden. */
+  &[data-variant="card"] {
+    position: relative;
+    flex-direction: column;
+    min-height: 100px;
+    padding: var(--spacing-base);
+    box-sizing: border-box;
+    border: 2px solid var(--color-neutral-border);
+    border-radius: var(--corner-radius-small);
+    background: transparent;
+    transition: all 200ms ease-out;
+
+    &:hover:not([data-checked], [data-disabled]) {
+      border-color: var(--color-primary-border-subtle);
+      background-color: var(--color-primary-emphasis-subtle);
+      box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+      transform: translateY(-2px);
+    }
+
+    &:has(:focus-visible) {
+      outline: 3px solid var(--color-primary-focus-outline);
+      outline-offset: 1px;
+      border-color: var(--color-primary-border-subtle);
+    }
+
+    &[data-checked] {
+      border-color: var(--color-primary-border-subtle);
+      background: var(--color-primary-background);
+      cursor: default;
+    }
+
+    &[data-invalid]:not([data-checked]) {
+      border-color: var(--color-negative-border);
+    }
+
+    &[data-disabled] {
+      opacity: 0.3;
+    }
+
+    & > .radio {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}
+
+/* A native radio drawn with tokens, so keyboard, form and screen-reader behaviour stay the browser's. */
+.radio {
+  appearance: none;
+  flex: none;
+  width: var(--spacing-400);
+  height: var(--spacing-400);
+  margin: 2px 0 0;
+  border: 1px solid var(--color-neutral-border-bold);
+  border-radius: 50%;
+  background: var(--color-neutral-background);
+  display: grid;
+  place-content: center;
+  cursor: inherit;
+
+  &::before {
+    content: "";
+    width: var(--spacing-tight);
+    height: var(--spacing-tight);
+    border-radius: 50%;
+    background: var(--color-primary-surface-content);
+    transform: scale(0);
+    transition: transform 120ms ease-out;
+  }
+
+  &:checked {
+    border-color: var(--color-primary-surface);
+    background: var(--color-primary-surface);
+
+    &::before {
+      transform: scale(1);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 2px;
+  }
+
+  &[aria-invalid="true"]:not(:checked) {
+    border-color: var(--color-negative-border);
+  }
+
+  &:disabled {
+    border-color: var(--color-neutral-border);
+    background: var(--color-neutral-surface);
+
+    &:checked {
+      background: var(--color-neutral-border-bold);
+    }
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-primary-icon);
+
+  & svg {
+    width: var(--spacing-600);
+    height: var(--spacing-600);
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tightest);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--font-size-body-medium);
+  line-height: var(--line-height-body-medium);
+
+  [data-variant="card"] > .text > & {
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.description {
+  color: var(--color-neutral-content-subtler);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+
+  [data-disabled] & {
+    color: var(--color-neutral-content-subtlest);
+  }
+}
