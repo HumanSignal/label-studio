@@ -3714,6 +3714,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_utc_1657_act_as_role": {
+      "key": "fflag_feat_utc_1657_act_as_role",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4bbedc752019408dbfa8f9cdb7ef8dab",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_utc_210_prediction_validation_15082025": {
       "key": "fflag_feat_utc_210_prediction_validation_15082025",
       "on": false,
