@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import {
   type MutableRefObject,
   createContext,
@@ -127,6 +128,8 @@ export type MultiTreeSelectProps = Omit<
   children?: ReactNode;
   /** Class for the root wrapper (defaults to `width: 100%` via `--multi-tree-width`). */
   className?: string;
+  /** Height of the trigger. */
+  size?: ControlSize;
   placeholder?: string;
   searchPlaceholder?: string;
   allLabel?: string;

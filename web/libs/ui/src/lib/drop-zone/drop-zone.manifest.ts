@@ -4,6 +4,7 @@ export default defineManifest({
   name: "DropZone",
   tier: 1,
   category: "Inputs",
+  sizing: "none",
   exports: ["DropZone"],
   intent: ["A place to drop files or pick them from the file dialog"],
   use_when:

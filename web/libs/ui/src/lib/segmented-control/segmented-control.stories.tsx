@@ -24,9 +24,9 @@ const PROMPT_OPTIONS: SegmentedControlOption[] = [
   { value: "box", label: "Box" },
 ];
 
-function Controlled({ options }: { options: SegmentedControlOption[] }) {
+function Controlled({ options, size }: { options: SegmentedControlOption[]; size?: "medium" | "small" | "smaller" }) {
   const [value, setValue] = useState(options[0]?.value ?? "");
-  return <SegmentedControl selectedOption={value} options={options} onChange={setValue} />;
+  return <SegmentedControl selectedOption={value} options={options} onChange={setValue} size={size} />;
 }
 
 export const TwoOptions: Story = {
@@ -54,5 +54,27 @@ export const IconOptions: Story = {
         { value: "table", label: <ListIcon />, tooltip: "Switch to List View" },
       ]}
     />
+  ),
+};
+
+const ICON_OPTIONS: SegmentedControlOption[] = [
+  { value: "cards", label: <SquaresFourIcon />, tooltip: "Switch to Cards View" },
+  { value: "table", label: <ListIcon />, tooltip: "Switch to List View" },
+];
+
+/**
+ * `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. The height
+ * comes from the size alone, so a control with icon-only options is as tall as one with text.
+ */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-base">
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <div key={size} className="flex items-center gap-base">
+          <Controlled size={size} options={PROMPT_OPTIONS} />
+          <Controlled size={size} options={ICON_OPTIONS} />
+        </div>
+      ))}
+    </div>
   ),
 };

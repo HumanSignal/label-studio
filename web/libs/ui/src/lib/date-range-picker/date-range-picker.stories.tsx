@@ -353,3 +353,16 @@ export const WithCustomButtonTrigger: Story = {
     initialDates: defaultInitialDates,
   },
 };
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col items-start gap-base">
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <DateRangePickerTrigger key={size} size={size} selected={defaultInitialDates}>
+          <DateRangePicker initialDates={defaultInitialDates} setAppliedDates={() => {}} />
+        </DateRangePickerTrigger>
+      ))}
+    </div>
+  ),
+};

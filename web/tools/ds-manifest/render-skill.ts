@@ -85,6 +85,27 @@ export function renderSkillSection(manifest: Manifest): string {
     lines.push(`- ${code(name)}: ${c.props_rules.map(cell).join("; ")}`);
   }
   lines.push("");
+  lines.push("### Control sizes");
+  lines.push("");
+  lines.push(
+    `One scale for every control that sits in a form row or a bar. ${manifest.controlSizes.rule} The default is ${code(manifest.controlSizes.default)}.`,
+  );
+  lines.push("");
+  lines.push("| `size` | Height | Use when |");
+  lines.push("|---|---|---|");
+  for (const [name, size] of Object.entries(manifest.controlSizes.sizes))
+    lines.push(`| ${code(name)} | ${size.px}px | ${cell(size.use_when)} |`);
+  lines.push("");
+  lines.push(`Never: ${manifest.controlSizes.never_when.map(cell).join("; ")}.`);
+  lines.push("");
+  const sized = (sizing: string) =>
+    live
+      .filter(([, c]) => c.sizing === sizing)
+      .map(([name]) => code(name))
+      .join(", ");
+  lines.push(`- **Take ${code("size")}:** ${sized("control")}`);
+  lines.push(`- **One size, no prop:** ${sized("fixed")}. ${manifest.controlSizes.fixed}`);
+  lines.push("");
   lines.push("### Patterns (Tier 2, composed from Tier 1)");
   lines.push("");
   for (const [name, c] of tier2) lines.push(`- ${code(name)} (${c.exports.map(code).join(", ")}): ${cell(c.use_when)}`);

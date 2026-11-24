@@ -4,6 +4,7 @@ export default defineManifest({
   name: "TagAutocomplete",
   tier: 2,
   category: "Inputs",
+  sizing: "control",
   exports: ["TagAutocomplete"],
   intent: [],
   use_when: "Free-form tag entry with suggestions.",

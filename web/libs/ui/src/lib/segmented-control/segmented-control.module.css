@@ -1,12 +1,39 @@
+/*
+ * The height comes from the size alone (40, 32, 24px, as Button, Select and Input), never from the
+ * content: an icon-only option is as tall as a text one.
+ */
 .segmentedControl {
+  --segmented-height: var(--spacing-1000);
+  --segmented-inset: var(--spacing-tighter);
+  --segmented-option-padding: var(--spacing-base);
+  --segmented-font-size: var(--font-size-label-medium);
+  --segmented-icon-size: var(--spacing-500);
+
   display: inline-flex;
   align-items: stretch;
   justify-content: center;
-  padding: var(--spacing-tighter);
+  height: var(--segmented-height);
+  padding: var(--segmented-inset);
+  box-sizing: border-box;
   border: 1px solid var(--color-neutral-border);
   border-radius: var(--corner-radius-small);
   background: var(--color-neutral-surface);
-  gap: var(--spacing-tighter);
+  gap: var(--segmented-inset);
+
+  &[data-size="small"] {
+    --segmented-height: var(--spacing-800);
+    --segmented-option-padding: var(--spacing-300);
+    --segmented-font-size: var(--font-size-label-small);
+    --segmented-icon-size: var(--spacing-400);
+  }
+
+  &[data-size="smaller"] {
+    --segmented-height: var(--spacing-600);
+    --segmented-inset: var(--spacing-tightest);
+    --segmented-option-padding: var(--spacing-200);
+    --segmented-font-size: var(--font-size-label-smaller);
+    --segmented-icon-size: 0.875rem;
+  }
 
   &_fullWidth {
     display: flex;
@@ -17,22 +44,31 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-tighter) var(--spacing-base);
+    padding: 0 var(--segmented-option-padding);
     border: none;
     border-radius: var(--corner-radius-smaller);
     background: transparent;
     color: var(--color-neutral-content-subtler);
     font-family: inherit;
-    font-size: var(--font-size-label-small);
+    font-size: var(--segmented-font-size);
     font-weight: var(--font-weight-medium);
-    line-height: 1.2;
+    line-height: 1;
+    white-space: nowrap;
     cursor: pointer;
     transition:
       background-color 200ms ease-out,
       color 200ms ease-out;
 
+    & > svg {
+      width: var(--segmented-icon-size);
+      height: var(--segmented-icon-size);
+      flex: none;
+    }
+
+    /* an icon-only option is a square of the option's own height */
     &:has(> svg:only-child) {
-      padding: var(--spacing-tighter);
+      padding: 0;
+      aspect-ratio: 1;
     }
 
     &:hover:not(&_selected) {
@@ -61,5 +97,6 @@
 
   &_fullWidth &__option {
     flex: 1 1 0;
+    aspect-ratio: auto;
   }
 }

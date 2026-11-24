@@ -63,6 +63,7 @@ const OverflowList = ({ users, total, searchFrom, countLabel, useRandomBackgroun
       {users.length > searchFrom && (
         <div className="lsf-avatar-stack-list__search">
           <SearchInput
+            size="small"
             value={query}
             placeholder="Search"
             aria-label="Search people"

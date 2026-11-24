@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import styles from "./segmented-control.module.css";
 import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { Tooltip } from "../Tooltip/Tooltip";
 
 export interface SegmentedControlOption {
@@ -22,6 +23,7 @@ export interface SegmentedControlProps {
   onChange?: (option: string) => void;
   /** Stretches the control (and its options evenly) to fill the width of its container, e.g. a filter dropdown. */
   fullWidth?: boolean;
+  size?: ControlSize;
   disabled?: boolean;
   className?: string;
   "aria-label"?: string;
@@ -34,6 +36,7 @@ export const SegmentedControl = ({
   activationMode = "automatic",
   onChange,
   fullWidth,
+  size = "medium",
   disabled = false,
   className,
   "aria-label": ariaLabel,
@@ -63,6 +66,7 @@ export const SegmentedControl = ({
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedIndex(null);
       }}
+      data-size={size}
       role="radiogroup"
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}

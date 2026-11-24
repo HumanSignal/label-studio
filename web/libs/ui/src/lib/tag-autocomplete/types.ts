@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import type { ReactNode } from "react";
 
 export interface TagOption<T = any> {
@@ -66,6 +67,9 @@ export interface TagAutocompleteProps<T = string> {
 
   /** Custom class names */
   triggerClassName?: string;
+
+  /** Smallest height of the field; it grows when the tags wrap. */
+  size?: ControlSize;
   contentClassName?: string;
   tagClassName?: string;
 

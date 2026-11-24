@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { MagnifyingGlassIcon } from "@humansignal/icons";
+import { CalendarBlankIcon, MagnifyingGlassIcon } from "@humansignal/icons";
 import { useState } from "react";
 import { Typography } from "../typography/typography";
 import { Input } from "./input";
@@ -57,14 +57,38 @@ export const States: Story = {
   ),
 };
 
-/** Heights match Button and Select: 40, 32 and 24px. */
+const SIZES = [
+  { size: "medium", label: "Medium · 40px" },
+  { size: "small", label: "Small · 32px" },
+  { size: "smaller", label: "Smaller · 24px" },
+] as const;
+
+/** Heights match Button and Select: 40, 32 and 24px. The same three sizes with a leading and a trailing icon. */
 export const Sizes: Story = {
-  decorators: [fieldWidth],
   render: () => (
-    <div className="flex flex-col gap-base">
-      <Input aria-label="Medium" size="medium" defaultValue="Medium · 40px" />
-      <Input aria-label="Small" size="small" defaultValue="Small · 32px" />
-      <Input aria-label="Smaller" size="smaller" defaultValue="Smaller · 24px" />
+    <div className="grid grid-cols-3 gap-base" style={{ width: 840, maxWidth: "100%" }}>
+      {(["Text only", "Leading icon", "Trailing icon"] as const).map((heading) => (
+        <Typography key={heading} variant="label" size="small" className="text-neutral-content-subtle">
+          {heading}
+        </Typography>
+      ))}
+      {SIZES.map(({ size, label }) => [
+        <Input key={`${size}-text`} aria-label={label} size={size} defaultValue={label} />,
+        <Input
+          key={`${size}-leading`}
+          aria-label={`${label}, leading icon`}
+          size={size}
+          defaultValue={label}
+          leading={<MagnifyingGlassIcon />}
+        />,
+        <Input
+          key={`${size}-trailing`}
+          aria-label={`${label}, trailing icon`}
+          size={size}
+          defaultValue={label}
+          trailing={<CalendarBlankIcon />}
+        />,
+      ])}
     </div>
   ),
 };

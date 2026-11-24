@@ -1,3 +1,4 @@
+export type { ControlSize } from "./ds-manifest/control-sizes";
 export * from "./lib/InputFile/InputFile";
 export * from "./lib/indicator";
 export * from "./lib/input/input";

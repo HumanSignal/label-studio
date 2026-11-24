@@ -71,6 +71,7 @@ export const ReaderViewModal: FC<ReaderViewModalProps> = ({ content, isOpen, onC
         Reader View
       </Typography>
       <SegmentedControl
+        size="small"
         aria-label="Format"
         selectedOption={format}
         onChange={(v) => setFormat(v as ContentFormat)}

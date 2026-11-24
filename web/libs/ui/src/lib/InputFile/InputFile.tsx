@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { UploadSimpleIcon } from "@humansignal/icons";
 import clsx from "clsx";
 import {
@@ -17,7 +18,7 @@ export interface InputFileProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   /** Button text. */
   text?: ReactNode;
   /** Matches Button: medium 40px, small 32px, smaller 24px. */
-  size?: ButtonProps["size"];
+  size?: ControlSize;
   /** Matches Button; outlined by default. */
   look?: ButtonProps["look"];
   /** Draws the error state and sets `aria-invalid`. */

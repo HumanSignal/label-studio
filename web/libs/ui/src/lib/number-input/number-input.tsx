@@ -1,12 +1,14 @@
 import { CaretDownIcon, CaretUpIcon, MinusIcon, PlusIcon } from "@humansignal/icons";
 import clsx from "clsx";
 import { type FocusEvent, forwardRef, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { Button } from "../button/button";
 import { Input, type InputProps } from "../input/input";
 import styles from "./number-input.module.css";
 
 export interface NumberInputProps
   extends Omit<InputProps, "value" | "defaultValue" | "onChange" | "type" | "min" | "max" | "step" | "trailing"> {
+  size?: ControlSize;
   /** The number, or null when empty. */
   value?: number | null;
   defaultValue?: number | null;

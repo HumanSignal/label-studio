@@ -4,6 +4,7 @@ export default defineManifest({
   name: "TextArea",
   tier: 1,
   category: "Inputs",
+  sizing: "control",
   exports: ["TextArea"],
   intent: ["Multi-line text entry"],
   use_when:

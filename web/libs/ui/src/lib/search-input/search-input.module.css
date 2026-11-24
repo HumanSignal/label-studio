@@ -1,10 +1,19 @@
+/* Sizes mirror Input, Button and Select (40, 32, 24px). */
 .container {
+  --search-height: var(--spacing-1000);
+  --search-padding: var(--spacing-300);
+  --search-icon-size: var(--spacing-600);
+  --search-font-size: var(--font-size-body-medium);
+  --search-line-height: var(--line-height-body-medium);
+  --search-clear-size: var(--spacing-600);
+  --search-clear-icon-size: var(--spacing-400);
+
   display: flex;
   align-items: center;
   gap: var(--spacing-tight);
-  height: var(--spacing-wider);
+  height: var(--search-height);
   min-width: 0;
-  padding: 0 var(--spacing-tight);
+  padding: 0 var(--search-padding);
   box-sizing: border-box;
   border: 1px solid var(--color-neutral-border);
   border-radius: var(--corner-radius-small);
@@ -24,9 +33,29 @@
   outline-offset: 1px;
 }
 
+.container[data-size="small"] {
+  --search-height: var(--spacing-800);
+  --search-padding: var(--spacing-200);
+  --search-font-size: var(--font-size-body-small);
+  --search-line-height: var(--line-height-body-small);
+  --search-clear-size: var(--spacing-500);
+}
+
+.container[data-size="smaller"] {
+  --search-height: var(--spacing-600);
+  --search-padding: var(--spacing-100);
+  --search-icon-size: var(--spacing-400);
+  --search-font-size: var(--font-size-label-smaller);
+  --search-line-height: var(--line-height-label-smaller);
+  --search-clear-size: var(--spacing-400);
+  --search-clear-icon-size: var(--spacing-300);
+
+  gap: var(--spacing-tighter);
+}
+
 .icon {
-  width: var(--spacing-wide);
-  height: var(--spacing-wide);
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
   flex: none;
   color: var(--color-neutral-content-subtlest);
 }
@@ -36,17 +65,38 @@
   flex: 1;
   min-width: 0;
   width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: 0;
+
+  /* one line of text, padded to the frame: the same text position as Input, Button and Select */
+  height: var(--search-line-height);
+  box-sizing: content-box;
+  padding: calc((var(--search-height) - 2px - var(--search-line-height)) / 2) 0;
   border: 0;
   outline: none;
   box-shadow: none;
   background: transparent;
   color: inherit;
   font-family: inherit;
-  font-size: var(--font-size-body-small);
-  line-height: var(--line-height-body-small);
+  font-size: var(--search-font-size);
+  line-height: var(--search-line-height);
+}
+
+/* The component draws its own clear button, the same in every browser. */
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* A ghost Button, held to a square that fits inside each control size. */
+.container .clear {
+  flex: none;
+  width: var(--search-clear-size);
+  height: var(--search-clear-size);
+  min-width: 0;
+  padding: 0;
+}
+
+.container .clear svg {
+  width: var(--search-clear-icon-size);
+  height: var(--search-clear-icon-size);
 }
 
 .input::placeholder {

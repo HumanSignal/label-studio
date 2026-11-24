@@ -617,3 +617,14 @@ export const SizesMatchButton: Story = {
     );
   },
 };
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-base" style={{ width: 240 }}>
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <Select key={size} size={size} placeholder={size} options={["Apple", "Banana", "Blueberry"] as any[]} />
+      ))}
+    </div>
+  ),
+};

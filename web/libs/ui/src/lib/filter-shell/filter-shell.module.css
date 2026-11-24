@@ -1,11 +1,10 @@
 .shell {
   /*
-   * Shared height for every control in the filter row (pill halves, Add Filter, Reset). Select
-   * size tokens are 24/32/40 only, so the row height can't come from a component size prop.
-   * Declared here and inherited: filter-pill.module.css and consumers applying
-   * .filterShellValueTrigger both read it from this root.
+   * Shared height for every control in the filter row (pill halves, Add Filter, Reset): 32px, the
+   * `small` step of the control size scale. Declared here and inherited: filter-pill.module.css and
+   * consumers applying .filterShellValueTrigger both read it from this root.
    */
-  --filter-pill-height: 30px;
+  --filter-pill-height: var(--spacing-800);
 
   display: flex;
   min-width: 0;

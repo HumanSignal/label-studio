@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import type { FC, ReactNode, HTMLAttributes } from "react";
 
 export type SelectOptionData<T = any> = {
@@ -136,7 +137,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   isInline?: boolean;
   isLoading?: boolean;
   dataTestid?: string;
-  size?: SelectSize | `${SelectSize}` | undefined;
+  size?: ControlSize | SelectSize | undefined;
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;

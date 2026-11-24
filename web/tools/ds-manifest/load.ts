@@ -7,6 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { manifestConfig } from "../../libs/ui/src/ds-manifest/config";
+import { CONTROL_SIZES } from "../../libs/ui/src/ds-manifest/control-sizes";
 import {
   CATEGORIES,
   type ComponentManifest,
@@ -14,7 +15,7 @@ import {
   type RegistryComponent,
 } from "../../libs/ui/src/ds-manifest/types";
 
-export const REGISTRY_VERSION = 2;
+export const REGISTRY_VERSION = 3;
 export const webRoot = path.resolve(import.meta.dir, "../..");
 export const repoRoot = path.resolve(webRoot, "../../..");
 export const uiSrc = path.join(webRoot, "libs/ui/src");
@@ -46,6 +47,28 @@ export function indexModuleDirs(): string[] {
   for (const match of index.matchAll(/from\s+"\.\/lib\/([^"/]+)[^"]*"/g)) dirs.add(`lib/${match[1]}`);
   return [...dirs].sort();
 }
+
+/** A sized control types its `size` prop with the shared `ControlSize`, never with its own union. */
+const usesControlSize = (dir: string) =>
+  listFiles(dir, (f) => /\.tsx?$/.test(f) && !/\.(stories|test|spec|manifest)\./.test(f)).some((file) =>
+    /\bsize\??:\s*ControlSize\b/.test(fs.readFileSync(file, "utf-8")),
+  );
+
+/** The heights of the scale as the spacing tokens (or their Tailwind `h-` classes) a control's styles read. */
+const HEIGHT_TOKENS = Object.entries(CONTROL_SIZES.sizes).map(([name, size]) => ({
+  name,
+  token: String((size.px / 4) * 100),
+}));
+const missingHeights = (dir: string) => {
+  const sources = listFiles(dir, (f) => /\.(css|tsx?)$/.test(f) && !/\.(stories|test|spec|manifest)\./.test(f))
+    .map((file) => fs.readFileSync(file, "utf-8"))
+    .join("\n");
+  // a control built on another sized control (NumberInput on Input, InputFile on Button) passes `size` through
+  if (/\bsize=\{size\}|\bbuttonVariant\(/.test(sources)) return [];
+  return HEIGHT_TOKENS.filter(({ token }) => !new RegExp(`--spacing-${token}\\b|\\bh-${token}\\b`).test(sources)).map(
+    ({ name, token }) => `${name} (--spacing-${token})`,
+  );
+};
 
 const isPathLike = (replaced: string) => !replaced.startsWith("jsx:") && !replaced.startsWith("css:");
 const treeOf = (relative: string) => TREES.find((tree) => relative.startsWith(`${tree}/`));
@@ -94,6 +117,20 @@ export async function loadManifest(): Promise<LoadResult> {
         if (!entry.use_when.trim()) problems.push(`${entry.name}: use_when is empty`);
         if (entry.tier === 1 && !entry.intent.length) problems.push(`${entry.name}: tier 1 needs at least one intent`);
         if (entry.tier === 1 && !entry.never_when.length) problems.push(`${entry.name}: tier 1 needs never_when`);
+        if (entry.category === "Inputs" && !entry.sizing)
+          problems.push(`${entry.name}: an Inputs component declares sizing ("control", "fixed" or "none")`);
+        if (entry.sizing === "control") {
+          const folder = path.dirname(file);
+          if (!usesControlSize(folder))
+            problems.push(`${entry.name}: sizing "control" needs a size prop typed as ControlSize`);
+          const missing = missingHeights(folder);
+          if (missing.length)
+            problems.push(
+              `${entry.name}: sizing "control" needs the three heights of the scale in its styles, missing ${missing.join(", ")}`,
+            );
+          if (!storyFiles(folder).some((story) => /^export const Sizes\b/m.test(fs.readFileSync(story, "utf-8"))))
+            problems.push(`${entry.name}: sizing "control" needs a story named Sizes that renders the three sizes`);
+        }
       }
     }
   }
@@ -168,6 +205,7 @@ export async function loadManifest(): Promise<LoadResult> {
   const manifest: Manifest = {
     version: REGISTRY_VERSION,
     package: manifestConfig.package,
+    controlSizes: CONTROL_SIZES,
     components: sorted,
     gaps: manifestConfig.gaps,
     internal: manifestConfig.internal,

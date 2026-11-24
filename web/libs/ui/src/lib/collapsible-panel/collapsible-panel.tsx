@@ -85,7 +85,7 @@ export const CollapsiblePanel = ({
 
   return (
     <div
-      className={cn("flex flex-col border rounded-md overflow-hidden shrink-0", styles.container, className)}
+      className={cn("flex flex-col border rounded-small overflow-hidden shrink-0", styles.container, className)}
       data-testid={dataTestId}
     >
       {/* Header - Always visible */}

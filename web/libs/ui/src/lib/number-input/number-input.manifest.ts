@@ -4,6 +4,7 @@ export default defineManifest({
   name: "NumberInput",
   tier: 1,
   category: "Inputs",
+  sizing: "control",
   exports: ["NumberInput"],
   intent: ["Enter a number"],
   use_when:

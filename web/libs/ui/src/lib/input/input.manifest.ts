@@ -4,6 +4,7 @@ export default defineManifest({
   name: "Input",
   tier: 1,
   category: "Inputs",
+  sizing: "control",
   exports: ["Input"],
   intent: ["Free text entry"],
   use_when:
@@ -16,7 +17,6 @@ export default defineManifest({
   props_rules: [
     "invalid together with an error message next to the field",
     "aria-label when there is no visible label",
-    "size matches the Button and Select beside it",
   ],
   replaces: ['jsx:<input type="text">'],
   retired: ["services/lso/web/libs/editor/src/common/Input/Input.jsx"],

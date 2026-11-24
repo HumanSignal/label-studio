@@ -4,6 +4,7 @@ export default defineManifest({
   name: "CheckboxGroup",
   tier: 1,
   category: "Inputs",
+  sizing: "fixed",
   exports: ["CheckboxGroup"],
   intent: ["Choose several values from a short list"],
   use_when: "A labelled set of checkboxes whose checked values form one list, such as the events a webhook sends.",

@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { CheckIcon, CopyIcon, EyeIcon, EyeSlashIcon, XIcon } from "@humansignal/icons";
 import { useCopyText } from "@humansignal/core";
 import clsx from "clsx";
@@ -17,11 +18,10 @@ import { type FieldChromeProps, fieldIds, hasFieldChrome, withField } from "../f
 import styles from "./input.module.css";
 import { useFieldFocus } from "./use-field-focus";
 
-export type InputSize = "medium" | "small" | "smaller";
+export type InputSize = ControlSize;
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">, FieldChromeProps {
-  /** Height preset, matching Button and Select: medium 40px, small 32px, smaller 24px. */
-  size?: InputSize;
+  size?: ControlSize;
   /** Draws the error state and sets `aria-invalid`. The message itself is rendered next to the field. */
   invalid?: boolean;
   /** Content before the text: an icon, or fixed text such as `https://`. */

@@ -1,9 +1,7 @@
 import { inject, observer } from "mobx-react";
 import { useEffect, useState } from "react";
-// @ts-ignore - RadioGroup is a .jsx file without types
-import { RadioGroup } from "../../Common/RadioGroup/RadioGroup";
 import { IconRows3, IconRows4 } from "@humansignal/icons";
-import { Tooltip } from "@humansignal/ui";
+import { SegmentedControl, type ControlSize } from "@humansignal/ui";
 
 // Density constants - exported for use in other components
 export const DENSITY_STORAGE_KEY = "dm:table:density";
@@ -17,7 +15,8 @@ export const ROW_HEIGHT_COMPACT = 50;
 export type Density = typeof DENSITY_COMFORTABLE | typeof DENSITY_COMPACT;
 
 interface DensityToggleProps {
-  size?: "small" | "medium" | "large";
+  size?: ControlSize;
+  "data-testid"?: string;
   onChange?: (density: Density) => void;
   storageKey?: string;
   view?: { type: string };
@@ -28,7 +27,7 @@ const densityInjector = inject(({ store }: any) => ({
 }));
 
 export const DensityToggle = densityInjector(
-  observer(({ size, onChange, storageKey, view, ...rest }: DensityToggleProps) => {
+  observer(({ size, onChange, storageKey, view, "data-testid": dataTestId }: DensityToggleProps) => {
     const key = storageKey ?? DENSITY_STORAGE_KEY;
     const [density, setDensity] = useState<Density>(() => {
       return (localStorage.getItem(key) as Density) ?? DENSITY_COMFORTABLE;
@@ -48,33 +47,27 @@ export const DensityToggle = densityInjector(
     }
 
     return (
-      <RadioGroup
+      <SegmentedControl
         size={size}
-        value={density}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDensity(e.target.value as Density)}
-        {...rest}
-        style={{ "--button-padding": "0 var(--spacing-tighter)" } as React.CSSProperties}
-        data-testid="density-toggle"
-      >
-        <Tooltip title="Comfortable density">
-          <div>
-            <RadioGroup.Button
-              value={DENSITY_COMFORTABLE}
-              aria-label="Comfortable density"
-              data-testid="density-comfortable"
-            >
-              <IconRows3 width={20} height={20} />
-            </RadioGroup.Button>
-          </div>
-        </Tooltip>
-        <Tooltip title="Compact density">
-          <div>
-            <RadioGroup.Button value={DENSITY_COMPACT} aria-label="Compact density" data-testid="density-compact">
-              <IconRows4 width={20} height={20} />
-            </RadioGroup.Button>
-          </div>
-        </Tooltip>
-      </RadioGroup>
+        aria-label="Row density"
+        data-testid={dataTestId ?? "density-toggle"}
+        selectedOption={density}
+        onChange={(value) => setDensity(value as Density)}
+        options={[
+          {
+            value: DENSITY_COMFORTABLE,
+            label: <IconRows3 />,
+            tooltip: "Comfortable density",
+            "data-testid": "density-comfortable",
+          },
+          {
+            value: DENSITY_COMPACT,
+            label: <IconRows4 />,
+            tooltip: "Compact density",
+            "data-testid": "density-compact",
+          },
+        ]}
+      />
     );
   }),
 );

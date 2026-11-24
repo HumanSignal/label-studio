@@ -464,9 +464,10 @@ describe("FilterShell", () => {
     const pillCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-pill.module.css"), "utf8");
     const shellCss = fs.readFileSync(path.join(FILTER_SHELL_DIR, "filter-shell.module.css"), "utf8");
 
-    expect(shellCss).toMatch(/\.shell\s*\{[\s\S]*?--filter-pill-height:\s*30px/);
+    // 32px, the `small` step of the control size scale
+    expect(shellCss).toMatch(/\.shell\s*\{[\s\S]*?--filter-pill-height:\s*var\(--spacing-800\)/);
     // The row height is a single source of truth: no control may hardcode it again.
-    expect(`${shellCss}\n${pillCss}`.match(/30px/g)).toHaveLength(1);
+    expect(`${shellCss}\n${pillCss}`.match(/--filter-pill-height:/g)).toHaveLength(1);
 
     expect(pillCss).toMatch(/\.pill\s*\{[\s\S]*?height:\s*var\(--filter-pill-height\)/);
     expect(pillCss).toMatch(/>\s*:global\(button\)[\s\S]*?height:\s*var\(--filter-pill-height\)/);

@@ -4,6 +4,7 @@ export default defineManifest({
   name: "DateRangePicker",
   tier: 2,
   category: "Inputs",
+  sizing: "control",
   exports: ["DateRangePicker", "DateRangePickerTrigger"],
   intent: ["Pick a date or date-time range"],
   use_when:

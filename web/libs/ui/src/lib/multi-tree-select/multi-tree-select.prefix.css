@@ -11,6 +11,29 @@
   width: var(--multi-tree-width, 100%);
   box-sizing: border-box;
 
+  /*
+   * The `size` prop: 32 and 24px, as Button, Select and Input. `medium` declares nothing, so the 40px
+   * fallbacks below stay the only default and a consumer's own variables still win.
+   */
+  &[data-size="small"] {
+    --multi-tree-trigger-height: var(--spacing-800);
+    --multi-tree-trigger-font-size: var(--font-size-label-small);
+    --multi-tree-trigger-line-height: var(--line-height-label-small);
+    --multi-tree-trigger-padding: 0 var(--spacing-800) 0 var(--spacing-300);
+    --multi-tree-trigger-caret-box: var(--spacing-600);
+    --multi-tree-trigger-caret-size: var(--spacing-400);
+  }
+
+  &[data-size="smaller"] {
+    --multi-tree-trigger-height: var(--spacing-600);
+    --multi-tree-trigger-font-size: var(--font-size-label-smaller);
+    --multi-tree-trigger-line-height: var(--line-height-label-smaller);
+    --multi-tree-trigger-padding: 0 var(--spacing-600) 0 var(--spacing-200);
+    --multi-tree-trigger-caret-box: var(--spacing-400);
+    --multi-tree-trigger-caret-size: var(--spacing-300);
+    --multi-tree-trigger-caret-offset: var(--spacing-tightest);
+  }
+
   &__icon {
     height: var(--multi-tree-trigger-caret-box, 30px);
     width: var(--multi-tree-trigger-caret-box, 30px);
@@ -43,8 +66,8 @@
 
     &__placeholder {
       color: var(--color-neutral-content-subtler);
-      font-size: 1rem;
-      line-height: 24px;
+      font-size: var(--multi-tree-trigger-font-size, 1rem);
+      line-height: var(--multi-tree-trigger-line-height, 24px);
     }
 
     svg {
@@ -84,7 +107,7 @@
     );
     box-shadow: var(--multi-tree-trigger-shadow, none);
     box-sizing: border-box;
-    border-radius: var(--multi-tree-trigger-radius, 0.25rem);
+    border-radius: var(--multi-tree-trigger-radius, var(--corner-radius-small));
     padding: var(--multi-tree-trigger-padding, 0 2.5rem 0 1rem);
     transition:
       box-shadow 200ms ease-out,

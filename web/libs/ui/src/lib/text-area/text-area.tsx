@@ -9,11 +9,14 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { type FieldChromeProps, fieldIds, hasFieldChrome, withField } from "../field/field";
 import { useFieldFocus } from "../input/use-field-focus";
 import styles from "./text-area.module.css";
 
 export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement>, FieldChromeProps {
+  /** Text size, padding and the height of one row; the height of the field itself comes from `rows`. */
+  size?: ControlSize;
   /** Draws the error state and sets `aria-invalid`. The message itself is rendered next to the field. */
   invalid?: boolean;
   /** Grows with the content instead of scrolling, up to `maxHeight`. */
@@ -33,6 +36,7 @@ export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
     {
+      size = "medium",
       invalid = false,
       autosize = false,
       maxHeight,
@@ -86,6 +90,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       { ...chrome, required: props.required, id: controlId },
       <div
         className={clsx(styles.field, wrapperClassName)}
+        data-size={size}
         data-resize={autosize ? "none" : resize}
         data-invalid={isInvalid || undefined}
         data-disabled={disabled || undefined}

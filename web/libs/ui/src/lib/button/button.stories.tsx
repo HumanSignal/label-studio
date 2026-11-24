@@ -64,37 +64,39 @@ export const WithAlignment: Story = {
   },
 };
 
-export const WithSize: Story = {
-  render: ({ children, ...props }) => {
-    return (
-      <div className="flex items-center gap-tight">
-        <Button {...props} size="medium" className="w-48" leading={<TagIcon />}>
-          Medium
-        </Button>
-        <Button {...props} size="small" className="w-48" leading={<TagIcon />}>
-          Small
-        </Button>
-        <Button {...props} size="smaller" className="w-48" leading={<TagIcon />}>
-          Smaller
-        </Button>
-      </div>
-    );
-  },
-};
+const SIZES = [
+  { size: "medium", label: "Medium · 40px" },
+  { size: "small", label: "Small · 32px" },
+  { size: "smaller", label: "Smaller · 24px" },
+] as const;
 
-export const WithIcon: Story = {
+/**
+ * `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. The same three
+ * sizes with a leading and a trailing icon.
+ */
+export const Sizes: Story = {
   render: ({ children, ...props }) => {
     return (
-      <div className="flex gap-tight">
-        <Button {...props} className="w-48" leading={<TagIcon />}>
-          Leading
-        </Button>
-        <Button {...props} className="w-48" trailing={<TagIcon />}>
-          Trailing
-        </Button>
-        <Button {...props} className="w-48" leading={<TagIcon />} trailing={<TagIcon />}>
-          Both
-        </Button>
+      <div
+        className="grid grid-cols-3 items-center justify-items-start gap-base"
+        style={{ width: 600, maxWidth: "100%" }}
+      >
+        {(["Text only", "Leading icon", "Trailing icon"] as const).map((heading) => (
+          <Typography key={heading} variant="label" size="small" className="text-neutral-content-subtle">
+            {heading}
+          </Typography>
+        ))}
+        {SIZES.map(({ size, label }) => [
+          <Button key={`${size}-text`} {...props} size={size}>
+            {label}
+          </Button>,
+          <Button key={`${size}-leading`} {...props} size={size} leading={<TagIcon />}>
+            {label}
+          </Button>,
+          <Button key={`${size}-trailing`} {...props} size={size} trailing={<TagIcon />}>
+            {label}
+          </Button>,
+        ])}
       </div>
     );
   },

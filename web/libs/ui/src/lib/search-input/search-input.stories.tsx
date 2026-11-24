@@ -26,3 +26,25 @@ export const Controlled: Story = {
     return <SearchInput {...args} value={value} onChange={(event) => setValue(event.target.value)} />;
   },
 };
+
+/** With text, a clear button appears at the end of the field, sized with the control. */
+export const WithText: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-base">
+      <SearchInput {...args} size="medium" defaultValue="Vehicle" />
+      <SearchInput {...args} size="small" defaultValue="Vehicle" />
+      <SearchInput {...args} size="smaller" defaultValue="Vehicle" />
+    </div>
+  ),
+};
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-base">
+      <SearchInput {...args} size="medium" placeholder="Medium · 40px" />
+      <SearchInput {...args} size="small" placeholder="Small · 32px" />
+      <SearchInput {...args} size="smaller" placeholder="Smaller · 24px" />
+    </div>
+  ),
+};

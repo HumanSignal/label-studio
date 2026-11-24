@@ -64,3 +64,15 @@ export const Autosize: Story = {
       "Label each review as positive, negative or neutral.\nSkip reviews that are not in English.\nFlag anything that mentions a person by name.",
   },
 };
+
+/** One row is as tall as the Input of the same size: 40, 32 and 24px. The text and the padding follow. */
+export const Sizes: Story = {
+  decorators: [fieldWidth],
+  render: () => (
+    <div className="flex flex-col gap-base">
+      <TextArea aria-label="Medium" size="medium" rows={1} defaultValue="Medium · one row is 40px" />
+      <TextArea aria-label="Small" size="small" rows={1} defaultValue="Small · one row is 32px" />
+      <TextArea aria-label="Smaller" size="smaller" rows={1} defaultValue="Smaller · one row is 24px" />
+    </div>
+  ),
+};

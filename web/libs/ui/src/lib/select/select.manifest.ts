@@ -4,6 +4,7 @@ export default defineManifest({
   name: "Select",
   tier: 1,
   category: "Inputs",
+  sizing: "control",
   exports: ["Select"],
   intent: ["Pick one or several values from a flat list"],
   use_when:

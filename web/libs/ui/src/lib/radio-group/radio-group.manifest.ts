@@ -4,6 +4,7 @@ export default defineManifest({
   name: "RadioGroup",
   tier: 1,
   category: "Inputs",
+  sizing: "fixed",
   exports: ["RadioGroup", "Radio"],
   intent: ["Pick one of several described options"],
   use_when:

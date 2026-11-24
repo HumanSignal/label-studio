@@ -4,6 +4,7 @@ export default defineManifest({
   name: "Toggle",
   tier: 1,
   category: "Inputs",
+  sizing: "fixed",
   exports: ["Toggle"],
   intent: ["An on/off setting"],
   use_when:

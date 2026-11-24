@@ -4,6 +4,7 @@ export default defineManifest({
   name: "MultiTreeSelect",
   tier: 2,
   category: "Inputs",
+  sizing: "control",
   exports: [
     "MultiTreeSelect",
     "MultiTreeSelectDropdown",

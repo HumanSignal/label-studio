@@ -11,6 +11,7 @@ export const MultiTreeSelect = memo(
   ({
     children,
     className,
+    size = "medium",
     allLabel,
     placeholder,
     RootLevelIcon,
@@ -40,12 +41,12 @@ export const MultiTreeSelect = memo(
 
     return (
       <MultiTreeSelectProvider {...providerProps}>
-        <div className={cnm(cn("multi-tree-select").toClassName(), className)}>
+        <div className={cnm(cn("multi-tree-select").toClassName(), className)} data-size={size}>
           {children ? (
             children
           ) : (
             <div className={cn("content").toClassName()}>
-              <TreeSelected allLabel={allLabel} placeholder={placeholder} RootLevelIcon={RootLevelIcon} />
+              <TreeSelected allLabel={allLabel} placeholder={placeholder} RootLevelIcon={RootLevelIcon} size={size} />
               <TreeSearch />
               <TreeSelect allLabel={allLabel} />
             </div>

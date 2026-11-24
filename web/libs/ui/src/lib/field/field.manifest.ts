@@ -4,6 +4,7 @@ export default defineManifest({
   name: "Field",
   tier: 1,
   category: "Inputs",
+  sizing: "none",
   exports: ["Field"],
   intent: ["A label, help text and error message around a control"],
   use_when:

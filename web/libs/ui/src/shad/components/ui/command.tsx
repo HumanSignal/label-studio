@@ -26,6 +26,7 @@ function CommandInput({
 }) {
   return (
     <SearchInput
+      size="small"
       asChild
       wrapperDataSlot="command-input-wrapper"
       wrapperClassName={wrapperClassName ?? "m-1"}

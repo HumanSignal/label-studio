@@ -191,6 +191,7 @@ export const InteractiveActionsBar = observer(({ objectTag }: InteractiveActions
       <div className="flex items-center gap-base">
         {showPromptToggle && !tracking && (
           <SegmentedControl
+            size="small"
             selectedOption={promptMode}
             options={[
               { value: "points", label: "Points" },

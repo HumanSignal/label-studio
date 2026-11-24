@@ -4,6 +4,7 @@ export default defineManifest({
   name: "InputFile",
   tier: 1,
   category: "Inputs",
+  sizing: "control",
   exports: ["InputFile"],
   intent: ["Pick a file from disk"],
   use_when:

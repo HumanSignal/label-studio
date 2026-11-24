@@ -17,6 +17,7 @@ interface ViewToggleProps {
 export const ViewToggle = ({ view, onViewChange, className }: ViewToggleProps) => {
   return (
     <SegmentedControl
+      size="small"
       className={className}
       aria-label="View mode"
       selectedOption={view}

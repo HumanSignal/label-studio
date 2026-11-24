@@ -211,7 +211,12 @@ export const MultiTreeSelectDropdown = memo(
           >
             <span className={cn("multi-tree-select").elem("value").toClassName()}>
               {selectionTrigger ?? (
-                <TreeSelected placeholder={placeholder} allLabel={allLabel} RootLevelIcon={RootLevelIcon} />
+                <TreeSelected
+                  placeholder={placeholder}
+                  allLabel={allLabel}
+                  RootLevelIcon={RootLevelIcon}
+                  size={props.size}
+                />
               )}
             </span>
             <DropdownIcon />

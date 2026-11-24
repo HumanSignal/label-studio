@@ -186,9 +186,13 @@
   & > :global(button),
   & > :global(div) > :global(button),
   & > :global(div) > :global([role="button"][aria-haspopup="true"]) {
+    display: inline-flex;
+    align-items: center;
     min-width: 0;
     height: var(--filter-pill-height);
-    padding: var(--spacing-tight);
+    padding: 0 var(--spacing-tight);
+    font-size: var(--font-size-body-small);
+    line-height: var(--line-height-body-small);
     /* Unset / placeholder ("Any"): subtler — set state overrides below. */
     color: var(--color-neutral-content-subtler);
     background: var(--filter-pill-value-background);

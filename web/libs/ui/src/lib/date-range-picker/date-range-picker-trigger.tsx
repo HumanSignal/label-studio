@@ -1,5 +1,6 @@
 import { CalendarBlankIcon } from "@humansignal/icons";
 import { useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
@@ -25,6 +26,7 @@ type DateRangePickerTriggerProps = {
    * Optional class name applied to the clickable trigger surface.
    */
   className?: string;
+  size?: ControlSize;
   /**
    * When true, the caller owns height/padding (e.g. FilterShell value trigger).
    * Decorative class names do not imply custom chrome.
@@ -36,6 +38,13 @@ type DateRangePickerTriggerProps = {
    */
   triggerProps?: ComponentPropsWithoutRef<"div">;
 } & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className" | "id">;
+
+/** Height, padding and label size per control size: 40, 32, 24px, as Button, Select and Input. */
+const TRIGGER_SIZES: Record<ControlSize, { frame: string; text: "small" | "smaller" }> = {
+  medium: { frame: "h-1000 pl-base pr-tight", text: "small" },
+  small: { frame: "h-800 pl-300 pr-tight", text: "small" },
+  smaller: { frame: "h-600 pl-tight pr-tighter", text: "smaller" },
+};
 
 const dateStrings = (dateRange: DateOrDateTimeRange | null): { fromString: string; toString: string } | null => {
   if (!dateRange) {
@@ -82,6 +91,7 @@ export const DateRangePickerTrigger = ({
   dataTestId,
   inline = false,
   className,
+  size = "medium",
   ownChrome = false,
   triggerProps,
   onToggle,
@@ -92,18 +102,18 @@ export const DateRangePickerTrigger = ({
 
   const defaultLabel = appliedDatesString ? (
     <div className="flex items-center gap-tight">
-      <Typography variant="body" size="small" className="text-neutral-content-subtler">
+      <Typography variant="body" size={TRIGGER_SIZES[size].text} className="text-neutral-content-subtler">
         {appliedDatesString.fromString}
       </Typography>
-      <Typography variant="body" size="small" className="text-neutral-content-subtlest">
+      <Typography variant="body" size={TRIGGER_SIZES[size].text} className="text-neutral-content-subtlest">
         to
       </Typography>
-      <Typography variant="body" size="small" className="text-neutral-content-subtler">
+      <Typography variant="body" size={TRIGGER_SIZES[size].text} className="text-neutral-content-subtler">
         {appliedDatesString.toString}
       </Typography>
     </div>
   ) : (
-    <Typography variant="body" size="small" className="text-neutral-content-subtler">
+    <Typography variant="body" size={TRIGGER_SIZES[size].text} className="text-neutral-content-subtler">
       Any time
     </Typography>
   );
@@ -133,10 +143,12 @@ export const DateRangePickerTrigger = ({
           // FilterShell supplies its own value-trigger chrome: shape, border and height. Leaving the
           // standalone border/radius utilities on would tie with `.filterShellValueTrigger` and, in a
           // build that loads Tailwind last, win over the flush-left / round-right pill shape.
-          !ownChrome && "border border-neutral-border rounded-smaller py-tight pl-base pr-tight h-10",
+          !ownChrome && "border border-neutral-border rounded-small box-border",
+          !ownChrome && TRIGGER_SIZES[size].frame,
           disabled && "opacity-50 cursor-not-allowed",
           className,
         )}
+        data-size={ownChrome ? undefined : size}
         data-testid={dataTestId}
         {...triggerProps}
       >
