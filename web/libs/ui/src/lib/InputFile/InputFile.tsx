@@ -1,4 +1,4 @@
-import type { ControlSize } from "../../ds-manifest/control-sizes";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { UploadSimpleIcon } from "@humansignal/icons";
 import clsx from "clsx";
 import {
@@ -90,8 +90,9 @@ export const InputFile = forwardRef<HTMLInputElement, InputFileProps>(
             styles.button,
             disabled && styles.disabled,
           )}
+          data-size={size}
         >
-          <UploadSimpleIcon size={16} weight="bold" aria-hidden="true" />
+          <UploadSimpleIcon weight={controlIconWeight(size)} aria-hidden="true" />
           {text ?? "Upload Image"}
           <input
             {...legacyProps}

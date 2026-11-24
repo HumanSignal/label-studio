@@ -7,7 +7,7 @@
   --segmented-inset: var(--spacing-tighter);
   --segmented-option-padding: var(--spacing-base);
   --segmented-font-size: var(--font-size-label-medium);
-  --segmented-icon-size: var(--spacing-500);
+  --segmented-icon-size: 20px;
 
   display: inline-flex;
   align-items: stretch;
@@ -24,7 +24,7 @@
     --segmented-height: var(--spacing-800);
     --segmented-option-padding: var(--spacing-300);
     --segmented-font-size: var(--font-size-label-small);
-    --segmented-icon-size: var(--spacing-400);
+    --segmented-icon-size: 16px;
   }
 
   &[data-size="smaller"] {
@@ -32,7 +32,7 @@
     --segmented-inset: var(--spacing-tightest);
     --segmented-option-padding: var(--spacing-200);
     --segmented-font-size: var(--font-size-label-smaller);
-    --segmented-icon-size: 0.875rem;
+    --segmented-icon-size: 12px;
   }
 
   &_fullWidth {

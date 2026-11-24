@@ -1,4 +1,4 @@
-import type { ControlSize } from "../../ds-manifest/control-sizes";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { CheckIcon, CopyIcon, EyeIcon, EyeSlashIcon, XIcon } from "@humansignal/icons";
 import { useCopyText } from "@humansignal/core";
 import clsx from "clsx";
@@ -145,7 +145,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             size="smaller"
             className={styles.action}
             aria-label="Clear"
-            icon={<XIcon size={16} weight="bold" />}
+            icon={<XIcon weight={controlIconWeight(size)} />}
             onClick={clear}
           />
         )}
@@ -158,7 +158,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={styles.action}
             aria-label={revealed ? "Hide password" : "Show password"}
             aria-pressed={revealed}
-            icon={revealed ? <EyeSlashIcon size={16} weight="bold" /> : <EyeIcon size={16} weight="bold" />}
+            icon={
+              revealed ? (
+                <EyeSlashIcon weight={controlIconWeight(size)} />
+              ) : (
+                <EyeIcon weight={controlIconWeight(size)} />
+              )
+            }
             onClick={() => setRevealed((value) => !value)}
             disabled={disabled}
           />
@@ -171,7 +177,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             size="smaller"
             className={styles.action}
             aria-label={copied ? "Copied" : "Copy"}
-            icon={copied ? <CheckIcon size={16} weight="bold" /> : <CopyIcon size={16} weight="bold" />}
+            icon={
+              copied ? <CheckIcon weight={controlIconWeight(size)} /> : <CopyIcon weight={controlIconWeight(size)} />
+            }
             onClick={() => copy(inputRef.current?.value ?? "")}
           />
         )}

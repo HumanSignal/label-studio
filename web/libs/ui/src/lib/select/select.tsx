@@ -22,6 +22,7 @@ import React, {
 } from "react";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
+import { controlIconWeight } from "../../ds-manifest/control-sizes";
 import { cn, cnm } from "../../utils/utils";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
@@ -820,7 +821,7 @@ const SelectBase = forwardRef(
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
             <CaretDownIcon
-              weight="bold"
+              weight={controlIconWeight(size)}
               className={cnm(
                 styles.selectCaret,
                 "shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",

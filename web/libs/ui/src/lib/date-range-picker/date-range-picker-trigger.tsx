@@ -1,6 +1,6 @@
 import { CalendarBlankIcon } from "@humansignal/icons";
 import { useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
-import type { ControlSize } from "../../ds-manifest/control-sizes";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { cnm } from "../../utils/utils";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
@@ -40,10 +40,11 @@ type DateRangePickerTriggerProps = {
 } & Omit<ComponentPropsWithoutRef<typeof DropdownTrigger>, "children" | "content" | "className" | "id">;
 
 /** Height, padding and label size per control size: 40, 32, 24px, as Button, Select and Input. */
-const TRIGGER_SIZES: Record<ControlSize, { frame: string; text: "small" | "smaller" }> = {
-  medium: { frame: "h-1000 pl-base pr-tight", text: "small" },
-  small: { frame: "h-800 pl-300 pr-tight", text: "small" },
-  smaller: { frame: "h-600 pl-tight pr-tighter", text: "smaller" },
+/** The control icon rule: text a text inset from the edge, the calendar a padding from it. */
+const TRIGGER_SIZES: Record<ControlSize, { frame: string; text: "small" | "smaller"; icon: number }> = {
+  medium: { frame: "h-1000 pl-base pr-tight gap-tight", text: "small", icon: 20 },
+  small: { frame: "h-800 pl-tight pr-tight gap-tight", text: "small", icon: 16 },
+  smaller: { frame: "h-600 pl-tight pr-tight gap-tighter", text: "smaller", icon: 12 },
 };
 
 const dateStrings = (dateRange: DateOrDateTimeRange | null): { fromString: string; toString: string } | null => {
@@ -138,7 +139,8 @@ export const DateRangePickerTrigger = ({
         aria-expanded={isOpen}
         aria-disabled={disabled || undefined}
         className={cnm(
-          "flex items-center gap-tight cursor-pointer",
+          "flex items-center cursor-pointer",
+          ownChrome && "gap-tight",
           "hover:border-neutral-border-bold",
           // FilterShell supplies its own value-trigger chrome: shape, border and height. Leaving the
           // standalone border/radius utilities on would tie with `.filterShellValueTrigger` and, in a
@@ -153,8 +155,11 @@ export const DateRangePickerTrigger = ({
         {...triggerProps}
       >
         <span className="min-w-0 truncate">{label}</span>
-        {/* 16px matches FilterShell --select-trigger-caret-size / Select caret. */}
-        <CalendarBlankIcon size={16} className="text-neutral-content-subtlest shrink-0" />
+        <CalendarBlankIcon
+          size={TRIGGER_SIZES[size].icon}
+          weight={controlIconWeight(size)}
+          className="text-neutral-content-subtlest shrink-0"
+        />
       </div>
     </DropdownTrigger>
   );

@@ -1,7 +1,7 @@
 import { CaretDownIcon, CaretUpIcon, MinusIcon, PlusIcon } from "@humansignal/icons";
 import clsx from "clsx";
 import { type FocusEvent, forwardRef, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
-import type { ControlSize } from "../../ds-manifest/control-sizes";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { Button } from "../button/button";
 import { Input, type InputProps } from "../input/input";
 import styles from "./number-input.module.css";
@@ -117,9 +117,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               <CaretDownIcon size={12} weight="bold" />
             )
           ) : direction === 1 ? (
-            <PlusIcon size={16} weight="bold" />
+            <PlusIcon weight={controlIconWeight(size)} />
           ) : (
-            <MinusIcon size={16} weight="bold" />
+            <MinusIcon weight={controlIconWeight(size)} />
           )
         }
       />

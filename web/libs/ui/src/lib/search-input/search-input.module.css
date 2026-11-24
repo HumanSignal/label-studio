@@ -1,19 +1,19 @@
-/* Sizes mirror Input, Button and Select (40, 32, 24px). */
+/*
+ * Sizes mirror Input, Button and Select (40, 32, 24px). The magnifier and the clear button follow the
+ * control icon rule: the icon size of the control, a padding from the edge, and the icon-to-text gap.
+ */
 .container {
   --search-height: var(--spacing-1000);
-  --search-padding: var(--spacing-300);
-  --search-icon-size: var(--spacing-600);
+  --search-icon-size: 20px;
   --search-font-size: var(--font-size-body-medium);
   --search-line-height: var(--line-height-body-medium);
-  --search-clear-size: var(--spacing-600);
-  --search-clear-icon-size: var(--spacing-400);
 
   display: flex;
   align-items: center;
   gap: var(--spacing-tight);
   height: var(--search-height);
   min-width: 0;
-  padding: 0 var(--search-padding);
+  padding: 0 var(--spacing-tight);
   box-sizing: border-box;
   border: 1px solid var(--color-neutral-border);
   border-radius: var(--corner-radius-small);
@@ -35,20 +35,16 @@
 
 .container[data-size="small"] {
   --search-height: var(--spacing-800);
-  --search-padding: var(--spacing-200);
+  --search-icon-size: 16px;
   --search-font-size: var(--font-size-body-small);
   --search-line-height: var(--line-height-body-small);
-  --search-clear-size: var(--spacing-500);
 }
 
 .container[data-size="smaller"] {
   --search-height: var(--spacing-600);
-  --search-padding: var(--spacing-100);
-  --search-icon-size: var(--spacing-400);
+  --search-icon-size: 12px;
   --search-font-size: var(--font-size-label-smaller);
   --search-line-height: var(--line-height-label-smaller);
-  --search-clear-size: var(--spacing-400);
-  --search-clear-icon-size: var(--spacing-300);
 
   gap: var(--spacing-tighter);
 }
@@ -85,18 +81,25 @@
   display: none;
 }
 
-/* A ghost Button, held to a square that fits inside each control size. */
+/*
+ * A ghost Button: the icon plus a hairline of hover area, pulled into the padding by that hairline so
+ * the X lands where an icon would.
+ */
+.container:has(> .clear) {
+  padding-right: calc(var(--spacing-tight) - var(--spacing-tightest));
+}
+
 .container .clear {
   flex: none;
-  width: var(--search-clear-size);
-  height: var(--search-clear-size);
+  width: calc(var(--search-icon-size) + 2 * var(--spacing-tightest));
+  height: calc(var(--search-icon-size) + 2 * var(--spacing-tightest));
   min-width: 0;
   padding: 0;
 }
 
 .container .clear svg {
-  width: var(--search-clear-icon-size);
-  height: var(--search-clear-icon-size);
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
 }
 
 .input::placeholder {

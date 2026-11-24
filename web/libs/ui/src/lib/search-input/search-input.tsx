@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { forwardRef, useRef, useState, type InputHTMLAttributes } from "react";
 import clsx from "clsx";
 import { Button } from "../button/button";
-import type { ControlSize } from "../../ds-manifest/control-sizes";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { useFieldFocus } from "../input/use-field-focus";
 import styles from "./search-input.module.css";
 
@@ -61,7 +61,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         data-focus-visible={focusVisible || undefined}
         onPointerDown={handlers.onPointerDown}
       >
-        <MagnifyingGlassIcon className={styles.icon} aria-hidden="true" />
+        <MagnifyingGlassIcon className={styles.icon} weight={controlIconWeight(size)} aria-hidden="true" />
         <Input
           ref={setRefs}
           type={type ?? (asChild ? undefined : "search")}
@@ -90,7 +90,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             size="smaller"
             className={styles.clear}
             aria-label="Clear search"
-            icon={<XIcon weight="bold" />}
+            icon={<XIcon weight={controlIconWeight(size)} />}
             onClick={clear}
           />
         ) : null}

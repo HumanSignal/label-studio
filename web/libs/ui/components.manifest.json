@@ -24,7 +24,30 @@
       "A size chosen to fit the space available: change the layout, not the size",
       "A height set on the control with CSS, a class or a CSS variable"
     ],
-    "fixed": "One size only. It centres in a row of any control size, so it takes no size prop."
+    "fixed": "One size only. It centres in a row of any control size, so it takes no size prop.",
+    "icons": {
+      "rule": "The control places its own icons: the icon size, its padding from the edge and its gap to the text come from the control size. Pass an icon without a size; never pad or resize it at the call site. An icon you pass to a Button is bold at small and smaller (18px or less), as every Phosphor icon.",
+      "sizes": {
+        "medium": {
+          "icon": 20,
+          "edge": "spacing-tight",
+          "gap": "spacing-tight",
+          "text_inset": "spacing-base"
+        },
+        "small": {
+          "icon": 16,
+          "edge": "spacing-tight",
+          "gap": "spacing-tight",
+          "text_inset": "spacing-tight"
+        },
+        "smaller": {
+          "icon": 12,
+          "edge": "spacing-tight",
+          "gap": "spacing-tighter",
+          "text_inset": "spacing-tight"
+        }
+      }
+    }
   },
   "components": {
     "Accordion": {

@@ -14,6 +14,11 @@ export type ControlSizing = {
   never_when: string[];
   /** What a manifest entry with `sizing: "fixed"` means. */
   fixed: string;
+  /** Where icons and text sit inside a control, per size. Every sized control applies it itself. */
+  icons: {
+    rule: string;
+    sizes: Record<ControlSize, { icon: number; edge: string; gap: string; text_inset: string }>;
+  };
 };
 
 /** The one size scale of the controls, and what each size is for. Every sized control takes it as `size`. */
@@ -41,6 +46,18 @@ export const CONTROL_SIZES: ControlSizing = {
     "A height set on the control with CSS, a class or a CSS variable",
   ],
   fixed: "One size only. It centres in a row of any control size, so it takes no size prop.",
+  icons: {
+    rule: "The control places its own icons: the icon size, its padding from the edge and its gap to the text come from the control size. Pass an icon without a size; never pad or resize it at the call site. An icon you pass to a Button is bold at small and smaller (18px or less), as every Phosphor icon.",
+    sizes: {
+      medium: { icon: 20, edge: "spacing-tight", gap: "spacing-tight", text_inset: "spacing-base" },
+      small: { icon: 16, edge: "spacing-tight", gap: "spacing-tight", text_inset: "spacing-tight" },
+      smaller: { icon: 12, edge: "spacing-tight", gap: "spacing-tighter", text_inset: "spacing-tight" },
+    },
+  },
 };
 
 export const CONTROL_SIZE_NAMES = Object.keys(CONTROL_SIZES.sizes) as ControlSize[];
+
+/** The stroke of a control's own icon: bold at 18px or smaller, regular above, as for every Phosphor icon. */
+export const controlIconWeight = (size: ControlSize = "medium"): "bold" | "regular" =>
+  (CONTROL_SIZES.icons.sizes[size] ?? CONTROL_SIZES.icons.sizes.medium).icon <= 18 ? "bold" : "regular";

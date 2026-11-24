@@ -4,8 +4,10 @@
  */
 .field {
   --field-height: var(--spacing-1000);
-  --field-padding-start: var(--spacing-400);
-  --field-padding-end: var(--spacing-300);
+  --field-padding-start: var(--field-text-inset);
+  --field-padding-end: var(--field-text-inset);
+  --field-text-inset: var(--spacing-base);
+  --field-icon-size: 20px;
   --field-font-size: var(--font-size-label-medium);
   --field-line-height: var(--line-height-label-medium);
 
@@ -28,16 +30,16 @@
 
   &[data-size="small"] {
     --field-height: var(--spacing-800);
-    --field-padding-start: var(--spacing-300);
-    --field-padding-end: var(--spacing-200);
+    --field-text-inset: var(--spacing-tight);
+    --field-icon-size: 16px;
     --field-font-size: var(--font-size-label-small);
     --field-line-height: var(--line-height-label-small);
   }
 
   &[data-size="smaller"] {
     --field-height: var(--spacing-600);
-    --field-padding-start: var(--spacing-200);
-    --field-padding-end: var(--spacing-100);
+    --field-text-inset: var(--spacing-tight);
+    --field-icon-size: 12px;
     --field-font-size: var(--font-size-label-smaller);
     --field-line-height: var(--line-height-label-smaller);
 
@@ -108,12 +110,38 @@
   color: var(--color-neutral-content-subtler);
 
   & svg {
-    width: var(--spacing-400);
-    height: var(--spacing-400);
+    width: var(--field-icon-size);
+    height: var(--field-icon-size);
     color: var(--color-neutral-icon);
   }
 }
 
-.action {
+/*
+ * The control icon rule: an icon sits a padding from the edge, where text would sit a text inset
+ * from it. An action button is the icon plus a hairline of hover area, so its glyph lands on the
+ * same line as an icon.
+ */
+.field:has(> .affix:first-child > svg) {
+  --field-padding-start: var(--spacing-tight);
+}
+
+.field:has(> .affix:last-child > svg) {
+  --field-padding-end: var(--spacing-tight);
+}
+
+.field:has(> .action:last-child) {
+  --field-padding-end: calc(var(--spacing-tight) - var(--spacing-tightest));
+}
+
+.field .action {
   flex: none;
+  width: calc(var(--field-icon-size) + 2 * var(--spacing-tightest));
+  min-width: 0;
+  height: calc(var(--field-icon-size) + 2 * var(--spacing-tightest));
+  padding: 0;
+
+  & svg {
+    width: var(--field-icon-size);
+    height: var(--field-icon-size);
+  }
 }

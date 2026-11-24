@@ -98,6 +98,13 @@ export function renderSkillSection(manifest: Manifest): string {
   lines.push("");
   lines.push(`Never: ${manifest.controlSizes.never_when.map(cell).join("; ")}.`);
   lines.push("");
+  lines.push(`Icons in controls: ${manifest.controlSizes.icons.rule}`);
+  lines.push("");
+  lines.push("| `size` | Icon | Icon from the edge | Icon to text | Text from the edge, no icon |");
+  lines.push("|---|---|---|---|---|");
+  for (const [name, i] of Object.entries(manifest.controlSizes.icons.sizes))
+    lines.push(`| ${code(name)} | ${i.icon}px | ${code(i.edge)} | ${code(i.gap)} | ${code(i.text_inset)} |`);
+  lines.push("");
   const sized = (sizing: string) =>
     live
       .filter(([, c]) => c.sizing === sizing)

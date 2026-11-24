@@ -70,6 +70,12 @@
   border-left: 1px solid var(--color-neutral-border);
 }
 
+/* Two arrows split the frame's height, so they keep a fixed small icon instead of the control's icon size. */
+.field .compactStep svg {
+  width: 12px;
+  height: 12px;
+}
+
 .field .compactStep {
   flex: 1;
   width: 100%;

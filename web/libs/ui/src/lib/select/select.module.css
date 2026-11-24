@@ -6,12 +6,15 @@
   --select-trigger-height: var(--spacing-1000);
   --select-trigger-font-size: var(--font-size-label-medium);
   --select-trigger-line-height: var(--line-height-label-medium);
-  --select-trigger-caret-size: var(--spacing-400);
+  --select-trigger-caret-size: 20px;
+  --select-trigger-text-inset: var(--spacing-base);
+  --select-trigger-icon-gap: var(--spacing-tight);
 
+  /* The control icon rule: text a text inset from the edge, the caret a padding from it. */
   display: flex;
   align-items: center;
-  padding: 0 var(--spacing-tight) 0 var(--spacing-base);
-  gap: var(--spacing-tight);
+  padding: 0 var(--spacing-tight) 0 var(--select-trigger-text-inset);
+  gap: var(--select-trigger-icon-gap);
   overflow: hidden;
   color: var(--color-neutral-content-subtler);
   text-overflow: ellipsis;
@@ -79,13 +82,17 @@
     --select-trigger-height: var(--spacing-800);
     --select-trigger-font-size: var(--font-size-label-small);
     --select-trigger-line-height: var(--line-height-label-small);
+    --select-trigger-caret-size: 16px;
+    --select-trigger-text-inset: var(--spacing-tight);
   }
 
   &.sizeSmaller {
     --select-trigger-height: var(--spacing-600);
     --select-trigger-font-size: var(--font-size-label-smaller);
     --select-trigger-line-height: var(--line-height-label-smaller);
-    --select-trigger-caret-size: var(--spacing-300);
+    --select-trigger-caret-size: 12px;
+    --select-trigger-text-inset: var(--spacing-tight);
+    --select-trigger-icon-gap: var(--spacing-tighter);
   }
 
   &.isInline {

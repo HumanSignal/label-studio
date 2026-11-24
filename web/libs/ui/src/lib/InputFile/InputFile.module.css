@@ -5,10 +5,33 @@
   min-width: 0;
 }
 
+/* The control icon rule: the icon sits a padding from the edge, the text ends a text inset from it. */
 .button {
+  --input-file-icon-size: 20px;
+  --input-file-icon-gap: var(--spacing-tight);
+  --input-file-text-inset: var(--spacing-base);
+
   position: relative;
-  gap: var(--spacing-tight);
+  gap: var(--input-file-icon-gap);
+  padding-inline: var(--spacing-tight) var(--input-file-text-inset);
   cursor: pointer;
+
+  &[data-size="small"] {
+    --input-file-icon-size: 16px;
+    --input-file-text-inset: var(--spacing-tight);
+  }
+
+  &[data-size="smaller"] {
+    --input-file-icon-size: 12px;
+    --input-file-icon-gap: var(--spacing-tighter);
+    --input-file-text-inset: var(--spacing-tight);
+  }
+
+  & > svg {
+    flex: none;
+    width: var(--input-file-icon-size);
+    height: var(--input-file-icon-size);
+  }
 
   /* The native input stays focusable but invisible; the label is the visible button. */
   &:has(:focus-visible) {

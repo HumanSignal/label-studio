@@ -208,6 +208,16 @@ export const WhenToUse = () => {
                   </div>
                 ))}
                 <Typography variant="body" size="small" className="text-neutral-content-subtle">
+                  Icons: {manifest.controlSizes.icons.rule}{" "}
+                  {Object.entries(manifest.controlSizes.icons.sizes)
+                    .map(
+                      ([name, i]) =>
+                        `${name}: icon ${i.icon}px, ${i.edge} from the edge, ${i.gap} to the text, text ${i.text_inset} from the edge without an icon`,
+                    )
+                    .join("; ")}
+                  .
+                </Typography>
+                <Typography variant="body" size="small" className="text-neutral-content-subtle">
                   {manifest.controlSizes.rule}
                 </Typography>
               </div>
