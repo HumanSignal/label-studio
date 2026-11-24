@@ -109,5 +109,8 @@ def proceed_registration(request, user_form, organization_form, next_page):
 
 
 def login(request, *args, **kwargs):
+    # Stamp after auth.login: it flushes a session that still belongs to another user, which would erase
+    # last_login and make the session timeout middleware log the new user straight out.
+    result = auth.login(request, *args, **kwargs)
     request.session['last_login'] = time()
-    return auth.login(request, *args, **kwargs)
+    return result
