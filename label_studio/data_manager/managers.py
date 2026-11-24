@@ -3,7 +3,7 @@
 import logging
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import reduce
 from typing import ClassVar
@@ -629,6 +629,11 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
     return queryset
 
 
+def parse_filter_datetime(value: str) -> datetime:
+    """Parse a Datetime filter value. DATETIME_FORMAT ends with a literal Z, so the value is UTC."""
+    return datetime.strptime(value, DATETIME_FORMAT).replace(tzinfo=timezone.utc)
+
+
 def cast_value(_filter):
     # range (is between)
     if hasattr(_filter.value, 'max'):
@@ -637,8 +642,8 @@ def cast_value(_filter):
             _filter.value.max = float(_filter.value.max)
         elif _filter.type == 'Datetime':
             try:
-                _filter.value.min = datetime.strptime(_filter.value.min, DATETIME_FORMAT)
-                _filter.value.max = datetime.strptime(_filter.value.max, DATETIME_FORMAT)
+                _filter.value.min = parse_filter_datetime(_filter.value.min)
+                _filter.value.max = parse_filter_datetime(_filter.value.max)
             except (TypeError, ValueError):
                 logger.warning(
                     'Skipping Datetime range cast for filter %s: invalid value %r',
@@ -651,7 +656,7 @@ def cast_value(_filter):
             _filter.value = float(_filter.value)
         elif _filter.type == 'Datetime':
             try:
-                _filter.value = datetime.strptime(_filter.value, DATETIME_FORMAT)
+                _filter.value = parse_filter_datetime(_filter.value)
             except (TypeError, ValueError):
                 logger.warning(
                     'Skipping Datetime cast for filter %s: invalid value %r',
