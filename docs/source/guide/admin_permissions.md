@@ -39,7 +39,7 @@ Note the following:
 | Permission | Can be granted to | Default | Description |
 |------------|-------------------|---------|-------------|
 | **Create API Tokens** | All roles | All roles | Controls who can create access tokens to use the API. All API endpoints are also constrained based on user role.<br><br>Changing this setting doesn't invalidate existing API tokens. To invalidate existing legacy tokens, disable them from the **Access Tokens** page at the organization level. To invalidate existing personal access tokens, expire all existing tokens from the organization level. |
-| **Edit Plugins** | Administrators, Managers | Manager+ | Controls who can view, modify, and add [plugins](plugins) to a project. Plugins involve custom code that can significantly change the labeling interface and what information annotators can see and access. |
+| **Edit Plugins** | Administrators, Managers | Administrator+ | Controls who can view, modify, and add [plugins](plugins) to a project. Plugins involve custom code that can significantly change the labeling interface and what information annotators can see and access.<br><br>Plugin code runs in the browser of everyone who opens the project, including Owners and Administrators. Organizations created before this default changed keep Managers enabled. |
 | **Manage Cloud Storage** | Administrators, Managers | Manager+ | Controls who can access the **Cloud Storage** page for a project. Users with access to this page can create and modify [cloud storage](storage) connections to import data into a project. |
 | **Manage Webhooks** | Administrators, Managers | Manager+ | Controls who can create, modify, and delete [webhooks](webhooks) for a project. Webhooks support integration with third-party applications. |
 
