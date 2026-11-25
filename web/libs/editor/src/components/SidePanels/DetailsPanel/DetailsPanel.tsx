@@ -89,7 +89,7 @@ const RelationsTab: FC<any> = inject("store")(
                 header="Create relations between regions"
                 description={<>Link regions to define relationships between them</>}
                 learnMore={{
-                  href: getDocsUrl("guide/labeling#Add-relations-between-annotations"),
+                  href: getDocsUrl("guide/labeling#Add-relations-between-regions"),
                   text: "Learn more",
                   testId: "relations-panel-learn-more",
                 }}
