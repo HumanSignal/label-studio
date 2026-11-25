@@ -67,6 +67,19 @@ describe("SegmentedControl keyboard navigation", () => {
     await user.keyboard("{ArrowRight}");
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("disables one option and skips it with the arrows", async () => {
+    const user = userEvent.setup();
+    const options: SegmentedControlOption[] = plain.map((option) =>
+      option.value === "b" ? { ...option, disabled: true } : option,
+    );
+    render(<Controlled options={options} />);
+    expect(screen.getByRole("radio", { name: "B" })).toBeDisabled();
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "C" })).toHaveFocus();
+    expect(screen.getByRole("radio", { name: "C" })).toHaveAttribute("aria-checked", "true");
+  });
 });
 
 describe("Tabs keyboard navigation", () => {

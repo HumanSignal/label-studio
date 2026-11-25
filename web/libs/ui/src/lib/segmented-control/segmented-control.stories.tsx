@@ -45,6 +45,19 @@ export const ThreeOptions: Story = {
   ),
 };
 
+/** An option can be unavailable on its own; the arrow keys skip it. */
+export const DisabledOption: Story = {
+  render: () => (
+    <Controlled
+      options={[
+        { value: "day", label: "Day" },
+        { value: "week", label: "Week", disabled: true },
+        { value: "month", label: "Month" },
+      ]}
+    />
+  ),
+};
+
 /** Icon-only options take a `tooltip`, which is also their accessible name. */
 export const IconOptions: Story = {
   render: () => (

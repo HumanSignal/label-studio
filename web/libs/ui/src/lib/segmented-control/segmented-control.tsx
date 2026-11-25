@@ -13,6 +13,8 @@ export interface SegmentedControlOption {
   /** Overrides the default `${data-testid}-${value}` id. */
   "data-testid"?: string;
   className?: string;
+  /** Disables this option alone; arrow keys skip it. */
+  disabled?: boolean;
 }
 
 export interface SegmentedControlProps {
@@ -53,9 +55,13 @@ export const SegmentedControl = ({
     event.preventDefault();
     event.stopPropagation();
     const direction = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
-    const nextIndex = (index + direction + options.length) % options.length;
+    let nextIndex = index;
+    for (let step = 0; step < options.length; step++) {
+      nextIndex = (nextIndex + direction + options.length) % options.length;
+      if (!options[nextIndex]?.disabled) break;
+    }
     const nextOption = options[nextIndex];
-    if (!nextOption) return;
+    if (!nextOption || nextOption.disabled || nextIndex === index) return;
     if (activationMode === "automatic") onChange?.(nextOption.value);
     optionRefs.current[nextIndex]?.focus();
   };
@@ -90,7 +96,7 @@ export const SegmentedControl = ({
             }}
             onKeyDown={(event) => handleKeyDown(event, index)}
             type="button"
-            disabled={disabled}
+            disabled={disabled || option.disabled}
             role="radio"
             aria-checked={selectedIndex === index}
             aria-label={option["aria-label"] ?? option.tooltip}

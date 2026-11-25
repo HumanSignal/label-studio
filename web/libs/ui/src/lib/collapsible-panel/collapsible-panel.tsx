@@ -91,7 +91,7 @@ export const CollapsiblePanel = ({
       {/* Header - Always visible */}
       <div
         className={cn(
-          "flex items-center gap-2 px-base py-tight",
+          "flex items-center gap-tight px-tight py-tight",
           styles.header,
           !disableToggle && "cursor-pointer",
           "transition-colors",

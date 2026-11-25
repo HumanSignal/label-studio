@@ -36,20 +36,45 @@ const DIALOGS: { pattern: RegExp; message: string }[] = [
 
 const RAW_CONTROLS: { pattern: RegExp; message: string }[] = [
   {
-    pattern: /<button\b|createElement\(\s*["']button["']/g,
+    pattern: /<button\b|(?:createElement|\bh)\(\s*["']button["']/g,
     message: "Use EditorUI.Button (look filled, outlined or ghost; aria-label when icon-only), not a raw <button>.",
   },
-  { pattern: /<select\b|createElement\(\s*["']select["']/g, message: "Use EditorUI.Select, not a raw <select>." },
+  {
+    pattern: /<select\b|(?:createElement|\bh)\(\s*["']select["']/g,
+    message: "Use EditorUI.Select, not a raw <select>.",
+  },
   {
     pattern: /type=["']checkbox["']|type:\s*["']checkbox["']/g,
     message: "Use EditorUI.Checkbox (EditorUI.Toggle for a setting), not a raw checkbox input.",
   },
   {
-    pattern: /<svg\b|createElement\(\s*["']svg["']/g,
+    pattern: /<svg\b|(?:createElement|\bh)\(\s*["']svg["']/g,
     message: "Use an EditorUI.Icons icon, not an inline <svg> (drawings and charts take a ds-allow-raw reason).",
   },
-  { pattern: /<table\b|createElement\(\s*["']table["']/g, message: "Use EditorUI.DataTable, not a raw <table>." },
+  {
+    pattern: /<textarea\b|(?:createElement|\bh)\(\s*["']textarea["']/g,
+    message: "Use EditorUI.TextArea, not a raw <textarea>.",
+  },
+  {
+    pattern: /<table\b|(?:createElement|\bh)\(\s*["']table["']/g,
+    message: "Use EditorUI.DataTable, not a raw <table>.",
+  },
 ];
+
+/** An input opening, matched on the whole source because its `type` is often on a later line. */
+const INPUT_OPEN = /<input\b|(?:createElement|\bh)\(\s*["']input["']/g;
+const INPUT_TYPE = /\btype(?:=|:)\s*\{?\s*["']([a-z]+)["']/;
+/** Checkboxes have their own rule; sliders, colour pickers, hidden fields and file pickers are out of scope. */
+const INPUT_TYPES_SKIPPED = new Set(["checkbox", "range", "color", "hidden", "file"]);
+const INPUT_MESSAGE =
+  "Use EditorUI.Input, EditorUI.NumberInput or EditorUI.RadioGroup (one size per row, matching Button and Select), not a raw <input>.";
+
+/** The props of the input that starts at `start`: up to the end of the JSX tag or of the createElement props. */
+const inputProps = (source: string, start: number) => {
+  const rest = source.slice(start, start + 800);
+  const end = rest.search(/\/>|\}\s*\)|\}\s*,\s*\n/);
+  return end === -1 ? rest : rest.slice(0, end);
+};
 
 const ALLOW = /ds-allow-raw:\s*\S/;
 /** A line that holds only a comment, so a marker above a control covers that control and nothing further. */
@@ -99,6 +124,14 @@ export function scanTemplateSource(file: string, source: string): Finding[] {
       }
     }
   });
+  for (const match of source.matchAll(INPUT_OPEN)) {
+    const type = INPUT_TYPE.exec(inputProps(source, match.index ?? 0))?.[1];
+    if (type && INPUT_TYPES_SKIPPED.has(type)) continue;
+    const index = source.slice(0, match.index ?? 0).split("\n").length - 1;
+    const text = lines[index];
+    if (ALLOW.test(text) || (index > 0 && isComment(lines[index - 1]) && ALLOW.test(lines[index - 1]))) continue;
+    findings.push({ file, line: index + 1, rule: TEMPLATE_RULE, message: `[ds/${TEMPLATE_RULE}] ${INPUT_MESSAGE}` });
+  }
   // Dialogs are matched on the whole source: a call's message can start on the next line.
   for (const { pattern, message } of DIALOGS) {
     for (const match of source.matchAll(pattern)) {
