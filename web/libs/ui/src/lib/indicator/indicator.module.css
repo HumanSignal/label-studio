@@ -1,0 +1,172 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  vertical-align: middle;
+}
+
+.mark {
+  --indicator-fill: var(--color-primary-surface);
+  --indicator-content: var(--color-primary-surface-content);
+  --indicator-ring: var(--color-neutral-background);
+  --indicator-offset: 50%;
+
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--indicator-fill);
+  color: var(--indicator-content);
+  box-shadow: 0 0 0 2px var(--indicator-ring);
+  pointer-events: none;
+
+  & svg {
+    width: 8px;
+    height: 8px;
+    flex: none;
+  }
+
+  /* Round hosts: the mark rests on the curve instead of the bounding box corner. */
+  &[data-overlap="circular"] {
+    --indicator-offset: 40%;
+  }
+
+  &[data-position="topRight"] {
+    top: 0;
+    right: 0;
+    transform: translate(var(--indicator-offset), calc(-1 * var(--indicator-offset)));
+  }
+
+  &[data-position="topLeft"] {
+    top: 0;
+    left: 0;
+    transform: translate(calc(-1 * var(--indicator-offset)), calc(-1 * var(--indicator-offset)));
+  }
+
+  &[data-position="bottomRight"] {
+    bottom: 0;
+    right: 0;
+    transform: translate(var(--indicator-offset), var(--indicator-offset));
+  }
+
+  &[data-position="bottomLeft"] {
+    bottom: 0;
+    left: 0;
+    transform: translate(calc(-1 * var(--indicator-offset)), var(--indicator-offset));
+  }
+
+  &[data-content="none"] {
+    width: 10px;
+    height: 10px;
+  }
+
+  &[data-content="icon"] {
+    width: 10px;
+    height: 10px;
+  }
+
+  &[data-content="count"] {
+    min-width: 12px;
+    height: 12px;
+    padding: 0 2px;
+    font-size: var(--font-size-label-tiny, 9px);
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 12px;
+    letter-spacing: var(--letter-spacing-widest);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &[data-shape="dot"] {
+    width: 8px;
+    height: 8px;
+    min-width: 0;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  &[data-shape="square"] {
+    border-radius: var(--corner-radius-smallest);
+  }
+
+  &[data-shape="rounded"] {
+    border-radius: var(--corner-radius-small);
+  }
+
+  &[data-shape="pill"] {
+    border-radius: 999px;
+  }
+
+  &[data-variant="positive"] {
+    --indicator-fill: var(--color-positive-surface);
+    --indicator-content: var(--color-positive-surface-content);
+  }
+
+  &[data-variant="negative"] {
+    --indicator-fill: var(--color-negative-surface);
+    --indicator-content: var(--color-negative-surface-content);
+  }
+
+  &[data-variant="warning"] {
+    --indicator-fill: var(--color-warning-surface);
+    --indicator-content: var(--color-warning-surface-content);
+  }
+
+  &[data-variant="neutral"] {
+    --indicator-fill: var(--color-neutral-content-subtler);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="grape"] {
+    --indicator-fill: var(--color-accent-grape-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="blueberry"] {
+    --indicator-fill: var(--color-accent-blueberry-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="kale"] {
+    --indicator-fill: var(--color-accent-kale-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="kiwi"] {
+    --indicator-fill: var(--color-accent-kiwi-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="mango"] {
+    --indicator-fill: var(--color-accent-mango-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="canteloupe"] {
+    --indicator-fill: var(--color-accent-canteloupe-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="persimmon"] {
+    --indicator-fill: var(--color-accent-persimmon-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="plum"] {
+    --indicator-fill: var(--color-accent-plum-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="fig"] {
+    --indicator-fill: var(--color-accent-fig-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+
+  &[data-variant="sand"] {
+    --indicator-fill: var(--color-accent-sand-base);
+    --indicator-content: var(--color-neutral-background);
+  }
+}

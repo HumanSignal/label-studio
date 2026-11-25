@@ -538,6 +538,23 @@ describe("HtxLabelView", () => {
     expect(el).toHaveTextContent("Bold");
   });
 
+  it("removes form actions and re-parsable markup from html", () => {
+    const item = createMockItem({
+      _value: "Fallback",
+      html: '<form><button formaction="javascript:alert(1)">go</button></form><noscript>&lt;/noscript&gt;&lt;img src=x onerror=alert(1)&gt;</noscript>',
+    });
+    const store = createMockStore();
+    render(
+      <Provider store={store}>
+        <HtxLabelView item={item} />
+      </Provider>,
+    );
+    expect(document.querySelector("[formaction]")).toBeNull();
+    expect(document.querySelector("form")).toBeNull();
+    expect(document.querySelector("[onerror]")).toBeNull();
+    expect(screen.getByText("go")).toBeInTheDocument();
+  });
+
   it("renders label when hint is set (wrapped in Tooltip)", () => {
     const item = createMockItem({ _value: "H", hint: "Help text" });
     const store = createMockStore();

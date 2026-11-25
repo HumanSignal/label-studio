@@ -1,0 +1,11 @@
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+
+  &[data-orientation="horizontal"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-tight) var(--spacing-wide);
+  }
+}

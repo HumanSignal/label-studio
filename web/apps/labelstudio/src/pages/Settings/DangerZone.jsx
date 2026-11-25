@@ -1,10 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router";
-import { Button, Typography, useToast } from "@humansignal/ui";
+import { Button, ModalWindow, Typography, useToast } from "@humansignal/ui";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Label } from "../../components/Form";
-import { modal } from "../../components/Modal/Modal";
-import { useModalControls } from "../../components/Modal/ModalPopup";
 import Input from "../../components/Form/Elements/Input/Input";
 import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
@@ -21,64 +19,7 @@ export const DangerZone = () => {
 
   useUpdatePageTitle(createTitleFromSegments([project?.title, "Danger Zone"]));
 
-  const showDangerConfirmation = ({ title, message, requiredWord, buttonText, onConfirm }) => {
-    const isDev = process.env.NODE_ENV === "development";
-
-    return modal({
-      title,
-      width: 600,
-      allowClose: false,
-      body: () => {
-        const ctrl = useModalControls();
-        const inputValue = ctrl?.state?.inputValue || "";
-
-        return (
-          <div>
-            <Typography variant="body" size="medium" className="mb-tight">
-              {message}
-            </Typography>
-            <Input
-              label={`To proceed, type "${requiredWord}" in the field below:`}
-              value={inputValue}
-              onChange={(e) => ctrl?.setState({ inputValue: e.target.value })}
-              autoFocus
-              data-testid="danger-zone-confirmation-input"
-              autoComplete="off"
-            />
-          </div>
-        );
-      },
-      footer: () => {
-        const ctrl = useModalControls();
-        const inputValue = (ctrl?.state?.inputValue || "").trim().toLowerCase();
-        const isValid = isDev || inputValue === requiredWord.toLowerCase();
-
-        return (
-          <Space align="end">
-            <Button
-              variant="neutral"
-              look="outline"
-              onClick={() => ctrl?.hide()}
-              data-testid="danger-zone-cancel-button"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="negative"
-              disabled={!isValid}
-              onClick={async () => {
-                await onConfirm();
-                ctrl?.hide();
-              }}
-              data-testid="danger-zone-confirm-button"
-            >
-              {buttonText}
-            </Button>
-          </Space>
-        );
-      },
-    });
-  };
+  const [danger, setDanger] = useState(null);
 
   const handleOnClick = (type) => () => {
     const actionConfig = {
@@ -120,7 +61,7 @@ export const DangerZone = () => {
       return;
     }
 
-    showDangerConfirmation({
+    setDanger({
       ...config,
       onConfirm: async () => {
         setProcessing(type);
@@ -240,7 +181,71 @@ export const DangerZone = () => {
           <Spinner size={32} />
         </div>
       )}
+      <DangerConfirmDialog config={danger} onClose={() => setDanger(null)} />
     </div>
+  );
+};
+
+/** Asks for a typed confirmation word before a destructive project action. */
+const DangerConfirmDialog = ({ config, onClose }) => {
+  const [inputValue, setInputValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const shown = useRef(config);
+  if (config) shown.current = config;
+  const { title, message, requiredWord = "", buttonText, onConfirm } = shown.current ?? {};
+  const isValid =
+    process.env.NODE_ENV === "development" || inputValue.trim().toLowerCase() === requiredWord.toLowerCase();
+
+  useEffect(() => {
+    if (config) setInputValue("");
+  }, [config]);
+
+  return (
+    <ModalWindow
+      open={config !== null}
+      onOpenChange={() => {}}
+      title={title}
+      size="medium"
+      showCloseButton={false}
+      closeOnScrimClick={false}
+      dataTestId="danger-zone-confirm-modal"
+      footer={
+        <Space align="end">
+          <Button variant="neutral" look="outlined" onClick={onClose} data-testid="danger-zone-cancel-button">
+            Cancel
+          </Button>
+          <Button
+            variant="negative"
+            disabled={!isValid || busy}
+            waiting={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await onConfirm();
+              } finally {
+                setBusy(false);
+              }
+              onClose();
+            }}
+            data-testid="danger-zone-confirm-button"
+          >
+            {buttonText}
+          </Button>
+        </Space>
+      }
+    >
+      <Typography variant="body" size="medium" className="mb-tight">
+        {message}
+      </Typography>
+      <Input
+        label={`To proceed, type "${requiredWord}" in the field below:`}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        autoFocus
+        data-testid="danger-zone-confirmation-input"
+        autoComplete="off"
+      />
+    </ModalWindow>
   );
 };
 

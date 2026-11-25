@@ -17,7 +17,7 @@ class TestTaskAPI(APITestCase):
         cls.user = cls.organization.created_by
 
     def test_get_task(self):
-        task = TaskFactory(project=self.project, data={'text': 'test'})
+        task = TaskFactory(project=self.project, data={'text': 'test'}, import_id=4242)
 
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{task.id}/')
@@ -50,6 +50,7 @@ class TestTaskAPI(APITestCase):
             'avg_lead_time': None,
             'cancelled_annotations': 0,
             'inner_id': task.inner_id,
+            'import_id': 4242,
             'storage_filename': None,
             'comment_authors': [],
             'comment_count': 0,
@@ -93,6 +94,7 @@ class TestTaskAPI(APITestCase):
             'total_predictions': 0,
             'cancelled_annotations': 0,
             'inner_id': task.inner_id,
+            'import_id': None,
             'comment_authors': [],
             'comment_count': 0,
             'last_comment_updated_at': None,
@@ -249,18 +251,14 @@ class TestTaskAgreementAPI(APITestCase):
         cls.project = ProjectFactory(organization=cls.organization)
         cls.user = cls.organization.created_by
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_returns_404_for_nonexistent_task(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/api/tasks/99999/agreement/')
         assert response.status_code == 404
         assert response.json() == {'error': 'Task not found'}
 
-    @patch('tasks.api.flag_set')
     @patch.object(Project, 'has_permission')
-    def test_distribution_permission_denied_for_other_project(self, mock_has_permission, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_permission_denied_for_other_project(self, mock_has_permission):
         other_org = OrganizationFactory()
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
@@ -276,9 +274,7 @@ class TestTaskAgreementAPI(APITestCase):
         response = self.client.get(f'/api/tasks/{task.id}/agreement/')
         assert response.status_code == 403
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_empty_task_returns_zero_annotations(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_empty_task_returns_zero_annotations(self):
         task = TaskFactory(project=self.project)
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{task.id}/agreement/')
@@ -287,10 +283,8 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['total_annotations'] == 0
         assert data['distributions'] == {}
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_includes_predictions_in_label_counts(self, mock_flag_set):
+    def test_distribution_includes_predictions_in_label_counts(self):
         """Predictions are merged into distributions so aggregate matches client-side (develop / FF off)."""
-        mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -333,18 +327,14 @@ class TestTaskSummaryAPI(APITestCase):
         cls.project = ProjectFactory(organization=cls.organization)
         cls.user = cls.organization.created_by
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_returns_404_for_nonexistent_task(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_returns_404_for_nonexistent_task(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/api/tasks/99999/summary/')
         assert response.status_code == 404
         assert response.json() == {'error': 'Task not found'}
 
-    @patch('tasks.api.flag_set')
     @patch.object(Project, 'has_permission')
-    def test_distribution_permission_denied_for_other_project(self, mock_has_permission, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_permission_denied_for_other_project(self, mock_has_permission):
         other_org = OrganizationFactory()
         other_project = ProjectFactory(organization=other_org)
         task = TaskFactory(project=other_project)
@@ -363,9 +353,7 @@ class TestTaskSummaryAPI(APITestCase):
         response = self.client.get(f'/api/tasks/{task.id}/summary/')
         assert response.status_code == 403
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_empty_task_returns_zero_annotations(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_empty_task_returns_zero_annotations(self):
         task = TaskFactory(project=self.project)
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{task.id}/summary/')
@@ -377,9 +365,7 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['annotations'] == []
         assert data['task']['id'] == task.id
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_rectanglelabels(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_rectanglelabels(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -415,9 +401,7 @@ class TestTaskSummaryAPI(APITestCase):
             'labels': {'Car': 2, 'Person': 1},
         }
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_choices(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_choices(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -465,9 +449,7 @@ class TestTaskSummaryAPI(APITestCase):
             'labels': {'Positive': 2, 'Negative': 1},
         }
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_rating(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_rating(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -503,9 +485,7 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['distributions']['rating']['count'] == 2
         assert 'values' not in data['distributions']['rating']
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_number(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_number(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -540,9 +520,7 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['distributions']['count']['average'] == 15.0
         assert data['distributions']['count']['count'] == 2
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_taxonomy(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_taxonomy(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -578,9 +556,7 @@ class TestTaskSummaryAPI(APITestCase):
             'labels': {'Dog': 1, 'Cat': 1},
         }
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_with_pairwise(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_with_pairwise(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -616,9 +592,7 @@ class TestTaskSummaryAPI(APITestCase):
             'labels': {'left': 1, 'right': 1},
         }
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_excludes_cancelled_annotations(self, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_distribution_excludes_cancelled_annotations(self):
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -652,10 +626,8 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['total_annotations'] == 1
         assert data['distributions']['label']['labels'] == {'Car': 1}
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_excludes_predictions_from_label_counts(self, mock_flag_set):
+    def test_distribution_excludes_predictions_from_label_counts(self):
         """Predictions are not merged into distributions; only annotations are counted."""
-        mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -689,10 +661,8 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['total_predictions'] == 1
         assert data['distributions']['label']['labels'] == {'Car': 2}
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_excludes_ground_truth_annotations(self, mock_flag_set):
+    def test_distribution_excludes_ground_truth_annotations(self):
         """Ground truth annotations are excluded from distributions to match agreement filter."""
-        mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,
@@ -727,10 +697,8 @@ class TestTaskSummaryAPI(APITestCase):
         assert data['distributions']['label']['labels'] == {'Car': 1}
         assert 'Person' not in data['distributions']['label']['labels']
 
-    @patch('tasks.api.flag_set')
-    def test_distribution_excludes_null_result_annotations(self, mock_flag_set):
+    def test_distribution_excludes_null_result_annotations(self):
         """Annotations with null results are excluded from distributions to match agreement filter."""
-        mock_flag_set.return_value = True
         task = TaskFactory(project=self.project)
         AnnotationFactory(
             task=task,

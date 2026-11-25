@@ -21,7 +21,7 @@ const MenuItems = ({ onAction }: { onAction?: (label: string) => void }) => (
 
 const meta = {
   component: ContextMenu,
-  title: "UI/ContextMenu",
+  title: "Navigation/ContextMenu",
   parameters: {
     layout: "centered",
     docs: {

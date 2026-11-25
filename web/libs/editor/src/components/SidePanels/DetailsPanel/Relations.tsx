@@ -120,7 +120,7 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
             {(hovered || !relation.visible) && (
               <Button
                 variant="neutral"
-                look="string"
+                look="ghost"
                 size="small"
                 tooltip="Toggle Visibility"
                 onClick={() => {
@@ -147,7 +147,7 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
             {hovered && (
               <Button
                 variant="negative"
-                look="string"
+                look="ghost"
                 size="small"
                 aria-label="Delete Relation"
                 tooltip="Delete Relation"

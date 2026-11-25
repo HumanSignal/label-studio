@@ -74,6 +74,13 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 };
 
 describe("Controls", () => {
+  // setupAppSettings() replaces window.APP_SETTINGS; restore it so enterprise billing doesn't leak into later files.
+  const originalAppSettings = (window as any).APP_SETTINGS;
+
+  afterAll(() => {
+    (window as any).APP_SETTINGS = originalAppSettings;
+  });
+
   beforeEach(() => {
     mock.clearAllMocks();
     spyOn(uiModule, "Button").mockImplementation(({ children, ...props }: any) => (
@@ -87,7 +94,7 @@ describe("Controls", () => {
         {children}
       </div>
     ));
-    spyOn(uiModule, "Userpic").mockImplementation(({ children }: any) => (
+    spyOn(uiModule, "Avatar").mockImplementation(({ children }: any) => (
       <div
         data-testid="userpic"
         className="userpic--tBKCQ"
@@ -541,17 +548,20 @@ describe("Controls", () => {
 
   test("moves focus between dropdown rows with the arrow keys", async () => {
     const { getByTestId } = renderRejectMenu();
+    // Compare test ids, not elements: a failing `toBe(element)` pretty-prints whole happy-dom trees, which takes
+    // seconds on a loaded CI runner and starves the focus effect this test is waiting for.
+    const focused = () => document.activeElement?.getAttribute("data-testid");
 
     fireEvent.click(getByTestId("bottombar-reject-menu"));
     const menu = getByTestId("reject-action-menu");
-    await waitFor(() => expect(document.activeElement).toBe(getByTestId("bottombar-custom-remove-button")));
+    await waitFor(() => expect(focused()).toBe("bottombar-custom-remove-button"));
 
     fireEvent.keyDown(menu, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(getByTestId("bottombar-custom-requeue-button"));
+    expect(focused()).toBe("bottombar-custom-requeue-button");
 
     // Wraps back around to the first row.
     fireEvent.keyDown(menu, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(getByTestId("bottombar-custom-remove-button"));
+    expect(focused()).toBe("bottombar-custom-remove-button");
   });
 
   test("keeps Update enabled when viewing submitted while a draft exists (BROS-1477 QA 93973)", () => {
@@ -804,6 +814,56 @@ describe("Controls", () => {
     expect(getByLabelText("accept-annotation")).not.toBeDisabled();
     expect(getByLabelText("reject-annotation")).toHaveTextContent("Reject");
     expect(getByLabelText("reject-annotation")).not.toBeDisabled();
+  });
+
+  // FIT-3230: a second reviewer may accept again (multi-layer review), the same reviewer may not.
+  test("disables Accept when the current reviewer's own accept is live", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "accepted",
+      acceptedByCurrentUser: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Accept");
+    expect(getByLabelText("accept-annotation")).toBeDisabled();
+    expect(getByLabelText("reject-annotation")).not.toBeDisabled();
+  });
+
+  test("keeps Fix + Accept enabled when the current reviewer's own accept is live", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      canBeReviewed: true,
+      acceptedState: "accepted",
+      acceptedByCurrentUser: true,
+      versions: { draft: [{ id: "r1" }] },
+      draftSelected: true,
+      submissionInProgress: mock(),
+      history: { canUndo: true },
+    };
+    mockStore.annotationStore.selected = annotation;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(getByLabelText("accept-annotation")).toHaveTextContent("Fix + Accept");
+    expect(getByLabelText("accept-annotation")).not.toBeDisabled();
   });
 
   test("shows first-time Accept / Reject after a stale verdict (acceptedState null)", () => {

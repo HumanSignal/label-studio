@@ -2,6 +2,10 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HtxTextBox } from "../HtxTextBox.jsx";
 
+// Shallow copies taken before mocking, so afterAll can hand the real modules back to later test files.
+const actualIcons = { ...requireActual("@humansignal/icons") };
+const actualUi = { ...requireActual("@humansignal/ui") };
+
 mockModule("@humansignal/icons", () => {
   const React = require("react");
   return {
@@ -14,7 +18,7 @@ mockModule("@humansignal/icons", () => {
 mockModule("@humansignal/ui", () => {
   const React = require("react");
   return {
-    ...requireActual("@humansignal/ui"),
+    ...actualUi,
     Button: ({ children, onClick, "aria-label": ariaLabel, "data-testid": testId, ...props }) =>
       React.createElement(
         "button",
@@ -26,6 +30,11 @@ mockModule("@humansignal/ui", () => {
       React.createElement("span", { ref, "data-testid": "typography", ...props }, children),
     ),
   };
+});
+
+afterAll(() => {
+  mockModule("@humansignal/icons", () => actualIcons);
+  mockModule("@humansignal/ui", () => actualUi);
 });
 
 const defaultProps = {

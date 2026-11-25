@@ -2,6 +2,7 @@ import { CaretDownIcon } from "@humansignal/icons";
 import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import type { CSSProperties, HTMLAttributes, KeyboardEvent, ReactNode } from "react";
 import { memo, useEffect, useRef, useState } from "react";
+import { type ControlSize, controlIconWeight } from "../../ds-manifest/control-sizes";
 import { cnm } from "../../utils/utils";
 import { Button } from "../button/button";
 import { Dropdown, type DropdownRef } from "../dropdown/dropdown";
@@ -11,7 +12,7 @@ import { TreeSearch } from "./tree-search";
 import { TreeSelect } from "./tree-select";
 import { TreeSelected } from "./tree-selected";
 
-const DropdownIcon = memo(() => {
+const DropdownIcon = memo(({ size }: { size?: ControlSize }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { subscribe } = useTreeContext();
 
@@ -25,7 +26,7 @@ const DropdownIcon = memo(() => {
 
   return (
     <div className={cn("multi-tree-select").elem("icon").mod({ open: dropdownOpen }).toClassName()}>
-      <CaretDownIcon size={18} />
+      <CaretDownIcon weight={controlIconWeight(size)} />
     </div>
   );
 });
@@ -211,10 +212,15 @@ export const MultiTreeSelectDropdown = memo(
           >
             <span className={cn("multi-tree-select").elem("value").toClassName()}>
               {selectionTrigger ?? (
-                <TreeSelected placeholder={placeholder} allLabel={allLabel} RootLevelIcon={RootLevelIcon} />
+                <TreeSelected
+                  placeholder={placeholder}
+                  allLabel={allLabel}
+                  RootLevelIcon={RootLevelIcon}
+                  size={props.size}
+                />
               )}
             </span>
-            <DropdownIcon />
+            <DropdownIcon size={props.size} />
           </div>
         </DropdownContent>
       </MultiTreeSelect>

@@ -172,26 +172,35 @@ export function buildControlsList(allTags: [string, any][]): ControlTag[] {
 /**
  * Build the ObjectTypes map from raw MST tag entries for DataSummary rendering.
  *
- * Extracts object tags that have data bindings (value contains "$") or
- * pre-loaded data, and resolves each tag's display value through the
+ * Extracts object tags that have data bindings (value or valuelist contains "$")
+ * or pre-loaded data, and resolves each tag's display value through the
  * MST value resolution chain.
  *
  * @param allTags - spread of `annotationStore.names` (array of [name, tag] tuples)
  */
 export function buildObjectDataTypes(allTags: [string, any][]): ObjectTypes {
   const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
+    ([_, tag]) => tag.isObjectTag && (tag.value?.includes("$") || tag.valuelist?.includes("$") || tag.loadedData),
   ) as ObjectTagEntry[];
 
   return Object.fromEntries(
-    objectTags.map(([name, object]) => [
-      name,
-      {
-        type: object.type,
-        value:
-          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
-      },
-    ]),
+    objectTags.map(([name, object]) => {
+      // most of tags has `updateValue()` method which resolves `value` and stores it in `_value`
+      // Image tag uses `parsedValue` instead of `_value`, or `parsedValueList` for multi-image (`valuelist`)
+      // Pdf tag uses `_url` instead of `_value`
+      // TimeSeries tag uses `dataObj` instead of `_value`, it's always an object {<channel name>: [array of values]}
+      // for other tags with complex logic (like TimeSeries) we use `value` for now, which is not ideal
+      // these fields are very specific and not added to types
+      const tag = object as any;
+      const parsedValue = tag.multiImage ? tag.parsedValueList : tag.parsedValue;
+
+      return [
+        name,
+        {
+          type: tag.type,
+          value: tag.loadedData ?? parsedValue ?? tag.dataObj ?? tag._url ?? tag._value ?? tag.value,
+        },
+      ];
+    }),
   );
 }

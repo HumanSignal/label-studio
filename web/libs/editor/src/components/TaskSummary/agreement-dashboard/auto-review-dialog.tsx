@@ -10,8 +10,8 @@
  * Comparison logic lives in annotation-review-logic.ts.
  */
 
-import { confirm } from "@humansignal/ui/lib/modal";
-import { cnm, Userpic } from "@humansignal/ui";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
+import { Avatar, cnm, type ConfirmDialogContent } from "@humansignal/ui";
 import { IconWarning } from "@humansignal/icons";
 import { computeReviewDecisions } from "./annotation-review-logic";
 import type { AnnotatorInfo, DimensionInfo, ExistingGroundTruth } from "./types";
@@ -72,7 +72,7 @@ const DialogBody = ({
             i < annotatorDecisions.length - 1 && "border-b border-neutral-border-subtle",
           )}
         >
-          <Userpic user={d.user} />
+          <Avatar user={d.user} size="large" />
           <span className="text-label-small font-medium flex-1 truncate">{d.displayName}</span>
           <span
             className={cnm(
@@ -106,7 +106,7 @@ const DialogBody = ({
 );
 
 // ---------------------------------------------------------------------------
-// Open the auto-review dialog
+// The auto-review confirmation, rendered by the caller with ConfirmDialog
 // ---------------------------------------------------------------------------
 
 interface OpenAutoReviewDialogOptions {
@@ -126,7 +126,7 @@ interface OpenAutoReviewDialogOptions {
   onCommit: () => void;
 }
 
-export function openAutoReviewDialog({
+export function autoReviewConfirmation({
   existingGt,
   annotations,
   dimensions,
@@ -134,7 +134,7 @@ export function openAutoReviewDialog({
   annotators,
   existingReviews,
   onCommit,
-}: OpenAutoReviewDialogOptions): void {
+}: OpenAutoReviewDialogOptions): ConfirmDialogContent {
   const submittedAnnotations = annotations.filter((a) => a.type === "annotation" && a.pk);
 
   const decisions = computeReviewDecisions(submittedAnnotations, existingGt, dimensions, annotationIds);
@@ -164,9 +164,9 @@ export function openAutoReviewDialog({
 
   const totalDecisionCount = annotatorDecisions.length;
 
-  confirm({
+  return {
     title: `Review ${totalDecisionCount} Annotations against Ground Truth`,
-    body: (
+    children: (
       <DialogBody
         annotatorDecisions={annotatorDecisions}
         acceptCount={acceptCount}
@@ -184,7 +184,7 @@ export function openAutoReviewDialog({
           console.error("[Auto-review] Failed:", err);
         });
     },
-  });
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -198,7 +198,7 @@ interface CommitAutoReviewOptions {
 async function commitAutoReview({ decisions }: CommitAutoReviewOptions): Promise<void> {
   const reviewPromises = [...decisions.entries()].map(async ([annotationPk, accepted]) => {
     try {
-      const response = await fetch("/api/annotation-reviews/", {
+      const response = await sameOriginFetch("/api/annotation-reviews/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ annotation: annotationPk, accepted }),

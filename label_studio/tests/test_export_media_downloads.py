@@ -2,15 +2,22 @@
 copyright information and LICENSE for a copy of the license.
 """
 
+import json
 import threading
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import data_export.mixins
+import data_export.models
 import pytest
 from data_export.functions import get_export_hostname
-from data_export.models import DataExport
+from data_export.models import ConvertedFormat, DataExport, Export
+from django.core.files.base import ContentFile
 from django.test import RequestFactory
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import AccessToken
 from tests.utils import make_project
+from users.models import User
 
 IMAGE_CONFIG = (
     '<View><Image name="image" value="$image"/>'
@@ -68,10 +75,26 @@ def _task(task_id, image):
     }
 
 
-def _exported_images(project, tasks, hostname):
-    out, _, _ = DataExport.generate_export_file(project, tasks, 'COCO_WITH_IMAGES', True, {}, hostname=hostname)
-    with out, zipfile.ZipFile(out) as archive:
+def _images(archive_file):
+    with archive_file, zipfile.ZipFile(archive_file) as archive:
         return [archive.read(name) for name in archive.namelist() if name.startswith('images/') and name[-1] != '/']
+
+
+def _exported_images(project, tasks, hostname, user=None):
+    out, _, _ = DataExport.generate_export_file(
+        project, tasks, 'COCO_WITH_IMAGES', True, {}, hostname=hostname, user=user
+    )
+    return _images(out)
+
+
+@pytest.fixture
+def member(business_client):
+    # Exports and the org owner are different people: media must be fetched as the person who exports
+    user = User.objects.create_user(email='member@pytest.net', password='pytest')
+    business_client.organization.add_user(user)
+    user.active_organization = business_client.organization
+    user.save()
+    return user
 
 
 @pytest.mark.django_db
@@ -86,16 +109,152 @@ def test_export_does_not_download_media_from_internal_addresses(business_client,
 
 
 @pytest.mark.django_db
-def test_export_downloads_media_from_its_own_host(business_client, media_server, settings):
+@pytest.mark.parametrize('ssrf_protection', [True, False])
+@pytest.mark.parametrize('subpath', ['', '/ls'])
+@pytest.mark.parametrize(
+    'path',
+    [
+        '/data/upload/1/image.png',
+        '/storage-data/uploaded/?filepath=upload/1/image.png',
+        '/tasks/1/presign/?fileuri=czM6Ly9idWNrZXQvaW1hZ2UucG5n',
+    ],
+)
+def test_export_downloads_media_from_its_own_host(
+    business_client, member, media_server, settings, ssrf_protection, subpath, path
+):
     # Self-hosted Label Studio often lives on a private address: its own URLs stay reachable
-    settings.SSRF_PROTECTION_ENABLED = True
+    settings.SSRF_PROTECTION_ENABLED = ssrf_protection
     project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
-    token = project.organization.created_by.auth_token.key
 
-    images = _exported_images(project, [_task(1, f'{media_server}/image.png')], hostname=f'{media_server}/')
+    images = _exported_images(
+        project, [_task(1, f'{media_server}{subpath}{path}')], hostname=f'{media_server}{subpath}/', user=member
+    )
 
     assert images == [b'internal bytes']
-    assert _MediaHandler.requests_seen == [('/image.png', f'Token {token}')]
+    [(seen_path, authorization)] = _MediaHandler.requests_seen
+    assert seen_path == subpath + path
+    # A short-lived access token for the person who exports, never the owner's long-lived API token
+    scheme, token = authorization.split(' ')
+    assert scheme == 'Bearer'
+    assert AccessToken(token)['user_id'] == str(member.id)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('ssrf_protection', [True, False])
+@pytest.mark.parametrize(
+    'path',
+    [
+        '/api/current-user/token',
+        '/api/projects/',
+        '/data/upload/../api/current-user/token',
+        '/data/upload/%2e%2e/%2e%2e/api/current-user/token',
+        '/data/upload%2f..%2f..%2fapi/current-user/token',
+        '/tasks/1/../../api/current-user/token',
+        '/data/local-files/?d=image.png',
+    ],
+)
+def test_export_does_not_fetch_other_paths_from_its_own_host(
+    business_client, member, media_server, settings, ssrf_protection, path
+):
+    settings.SSRF_PROTECTION_ENABLED = ssrf_protection
+    project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
+
+    images = _exported_images(project, [_task(1, f'{media_server}{path}')], hostname=f'{media_server}/', user=member)
+
+    assert images == []
+    assert _MediaHandler.requests_seen == []
+
+
+@pytest.mark.django_db
+def test_export_media_uses_legacy_token_only_where_jwt_is_not_accepted(
+    business_client, member, media_server, settings
+):
+    settings.SSRF_PROTECTION_ENABLED = True
+    project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
+    jwt_settings = member.active_organization.jwt
+    jwt_settings.api_tokens_enabled = False
+    jwt_settings.legacy_api_tokens_enabled = True
+    jwt_settings.save()
+
+    images = _exported_images(
+        project, [_task(1, f'{media_server}/data/upload/1/image.png')], hostname=f'{media_server}/', user=member
+    )
+
+    assert images == [b'internal bytes']
+    assert _MediaHandler.requests_seen == [('/data/upload/1/image.png', f'Token {member.auth_token.key}')]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('ssrf_protection', [True, False])
+def test_export_without_a_user_does_not_fetch_from_its_own_host(
+    business_client, media_server, settings, ssrf_protection
+):
+    settings.SSRF_PROTECTION_ENABLED = ssrf_protection
+    project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
+
+    images = _exported_images(
+        project, [_task(1, f'{media_server}/data/upload/1/image.png')], hostname=f'{media_server}/'
+    )
+
+    assert images == []
+    assert _MediaHandler.requests_seen == []
+
+
+@pytest.fixture
+def converter_kwargs(monkeypatch):
+    seen = []
+    for module in (data_export.models, data_export.mixins):
+        original = module.Converter
+
+        def spy(*args, _original=original, **kwargs):
+            seen.append(kwargs)
+            return _original(*args, **kwargs)
+
+        monkeypatch.setattr(module, 'Converter', spy)
+    return seen
+
+
+@pytest.mark.django_db
+def test_converter_is_never_given_a_user_token(business_client, member, media_server, settings, converter_kwargs):
+    project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
+    owner = project.organization.created_by
+    tasks = [_task(1, f'{media_server}/data/upload/1/image.png')]
+
+    _exported_images(project, tasks, hostname=f'{media_server}/', user=member)
+    export = Export.objects.create(project=project, status=Export.Status.COMPLETED)
+    export.file.save(f'{project.id}/snapshot.json', ContentFile(json.dumps(tasks).encode()))
+    export.convert_file('COCO_WITH_IMAGES', download_resources=True, hostname=f'{media_server}/', user=member).close()
+
+    assert len(converter_kwargs) == 2
+    for kwargs in converter_kwargs:
+        assert kwargs['access_token'] not in {owner.auth_token.key, member.auth_token.key}
+        assert kwargs['http_session'] is not None
+
+
+@pytest.mark.django_db
+def test_snapshot_conversion_fetches_media_as_the_user_who_converts(business_client, member, media_server, settings):
+    settings.HOSTNAME = media_server
+    settings.DOMAIN_FROM_REQUEST = False
+    project = make_project({'label_config': IMAGE_CONFIG}, business_client.user, use_ml_backend=False)
+    export = Export.objects.create(project=project, status=Export.Status.COMPLETED, created_by=business_client.user)
+    tasks = [_task(1, f'{media_server}/data/upload/1/image.png')]
+    export.file.save(f'{project.id}/snapshot.json', ContentFile(json.dumps(tasks).encode()))
+    client = APIClient()
+    client.force_authenticate(member)
+
+    response = client.post(
+        f'/api/projects/{project.id}/exports/{export.id}/convert',
+        {'export_type': 'COCO_WITH_IMAGES', 'download_resources': True},
+        format='json',
+    )
+
+    assert response.status_code == 200, response.content
+    converted = ConvertedFormat.objects.get(id=response.json()['converted_format'])
+    assert converted.created_by == member
+    assert converted.status == ConvertedFormat.Status.COMPLETED, converted.traceback
+    assert _images(converted.file.open('rb')) == [b'internal bytes']
+    [(_, authorization)] = _MediaHandler.requests_seen
+    assert AccessToken(authorization.split(' ')[1])['user_id'] == str(member.id)
 
 
 @pytest.mark.parametrize(

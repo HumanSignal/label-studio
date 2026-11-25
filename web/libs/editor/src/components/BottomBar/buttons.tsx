@@ -13,7 +13,7 @@ import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 import { FF_FIT_1304_STRICT_OVERLAP, isFF } from "../../utils/feature-flags";
 import { annotationActionProps, emitLabelingEvent } from "../../utils/labelingTelemetry";
-import { INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
+import { ALREADY_ACCEPTED_TOOLTIP, INCOMPLETE_ACCEPT_TOOLTIP } from "./Controls";
 
 type MixedInParams = {
   store: MSTStore;
@@ -60,8 +60,15 @@ export const AcceptButton = memo(
     const hasChanges = Boolean(history.canUndo || annotation.versions.draft);
     const reviewCopy = resolveReviewBarCopy(normalizeReviewAcceptedState(annotation.acceptedState), hasChanges);
     const hasIncompleteRegions = annotation.hasIncompleteRegions;
-    const isDisabled = disabled || hasIncompleteRegions;
-    const tooltip = hasIncompleteRegions ? INCOMPLETE_ACCEPT_TOOLTIP : "Accept annotation: [ Ctrl+Enter ]";
+    // FIT-3230: the reviewer's own live accept spends a plain Accept; Fix + Accept and other
+    // reviewers' Accept stay available (multi-layer review).
+    const ownAcceptIsLive = Boolean(annotation.acceptedByCurrentUser) && !hasChanges;
+    const isDisabled = disabled || hasIncompleteRegions || ownAcceptIsLive;
+    const tooltip = hasIncompleteRegions
+      ? INCOMPLETE_ACCEPT_TOOLTIP
+      : ownAcceptIsLive
+        ? ALREADY_ACCEPTED_TOOLTIP
+        : "Accept annotation: [ Ctrl+Enter ]";
 
     return (
       <Tooltip title={tooltip} disabled={!store.settings.enableTooltips} className="whitespace-nowrap max-w-none">

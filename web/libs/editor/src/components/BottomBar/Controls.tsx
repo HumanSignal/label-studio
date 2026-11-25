@@ -53,6 +53,7 @@ export const EMPTY_SUBMIT_TOOLTIP = "Empty annotations denied in this project";
 export const INCOMPLETE_SUBMIT_TOOLTIP = "Complete all regions before submitting";
 export const INCOMPLETE_UPDATE_TOOLTIP = "Complete all regions before updating";
 export const INCOMPLETE_ACCEPT_TOOLTIP = "Complete all regions before accepting";
+export const ALREADY_ACCEPTED_TOOLTIP = "You already accepted this annotation";
 
 /** Arrows move between rows; Escape closes. Enter/Space commit natively on the focused button. */
 function moveRejectMenuFocus(menu: HTMLElement, step: 1 | -1) {
@@ -70,7 +71,7 @@ const ControlButton = observer(({ button, disabled, onClick, variant, look }: Co
     <Button
       {...button.props}
       variant={button.variant ?? variant}
-      look={button.look ?? look}
+      look={(button.look === "string" ? "ghost" : button.look) ?? look}
       tooltip={button.tooltip}
       className="w-[150px]"
       aria-label={button.ariaLabel}
@@ -294,13 +295,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               {button.title}
             </Typography>
             {isDefault && (
-              <Badge
-                variant="neutral"
-                look="outline"
-                shape="rounded"
-                size="small"
-                data-testid="reject-action-default-badge"
-              >
+              <Badge variant="neutral" shape="rounded" size="small" data-testid="reject-action-default-badge">
                 Default
               </Badge>
             )}
@@ -412,7 +407,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           <div className="p-tighter rounded">
             <Button
               name="submit-option"
-              look="string"
+              look="ghost"
               size="small"
               className="w-[150px]"
               onClick={async (event) => {

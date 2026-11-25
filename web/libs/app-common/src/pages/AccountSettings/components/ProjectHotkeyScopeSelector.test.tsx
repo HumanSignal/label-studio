@@ -54,6 +54,18 @@ const renderSelector = ({
 };
 
 describe("ProjectHotkeyScopeSelector", () => {
+  // Non-enterprise by default; files that run earlier in the same worker may leave billing set.
+  let originalBilling: unknown;
+
+  beforeEach(() => {
+    originalBilling = window.APP_SETTINGS.billing;
+    window.APP_SETTINGS.billing = undefined;
+  });
+
+  afterEach(() => {
+    window.APP_SETTINGS.billing = originalBilling;
+  });
+
   it("selects account defaults when the URL has no project query", () => {
     renderSelector();
 
@@ -61,19 +73,27 @@ describe("ProjectHotkeyScopeSelector", () => {
   });
 
   it("fetches and preselects the project from a deep link", async () => {
+    // Other test files can leave billing set, which would make this the enterprise picker.
+    const originalBilling = window.APP_SETTINGS.billing;
+    window.APP_SETTINGS.billing = undefined as typeof window.APP_SETTINGS.billing;
+
     const callApi = mock(async (_name: string, options?: { params?: Record<string, unknown> }) => {
       return options?.params?.ids === "42" ? projectsResponse({ id: 42, title: "Apollo" }) : projectsResponse();
     });
 
-    renderSelector({ initialPath: "/user/account/hotkeys?project=42", callApi });
+    try {
+      renderSelector({ initialPath: "/user/account/hotkeys?project=42", callApi });
 
-    await waitFor(() => expect(screen.getByText("Apollo")).toBeInTheDocument());
-    expect(callApi).toHaveBeenCalledWith(
-      "projects",
-      expect.objectContaining({
-        params: expect.objectContaining({ ids: "42", fields: "id,title" }),
-      }),
-    );
+      await waitFor(() => expect(screen.getByText("Apollo")).toBeInTheDocument());
+      expect(callApi).toHaveBeenCalledWith(
+        "projects",
+        expect.objectContaining({
+          params: expect.objectContaining({ ids: "42", fields: "id,title" }),
+        }),
+      );
+    } finally {
+      window.APP_SETTINGS.billing = originalBilling;
+    }
   });
 
   it("requests workspace titles in the enterprise picker", async () => {

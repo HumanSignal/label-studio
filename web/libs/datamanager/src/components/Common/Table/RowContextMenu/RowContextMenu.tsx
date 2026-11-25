@@ -3,8 +3,6 @@ import { getRoot } from "mobx-state-tree";
 import { IconBraces, IconCopyOutline, IconUserStats, IntersectSquareIcon } from "@humansignal/icons";
 // @ts-expect-error - Menu is from JS module
 import { Menu } from "../../Menu/Menu";
-import { modal } from "../../Modal/Modal";
-import { TaskSourceViewer, getTaskSourceViewerStorageKey } from "../../TaskSourceViewer";
 // @ts-expect-error - utils is JS module
 import { getProperty } from "../utils";
 
@@ -24,10 +22,10 @@ export interface RowContextMenuProps {
   view: any;
   /** API object from useSDK hook */
   api?: any;
-  /** SDK type (e.g., "DE" for Data Explorer) */
-  sdkType?: string;
   /** LSE-only callback for viewing analytics */
   onViewAnalytics?: (row: any) => void;
+  /** Opens the task source dialog, which the table owns so it outlives this menu. */
+  onViewSource?: (source: { task: any; onTaskLoad: (options?: any) => Promise<any> }) => void;
   /** Callback when menu closes */
   onClose: () => void;
   /** Optional project ID for project-scoped TaskSourceViewer storage */
@@ -44,10 +42,9 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
   column,
   view,
   api,
-  sdkType,
   onViewAnalytics,
+  onViewSource,
   onClose,
-  projectId,
 }) => {
   // Columns that should not have copy cell content option
   const excludedColumns = [
@@ -188,26 +185,10 @@ export const RowContextMenu: FC<RowContextMenuProps> = ({
       return response ?? {};
     };
 
-    const modalInstance = modal({
-      title: `Source for task ${taskId}`,
-      style: { width: 900 },
-      header: null, // Will be set by renderToggle
-      body: (
-        <TaskSourceViewer
-          content={taskData}
-          onTaskLoad={onTaskLoad}
-          sdkType={sdkType}
-          storageKey={getTaskSourceViewerStorageKey(projectId)}
-          renderToggle={(toggle) => {
-            // Update modal header with toggle
-            modalInstance?.update({ header: toggle });
-          }}
-        />
-      ),
-    });
+    onViewSource?.({ task: taskData, onTaskLoad });
 
     onClose();
-  }, [row, api, sdkType, onClose, projectId]);
+  }, [row, api, onViewSource, onClose]);
 
   // 5. View annotator performance (LSE-only)
   const handleViewAnalytics = useCallback(() => {

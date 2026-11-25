@@ -6,6 +6,7 @@ import { cn } from "../../utils/bem";
 import { Spinner } from "../Common/Spinner";
 import { DataManager } from "../DataManager/DataManager";
 import { Labeling } from "../Label/Label";
+import { StoreDialogs, type StoreDialogsProps } from "./StoreDialogs";
 import "./App.prefix.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
@@ -34,7 +35,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 interface AppComponentProps {
-  app: {
+  app: StoreDialogsProps["store"] & {
     SDK: {
       mode: string;
     };
@@ -76,6 +77,7 @@ const AppComponent: React.FC<AppComponentProps> = ({ app }) => {
                 )}
                 <div className={cn("offscreen").toClassName()} />
               </div>
+              <StoreDialogs store={app} />
             </SDKProvider>
           </Provider>
         </AuthProvider>

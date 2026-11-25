@@ -77,6 +77,23 @@ def test_direct_export(test_project):
     assert len(_bytestream_to_json(data)) == 2
 
 
+def test_export_then_import_keeps_source_task_id(test_project):
+    """A JSON export imported into another project keeps each source task id as import_id (one hop)."""
+    ls, project = test_project
+    exported = ls.projects.exports.as_json(project.id)
+    source_id = exported[0]['id']
+    assert exported[0]['import_id'] is None
+
+    target = ls.projects.create(title='Import Target', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+    # this export lists predictions by id only, which an import cannot take back
+    ls.projects.import_tasks(id=target.id, request=[{**t, 'predictions': []} for t in exported])
+
+    (task,) = ls.tasks.list(project=target.id)
+    assert task.id != source_id
+    assert ls.tasks.get(task.id).import_id == source_id
+    assert ls.projects.exports.as_json(target.id)[0]['import_id'] == source_id
+
+
 # TODO: support pytest-asyncio, otherwise this test will be skipped
 @pytest.mark.skip(reason='pytest-asyncio is not supported in this version of Label Studio')
 async def test_async_export(test_project_async):

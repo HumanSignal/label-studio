@@ -2,6 +2,7 @@ import { inject, observer } from "mobx-react";
 import { useCallback } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { cn } from "../../utils/bem";
+import { emitDatamanagerTabEvent } from "../../utils/datamanagerTelemetry";
 import { Interface } from "../Common/Interface";
 import { Space } from "../Common/Space/Space";
 import { Spinner } from "../Common/Spinner";
@@ -84,8 +85,14 @@ const TabsSwitch = switchInjector(
     return (
       <Tabs
         activeTab={selectedKey}
-        onAdd={() => views.addView({ reload: false })}
-        onChange={(key) => views.setSelected(key)}
+        onAdd={() => {
+          views.addView({ reload: false });
+          emitDatamanagerTabEvent(views.selected, "dm_tab_created", { tab_id: null, tab_virtual: false });
+        }}
+        onChange={(key) => {
+          views.setSelected(key);
+          emitDatamanagerTabEvent(views.selected, "dm_tab_switched", { tab_key: key });
+        }}
         onDragEnd={onDragEnd}
         tabBarExtraContent={<ProjectSummary />}
         allowedActions={editable}
@@ -111,10 +118,21 @@ const TabsSwitch = switchInjector(
                   onFinishEditing={(title) => {
                     tab.setTitle(title);
                     tab.save();
+                    emitDatamanagerTabEvent(tab, "dm_tab_renamed");
                   }}
-                  onDuplicate={() => views.duplicateView(tab)}
-                  onClose={() => views.deleteView(tab)}
-                  onSave={() => tab.virtual && tab.saveVirtual()}
+                  onDuplicate={() => {
+                    views.duplicateView(tab);
+                    emitDatamanagerTabEvent(tab, "dm_tab_duplicated");
+                  }}
+                  onClose={() => {
+                    views.deleteView(tab);
+                    emitDatamanagerTabEvent(tab, "dm_tab_deleted");
+                  }}
+                  onSave={() => {
+                    if (!tab.virtual) return;
+                    tab.saveVirtual();
+                    emitDatamanagerTabEvent(tab, "dm_tab_virtual_saved");
+                  }}
                   onToggleLock={() => tab.toggleLock()}
                   active={tab.key === selectedKey}
                   editable={tab.editable}

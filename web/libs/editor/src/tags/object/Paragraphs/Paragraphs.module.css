@@ -192,27 +192,6 @@
 /*   } */
 /* } */
 
-.play {
-  user-select: none;
-  position: absolute;
-  left: -32px; /* Position in the left margin space */
-  top: 50%; /* Center vertically relative to phrase container */
-  transform: translateY(-50%); /* Perfect vertical centering */
-  font-size: inherit;
-  z-index: 1; /* Ensure it's above other elements */
-  margin-right: 5px;
-
-  /* highlight play/pause buttons on interactions */
-  &:active path {
-    fill: #1890ff;
-  }
-
-  /* only the circle of play button highlighted */
-  &:focus path:first-child {
-    fill: #1890ff;
-  }
-}
-
 .selectAllBtn {
   user-select: none;
   cursor: pointer;

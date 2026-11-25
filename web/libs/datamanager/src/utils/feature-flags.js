@@ -12,7 +12,6 @@ export const FF_DEV_2536 = "fflag_feat_front_dev-2536_comment_notifications_shor
 /**
  * Support for Datasets functionality.
  */
-export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
 
 /**
  * Strict task overlap enforcement - prevents annotators from submitting

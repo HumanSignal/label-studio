@@ -7,6 +7,15 @@
     line-height: 20px;
   }
 
+  /* HyperText task HTML keeps inline style: keep position:fixed / z-index overlays inside the text pane (INT-30729).
+     contain: paint clips to this box, so the box scrolls its own overflow to keep wide content reachable.
+     Not on <Text>: its data is escaped, and its resize handles sit 7px outside the line box. */
+  &__container_hypertext {
+    overflow: auto;
+    contain: paint;
+    isolation: isolate;
+  }
+
   &__orig-container {
     display: none !important;
   }

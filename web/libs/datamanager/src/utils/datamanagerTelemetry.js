@@ -64,3 +64,21 @@ export function emitDatamanagerEvent(eventName, properties = {}) {
     }
   }, 0);
 }
+
+/** Stable join props for a DM tab. Read synchronously, so it is safe right before `destroy`. */
+export function datamanagerTabContext(tab) {
+  try {
+    return {
+      project_id: tab?.root?.project?.id ?? tab?.root?.SDK?.projectId ?? null,
+      tab_id: tab?.id ?? null,
+      tab_virtual: Boolean(tab?.virtual),
+    };
+  } catch {
+    return { project_id: null, tab_id: null, tab_virtual: false };
+  }
+}
+
+/** Fire-and-forget DM event with the tab's join props. */
+export function emitDatamanagerTabEvent(tab, eventName, properties = {}) {
+  emitDatamanagerEvent(eventName, { ...datamanagerTabContext(tab), ...properties });
+}

@@ -1,0 +1,100 @@
+/* Same frame, states and focus rules as Input; the textarea inside is unstyled. */
+.field {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-small);
+  background: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-base);
+  font-size: var(--textarea-font-size);
+  line-height: var(--textarea-line-height);
+  transition: border-color 150ms ease-out;
+
+  /*
+   * One row is as tall as the Input of the same size (40, 32, 24px): the vertical padding is what is
+   * left of that height after the border and one line of text.
+   */
+  --textarea-row-height: var(--spacing-1000);
+  --textarea-font-size: var(--font-size-body-medium);
+  --textarea-line-height: var(--line-height-body-medium);
+  --textarea-padding-start: var(--spacing-400);
+  --textarea-padding-end: var(--spacing-300);
+
+  &[data-size="small"] {
+    --textarea-row-height: var(--spacing-800);
+    --textarea-font-size: var(--font-size-body-small);
+    --textarea-line-height: var(--line-height-body-small);
+    --textarea-padding-start: var(--spacing-300);
+    --textarea-padding-end: var(--spacing-200);
+  }
+
+  &[data-size="smaller"] {
+    --textarea-row-height: var(--spacing-600);
+    --textarea-font-size: var(--font-size-label-smaller);
+    --textarea-line-height: var(--line-height-label-smaller);
+    --textarea-padding-start: var(--spacing-200);
+    --textarea-padding-end: var(--spacing-100);
+  }
+
+  &:hover:not([data-disabled]),
+  &:focus-within {
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &[data-invalid],
+  &[data-invalid]:hover,
+  &[data-invalid]:focus-within {
+    border-color: var(--color-negative-border);
+  }
+
+  &[data-disabled] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtlest);
+    cursor: not-allowed;
+  }
+
+  &[data-readonly] {
+    background: var(--color-neutral-surface);
+    color: var(--color-neutral-content-subtler);
+  }
+}
+
+.textarea {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  --textarea-padding-block: calc((var(--textarea-row-height) - 2px - var(--textarea-line-height)) / 2);
+
+  min-height: calc(var(--textarea-row-height) - 2px);
+  padding: var(--textarea-padding-block) var(--textarea-padding-end) var(--textarea-padding-block)
+    var(--textarea-padding-start);
+  box-sizing: border-box;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+
+  [data-resize="none"] > & {
+    resize: none;
+  }
+
+  &::placeholder {
+    color: var(--color-neutral-content-subtle);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

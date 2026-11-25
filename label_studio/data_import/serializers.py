@@ -16,7 +16,8 @@ class ImportApiSerializer(TaskSerializer):
     class Meta:
         model = Task
         list_serializer_class = TaskSerializerBulk
-        exclude = ('is_labeled', 'project')
+        # import_id is not accepted here: the import stores the task's own `id` as import_id
+        exclude = ('is_labeled', 'project', 'import_id')
 
 
 class FileUploadSerializer(serializers.ModelSerializer):

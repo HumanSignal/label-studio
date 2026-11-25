@@ -1,5 +1,4 @@
-import { confirm } from "@humansignal/ui/lib/modal";
-import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
+import { type ConfirmDialogContent, ToastType, useToast } from "@humansignal/ui";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -140,6 +139,7 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
   const toast = useToast();
   const [hotkeys, setHotkeys] = useState<Hotkey[]>([]);
   const [hotkeySettings, setHotkeySettings] = useState<HotkeySettings>({});
+  const [resetConfirm, setResetConfirm] = useState<ConfirmDialogContent | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasProjectAccessError, setHasProjectAccessError] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(scope.kind === "project");
@@ -296,15 +296,15 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
 
   const handleResetToDefaults = useCallback(
     (onSuccess?: () => void) => {
-      confirm({
+      setResetConfirm({
         title: projectId === undefined ? "Reset Hotkeys to Defaults?" : "Reset Project Hotkey Override?",
-        body:
+        children:
           projectId === undefined
             ? "Are you sure you want to reset all hotkeys and settings to their default values? This action cannot be undone."
             : "Are you sure you want to reset only this project's hotkey override? Your account defaults and other projects will not be changed.",
         okText: projectId === undefined ? "Reset to Defaults" : "Reset Project Override",
         buttonLook: "negative",
-        style: { width: 500 },
+        size: "small",
         onOk: async () => {
           setIsLoading(true);
 
@@ -416,6 +416,8 @@ export const useHotkeys = (scope: HotkeyScope = { kind: "account" }) => {
   }, [loadHotkeysFromAPI]);
 
   return {
+    resetConfirm,
+    closeResetConfirm: () => setResetConfirm(null),
     hotkeys,
     setHotkeys,
     hotkeySettings,

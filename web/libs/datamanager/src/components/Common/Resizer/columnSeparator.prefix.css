@@ -1,0 +1,18 @@
+/*
+ * Geometry shared by everything that draws a "column separator" in the Data Manager table header:
+ *  - the column resize handle (Resizer.module.css), and
+ *  - the drop placeholder shown while reordering columns (Table/TableHead/TableHead.prefix.css).
+ *
+ * Both read these variables, so they cannot drift apart. `columnSeparator.contract.test.js` enforces that neither
+ * file hard-codes these numbers again.
+ */
+:root {
+  /* Width of the interactive (grabbable) area of the resize handle. Its line is centered in this area. */
+  --dm-column-separator-hit-size: 8px;
+  /* Distance from the top and from the bottom of the header to the separator line. */
+  --dm-column-separator-inset-y: var(--spacing-tight);
+  /* Width of the separator line at rest. */
+  --dm-column-separator-line-width: 2px;
+  /* Width of the separator line while hovered/active. The drop placeholder is drawn with this width. */
+  --dm-column-separator-line-width-active: 4px;
+}

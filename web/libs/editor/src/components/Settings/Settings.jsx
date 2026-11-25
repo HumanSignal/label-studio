@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Modal, Table, Tabs } from "antd";
+import { Table, Tabs } from "antd";
 import { observer } from "mobx-react";
 
 import { Hotkey } from "../../core/Hotkey";
@@ -9,7 +9,6 @@ import { cn } from "../../utils/bem";
 
 import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
-import { IconClose } from "@humansignal/icons";
 import { ModalWindow, Toggle, Typography } from "@humansignal/ui";
 import { ff, isAnnotatorRole } from "@humansignal/core";
 import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
@@ -160,7 +159,6 @@ const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 const DEFAULT_MODAL_SETTINGS = {
   name: "settings-modal",
   title: "Labeling Interface Settings",
-  closeIcon: <IconClose />,
 };
 
 export default observer(({ store }) => {
@@ -178,50 +176,40 @@ export default observer(({ store }) => {
     }, []);
   }, []);
 
+  // ModalWindow's body is p-0 so the tab bar runs edge to edge; each pane adds its own padding.
+  const paneProps = (key) => ({ className: "px-wide pb-wide", "data-testid": `editor-settings-tab-pane-${key}` });
+
   const settingsTabs = (
     <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
       {Object.entries(Settings).map(([key, { name, component }]) => (
         <Tabs.TabPane tab={name} key={key}>
-          {React.createElement(component, { store })}
+          <div {...paneProps(key)}>{React.createElement(component, { store })}</div>
         </Tabs.TabPane>
       ))}
       {availableSettings.map((Page) => (
         <Tabs.TabPane tab={Page.title} key={Page.tagName}>
-          <Page store={store} />
+          <div {...paneProps(Page.tagName)}>
+            <Page store={store} />
+          </div>
         </Tabs.TabPane>
       ))}
     </Tabs>
   );
 
-  if (ff.isActive(ff.FF_MODAL_WINDOW_APP_CHROME)) {
-    return (
-      <ModalWindow
-        className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}
-        open={store.showingSettings}
-        onOpenChange={(open) => {
-          if (!open && store.showingSettings) store.toggleSettings();
-        }}
-        title={DEFAULT_MODAL_SETTINGS.title}
-        size="large"
-        contentClassName="max-w-[568px]"
-        bodyClassName="min-h-0 p-0"
-        dataTestId="editor-settings-modal"
-      >
-        {settingsTabs}
-      </ModalWindow>
-    );
-  }
-
   return (
-    <Modal
+    <ModalWindow
       className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}
       open={store.showingSettings}
-      onCancel={store.toggleSettings}
-      footer=""
+      onOpenChange={(open) => {
+        if (!open && store.showingSettings) store.toggleSettings();
+      }}
       title={DEFAULT_MODAL_SETTINGS.title}
-      closeIcon={DEFAULT_MODAL_SETTINGS.closeIcon}
+      size="large"
+      contentClassName="max-w-[568px]"
+      bodyClassName="min-h-0 p-0"
+      dataTestId="editor-settings-modal"
     >
       {settingsTabs}
-    </Modal>
+    </ModalWindow>
   );
 });

@@ -1,9 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+from datetime import timedelta
+
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
 from django.conf import settings
+from django.utils import timezone
 from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import is_video_object_tracking
 from label_studio_sdk._extensions.label_studio_tools.postprocessing.video import extract_key_frames
@@ -128,10 +131,32 @@ class ExportSerializer(serializers.ModelSerializer):
             'counters',
             'converted_formats',
         ]
-        fields = ['title'] + read_only
+        fields = ['title', 'since', 'until', 'ephemeral'] + read_only
 
     created_by = UserSimpleSerializer(required=False)
     converted_formats = ConvertedFormatSerializer(many=True, required=False)
+    since = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text='Inclusive lower bound on Task.updated_at for an incremental snapshot. '
+        'Omit for a full export. Pair with until for a half-open window [since, until).',
+    )
+    until = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text='Exclusive upper bound on Task.updated_at. If omitted, or later than create/request time minus '
+        'INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS, the server uses that time instead. '
+        'Use the returned value as since on the next incremental create.',
+    )
+    ephemeral = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text='When true, the export is omitted from list endpoints. Detail and download by id '
+        'still work. TTL deletion (EPHEMERAL_EXPORT_TTL_HOURS, default 24) runs via the RQ cron '
+        'scheduler when enabled (SaaS; on-prem `rqcron.enabled`); otherwise delete explicitly.',
+    )
 
 
 ONLY_OR_EXCLUDE_CHOICE = [
@@ -218,6 +243,29 @@ class ExportCreateSerializer(ExportSerializer):
     task_filter_options = TaskFilterOptionsSerializer(required=False, default=None)
     annotation_filter_options = AnnotationFilterOptionsSerializer(required=False, default=None)
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        since = attrs.get('since')
+        until = attrs.get('until')
+        if until is not None and since is None:
+            raise serializers.ValidationError({'until': 'until requires since'})
+        if since is not None:
+            # The exclusive upper bound may not pass create time (minus a small lag, so writes that commit after
+            # the export query but stamp updated_at before now() are less likely to fall between consecutive
+            # windows; the lag is dropped when it would invert a very recent since). A later until (omitted, or
+            # a client clock running ahead) is capped there: the export runs now, so anything changed after it
+            # but before a future until would otherwise fall into neither this snapshot nor the next one.
+            now = timezone.now()
+            if since >= now:
+                raise serializers.ValidationError({'since': 'since must be in the past'})
+            lagged = now - timedelta(seconds=settings.INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS)
+            latest_until = lagged if lagged > since else now
+            if until is None or until > latest_until:
+                attrs['until'] = until = latest_until
+        if since is not None and since >= until:
+            raise serializers.ValidationError({'until': 'until must be after since ([since, until) window)'})
+        return attrs
 
 
 class ExportParamSerializer(serializers.Serializer):

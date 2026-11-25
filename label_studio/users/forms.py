@@ -69,6 +69,9 @@ class UserSignupForm(forms.Form):
     how_find_us = forms.CharField(required=False)
     elaborate = forms.CharField(required=False)
 
+    # Subclasses whose view answers registered and new emails the same way set this to False.
+    reject_existing_email = True
+
     def clean_password(self):
         password = self.cleaned_data.get('password')
         try:
@@ -88,7 +91,7 @@ class UserSignupForm(forms.Form):
         if len(email) >= EMAIL_MAX_LENGTH:
             raise forms.ValidationError('Email is too long')
 
-        if email and User.objects.filter(email__iexact=email).exists():
+        if self.reject_existing_email and email and User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('User with this email already exists')
 
         return email

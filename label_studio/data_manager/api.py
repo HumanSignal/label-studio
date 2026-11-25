@@ -3,17 +3,19 @@
 import logging
 
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
-from data_manager.functions import evaluate_predictions, get_prepare_params
+from data_manager.actions.data_columns import add_or_modify_columns_enabled, set_task_data_column_values
+from data_manager.functions import accessible_projects, evaluate_predictions, get_prepare_params
 from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
 from data_manager.models import View
 from data_manager.serializers import (
     DataManagerTaskSerializer,
     PrepareParamsRequestSerializer,
+    TaskDataColumnResultSerializer,
+    TaskDataColumnSerializer,
     ViewOrderSerializer,
     ViewRequestSerializer,
     ViewResetSerializer,
@@ -26,12 +28,15 @@ from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from fsm.serializer_fields import fsm_state_fields_enabled
 from io_storages.functions import get_import_storage_link_prefetches
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Annotation, Task
@@ -211,6 +216,7 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         project = serializer.validated_data.get('project')
+        self.check_object_permissions(self.request, project)
         max_order = View.objects.filter(project=project).aggregate(Max('order'))['order__max']
         order = (max_order if max_order is not None else -1) + 1
         serializer.save(user=self.request.user, order=order)
@@ -244,8 +250,9 @@ class ViewAPI(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         project = generics.get_object_or_404(
-            Project.objects.for_user(request.user), pk=serializer.validated_data['project'].id
+            accessible_projects(request.user), pk=serializer.validated_data['project']
         )
+        self.check_object_permissions(request, project)
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         queryset.all().delete()
         return Response(status=204)
@@ -270,7 +277,8 @@ class ViewAPI(viewsets.ModelViewSet):
         project_id = serializer.validated_data['project']
         view_ids = serializer.validated_data['ids']
 
-        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=project_id)
+        project = generics.get_object_or_404(accessible_projects(request.user), pk=project_id)
+        self.check_object_permissions(request, project)
 
         queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
         views = list(queryset.filter(id__in=view_ids))
@@ -287,7 +295,8 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')
+        accessible_ids = accessible_projects(self.request.user).values('id')
+        return View.objects.filter(project_id__in=accessible_ids).order_by('order', 'id')
 
 
 def _paginator_with_known_count(paginator_class, count):
@@ -381,9 +390,7 @@ class TaskListAPI(generics.ListCreateAPIView):
     pagination_class = TaskPagination
 
     def _ensure_state_field_for_evaluation(self, fields_for_evaluation, request):
-        if not (
-            CurrentContext.is_fsm_enabled() and flag_set('fflag_feat_fit_710_fsm_state_fields', user=request.user)
-        ):
+        if not (CurrentContext.is_fsm_enabled() and fsm_state_fields_enabled()):
             return fields_for_evaluation
 
         fields_for_evaluation = list(fields_for_evaluation)
@@ -770,9 +777,7 @@ class ProjectActionsAPI(APIView):
         # keep ordering only when needed, otherwise drop to avoid expensive sorts/annotations
         action_id = request.GET.get('id', None)
         prepare_params = get_prepare_params(request, project)
-        if not flag_set(
-            'fflag_root_223_optimize_delete_predictions', organization=project.organization
-        ) or action_id in ['next_task', 'remove_duplicates']:
+        if action_id in ['next_task', 'remove_duplicates']:
             queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
         else:
             prepare_params.ordering = []
@@ -790,6 +795,79 @@ class ProjectActionsAPI(APIView):
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)
+
+
+@method_decorator(
+    name='post',
+    decorator=extend_schema(
+        tags=['Tasks'],
+        summary='Set a data column on tasks',
+        description=(
+            'Set one `task.data` key to a different value for each listed task of the project, in one synchronous '
+            'request. Only that key of the listed tasks is written: other keys and other tasks are not touched, and '
+            'a new column is created on the listed tasks only (the "Add or Update Columns" Data Manager action, in '
+            'contrast, writes `null` into every other task when it adds a column). The column then appears in the '
+            'Data Manager. All values are validated first; if any is invalid, nothing is written. The response lists '
+            'the tasks that were updated and the requested IDs that are not tasks of this project. Requires the '
+            'same permission and feature flag as the "Add or Update Columns" action. Values are not checked against '
+            'the labeling configuration or a custom interface input schema. If an "Add or Update Columns" action '
+            'that adds the same column is still running in the background, it can overwrite the values with `null`.'
+        ),
+        operation_id='api_projects_tasks_data_column_create',
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=OpenApiTypes.INT,
+                location='path',
+                description='A unique integer value identifying this project.',
+            ),
+        ],
+        request=TaskDataColumnSerializer,
+        responses={
+            200: OpenApiResponse(response=TaskDataColumnResultSerializer, description='Values set'),
+            400: OpenApiResponse(description='Invalid column name or values; nothing was written'),
+            403: OpenApiResponse(description='No permission, or "Add or Update Columns" is disabled'),
+            404: OpenApiResponse(description='Project not found'),
+        },
+        examples=[
+            OpenApiExample(
+                name='request',
+                value={
+                    'column_name': 'customer_feedback',
+                    'value_type': 'String',
+                    'values': {'101': 'Box 3 is missing', '102': 'OK', '999': 'Unknown task'},
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                name='response',
+                value={'updated_task_ids': [101, 102], 'not_found_task_ids': [999]},
+                response_only=True,
+            ),
+        ],
+        extensions={
+            'x-fern-sdk-group-name': 'tasks',
+            'x-fern-sdk-method-name': 'set_data_column',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+class ProjectTaskDataColumnAPI(APIView):
+    parser_classes = (JSONParser,)
+    permission_required = ViewClassPermission(POST=all_permissions.projects_change)
+
+    def post(self, request, pk):
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=pk)
+        self.check_object_permissions(request, project)
+        if not add_or_modify_columns_enabled(project):
+            raise PermissionDenied('Add or Update Columns is not enabled for this organization.')
+
+        serializer = TaskDataColumnSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = set_task_data_column_values(
+            project, serializer.validated_data['column_name'], serializer.validated_data['values']
+        )
+        return Response(TaskDataColumnResultSerializer(result).data)
 
 
 @method_decorator(

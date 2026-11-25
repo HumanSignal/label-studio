@@ -28,6 +28,13 @@ const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {})
 };
 
 describe("CurrentTask", () => {
+  // setupAppSettings() replaces window.APP_SETTINGS; restore it so enterprise billing doesn't leak into later files.
+  const originalAppSettings = (window as any).APP_SETTINGS;
+
+  afterAll(() => {
+    (window as any).APP_SETTINGS = originalAppSettings;
+  });
+
   let store: any;
 
   beforeAll(() => {

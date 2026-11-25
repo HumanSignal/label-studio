@@ -1,10 +1,11 @@
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 from organizations.models import OrganizationMember
+from organizations.tests.factories import OrganizationFactory
 from projects.api import ProjectListAPI
 from projects.models import ProjectManager, ProjectQuerySetWithFSM
 from projects.tests.factories import ProjectFactory
@@ -55,7 +56,7 @@ class TestProjectListAPI(APITestCase):
     def test_fields_with_whitespace_matches_enrichment_skips(self):
         """Whitespace around fields tokens must not desync serializer flex-fields vs enrichment gating."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,
@@ -80,7 +81,7 @@ class TestProjectListAPI(APITestCase):
     def test_sparse_fields_skip_counts_state_and_related_prefetches(self):
         """The picker shape avoids unrelated list enrichment work."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,
@@ -101,7 +102,7 @@ class TestProjectListAPI(APITestCase):
     def test_default_fields_preserve_project_list_enrichment(self):
         """The normal project list keeps its existing counts, state, and related prefetches."""
         with (
-            patch('projects.api.flag_set', return_value=True),
+            override_settings(FSM_ENABLED=True),
             patch(
                 'projects.api.ProjectManager.with_counts_annotate',
                 wraps=ProjectManager.with_counts_annotate,
@@ -225,3 +226,35 @@ class TestProjectAnnotatorsAPI(APITestCase):
 
         assert response.status_code == 200
         assert [user['id'] for user in response.json()] == [visible.id]
+
+
+class TestProjectOrganizationIsReadOnly(APITestCase):
+    """organization is set from the caller's active organization at creation and never from the request body"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user = cls.project.created_by
+        cls.own_organization = cls.project.organization
+        cls.foreign_organization = OrganizationFactory()
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_patch_cannot_move_project_into_another_organization(self):
+        response = self.client.patch(
+            f'/api/projects/{self.project.id}/', {'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 200
+        assert response.json()['organization'] == self.own_organization.id
+        self.project.refresh_from_db()
+        assert self.project.organization_id == self.own_organization.id
+
+    def test_create_ignores_organization_in_body(self):
+        response = self.client.post(
+            '/api/projects/', {'title': 'Created', 'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 201
+        assert response.json()['organization'] == self.own_organization.id

@@ -62,7 +62,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Co
           {showCloseButton && (
             <DialogPrimitive.Close asChild>
               <Button
-                look="string"
+                look="ghost"
                 size="small"
                 className="absolute right-3 !p-0"
                 style={{ top: "12px" }}

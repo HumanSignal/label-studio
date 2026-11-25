@@ -24,6 +24,29 @@ from tasks.models import Annotation, Prediction, Task
 logger = logging.getLogger(__name__)
 
 
+def touch_tasks_updated_at(task_ids, *, updated_by=None):
+    """Bump ``Task.updated_at`` for the given ids (bulk paths that skip ``save()``).
+
+    Incremental export windows key off ``Task.updated_at``. Call this after bulk
+    mutations that change exported task/annotation/prediction/draft fields without
+    going through model ``save()`` (e.g. ``QuerySet.update``, ``bulk_create``,
+    ``QuerySet.delete``).
+
+    Updates run in sorted id chunks of ``settings.BATCH_SIZE`` so a large id set never becomes one
+    statement that rewrites and row-locks every task at once. Returns the number of rows updated.
+    """
+    ids = sorted({tid for tid in task_ids if tid is not None})
+    if not ids:
+        return 0
+    update_fields = {'updated_at': now()}
+    if updated_by is not None:
+        update_fields['updated_by'] = updated_by
+    updated = 0
+    for start in range(0, len(ids), settings.BATCH_SIZE):
+        updated += Task.objects.filter(id__in=ids[start : start + settings.BATCH_SIZE]).update(**update_fields)
+    return updated
+
+
 def bulk_create_annotations_with_side_effects(
     annotations: list[Annotation],
     *,
@@ -77,11 +100,7 @@ def bulk_create_annotations_with_side_effects(
 
     if update_task_timestamps:
         task_ids = {annotation.task_id for annotation in db_annotations if annotation.task_id}
-        if task_ids:
-            update_fields = {'updated_at': now()}
-            if user is not None:
-                update_fields['updated_by'] = user
-            Task.objects.filter(id__in=task_ids).update(**update_fields)
+        touch_tasks_updated_at(task_ids, updated_by=user)
 
     if update_task_counters and tasks_queryset is not None:
         # Derive the tasks to recount from the annotations we just created instead of

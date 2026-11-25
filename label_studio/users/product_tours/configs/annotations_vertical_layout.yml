@@ -1,0 +1,29 @@
+# FIT-3345: nudge users who keep paging the horizontal annotations carousel towards the vertical panel.
+# Started by VerticalLayoutNudge (libs/core/src/lib/topbar), not on page load. Step 1 "Yes, switch" is
+# handled in code (the layout is a browser-level editor setting), so it is the primary button, not a link.
+steps:
+  - target: '[data-testid="annotations-carousel-horizontal"]'
+    placement: bottom
+    offset: 8
+    floaterProps:
+      disableFlip: true
+    title: "Want to view annotations in a vertical panel?"
+    content: >
+      Browse long lists of annotations without paging sideways. Switch to vertical tabs on this browser.
+    disableBeacon: true
+    disableOverlay: true
+    showSkipButton: true
+    locale:
+      next: "Yes, switch"
+      skip: "No thanks"
+  - target: '[data-testid="bottombar-settings-button"]'
+    placement: top
+    offset: 8
+    title: "You can change this any time"
+    content: >
+      Open Settings and turn off "Display annotations in vertical panel" to go back to the horizontal list.
+    disableBeacon: true
+    # The user already accepted on step 1; a stray click on the backdrop must not close the tour unrecorded.
+    disableOverlayClose: true
+    locale:
+      last: "Got it"

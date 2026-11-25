@@ -6,7 +6,6 @@ import { Hotkey } from "../core/Hotkey";
 import { isDefined } from "../utils/utilities";
 import { AllRegionsType } from "../regions";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
-import { FF_DEV_2755, isFF } from "../utils/feature-flags";
 
 const hotkeys = Hotkey("RegionStore");
 
@@ -380,17 +379,10 @@ export default types
             children: [],
           });
         };
-        const getRegionLabel = (region) =>
-          region.labeling?.selectedLabels || (region.emptyLabel && [region.emptyLabel]);
         const addToLabelGroup = (key, label, region) => {
           const group = getLabelGroup(label, key);
           const groupId = group.id;
-          const labelHotKey = getRegionLabel(region)?.[0]?.hotkey;
 
-          if (isFF(FF_DEV_2755)) {
-            group.hotkey = labelHotKey;
-            group.pos = groupId.slice(0, groupId.indexOf("#"));
-          }
           group.children.push({
             ...enrich(region, index, false, null, onClick, groupId),
             item: region,
@@ -441,12 +433,7 @@ export default types
           }
         }
 
-        const groupsArray = Object.values(groups);
-
-        if (isFF(FF_DEV_2755)) {
-          groupsArray.sort((a, b) => (a.hotkey > b.hotkey ? 1 : a.hotkey < b.hotkey ? -1 : 0));
-        }
-        result.push(...groupsArray);
+        result.push(...Object.values(groups));
 
         return result;
       },
@@ -549,9 +536,6 @@ export default types
     },
 
     setView(view) {
-      if (isFF(FF_DEV_2755)) {
-        window.localStorage.setItem(localStorageKeys.view, view);
-      }
       self.view = view;
     },
 

@@ -26,14 +26,12 @@ This storage type is designed for importing tasks FROM cloud storage to Label St
     ImportStorage-->GCSImportStorageBase;
 
     GCSImportStorageBase-->GCSImportStorage; 
-    GCSImportStorageBase-->GCSDatasetStorage;
 
     GCSImportStorageLink-->ImportStorageLink
 
     subgraph Google Cloud Storage
         GCSImportStorage;
         GCSImportStorageBase;
-        GCSDatasetStorage;
     end
 ```
 

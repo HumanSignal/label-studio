@@ -13,7 +13,7 @@
  * rather than falling back to the OSS LabelingSummary.
  */
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DataSummary } from "./DataSummary";
 import { NumbersSummary } from "./NumbersSummary";
 import type { LabelColors, ObjectTypes } from "./types";
@@ -30,10 +30,10 @@ import { useGroundTruth } from "./agreement-dashboard/use-ground-truth";
 import { useEffectiveGroundTruth } from "./agreement-dashboard/use-effective-ground-truth";
 import { TaskSummaryControlPanel } from "./agreement-dashboard/task-summary-control-panel";
 import type { ReviewStats } from "./agreement-dashboard/task-summary-control-panel";
-import { openCommitGroundTruthDialog, commitGroundTruth } from "./agreement-dashboard/commit-ground-truth-dialog";
-import { openAutoReviewDialog } from "./agreement-dashboard/auto-review-dialog";
+import { commitGroundTruth, commitGroundTruthConfirmation } from "./agreement-dashboard/commit-ground-truth-dialog";
+import { autoReviewConfirmation } from "./agreement-dashboard/auto-review-dialog";
 
-import { CollapsiblePanel } from "@humansignal/ui";
+import { CollapsiblePanel, ConfirmDialog, type ConfirmDialogContent } from "@humansignal/ui";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -111,6 +111,7 @@ export const TaskSummaryDashboard = ({
   autoReviewAnnotations,
   onDataInvalidated,
 }: TaskSummaryDashboardProps) => {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const handleAnnotationClick = useCallback(
     (annotationPk: number) => onAnnotationClick?.(annotationPk),
     [onAnnotationClick],
@@ -207,22 +208,24 @@ export const TaskSummaryDashboard = ({
 
   const handleSaveGroundTruth = useCallback(() => {
     if (!taskId) return;
-    openCommitGroundTruthDialog({
-      taskId,
-      cells: effectiveGtCells,
-      summary: effectiveSummary,
-      annotations: agreementData.summaryAnnotations,
-      dimensions: agreementData.filteredDimensions,
-      annotators: agreementData.annotators,
-      onCommit: (payload) => {
-        commitGroundTruth(payload, () => {
-          groundTruth.actions.clearOnCommit();
-          invalidateData();
-        }).catch((err) => {
-          console.error("[Ground Truth] Commit failed:", err);
-        });
-      },
-    });
+    setPendingConfirm(
+      commitGroundTruthConfirmation({
+        taskId,
+        cells: effectiveGtCells,
+        summary: effectiveSummary,
+        annotations: agreementData.summaryAnnotations,
+        dimensions: agreementData.filteredDimensions,
+        annotators: agreementData.annotators,
+        onCommit: (payload) => {
+          commitGroundTruth(payload, () => {
+            groundTruth.actions.clearOnCommit();
+            invalidateData();
+          }).catch((err) => {
+            console.error("[Ground Truth] Commit failed:", err);
+          });
+        },
+      }),
+    );
   }, [
     taskId,
     effectiveGtCells,
@@ -283,21 +286,23 @@ export const TaskSummaryDashboard = ({
 
   const handleAutoReview = useCallback(() => {
     if (!taskId || !existingGtObject) return;
-    openAutoReviewDialog({
-      taskId,
-      existingGt: existingGtObject,
-      annotations: autoReviewAnnotations ?? [],
-      // BUSINESS RULE: Must use all categorical dimensions, never the UI-filtered subset.
-      // Column visibility is a display preference; hidden mismatches are still real.
-      dimensions: agreementData.categoricalDimensions,
-      // annotation_ids maps each position i to a unique annotation DB ID,
-      // letting the comparison logic avoid user-ID collisions (same user
-      // can appear multiple times in the agreement arrays).
-      annotationIds: agreementData.agreementResult?.annotation_ids ?? [],
-      annotators: agreementData.annotators,
-      existingReviews,
-      onCommit: invalidateData,
-    });
+    setPendingConfirm(
+      autoReviewConfirmation({
+        taskId,
+        existingGt: existingGtObject,
+        annotations: autoReviewAnnotations ?? [],
+        // BUSINESS RULE: Must use all categorical dimensions, never the UI-filtered subset.
+        // Column visibility is a display preference; hidden mismatches are still real.
+        dimensions: agreementData.categoricalDimensions,
+        // annotation_ids maps each position i to a unique annotation DB ID,
+        // letting the comparison logic avoid user-ID collisions (same user
+        // can appear multiple times in the agreement arrays).
+        annotationIds: agreementData.agreementResult?.annotation_ids ?? [],
+        annotators: agreementData.annotators,
+        existingReviews,
+        onCommit: invalidateData,
+      }),
+    );
   }, [
     taskId,
     existingGtObject,
@@ -481,6 +486,13 @@ export const TaskSummaryDashboard = ({
           )}
         </CollapsiblePanel>
       )}
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
     </div>
   );
 };

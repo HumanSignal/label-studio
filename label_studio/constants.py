@@ -182,3 +182,11 @@ UNSAFE_HTML_TAGS = [
 ]
 
 SAFE_INSTRUCTION_HTML_TAGS = [tag for tag in SAFE_HTML_TAGS if tag not in UNSAFE_HTML_TAGS]
+
+# Never needed in instructions: they act on the whole app document (base rewrites every relative URL) or load active
+# content, so they stay escaped even when the organization owner allows unsafe tags
+FORBIDDEN_INSTRUCTION_HTML_TAGS = ['base', 'embed', 'form', 'link', 'meta', 'object']
+
+UNSAFE_ALLOWED_INSTRUCTION_HTML_TAGS = [tag for tag in SAFE_HTML_TAGS if tag not in FORBIDDEN_INSTRUCTION_HTML_TAGS]
+
+SAFE_HTML_PROTOCOLS = ['http', 'https', 'mailto']

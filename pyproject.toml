@@ -14,7 +14,6 @@ classifiers = [
 dependencies = [
     "wheel (>=0.46.3)",
     "appdirs (>=1.4.3)",
-    "attr (==0.3.1)",
     "attrs (>=19.2.0)",
     "pyyaml (>=6.0.0)",
     "azure-storage-blob (>=12.6.0)",
@@ -26,7 +25,7 @@ dependencies = [
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
     "django-debug-toolbar (==3.2.1)",
-    "django-environ (==0.10.0)",
+    "django-environ (==0.14.0)",
     "django-filter (==24.3)",
     "django-rq (>=4.1.1,<4.2)",
     "django-cors-headers (==4.7.0)",
@@ -34,7 +33,7 @@ dependencies = [
     "django-user-agents (==0.4.0)",
     "django-ranged-fileresponse (>=0.1.2)",
     "drf-dynamic-fields (==0.3.0)",
-    "djangorestframework (==3.17.2)",
+    "djangorestframework (==3.18.3)",
     "drf-flex-fields (==0.9.5)",
     "drf-spectacular (==0.28.0)",
     "drf-generators (==0.3.0)",
@@ -44,7 +43,7 @@ dependencies = [
     "ordered-set (==4.0.2)",
     "pandas (>=2.2.3)",
     "psycopg[binary] (>=3.2.0,<4.0.0)",
-    "pyarrow (>=24.0.0,<25.0.0)",
+    "pyarrow (>=26.0.1,<27.0.0)",
     "pydantic (>=2.9.2)",
     "python-dateutil (>=2.8.1)",
     "pytz (>=2022.1,<2023.0)",
@@ -57,7 +56,7 @@ dependencies = [
     "colorama (>=0.4.4)",
     "pyboxen (>=1.3.0)",
     "redis (>=5.2.1,<5.3.0)",
-    "sentry-sdk (>=2.16.0)",
+    "sentry-sdk (>=2.69.0)",
     "launchdarkly-server-sdk (==8.2.1)",
     "python-json-logger (==2.0.4)",
     "google-cloud-storage (>=3.8.0,<4.0.0)",
@@ -73,11 +72,11 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "3a0a1cf970b7c5ee88ddac9e9a5333e5d95c8d50" }
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "1e13beb991c55f9f0426458fe3491da007a0ef42" }
 
 [project.optional-dependencies]
 uwsgi = [
-    "pyuwsgi (==2.0.28.post1)",
+    "pyuwsgi (==2.0.30.post1)",
     "uwsgitop (==0.12)",
 ]
 
@@ -100,7 +99,6 @@ test = [
     "pytest-xdist==3.8.0",
     "psutil==7.0.0",
     "freezegun~=1.5.1",
-    "pre-commit==3.3.3",
     "s3transfer>=0.16.0",
     "mock>=5.1.0",
     "moto>=4.2.6",
@@ -113,11 +111,11 @@ build = [
 ]
 
 [build-system]
-requires = ["uv_build<0.13.0"]
+requires = ["uv_build<0.14.0"]
 build-backend = "uv_build"
 
 [tool.uv]
-required-version = ">=0.11.8"
+required-version = ">=0.13.5"
 exclude-newer = "4 days"
 exclude-newer-package = { certifi = false }
 
@@ -206,5 +204,4 @@ env = [
     "D:USE_ENFORCE_CSRF_CHECKS=0",
     "D:TEST_ENVIRONMENT=1",
     "COLLECT_ANALYTICS=0",
-    "fflag_feat_fit_568_finite_state_management=1",
 ]

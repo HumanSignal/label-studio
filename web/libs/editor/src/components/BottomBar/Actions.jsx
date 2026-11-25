@@ -30,7 +30,7 @@ export const Actions = ({ store }) => {
             aria-label="Instructions"
             size="small"
             variant="neutral"
-            look="string"
+            look="ghost"
             tooltip="Show instructions"
             onClick={() => store.toggleDescription()}
             className="aspect-square"
@@ -42,7 +42,7 @@ export const Actions = ({ store }) => {
           type="text"
           aria-label="Settings"
           size="small"
-          look="string"
+          look="ghost"
           variant="neutral"
           onClick={() => store.toggleSettings()}
           tooltip="Settings"

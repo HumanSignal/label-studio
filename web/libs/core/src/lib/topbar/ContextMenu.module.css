@@ -93,3 +93,12 @@
     background-color: transparent;
   }
 }
+
+.disabled {
+  color: var(--color-neutral-content-subtler);
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+  }
+}

@@ -6,18 +6,13 @@ import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
-import {
-  isActive,
-  FF_AGREEMENT_FILTERED,
-  FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT,
-} from "@humansignal/core/lib/utils/feature-flags";
+import { isActive, FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT } from "@humansignal/core/lib/utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { Spinner } from "../../Common/Spinner";
 import { Table } from "../../Common/Table/Table";
 import { GridView } from "../GridView/GridView";
 import "./Table.prefix.css";
-import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";
 import {
@@ -91,7 +86,6 @@ function DataViewInner({
   RowContextMenuComponent,
   ...props
 }) {
-  const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
   const [density, setDensity] = useState(() => {
     return localStorage.getItem(DENSITY_STORAGE_KEY) ?? DENSITY_COMFORTABLE;
   });
@@ -127,8 +121,7 @@ function DataViewInner({
   );
 
   const agreementFeatureFlagsActive =
-    isActive(FF_AGREEMENT_FILTERED) &&
-    (project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT));
+    project?.is_dimensions_enabled ?? isActive(FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT);
   const agreementSelectedKey = JSON.stringify(view?.agreement_selected ?? {});
 
   const columnHeaderExtra = useCallback(
@@ -207,16 +200,14 @@ function DataViewInner({
     async (item, e) => {
       const itemID = item.task_id ?? item.id;
 
-      if (store.SDK.type === "DE") {
-        store.SDK.invoke("recordPreview", item, columns, getRoot(view).taskStore.associatedList);
-      } else if (e.metaKey || e.ctrlKey) {
+      if (e.metaKey || e.ctrlKey) {
         window.open(`./?task=${itemID}`, "_blank");
       } else {
         store._sdk.lsf?.saveDraft();
         getRoot(view).startLabeling(item);
       }
     },
-    [view, columns],
+    [view],
   );
 
   const renderContent = useCallback(
@@ -225,55 +216,6 @@ function DataViewInner({
         return (
           <div className={cn("fill-container").toClassName()}>
             <Spinner size="large" />
-          </div>
-        );
-      }
-      if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
-        return (
-          <div className={cn("syncInProgress").toClassName()}>
-            <h3 className={cn("syncInProgress").elem("title").toClassName()}>Failed to sync data</h3>
-            <div className={cn("syncInProgress").elem("text").toClassName()}>
-              Check your storage settings. You may need to recreate this dataset
-            </div>
-          </div>
-        );
-      }
-      if (
-        store.SDK.type === "DE" &&
-        (total === 0 || data.length === 0 || !hasData) &&
-        datasetStatusID === "completed"
-      ) {
-        return (
-          <div className={cn("syncInProgress").toClassName()}>
-            <h3 className={cn("syncInProgress").elem("title").toClassName()}>Nothing found</h3>
-            <div className={cn("syncInProgress").elem("text").toClassName()}>
-              Try adjusting the filter or similarity search parameters
-            </div>
-          </div>
-        );
-      }
-      if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
-        return (
-          <div className={cn("syncInProgress").toClassName()}>
-            <h3 className={cn("syncInProgress").elem("title").toClassName()}>
-              Hang tight! Records are syncing in the background
-            </h3>
-            <div className={cn("syncInProgress").elem("text").toClassName()}>
-              Press the button below to see any synced records
-            </div>
-            <Button
-              size="small"
-              look="outlined"
-              onClick={async () => {
-                await store.fetchProject({
-                  force: true,
-                  interaction: "refresh",
-                });
-                await store.currentView?.reload();
-              }}
-            >
-              Refresh
-            </Button>
           </div>
         );
       }
@@ -321,7 +263,7 @@ function DataViewInner({
 
       return content;
     },
-    [hasData, isLabeling, isLoading, total, datasetStatusID, role, project, hasFilters, canLabel],
+    [hasData, isLabeling, isLoading, total, role, project, hasFilters, canLabel],
   );
 
   const decorationContent = (col) => {
@@ -370,12 +312,8 @@ function DataViewInner({
         },
       },
       {
-        resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type !== "DE",
+        resolver: (col) => col.type === "Image" && col.original,
         style: { width: 150, justifyContent: "center" },
-      },
-      {
-        resolver: (col) => col.type === "Image" && col.original && getRoot(col.original)?.SDK?.type === "DE",
-        style: { width: 150 },
       },
       {
         resolver: (col) => ["Date", "Datetime"].includes(col.type),
@@ -470,13 +408,6 @@ function DataViewInner({
 
     if (highlighted && !highlighted.isSelected) store.startLabeling(highlighted);
   });
-
-  useEffect(() => {
-    const updateDatasetStatus = (dataset) => dataset?.status?.id && setDatasetStatusID(dataset?.status?.id);
-
-    getRoot(store).SDK.on("datasetUpdated", updateDatasetStatus);
-    return () => getRoot(store).SDK.off("datasetUpdated", updateDatasetStatus);
-  }, []);
 
   // Render the UI for your table
   return (

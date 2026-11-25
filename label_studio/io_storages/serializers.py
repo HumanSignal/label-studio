@@ -7,6 +7,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from io_storages.base_models import ExportStorage, ImportStorage
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from tasks.models import Task
 from tasks.serializers import AnnotationSerializer, TaskSerializer
 from users.models import User
@@ -73,7 +74,63 @@ class StorageTypeField(serializers.ReadOnlyField):
     pass
 
 
-class ImportStorageSerializer(serializers.ModelSerializer):
+def get_stored_storage(serializer):
+    """Return the saved storage a request applies to: the PATCH/PUT instance, or the `id` sent to validate."""
+    if serializer.instance is not None:
+        return serializer.instance
+    initial_data = getattr(serializer, 'initial_data', None)
+    storage_id = initial_data.get('id') if hasattr(initial_data, 'get') else None
+    try:
+        storage_id = int(storage_id)
+    except (TypeError, ValueError):
+        return None
+    return serializer.Meta.model.objects.filter(pk=storage_id).first()
+
+
+def _endpoint_value(value):
+    return str(value or '').strip().rstrip('/')
+
+
+def reset_secrets_on_endpoint_change(storage, data, endpoint_fields, secret_fields, required_secret_fields):
+    """Keep stored secrets from reaching a new endpoint.
+
+    When `data` points `storage` at a different endpoint, a stored secret in `required_secret_fields` must be
+    sent again, and every other secret the request omits is cleared, so a later request can't send it to the
+    new endpoint either.
+
+    Returns True when the endpoint changed. Callers must then not fill omitted secrets from `storage`.
+    """
+    if storage is None:
+        return False
+    changed = [
+        field
+        for field in endpoint_fields
+        if field in data and _endpoint_value(data[field]) != _endpoint_value(getattr(storage, field))
+    ]
+    if not changed:
+        return False
+
+    errors = {}
+    for field in secret_fields:
+        if data.get(field):
+            continue
+        if field in required_secret_fields and getattr(storage, field):
+            errors[field] = f'Enter this value again when changing the {" or ".join(changed)}.'
+        data[field] = ''
+    if errors:
+        raise ValidationError(errors)
+    return True
+
+
+class StorageProjectValidationMixin:
+    def validate_project(self, project):
+        stored = get_stored_storage(self)
+        if stored is not None and getattr(project, 'id', None) != stored.project_id:
+            raise ValidationError('A storage cannot be moved to another project.')
+        return project
+
+
+class ImportStorageSerializer(StorageProjectValidationMixin, serializers.ModelSerializer):
     type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 
@@ -89,7 +146,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ExportStorageSerializer(serializers.ModelSerializer):
+class ExportStorageSerializer(StorageProjectValidationMixin, serializers.ModelSerializer):
     type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     synchronizable = serializers.BooleanField(required=False, default=True)
 

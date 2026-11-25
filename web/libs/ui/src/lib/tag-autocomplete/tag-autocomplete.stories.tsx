@@ -7,7 +7,7 @@ import type { TagOption } from "./types";
 
 const meta: Meta<typeof TagAutocomplete> = {
   component: TagAutocomplete,
-  title: "UI/TagAutocomplete",
+  title: "Inputs/TagAutocomplete",
   argTypes: {
     disabled: {
       control: "boolean",
@@ -696,4 +696,23 @@ export const PasteBlocked: Story = {
       </div>
     );
   },
+};
+
+/** The smallest height of the field: 40, 32 and 24px, as every other control. It grows when the tags wrap. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-base">
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <TagAutocomplete
+          key={size}
+          size={size}
+          triggerClassName="w-96"
+          options={sampleTags}
+          value={[]}
+          onChange={() => {}}
+          placeholder={size}
+        />
+      ))}
+    </div>
+  ),
 };

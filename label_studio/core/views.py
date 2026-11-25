@@ -197,9 +197,19 @@ def static_file_with_host_resolver(path_on_disk, content_type):
 def feature_flags(request):
     user = request.user
     if not user.is_authenticated:
-        return HttpResponseForbidden()
+        from jwt_auth.auth import TokenAuthenticationPhaseout
+        from rest_framework.exceptions import AuthenticationFailed
 
-    flags = all_flags(request.user)
+        try:
+            auth_result = TokenAuthenticationPhaseout().authenticate(request)
+        except AuthenticationFailed:
+            return HttpResponseForbidden()
+        if auth_result is None:
+            return HttpResponseForbidden()
+        user, _ = auth_result
+        request.user = user
+
+    flags = all_flags(user)
     flags['$system'] = {
         'FEATURE_FLAGS_DEFAULT_VALUE': settings.FEATURE_FLAGS_DEFAULT_VALUE,
         'FEATURE_FLAGS_FROM_FILE': settings.FEATURE_FLAGS_FROM_FILE,

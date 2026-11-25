@@ -1,7 +1,7 @@
 /**
  * Unit tests for HtxParagraphs view (tags/object/Paragraphs/HtxParagraphs.jsx)
  */
-import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
+import { FF_DEV_2918, FF_NER_SELECT_ALL } from "../../../../utils/feature-flags";
 import * as selectionTools from "../../../../utils/selection-tools";
 import * as htmlUtils from "../../../../utils/html";
 import { HtxParagraphsView } from "../HtxParagraphs";
@@ -10,7 +10,6 @@ const ff = mockFF();
 beforeEach(() => {
   restoreAllMocks();
   ff.reset();
-  ff.set({ [FF_LSDV_E_278]: true });
 });
 
 function createMockItem(overrides = {}) {
@@ -332,7 +331,7 @@ describe("HtxParagraphsView", () => {
 
   describe("getRegionsForPhrase (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns [] when item has no annotation", () => {
@@ -363,7 +362,7 @@ describe("HtxParagraphsView", () => {
 
   describe("selectRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.annotation.selectArea and returns true", () => {
@@ -378,7 +377,7 @@ describe("HtxParagraphsView", () => {
 
   describe("hasSelectedLabels (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns false when activeStates returns empty", () => {
@@ -406,7 +405,7 @@ describe("HtxParagraphsView", () => {
 
   describe("selectRegionsForPhrase (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns early when annotation has no results", () => {
@@ -448,7 +447,7 @@ describe("HtxParagraphsView", () => {
 
   describe("handleNextPhrase", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.goToNextPhrase and selectRegionsForPhrase", () => {
@@ -468,7 +467,7 @@ describe("HtxParagraphsView", () => {
 
   describe("handlePreviousPhrase", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.goToPreviousPhrase", () => {
@@ -488,7 +487,7 @@ describe("HtxParagraphsView", () => {
 
   describe("handleSelectAllAndAnnotate", () => {
     beforeEach(() => {
-      ff.set({ [FF_NER_SELECT_ALL]: true, [FF_LSDV_E_278]: false });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls item.selectAllAndAnnotateCurrentPhrase", () => {
@@ -502,7 +501,7 @@ describe("HtxParagraphsView", () => {
 
   describe("handleNextRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns early when playingId < 0", () => {
@@ -557,7 +556,7 @@ describe("HtxParagraphsView", () => {
 
   describe("handlePreviousRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("selects previous region in phrase", () => {
@@ -829,7 +828,7 @@ describe("HtxParagraphsView", () => {
 
   describe("isDuplicateRegion (FF_NER_SELECT_ALL)", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("returns false when FF_NER_SELECT_ALL is off", () => {
@@ -919,7 +918,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("returns early when duplicate detected (FF_NER_SELECT_ALL)", () => {
-      ff.set({ [FF_NER_SELECT_ALL]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
       const addRegion = mock();
       const item = createMockItem({
         activeStates: mock(() => [{ selectedValues: () => ["Label"] }]),
@@ -952,7 +951,6 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegion when FF_DEV_2918 is off", () => {
-      ff.set({ [FF_LSDV_E_278]: true });
       const createdRegion = {
         createSpans: mock(() => []),
         addEventsToSpans: mock(),
@@ -970,7 +968,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegions when FF_DEV_2918 is on", () => {
-      ff.set({ [FF_DEV_2918]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_DEV_2918]: true });
       const htxRange = {
         createSpans: mock(() => []),
         addEventsToSpans: mock(),
@@ -988,7 +986,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("does not iterate htxRanges when addRegions returns empty array", () => {
-      ff.set({ [FF_DEV_2918]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_DEV_2918]: true });
       const addRegions = mock(() => []);
       const item = createMockItem({
         activeStates: mock(() => [{ selectedValues: () => [] }]),
@@ -1000,7 +998,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("iterates all htxRanges when addRegions returns multiple", () => {
-      ff.set({ [FF_DEV_2918]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_DEV_2918]: true });
       const htxRange1 = { createSpans: mock(() => []), addEventsToSpans: mock() };
       const htxRange2 = { createSpans: mock(() => []), addEventsToSpans: mock() };
       const addRegions = mock(() => [htxRange1, htxRange2]);
@@ -1020,7 +1018,6 @@ describe("HtxParagraphsView", () => {
     });
 
     it("does not call createSpans when addRegion returns null", () => {
-      ff.set({ [FF_LSDV_E_278]: true });
       const addRegion = mock(() => null);
       const item = createMockItem({
         activeStates: mock(() => [{ selectedValues: () => [] }]),
@@ -1338,7 +1335,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegions when FF_DEV_2918 and selection captured", () => {
-      ff.set({ [FF_DEV_2918]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_DEV_2918]: true });
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
       const htxRange = { createSpans: mock(() => []), addEventsToSpans: mock() };
       const addRegions = mock(() => [htxRange]);
@@ -1356,7 +1353,6 @@ describe("HtxParagraphsView", () => {
     });
 
     it("calls item.addRegion when FF_DEV_2918 off and selection captured", () => {
-      ff.set({ [FF_LSDV_E_278]: true });
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
       const createdRegion = { createSpans: mock(() => []), addEventsToSpans: mock() };
       const addRegion = mock(() => createdRegion);
@@ -1373,7 +1369,7 @@ describe("HtxParagraphsView", () => {
     });
 
     it("handles addRegions returning empty array", () => {
-      ff.set({ [FF_DEV_2918]: true, [FF_LSDV_E_278]: true });
+      ff.set({ [FF_DEV_2918]: true });
       const ranges = [{ start: "0", end: "0", startOffset: 0, endOffset: 5 }];
       const addRegions = mock(() => []);
       const item = createMockItem({
@@ -1399,28 +1395,18 @@ describe("HtxParagraphsView", () => {
   });
 
   describe("render", () => {
-    it("returns null when FF_DEV_2669 and !item._value", () => {
-      ff.set({ [FF_DEV_2669]: true, [FF_LSDV_E_278]: true });
+    it("returns null when !item._value", () => {
       const item = createMockItem({ _value: null });
       const view = new HtxParagraphsView({ item });
       expect(view.render()).toBe(null);
     });
 
-    it("calls _disposeTimeout when !playing and FF_LSDV_E_278", () => {
+    it("calls _disposeTimeout when !playing", () => {
       const item = createMockItem({ playing: false });
       const view = new HtxParagraphsView({ item });
       view._disposeTimeout = mock();
       view.render();
       expect(view._disposeTimeout).toHaveBeenCalled();
-    });
-
-    it("does not call _disposeTimeout when FF_LSDV_E_278 is off", () => {
-      ff.reset();
-      const item = createMockItem({ playing: false, _value: [{}] });
-      const view = new HtxParagraphsView({ item });
-      view._disposeTimeout = mock();
-      view.render();
-      expect(view._disposeTimeout).not.toHaveBeenCalled();
     });
 
     it("renders without wrapper header Toggle when contextscroll is false", () => {
@@ -1622,7 +1608,7 @@ describe("HtxParagraphsView", () => {
 
   describe("componentDidMount", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls setViewRef when FF_NER_SELECT_ALL", () => {
@@ -1654,7 +1640,7 @@ describe("HtxParagraphsView", () => {
 
   describe("componentWillUnmount", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("calls setViewRef(null) and disconnects resize observer", () => {
@@ -1684,7 +1670,7 @@ describe("HtxParagraphsView", () => {
 
   describe("getRegionsForPhrase edge cases", () => {
     beforeEach(() => {
-      ff.set({ [FF_LSDV_E_278]: true, [FF_NER_SELECT_ALL]: true });
+      ff.set({ [FF_NER_SELECT_ALL]: true });
     });
 
     it("filters out regions with non-numeric start or end", () => {

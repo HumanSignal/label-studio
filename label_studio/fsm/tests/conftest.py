@@ -32,15 +32,18 @@ azure_client = ls_tests_conftest.azure_client
 
 
 @pytest.fixture(autouse=True, scope='function')
-def fsm_test_isolation():
+def fsm_test_isolation(settings):
     """
     Ensure test isolation by:
-    1. Saving and restoring the transition registry
-    2. Clearing CurrentContext and cache
+    1. Enabling FSM for the FSM test suite (LSO defaults to FSM_ENABLED=False)
+    2. Saving and restoring the transition registry
+    3. Clearing CurrentContext and cache
 
     This prevents test leakage when tests clear the registry for their own purposes.
     """
     from core.current_request import CurrentContext
+
+    settings.FSM_ENABLED = True
 
     # Restore original registry state after test to avoid test pollution
     original_transitions = deepcopy(transition_registry._transitions)

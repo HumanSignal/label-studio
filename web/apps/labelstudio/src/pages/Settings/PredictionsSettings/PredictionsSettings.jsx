@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Divider } from "../../../components/Divider/Divider";
-import { EmptyState, SimpleCard } from "@humansignal/ui";
+import { EmptyState, Card } from "@humansignal/ui";
 import { Typography } from "@humansignal/ui";
 import { IconExternal, IconPredictions } from "@humansignal/icons";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
@@ -59,7 +59,7 @@ export const PredictionsSettings = () => {
         )}
 
         {loaded && versions.length === 0 && (
-          <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
+          <Card size="compact" title="" className="bg-primary-background border-primary-border-subtler p-base">
             <EmptyState
               size="medium"
               variant="primary"
@@ -84,7 +84,7 @@ export const PredictionsSettings = () => {
                 )
               }
             />
-          </SimpleCard>
+          </Card>
         )}
 
         <PredictionsList project={project} versions={versions} fetchVersions={fetchVersions} />

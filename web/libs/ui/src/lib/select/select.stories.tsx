@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
 import { Badge } from "../badge/badge";
-import { BadgeGroup } from "../badge-group";
+import { SummaryLabel } from "../summary-label";
 import { Button } from "../button/button";
 
 const thousandOptions = (() => {
@@ -10,7 +10,7 @@ const thousandOptions = (() => {
 })();
 
 const meta = {
-  title: "UI/Select",
+  title: "Inputs/Select",
   component: Select,
   parameters: {
     layout: "centered",
@@ -263,7 +263,8 @@ export const MultipleWithBadges: Story = {
           renderSelected={(selectedOptions) => {
             if (!selectedOptions || selectedOptions?.length === 0) return null;
             return (
-              <BadgeGroup
+              <SummaryLabel
+                badges
                 items={
                   selectedOptions?.map((opt: any) => ({
                     id: opt?.value ?? opt,
@@ -401,13 +402,45 @@ export const WithGroupByAndOptionRenderer: Story = {
       <span className="flex w-full items-center justify-between gap-2">
         <span>{option?.title ?? option?.label ?? option?.value}</span>
         {option?.readableType && (
-          <Badge variant="secondary" shape="squared" className="text-[10px]">
+          <Badge variant="neutral" shape="square" className="text-[10px]">
             {option.readableType}
           </Badge>
         )}
       </span>
     ),
     label: "With groupBy and optionRenderer (type badges)",
+  },
+};
+
+/**
+ * `listHeader` sits under the search field and above the options, so column headings for a custom
+ * `optionRenderer` stay pinned while the list scrolls.
+ */
+export const WithListHeader: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    options: [
+      { value: "summary", label: "summary", readableType: "TextArea" },
+      { value: "rating", label: "rating", readableType: "Rating" },
+      { value: "author", label: "author", readableType: "str" },
+    ] as any[],
+    listHeader: (
+      <div className="flex items-center justify-between px-4 py-2 text-body-smaller text-neutral-content-subtle">
+        <span>Column</span>
+        <span>Type</span>
+      </div>
+    ),
+    optionRenderer: ({ option }) => (
+      <span className="flex w-full items-center justify-between gap-2">
+        <span>{option?.label}</span>
+        <Badge variant="neutral" shape="square" className="text-[10px]">
+          {option?.readableType}
+        </Badge>
+      </span>
+    ),
+    label: "With listHeader (pinned column headings)",
   },
 };
 
@@ -471,6 +504,44 @@ export const ControlledOpenWithFooterApply: Story = {
               Apply
             </Button>
           }
+        />
+        <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
+      </div>
+    );
+  },
+};
+
+/**
+ * `requireApply` on a multiple select: picks stay pending until Apply, closing without Apply discards them, and
+ * `onChange` fires once with the full list. Use it when the list is long or a change reloads data.
+ */
+export const RequireApply: Story = {
+  render: () => {
+    const options = [
+      { value: "AN", label: "Annotator" },
+      { value: "RE", label: "Reviewer" },
+      { value: "MA", label: "Manager" },
+      { value: "AD", label: "Administrator" },
+    ];
+    const [applied, setApplied] = useState<string[]>(["AN"]);
+
+    return (
+      <div className="flex flex-col gap-4 w-[350px]">
+        <Select
+          multiple
+          requireApply
+          value={applied}
+          options={options}
+          placeholder="Roles"
+          label="Enforced roles"
+          renderSelected={(picked, placeholder) =>
+            picked?.length ? (
+              <SummaryLabel items={picked.map((option: any) => ({ id: option.value, label: option.label }))} />
+            ) : (
+              placeholder
+            )
+          }
+          onChange={(values: any) => setApplied(values)}
         />
         <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
       </div>
@@ -545,4 +616,15 @@ export const SizesMatchButton: Story = {
       </div>
     );
   },
+};
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-base" style={{ width: 240 }}>
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <Select key={size} size={size} placeholder={size} options={["Apple", "Banana", "Blueberry"] as any[]} />
+      ))}
+    </div>
+  ),
 };

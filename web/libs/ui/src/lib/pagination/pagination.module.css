@@ -19,7 +19,7 @@
 }
 
 .navigation {
-  @apply flex h-full items-center rounded border border-neutral-border bg-neutral-background;
+  @apply flex h-full items-center rounded-small border border-neutral-border bg-neutral-background;
 
   .container.disabled & {
     @apply pointer-events-none;
@@ -57,13 +57,13 @@
   }
 
   &.button-first {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-top-left-radius: calc(var(--corner-radius-small) - 1px);
+    border-bottom-left-radius: calc(var(--corner-radius-small) - 1px);
   }
 
   &.button-last {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border-top-right-radius: calc(var(--corner-radius-small) - 1px);
+    border-bottom-right-radius: calc(var(--corner-radius-small) - 1px);
   }
 }
 

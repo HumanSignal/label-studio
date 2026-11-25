@@ -1,4 +1,5 @@
 import { formDataToJPO } from "../utils/helpers";
+import { REQUESTED_WITH_HEADER, REQUESTED_WITH_VALUE, isSameOrigin, isUnsafeMethod } from "./same-origin-fetch";
 import statusCodes from "./status-codes.json";
 import type {
   APIProxyOptions,
@@ -172,7 +173,7 @@ export class APIProxy<T extends {}> {
         const requestMethod = method ?? (methodSettings.method ?? "get").toUpperCase();
 
         const initialheaders = Object.assign(
-          this.getDefaultHeaders(requestMethod as RequestMethod),
+          this.getDefaultHeaders(requestMethod as RequestMethod, apiCallURL),
           this.commonHeaders ?? {},
           methodSettings.headers ?? {},
           headers ?? {},
@@ -216,8 +217,9 @@ export class APIProxy<T extends {}> {
           }
 
           // @todo better check for files maybe?
-          if (contentType === "multipart/form-data") {
-            // fetch will set correct header with boundaries
+          if (contentType === "multipart/form-data" || requestParams.body instanceof FormData) {
+            // fetch will set correct header with boundaries — the default `application/json`
+            // from getDefaultHeaders must never be forced onto a multipart body.
             requestHeaders.delete("Content-Type");
           }
         }
@@ -320,18 +322,36 @@ export class APIProxy<T extends {}> {
     };
   }
 
-  getDefaultHeaders(method: RequestMethod) {
-    switch (method) {
-      case "POST":
-      case "PATCH":
-      case "DELETE": {
-        return {
-          "Content-Type": "application/json",
-        };
-      }
-      default:
-        return {};
+  /**
+   * Default headers for a request. Unsafe methods (POST/PUT/PATCH/DELETE) default to a JSON body
+   * and, when the request stays on the current origin, carry the FIT-2967 marker header.
+   *
+   * @param method Resolved HTTP method.
+   * @param url Final request URL. Omit to fall back on the proxy-level `requestMode` only.
+   */
+  getDefaultHeaders(method: RequestMethod, url?: string): Record<string, string> {
+    if (!isUnsafeMethod(method)) return {};
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (this.shouldSendRequestedWith(url)) {
+      headers[REQUESTED_WITH_HEADER] = REQUESTED_WITH_VALUE;
     }
+
+    return headers;
+  }
+
+  /**
+   * The marker header is a same-origin-only signal: never add it to a `cors` proxy (gateway on
+   * another origin) or to an endpoint whose per-call `gateway` resolves to another origin, since
+   * a custom header forces a CORS preflight that can fail the write.
+   */
+  private shouldSendRequestedWith(url?: string): boolean {
+    if (this.requestMode === "cors") return false;
+
+    return url === undefined || isSameOrigin(url);
   }
 
   /**

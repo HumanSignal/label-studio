@@ -35,3 +35,11 @@ def test_existing_world_readable_env_file_is_restricted(tmp_path, no_secret_key_
 
     assert generate_secret_key_if_missing(str(tmp_path)) == 'existing-secret'
     assert _mode(env_file) == 0o600
+
+
+@pytest.mark.parametrize('secret', ['7g#-8e8^d--5b=81!0m', 'abc #def', 'x=y#z'])
+def test_persisted_secret_with_hash_is_read_back_intact(tmp_path, no_secret_key_env, secret):
+    # Keys are written unquoted; django-environ 0.11-0.13 parsed '#' as a comment and truncated them
+    (tmp_path / '.env').write_text(f'\nSECRET_KEY={secret}\n')
+
+    assert generate_secret_key_if_missing(str(tmp_path)) == secret

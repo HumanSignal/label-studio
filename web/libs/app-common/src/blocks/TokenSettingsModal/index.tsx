@@ -5,6 +5,7 @@ import { Form, Input, Toggle } from "apps/labelstudio/src/components/Form";
 import { useAtomValue } from "jotai";
 import { queryClientAtom } from "jotai-tanstack-query";
 import { type ChangeEvent, useState } from "react";
+import { useStepUp } from "../../components/step-up/step-up-provider";
 
 const NEVER_EXPIRES_TTL = 200 * 365;
 
@@ -35,12 +36,17 @@ function TokenSettingsModalView({
   const [enableTTL, setEnableTTL] = useState(settings.api_tokens_enabled);
   const [neverExpires, setNeverExpires] = useState(settings.api_token_ttl_days === NEVER_EXPIRES_TTL);
   const queryClient = useAtomValue(queryClientAtom);
+  const withStepUp = useStepUp();
   const reloadSettings = () => {
     queryClient.invalidateQueries({ queryKey: [TOKEN_SETTINGS_KEY] });
     onSaved?.();
   };
   return (
-    <Form action="accessTokenUpdateSettings" onSubmit={reloadSettings}>
+    <Form
+      action="accessTokenUpdateSettings"
+      sendRequest={(send: () => Promise<unknown>) => withStepUp("Change API token settings", send)}
+      onSubmit={reloadSettings}
+    >
       <Form.Row columnCount={1}>
         <Toggle
           label="Personal Access Tokens"

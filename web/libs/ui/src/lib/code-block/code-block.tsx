@@ -6,18 +6,18 @@ import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
 export function CodeBlock({
   code,
   className,
-  variant = "default",
+  variant = "neutral",
   allowCopy,
 }: {
   title?: string;
   description?: string;
   code: string;
   className?: string;
-  variant?: "default" | "warning" | "negative";
+  variant?: "neutral" | "warning" | "negative";
   allowCopy?: boolean;
 }) {
   const variantStyles = {
-    default: "bg-neutral-surface border-neutral-border",
+    neutral: "bg-neutral-surface border-neutral-border",
     warning: "bg-warning-background border-warning-border-subtle",
     negative: "bg-negative-background border-negative-border-subtle",
   };
@@ -36,7 +36,7 @@ export function CodeBlock({
     >
       <pre className="whitespace-pre-wrap">{code.trim()}</pre>
       {allowCopy && (
-        <Button size="small" look="string" className="absolute top-1 right-2" onClick={() => copyCode(code)}>
+        <Button size="small" look="ghost" className="absolute top-1 right-2" onClick={() => copyCode(code)}>
           {isCopied ? <CheckIcon /> : <CopyIcon />}
         </Button>
       )}

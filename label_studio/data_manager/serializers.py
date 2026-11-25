@@ -2,11 +2,10 @@
 
 import copy
 import os
+import re
 from typing import Any
 
 import ujson as json
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from data_manager.models import Filter, FilterGroup, View
 from data_manager.prepare_params import filters_schema, ordering_schema, selected_items_schema
 from django.conf import settings
@@ -15,7 +14,7 @@ from django.db.models import Max
 from django.utils import timezone
 from drf_spectacular.extensions import OpenApiSerializerFieldExtension
 from drf_spectacular.utils import extend_schema_field
-from fsm.serializer_fields import FSMStateField
+from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from projects.models import Project
 from psycopg import errors as pg_errors
 from rest_framework import serializers, status
@@ -61,7 +60,7 @@ def view_lock_project(instance_or_data):
     """Resolve a project for lock permission checks.
 
     ``View`` has ``project``; ``DatasetView`` has ``dataset`` only. Returning
-    ``None`` lets ``get_user_role`` fall back to an org-level role check.
+    ``None`` lets ``user.get_role`` fall back to an org-level role check.
     """
     if isinstance(instance_or_data, dict):
         return instance_or_data.get('project')
@@ -70,12 +69,11 @@ def view_lock_project(instance_or_data):
 
 def user_can_manage_view_lock(user, project):
     try:
-        from lse_organizations.functions import get_user_role
         from lse_organizations.models import OrganizationRole
     except ImportError:
         return True
 
-    role = get_user_role(user=user, organization_or_pk=user.active_organization_id, project=project)
+    role = user.get_role(user.active_organization_id, project)
     return role in (OrganizationRole.OWNER, OrganizationRole.ADMINISTRATOR, OrganizationRole.MANAGER)
 
 
@@ -317,6 +315,24 @@ class ViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = View
         fields = '__all__'
+
+    def validate_project(self, project):
+        """Only allow a project the requesting user can access, the same scope as the other view routes.
+
+        Without this the primary-key field accepts any project id, so a view could be created in (or moved to)
+        a project of another organization. The error matches a missing project, so existence is not revealed.
+        """
+        from data_manager.functions import accessible_projects
+
+        request = self.context.get('request')
+        if request is None or project is None:
+            return project
+        if self.instance is not None and self.instance.project_id == project.pk:
+            # get_object() already scoped the view to accessible projects
+            return project
+        if not accessible_projects(request.user).filter(pk=project.pk).exists():
+            self.fields['project'].fail('does_not_exist', pk_value=project.pk)
+        return project
 
     @extend_schema_field(
         {
@@ -781,12 +797,8 @@ class DataManagerTaskSerializer(TaskSerializer):
             ret.pop('annotations', None)
         if not self.context.get('predictions'):
             ret.pop('predictions', None)
-        # Remove state field if feature flags are disabled
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        # Remove state field if FSM state fields are disabled
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
         return ret
 
@@ -826,8 +838,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     def get_annotations(self, task) -> list[dict[str, Any]]:
         """Return annotations for the task.
 
-        If annotations_stub=True is in context (via feature flag
-        fflag_fix_all_fit_720_lazy_load_annotations), returns lightweight
+        If annotations_stub=True is in context, returns lightweight
         annotation stubs without result data for improved performance.
         """
         if not self.context.get('annotations'):
@@ -836,7 +847,7 @@ class DataManagerTaskSerializer(TaskSerializer):
         ordering = self.context.get('annotations_ordering')
         annotations = get_task_annotations_queryset(task, ordering, include_completed_by=True)
 
-        # Use stub serializer if requested (feature flag checked at API level)
+        # Use stub serializer if requested
         if self.context.get('annotations_stub'):
             return AnnotationStubSerializer(
                 annotations,
@@ -955,7 +966,7 @@ class SelectedItemsSerializer(serializers.Serializer):
 
 
 class ViewResetSerializer(serializers.Serializer):
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
+    project = serializers.IntegerField()
 
 
 class ViewOrderSerializer(serializers.Serializer):
@@ -1045,3 +1056,81 @@ class ViewRequestSerializer(serializers.Serializer):
 
     data = ViewDataRequestSerializer(required=False)
     project = serializers.IntegerField(required=False, help_text='Project ID')
+
+
+TASK_ID_KEY_PATTERN = re.compile(r'[1-9][0-9]{0,18}')
+
+
+class NumberValueField(serializers.FloatField):
+    """A JSON number (or numeric string) stored as a float, like the Add or Update Columns `Number` type.
+
+    FloatField already rejects NaN and Infinity; booleans are rejected too, since `float(True)` would store 1.0.
+    """
+
+    def to_internal_value(self, data):
+        if isinstance(data, bool):
+            self.fail('invalid')
+        return super().to_internal_value(data)
+
+
+class TaskDataColumnSerializer(serializers.Serializer):
+    column_name = serializers.CharField(
+        # Kept exactly as sent: an existing key with surrounding spaces stays addressable, and a new one is rejected.
+        trim_whitespace=False,
+        help_text=(
+            'Data column to set: the key in `task.data`, used exactly as sent. If no task of the project has it yet, '
+            'it is created on the listed tasks only. A new column name cannot contain whitespace, quotation marks, '
+            'brackets, semicolons, hashes, control characters, or SQL comments.'
+        ),
+    )
+    value_type = serializers.ChoiceField(
+        choices=['String', 'Number'],
+        default='String',
+        help_text='How the values are stored: `String` keeps the text exactly as sent; `Number` stores a number.',
+    )
+    values = serializers.DictField(
+        child=serializers.JSONField(),
+        allow_empty=False,
+        help_text=(
+            'Map of task ID to the value for that task, for example `{"101": "Missing box", "102": "OK"}`. '
+            'At most `TASK_DATA_COLUMN_MAX_TASKS` tasks per request (1000 by default).'
+        ),
+    )
+
+    def validate(self, attrs):
+        values = attrs['values']
+        max_tasks = settings.TASK_DATA_COLUMN_MAX_TASKS
+        if len(values) > max_tasks:
+            raise serializers.ValidationError({'values': f'Send at most {max_tasks} tasks per request.'})
+
+        if attrs['value_type'] == 'Number':
+            value_field = NumberValueField()
+        else:
+            value_field = serializers.CharField(
+                allow_blank=True, trim_whitespace=False, max_length=settings.TASK_DATA_COLUMN_MAX_VALUE_LENGTH
+            )
+
+        task_values, errors = {}, {}
+        for key, value in values.items():
+            if not TASK_ID_KEY_PATTERN.fullmatch(key):
+                errors[key] = ['Task IDs must be positive integers.']
+                continue
+            try:
+                task_values[int(key)] = value_field.run_validation(value)
+            except serializers.ValidationError as exc:
+                errors[key] = exc.detail
+        if errors:
+            raise serializers.ValidationError({'values': errors})
+
+        attrs['values'] = task_values
+        return attrs
+
+
+class TaskDataColumnResultSerializer(serializers.Serializer):
+    updated_task_ids = serializers.ListField(
+        child=serializers.IntegerField(), help_text='Tasks whose column value was set, in ascending order.'
+    )
+    not_found_task_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        help_text='Requested task IDs that are not tasks of this project (nothing was written for them).',
+    )

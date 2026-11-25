@@ -1,5 +1,3 @@
-@import "../../../../../ui/src/styles/userpic-badge.prefix.css";
-
 .annotators {
   display: grid;
   grid-auto-flow: column;
@@ -7,6 +5,10 @@
   overflow: hidden;
   width: 100%;
   justify-content: flex-start;
+
+  /* Room for review badges that hang below the avatar, without changing the row height. */
+  padding-bottom: var(--spacing-tight);
+  margin-bottom: calc(-1 * var(--spacing-tight));
 
   &__item {
     z-index: 1;

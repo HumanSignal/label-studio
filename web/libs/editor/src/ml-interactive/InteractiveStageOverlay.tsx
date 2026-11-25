@@ -376,7 +376,7 @@ export const InteractiveStageOverlay = observer(({ control, binding, labelSource
             zIndex: 52,
           }}
         >
-          <Spinner size={16} />
+          <Spinner size="smaller" />
           <span>{controller.isTracking ? "Tracking…" : "Processing…"}</span>
         </div>
       )}

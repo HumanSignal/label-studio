@@ -26,6 +26,7 @@
     width: 100%;
     height: 100%;
     position: absolute;
+    cursor: inherit;
   }
 
   &__indicator {
@@ -91,4 +92,28 @@
     transition: none;
     background-color: var(--color-neutral-border);
   }
+}
+
+.toggle_invalid .toggle__indicator {
+  box-shadow: 0 0 0 1px var(--color-negative-border);
+}
+
+/* Same distance to the label as Checkbox; doubled to win over Label's own placement gap. */
+.toggle_label.toggle_label {
+  gap: var(--spacing-tight);
+  cursor: pointer;
+
+  /* Off the text baseline: the knob changes size when toggled, which moved the baseline and the line height. */
+  vertical-align: top;
+
+  &:has(:disabled) {
+    cursor: not-allowed;
+  }
+}
+
+/* Label first, toggle at the right edge of the row. */
+.toggle_alignEnd {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
 }

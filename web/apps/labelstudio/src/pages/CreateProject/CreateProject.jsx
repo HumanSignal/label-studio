@@ -2,8 +2,7 @@ import { EnterpriseBadge, Select, Typography } from "@humansignal/ui";
 import React from "react";
 import { useHistory } from "react-router";
 import { ToggleItems } from "../../components";
-import { Button } from "@humansignal/ui";
-import { Modal } from "../../components/Modal/Modal";
+import { Button, ModalWindow } from "@humansignal/ui";
 import { Space } from "../../components/Space/Space";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
@@ -196,10 +195,35 @@ export const CreateProject = ({ onClose }) => {
     performClose();
   }, [project]);
 
+  // Escape discards the draft. It is handled on the document, after the editors and dropdowns inside have
+  // had the chance to use it (they stop it from bubbling); onEscapeKeyDown keeps ModalWindow from closing first.
+  const onDeleteRef = React.useRef(onDelete);
+  onDeleteRef.current = onDelete;
+  React.useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") onDeleteRef.current();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
-    <Modal onHide={onDelete} closeOnClickOutside={false} allowToInterceptEscape fullscreen visible bare>
+    <ModalWindow
+      open
+      onOpenChange={() => {}}
+      title="Create Project"
+      hideHeader
+      size="fullscreen"
+      // Focus the dialog itself, not its first button (Cancel), so Enter does nothing on open.
+      onOpenAutoFocus={(e) => e.preventDefault()}
+      onEscapeKeyDown={(e) => e.preventDefault()}
+      showCloseButton={false}
+      closeOnScrimClick={false}
+      bodyClassName="flex min-h-0 flex-col p-0"
+      dataTestId="create-project-modal"
+    >
       <div className={rootClass}>
-        <Modal.Header>
+        <div className={rootClass.elem("header").toClassName()}>
           <h1>Create Project</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
 
@@ -214,7 +238,6 @@ export const CreateProject = ({ onClose }) => {
               Cancel
             </Button>
             <Button
-              look="primary"
               onClick={onCreate}
               waiting={waiting || uploading}
               waitingClickable={false}
@@ -223,7 +246,7 @@ export const CreateProject = ({ onClose }) => {
               Save
             </Button>
           </Space>
-        </Modal.Header>
+        </div>
         <ProjectName
           name={name}
           setName={setName}
@@ -239,7 +262,6 @@ export const CreateProject = ({ onClose }) => {
           show={step === "import"}
           sample={sample}
           onSampleDatasetSelect={setSample}
-          openLabelingConfig={() => setStep("config")}
           {...pageProps}
         />
         <ConfigPage
@@ -252,6 +274,6 @@ export const CreateProject = ({ onClose }) => {
           disableSaveButton={true}
         />
       </div>
-    </Modal>
+    </ModalWindow>
   );
 };

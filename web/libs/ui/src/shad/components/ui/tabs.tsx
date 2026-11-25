@@ -1,95 +1,47 @@
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "@humansignal/shad/utils";
-import { cva } from "class-variance-authority";
 
-type TabsContextType = {
-  variant: "default" | "flat";
-};
+const Tabs = TabsPrimitive.Root;
 
-const TabsContext = React.createContext<TabsContextType>({
-  variant: "default",
-});
-
-const Tabs = ({
-  variant = "default",
-  ...props
-}: React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> & {
-  variant?: "default" | "flat";
-}) => {
-  return (
-    <TabsContext.Provider value={{ variant }}>
-      <TabsPrimitive.Root {...props} />
-    </TabsContext.Provider>
-  );
-};
-const tabsListVariants = cva("inline-flex items-center", {
-  variants: {
-    variant: {
-      default:
-        "justify-center h-auto bg-neutral-surface p-tighter gap-tighter border border-neutral-border rounded-small",
-      flat: "w-full h-auto border-b border-neutral-border",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
-});
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => {
-  const { variant } = React.useContext(TabsContext);
-  return <TabsPrimitive.List ref={ref} className={cn(tabsListVariants({ variant }), className)} {...props} />;
-});
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn("inline-flex items-center w-full h-auto border-b border-neutral-border", className)}
+    {...props}
+  />
+));
 TabsList.displayName = TabsPrimitive.List.displayName;
-
-const tabsTriggerVariants = cva(
-  "inline-flex justify-center items-center text-body-regular font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default:
-          "h-auto py-tightest px-base rounded-smaller text-label-small data-[state=active]:bg-neutral-surface-hover data-[state=active]:text-neutral-content data-[state=active]:shadow-[0_1px_0_rgba(var(--color-neutral-shadow-raw)/0.1),0_5px_10px_rgba(var(--color-neutral-shadow-raw)/0.1)] data-[state=inactive]:text-neutral-content-subtler data-[state=inactive]:hover:text-neutral-content-subtle",
-        flat: "py-tight px-base -mb-px border-b-2 border-transparent data-[state=active]:border-primary-border data-[state=active]:text-primary-content data-[state=inactive]:text-neutral-content-subtle data-[state=inactive]:hover:text-neutral-content",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => {
-  const { variant } = React.useContext(TabsContext);
-  return <TabsPrimitive.Trigger ref={ref} className={cn(tabsTriggerVariants({ variant }), className)} {...props} />;
-});
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex justify-center items-center text-body-regular font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 py-tight px-base -mb-px border-b-2 border-transparent data-[state=active]:border-primary-border data-[state=active]:text-primary-content data-[state=inactive]:text-neutral-content-subtle data-[state=inactive]:hover:text-neutral-content",
+      className,
+    )}
+    {...props}
+  />
+));
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
-
-const tabsContentVariants = cva("", {
-  variants: {
-    variant: {
-      // Inactive tab panels stay mounted with Radix `hidden` / data-state=inactive; strip top margin so
-      // they do not reserve vertical space (e.g. extra gap at bottom of Members dashboard tabs).
-      default: "mt-2 data-[state=inactive]:mt-0 [hidden]:mt-0",
-      flat: "mt-wide data-[state=inactive]:mt-0 [hidden]:mt-0",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
-});
 
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref) => {
-  const { variant } = React.useContext(TabsContext);
-  return <TabsPrimitive.Content ref={ref} className={cn(tabsContentVariants({ variant }), className)} {...props} />;
-});
+>(({ className, ...props }, ref) => (
+  // Inactive panels stay mounted with `hidden`; drop the top margin so they reserve no space.
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn("mt-wide data-[state=inactive]:mt-0 [hidden]:mt-0", className)}
+    {...props}
+  />
+));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };

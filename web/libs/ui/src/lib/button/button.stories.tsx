@@ -7,7 +7,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Button> = {
   component: Button,
-  title: "UI/Button",
+  title: "Inputs/Button",
   argTypes: {
     disabled: { control: "boolean" },
     waiting: { control: "boolean" },
@@ -64,37 +64,39 @@ export const WithAlignment: Story = {
   },
 };
 
-export const WithSize: Story = {
-  render: ({ children, ...props }) => {
-    return (
-      <div className="flex items-center gap-tight">
-        <Button {...props} size="medium" className="w-48" leading={<TagIcon />}>
-          Medium
-        </Button>
-        <Button {...props} size="small" className="w-48" leading={<TagIcon />}>
-          Small
-        </Button>
-        <Button {...props} size="smaller" className="w-48" leading={<TagIcon />}>
-          Smaller
-        </Button>
-      </div>
-    );
-  },
-};
+const SIZES = [
+  { size: "medium", label: "Medium · 40px" },
+  { size: "small", label: "Small · 32px" },
+  { size: "smaller", label: "Smaller · 24px" },
+] as const;
 
-export const WithIcon: Story = {
+/**
+ * `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. The same three
+ * sizes with a leading and a trailing icon.
+ */
+export const Sizes: Story = {
   render: ({ children, ...props }) => {
     return (
-      <div className="flex gap-tight">
-        <Button {...props} className="w-48" leading={<TagIcon />}>
-          Leading
-        </Button>
-        <Button {...props} className="w-48" trailing={<TagIcon />}>
-          Trailing
-        </Button>
-        <Button {...props} className="w-48" leading={<TagIcon />} trailing={<TagIcon />}>
-          Both
-        </Button>
+      <div
+        className="grid grid-cols-3 items-center justify-items-start gap-base"
+        style={{ width: 600, maxWidth: "100%" }}
+      >
+        {(["Text only", "Leading icon", "Trailing icon"] as const).map((heading) => (
+          <Typography key={heading} variant="label" size="small" className="text-neutral-content-subtle">
+            {heading}
+          </Typography>
+        ))}
+        {SIZES.map(({ size, label }) => [
+          <Button key={`${size}-text`} {...props} size={size}>
+            {label}
+          </Button>,
+          <Button key={`${size}-leading`} {...props} size={size} leading={<TagIcon />}>
+            {label}
+          </Button>,
+          <Button key={`${size}-trailing`} {...props} size={size} trailing={<TagIcon />}>
+            {label}
+          </Button>,
+        ])}
       </div>
     );
   },
@@ -227,7 +229,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" leading={<TagIcon />}>
               Outlined
             </Button>
-            <Button variant="gradient" look="string" leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" leading={<TagIcon />}>
               String
             </Button>
           </div>
@@ -243,7 +245,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" waiting leading={<TagIcon />}>
               Outlined waiting
             </Button>
-            <Button variant="gradient" look="string" waiting leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" waiting leading={<TagIcon />}>
               String waiting
             </Button>
           </div>
@@ -259,7 +261,7 @@ export const GradientButton: Story = {
             <Button variant="gradient" look="outlined" disabled leading={<TagIcon />}>
               Outlined disabled
             </Button>
-            <Button variant="gradient" look="string" disabled leading={<TagIcon />}>
+            <Button variant="gradient" look="ghost" disabled leading={<TagIcon />}>
               String disabled
             </Button>
           </div>
@@ -288,10 +290,10 @@ export const WithButtonGroup: Story = {
               alignment="bottom-right"
               content={
                 <Space direction="vertical" className="bg-neutral-background p-tight rounded">
-                  <Button align="left" look="string" size="small">
+                  <Button align="left" look="ghost" size="small">
                     Label tasks as displayed
                   </Button>
-                  <Button align="left" look="string" size="small">
+                  <Button align="left" look="ghost" size="small">
                     Skip all tasks
                   </Button>
                 </Space>

@@ -19,7 +19,7 @@
 
 import { observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
-import { Button, MultiStateToggle, Typography } from "@humansignal/ui";
+import { Button, SegmentedControl, Typography } from "@humansignal/ui";
 
 import { useInteractiveCapabilities } from "./hooks";
 import { resolveActiveBinding } from "./resolve";
@@ -190,7 +190,8 @@ export const InteractiveActionsBar = observer(({ objectTag }: InteractiveActions
           the text changes. */}
       <div className="flex items-center gap-base">
         {showPromptToggle && !tracking && (
-          <MultiStateToggle
+          <SegmentedControl
+            size="small"
             selectedOption={promptMode}
             options={[
               { value: "points", label: "Points" },
@@ -211,14 +212,14 @@ export const InteractiveActionsBar = observer(({ objectTag }: InteractiveActions
       {/* Right: contextual actions (Reject / Accept / Track / Stop). */}
       <div className="flex items-center gap-tight">
         {tracking && (
-          <Button variant="negative" look="string" size="small" onClick={() => controller.cancelTracking()}>
+          <Button variant="negative" look="ghost" size="small" onClick={() => controller.cancelTracking()}>
             Stop
           </Button>
         )}
 
         {!tracking && hasMask && (
           <>
-            <Button variant="negative" look="string" size="small" onClick={handleReject} tooltip="Reject (Esc)">
+            <Button variant="negative" look="ghost" size="small" onClick={handleReject} tooltip="Reject (Esc)">
               Reject
             </Button>
             <Button variant="positive" look="filled" size="small" onClick={handleAccept} tooltip="Accept (Enter)">

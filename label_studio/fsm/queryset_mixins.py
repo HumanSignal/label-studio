@@ -13,20 +13,13 @@ Usage:
             return TaskQuerySet(self.model, using=self._db)
 
 Note:
-    State annotation is guarded by 'fflag_feat_fit_568_finite_state_management' only.
-    This allows background FSM processes to annotate current_state for internal use.
-
-    UI/API consumption of state fields is separately controlled by serializers
-    that check BOTH 'fflag_feat_fit_568_finite_state_management' AND
-    'fflag_feat_fit_710_fsm_state_fields' before exposing state data.
-
-    When the flag is disabled, no annotation is performed and there is zero performance impact.
+    State annotation is guarded by `settings.FSM_ENABLED`.
+    When FSM is disabled (e.g., in LSO), no annotation is performed and there is zero performance impact.
 """
 
 import logging
 
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
+from django.conf import settings
 from django.db.models import OuterRef, Subquery
 from fsm.registry import get_state_model
 
@@ -91,13 +84,8 @@ class FSMStateQuerySetMixin:
             - If no state exists for an entity, `current_state` will be None
             - The state is read-only and should not be modified directly
         """
-        # Check only fflag_feat_fit_568_finite_state_management for background FSM processes.
-        # This allows background processes to annotate current_state for internal use.
-        # UI/API serializers separately check both fflag_feat_fit_568 AND fflag_feat_fit_710
-        # before exposing state data to consumers.
-        user = CurrentContext.get_user()
-        if not flag_set('fflag_feat_fit_568_finite_state_management', user=user):
-            logger.debug('FSM feature flag disabled, skipping state annotation')
+        if not getattr(settings, 'FSM_ENABLED', False):
+            logger.debug('FSM disabled, skipping state annotation')
             return self
 
         # Get the entity name from the model
@@ -111,19 +99,23 @@ class FSMStateQuerySetMixin:
             logger.debug(f'No state model registered for {entity_name}, skipping annotation')
             return self
 
-        # Get the foreign key field name on the state model
-        # e.g., 'task_id' for TaskState
-        entity_field_name = state_model._get_entity_field_name()
-        fk_field = f'{entity_field_name}_id'
-
-        # Create subquery to get current state using UUID7 natural ordering
-        # This is extremely efficient because:
-        # 1. UUID7 provides natural time ordering (latest = highest ID)
-        # 2. We only fetch the state column, not the entire record
-        # 3. Django optimizes this into a single JOIN or lateral subquery
-        lookup = {fk_field: OuterRef('pk')}
-        lookup.update({field: OuterRef(field) for field in state_model.latest_state_scope_fields})
-        current_state_subquery = Subquery(state_model.objects.filter(**lookup).order_by('-id').values('state')[:1])
-
         # Annotate the queryset with the current state
-        return self.annotate(current_state=current_state_subquery)
+        return self.annotate(current_state=latest_state_subquery(state_model))
+
+
+def latest_state_subquery(state_model):
+    """Correlated subquery for the current state value of each entity row, matching ``latest_state_scope_fields``."""
+    # Get the foreign key field name on the state model
+    # e.g., 'task_id' for TaskState
+    entity_field_name = state_model._get_entity_field_name()
+    fk_field = f'{entity_field_name}_id'
+
+    # Create subquery to get current state using UUID7 natural ordering
+    # This is extremely efficient because:
+    # 1. UUID7 provides natural time ordering (latest = highest ID)
+    # 2. We only fetch the state column, not the entire record
+    # 3. Django optimizes this into a single JOIN or lateral subquery
+    lookup = {fk_field: OuterRef('pk')}
+    lookup.update({field: OuterRef(field) for field in state_model.latest_state_scope_fields})
+    current_state_subquery = Subquery(state_model.objects.filter(**lookup).order_by('-id').values('state')[:1])
+    return current_state_subquery

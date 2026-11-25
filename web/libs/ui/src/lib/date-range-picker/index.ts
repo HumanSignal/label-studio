@@ -13,5 +13,6 @@ export type {
   FormDateValues,
   FormDateTimeValue,
 } from "./date-utils";
+export { formatDateString } from "./date-utils";
 export { rangeSetters } from "./range-setters";
 export type { TimeRangeButton } from "./range-setters";

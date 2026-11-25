@@ -1,6 +1,5 @@
 export { TaxonomyMultiTreeSelect } from "./taxonomy-multi-tree-select";
-export { TAXONOMY_LEVEL_PLACEHOLDER, TaxonomySelectionChip } from "./taxonomy-selection-chip";
-export type { TaxonomySelectionChipProps } from "./taxonomy-selection-chip";
+export { TAXONOMY_LEVEL_PLACEHOLDER } from "./taxonomy-selection-chip";
 export {
   buildTaxonomyTreeData,
   getTaxonomyOptionPath,

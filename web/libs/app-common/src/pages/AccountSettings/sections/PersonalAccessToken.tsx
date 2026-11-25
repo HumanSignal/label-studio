@@ -1,4 +1,5 @@
 import { useCopyText } from "@humansignal/core";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { ArrowSquareOutIcon, CopyIcon } from "@humansignal/icons";
 import { Button, Label, Typography } from "@humansignal/ui";
 /**
@@ -7,42 +8,48 @@ import { Button, Label, Typography } from "@humansignal/ui";
  */
 import { Input, TextArea } from "apps/labelstudio/src/components/Form";
 import { atom, useAtomValue } from "jotai";
-import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
+import { atomWithMutation } from "jotai-tanstack-query";
+import { useStepUp, type WithStepUp } from "../../../components/step-up/step-up-provider";
 import styles from "./PersonalAccessToken.module.css";
 
-const tokenAtom = atomWithQuery(() => ({
-  queryKey: ["access-token"],
-  queryFn: async () => {
-    const result = await fetch("/api/current-user/token");
-    return result.json();
+// The token is a credential: it is shown on request, after the user confirms their identity
+const revealTokenAtom = atomWithMutation(() => ({
+  mutationKey: ["access-token"],
+  mutationFn: async (withStepUp: WithStepUp) => {
+    const result = await withStepUp("Show your access token", () => sameOriginFetch("/api/current-user/token"));
+    return result.ok ? result.json() : {};
   },
 }));
 
 const resetTokenAtom = atomWithMutation(() => ({
   mutationKey: ["reset-token"],
-  mutationFn: async () => {
-    const result = await fetch("/api/current-user/reset-token", {
-      method: "post",
-    });
-    return result.json();
+  mutationFn: async (withStepUp: WithStepUp) => {
+    const result = await withStepUp("Reset your access token", () =>
+      sameOriginFetch("/api/current-user/reset-token/", {
+        method: "post",
+      }),
+    );
+    return result.ok ? result.json() : {};
   },
 }));
 
 const currentTokenAtom = atom((get) => {
-  const initialToken = get(tokenAtom).data?.token;
+  const revealedToken = get(revealTokenAtom).data?.token;
   const resetToken = get(resetTokenAtom).data?.token;
 
-  return resetToken ?? initialToken;
+  return resetToken ?? revealedToken;
 });
 
 const curlStringAtom = atom((get) => {
-  const currentToken = get(currentTokenAtom);
+  const currentToken = get(currentTokenAtom) ?? "<your access token>";
   const curlString = `curl -X GET ${location.origin}/api/projects/ -H 'Authorization: Token ${currentToken}'`;
   return curlString;
 });
 
 export const PersonalAccessToken = () => {
   const token = useAtomValue(currentTokenAtom);
+  const withStepUp = useStepUp();
+  const reveal = useAtomValue(revealTokenAtom);
   const reset = useAtomValue(resetTokenAtom);
   const curl = useAtomValue(curlStringAtom);
   const [copyToken, tokenCopied] = useCopyText({ defaultText: token });
@@ -54,18 +61,29 @@ export const PersonalAccessToken = () => {
         <div>
           <Label text="Access Token" className={styles.label} />
           <div className="flex gap-2 w-full justify-between">
-            <Input name="token" className={styles.input} readOnly value={token ?? ""} />
+            <Input name="token" className={styles.input} readOnly value={token ?? "••••••••••••••••"} />
+            {!token && (
+              <Button
+                variant="primary"
+                look="outlined"
+                onClick={() => reveal.mutate(withStepUp)}
+                waiting={reveal.isPending}
+                data-testid="access-token-show"
+              >
+                Show
+              </Button>
+            )}
             <Button
               leading={<CopyIcon />}
               onClick={() => copyToken()}
-              disabled={tokenCopied}
+              disabled={!token || tokenCopied}
               variant="primary"
               look="outlined"
               className="w-[116px]"
             >
               {tokenCopied ? "Copied!" : "Copy"}
             </Button>
-            <Button variant="negative" look="outlined" onClick={() => reset.mutate()}>
+            <Button variant="negative" look="outlined" onClick={() => reset.mutate(withStepUp)}>
               Reset
             </Button>
           </div>

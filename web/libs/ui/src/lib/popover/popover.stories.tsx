@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Popover } from "./popover";
-import { Button } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
 
 const meta = {
-  title: "UI/Popover",
+  title: "Utilities/Popover",
   component: Popover,
   parameters: {
     layout: "centered",
@@ -80,4 +80,21 @@ export const WithCustomAlignment: Story = {
       </div>
     ),
   },
+};
+
+export const Compound: Story = {
+  render: () => (
+    <Popover.Root>
+      <Tooltip title="Filter annotations">
+        <span className="inline-flex">
+          <Popover.Trigger asChild>
+            <Button>Filter</Button>
+          </Popover.Trigger>
+        </span>
+      </Tooltip>
+      <Popover.Content side="right" className="p-4">
+        <p>The trigger sits inside a Tooltip, so it is composed with Popover.Root and Popover.Trigger.</p>
+      </Popover.Content>
+    </Popover.Root>
+  ),
 };

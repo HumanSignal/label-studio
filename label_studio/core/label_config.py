@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import xmljson
 from django.conf import settings
-from label_studio_sdk._extensions.label_studio_tools.core import label_config
+from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config as _sdk_parse_config
 from label_studio_sdk._legacy.exceptions import LabelStudioValidationErrorSentryIgnored
 from label_studio_sdk.label_interface import LabelInterface
 from rest_framework.exceptions import ValidationError
@@ -51,7 +51,7 @@ def parse_config(config_string):
     }
     """
     logger.warning('Using deprecated method - switch to label_studio.tools.label_config.parse_config!')
-    return label_config.parse_config(config_string)
+    return _sdk_parse_config(config_string)
 
 
 def _fix_choices(config):
@@ -179,7 +179,7 @@ def extract_data_types(label_config):
 
 
 def get_all_labels(label_config):
-    outputs = parse_config(label_config)
+    outputs = _sdk_parse_config(label_config)
     labels = defaultdict(list)
     dynamic_labels = defaultdict(bool)
     for control_name in outputs:
@@ -197,7 +197,7 @@ def get_annotation_tuple(from_name, to_name, type):
 
 
 def get_all_control_tag_tuples(label_config):
-    outputs = parse_config(label_config)
+    outputs = _sdk_parse_config(label_config)
     out = []
     for control_name, info in outputs.items():
         out.append(get_annotation_tuple(control_name, info['to_name'], info['type']))
@@ -452,8 +452,8 @@ def get_sample_task(label_config, secure_mode=False):
 
 def config_essential_data_has_changed(new_config_str, old_config_str):
     """Detect essential changes of the labeling config"""
-    new_config = parse_config(new_config_str)
-    old_config = parse_config(old_config_str)
+    new_config = _sdk_parse_config(new_config_str)
+    old_config = _sdk_parse_config(old_config_str)
 
     for tag, new_info in new_config.items():
         if tag not in old_config:
@@ -480,7 +480,7 @@ def check_control_in_config_by_regex(config_string, control_type, filter=None):
     """
     Check if control type is in config including regex filter
     """
-    c = parse_config(config_string)
+    c = _sdk_parse_config(config_string)
     if filter is not None and len(filter) == 0:
         return False
     if filter:
@@ -502,7 +502,7 @@ def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
     Check if to_name is in config including regex filter
     :return: True if to_name is fullmatch to some pattern ion config
     """
-    c = parse_config(config_string)
+    c = _sdk_parse_config(config_string)
     if control_type:
         check_list = [control_type]
     else:
@@ -524,7 +524,7 @@ def get_original_fromname_by_regex(config_string, fromname):
     """
     Get from_name from config on from_name key from data after applying regex search or original fromname
     """
-    c = parse_config(config_string)
+    c = _sdk_parse_config(config_string)
     for control in c:
         item = c[control].get('regex', {})
         expression = control
@@ -541,7 +541,7 @@ def get_all_types(label_config):
     """
     Get all types from label_config
     """
-    outputs = parse_config(label_config)
+    outputs = _sdk_parse_config(label_config)
     out = []
     for control_name, info in outputs.items():
         out.append(info['type'].lower())

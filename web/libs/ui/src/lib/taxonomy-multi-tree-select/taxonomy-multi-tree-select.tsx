@@ -64,14 +64,7 @@ export const TaxonomyMultiTreeSelect = ({
   const selectionTrigger = (
     <div className={styles.triggerContent}>
       {showAddPill ? (
-        <Badge
-          look="outline"
-          variant="neutral"
-          size="large"
-          icon={<PlusIcon />}
-          className={styles.addPill}
-          aria-hidden="true"
-        >
+        <Badge variant="neutral" size="large" icon={<PlusIcon />} className={styles.addPill} aria-hidden="true">
           {addLabel}
         </Badge>
       ) : (

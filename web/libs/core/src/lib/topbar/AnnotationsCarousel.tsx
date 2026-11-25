@@ -9,7 +9,7 @@
  * above 50 items, or `__listScroll` with native overflow below that). Horizontal
  * layout keeps the classic transform carousel and the virtualized react-window
  * strip. The wrapper decides whether to enable virtualization at all (classic
- * gates on FF_FIT_720_LAZY_LOAD_ANNOTATIONS; shell passes `virtualizationEnabled={true}`).
+ * and shell both pass `virtualizationEnabled={true}`).
  *
  * Sort order: rendered in the order the wrapper supplies. Wrappers MUST place
  * predictions before annotations; sort within type matches the API's order. This is
@@ -34,6 +34,7 @@ import type {
   AnnotationsListLayout,
   SharedAnnotation,
 } from "./types";
+import { createWheelIntentTracker, type NavigationIntentSource } from "./navigation-intent";
 import "./AnnotationsCarousel.prefix.css";
 
 /**
@@ -87,6 +88,13 @@ export interface SharedAnnotationsCarouselProps {
   addNewDisabledTooltip?: string;
   /** Rendered inside the scroll container after the entity rows (vertical layout only). */
   emptyState?: ReactNode;
+  /**
+   * Called when the user deliberately tries to page through the horizontal strip: a chevron click or a
+   * wheel / trackpad gesture over it (including gestures that cannot scroll the non-virtualized strip).
+   * Never called for programmatic scrolling (scroll-to-selected, snap-to-start), so `onScroll` is not a
+   * signal. Horizontal layout only.
+   */
+  onNavigationIntent?: (source: NavigationIntentSource) => void;
 }
 
 interface ItemData {
@@ -171,6 +179,7 @@ export function AnnotationsCarousel({
   addNewDisabled = false,
   addNewDisabledTooltip,
   emptyState,
+  onNavigationIntent,
 }: SharedAnnotationsCarouselProps) {
   const isVertical = layout === "vertical";
   const renderRow = useMemo<AnnotationRenderItem>(
@@ -220,22 +229,25 @@ export function AnnotationsCarousel({
   }, []);
 
   const scrollLeft = useCallback(() => {
+    onNavigationIntent?.("chevron");
     if (listRef.current) {
       const newOffset = Math.max(0, scrollOffset - containerWidth);
       listRef.current.scrollTo(newOffset);
     }
-  }, [scrollOffset, containerWidth]);
+  }, [scrollOffset, containerWidth, onNavigationIntent]);
 
   const scrollRight = useCallback(() => {
+    onNavigationIntent?.("chevron");
     if (listRef.current) {
       const maxOffset = totalWidth - containerWidth;
       const newOffset = Math.min(maxOffset, scrollOffset + containerWidth);
       listRef.current.scrollTo(newOffset);
     }
-  }, [scrollOffset, containerWidth, totalWidth]);
+  }, [scrollOffset, containerWidth, totalWidth, onNavigationIntent]);
 
   const updatePosition = useCallback(
     (_e: React.MouseEvent, goLeft = true) => {
+      onNavigationIntent?.("chevron");
       if (containerRef.current && carouselRef.current) {
         const step = containerRef.current.clientWidth;
         const carouselWidth = carouselRef.current.clientWidth;
@@ -246,7 +258,17 @@ export function AnnotationsCarousel({
         setCurrentPosition(newPos);
       }
     },
-    [currentPosition],
+    [currentPosition, onNavigationIntent],
+  );
+
+  const wheelIntentTracker = useMemo(() => createWheelIntentTracker(), []);
+  // A strip that fits shows no chevrons and has nothing to page, so wheeling over it is not paging intent.
+  const canPage = shouldVirtualize ? showControls : !isLeftDisabledOriginal || !isRightDisabledOriginal;
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (canPage && wheelIntentTracker.record(e)) onNavigationIntent?.("wheel");
+    },
+    [canPage, wheelIntentTracker, onNavigationIntent],
   );
 
   // Disable button states for non-virtualized branch
@@ -384,6 +406,8 @@ export function AnnotationsCarousel({
         className={cn("annotations-carousel")
           .mod({ scrolled: scrollOffset > 0, virtualized: true })
           .toClassName()}
+        data-testid="annotations-carousel-horizontal"
+        onWheel={handleWheel}
       >
         <div className={containerClassName}>
           <AutoSizer>
@@ -444,6 +468,8 @@ export function AnnotationsCarousel({
         .mod({ scrolled: currentPosition > 0 })
         .toClassName()}
       style={{ "--carousel-left": `${currentPosition}px` } as any}
+      data-testid="annotations-carousel-horizontal"
+      onWheel={handleWheel}
     >
       <div ref={containerRef as any} className={cn("annotations-carousel").elem("container").toClassName()}>
         <div ref={carouselRef as any} className={cn("annotations-carousel").elem("carosel").toClassName()}>

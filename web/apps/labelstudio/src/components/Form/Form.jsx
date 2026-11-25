@@ -4,6 +4,7 @@ import { ApiProvider } from "../../providers/ApiProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
 import { cn } from "../../utils/bem";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
+import { sameOriginFetch } from "@humansignal/core/lib/api-proxy/same-origin-fetch";
 import { isDefined, objectClean } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";
@@ -238,10 +239,13 @@ export default class Form extends React.Component {
 
   async submitWithAPI(action, body) {
     const urlParams = objectClean(this.props.params ?? {});
-    const response = await this.api.callApi(action, {
-      params: urlParams,
-      body,
-    });
+    const send = () =>
+      this.api.callApi(action, {
+        params: urlParams,
+        body,
+      });
+    // e.g. withStepUp from useStepUp (@humansignal/app-common), for forms that save a step-up protected setting
+    const response = await (this.props.sendRequest ? this.props.sendRequest(send) : send());
 
     this.setState({ lastResponse: response });
 
@@ -256,7 +260,7 @@ export default class Form extends React.Component {
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
     const method = (this.props.method ?? "POST").toUpperCase();
-    const response = await fetch(action, { method, body });
+    const response = await sameOriginFetch(action, { method, body });
 
     try {
       const result = await response.json();

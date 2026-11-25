@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { AnnotationsCarousel } from "../AnnotationsCarousel";
 import type { AnnotationActionHandlers, AnnotationCapabilities, SharedAnnotation } from "../types";
 
@@ -191,5 +191,139 @@ describe("shared AnnotationsCarousel", () => {
     );
     expect(container.querySelector('[data-annotation-id="a"]')).not.toBeNull();
     expect(container.querySelector('[data-annotation-id="p"]')).toBeNull();
+  });
+});
+
+describe("shared AnnotationsCarousel navigation intent", () => {
+  const manyEntities = Array.from({ length: 60 }, (_, i) => makeAnnotation(`a-${i}`));
+  const fewEntities = Array.from({ length: 5 }, (_, i) => makeAnnotation(`a-${i}`));
+
+  // jsdom has no layout, so the non-virtualized strip never overflows. Give the strip and its
+  // container widths so the chevrons render.
+  const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientWidth");
+  function stubOverflowingStrip() {
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.classList.contains("ls-annotations-carousel__carosel") ? 1000 : 300;
+      },
+    });
+  }
+  afterEach(() => {
+    // jsdom defines clientWidth on Element.prototype, so there is usually no own descriptor to put back: remove the stub
+    if (originalClientWidth) Object.defineProperty(HTMLElement.prototype, "clientWidth", originalClientWidth);
+    else Reflect.deleteProperty(HTMLElement.prototype, "clientWidth");
+  });
+
+  function renderCarousel(
+    entities: SharedAnnotation[],
+    props: Partial<React.ComponentProps<typeof AnnotationsCarousel>> = {},
+  ) {
+    return render(
+      <AnnotationsCarousel
+        entities={entities}
+        selectedId={null}
+        capabilities={fullCapabilities}
+        handlers={makeHandlers()}
+        {...props}
+      />,
+    );
+  }
+
+  it("reports a chevron intent for each click on the virtualized list", () => {
+    const onNavigationIntent = mock();
+    renderCarousel(manyEntities, { virtualizationEnabled: true, onNavigationIntent });
+
+    fireEvent.click(screen.getByLabelText("Carousel right"));
+    expect(onNavigationIntent).toHaveBeenCalledTimes(1);
+    expect(onNavigationIntent).toHaveBeenLastCalledWith("chevron");
+  });
+
+  it("reports a chevron intent for each click on the non-virtualized list", () => {
+    stubOverflowingStrip();
+    const onNavigationIntent = mock();
+    renderCarousel(fewEntities, { onNavigationIntent });
+
+    fireEvent.click(screen.getByLabelText("Carousel right"));
+    expect(onNavigationIntent).toHaveBeenCalledTimes(1);
+    expect(onNavigationIntent).toHaveBeenLastCalledWith("chevron");
+  });
+
+  it("does not report an intent for a disabled chevron", () => {
+    const onNavigationIntent = mock();
+    renderCarousel(manyEntities, { virtualizationEnabled: true, onNavigationIntent });
+
+    // Strip starts at offset 0, so "left" is disabled
+    fireEvent.click(screen.getByLabelText("Carousel left"));
+    expect(onNavigationIntent).not.toHaveBeenCalled();
+  });
+
+  it("reports a wheel intent over the virtualized list (vertical wheel included)", () => {
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(manyEntities, { virtualizationEnabled: true, onNavigationIntent });
+
+    fireEvent.wheel(container.querySelector(".ls-annotations-carousel__container")!, { deltaY: 100 });
+    expect(onNavigationIntent).toHaveBeenCalledTimes(1);
+    expect(onNavigationIntent).toHaveBeenLastCalledWith("wheel");
+  });
+
+  it("reports a wheel intent over the non-virtualized list, where wheel does not scroll", () => {
+    stubOverflowingStrip();
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(fewEntities, { onNavigationIntent });
+
+    fireEvent.wheel(container.querySelector(".ls-annotations-carousel__container")!, { deltaX: 120 });
+    expect(onNavigationIntent).toHaveBeenCalledTimes(1);
+    expect(onNavigationIntent).toHaveBeenLastCalledWith("wheel");
+  });
+
+  it("does not report wheel intent over a strip that fits (nothing to page)", () => {
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(fewEntities.slice(0, 2), { onNavigationIntent });
+
+    expect(screen.queryByLabelText("Carousel right")).toBeNull();
+    fireEvent.wheel(container.querySelector(".ls-annotations-carousel__container")!, { deltaY: 200 });
+    expect(onNavigationIntent).not.toHaveBeenCalled();
+  });
+
+  it("reports one wheel intent for a whole trackpad gesture", () => {
+    stubOverflowingStrip();
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(fewEntities, { onNavigationIntent });
+    const target = container.querySelector(".ls-annotations-carousel__container")!;
+
+    for (let i = 0; i < 30; i++) fireEvent.wheel(target, { deltaX: 12 });
+    expect(onNavigationIntent).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores a barely-there wheel nudge", () => {
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(fewEntities, { onNavigationIntent });
+
+    fireEvent.wheel(container.querySelector(".ls-annotations-carousel__container")!, { deltaY: 3 });
+    expect(onNavigationIntent).not.toHaveBeenCalled();
+  });
+
+  it("never reports scroll events as intent (they also fire for programmatic scrolling)", () => {
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(manyEntities, { virtualizationEnabled: true, onNavigationIntent });
+
+    // Scroll events do not bubble: fire one on every element that could be the scroller (react-window's list
+    // only mounts when AutoSizer measures a size, which depends on what other test files mocked).
+    for (const element of [
+      container.firstElementChild!,
+      ...container.querySelectorAll("[class*='annotations-carousel']"),
+    ]) {
+      fireEvent.scroll(element, { target: { scrollLeft: 500 } });
+    }
+    expect(onNavigationIntent).not.toHaveBeenCalled();
+  });
+
+  it("does not report wheel intent in the vertical layout", () => {
+    const onNavigationIntent = mock();
+    const { container } = renderCarousel(fewEntities, { layout: "vertical", onNavigationIntent });
+
+    fireEvent.wheel(container.querySelector(".ls-annotations-carousel__container")!, { deltaY: 200 });
+    expect(onNavigationIntent).not.toHaveBeenCalled();
   });
 });

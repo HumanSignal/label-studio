@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import type { MouseEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { ToastProvider, ToastViewport } from "@humansignal/ui/lib/toast/toast";
-import { cnm } from "@humansignal/shad/utils";
+import { ToastProvider, ToastViewport } from "@humansignal/ui";
+import { cnm } from "@humansignal/ui";
 import { PreviewPanel } from "../PreviewPanel";
 import { EditorPanel } from "../EditorPanel";
 import { TopBar } from "./TopBar";

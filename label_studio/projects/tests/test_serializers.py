@@ -1,10 +1,13 @@
 """Tests for project serializers."""
 
+from unittest import mock
+
+import bleach
 import pytest
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
-from projects.serializers import ControlTagWeightSerializer, ProjectSerializer
+from projects.serializers import ControlTagWeightSerializer, ProjectSerializer, sanitize_expert_instruction
 from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
 from tasks.tests.factories import AnnotationFactory, TaskFactory
@@ -205,6 +208,31 @@ class TestProjectSerializerExpertInstruction(TestCase):
         project.refresh_from_db()
         assert self._read(project) == self.PAYLOAD
 
+    DOCUMENT_LEVEL_PAYLOAD = (
+        '<base href="https://example.com/"><link rel="stylesheet" href="https://example.com/a.css">'
+        '<meta http-equiv="refresh" content="0;url=https://example.com/">'
+        '<embed src="https://example.com/" type="text/html"><object data="https://example.com/"></object>'
+        '<form action="https://example.com/"></form><style>p{color:red}</style><p>hi</p>'
+    )
+    DOCUMENT_LEVEL_ESCAPED = (
+        '&lt;base href="https://example.com/"&gt;&lt;link rel="stylesheet" href="https://example.com/a.css"&gt;'
+        '&lt;meta http-equiv="refresh" content="0;url=https://example.com/"&gt;'
+        '&lt;embed src="https://example.com/" type="text/html"&gt;&lt;object data="https://example.com/"&gt;'
+        '&lt;/object&gt;&lt;form action="https://example.com/"&gt;&lt;/form&gt;<style>p{color:red}</style><p>hi</p>'
+    )
+
+    def test_write_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, self.DOCUMENT_LEVEL_PAYLOAD) == self.DOCUMENT_LEVEL_ESCAPED
+
+    def test_read_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.DOCUMENT_LEVEL_PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.DOCUMENT_LEVEL_ESCAPED
+
     def test_read_of_plain_text_does_not_query_organization(self):
         project = ProjectFactory(expert_instruction='Label all cats')
         with CaptureQueriesContext(connection) as captured_queries:
@@ -218,3 +246,43 @@ class TestProjectSerializerExpertInstruction(TestCase):
             data = ProjectSerializer(projects, many=True, include=['id', 'expert_instruction']).data
         assert [item['expert_instruction'] for item in data] == ['<p>x</p>'] * 3
         assert len(captured_queries) == 1
+
+    JAVASCRIPT_LINKS = [
+        '<a href="javascript:alert(1)">x</a>',
+        '<a href="JaVaScRiPt:alert(1)">x</a>',
+        '<a href="jav&#x61;script:alert(1)">x</a>',
+        '<a href="&#106;avascript:alert(1)">x</a>',
+        '<a href="java\tscript:alert(1)">x</a>',
+        '<a href=" javascript:alert(1)">x</a>',
+        '<a href="data:text/html,x">x</a>',
+        '<a href="vbscript:x">x</a>',
+    ]
+
+    def test_write_strips_javascript_links(self):
+        project = ProjectFactory()
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                assert self._write(project, payload) == '<a>x</a>'
+
+    def test_write_strips_javascript_links_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                assert self._write(project, payload) == '<a>x</a>'
+        assert self._write(project, '<iframe src="javascript:alert(1)"></iframe>') == '<iframe></iframe>'
+
+    def test_read_strips_javascript_links_stored_before_the_fix(self):
+        project = ProjectFactory()
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                type(project).objects.filter(pk=project.pk).update(expert_instruction=payload)
+                project.refresh_from_db()
+                assert self._read(project) == '<a>x</a>'
+
+    def test_sanitize_expert_instruction_pins_protocols(self):
+        for allow_unsafe_tags in (False, True):
+            with self.subTest(allow_unsafe_tags=allow_unsafe_tags):
+                with mock.patch('projects.serializers.bleach.clean', wraps=bleach.clean) as clean:
+                    sanitize_expert_instruction('<a href="https://ok.example">x</a>', allow_unsafe_tags)
+                assert clean.call_args.kwargs['protocols'] == ['http', 'https', 'mailto']

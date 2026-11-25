@@ -4,7 +4,6 @@ import logging
 import os
 import pathlib
 
-from core.feature_flags import flag_set
 from core.filters import NumberInFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
@@ -25,6 +24,7 @@ from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from fsm.serializer_fields import fsm_state_fields_enabled
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
 from projects.functions.next_task import get_next_task
@@ -188,18 +188,14 @@ class ProjectListAPI(generics.ListCreateAPIView):
         if fields is None or set(fields) & set(ProjectManager.COUNTER_FIELDS):
             projects = ProjectManager.with_counts_annotate(projects, fields=fields)
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
         state_requested = (
             sparse_fields is None
             or 'state' in sparse_fields
             or 'state' in self.request.query_params.get('ordering', '')
             or bool(self.request.query_params.get('state'))
         )
-        if (
-            state_requested
-            and flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=self.request.user)
-        ):
+        if state_requested and fsm_state_fields_enabled():
             projects = projects.with_state()
 
         prefetch_fields = []
@@ -268,14 +264,15 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        projects = Project.objects.with_counts(fields=fields).filter(
-            organization=self.request.user.active_organization
+        # Same order as ProjectListAPI: paginating an unordered queryset returns unstable pages.
+        projects = (
+            Project.objects.with_counts(fields=fields)
+            .filter(organization=self.request.user.active_organization)
+            .order_by(F('pinned_at').desc(nulls_last=True), '-created_at')
         )
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
-        ):
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
+        if fsm_state_fields_enabled():
             projects = projects.with_state()
 
         return projects
@@ -406,10 +403,8 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
             organization=self.request.user.active_organization
         )
 
-        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
-        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
-        ):
+        # Only annotate FSM state for UI/API consumption when FSM state fields are enabled
+        if fsm_state_fields_enabled():
             projects = projects.with_state()
 
         return projects
@@ -624,22 +619,19 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class _ProjectImportJobMixin:
+class _ProjectImportJobMixin(GetParentObjectMixin):
     """Shared helpers for project-scoped import/reimport status views."""
 
-    project_model = Project
+    parent_lookup_url_kwarg = 'pk'
     # Disable LSE default OrderingFilter — list order is fixed (created_at DESC, -id).
     filter_backends = []
 
-    def _get_project(self):
-        project_pk = self.kwargs.get('pk')
-        return generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
-            pk=project_pk,
-        )
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
 
     def get_queryset(self):
-        return super().get_queryset().filter(project=self._get_project())
+        return super().get_queryset().filter(project=self.parent_object)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -760,6 +752,8 @@ class ProjectImportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
         summary='Get project import status',
         description="""
             Poll the status of an asynchronous project import operation.
+
+            *Note*: this endpoint is also accessible as `client.tasks.create_many_status`, its historical location.
             
             **Usage:**
             1. When you POST to `/api/projects/{project_id}/import`, you'll receive a response like `{"import": <import_id>}`
@@ -786,8 +780,10 @@ class ProjectImportListAPI(_ProjectImportJobListMixin, generics.ListAPIView):
             ),
         ],
         extensions={
-            'x-fern-sdk-group-name': 'tasks',
-            'x-fern-sdk-method-name': 'create_many_status',
+            # Docs/SDK under projects.imports.get (parity with list + projects.reimports.get).
+            # client.tasks.create_many_status remains a supported alias via TasksClientExt.
+            'x-fern-sdk-group-name': ['projects', 'imports'],
+            'x-fern-sdk-method-name': 'get',
             'x-fern-audiences': ['public'],
         },
     ),
@@ -957,7 +953,6 @@ class ProjectReimportAPI(_ProjectImportJobMixin, generics.RetrieveAPIView):
 class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, generics.DestroyAPIView):
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
-    parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -967,6 +962,10 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return TaskSimpleSerializer
@@ -974,7 +973,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             return TaskSerializer
 
     def filter_queryset(self, queryset):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        project = self.parent_object
         # ordering is deprecated here
         tasks = Task.objects.filter(project=project).order_by('-updated_at')
         page = paginator(tasks, self.request)
@@ -984,7 +983,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
             raise Http404
 
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = self.parent_object
         task_ids = list(Task.objects.filter(project=project).values('id'))
         Task.delete_tasks_without_signals(Task.objects.filter(project=project))
         logger.info(f'calling reset project_id={project.id} ProjectTaskListAPI.delete()')

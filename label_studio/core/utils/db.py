@@ -5,7 +5,7 @@ from typing import Dict, Optional, TypeVar
 
 from django.db import IntegrityError, OperationalError, connection, models, transaction
 from django.db.models import Model, QuerySet, Subquery
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, pre_migrate
 from django.db.utils import DatabaseError, ProgrammingError
 from django.dispatch import receiver
 
@@ -270,3 +270,28 @@ def signal_clear_column_presence_cache(**_kwargs):
     so that the next migration can introspect the new column using has_column_cached()."""
     logger.debug('Clearing column presence cache in post_migrate signal')
     _column_presence_cache.clear()
+
+
+# migrate sends pre_migrate and then post_migrate once per app, so the depth is positive only
+# while a migrate run is applying migrations. A nested migrate (activity_log's pre_migrate
+# handler migrates its own database) keeps the counts balanced. flush sends post_migrate
+# alone, hence the floor at zero.
+_migrate_depth = 0
+
+
+@receiver(pre_migrate)
+def signal_enter_migrate(**_kwargs):
+    global _migrate_depth
+    _migrate_depth += 1
+
+
+@receiver(post_migrate)
+def signal_exit_migrate(**_kwargs):
+    global _migrate_depth
+    _migrate_depth = max(0, _migrate_depth - 1)
+
+
+def migrations_running() -> bool:
+    """True while migrate is applying migrations in this process, the only time model code
+    can run against a table that lacks a column the model declares."""
+    return _migrate_depth > 0

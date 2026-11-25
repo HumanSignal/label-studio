@@ -9,6 +9,14 @@ class UserMixin:
     def is_project_annotator(self, project):
         return False
 
+    def get_role(self, organization_or_pk, project=None, acting=True, prefer_project_role=False):
+        """Roles exist only in Label Studio Enterprise."""
+        return None
+
+    def get_acting_role(self, organization_or_pk):
+        """Acting as another role exists only in Label Studio Enterprise."""
+        return None
+
     @property
     def is_view_only(self):
         return False

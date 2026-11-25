@@ -81,7 +81,7 @@ const HtxTextAreaResultLine = forwardRef(
           <Button
             className={cn("textarea-tag").elem("action").toClassName()}
             size="small"
-            look="string"
+            look="ghost"
             aria-label="Delete Region"
             data-testid="textarea-region-delete"
             leading={<IconTrash />}

@@ -1,8 +1,9 @@
 import { type FC, useState, useMemo } from "react";
 import sanitizeHtml from "sanitize-html";
 import { Markdown } from "../../../../editor/src/components/Markdown/Markdown";
-import { Modal } from "../modal";
-import { Tabs, TabsList, TabsTrigger } from "../tabs/tabs";
+import { ModalWindow } from "../modal-window/modal-window";
+import { SegmentedControl } from "../segmented-control/segmented-control";
+import { Typography } from "../typography/typography";
 import styles from "./reader-view-modal.module.css";
 
 type ContentFormat = "plain" | "markdown" | "html";
@@ -64,30 +65,37 @@ export const ReaderViewModal: FC<ReaderViewModalProps> = ({ content, isOpen, onC
     }
   };
 
-  const headerContent = (
-    <Tabs value={format} onValueChange={(v) => setFormat(v as ContentFormat)} variant="default">
-      <TabsList>
-        <TabsTrigger value="plain">Plain Text</TabsTrigger>
-        <TabsTrigger value="markdown">Markdown</TabsTrigger>
-        <TabsTrigger value="html">HTML</TabsTrigger>
-      </TabsList>
-    </Tabs>
+  const header = (
+    <div className="flex items-center justify-between gap-base">
+      <Typography variant="title" size="large" className="text-neutral-content" data-testid="modal-window-title">
+        Reader View
+      </Typography>
+      <SegmentedControl
+        size="small"
+        aria-label="Format"
+        selectedOption={format}
+        onChange={(v) => setFormat(v as ContentFormat)}
+        options={[
+          { value: "plain", label: "Plain Text" },
+          { value: "markdown", label: "Markdown" },
+          { value: "html", label: "HTML" },
+        ]}
+      />
+    </div>
   );
 
   return (
-    // @ts-expect-error - Modal is a class component with React type compatibility issues
-    <Modal
-      visible={isOpen}
-      onHide={onClose}
-      fullscreen={true}
+    <ModalWindow
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      size="fullscreen"
       title="Reader View"
-      header={headerContent}
-      allowClose={true}
-      closeOnClickOutside={false}
-      className={styles.readerViewModal}
-      data-testid="reader-view-modal"
+      header={header}
+      closeOnScrimClick={false}
+      bodyClassName="flex min-h-0"
+      dataTestId="reader-view-modal"
     >
       <div className={styles.contentContainer}>{renderContent()}</div>
-    </Modal>
+    </ModalWindow>
   );
 };

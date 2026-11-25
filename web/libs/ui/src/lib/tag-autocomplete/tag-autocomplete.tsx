@@ -24,6 +24,7 @@ export const TagAutocomplete = forwardRef(
       name,
       placeholder,
       triggerClassName,
+      size = "medium",
       contentClassName,
       tagClassName,
       renderTag,
@@ -264,6 +265,7 @@ export const TagAutocomplete = forwardRef(
                 },
                 triggerClassName,
               )}
+              data-size={size}
               data-testid={dataTestid ?? "tag-autocomplete-trigger"}
               // Prevent PopoverTrigger from toggling on click - we manage open state ourselves
               onClick={(e) => {
@@ -330,7 +332,7 @@ export const TagAutocomplete = forwardRef(
             >
               {isLoading ? (
                 <div className={styles.loadingContainer}>
-                  <Spinner size={20} />
+                  <Spinner size="smaller" />
                 </div>
               ) : (
                 <>

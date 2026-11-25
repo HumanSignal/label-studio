@@ -1,24 +1,23 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { Badge, Button, cnm, Message, ToastType, Typography, useToast } from "@humansignal/ui";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@humansignal/ui/lib/card-new/card";
-import { confirm } from "@humansignal/ui/lib/modal";
-import { IconWarning } from "@humansignal/icons";
+import {
+  ConfirmDialog,
+  type ConfirmDialogContent,
+  Badge,
+  Button,
+  cnm,
+  Message,
+  ToastType,
+  Typography,
+  useToast,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@humansignal/ui";
 import { useLocation } from "react-router-dom";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "apps/labelstudio/src/components/LeaveBlocker/LeaveBlocker";
-import {
-  Card as ShadCard,
-  CardContent as ShadCardContent,
-  CardHeader as ShadCardHeader,
-} from "@humansignal/shad/components/ui/card";
-import { Skeleton } from "@humansignal/shad/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@humansignal/shad/components/ui/dialog";
+import { Skeleton } from "@humansignal/ui";
 
 import { HotkeySection } from "./Hotkeys/Section";
 import { ImportDialog } from "./Hotkeys/Import";
@@ -51,6 +50,7 @@ export const useHotkeySections = (scope?: HotkeyScope | null): Section[] => {
 };
 
 export const HotkeysManager = () => {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const location = useLocation();
   const [isDirty, setIsDirty] = useState(false);
   const [resolution, setResolution] = useState<ProjectHotkeyScopeResolution>(() =>
@@ -65,9 +65,9 @@ export const HotkeysManager = () => {
   }, []);
 
   const handleDirtyNavigation = useCallback(({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
-    confirm({
+    setPendingConfirm({
       title: "Discard unsaved hotkey changes?",
-      body: "Changing hotkey scope will discard your unsaved changes.",
+      children: "Changing hotkey scope will discard your unsaved changes.",
       okText: "Discard Changes",
       buttonLook: "negative",
       onOk: () => {
@@ -86,7 +86,7 @@ export const HotkeysManager = () => {
         : null;
 
   return (
-    <Card className="!w-full">
+    <Card className="w-full">
       <CardHeader>
         <div className="flex flex-col gap-tight">
           <CardTitle>
@@ -126,6 +126,13 @@ export const HotkeysManager = () => {
           )}
         </div>
       </CardContent>
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
     </Card>
   );
 };
@@ -149,6 +156,8 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
   });
 
   const {
+    resetConfirm,
+    closeResetConfirm,
     hotkeys,
     setHotkeys,
     isLoading,
@@ -352,36 +361,24 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
       >
         <div className={styles.sectionContent}>
           {isLoading && hotkeys.length === 0 ? (
-            <div className="flex flex-col gap-wide">
-              <ShadCard>
-                <ShadCardHeader className="pb-tight">
-                  <Skeleton className="h-wide w-[16rem]" />
-                  <Skeleton className="h-base w-[18rem]" />
-                </ShadCardHeader>
-                <ShadCardContent>
-                  <Skeleton className="h-5 w-44 mb-tight" />
-                  <Skeleton className="h-base w-[16rem]" />
-                </ShadCardContent>
-              </ShadCard>
-              {typedHotkeySections.map((section: Section) => (
-                <ShadCard key={section.id}>
-                  <ShadCardHeader className="pb-tight">
-                    <Skeleton className="h-wide w-[16rem]" />
+            <div className="flex flex-col gap-wide divide-y divide-neutral-border">
+              {[{ id: "loading" }, ...typedHotkeySections].map((section) => (
+                <section key={section.id} className="flex flex-col gap-base pt-wide first:pt-0">
+                  <div className="flex flex-col gap-tighter">
+                    <Skeleton className="h-base w-[16rem]" />
                     <Skeleton className="h-base w-[18rem]" />
-                  </ShadCardHeader>
-                  <ShadCardContent>
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
-                        <Skeleton className="h-5 w-44 mb-tight" />
-                        <Skeleton className="h-base w-[16rem]" />
-                      </div>
-                    ))}
-                  </ShadCardContent>
-                </ShadCard>
+                  </div>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className={`py-wide ${i < 3 ? "border-b border-border" : ""}`}>
+                      <Skeleton className="h-5 w-44 mb-tight" />
+                      <Skeleton className="h-base w-[16rem]" />
+                    </div>
+                  ))}
+                </section>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col gap-wide">
+            <div className="flex flex-col gap-wide divide-y divide-neutral-border">
               {typedHotkeySections.map((section: Section) => (
                 <HotkeySection
                   key={section.id}
@@ -401,15 +398,22 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
         </div>
       </fieldset>
 
-      <Dialog open={duplicateConfirmDialog.open} onOpenChange={handleCancelDuplicate}>
-        <DialogContent className="bg-neutral-surface">
-          <DialogHeader>
-            <DialogTitle>Warning: Duplicate Hotkey Detected</DialogTitle>
-            <DialogDescription>
-              The hotkey combination "<strong>{duplicateConfirmDialog.newKey}</strong>" is already being used by:
-            </DialogDescription>
-          </DialogHeader>
-
+      <ConfirmDialog
+        open={duplicateConfirmDialog.open}
+        onOpenChange={(open) => {
+          if (!open) handleCancelDuplicate();
+        }}
+        title="Duplicate hotkey"
+        okText="Allow Duplicate"
+        onOk={handleConfirmDuplicate}
+        onCancel={handleCancelDuplicate}
+        allowClose
+        dataTestId="hotkeys-duplicate-confirm"
+      >
+        <div className="flex flex-col gap-base">
+          <Typography variant="body" size="medium" className="m-0 text-neutral-content">
+            The hotkey combination "<strong>{duplicateConfirmDialog.newKey}</strong>" is already being used by:
+          </Typography>
           <div className="max-h-60 overflow-y-auto">
             <div className="flex flex-col gap-base">
               {duplicateConfirmDialog.conflictingHotkeys.map((conflictHotkey: Hotkey) => (
@@ -432,24 +436,19 @@ const ScopedHotkeysContent = ({ scope, onDirtyChange }: PropsScopedHotkeysConten
               ))}
             </div>
           </div>
+          <Message variant="warning" size="small">
+            Having duplicate hotkeys may cause conflicts and unexpected behavior. Are you sure you want to proceed?
+          </Message>
+        </div>
+      </ConfirmDialog>
 
-          <DialogDescription className="text-warning-text bg-warning-background p-base rounded-small border border-warning-border-subtle flex items-start gap-tight">
-            <div>
-              <IconWarning className="text-warning-icon" />
-            </div>
-            <div>
-              Having duplicate hotkeys may cause conflicts and unexpected behavior. Are you sure you want to proceed?
-            </div>
-          </DialogDescription>
-
-          <DialogFooter>
-            <Button variant="neutral" onClick={handleCancelDuplicate}>
-              Cancel
-            </Button>
-            <Button onClick={handleConfirmDuplicate}>Allow Duplicate</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        {...resetConfirm}
+        open={resetConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) closeResetConfirm();
+        }}
+      />
     </div>
   );
 };

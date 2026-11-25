@@ -14,7 +14,6 @@ from django.shortcuts import redirect, render, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
-from rest_framework.authtoken.models import Token
 from users import forms
 from users.functions import login, proceed_registration
 
@@ -139,6 +138,16 @@ def user_login(request):
 
 
 @login_required
+def user_reauthenticate(request):
+    """Sign out and back in to prove identity for a step-up protected action (users/step_up.py)."""
+    next_url = request.GET.get('next') or '/'
+    if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        next_url = '/'
+    auth.logout(request)
+    return redirect(f'{reverse("user-login")}?next={quote(next_url)}')
+
+
+@login_required
 def user_account(request, sub_path=None):
     """
     Handle user account view and profile updates.
@@ -159,7 +168,6 @@ def user_account(request, sub_path=None):
 
     Notes:
         - Authentication is required (enforced by @login_required decorator)
-        - Retrieves the user's API token for display in the template
         - Form validation happens on POST requests
     """
     user = request.user
@@ -168,7 +176,6 @@ def user_account(request, sub_path=None):
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)
-    token = Token.objects.get(user=user)
 
     if request.method == 'POST':
         form = forms.UserProfileForm(request.POST, instance=user)
@@ -179,5 +186,5 @@ def user_account(request, sub_path=None):
     return render(
         request,
         'users/user_account.html',
-        {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
+        {'settings': settings, 'user': user, 'user_profile_form': form},
     )

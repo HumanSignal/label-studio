@@ -1,10 +1,14 @@
+from datetime import timedelta
 from unittest.mock import PropertyMock, patch
 
+import pytest
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from io_storages.tests.factories import GCSImportStorageFactory, S3ImportStorageFactory
 from projects.models import Project
+from projects.tests.factories import ProjectFactory
 from tasks.models import Task
-from tasks.tests.factories import TaskFactory
+from tasks.tests.factories import AnnotationFactory, TaskFactory
 
 
 class TestTaskResolveUris(TestCase):
@@ -166,3 +170,36 @@ class TestTaskResolveUris(TestCase):
         finally:
             self.project.task_data_login = None
             self.project.task_data_password = None
+
+
+@pytest.mark.django_db
+class TestAnnotationDeleteBumpsTaskUpdatedAt:
+    def test_annotation_instance_delete_updates_task_updated_at(self):
+        """Annotation.delete() bumps Task.updated_at via update_task()."""
+        project = ProjectFactory()
+        task = TaskFactory(project=project)
+        annotation = AnnotationFactory(task=task, project=project, completed_by=project.created_by)
+        Task.objects.filter(pk=task.pk).update(updated_at=timezone.now() - timedelta(days=7))
+        task.refresh_from_db()
+        before = task.updated_at
+
+        annotation.delete()
+        task.refresh_from_db()
+
+        assert task.updated_at > before
+
+    def test_annotation_queryset_delete_updates_task_updated_at(self):
+        """Raw QuerySet.delete() skips Annotation.delete(); post_delete safety-net must bump updated_at."""
+        from tasks.models import Annotation
+
+        project = ProjectFactory()
+        task = TaskFactory(project=project)
+        annotation = AnnotationFactory(task=task, project=project, completed_by=project.created_by)
+        Task.objects.filter(pk=task.pk).update(updated_at=timezone.now() - timedelta(days=7))
+        task.refresh_from_db()
+        before = task.updated_at
+
+        Annotation.objects.filter(pk=annotation.pk).delete()
+        task.refresh_from_db()
+
+        assert task.updated_at > before

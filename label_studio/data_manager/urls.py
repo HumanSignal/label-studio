@@ -19,6 +19,11 @@ urlpatterns = [
     path('api/dm/project/', api.ProjectStateAPI.as_view(), name='dm-project'),
     path('api/dm/actions/', api.ProjectActionsAPI.as_view(), name='dm-actions'),
     path('api/dm/actions/<str:action_id>/form/', api.ProjectActionsFormAPI.as_view(), name='dm-actions-form'),
+    path(
+        'api/projects/<int:pk>/tasks/data-column/',
+        api.ProjectTaskDataColumnAPI.as_view(),
+        name='project-tasks-data-column',
+    ),
     # path("api/dm/tasks/", api.TaskListAPI.as_view()),
     # path("api/dm/tasks/<int:pk>", api.TaskAPI.as_view()),
     path('projects/<int:pk>/', views.task_page, name='project-data'),

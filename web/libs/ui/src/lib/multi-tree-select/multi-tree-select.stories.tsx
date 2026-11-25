@@ -6,7 +6,7 @@ import type { MultiTreeSelectSchema, TreeNodeProps } from "./tree-context";
 
 const meta: Meta<typeof MultiTreeSelectDropdown> = {
   component: MultiTreeSelectDropdown,
-  title: "UI/MultiTreeSelect",
+  title: "Inputs/MultiTreeSelect",
   parameters: {
     layout: "padded",
   },
@@ -199,6 +199,24 @@ export const WithoutAllOption: Story = {
         placeholder="Select workspaces or projects"
         searchPlaceholder="Search by project or workspace"
       />
+    </div>
+  ),
+};
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="w-full max-w-md flex flex-col gap-base">
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <DropdownShell
+          key={size}
+          size={size}
+          data={createWorkspaceData()}
+          schema={WORKSPACES_SCHEMA}
+          placeholder={`All projects (${size})`}
+          allLabel="All workspaces"
+        />
+      ))}
     </div>
   ),
 };

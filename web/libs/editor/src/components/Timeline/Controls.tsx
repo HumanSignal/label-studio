@@ -379,7 +379,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 export const ControlButton: FC<ButtonProps & { hotkey?: string }> = ({ children, hotkey, hotkeyScope, ...props }) => {
   return (
     <WithHotkey binging={hotkey as HotkeyList} hotkeyScope={hotkeyScope}>
-      <Button {...props} look="string" size="small" variant="neutral">
+      <Button {...props} look="ghost" size="small" variant="neutral">
         {children}
       </Button>
     </WithHotkey>

@@ -16,7 +16,8 @@ export const CustomButton = types
     variant: types.maybe(
       types.enumeration(["primary", "neutral", "positive", "negative", "warning", "inverted"] as const),
     ),
-    look: types.maybe(types.enumeration(["filled", "outlined", "string"])),
+    /** `string` is the retired name of `ghost`; embedders still pass it, so it stays accepted. */
+    look: types.maybe(types.enumeration(["filled", "outlined", "ghost", "string"])),
     size: types.maybe(types.enumeration(["medium", "small", "smaller"])),
     tooltip: types.maybe(types.string),
     /** Secondary line rendered under the title when the button is shown as a menu row. */

@@ -10,7 +10,7 @@ import { AiChatShell } from "./ai-chat-shell";
 
 const meta: Meta<typeof AiChatShell> = {
   component: AiChatShell,
-  title: "UI/AI Chat/Chat Shell",
+  title: "Product/AI Chat/Chat Shell",
   parameters: {
     docs: {
       description: {

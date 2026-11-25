@@ -24,20 +24,18 @@
   {% endblock %}
 
   {% block theme_colors %}
-    {% if feature_flags.fflag_feat_front_optic_1217_theme_toggle_short %}
-    <script>
-      function handleThemeColor() {
-        let themeColor = window.localStorage.getItem("preferred-color-scheme");
-        if (themeColor === "Auto") {
-          themeColor = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"
-        } else if (!themeColor) {
-          themeColor = "Light";
-        }
-        document.documentElement.setAttribute("data-color-scheme", themeColor.toLowerCase());
+  <script nonce="{{ request.csp_nonce }}">
+    function handleThemeColor() {
+      let themeColor = window.localStorage.getItem("preferred-color-scheme");
+      if (themeColor === "Auto") {
+        themeColor = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"
+      } else if (!themeColor) {
+        themeColor = "Light";
       }
-      handleThemeColor();
-    </script>
-    {% endif %}
+      document.documentElement.setAttribute("data-color-scheme", themeColor.toLowerCase());
+    }
+    handleThemeColor();
+  </script>
   {% endblock %}
 
   {% block app-scripts %}
@@ -155,13 +153,13 @@
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
   </script>
-  <script type="module" src="{{ settings.FRONTEND_HOSTNAME }}/react-app/@vite/client"></script>
+  <script nonce="{{ request.csp_nonce }}" type="module" src="{{ settings.FRONTEND_HOSTNAME }}/react-app/@vite/client"></script>
   {% endif %}
-  <script type="module" src="{% manifest_asset 'main.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}" type="module" src="{% manifest_asset 'main.js' %}"></script>
 {% endblock %}
 
 {% block bottomjs %}
-  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script nonce="{{ request.csp_nonce }}" src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
   <script nonce="{{request.csp_nonce}}">
 
     // CSRF

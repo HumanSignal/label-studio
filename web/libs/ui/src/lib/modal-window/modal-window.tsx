@@ -1,11 +1,12 @@
 "use client";
 
-import { IconClose } from "@humansignal/icons";
+import { XIcon } from "@humansignal/icons";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef } from "react";
 import { cnm } from "../../utils/utils";
 import { Button } from "../button/button";
 import { Typography } from "../typography/typography";
+import { useModalStack } from "./modal-stack";
 import styles from "./modal-window.module.css";
 
 export type ModalWindowSize = "small" | "medium" | "large" | "larger" | "fullscreen";
@@ -14,7 +15,7 @@ export type ModalWindowSize = "small" | "medium" | "large" | "larger" | "fullscr
  * - `workflow` — Top-aligned panel: when body content height changes, the panel stays anchored so the layout does not jump vertically. Use for multi-step flows, long forms, and substantial content.
  * - `dialog` — Vertically centered: suited to short, stable-height confirmations, acknowledgements, and simple actions.
  */
-export type ModalWindowVariant = "workflow" | "dialog";
+export type ModalWindowPlacement = "top" | "center";
 
 export interface ModalWindowProps {
   /**
@@ -27,9 +28,9 @@ export interface ModalWindowProps {
   onOpenChange?: (open: boolean) => void;
   /**
    * Layout intent: top-anchored workflow surface vs vertically centered dialog. Ignored when `size` is `fullscreen`.
-   * @default 'workflow'
+   * @default 'top'
    */
-  variant?: ModalWindowVariant;
+  placement?: ModalWindowPlacement;
   /**
    * Primary width preset (`max-w-*`). Below the viewport width, the panel is full width (caps only apply on wider viewports).
    * Prefer this over custom width overrides.
@@ -58,6 +59,10 @@ export interface ModalWindowProps {
    */
   footer?: ReactNode;
   /**
+   * Status text on the left of the footer, next to the actions (e.g. "12 tasks selected").
+   */
+  footerMeta?: ReactNode;
+  /**
    * Show dimmed scrim behind the panel.
    * @default true
    */
@@ -67,6 +72,16 @@ export interface ModalWindowProps {
    * @default true
    */
   closeOnScrimClick?: boolean;
+  /**
+   * Close when focus moves to the page behind the panel (only without `trapFocus`, which pulls focus back instead).
+   * @default true
+   */
+  closeOnFocusOutside?: boolean;
+  /**
+   * Keep keyboard focus inside the panel: focus that moves to the page behind comes back (Tab already cycles inside).
+   * For dialogs without portaled controls, since a Select or Dropdown inside opens outside the panel. @default false
+   */
+  trapFocus?: boolean;
   /**
    * Show the header close button.
    * @default true
@@ -102,6 +117,11 @@ export interface ModalWindowProps {
    */
   animate?: boolean;
   onOpenAutoFocus?: (event: Event) => void;
+  /**
+   * Called on Escape before the dialog closes. `event.preventDefault()` keeps it open, e.g. for a dialog
+   * that lets the widgets inside use Escape first and handles it itself.
+   */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onCloseAutoFocus?: (event: Event) => void;
 }
 
@@ -114,26 +134,46 @@ const sizeToMaxWidthClass: Record<Exclude<ModalWindowSize, "fullscreen">, string
 };
 
 /**
+ * The ModalWindow close button. Use it inside a custom `header` (with `showCloseButton={false}`) so the dialog
+ * closes through ModalWindow instead of a Radix primitive imported by the screen.
+ */
+export function ModalWindowCloseButton({ className }: { className?: string }) {
+  return (
+    <DialogPrimitive.Close asChild>
+      <Button
+        look="ghost"
+        size="small"
+        className={cnm("shrink-0", className)}
+        leading={<XIcon size={16} weight="bold" />}
+        aria-label="Close"
+        data-testid="modal-window-close-button"
+      />
+    </DialogPrimitive.Close>
+  );
+}
+
+/**
  * ModalWindow — Radix Dialog–based overlay with optional header, scrollable body, and footer.
  *
- * Use `variant="workflow"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `variant="dialog"` or the {@link Dialog} wrapper for short, centered confirmations and notices.
+ * Use `placement="top"` (default) for task-focused panels where body height may change—top alignment keeps the panel from shifting vertically. Use `placement="center"` for short, centered confirmations and notices.
  *
- * **Migration from legacy `modal()` / `Modal`:**
- * - Gate with `ff.isActive(...)` next to each modal, not via a global switch in app `Modal.tsx`.
- * - Content that used `useModalControls()` from the legacy modal must lift state into the parent or use a compat layer — `ModalWindow` does not provide that React context.
+ * Content does not get a modal context: the owner passes it what it needs to close the dialog.
  */
 export function ModalWindow({
   open,
   onOpenChange,
-  variant = "workflow",
+  placement = "top",
   size = "medium",
   title,
   description,
   header,
   children,
   footer,
+  footerMeta,
   showScrim = true,
   closeOnScrimClick = true,
+  closeOnFocusOutside = true,
+  trapFocus = false,
   showCloseButton = true,
   hideHeader = false,
   contentClassName,
@@ -145,28 +185,51 @@ export function ModalWindow({
   dataTestId = "modal-window",
   animate = true,
   onOpenAutoFocus,
+  onEscapeKeyDown,
   onCloseAutoFocus,
 }: ModalWindowProps) {
   const isFullscreen = size === "fullscreen";
-  const isDialogVariant = !isFullscreen && variant === "dialog";
+  const stack = useModalStack(Boolean(open), showScrim);
+  // A fullscreen workspace stays behind the dialog on top of it: hiding it would uncover the page.
+  const covered = stack.covered && !isFullscreen;
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Radix runs the panel non-modal (portaled controls stay usable), so it never pulls focus back by itself.
+  useEffect(() => {
+    if (!open || !trapFocus || covered) return;
+    let lastInside: HTMLElement | null = null;
+    const onFocusIn = (event: FocusEvent) => {
+      const panel = panelRef.current;
+      const target = event.target as HTMLElement | null;
+      if (!panel || !target) return;
+      if (panel.contains(target)) {
+        lastInside = target;
+        return;
+      }
+      (lastInside && panel.contains(lastInside) ? lastInside : panel).focus();
+    };
+    document.addEventListener("focusin", onFocusIn);
+    return () => document.removeEventListener("focusin", onFocusIn);
+  }, [open, trapFocus, covered]);
+  const isCentered = !isFullscreen && placement === "center";
 
   const panelClassName = cnm(
     "flex min-h-0 flex-col bg-neutral-background outline-none",
-    isDialogVariant ? "origin-center" : "origin-top",
+    isCentered ? "origin-center" : "origin-top",
     styles.panel,
     isFullscreen
       ? [
           "fixed z-[2001] inset-0 m-0 max-h-none h-screen w-full rounded-none",
           animate && styles.withAnimationFullscreen,
         ]
-      : isDialogVariant
+      : isCentered
         ? [
-            "fixed z-[2001] left-1/2 top-1/2 w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-lg",
+            "fixed z-[2001] left-1/2 top-1/2 w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-medium",
             !animate && "-translate-x-1/2 -translate-y-1/2",
             animate && styles.withAnimationDialog,
           ]
         : [
-            "fixed z-[2001] left-1/2 top-widest w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-lg",
+            "fixed z-[2001] left-1/2 top-widest w-full max-h-[calc(100dvh-2*var(--spacing-widest))] rounded-medium",
             !animate && "-translate-x-1/2",
             animate && styles.withAnimation,
           ],
@@ -178,13 +241,14 @@ export function ModalWindow({
   const showHeaderChrome = !hideHeader && Boolean(header || title || description || showCloseButton);
 
   /** Radix runs `onPointerDownOutside` before dismiss; blocking scrim close requires preventDefault there (see Radix Dialog docs), not only `onInteractOutside`. */
-  const blockDismissFromOutside = !closeOnScrimClick;
+  // A covered modal is not the one being used: focus and clicks in the dialog on top must not dismiss it.
+  const blockDismissFromOutside = !closeOnScrimClick || stack.covered;
 
   /* modal={false}: portaled overlays (e.g. UI Dropdown) stay interactive; Radix renders no Dialog.Overlay then — use a custom scrim. */
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPrimitive.Portal>
-        {showScrim ? (
+        {stack.ownsScrim ? (
           <div
             role="presentation"
             aria-hidden
@@ -198,16 +262,20 @@ export function ModalWindow({
           />
         ) : null}
         <DialogPrimitive.Content
+          ref={panelRef}
           aria-describedby={undefined}
           className={panelClassName}
-          style={contentStyle}
+          style={covered ? { ...contentStyle, visibility: "hidden" } : contentStyle}
           data-slot="modal-window-content"
-          data-variant={isFullscreen ? undefined : variant}
+          data-covered={covered || undefined}
+          data-placement={isFullscreen ? undefined : placement}
           data-testid={dataTestId}
           tabIndex={-1}
           onPointerDownOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
           onInteractOutside={blockDismissFromOutside ? (e) => e.preventDefault() : undefined}
+          onFocusOutside={closeOnFocusOutside && !stack.covered ? undefined : (e) => e.preventDefault()}
           onOpenAutoFocus={onOpenAutoFocus}
+          onEscapeKeyDown={onEscapeKeyDown}
           onCloseAutoFocus={onCloseAutoFocus}
         >
           {showHeaderChrome ? (
@@ -228,7 +296,7 @@ export function ModalWindow({
                       <DialogPrimitive.Title asChild>
                         <Typography
                           variant="title"
-                          size={isDialogVariant ? "medium" : "large"}
+                          size={isCentered ? "medium" : "large"}
                           className={cnm("text-neutral-content", !title && "sr-only")}
                           data-slot="modal-window-title"
                           data-testid="modal-window-title"
@@ -271,18 +339,7 @@ export function ModalWindow({
                   </>
                 )}
               </div>
-              {showCloseButton ? (
-                <DialogPrimitive.Close asChild>
-                  <Button
-                    look="string"
-                    size="small"
-                    className="shrink-0"
-                    leading={<IconClose />}
-                    aria-label="Close"
-                    data-testid="modal-window-close-button"
-                  />
-                </DialogPrimitive.Close>
-              ) : null}
+              {showCloseButton ? <ModalWindowCloseButton /> : null}
             </div>
           ) : (
             <DialogPrimitive.Title className="sr-only">{title ?? "Modal window"}</DialogPrimitive.Title>
@@ -296,29 +353,34 @@ export function ModalWindow({
             {children}
           </div>
 
-          {footer ? (
+          {footer || footerMeta ? (
             <div
               className={cnm(
                 "shrink-0 border-t bg-neutral-surface rounded-b-medium border-neutral-border px-wide py-base",
+                footerMeta && "flex items-center justify-between gap-base",
                 footerClassName,
               )}
               data-slot="modal-window-footer"
               data-testid="modal-window-footer"
             >
-              {footer}
+              {footerMeta ? (
+                <>
+                  <div
+                    className="min-w-0 text-neutral-content-subtle"
+                    data-slot="modal-window-footer-meta"
+                    data-testid="modal-window-footer-meta"
+                  >
+                    {footerMeta}
+                  </div>
+                  <div className="shrink-0">{footer}</div>
+                </>
+              ) : (
+                footer
+              )}
             </div>
           ) : null}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );
-}
-
-/**
- * Centered {@link ModalWindow} (`variant="dialog"`). Prefer for short confirmations and notices with stable height.
- *
- * For the Radix/shad compound primitive also named `Dialog`, import from `@humansignal/shad/components/ui/dialog`.
- */
-export function Dialog(props: ModalWindowProps) {
-  return <ModalWindow variant="dialog" {...props} />;
 }

@@ -12,7 +12,7 @@ from io_storages.azure_blob.utils import (
 from io_storages.gcs.utils import GCS, GOOGLE_TOKEN_URI, GOOGLE_UNIVERSE_DOMAIN
 from tests.utils import make_project
 
-ACCOUNT_KEY = 'dGVzdC1hY2NvdW50LWtleQ=='  # gitleaks:allow base64("test-account-key")
+ACCOUNT_KEY = 'dGVzdC1hY2NvdW50LWtleQ=='  # trufflehog:ignore base64("test-account-key")
 
 INJECTED_ACCOUNT_NAMES = [
     'x;BlobEndpoint=http://127.0.0.1:9;AccountName=x',

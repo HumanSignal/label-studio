@@ -9,7 +9,7 @@
  *
  * Behaviors preserved:
  * - Predictions before annotations (B2; classic order, no date sort)
- * - Virtualization gated by FF_FIT_720_LAZY_LOAD_ANNOTATIONS (B3)
+ * - Virtualization of long annotation lists (B3)
  * - Suppress scroll-to-selected on Task Summary tab (B5; same persistent-state key)
  */
 import { observer } from "mobx-react";
@@ -22,8 +22,8 @@ import {
   type AnnotationsListLayout,
   type SharedAnnotation,
   resolveClassicEntityReviewState,
+  useCarouselNavigationIntent,
 } from "@humansignal/core";
-import { isActive, FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import { AnnotationButton } from "./AnnotationButton";
 import { emitAnnotationCreated, emitOverviewOpenedOrClosed } from "../../utils/labelingTelemetry";
@@ -66,6 +66,7 @@ function entityToSummary(entity: any, store: any): SharedAnnotation {
 
 export const AnnotationsCarousel = observer(
   ({ store, annotationStore, layout, entities: entitiesOverride, emptyState }: AnnotationsCarouselInterface) => {
+    const onNavigationIntent = useCarouselNavigationIntent();
     const enableAnnotations = store.hasInterface("annotations:tabs");
     const enablePredictions = store.hasInterface("predictions:tabs");
     const enableCreateAnnotation = store.hasInterface("annotations:add-new");
@@ -97,8 +98,6 @@ export const AnnotationsCarousel = observer(
     const hasSummaryTab = store.hasInterface("annotations:summary");
     const [viewAllTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
     const suppressScrollToSelected = annotationStore.viewingAll && hasSummaryTab && viewAllTab === "summary";
-
-    const virtualizationEnabled = isActive(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
 
     const sharedCapabilities: AnnotationCapabilities = useMemo(
       () => ({
@@ -188,13 +187,14 @@ export const AnnotationsCarousel = observer(
         selectedId={selectedId}
         capabilities={sharedCapabilities}
         handlers={carouselHandlers}
-        virtualizationEnabled={virtualizationEnabled}
+        virtualizationEnabled
         suppressScrollToSelected={suppressScrollToSelected}
         renderItem={renderItem}
         layout={layout}
         showAddNew={layout === "vertical" && enableCreateAnnotation}
         onAddNew={handleAddNew}
         emptyState={emptyState}
+        onNavigationIntent={onNavigationIntent}
       />
     );
   },

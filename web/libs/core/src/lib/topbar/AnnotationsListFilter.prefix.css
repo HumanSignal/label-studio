@@ -99,8 +99,8 @@
   }
 
   &__filterPopover {
-    width: 360px;
-    max-width: min(360px, calc(100vw - 2 * var(--spacing-base)));
+    width: 460px;
+    max-width: min(460px, calc(100vw - 2 * var(--spacing-base)));
     padding: var(--spacing-base);
     border: 1px solid var(--color-neutral-border);
     border-radius: var(--corner-radius-small);
@@ -124,22 +124,18 @@
     }
   }
 
-  &__typeTabs {
-    width: 100%;
-  }
-
   &__typeTabsList {
     width: 100%;
     gap: 2px;
     padding: 2px;
   }
 
-  &__typeTab {
+  &__typeTabsList &__typeTab {
     flex: 1;
     min-width: 0;
     font-size: var(--font-size-label-smallest);
     line-height: 16px;
-    padding: 4px var(--spacing-tightest);
+    padding: var(--spacing-tighter) var(--spacing-tightest);
     white-space: nowrap;
   }
 
@@ -212,32 +208,28 @@
     }
   }
 
-  &__booleanTabs {
-    flex-shrink: 0;
-  }
-
   &__booleanTabsList {
     min-width: 120px;
     gap: 2px;
     padding: 2px;
   }
 
-  &__booleanTabs &__booleanTab {
+  &__booleanTabsList &__booleanTab {
     min-width: 36px;
     line-height: 16px;
-    padding: 3px var(--spacing-tightest);
+    padding: var(--spacing-tighter) var(--spacing-tightest);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   &__booleanTab {
-    &_is[data-state="active"] {
+    &_is[aria-checked="true"] {
       background-color: var(--color-positive-surface);
       color: var(--color-positive-surface-content);
     }
 
-    &_not[data-state="active"] {
+    &_not[aria-checked="true"] {
       background-color: var(--color-negative-surface);
       color: var(--color-negative-surface-content);
     }

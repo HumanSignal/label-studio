@@ -197,3 +197,19 @@
     }
   }
 }
+
+.checkbox_invalid .checkbox__box:not(.checkbox__box_checked) {
+  border-color: var(--color-negative-border);
+}
+
+.checkbox__text {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--spacing-tightest);
+}
+
+.checkbox__description {
+  color: var(--color-neutral-content-subtler);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+}

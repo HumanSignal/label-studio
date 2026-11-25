@@ -6,7 +6,6 @@ from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
@@ -27,7 +26,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import batch_update_with_retry, fast_first, has_column_cached
+from core.utils.db import batch_update_with_retry, fast_first, has_column_cached, migrations_running
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -149,8 +148,12 @@ class ProjectVisibleManager(ProjectManager):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Avoid referencing columns that might not exist during early migrations
-        if has_column_cached(self.model._meta.db_table, 'deleted_at'):
+        # Avoid referencing deleted_at while migrations run on a database that may predate it.
+        # Outside migrate the column exists, so filter without introspecting: class-level
+        # `queryset = Project.objects.all()` in views and serializers is built once and kept,
+        # and an introspection at build time (during app init, or during migrate's checks on
+        # an empty database) would freeze the answer into it.
+        if not migrations_running() or has_column_cached(self.model._meta.db_table, 'deleted_at'):
             return qs.filter(deleted_at__isnull=True)
         return qs
 
@@ -506,7 +509,12 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         """
         # Async RQ jobs pickle the Project instance; refresh so concurrent settings
         # changes (e.g. during duplication) are not overwritten with stale values.
-        self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        try:
+            self.refresh_from_db(fields=['maximum_annotations', 'overlap_cohort_percentage'])
+        except type(self).DoesNotExist:
+            # The project was deleted after this job was enqueued; there is nothing left to update.
+            logger.info(f'Skipping _update_tasks_states: project {self.pk} no longer exists')
+            return
         logger.info(
             f'Starting _update_tasks_states with params: Project {str(self)} maximum_annotations '
             f'{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}'
@@ -587,12 +595,9 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             )
             # order other tasks by count(annotations)
             tasks_with_min_annotations = tasks_with_min_annotations.annotate(annotation_count=Count('annotations'))
-            if flag_set('fflag_feat_utc_563_randomize_overlap_cohort', user='auto'):
-                # Randomize within tie groups so cohort selection isn't deterministic.
-                # If there are many tasks with the same annotation count, their order is random.
-                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count', '?')
-            else:
-                tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count').distinct()
+            # Randomize within tie groups so cohort selection isn't deterministic.
+            # If there are many tasks with the same annotation count, their order is random.
+            tasks_with_min_annotations = tasks_with_min_annotations.order_by('-annotation_count', '?')
 
             # Materialize the full ID list once to ensure consistent ordering across slices, instead of slicing twice with random ordering.
             all_min_ids = list(tasks_with_min_annotations.values_list('id', flat=True))
@@ -847,7 +852,13 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                 self.model_version = None
                 self.save(update_fields=['model_version'])
 
+            task_ids = list(predictions.order_by().values_list('task_id', flat=True).distinct())
             _, deleted_map = predictions.delete()
+            # QuerySet.delete skips Prediction.delete() -> update_task(); predictions are exported, so bump
+            # Task.updated_at for incremental exports (FIT-3092).
+            from tasks.functions import touch_tasks_updated_at
+
+            touch_tasks_updated_at(task_ids)
 
         count = deleted_map.get('tasks.Prediction', 0)
         return {'deleted_predictions': count}
@@ -1174,11 +1185,6 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             mlb.update_state()
 
         return ml_backends
-
-    def get_active_ml_backends(self):
-        from ml.models import MLBackendState
-
-        return self.get_ml_backends(state=MLBackendState.CONNECTED)
 
     @cached_property
     def get_all_import_storage_objects(self):

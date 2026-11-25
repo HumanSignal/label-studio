@@ -52,7 +52,7 @@ export const FilterShell = ({
         {onReset && (
           <Button
             type="button"
-            look="string"
+            look="ghost"
             variant="neutral"
             size="small"
             data-testid="filter-shell-reset"

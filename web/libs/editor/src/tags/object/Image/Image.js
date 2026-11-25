@@ -16,7 +16,7 @@ import { RectRegionModel } from "../../../regions/RectRegion";
 import * as Tools from "../../../tools";
 import ToolsManager from "../../../tools/Manager";
 import { parseValue } from "../../../utils/data";
-import { FF_DEV_3377, FF_DEV_3391, FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_3391 } from "../../../utils/feature-flags";
 import { guidGenerator } from "../../../utils/unique";
 import { clamp, isDefined } from "../../../utils/utilities";
 import ObjectBase from "../Base";
@@ -443,22 +443,14 @@ const Model = types
     get canvasSize() {
       if (self.isSideways) {
         return {
-          width: isFF(FF_DEV_3377)
-            ? self.naturalHeight * self.stageZoomX
-            : Math.round(self.naturalHeight * self.stageZoomX),
-          height: isFF(FF_DEV_3377)
-            ? self.naturalWidth * self.stageZoomY
-            : Math.round(self.naturalWidth * self.stageZoomY),
+          width: self.naturalHeight * self.stageZoomX,
+          height: self.naturalWidth * self.stageZoomY,
         };
       }
 
       return {
-        width: isFF(FF_DEV_3377)
-          ? self.naturalWidth * self.stageZoomX
-          : Math.round(self.naturalWidth * self.stageZoomX),
-        height: isFF(FF_DEV_3377)
-          ? self.naturalHeight * self.stageZoomY
-          : Math.round(self.naturalHeight * self.stageZoomY),
+        width: self.naturalWidth * self.stageZoomX,
+        height: self.naturalHeight * self.stageZoomY,
       };
     },
 
@@ -893,9 +885,7 @@ const Model = types
     },
 
     setZoomPosition(x, y) {
-      const [width, height] = isFF(FF_DEV_3377)
-        ? [self.canvasSize.width, self.canvasSize.height]
-        : [self.containerWidth, self.containerHeight];
+      const [width, height] = [self.canvasSize.width, self.canvasSize.height];
 
       const [minX, minY] = [
         width - self.stageComponentSize.width * self.zoomScale,
@@ -910,9 +900,7 @@ const Model = types
       const { stageComponentSize, zoomScale } = self;
       const { width, height } = stageComponentSize;
 
-      const [containerWidth, containerHeight] = isFF(FF_DEV_3377)
-        ? [self.canvasSize.width, self.canvasSize.height]
-        : [self.containerWidth, self.containerHeight];
+      const [containerWidth, containerHeight] = [self.canvasSize.width, self.canvasSize.height];
 
       self.setZoomPosition((containerWidth - width * zoomScale) / 2, (containerHeight - height * zoomScale) / 2);
     },
@@ -1090,12 +1078,8 @@ const Model = types
     },
 
     _recalculateImageParams() {
-      self.stageWidth = isFF(FF_DEV_3377)
-        ? self.naturalWidth * self.stageZoom
-        : Math.round(self.naturalWidth * self.stageZoom);
-      self.stageHeight = isFF(FF_DEV_3377)
-        ? self.naturalHeight * self.stageZoom
-        : Math.round(self.naturalHeight * self.stageZoom);
+      self.stageWidth = self.naturalWidth * self.stageZoom;
+      self.stageHeight = self.naturalHeight * self.stageZoom;
     },
 
     _updateImageSize({ width, height, userResize }) {
@@ -1317,7 +1301,7 @@ const ImageModel = types.compose(
   "ImageModel",
   TagAttrs,
   ObjectBase,
-  ...(isFF(FF_LSDV_4583) ? [MultiItemObjectBase] : []),
+  MultiItemObjectBase,
   AnnotationMixin,
   IsReadyWithDepsMixin,
   ImageEntityMixin,

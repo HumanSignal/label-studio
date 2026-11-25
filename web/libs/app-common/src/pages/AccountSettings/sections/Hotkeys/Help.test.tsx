@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { act, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import * as transitionUtils from "@humansignal/core/lib/utils/transition";
 import { effectiveHotkeys } from "../../hotkeys/effectiveHotkeys";
-import { openHotkeyHelp } from "./Help";
+import { HotkeyHelpDialog } from "./Help";
+
+const renderHelp = (sections?: string | string[]) =>
+  render(<HotkeyHelpDialog open onOpenChange={() => {}} sections={sections} />);
 
 describe("Hotkey Help customization link", () => {
   const originalPath = window.location.pathname;
   const originalUser = window.APP_SETTINGS.user;
   const originalLookupHotkey = window.APP_SETTINGS.lookupHotkey;
   const originalEditorKeymap = window.APP_SETTINGS.editor_keymap;
-  let openModal: { close: () => void | Promise<void> } | null = null;
   let aroundTransitionSpy: ReturnType<typeof spyOn> | null = null;
 
   beforeEach(() => {
@@ -26,12 +28,6 @@ describe("Hotkey Help customization link", () => {
   });
 
   afterEach(async () => {
-    if (openModal) {
-      await act(async () => {
-        await openModal?.close();
-      });
-      openModal = null;
-    }
     aroundTransitionSpy?.mockRestore();
     aroundTransitionSpy = null;
     window.history.pushState({}, "", originalPath);
@@ -39,21 +35,27 @@ describe("Hotkey Help customization link", () => {
     window.APP_SETTINGS.lookupHotkey = originalLookupHotkey;
     window.APP_SETTINGS.editor_keymap = originalEditorKeymap;
     document.body.style.overflow = "";
-    document.querySelectorAll(".ls-modal-ls").forEach((el) => el.remove());
     effectiveHotkeys.resetForTests();
   });
 
   it("links to the current project's account hotkeys", async () => {
     window.history.pushState({}, "", "/projects/123/data");
-    openModal = openHotkeyHelp();
+    renderHelp();
 
     const link = await screen.findByRole("link", { name: "Customize for this project" });
     expect(link).toHaveAttribute("href", "/user/account/hotkeys?project=123");
   });
 
+  it("shows the title once, in the dialog header", async () => {
+    renderHelp("annotation");
+
+    expect(await screen.findByRole("dialog", { name: "Keyboard Shortcuts" })).toBeInTheDocument();
+    expect(screen.getAllByText("Keyboard Shortcuts")).toHaveLength(1);
+  });
+
   it("links to account hotkeys outside a project", async () => {
     window.history.pushState({}, "", "/user/account/hotkeys");
-    openModal = openHotkeyHelp();
+    renderHelp();
 
     const link = await screen.findByRole("link", { name: "Customize hotkeys" });
     expect(link).toHaveAttribute("href", "/user/account/hotkeys");
@@ -77,7 +79,7 @@ describe("Hotkey Help customization link", () => {
       project: { "annotation:annotation:submit": { key: "shift+enter", active: true } },
     });
 
-    openModal = openHotkeyHelp("annotation");
+    renderHelp("annotation");
 
     const shortcut = (await screen.findByText("Submit Annotation")).parentElement?.parentElement;
     expect(shortcut).toHaveTextContent("shiftenter");
@@ -100,7 +102,7 @@ describe("Hotkey Help customization link", () => {
     };
     effectiveHotkeys.apply({ account: accountHotkeys });
 
-    openModal = openHotkeyHelp("annotation");
+    renderHelp("annotation");
 
     const shortcut = (await screen.findByText("Submit Annotation")).parentElement?.parentElement;
     expect(shortcut).toHaveTextContent("altenter");
@@ -124,7 +126,7 @@ describe("Hotkey Help customization link", () => {
       project: { "annotation:annotation:submit": { key: "alt+enter", active: false } },
     });
 
-    openModal = openHotkeyHelp("annotation");
+    renderHelp("annotation");
 
     const shortcut = (await screen.findByText("Submit Annotation")).parentElement?.parentElement;
     expect(shortcut).toHaveTextContent("Disabled");
@@ -140,7 +142,7 @@ describe("Hotkey Help customization link", () => {
     };
     effectiveHotkeys.apply({ account: {} });
 
-    openModal = openHotkeyHelp("annotation");
+    renderHelp("annotation");
     const shortcut = (await screen.findByText("Submit Annotation")).parentElement?.parentElement;
     expect(shortcut).not.toHaveTextContent("shiftenter");
 

@@ -4,9 +4,9 @@ import pytest
 from data_import.serializers import ImportApiSerializer
 from ml.models import MLBackend
 from projects.tests.factories import ProjectFactory
-from tasks.models import AnnotationDraft
+from tasks.models import AnnotationDraft, Task
 from tasks.serializers import NextTaskSerializer
-from tasks.tests.factories import TaskFactory
+from tasks.tests.factories import PredictionFactory, TaskFactory
 
 
 @pytest.mark.django_db
@@ -39,6 +39,20 @@ def test_get_predictions_with_int_model_version_from_ml_backend():
 
     # Serialized predictions must always be an iterable list of prediction dicts.
     assert isinstance(predictions, list)
+
+
+@pytest.mark.django_db
+def test_get_predictions_when_project_model_version_is_empty():
+    # FIT-1710: with no model version selected (project.model_version == ''),
+    # next_task filtered predictions to model_version='' and returned none,
+    # while GET /api/tasks/:id/ and total_predictions still showed them.
+    project = ProjectFactory(show_collab_predictions=True, model_version='')
+    task = TaskFactory(project=project)
+    PredictionFactory(task=task, model_version='v1')
+
+    predictions = NextTaskSerializer(task, context={}).get_predictions(task)
+
+    assert [p['model_version'] for p in predictions] == ['v1']
 
 
 @pytest.mark.django_db
@@ -93,3 +107,54 @@ def test_import_draft_referencing_unknown_annotation_does_not_raise(monkeypatch)
     drafts = AnnotationDraft.objects.filter(task=db_tasks[0])
     assert drafts.count() == 1
     assert drafts.first().annotation_id is None
+
+
+def _import(project, items):
+    serializer = ImportApiSerializer(data=items, many=True, context={'project': project, 'user': project.created_by})
+    serializer.is_valid(raise_exception=True)
+    serializer.save(project_id=project.id)
+    return list(Task.objects.filter(project=project).order_by('id'))
+
+
+@pytest.mark.django_db
+def test_import_keeps_source_task_id_as_import_id():
+    """The root `id` of an imported task (e.g. from a JSON export) is kept as import_id, never reused as the id."""
+    project = ProjectFactory()
+    source = TaskFactory(project=ProjectFactory(organization=project.organization))
+
+    tasks = _import(project, [{'id': source.id, 'data': {'text': 'exported'}}, {'data': {'text': 'no id'}}])
+
+    assert [task.import_id for task in tasks] == [source.id, None]
+    assert tasks[0].id != source.id
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('task_id', ['17', 'a3f5c2d1-uuid', True, 1.5, 2**63, -(2**63) - 1, None, {'id': 1}])
+def test_import_ignores_task_id_that_is_not_a_bigint(task_id):
+    """A root `id` that is not an integer fitting the column is ignored, as before, and the import succeeds."""
+    project = ProjectFactory()
+
+    (task,) = _import(project, [{'id': task_id, 'data': {'text': 'from another tool'}}])
+
+    assert task.import_id is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('task_id', [2**63 - 1, -(2**63), 0])
+def test_import_keeps_task_id_at_bigint_bounds(task_id):
+    project = ProjectFactory()
+
+    (task,) = _import(project, [{'id': task_id, 'data': {'text': 'bounds'}}])
+
+    assert task.import_id == task_id
+
+
+@pytest.mark.django_db
+def test_import_of_data_only_item_treats_id_as_data():
+    """Without a "data" key the whole item is task data, so its "id" is a data field, not a source task id."""
+    project = ProjectFactory()
+
+    (task,) = _import(project, [{'id': 7, 'text': 'flat'}])
+
+    assert task.import_id is None
+    assert task.data == {'id': 7, 'text': 'flat'}

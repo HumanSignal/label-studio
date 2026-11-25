@@ -251,7 +251,7 @@ export const TreeNode = memo(({ id, label, children, disabled }: TreeNodeProps) 
                 .mod({ filtered: !hasChildrenMatched })
                 .toClassName()}
               size="small"
-              look="string"
+              look="ghost"
               variant="neutral"
               aria-label={`${isExpanded ? "Collapse" : "Expand"} ${label}`}
               aria-expanded={isExpanded}

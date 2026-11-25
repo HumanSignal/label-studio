@@ -5,7 +5,7 @@ import { AiChatStreamingMessage } from "./ai-chat-streaming-message";
 
 const meta: Meta<typeof AiChatStreamingMessage> = {
   component: AiChatStreamingMessage,
-  title: "UI/AI Chat/Streaming Message",
+  title: "Product/AI Chat/Streaming Message",
   parameters: {
     docs: {
       description: {
@@ -32,16 +32,16 @@ export const Complete: Story = {
     content:
       "Here is a suggested labeling interface for your image classification project. Use Choices for mutually exclusive labels and add Hotkeys for faster labeling.",
     sources: (
-      <Badge variant="neutral" size="small" look="outline">
+      <Badge variant="neutral" size="small">
         3 sources
       </Badge>
     ),
     actions: (
       <>
-        <Button size="small" variant="neutral" look="string">
+        <Button size="small" variant="neutral" look="ghost">
           Copy
         </Button>
-        <Button size="small" variant="neutral" look="string">
+        <Button size="small" variant="neutral" look="ghost">
           Regenerate
         </Button>
       </>

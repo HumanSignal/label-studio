@@ -1,10 +1,9 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
-import Grid, { VirtualizedGrid, VirtualizedAnnotationPanel, Item } from "../Grid";
+import Grid, { VirtualizedGrid, VirtualizedAnnotationPanel } from "../Grid";
 
 import { FF_DEV_3391 } from "../../../utils/feature-flags";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 const ff = mockFF();
 
@@ -103,23 +102,6 @@ describe("Grid", () => {
     ff.reset();
   });
 
-  it("renders classic Grid (GridClassComponent) when virtualization FF is off", () => {
-    ff.reset();
-    const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
-    const store = createStore({ selected: { selected: annotations[0] } });
-    const root = {};
-
-    render(
-      <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
-      </Provider>,
-    );
-
-    expect(screen.getByLabelText("Move left")).toBeInTheDocument();
-    expect(screen.getByLabelText("Move right")).toBeInTheDocument();
-    expect(screen.getAllByTestId("entity-tab")).toHaveLength(2);
-  });
-
   it("filters out hidden annotations", () => {
     ff.reset();
     const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2", hidden: true })];
@@ -133,23 +115,6 @@ describe("Grid", () => {
     );
 
     expect(screen.getAllByTestId("entity-tab")).toHaveLength(1);
-  });
-
-  it("renders GridClassComponent with FF_DEV_3391 on (direct Annotation per panel)", () => {
-    ff.set({ [FF_DEV_3391]: true });
-    const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
-    const store = createStore({ selected: { selected: annotations[0] } });
-    const root = {};
-
-    render(
-      <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
-      </Provider>,
-    );
-
-    expect(screen.getAllByTestId("annotation-panel")).toHaveLength(2);
-    expect(screen.getByLabelText("Move left")).toBeInTheDocument();
-    expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
 
   it("calls selectAnnotation when clicking second panel entity tab", async () => {
@@ -189,28 +154,6 @@ describe("Grid", () => {
     expect(store.selectPrediction).toHaveBeenCalledWith("a2", { exitViewAll: true });
   });
 
-  it("re-renders when selected annotation changes (shouldComponentUpdate)", () => {
-    ff.reset();
-    const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
-    const store = createStore({ selected: { selected: annotations[0] } });
-    const root = {};
-
-    const { rerender } = render(
-      <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
-      </Provider>,
-    );
-
-    store.selected.selected = annotations[1];
-    rerender(
-      <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
-      </Provider>,
-    );
-
-    expect(screen.getAllByTestId("entity-tab")).toHaveLength(2);
-  });
-
   it("navigates with Move right then Move left buttons", async () => {
     ff.reset();
     const annotations = [
@@ -233,24 +176,8 @@ describe("Grid", () => {
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
 
-  it("GridClassComponent onFinish runs when Item finishes loading", async () => {
-    ff.reset();
-    const annotations = [createAnnotation({ id: "a1" }), createAnnotation({ id: "a2" })];
-    const store = createStore({ selected: { selected: annotations[0] } });
-    const root = {};
-
-    render(
-      <Provider store={store}>
-        <Grid store={store} annotations={annotations} root={root} />
-      </Provider>,
-    );
-
-    await waitForUpdates(60);
-    expect(screen.getByLabelText("Move right")).toBeInTheDocument();
-  });
-
-  it("renders VirtualizedGrid when FIT_720 on (including compare-all with few annotations)", async () => {
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+  it("renders VirtualizedGrid (including compare-all with few annotations)", async () => {
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 5 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -265,8 +192,8 @@ describe("Grid", () => {
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
   });
 
-  it("renders VirtualizedGrid when FIT_720 FF on and more than 10 annotations", async () => {
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+  it("renders VirtualizedGrid with more than 10 annotations", async () => {
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 11 }, (_, i) =>
       createAnnotation({ id: `a${i}`, pk: i + 1, versions: { result: [] }, regions: [] }),
     );
@@ -285,7 +212,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid direct render exercises hooks and callbacks", async () => {
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 12 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -303,7 +230,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid scroll right and left buttons work", async () => {
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 11 }, (_, i) =>
       createAnnotation({ id: `a${i}`, pk: i + 1, versions: { result: [] }, regions: [] }),
     );
@@ -319,39 +246,6 @@ describe("Grid", () => {
     await userEvent.click(screen.getByLabelText("Move right"));
     await userEvent.click(screen.getByLabelText("Move left"));
     expect(screen.getByLabelText("Move right")).toBeInTheDocument();
-  });
-
-  it("Item renders and componentDidMount runs for image objects", async () => {
-    const onFinish = mock();
-    const annotation = {
-      id: "a1",
-      pk: 1,
-      type: "annotation",
-      objects: [{ type: "image" }],
-    };
-    const root = {};
-
-    render(<Item annotation={annotation} root={root} onFinish={onFinish} />);
-
-    expect(screen.getByTestId("annotation-panel")).toBeInTheDocument();
-    await waitForUpdates(50);
-    expect(onFinish).toHaveBeenCalled();
-  });
-
-  it("Item componentDidMount runs for non-image object with isReady true", async () => {
-    const onFinish = mock();
-    const annotation = {
-      id: "a1",
-      pk: 1,
-      type: "annotation",
-      objects: [{ type: "text", isReady: true }],
-    };
-    const root = {};
-
-    render(<Item annotation={annotation} root={root} onFinish={onFinish} />);
-
-    await waitForUpdates(50);
-    expect(onFinish).toHaveBeenCalled();
   });
 
   it("VirtualizedAnnotationPanel shows loading when isStub (no versions.result)", () => {
@@ -465,7 +359,7 @@ describe("Grid", () => {
   it("VirtualizedGrid mount skips annotations that already have data (hasDataInMST)", async () => {
     mockGetCachedAnnotation.mockClear();
     mockGetCachedAnnotation.mockReturnValue(undefined);
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annWithData = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: { result: [{ id: "r1" }] },
@@ -491,7 +385,7 @@ describe("Grid", () => {
   it("VirtualizedGrid mount restores annotations from getCachedAnnotation cache", async () => {
     const result = [{ id: "r1", from_name: "rating", to_name: "text", type: "rating", value: { rating: 1 } }];
     mockGetCachedAnnotation.mockImplementation((id) => (id === 1 ? { result } : undefined));
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const ann = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: {},
@@ -527,7 +421,7 @@ describe("Grid", () => {
     mockFetchAnnotationCached.mockResolvedValue({
       result: [{ id: "r1", from_name: "rating", to_name: "text", type: "rating", value: { rating: 1 } }],
     });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
       versions: { result: [] },
@@ -556,7 +450,7 @@ describe("Grid", () => {
     mockFetchAnnotationCached.mockResolvedValue({
       result: [{ id: "taxonomy-new", from_name: "taxonomy", type: "taxonomy", value: { choices: ["Dog"] } }],
     });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
 
     const ann = {
       ...createAnnotation({ id: "a0", pk: 42 }),
@@ -596,7 +490,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation uses sdk.ensureAnnotationLoaded when available", async () => {
     const ensureAnnotationLoaded = mock().mockResolvedValue(undefined);
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const store = createStore({
       selected: { selected: null },
       store: { SDK: { ensureAnnotationLoaded } },
@@ -617,7 +511,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation uses taskStore.loadAnnotation when no ensureAnnotationLoaded", async () => {
     const loadAnnotation = mock().mockResolvedValue({ result: [] });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const store = createStore({
       selected: { selected: null },
       store: {
@@ -644,7 +538,7 @@ describe("Grid", () => {
   it("VirtualizedGrid hydrateAnnotation deserializes and updates annotation", async () => {
     const result = [{ id: "r1", type: "rating", value: { rating: 1 } }];
     mockFetchAnnotationCached.mockResolvedValue({ result });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const ann = {
       ...createAnnotation({ id: "a1", pk: 1 }),
       versions: { result: [] },
@@ -678,7 +572,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation marks hydrated when fetch returns no result", async () => {
     mockFetchAnnotationCached.mockResolvedValue({ result: undefined });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -697,7 +591,7 @@ describe("Grid", () => {
     const err = new Error("cancelled");
     err.name = "CancelledError";
     mockFetchAnnotationCached.mockRejectedValue(err);
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -714,7 +608,7 @@ describe("Grid", () => {
 
   it("VirtualizedGrid hydrateAnnotation marks hydrated when fetch returns error", async () => {
     mockFetchAnnotationCached.mockResolvedValue({ error: "Not found", result: undefined });
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const annotations = Array.from({ length: 11 }, (_, i) => createAnnotation({ id: `a${i}`, pk: i + 1 }));
     const store = createStore({ selected: { selected: annotations[0] } });
     const root = {};
@@ -732,7 +626,7 @@ describe("Grid", () => {
   it("VirtualizedGrid onItemsRendered runs debounced hydration", () => {
     useFakeTimers();
     try {
-      ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+      ff.set({ [FF_DEV_3391]: true });
       const stubAnnotation = (id, pk) => ({
         ...createAnnotation({ id, pk }),
         versions: { result: [] },
@@ -758,7 +652,7 @@ describe("Grid", () => {
   });
 
   it("VirtualizedGrid renders with stub annotations (no result)", async () => {
-    ff.set({ [FF_DEV_3391]: true, [FF_FIT_720_LAZY_LOAD_ANNOTATIONS]: true });
+    ff.set({ [FF_DEV_3391]: true });
     const stubAnnotation = (id, pk) => ({
       ...createAnnotation({ id, pk }),
       versions: { result: [] },

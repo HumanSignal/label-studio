@@ -237,13 +237,14 @@ class MLApi(BaseHTTPAPI):
         return self._request(VALIDATE_URL, request={'config': config}, timeout=self._validate_request_timeout)
 
     def setup(self, project, extra_params=None, **kwargs):
+        # No credentials: whoever can edit the project's ML backends chooses this URL. Backends that read
+        # Label Studio data authenticate with their own LABEL_STUDIO_API_KEY.
         return self._request(
             SETUP_URL,
             request={
                 'project': self._create_project_uid(project),
                 'schema': project.label_config,
                 'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
-                'access_token': project.created_by.auth_token.key,
                 'extra_params': extra_params,
             },
             timeout=TIMEOUT_SETUP,

@@ -1,0 +1,31 @@
+/* IBM Plex Mono v2.3 (© 2017 IBM Corp., SIL OFL 1.1 — see OFL.txt).
+   The DS's --font-family-mono token names "IBM Plex Mono" but the app never ships it; design-sync ships it so
+   Claude Design renders the intended mono face (user decision, 2026-10-03 — see .design-sync/NOTES.md). */
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./ibm-plex-mono-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./ibm-plex-mono-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./ibm-plex-mono-semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("./ibm-plex-mono-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,4 +1,4 @@
-import { Button, EmptyState, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
+import { Button, EmptyState, Spinner, Tooltip, Typography, Card } from "@humansignal/ui";
 import {
   IconCloudCustom,
   IconCloudProviderAzure,
@@ -101,7 +101,7 @@ export const StorageSettings = () => {
 
       {/* Show EmptyState when no storages exist */}
       {!hasAnyStorages && isLoaded && !isLoading && (
-        <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
+        <Card size="compact" title="" className="bg-primary-background border-primary-border-subtler p-base">
           <EmptyState
             size="medium"
             variant="primary"
@@ -135,7 +135,6 @@ export const StorageSettings = () => {
             actions={
               <div className="flex gap-base">
                 <Button
-                  look="primary"
                   data-testid="add-source-storage-button-empty-state"
                   aria-label="Add Source Storage"
                   onClick={() => sourceStorageRef.current?.openAddModal()}
@@ -143,7 +142,6 @@ export const StorageSettings = () => {
                   Add Source Storage
                 </Button>
                 <Button
-                  look="primary"
                   data-testid="add-target-storage-button-empty-state"
                   aria-label="Add Target Storage"
                   onClick={() => targetStorageRef.current?.openAddModal()}
@@ -170,7 +168,7 @@ export const StorageSettings = () => {
               )
             }
           />
-        </SimpleCard>
+        </Card>
       )}
     </section>
   );

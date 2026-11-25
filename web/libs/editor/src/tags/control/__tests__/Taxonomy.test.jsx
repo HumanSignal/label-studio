@@ -716,7 +716,7 @@ describe("Taxonomy model", () => {
   });
 
   it("loadItems uses Basic auth when apiUrl has username and password", async () => {
-    const apiUrl = "https://user:pass@example.com/taxonomy.json";
+    const apiUrl = "https://user:pass@example.com/taxonomy.json"; // trufflehog:ignore
     const storeWithTask = { ...mockStore, task: { dataObj: { api: apiUrl } } };
     const config = Tree.treeToModel(
       `<View><Taxonomy name="tax" toName="t1" apiUrl="$api"><Choice value="A" /></Taxonomy><Text name="t1" value="$text" /></View>`,

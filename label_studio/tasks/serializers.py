@@ -282,13 +282,9 @@ class AnnotationSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
         return name
 
     def to_representation(self, obj):
-        """Remove state field if feature flags are disabled"""
+        """Remove state field if FSM state fields are disabled"""
         ret = super().to_representation(obj)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
         return ret
 
@@ -303,7 +299,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     Lightweight Annotation Serializer for lazy loading.
 
     Returns only minimal metadata needed for annotation list display.
-    Used when fflag_fix_all_fit_720_lazy_load_annotations is enabled
+    Used when the client requests annotation stubs
     to improve performance for tasks with many annotations.
 
     Fields included:
@@ -457,6 +453,22 @@ class BaseTaskSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
 
 
 FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY = 'fflag_fix_back_bros_1092_import_unknown_completed_by_short'
+
+# Task.import_id is a BigIntegerField (Postgres bigint)
+_BIGINT_MIN, _BIGINT_MAX = -(2**63), 2**63 - 1
+
+
+def get_task_import_id(task: dict) -> int | None:
+    """Source task id to keep as ``Task.import_id``: the root ``id`` of an imported task.
+
+    Only a real integer that fits the column is kept. Imported JSON is often not ours: ``id`` can be a
+    string, a UUID, a float or a 64-bit unsigned number from another tool. Label Studio always ignored
+    a task ``id`` on import, so anything unusable is ignored again instead of failing the import.
+    """
+    value = task.get('id')
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value if _BIGINT_MIN <= value <= _BIGINT_MAX else None
 
 
 def resolve_completed_by_id(
@@ -798,10 +810,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                 # Strip FSM state field from predictions before validation
                 # Exported data may include 'state' which is not a valid prediction field
-                ff_user = self.project.organization.created_by
-                if flag_set('fflag_feat_fit_568_finite_state_management', user=ff_user) and flag_set(
-                    'fflag_feat_fit_710_fsm_state_fields', user=ff_user
-                ):
+                if fsm_state_fields_enabled(self.context):
                     prediction.pop('state', None)
 
                 # Validate prediction only when project label config is not default
@@ -999,6 +1008,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
                 allow_skip=task.get('allow_skip', True),
+                import_id=get_task_import_id(task),
             )
             db_tasks.append(t)
 
@@ -1166,13 +1176,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
     def get_predictions(self, task):
         predictions = task.predictions
-        user = self._get_user()
-        if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
-            active_ml_backends = task.project.get_active_ml_backends()
-            model_versions = active_ml_backends.values_list('model_version', flat=True)
-            logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
-            predictions = predictions.filter(model_version__in=model_versions)
-        elif task.project.model_version:
+        if task.project.model_version:
             predictions = predictions.filter(model_version=task.project.model_version)
         predictions = apply_prediction_ordering(predictions, self.context.get('annotations_ordering'))
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data

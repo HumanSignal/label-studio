@@ -1,19 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TableRow } from "./TableRow";
 import { TableContext } from "../TableContext";
-import { FF_LOPS_E_3 } from "../../../../utils/feature-flags";
-
-// Mock SkeletonLoader
-mockModule("../../SkeletonLoader", () => ({
-  SkeletonLoader: () => <div data-testid="skeleton-loader">Loading...</div>,
-}));
-
-// Mock feature flags
-let mockFlags = {};
-mockModule("../../../../utils/feature-flags", () => ({
-  FF_LOPS_E_3: "fflag_feat_all_lops_e_3_datasets_short",
-  isFF: mock((id) => mockFlags[id] === true),
-}));
 
 // Mock utils
 mockModule("../utils", () => ({
@@ -293,19 +280,6 @@ describe("TableRow", () => {
 
       expect(screen.getByTestId("custom-cell")).toBeInTheDocument();
       expect(screen.getByTestId("custom-cell")).toHaveTextContent("1");
-    });
-
-    it("should show skeleton loader when cell is loading", () => {
-      mockFlags[FF_LOPS_E_3] = true;
-
-      try {
-        const loadingData = { ...mockData, loading: "col1" };
-        renderWithContext({ data: loadingData });
-
-        expect(screen.getByTestId("skeleton-loader")).toBeInTheDocument();
-      } finally {
-        mockFlags[FF_LOPS_E_3] = false;
-      }
     });
   });
 

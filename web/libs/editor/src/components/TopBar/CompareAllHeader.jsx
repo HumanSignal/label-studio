@@ -42,7 +42,7 @@ export const CompareAllHeader = observer(({ store }) => {
       </div>
       <Button
         variant="primary"
-        look="string"
+        look="ghost"
         size="small"
         aria-label="Close Compare All"
         onClick={onClose}

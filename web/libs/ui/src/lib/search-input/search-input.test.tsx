@@ -1,0 +1,165 @@
+import { describe, expect, it, mock } from "bun:test";
+import { createRef, useState } from "react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { SearchInput } from "./search-input";
+import { Command, CommandInput } from "../../shad/components/ui/command";
+
+describe("SearchInput", () => {
+  it("uses accessible placeholder contrast", async () => {
+    const css = await Bun.file(new URL("./search-input.module.css", import.meta.url)).text();
+    const placeholder = css.slice(css.indexOf(".input::placeholder"));
+    expect(placeholder.slice(0, placeholder.indexOf("}"))).toContain("var(--color-neutral-content-subtle)");
+  });
+  it("forwards focus, input changes and keyboard events to a named search field", () => {
+    const ref = createRef<HTMLInputElement>();
+    const onKeyDown = mock();
+    function Example() {
+      const [value, setValue] = useState("");
+      return (
+        <SearchInput
+          ref={ref}
+          aria-label="Filter labels"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          onKeyDown={onKeyDown}
+        />
+      );
+    }
+    render(<Example />);
+    const input = screen.getByRole("searchbox", { name: "Filter labels" });
+    fireEvent.change(input, { target: { value: "Vehicle" } });
+    expect(input).toHaveValue("Vehicle");
+    ref.current?.focus();
+    expect(input).toHaveFocus();
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears a controlled field through onChange and returns focus to it", () => {
+    function Example() {
+      const [value, setValue] = useState("Vehicle");
+      return (
+        <SearchInput aria-label="Filter labels" value={value} onChange={(event) => setValue(event.target.value)} />
+      );
+    }
+    render(<Example />);
+    const input = screen.getByRole("searchbox", { name: "Filter labels" });
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(input).toHaveValue("");
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+  });
+
+  it("shows the clear button for an uncontrolled field only while it has text", () => {
+    render(<SearchInput aria-label="Filter labels" />);
+    const input = screen.getByRole("searchbox", { name: "Filter labels" });
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+    fireEvent.change(input, { target: { value: "Car" } });
+    fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+    expect(input).toHaveValue("");
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+  });
+
+  it("offers no clear button when disabled, read-only or wrapping another input", () => {
+    const { rerender } = render(<SearchInput aria-label="Filter" value="Car" disabled onChange={() => {}} />);
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+    rerender(<SearchInput aria-label="Filter" value="Car" readOnly />);
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+    rerender(
+      <SearchInput asChild>
+        <input aria-label="Filter" defaultValue="Car" />
+      </SearchInput>,
+    );
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+  });
+
+  it("supports labeled, disabled and read-only native input states", () => {
+    const { rerender } = render(<SearchInput placeholder="Find a label" disabled />);
+    expect(screen.getByRole("searchbox", { name: "Find a label" })).toBeDisabled();
+    rerender(
+      <>
+        <label id="search-label">Search objects</label>
+        <SearchInput aria-labelledby="search-label" value="Person" readOnly />
+      </>,
+    );
+    const input = screen.getByRole("searchbox", { name: "Search objects" });
+    expect(input).toHaveAttribute("readonly");
+    expect(input).toHaveValue("Person");
+  });
+
+  it("does not inject native search defaults into a slotted input", () => {
+    render(
+      <>
+        <span id="options-label">Options</span>
+        <SearchInput asChild>
+          <input aria-labelledby="options-label" />
+        </SearchInput>
+      </>,
+    );
+    const input = screen.getByRole("textbox", { name: "Options" });
+    expect(input).not.toHaveAttribute("aria-label");
+    expect(input).not.toHaveAttribute("placeholder");
+    expect(input).not.toHaveAttribute("type");
+  });
+
+  it("preserves the command wrapper and caller-provided input semantics", () => {
+    render(
+      <Command label="Find labels">
+        <CommandInput placeholder="Filter labels" />
+      </Command>,
+    );
+    const input = screen.getByRole("combobox", { name: "Find labels" });
+    expect(input).toHaveAttribute("placeholder", "Filter labels");
+    expect(input).not.toHaveAttribute("aria-label");
+    expect(input).not.toHaveAttribute("type", "search");
+    expect(input.parentElement).toHaveAttribute("data-slot", "command-input-wrapper");
+  });
+
+  it("composes with a specialized input without replacing its semantics or handlers", () => {
+    const onChange = mock();
+    const ref = createRef<HTMLInputElement>();
+    render(
+      <SearchInput asChild ref={ref}>
+        <input role="combobox" aria-label="Find an option" aria-expanded={false} onChange={onChange} />
+      </SearchInput>,
+    );
+    const input = screen.getByRole("combobox", { name: "Find an option" });
+    fireEvent.change(input, { target: { value: "Car" } });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(ref.current).toBe(input);
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+  });
+
+  describe("focus outline", () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const setup = () => {
+      const { container } = render(<SearchInput aria-label="Filter" />);
+      return { wrapper: container.firstElementChild as HTMLElement, input: screen.getByLabelText("Filter") };
+    };
+
+    it("keeps the keyboard outline after a second click in the focused field", () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(input);
+      fireEvent.focus(input);
+      fireEvent.pointerDown(input);
+      fireEvent.blur(input);
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(true);
+    });
+
+    it("keeps the keyboard outline after a press on the icon that moved no focus", async () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(wrapper.querySelector("svg") as SVGElement);
+      await frame();
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(true);
+    });
+
+    it("draws no outline for a click", () => {
+      const { wrapper, input } = setup();
+      fireEvent.pointerDown(input);
+      fireEvent.focus(input);
+      expect(wrapper.hasAttribute("data-focus-visible")).toBe(false);
+    });
+  });
+});

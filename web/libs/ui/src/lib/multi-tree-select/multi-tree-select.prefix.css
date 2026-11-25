@@ -11,13 +11,42 @@
   width: var(--multi-tree-width, 100%);
   box-sizing: border-box;
 
+  /*
+   * The `size` prop: 32 and 24px, as Button, Select and Input. `medium` declares nothing, so the 40px
+   * fallbacks below stay the only default and a consumer's own variables still win.
+   *
+   * The control icon rule: the text sits a text inset from the edge and the caret a padding from it.
+   * The caret's box is the icon plus a hairline of hover area, pulled into the padding by that hairline.
+   */
+  &[data-size="small"] {
+    --multi-tree-trigger-height: var(--spacing-800);
+    --multi-tree-trigger-font-size: var(--font-size-label-small);
+    --multi-tree-trigger-line-height: var(--line-height-label-small);
+    --multi-tree-trigger-padding: 0 calc(var(--spacing-tight) + 16px + var(--spacing-tight)) 0 var(--spacing-tight);
+    --multi-tree-trigger-caret-size: 16px;
+  }
+
+  &[data-size="smaller"] {
+    --multi-tree-trigger-height: var(--spacing-600);
+    --multi-tree-trigger-font-size: var(--font-size-label-smaller);
+    --multi-tree-trigger-line-height: var(--line-height-label-smaller);
+    --multi-tree-trigger-padding: 0 calc(var(--spacing-tight) + 12px + var(--spacing-tighter)) 0 var(--spacing-tight);
+    --multi-tree-trigger-caret-size: 12px;
+  }
+
   &__icon {
-    height: var(--multi-tree-trigger-caret-box, 30px);
-    width: var(--multi-tree-trigger-caret-box, 30px);
+    height: var(
+      --multi-tree-trigger-caret-box,
+      calc(var(--multi-tree-trigger-caret-size, 20px) + 2 * var(--spacing-tightest))
+    );
+    width: var(
+      --multi-tree-trigger-caret-box,
+      calc(var(--multi-tree-trigger-caret-size, 20px) + 2 * var(--spacing-tightest))
+    );
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: var(--multi-tree-trigger-caret-offset, var(--spacing-tighter));
+    right: var(--multi-tree-trigger-caret-offset, calc(var(--spacing-tight) - var(--spacing-tightest)));
     color: var(--color-neutral-content-subtler);
     display: flex;
     border-radius: var(--corner-radius-small);
@@ -32,8 +61,8 @@
     }
 
     & svg {
-      height: var(--multi-tree-trigger-caret-size, 18px);
-      width: var(--multi-tree-trigger-caret-size, 18px);
+      height: var(--multi-tree-trigger-caret-size, 20px);
+      width: var(--multi-tree-trigger-caret-size, 20px);
     }
   }
 
@@ -43,8 +72,8 @@
 
     &__placeholder {
       color: var(--color-neutral-content-subtler);
-      font-size: 1rem;
-      line-height: 24px;
+      font-size: var(--multi-tree-trigger-font-size, 1rem);
+      line-height: var(--multi-tree-trigger-line-height, 24px);
     }
 
     svg {
@@ -84,8 +113,11 @@
     );
     box-shadow: var(--multi-tree-trigger-shadow, none);
     box-sizing: border-box;
-    border-radius: var(--multi-tree-trigger-radius, 0.25rem);
-    padding: var(--multi-tree-trigger-padding, 0 2.5rem 0 1rem);
+    border-radius: var(--multi-tree-trigger-radius, var(--corner-radius-small));
+    padding: var(
+      --multi-tree-trigger-padding,
+      0 calc(var(--spacing-tight) + 20px + var(--spacing-tight)) 0 var(--spacing-base)
+    );
     transition:
       box-shadow 200ms ease-out,
       border-color 200ms ease-out;
@@ -192,6 +224,21 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
+    }
+
+    /* With an Apply footer the tree scrolls on its own, so Apply stays in view under a long list. */
+    &:has(> .multi-tree-select__content__footer) {
+      overflow: hidden;
+
+      .multi-tree-select__content__select {
+        overflow-y: auto;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      .multi-tree-select__content__footer {
+        flex: 0 0 auto;
+      }
     }
 
     &__toggle {

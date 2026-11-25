@@ -9,7 +9,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
-  title: "UI/Badge",
+  title: "Data display/Badge",
   argTypes: {
     variant: {
       control: "select",
@@ -31,22 +31,18 @@ const meta: Meta<typeof Badge> = {
         "fig",
         "sand",
       ],
-      // Note: Other variants (default, secondary, destructive, error, info, success, caution, beta, enterprise)
-      // are still supported as hidden fallbacks for backwards compatibility
     },
     look: {
       control: "select",
-      options: ["filled", "outline", "ghost", "solid"],
+      options: ["filled", "ghost", "solid"],
     },
     shape: {
       control: "select",
       options: ["rounded", "square"],
-      // Note: "squared" is still supported as a hidden fallback for backwards compatibility
     },
     size: {
       control: "select",
       options: ["large", "medium", "small"],
-      // Note: "default" and "compact" are still supported as hidden fallbacks for backwards compatibility
     },
   },
 };
@@ -67,10 +63,10 @@ export const Default: Story = {
 export const LargeSize: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
-      <Badge look="outline" variant="neutral" shape="rounded" size="large">
+      <Badge variant="neutral" shape="rounded" size="large">
         English
       </Badge>
-      <Badge look="outline" variant="neutral" shape="rounded" size="large">
+      <Badge variant="neutral" shape="rounded" size="large">
         <span>English</span>
         <span className="text-neutral-content-subtler">· Native</span>
       </Badge>
@@ -130,7 +126,6 @@ export const SemanticVariants: Story = {
           <p className="text-xs text-neutral-content-subtler mb-2">Use to highlight number of warnings.</p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="warning">Warning</Badge>
-            <Badge variant="caution">Caution</Badge>
           </div>
         </div>
         <div>
@@ -174,7 +169,8 @@ export const AccentColors: Story = {
 
 /**
  *
- * Badges support four styles: filled (default), outline, ghost, and solid.
+ * Badges support three styles: filled (default), ghost, and solid. A selection control shows not selected as
+ * the neutral filled Badge.
  */
 export const StyleVariants: Story = {
   render: () => {
@@ -193,23 +189,6 @@ export const StyleVariants: Story = {
               Persimmon
             </Badge>
             <Badge variant="canteloupe" look="filled">
-              Canteloupe
-            </Badge>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Outline:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" look="outline">
-              Grape
-            </Badge>
-            <Badge variant="kale" look="outline">
-              Kale
-            </Badge>
-            <Badge variant="persimmon" look="outline">
-              Persimmon
-            </Badge>
-            <Badge variant="canteloupe" look="outline">
               Canteloupe
             </Badge>
           </div>

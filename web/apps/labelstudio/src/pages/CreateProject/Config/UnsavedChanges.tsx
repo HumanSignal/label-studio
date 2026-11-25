@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { Button } from "@humansignal/ui";
+import { Button, ModalWindow } from "@humansignal/ui";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "../../../components/LeaveBlocker/LeaveBlocker";
-import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
 
 type SaveAndLeaveButtonProps = {
@@ -22,7 +21,7 @@ const SaveAndLeaveButton = ({ onSave, text = "Save and Leave" }: SaveAndLeaveBut
   );
 };
 
-type UnsavedChangesModalProps = {
+export type UnsavedChangesRequest = {
   onSave: () => void;
   onCancel?: () => void;
   onDiscard?: () => void;
@@ -33,61 +32,66 @@ type UnsavedChangesModalProps = {
   body?: string;
 };
 
-export const unsavedChangesModal = ({
-  onSave,
-  onCancel,
-  onDiscard,
-  cancelText,
-  discardText,
-  okText,
-  title = "You have unsaved changes.",
-  body = "Would you like to save them before leaving?",
-  ...props
-}: UnsavedChangesModalProps) => {
-  let modalInstance: any;
-  const saveAndLeave = async () => {
-    await onSave?.();
-    modalInstance?.close();
+/** Asks to save before leaving. `request` is `null` while closed; every button closes it through `onClose`. */
+export const UnsavedChangesDialog = ({
+  request: openRequest,
+  onClose,
+}: {
+  request: UnsavedChangesRequest | null;
+  onClose: () => void;
+}) => {
+  // Keep the last request while the dialog fades out.
+  const lastRequest = useRef(openRequest);
+  if (openRequest) lastRequest.current = openRequest;
+  const request = lastRequest.current;
+
+  const cancel = () => {
+    request?.onCancel?.();
+    onClose();
   };
-  modalInstance = modal({
-    ...props,
-    title,
-    body: () => <>{body}</>,
-    allowClose: true,
-    footer: (
-      <Space align="end">
-        <Button
-          look="outlined"
-          size="small"
-          onClick={() => {
-            onCancel?.();
-            modalInstance?.close();
-          }}
-          autoFocus
-        >
-          {cancelText ?? "Cancel"}
-        </Button>
 
-        {onDiscard && (
-          <Button
-            variant="negative"
-            look="outlined"
-            onClick={() => {
-              onDiscard?.();
-              modalInstance?.close();
-            }}
-            size="small"
-          >
-            {discardText ?? "Discard and leave"}
-          </Button>
-        )}
+  return (
+    <ModalWindow
+      open={openRequest !== null}
+      onOpenChange={(open) => !open && cancel()}
+      title={request?.title ?? "You have unsaved changes."}
+      size="small"
+      dataTestId="unsaved-changes-modal"
+      footer={
+        request && (
+          <Space align="end">
+            <Button look="outlined" size="small" onClick={cancel} autoFocus>
+              {request.cancelText ?? "Cancel"}
+            </Button>
 
-        <SaveAndLeaveButton onSave={saveAndLeave} text={okText} />
-      </Space>
-    ),
-    style: { width: 512 },
-    unique: "UNSAVED_CHANGES_MODAL",
-  });
+            {request.onDiscard && (
+              <Button
+                variant="negative"
+                look="outlined"
+                onClick={() => {
+                  request.onDiscard?.();
+                  onClose();
+                }}
+                size="small"
+              >
+                {request.discardText ?? "Discard and leave"}
+              </Button>
+            )}
+
+            <SaveAndLeaveButton
+              onSave={async () => {
+                await request.onSave?.();
+                onClose();
+              }}
+              text={request.okText}
+            />
+          </Space>
+        )
+      }
+    >
+      {request?.body ?? "Would you like to save them before leaving?"}
+    </ModalWindow>
+  );
 };
 
 type UnsavedChangesProps = {
@@ -101,6 +105,7 @@ type UnsavedChangesProps = {
  * @param onSave - function that should be called to save changes
  */
 export const UnsavedChanges = ({ hasChanges, onSave }: UnsavedChangesProps) => {
+  const [request, setRequest] = useState<UnsavedChangesRequest | null>(null);
   const saveHandlerRef = useRef(onSave);
   saveHandlerRef.current = onSave;
   const blockHandler = useCallback(async ({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
@@ -115,12 +120,17 @@ export const UnsavedChanges = ({ hasChanges, onSave }: UnsavedChangesProps) => {
       }
     };
 
-    unsavedChangesModal({
+    setRequest({
       onSave: wrappedOnSave,
       onCancel: cancelCallback,
       onDiscard: continueCallback,
     });
   }, []);
 
-  return <LeaveBlocker active={hasChanges} onBlock={blockHandler} />;
+  return (
+    <>
+      <LeaveBlocker active={hasChanges} onBlock={blockHandler} />
+      <UnsavedChangesDialog request={request} onClose={() => setRequest(null)} />
+    </>
+  );
 };

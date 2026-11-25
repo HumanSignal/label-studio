@@ -17,7 +17,7 @@ const variants = {
 
 // Look configuration
 const looks = {
-  card: styles["look-card"],
+  filled: styles["look-filled"],
   ghost: styles["look-ghost"],
 } as const;
 
@@ -27,7 +27,7 @@ const sizes = {
   small: styles["size-small"],
 } as const;
 
-export type MessageVariant = keyof typeof variants | "info" | "success" | "error";
+export type MessageVariant = keyof typeof variants;
 export type MessageLook = keyof typeof looks;
 export type MessageSize = keyof typeof sizes;
 
@@ -42,17 +42,12 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
    * - enterprise: Exclusively for gated/enterprise-only feature callouts.
    *               Uses the enterprise gradient palette (canteloupe → persimmon → plum)
    *               and defaults to IconSpark. Do not use for general informational messages.
-   *
-   * Aliases for backward compatibility:
-   * - info → primary
-   * - error → negative
-   * - success → positive
    */
   variant?: MessageVariant;
 
   /**
    * Visual look of the message
-   * - card: Default look with background, border and padding (default)
+   * - filled: Default look with background, border and padding (default)
    * - ghost: Minimal look without background, border or padding — just the icon and content
    */
   look?: MessageLook;
@@ -122,8 +117,7 @@ export interface MessageProps extends React.HTMLAttributes<HTMLDivElement> {
  *
  * Features:
  * - Six primary variants: primary, neutral, negative, positive, warning, enterprise
- * - Backward compatibility aliases: info, success, error
- * - Two looks: card (default with background/border) and ghost (minimal, no card wrapper)
+ * - Two looks: filled (default, with background and border) and ghost (minimal, no card wrapper)
  * - Optional closable functionality
  * - Flexible content areas for actions and extra elements
  * - Full accessibility support with ARIA attributes
@@ -162,7 +156,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
   (
     {
       variant = "primary",
-      look = "card",
+      look = "filled",
       size = "medium",
       icon,
       iconSize,
@@ -177,19 +171,9 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     },
     ref,
   ) => {
-    // Normalize variant aliases to primary variants
-    const normalizedVariant = useMemo(() => {
-      const aliasMap: Record<string, keyof typeof variants> = {
-        info: "primary",
-        error: "negative",
-        success: "positive",
-      };
-      return aliasMap[variant] || (variant as keyof typeof variants);
-    }, [variant]);
-
     // Get default icon based on variant
     const defaultIcon = useMemo(() => {
-      switch (normalizedVariant) {
+      switch (variant) {
         case "primary":
           return <InfoIcon />;
         case "warning":
@@ -205,7 +189,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
         default:
           return <InfoIcon />;
       }
-    }, [normalizedVariant]);
+    }, [variant]);
 
     const iconElement = icon || defaultIcon;
 
@@ -227,7 +211,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
     return (
       <div
         ref={ref}
-        className={cn("message", styles.base, sizes[size], variants[normalizedVariant], looks[look], className)}
+        className={cn("message", styles.base, sizes[size], variants[variant], looks[look], className)}
         data-testid={testId}
         role="alert"
         aria-live="polite"
@@ -263,7 +247,7 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(
         {closable && (
           <Button
             variant="neutral"
-            look="string"
+            look="ghost"
             size="smaller"
             className={cn("message__close", styles.close)}
             onClick={onClose}

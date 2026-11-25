@@ -47,7 +47,7 @@ function StatusIcon({ status }: { status?: AiChatToolActivityStatus }) {
     return <XCircleIcon size={14} weight="bold" className={styles.statusFailed} aria-hidden />;
   }
   if (status === "running" || status === "pending") {
-    return <AiChatLoadingIcon variant="dots" className={styles.statusBusy} />;
+    return <AiChatLoadingIcon animation="dots" className={styles.statusBusy} />;
   }
   return <span className={styles.statusPending} aria-hidden />;
 }
@@ -67,25 +67,25 @@ function isBusyStatus(status?: AiChatToolActivityStatus) {
 function statusBadge(status?: AiChatToolActivityStatus) {
   if (status === "completed")
     return (
-      <Badge variant="positive" size="small" look="outline">
+      <Badge variant="positive" size="small">
         Completed
       </Badge>
     );
   if (status === "failed")
     return (
-      <Badge variant="negative" size="small" look="outline">
+      <Badge variant="negative" size="small">
         Failed
       </Badge>
     );
   if (status === "running")
     return (
-      <Badge variant="primary" size="small" look="outline">
+      <Badge variant="primary" size="small">
         Running
       </Badge>
     );
   if (status === "pending")
     return (
-      <Badge variant="neutral" size="small" look="outline">
+      <Badge variant="warning" size="small">
         Pending
       </Badge>
     );
@@ -129,7 +129,7 @@ export function AiChatToolActivity({
           className={cn(styles.chevron, !isExpanded && styles.chevronClosed)}
           aria-hidden
         />
-        {isBusy && !isExpanded ? <AiChatLoadingIcon variant="dots" className={styles.statusBusy} /> : null}
+        {isBusy && !isExpanded ? <AiChatLoadingIcon animation="dots" className={styles.statusBusy} /> : null}
         <Typography variant="label" size="small" as="span" className={styles.summaryLabel}>
           {summary}
         </Typography>

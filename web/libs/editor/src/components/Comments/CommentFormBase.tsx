@@ -66,7 +66,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
           onBlur={(e) => onBlur?.(e)}
         />
         <div className={cn("comment-form").elem("primary-action").toClassName()}>
-          <Button type="submit" aria-label="Submit comment" variant="neutral" look="string">
+          <Button type="submit" aria-label="Submit comment" variant="neutral" look="ghost">
             <IconSend />
           </Button>
         </div>

@@ -2,7 +2,6 @@ import { flow, getRoot, types, isAlive } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
-import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 const listIncludes = (list, id) => {
   const index = id !== undefined ? Array.from(list).findIndex((item) => item.id === id) : -1;
@@ -263,7 +262,7 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
+        const data = yield root.apiCall(apiMethod, params);
 
         if (!isAlive(self)) return;
 
@@ -276,20 +275,13 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         }
 
         const highlightedID = self.highlighted;
-        const apiMethodSettings = root.API.getSettingsByMethodName(apiMethod);
         const { total, [apiMethod]: list } = data;
-        let associatedList = [];
-
-        if (isFF(FF_LOPS_E_3) && apiMethodSettings?.associatedType) {
-          associatedList = data[apiMethodSettings?.associatedType];
-        }
 
         if (list)
           self.setList({
             total,
             list,
             reload: reload || isDefined(pageNumber),
-            associatedList,
           });
 
         if (isDefined(highlightedID) && !listIncludes(self.list, highlightedID)) {

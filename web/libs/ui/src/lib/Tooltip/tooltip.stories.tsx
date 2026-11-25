@@ -4,7 +4,7 @@ import { Button } from "../button/button";
 
 const meta: Meta<typeof Tooltip> = {
   component: Tooltip,
-  title: "UI/Tooltip",
+  title: "Data display/Tooltip",
   argTypes: {
     disabled: { control: "boolean" },
   },

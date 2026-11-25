@@ -16,7 +16,7 @@ export const GroundTruth = observer(({ entity, disabled = false, size = "md" }) 
         <Tooltip alignment="top-left" title={title}>
           <Button
             size="small"
-            look="string"
+            look="ghost"
             className="!p-0"
             onClick={(ev) => {
               ev.preventDefault();

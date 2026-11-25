@@ -83,3 +83,27 @@ def test_model_run_delete_recounts_task_total_predictions():
     task.refresh_from_db()
     assert Prediction.objects.filter(task=task).count() == 0
     assert task.total_predictions == 0
+
+
+@pytest.mark.django_db
+def test_delete_predictions_bumps_task_updated_at():
+    """FIT-3092: _raw_delete skips Prediction.delete(); incremental exports need the task's updated_at to move."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+    from tasks.models import Task
+
+    project = ProjectFactory()
+    task = TaskFactory(project=project)
+    untouched = TaskFactory(project=project)
+    model_run = _model_run_for(project)
+    Prediction.objects.create(task=task, project=project, model_run=model_run, result=[], model_version='v1')
+    stale = timezone.now() - timedelta(days=3)
+    Task.objects.filter(id__in=[task.id, untouched.id]).update(updated_at=stale)
+
+    model_run.delete_predictions()
+
+    task.refresh_from_db()
+    untouched.refresh_from_db()
+    assert task.updated_at > stale
+    assert untouched.updated_at == stale

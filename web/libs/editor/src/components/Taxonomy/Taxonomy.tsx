@@ -438,7 +438,7 @@ const TaxonomyDropdown = ({ show, flatten, items, dropdownRef, isEditable }: Tax
               <Button
                 size="small"
                 variant="neutral"
-                look="string"
+                look="ghost"
                 type="button"
                 onClick={addInside}
                 aria-label="Add new label"

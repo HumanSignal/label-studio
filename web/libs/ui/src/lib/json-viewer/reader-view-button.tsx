@@ -40,7 +40,7 @@ export const ReaderViewButton: FC<ReaderViewButtonProps> = ({ nodeData, threshol
     <>
       <Tooltip title="Open Reader View">
         <Button
-          look="string"
+          look="ghost"
           onClick={handleClick}
           className="jer-edit-button"
           size="small"

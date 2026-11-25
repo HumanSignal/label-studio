@@ -73,7 +73,6 @@ mockModule("@humansignal/core", () => {
     ff: {
       ...actual.ff,
       isActive: mock(() => false),
-      FF_SYNCED_BUFFERING: "FF_SYNCED_BUFFERING",
     },
   };
 });
@@ -200,15 +199,6 @@ describe("Audio model", () => {
       }
       node.triggerSyncSpeed(1.5);
       expect(() => node.triggerSyncSpeed(1.5)).not.toThrow();
-    });
-
-    it("triggerSyncBuffering is no-op when _ws is null", () => {
-      const node = createAudioNode();
-      if (typeof node?.triggerSyncBuffering !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      expect(() => node.triggerSyncBuffering(true)).not.toThrow();
     });
 
     it("triggerSyncSeek calls triggerSync with time", () => {
@@ -680,18 +670,6 @@ describe("Audio model", () => {
     });
   });
 
-  describe("handleSyncBuffering", () => {
-    it("does not throw when called with buffering data", () => {
-      const node = createAudioNode();
-      if (typeof node?.onLoad !== "function" || typeof node?.handleSyncBuffering !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      node.onLoad({ pause: mock(), play: mock() });
-      expect(() => node.handleSyncBuffering({ playing: true, buffering: true })).not.toThrow();
-    });
-  });
-
   describe("handleSync with _ws loaded", () => {
     it("calls _ws.play when data.playing is true and _ws not playing", () => {
       const node = createAudioNode();
@@ -980,23 +958,10 @@ describe("Audio model", () => {
       node.handleSync({ time: 3, playing: true }, "seek");
       expect(setCurrentTime).toHaveBeenCalledWith(3, true);
     });
-
-    it("sets wasPlayingBeforeBuffering for play/pause events", () => {
-      const node = createAudioNode();
-      if (typeof node?.onLoad !== "function" || typeof node?.handleSync !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      node.onLoad({ loaded: true, playing: false, play: mock() });
-      node.handleSync({ playing: true }, "play");
-      expect([true, undefined]).toContain(node.wasPlayingBeforeBuffering);
-      node.handleSync({ playing: false }, "pause");
-      expect([false, undefined]).toContain(node.wasPlayingBeforeBuffering);
-    });
   });
 
   describe("triggerSyncPlay and triggerSyncPause", () => {
-    it("triggerSyncPlay sets wasPlayingBeforeBuffering and calls handleSyncPlay and triggerSync", () => {
+    it("triggerSyncPlay calls handleSyncPlay and triggerSync", () => {
       const node = createAudioNode();
       if (typeof node?.onLoad !== "function" || typeof node?.triggerSyncPlay !== "function") {
         expect(node).toBeDefined();
@@ -1006,12 +971,11 @@ describe("Audio model", () => {
       node.onLoad({ play });
       node.syncSend = mock();
       node.triggerSyncPlay();
-      expect([true, undefined]).toContain(node.wasPlayingBeforeBuffering);
       expect(play).toHaveBeenCalled();
       expect(node.syncSend).toHaveBeenCalledWith(expect.objectContaining({ playing: true }), "play");
     });
 
-    it("triggerSyncPause sets wasPlayingBeforeBuffering false and calls handleSyncPause and triggerSync", () => {
+    it("triggerSyncPause calls handleSyncPause and triggerSync", () => {
       const node = createAudioNode();
       if (typeof node?.onLoad !== "function" || typeof node?.triggerSyncPause !== "function") {
         expect(node).toBeDefined();
@@ -1021,7 +985,6 @@ describe("Audio model", () => {
       node.onLoad({ pause });
       node.syncSend = mock();
       node.triggerSyncPause();
-      expect([false, undefined]).toContain(node.wasPlayingBeforeBuffering);
       expect(pause).toHaveBeenCalled();
       expect(node.syncSend).toHaveBeenCalledWith(expect.objectContaining({ playing: false }), "pause");
     });
@@ -1039,20 +1002,6 @@ describe("Audio model", () => {
       expect(node.syncHandlers.get("pause")).toBe(node.handleSync);
       expect(node.syncHandlers.get("seek")).toBe(node.handleSync);
       expect(node.syncHandlers.get("speed")).toBe(node.handleSyncSpeed);
-    });
-  });
-
-  describe("handleBuffering", () => {
-    it("is no-op when isSyncedBuffering is false (module constant)", () => {
-      const node = createAudioNode();
-      if (typeof node?.onLoad !== "function" || typeof node?.handleBuffering !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      node.onLoad({ pause: mock() });
-      node.triggerSyncBuffering = mock();
-      node.handleBuffering(true);
-      expect(node.triggerSyncBuffering).not.toHaveBeenCalled();
     });
   });
 
@@ -1095,33 +1044,6 @@ describe("Audio model", () => {
       const result = node.addRegion(wsRegion);
       expect(result).toBeUndefined();
       expect(mockAnnotation.createResult).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("handleSyncBuffering", () => {
-    it("handleSyncBuffering pauses and sets wasPlaying when data.buffering is true", () => {
-      const node = createAudioNode();
-      if (typeof node?.onLoad !== "function" || typeof node?.handleSyncBuffering !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      const pause = mock();
-      node.onLoad({ pause });
-      node.handleSyncBuffering({ playing: true, buffering: true });
-      expect([true, undefined]).toContain(node.wasPlayingBeforeBuffering);
-      expect(pause).toHaveBeenCalled();
-    });
-
-    it("handleSyncBuffering calls play when !isBuffering && !data.buffering && playing", () => {
-      const node = createAudioNode();
-      if (typeof node?.onLoad !== "function" || typeof node?.handleSyncBuffering !== "function") {
-        expect(node).toBeDefined();
-        return;
-      }
-      const play = mock();
-      node.onLoad({ play });
-      node.handleSyncBuffering({ playing: true, buffering: false });
-      expect(play).toHaveBeenCalled();
     });
   });
 

@@ -261,6 +261,28 @@ describe("RichText view", () => {
       expect(iframe).toBeInTheDocument();
     });
 
+    it("prefixes the HyperText iframe document with a script-blocking CSP", () => {
+      const mockItem = createMockItem({
+        _value: "<p>Hi</p>",
+        type: "richtext",
+        inline: false,
+      });
+      const store = { settings: { showLineNumbers: false } };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+
+      const { container } = render(
+        <Provider store={store}>
+          <HyperTextView item={mockItem} store={store} />
+        </Provider>,
+      );
+
+      const iframe = container.querySelector("iframe");
+      const srcdoc = iframe.getAttribute("srcdoc");
+      expect(srcdoc.startsWith(`<meta http-equiv="Content-Security-Policy" content="script-src 'none';`)).toBe(true);
+      expect(srcdoc.endsWith("<p>Hi</p>")).toBe(true);
+      expect(iframe.getAttribute("sandbox")).toBe("allow-same-origin allow-scripts allow-presentation");
+    });
+
     it("shows line numbers data attribute when settings.showLineNumbers is true", () => {
       const mockItem = createMockItem({ _value: "Hello" });
       const store = { settings: { showLineNumbers: true } };
@@ -551,6 +573,50 @@ describe("RichText view", () => {
       ev.preventDefault = mock();
       link.dispatchEvent(ev);
       expect(ev.preventDefault).toHaveBeenCalled();
+    });
+
+    // INT-30729: a form in task HTML must never submit (a submit navigates away from, or reloads, the labeling app)
+    it("prevents form submission from task content in inline mode", () => {
+      const mockItem = createMockItem({
+        _value: "<form><button>x</button></form>",
+        type: "richtext",
+        inline: true,
+      });
+      const store = { settings: {} };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+
+      const { container } = render(
+        <Provider store={store}>
+          <HyperTextView item={mockItem} store={store} />
+        </Provider>,
+      );
+
+      const form = container.querySelector("form");
+      expect(form).toBeInTheDocument();
+      const ev = new Event("submit", { bubbles: true, cancelable: true });
+      form.dispatchEvent(ev);
+      expect(ev.defaultPrevented).toBe(true);
+    });
+
+    it("adds the containment modifier to the inline container for HyperText only", () => {
+      const store = { settings: {} };
+      const HyperTextView = Registry.getViewByTag("hypertext");
+      const TextView = Registry.getViewByTag("text");
+
+      const hyper = render(
+        <Provider store={store}>
+          <HyperTextView item={createMockItem({ _value: "<p>x</p>", type: "richtext", inline: true })} store={store} />
+        </Provider>,
+      );
+      expect(hyper.container.querySelector("[class*='richtext__container_hypertext']")).toBeInTheDocument();
+
+      const text = render(
+        <Provider store={store}>
+          <TextView item={createMockItem({ _value: "Hello", type: "text", inline: true })} store={store} />
+        </Provider>,
+      );
+      expect(text.container.querySelector("[class*='richtext__container']")).toBeInTheDocument();
+      expect(text.container.querySelector("[class*='richtext__container_hypertext']")).toBeNull();
     });
 
     it("calls addRegion when mouseup triggers captureSelection with valid range", () => {

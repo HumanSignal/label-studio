@@ -9,7 +9,7 @@
  * wrapper's responsibility — by the time the wrapper renders <AnnotationButton/>
  * the SharedAnnotation it passes is fully populated.
  *
- * Delete confirmation lives in the classic wrapper (uses editor/common/Modal/Modal#confirm)
+ * Delete confirmation lives in the classic wrapper (a ConfirmDialog it renders)
  * — the shared component just calls `handlers.onDelete` and lets the wrapper decide
  * whether to confirm before invoking the real action.
  */
@@ -31,11 +31,11 @@ import {
   ChartBarIcon,
   IconAnnotationGroundTruth,
   IconAnnotationSkipped2,
-  IconCheckAlt,
+  CheckIcon,
   CopyIcon,
   IconCommentResolved,
   IconCommentUnresolved,
-  IconCrossAlt,
+  XIcon,
   IconDraftCreated2,
   IconEllipsisVertical,
   LinkSimpleHorizontalIcon,
@@ -44,7 +44,16 @@ import {
   TrashIcon,
   IntersectSquareIcon,
 } from "@humansignal/icons";
-import { Badge, DropdownTrigger, Tooltip, ToastContext, ToastType, Userpic, useDropdown } from "@humansignal/ui";
+import {
+  Badge,
+  DropdownTrigger,
+  Tooltip,
+  ToastContext,
+  ToastType,
+  Avatar,
+  type AvatarBadgeProps,
+  useDropdown,
+} from "@humansignal/ui";
 import { cnb as cn } from "../utils/bem";
 import { useCopyText } from "../hooks/useCopyText";
 import { isDefined, userDisplayName } from "../utils/helpers";
@@ -151,39 +160,16 @@ function getCommentIconAndTooltip(annotation: SharedAnnotation) {
   return null;
 }
 
-function getReviewBadge(acceptedState: SharedAnnotation["acceptedState"]) {
+const REVIEW_BADGES = {
+  accepted: { variant: "kale", icon: <CheckIcon weight="bold" />, label: "Accepted review" },
+  rejected: { variant: "persimmon", icon: <XIcon weight="bold" />, label: "Rejected review" },
+  fixed: { variant: "grape", icon: <CheckIcon weight="bold" />, label: "Fixed review" },
+  fixed_and_accepted: { variant: "grape", icon: <CheckIcon weight="bold" />, label: "Fixed review" },
+} as const;
+
+function getReviewBadge(acceptedState: SharedAnnotation["acceptedState"]): AvatarBadgeProps | null {
   if (!acceptedState) return null;
-  let Icon: React.ComponentType<{ width?: number; height?: number }> | null = null;
-  let badgeMod = "";
-  let label = "";
-  switch (acceptedState) {
-    case "accepted":
-      Icon = IconCheckAlt;
-      badgeMod = "accepted";
-      label = "Accepted";
-      break;
-    case "rejected":
-      Icon = IconCrossAlt;
-      badgeMod = "rejected";
-      label = "Rejected";
-      break;
-    case "fixed":
-    case "fixed_and_accepted":
-      Icon = IconCheckAlt;
-      badgeMod = "fixed";
-      label = "Fixed";
-      break;
-    default:
-      return null;
-  }
-  if (!Icon) return null;
-  const userPickBadge = cn("userpic-badge");
-  const className = `${userPickBadge.toString()} ${userPickBadge.mod({ [badgeMod]: true }).toString()}`;
-  return (
-    <div className={className} aria-label={`${label} review`} data-testid="annotation-review-badge">
-      <Icon />
-    </div>
-  );
+  return { ...REVIEW_BADGES[acceptedState], "data-testid": "annotation-review-badge" };
 }
 
 interface TooltipProps {
@@ -228,7 +214,7 @@ function AnnotationButtonTooltip({
 }: TooltipProps) {
   const statusBadge = useMemo(() => {
     if (isPrediction) return null;
-    if (isDraft || isDraftSaved) return { label: "Draft", variant: "primary" as const };
+    if (isDraft || isDraftSaved) return { label: "Draft", variant: "neutral" as const };
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":
@@ -237,7 +223,7 @@ function AnnotationButtonTooltip({
           return { label: "Rejected", variant: "negative" as const };
         case "fixed":
         case "fixed_and_accepted":
-          return { label: "Fixed", variant: "warning" as const };
+          return { label: "Fixed", variant: "grape" as const };
         default:
           break;
       }
@@ -355,6 +341,8 @@ interface MenuActionItem {
   icon: React.ReactNode;
   onClick: () => void;
   enabled: boolean;
+  /** Shown disabled, with this text as its tooltip, instead of being clickable. */
+  disabledReason?: string;
   separator?: boolean;
   danger?: boolean;
   dataTestId: string;
@@ -435,6 +423,7 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
           close();
         },
         enabled: capabilities.enableCreateAnnotation && !isDraft,
+        disabledReason: capabilities.duplicateDisabledReason,
         dataTestId: "annotation-button-menu-duplicate",
       },
       {
@@ -504,16 +493,34 @@ function AnnotationContextMenu({ annotation, capabilities, handlers }: Annotatio
     <div className={contextMenuStyles.menu}>
       {items.map((item, index) => {
         if (!item.enabled) return null;
-        const className = [contextMenuStyles.option, item.danger ? contextMenuStyles.danger : ""]
+        const className = [
+          contextMenuStyles.option,
+          item.danger ? contextMenuStyles.danger : "",
+          item.disabledReason ? contextMenuStyles.disabled : "",
+        ]
           .filter(Boolean)
           .join(" ");
+        const option = (
+          <div
+            className={className}
+            onClick={item.disabledReason ? undefined : item.onClick}
+            aria-disabled={item.disabledReason ? true : undefined}
+            data-testid={item.dataTestId}
+          >
+            {item.icon && <span className={contextMenuStyles.icon}>{item.icon}</span>}
+            {item.label}
+          </div>
+        );
         return (
           <div key={item.dataTestId ?? index}>
             {item.separator && <div className={contextMenuStyles.seperator} />}
-            <div className={className} onClick={item.onClick} data-testid={item.dataTestId}>
-              {item.icon && <span className={contextMenuStyles.icon}>{item.icon}</span>}
-              {item.label}
-            </div>
+            {item.disabledReason ? (
+              <Tooltip title={item.disabledReason} alignment="bottom-center">
+                {option}
+              </Tooltip>
+            ) : (
+              option
+            )}
           </div>
         );
       })}
@@ -711,17 +718,17 @@ function AnnotationButtonImpl(
     >
       <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={handleClick}>
         <div className={cn("annotation-button").elem("picSection").toClassName()}>
-          <Userpic
+          <Avatar
             className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
             // @ts-expect-error - block attribute kept for Selenium compatibility (legacy classic editor contract)
             block="lsf-annotation-button"
             username={isPrediction ? annotation.createdBy : null}
             user={userpicUser as any}
-            size={24}
-            badge={reviewBadge ? { bottomRight: reviewBadge } : undefined}
+            size="medium"
+            badge={reviewBadge}
           >
             {isPrediction && <IconSparks style={{ width: 18, height: 18 }} />}
-          </Userpic>
+          </Avatar>
         </div>
         <div className={cn("annotation-button").elem("main").toClassName()}>
           <div className={cn("annotation-button").elem("user").toClassName()}>

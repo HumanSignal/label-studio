@@ -22,6 +22,7 @@ import React, {
 } from "react";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
+import { controlIconWeight } from "../../ds-manifest/control-sizes";
 import { cn, cnm } from "../../utils/utils";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
@@ -175,7 +176,7 @@ const SelectedItemsGroup = ({
             onClick={handleSelectAllClick}
             disabled={disabled}
             aria-label={selectAllLabel}
-            look="string"
+            look="ghost"
             size="smaller"
           >
             Select All
@@ -248,7 +249,7 @@ const SelectedItemsGroup = ({
  * tools.
  */
 
-export const Select = forwardRef(
+const SelectBase = forwardRef(
   <T, A extends SelectOption<T>[]>(
     {
       label,
@@ -269,11 +270,13 @@ export const Select = forwardRef(
       disabled = false,
       readOnly = false,
       multiple = false,
+      optionCheckbox = true,
       isInline = false,
       isLoading = false,
       triggerProps,
       triggerClassName,
       contentClassName,
+      contentProps,
       size,
       searchFilter,
       onSearch,
@@ -290,6 +293,8 @@ export const Select = forwardRef(
       onClose,
       onOpen,
       footer,
+      listHeader,
+      searchClassName,
       alwaysShowSelectedGroup = false,
       optionRenderer,
       onSelectAllClick,
@@ -297,6 +302,9 @@ export const Select = forwardRef(
       showGroupActions = false,
       open: controlledOpen,
       align = "start",
+      invalid,
+      error,
+      onBlur,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -621,6 +629,7 @@ export const Select = forwardRef(
           disabled={readOnly || option?.disabled}
           style={option?.style}
           multiple={multiple}
+          optionCheckbox={optionCheckbox}
           onSelect={() => {
             _onChange(optionValue, isOptionSelected);
           }}
@@ -659,6 +668,7 @@ export const Select = forwardRef(
                 disabled={readOnly || (typeof item === "object" && item?.disabled)}
                 style={typeof item === "object" ? item?.style : undefined}
                 multiple={multiple}
+                optionCheckbox={optionCheckbox}
                 onSelect={() => {
                   _onChange(val, isOptionSelected);
                 }}
@@ -708,6 +718,7 @@ export const Select = forwardRef(
               {multiple ? (
                 <Option
                   multiple={multiple}
+                  optionCheckbox={optionCheckbox}
                   label={label}
                   isIndeterminate={!isOptionSelected && isIndeterminate}
                   isOptionSelected={isOptionSelected}
@@ -741,6 +752,7 @@ export const Select = forwardRef(
                       disabled={readOnly || item?.disabled}
                       style={item?.style}
                       multiple={multiple}
+                      optionCheckbox={optionCheckbox}
                       onSelect={() => {
                         _onChange(val, isChildOptionSelected);
                       }}
@@ -784,6 +796,7 @@ export const Select = forwardRef(
                 [styles.isInline]: isInline,
                 [styles.isOpen]: isOpen,
                 [styles.isDisabled]: disabled,
+                [styles.isInvalid]: invalid || error,
                 [styles.sizeSmaller]: size === "smaller",
                 [styles.sizeSmall]: size === "small",
               },
@@ -800,13 +813,15 @@ export const Select = forwardRef(
             data-name={props?.name}
             data-value={value ?? ""}
             aria-readonly={readOnly || undefined}
+            aria-invalid={invalid || error || undefined}
+            onBlur={onBlur}
             {...triggerProps}
           >
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
             <CaretDownIcon
-              weight="bold"
+              weight={controlIconWeight(size)}
               className={cnm(
                 styles.selectCaret,
                 "shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
@@ -815,7 +830,12 @@ export const Select = forwardRef(
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent align={align} data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
+        <PopoverContent
+          {...contentProps}
+          align={align}
+          data-testid="select-popup"
+          className={cnm("min-w-full", contentClassName)}
+        >
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...
@@ -830,9 +850,11 @@ export const Select = forwardRef(
                   value={query}
                   onChangeCapture={onSearchInputHandler}
                   data-testid="select-search-field"
+                  wrapperClassName={searchClassName}
                   autoFocus
                 />
               )}
+              {listHeader ?? null}
               <CommandList
                 label="Select an option"
                 className={cnm({
@@ -935,7 +957,18 @@ export const Select = forwardRef(
                 </CommandGroup>
               </CommandList>
               {/* Outside CommandList so it stays pinned while the options scroll. */}
-              {footer && <div className="p-tight border-t border-neutral-border flex">{footer}</div>}
+              {footer && (
+                <div
+                  className="p-tight border-t border-neutral-border flex"
+                  // A dialog opened from the footer is portaled, but its key events still bubble here through
+                  // React: keep them from the option list, which would take Enter as picking an option.
+                  onKeyDown={(e) => {
+                    if (!e.currentTarget.contains(e.target as Node)) e.stopPropagation();
+                  }}
+                >
+                  {footer}
+                </div>
+              )}
             </Command>
           )}
         </PopoverContent>
@@ -968,6 +1001,9 @@ export const Select = forwardRef(
         )}
         <select
           name={props?.name}
+          hidden
+          aria-hidden="true"
+          tabIndex={-1}
           value={selectedOptions.map((option) => option?.value ?? option).join(",")}
           ref={ref}
           disabled={disabled}
@@ -990,7 +1026,86 @@ export const Select = forwardRef(
     }
     return combobox;
   },
-);
+) as (<T, A extends SelectOption<T>[]>(props: SelectProps<T, A>) => React.ReactElement | null) & {
+  displayName?: string;
+};
+
+const toValueList = (value: unknown): unknown[] => {
+  if (!isDefined(value)) return [];
+  const list = Array.isArray(value) ? value : [value];
+  return list.map((item: any) => item?.value ?? item);
+};
+
+const sameValues = (left: unknown[], right: unknown[]) =>
+  left.length === right.length && left.every((item) => right.includes(item));
+
+/**
+ * Multiple select whose picks stay pending until Apply. It drives SelectBase only through its public props
+ * (open, value, onChange, footer), so SelectBase itself is unchanged.
+ */
+const SelectWithApply = forwardRef((props: SelectProps<unknown, any[]>, ref: ForwardedRef<HTMLSelectElement>) => {
+  const { value, defaultValue, onChange, onOpen, onClose, footer, dataTestid, ...rest } = props;
+  const isControlled = value !== undefined;
+  const [uncontrolledValue, setUncontrolledValue] = useState<unknown[]>(() => toValueList(defaultValue));
+  const committed = useMemo(
+    () => (isControlled ? toValueList(value) : uncontrolledValue),
+    [isControlled, value, uncontrolledValue],
+  );
+  const [isOpen, setIsOpen] = useState(false);
+  const [pending, setPending] = useState<unknown[]>(committed);
+  const hasChanges = !sameValues(pending, committed);
+
+  const apply = () => {
+    if (!isControlled) setUncontrolledValue(pending);
+    onChange?.(pending);
+    setIsOpen(false);
+    onClose?.();
+  };
+
+  return (
+    <SelectBase
+      {...rest}
+      ref={ref}
+      multiple
+      dataTestid={dataTestid}
+      value={isOpen ? pending : committed}
+      open={isOpen}
+      onOpen={() => {
+        setPending(committed);
+        setIsOpen(true);
+        onOpen?.();
+      }}
+      onClose={() => {
+        setPending(committed);
+        setIsOpen(false);
+        onClose?.();
+      }}
+      onChange={(next: unknown) => setPending(toValueList(next))}
+      footer={
+        <>
+          {footer}
+          <Button
+            type="button"
+            variant="primary"
+            look="filled"
+            size="small"
+            className={footer ? undefined : "flex-1"}
+            disabled={!hasChanges}
+            data-testid={dataTestid ? `${dataTestid}-apply` : "select-apply"}
+            onClick={apply}
+          >
+            Apply
+          </Button>
+        </>
+      }
+    />
+  );
+});
+
+export const Select = forwardRef(
+  ({ requireApply, ...props }: SelectProps<unknown, any[]>, ref: ForwardedRef<HTMLSelectElement>) =>
+    requireApply && props.multiple ? <SelectWithApply {...props} ref={ref} /> : <SelectBase {...props} ref={ref} />,
+) as typeof SelectBase;
 
 type GroupActionsProps = {
   groupItems: any[];
@@ -1032,10 +1147,10 @@ const GroupActions = ({ groupItems, valueRef, setValue, onChange }: GroupActions
 
   return (
     <div className={styles.groupActions}>
-      <Button type="button" look="string" size="smaller" onClick={handleSelectAll}>
+      <Button type="button" look="ghost" size="smaller" onClick={handleSelectAll}>
         All
       </Button>
-      <Button type="button" look="string" size="smaller" onClick={handleSelectNone}>
+      <Button type="button" look="ghost" size="smaller" onClick={handleSelectNone}>
         None
       </Button>
     </div>
@@ -1051,6 +1166,7 @@ const Option = ({
   style,
   onSelect,
   multiple,
+  optionCheckbox = true,
   className,
   optionRenderer,
   option,
@@ -1095,6 +1211,7 @@ const Option = ({
       {...(style ? { style } : {})}
       data-value={value}
       data-selected={isOptionSelected}
+      aria-selected={multiple && !optionCheckbox ? isOptionSelected : undefined}
       data-testid={`select-option-${value}`}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={keyDownHandler}
@@ -1133,13 +1250,13 @@ const Option = ({
             "hover:data-[disabled=true]:cursor-not-allowed",
             "duration-150 ease-out",
           ],
-          !multiple && isOptionSelected && ["bg-primary-emphasis"],
+          (!multiple || !optionCheckbox) && isOptionSelected && ["bg-primary-emphasis"],
           highlighted && "bg-primary-emphasis-subtle",
         )}
         data-disabled={disabled}
       >
         {leadingIcon}
-        {multiple && (
+        {multiple && optionCheckbox && (
           <Checkbox
             tabIndex={-1}
             checked={isOptionSelected}
@@ -1149,7 +1266,8 @@ const Option = ({
           />
         )}
         <div data-testid="select-option-label" className="flex w-full min-w-0 items-center gap-2">
-          <span className="truncate">{labelContent}</span>
+          {/* A custom row takes the full width so trailing cells (status columns, counts) line up across rows. */}
+          <span className={clsx("truncate", optionRenderer && "flex-1 min-w-0")}>{labelContent}</span>
           {badge && <Badge size="small">{badge}</Badge>}
           {description && (
             <Tooltip title={description}>

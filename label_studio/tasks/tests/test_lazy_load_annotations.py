@@ -2,13 +2,8 @@
 
 This module tests the AnnotationStubSerializer and the annotations_stub
 query parameter for the TaskAPI endpoint.
-
-Feature flag fixtures are defined in tasks/tests/conftest.py:
-- fflag_fix_all_fit_720_lazy_load_annotations_on: Enable the feature flag
-- fflag_fix_all_fit_720_lazy_load_annotations_off: Disable the feature flag
 """
 
-import pytest
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
@@ -156,7 +151,6 @@ class TestAnnotationsStubQueryParameter(APITestCase):
             ],
         )
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_task_api_with_annotations_stub_enabled(self):
         """Test that TaskAPI returns stub annotations when feature flag is enabled and annotations_stub=true."""
         self.client.force_authenticate(user=self.user)
@@ -173,7 +167,6 @@ class TestAnnotationsStubQueryParameter(APITestCase):
         assert 'result' not in annotation_data
         assert annotation_data.get('is_stub') is True
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_task_api_stub_annotations_respect_annotations_ordering_desc(self):
         """annotations_ordering=-id must return highest id first (not prefetch cache order)."""
         AnnotationFactory(
@@ -196,7 +189,6 @@ class TestAnnotationsStubQueryParameter(APITestCase):
         assert len(ids) == 2
         assert ids == sorted(ids, reverse=True), ids
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_task_api_without_annotations_stub(self):
         """Test that TaskAPI returns full annotations when annotations_stub is not set."""
         self.client.force_authenticate(user=self.user)
@@ -210,24 +202,6 @@ class TestAnnotationsStubQueryParameter(APITestCase):
 
         annotation_data = data['annotations'][0]
         # Without stub mode, result should be included
-        assert 'result' in annotation_data
-        assert 'is_stub' not in annotation_data
-
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_task_api_with_feature_flag_disabled(self):
-        """Test that TaskAPI ignores annotations_stub when feature flag is disabled."""
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/?annotations_stub=true')
-
-        assert response.status_code == 200
-        data = response.json()
-
-        assert 'annotations' in data
-        assert len(data['annotations']) == 1
-
-        annotation_data = data['annotations'][0]
-        # With feature flag disabled, annotations_stub should be ignored
-        # and full annotations should be returned
         assert 'result' in annotation_data
         assert 'is_stub' not in annotation_data
 
@@ -279,16 +253,6 @@ class TestTaskAgreementAPI(APITestCase):
         cls.user = cls.organization.created_by
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_agreement_endpoint_available_without_lazy_load_flag(self):
-        """Agreement is a summary payload, not a lazy-load concern, so FIT-720 does not gate it."""
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/agreement/')
-
-        assert response.status_code == 200
-        assert response.json()['total_annotations'] == 0
-
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_empty_task(self):
         """Test summary endpoint returns empty distributions for task with no annotations."""
         self.client.force_authenticate(user=self.user)
@@ -301,7 +265,6 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions'] == {}
         assert 'agreement' in data
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_labels(self):
         """Test summary endpoint correctly aggregates label annotations."""
         # Create multiple annotations with different labels
@@ -360,7 +323,6 @@ class TestTaskAgreementAPI(APITestCase):
         # Car appears twice, Person once, Dog once
         assert data['distributions']['label']['labels'] == {'Car': 2, 'Person': 1, 'Dog': 1}
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_choices(self):
         """Test summary endpoint correctly aggregates choices."""
         AnnotationFactory(
@@ -410,7 +372,6 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['sentiment']['type'] == 'choices'
         assert data['distributions']['sentiment']['labels'] == {'Positive': 2, 'Negative': 1}
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_ratings(self):
         """Test summary endpoint correctly calculates rating average."""
         AnnotationFactory(
@@ -461,7 +422,6 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['rating']['average'] == 4.0  # (5 + 3 + 4) / 3
         assert data['distributions']['rating']['count'] == 3
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_excludes_cancelled_annotations(self):
         """Test that cancelled annotations are not included in summary distributions."""
         # Create a normal annotation
@@ -504,7 +464,6 @@ class TestTaskAgreementAPI(APITestCase):
         # Skipped should not appear as it was from cancelled annotation
         assert 'Skipped' not in data['distributions']['label']['labels']
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_multiple_controls(self):
         """Test summary endpoint handles multiple control types in one annotation."""
         AnnotationFactory(
@@ -547,7 +506,6 @@ class TestTaskAgreementAPI(APITestCase):
         assert data['distributions']['sentiment']['labels'] == {'Positive': 1}
         assert data['distributions']['quality']['average'] == 5.0
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_task_not_found(self):
         """Test that summary endpoint returns 404 for non-existent task."""
         self.client.force_authenticate(user=self.user)
@@ -556,7 +514,6 @@ class TestTaskAgreementAPI(APITestCase):
         assert response.status_code == 404
         assert response.json()['error'] == 'Task not found'
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_agreement_endpoint_with_taxonomy(self):
         """Test summary endpoint correctly handles taxonomy labels."""
         AnnotationFactory(
@@ -604,15 +561,6 @@ class TestTaskSummaryAPI(APITestCase):
         cls.user = cls.organization.created_by
         cls.task = TaskFactory(project=cls.project, data={'text': 'test'})
 
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_off')
-    def test_summary_endpoint_available_without_lazy_load_flag(self):
-        """Summary is permissioned by tasks_view; FIT-720 only controls lazy-loading task GET."""
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/tasks/{self.task.id}/summary/')
-        assert response.status_code == 200
-        assert response.json()['task']['id'] == self.task.id
-
-    @pytest.mark.usefixtures('fflag_fix_all_fit_720_lazy_load_annotations_on')
     def test_summary_endpoint_includes_annotations_and_task(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/tasks/{self.task.id}/summary/')

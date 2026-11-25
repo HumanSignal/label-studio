@@ -1,4 +1,3 @@
-from core.feature_flags import flag_set
 from django.conf import settings
 
 
@@ -24,9 +23,7 @@ def iterate_queryset(queryset, chunk_size=None):
     # Re-selecting the primary key below rewrites an explicit GROUP BY to the pk, which
     # silently collapses the aggregation and yields one row per underlying table row
     # instead of one row per group. Aggregates therefore have to stream as-is.
-    if not flag_set('fflag_fix_back_plt_863_remove_iterator_27082025_short', user='auto') or _has_explicit_group_by(
-        queryset
-    ):
+    if _has_explicit_group_by(queryset):
         for obj in queryset.iterator(chunk_size=chunk_size):
             yield obj
         return

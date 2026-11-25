@@ -7,6 +7,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
@@ -188,19 +189,14 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get_task_queryset(self, queryset):
         # Import here to avoid circular dependencies
-        from core.feature_flags import flag_set
+        from fsm.serializer_fields import fsm_state_fields_enabled
         from tasks.models import Annotation, Prediction
 
         # Create a prefetch for annotations with FSM state
         annotations_qs = Annotation.objects.all()
 
-        # Only annotate FSM state if both feature flags are enabled
-        user = getattr(self.request, 'user', None)
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(annotations_qs, 'with_state')
-        ):
+        # Only annotate FSM state if FSM state fields are enabled
+        if fsm_state_fields_enabled() and hasattr(annotations_qs, 'with_state'):
             annotations_qs = annotations_qs.with_state()
 
         qs = queryset.select_related('project').prefetch_related(
@@ -210,11 +206,7 @@ class ExportAPI(generics.RetrieveAPIView):
         )
 
         # Add FSM state annotation to tasks as well to avoid N+1 queries during export
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(qs, 'with_state')
-        ):
+        if fsm_state_fields_enabled() and hasattr(qs, 'with_state'):
             qs = qs.with_state()
         return qs
 
@@ -254,7 +246,13 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Prepare export files')
 
         export_file, content_type, filename = DataExport.generate_export_file(
-            project, tasks, export_type, download_resources, request.GET, hostname=get_export_hostname(request)
+            project,
+            tasks,
+            export_type,
+            download_resources,
+            request.GET,
+            hostname=get_export_hostname(request),
+            user=request.user,
         )
 
         r = FileResponse(export_file, as_attachment=True, content_type=content_type, filename=filename)
@@ -312,7 +310,8 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=pk)
+        self.check_object_permissions(request, project)
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
@@ -342,7 +341,21 @@ class ProjectExportFilesAuthCheck(APIView):
     decorator=extend_schema(
         tags=['Export'],
         summary='Create new export snapshot',
-        description='Create a new export request to start a background task and generate an export file for a specific project by ID.',
+        description=(
+            'Create a new export request to start a background task and generate an export file '
+            'for a specific project by ID. Optional `since` / `until` limit the snapshot to tasks '
+            'with `updated_at` in the half-open window `[since, until)`. `since` must be in the past; an '
+            'omitted or later `until` becomes create/request time minus INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS. '
+            'Set `ephemeral=true` to omit the snapshot from list endpoints. '
+            'On deployments that run the RQ cron scheduler (SaaS; on-prem with `rqcron.enabled`), '
+            'ephemeral exports older than EPHEMERAL_EXPORT_TTL_HOURS (default 24) are deleted by a '
+            'daily low-queue sweep; otherwise they remain unlisted until explicitly deleted. '
+            'Use the resolved `until` from the response as `since` on the next incremental create. '
+            'Task deletions are not represented in incremental snapshots (only surviving tasks with '
+            'bumped `updated_at`). Rows committed after the export query starts but stamped with '
+            '`updated_at` before `until` can fall outside both consecutive windows; the default '
+            '`until` lag mitigates long transactions.'
+        ),
         parameters=[
             OpenApiParameter(
                 name='id',
@@ -358,9 +371,8 @@ class ProjectExportFilesAuthCheck(APIView):
         },
     ),
 )
-class ExportListAPI(generics.ListCreateAPIView):
+class ExportListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     queryset = Export.objects.all().order_by('-created_at')
-    project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
@@ -376,20 +388,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         context['user'] = self.request.user
         return context
 
-    def _get_project(self):
-        project_pk = self.kwargs.get('pk')
-        project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
-            pk=project_pk,
-        )
-        return project
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
 
     def perform_create(self, serializer):
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
 
-        project = self._get_project()
+        project = self.parent_object
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -400,8 +408,8 @@ class ExportListAPI(generics.ListCreateAPIView):
         )
 
     def get_queryset(self):
-        project = self._get_project()
-        return super().get_queryset().filter(project=project)
+        project = self.parent_object
+        return super().get_queryset().filter(project=project).exclude(ephemeral=True)
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -643,7 +651,11 @@ def async_convert(converted_format_id, export_type, project, hostname, download_
         converted_format.save(update_fields=['status'])
 
     snapshot = converted_format.export
-    converted_file = snapshot.convert_file(export_type, download_resources=download_resources, hostname=hostname)
+    # Jobs queued before conversions recorded their user fall back to the snapshot's
+    user = converted_format.created_by or snapshot.created_by
+    converted_file = snapshot.convert_file(
+        export_type, download_resources=download_resources, hostname=hostname, user=user
+    )
     if converted_file is None:
         raise ValidationError('No converted file found, probably there are no annotations in the export snapshot')
     md5 = Export.eval_md5(converted_file)
@@ -723,7 +735,7 @@ class ExportConvertAPI(generics.CreateAPIView):
 
         converted_format, created = ConvertedFormat.objects.exclude(
             status=ConvertedFormat.Status.FAILED
-        ).get_or_create(export=snapshot, export_type=export_type)
+        ).get_or_create(export=snapshot, export_type=export_type, defaults={'created_by': request.user})
 
         if not created:
             raise ValidationError(f'Conversion to {export_type} already started')

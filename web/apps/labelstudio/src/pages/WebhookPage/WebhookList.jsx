@@ -1,14 +1,15 @@
 import { IconCross, IconExternal, IconPencil, IconWebhook } from "@humansignal/icons";
-import { Button, EmptyState, SimpleCard, Typography } from "@humansignal/ui";
+import { Button, Card, ConfirmDialog, EmptyState, Typography } from "@humansignal/ui";
 import clsx from "clsx";
 import { format } from "date-fns";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Toggle } from "../../components/Form";
 import { useAPI } from "../../providers/ApiProvider";
-import { WebhookDeleteModal } from "./WebhookDeleteModal";
 import { ABILITY, useAuth } from "@humansignal/core/providers/AuthProvider";
 
 const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, canChangeWebhooks }) => {
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
   return (
     <li
       className={clsx(
@@ -45,20 +46,22 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
           <Button variant="primary" look="outlined" onClick={() => onSelectActive(webhook.id)} icon={<IconPencil />}>
             Edit
           </Button>
-          <Button
-            variant="negative"
-            look="outlined"
-            onClick={() =>
-              WebhookDeleteModal({
-                onDelete,
-              })
-            }
-            icon={<IconCross />}
-          >
+          <Button variant="negative" look="outlined" onClick={() => setConfirmDeleteOpen(true)} icon={<IconCross />}>
             Delete
           </Button>
         </div>
       )}
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete"
+        okText="Delete Webhook"
+        buttonLook="negative"
+        onOk={onDelete}
+        dataTestId="webhook-delete-modal"
+      >
+        Are you sure you want to delete the webhook? This action cannot be undone.
+      </ConfirmDialog>
     </li>
   );
 };
@@ -99,7 +102,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
       </header>
       <div className="w-full">
         {webhooks.length === 0 ? (
-          <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
+          <Card size="compact" title="" className="bg-primary-background border-primary-border-subtler p-base">
             <EmptyState
               size="medium"
               variant="primary"
@@ -134,7 +137,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                 )
               }
             />
-          </SimpleCard>
+          </Card>
         ) : (
           <ul className="space-y-4 mt-wide">
             {webhooks.map((obj) => (

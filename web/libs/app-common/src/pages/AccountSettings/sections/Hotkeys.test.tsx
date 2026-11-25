@@ -1,6 +1,5 @@
 import { ApiContext, type ApiContextType } from "@humansignal/core";
 import { ToastProvider } from "@humansignal/ui";
-import * as modalModule from "@humansignal/ui/lib/modal";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "history";
 import type { PropsWithChildren } from "react";
@@ -139,30 +138,19 @@ describe("HotkeysManager project scope", () => {
 
 describe("HotkeysManager reset", () => {
   it("shows project-specific reset confirmation copy", async () => {
-    // spyOn in the test body is fine for a single it(); keep confirm from opening UI.
-    const confirmSpy = spyOn(modalModule, "confirm").mockImplementation(() => undefined as never);
-
     renderHotkeys();
     await waitForProjectHotkeysReady();
 
-    await waitFor(() => {
-      const button = screen.getByRole("button", { name: "Reset to Defaults" });
-      expect(button).toBeEnabled();
-      fireEvent.click(button);
-      expect(confirmSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Reset Project Hotkey Override?",
-          okText: "Reset Project Override",
-        }),
-      );
-    });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Reset to Defaults" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Reset to Defaults" }));
+
+    expect(await screen.findByRole("dialog", { name: "Reset Project Hotkey Override?" })).toBeInTheDocument();
+    expect(screen.getByTestId("dialog-ok-button")).toHaveTextContent("Reset Project Override");
   });
 });
 
 describe("HotkeysManager dirty scope changes", () => {
   it("prompts before discarding unsaved changes when switching scope", async () => {
-    const confirmSpy = spyOn(modalModule, "confirm").mockImplementation(() => undefined as never);
-
     renderHotkeys();
     await waitForProjectHotkeysReady();
 
@@ -171,13 +159,28 @@ describe("HotkeysManager dirty scope changes", () => {
     fireEvent.click(screen.getByTestId("project-hotkey-scope-selector"));
     fireEvent.click(screen.getByTestId("select-option-account"));
 
-    await waitFor(() =>
-      expect(confirmSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Discard unsaved hotkey changes?",
-          okText: "Discard Changes",
-        }),
-      ),
-    );
+    expect(await screen.findByRole("dialog", { name: "Discard unsaved hotkey changes?" })).toBeInTheDocument();
+    expect(screen.getByTestId("dialog-ok-button")).toHaveTextContent("Discard Changes");
+  });
+});
+
+describe("HotkeysManager duplicate keys", () => {
+  it("asks in a confirm dialog before assigning a key another hotkey uses", async () => {
+    renderHotkeys({ initialPath: "/user/account/hotkeys" });
+    const toggle = await screen.findByLabelText(/Disable Submit Annotation|Enable Submit Annotation/);
+    const row = toggle.closest(".flex.items-center") as HTMLElement;
+    fireEvent.click(row.querySelector(".cursor-pointer") as HTMLElement);
+
+    const recorder = await screen.findByRole("button", { name: "Click to record keyboard shortcut" });
+    fireEvent.click(recorder);
+    fireEvent.keyDown(recorder, { key: "z", ctrlKey: true });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    const dialog = await screen.findByTestId("hotkeys-duplicate-confirm");
+    expect(dialog).toHaveTextContent("Undo");
+    expect(dialog).toHaveTextContent("Having duplicate hotkeys may cause conflicts");
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByTestId("hotkeys-duplicate-confirm")).toBeNull());
   });
 });

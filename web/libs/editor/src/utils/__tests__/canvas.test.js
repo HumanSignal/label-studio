@@ -1,9 +1,6 @@
 /* global describe, test, expect, mock, spyOn, beforeEach */
 import { encode as rleEncode } from "@thi.ng/rle-pack";
 import Canvas from "../canvas";
-import { FF_LSDV_4583 } from "../feature-flags";
-
-const ff = mockFF();
 
 const svgs = {
   simple: [
@@ -17,7 +14,7 @@ const svgs = {
     "'data:image/svg+xml,",
     '%3Csvg xmlns="http://www.w3.org/2000/svg" height="16" width="2"%3E',
     '%3Ctext x="0" y="11" style="font-size: 9.5px; font-weight: bold; font-family: var(--font-mono);"%3E',
-    "A&lt;/text%3E B",
+    "A&lt;/text&gt; B",
     "%3C/text%3E%3C/svg%3E'",
   ].join(""),
   score: [
@@ -42,8 +39,51 @@ describe("Helper function labelToSVG", () => {
   });
 
   test("Complex label", () => {
-    // labels will be already escaped
-    expect(Canvas.labelToSVG({ label: "A&lt;/text>   B" })).toBe(svgs.complex);
+    expect(Canvas.labelToSVG({ label: "A</text>   B" })).toBe(svgs.complex);
+  });
+
+  test("measures label markup as text", () => {
+    const label = '<img src="x" onerror="window.__labelToSvgXss = 1">';
+    const appendChild = spyOn(document.body, "appendChild");
+
+    try {
+      Canvas.labelToSVG({ label });
+
+      const captured = appendChild.mock.calls.map(([node]) => node).find((node) => node.localName === "svg");
+
+      expect(captured).toBeDefined();
+      expect(captured.querySelector("img")?.outerHTML).toBeUndefined();
+      expect(captured.textContent).toBe(label);
+    } finally {
+      appendChild.mockRestore();
+    }
+  });
+
+  test("XML-escapes label markup in the SVG", () => {
+    const label = 'A</text><image href="x"/>\'B"&';
+    const out = Canvas.labelToSVG({ label });
+    const inner = out.slice(1, -1);
+
+    expect(inner).not.toContain("'");
+
+    const svg = decodeURIComponent(inner.slice("data:image/svg+xml,".length));
+    const doc = new DOMParser().parseFromString(svg, "image/svg+xml");
+
+    expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+    expect(doc.getElementsByTagName("text")).toHaveLength(1);
+    expect(doc.getElementsByTagName("text")[0].textContent).toBe(label);
+    expect(doc.getElementsByTagName("image")).toHaveLength(0);
+  });
+
+  test("renders labels with XML special characters", () => {
+    const out = Canvas.labelToSVG({ label: "R&D" });
+    const svg = decodeURIComponent(out.slice(1, -1).slice("data:image/svg+xml,".length));
+    const doc = new DOMParser().parseFromString(svg, "image/svg+xml");
+
+    expect(out).toContain("R&amp;D");
+    expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+    expect(doc.getElementsByTagName("text")).toHaveLength(1);
+    expect(doc.getElementsByTagName("text")[0].textContent).toBe("R&D");
   });
 
   test("With score", () => {
@@ -292,12 +332,7 @@ function createExportRLECanvas(nw, nh) {
 }
 
 describe("Region2RLE", () => {
-  beforeEach(() => {
-    ff.reset();
-  });
-
-  test("returns RLE when isFF(FF_LSDV_4583) is true (exportRLE path)", () => {
-    ff.set({ [FF_LSDV_4583]: true });
+  test("returns RLE (exportRLE path)", () => {
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -315,7 +350,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with existing region.rle applies decode and putImageData", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const nw = 4;
     const nh = 4;
     const raw = new Uint8Array(nw * nh * 4);
@@ -349,7 +383,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with getMaskImage draws mask on canvas", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(4, 4);
@@ -370,7 +403,6 @@ describe("Region2RLE", () => {
   });
 
   test("exportRLE path with touches renders strokes and encodes", () => {
-    ff.set({ [FF_LSDV_4583]: true });
     const origCreateElement = document.createElement.bind(document);
     spyOn(document, "createElement").mockImplementation((tag) => {
       if (tag === "canvas") return createExportRLECanvas(10, 10);
@@ -390,36 +422,5 @@ describe("Region2RLE", () => {
     const result = Canvas.Region2RLE(region);
     expect(result).toBeDefined();
     restoreAllMocks();
-  });
-
-  test("legacy path returns undefined when stage is missing", () => {
-    const consoleSpy = spyOn(console, "error").mockImplementation(() => {});
-    const region = {
-      currentImageEntity: { naturalWidth: 4, naturalHeight: 4 },
-      object: {},
-      cleanId: "area-1",
-    };
-    const result = Canvas.Region2RLE(region);
-    expect(result).toBeUndefined();
-    expect(consoleSpy).toHaveBeenCalledWith("Stage not found for area #area-1");
-    consoleSpy.mockRestore();
-  });
-
-  test("legacy path returns [] when layer not found on stage", () => {
-    const consoleSpy = spyOn(console, "error").mockImplementation(() => {});
-    const region = {
-      currentImageEntity: { naturalWidth: 4, naturalHeight: 4 },
-      id: "layer-1",
-      cleanId: "layer-1",
-      object: {
-        stageRef: {
-          findOne: () => null,
-        },
-      },
-    };
-    const result = Canvas.Region2RLE(region);
-    expect(result).toEqual([]);
-    expect(consoleSpy).toHaveBeenCalledWith("Layer #layer-1 was not found on Stage");
-    consoleSpy.mockRestore();
   });
 });

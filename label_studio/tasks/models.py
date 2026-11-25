@@ -12,11 +12,9 @@ from typing import Any, Mapping, Optional, Union, cast
 from urllib.parse import urljoin
 
 import ujson as json
-from core.bulk_update_utils import bulk_update
 from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
-from core.redis import start_job_async_or_sync
 from core.utils.common import (
     find_first_one_to_one_related_field_by_prefix,
     load_func,
@@ -28,12 +26,13 @@ from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
 from django.conf import settings
-from django.db import OperationalError, models, transaction
-from django.db.models import CheckConstraint, F, JSONField, Q
-from django.db.models.lookups import GreaterThanOrEqual
+from django.core.signing import Signer
+from django.db import models, transaction
+from django.db.models import CheckConstraint, JSONField, Q
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
+from django.utils.crypto import constant_time_compare
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -47,6 +46,21 @@ from tasks.result_utils import sanitize_null_bytes
 logger = logging.getLogger(__name__)
 
 TaskMixin = load_func(settings.TASK_MIXIN)
+
+_FILE_PROXY_SIGNER = Signer(salt='projects-file-proxy')
+
+
+def sign_file_proxy_url(project_id: int, url: str) -> str:
+    """Signature proving that ``url`` came from the task data of project ``project_id``.
+
+    The file proxy sends the project's task-data credentials only with a signed URL,
+    so a caller can't make it send them to a host of their choice.
+    """
+    return _FILE_PROXY_SIGNER.signature(f'{project_id}:{url}')
+
+
+def is_signed_file_proxy_url(project_id: int, url: str, signature: Optional[str]) -> bool:
+    return bool(signature) and constant_time_compare(signature, sign_file_proxy_url(project_id, url))
 
 
 class Task(TaskMixin, FsmHistoryStateModel):
@@ -123,6 +137,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
         default=0,
         null=True,
         help_text='Internal task ID in the project, starts with 1',
+    )
+    # Provenance, like Annotation.import_id: one hop back, never reused as this task's own id.
+    # No index on purpose: nothing filters by it, and `task` is too large for a synchronous index.
+    import_id = models.BigIntegerField(
+        _('import id'),
+        null=True,
+        blank=True,
+        help_text='Original task ID that was at the import step (the "id" of the task in the imported data, '
+        'or the source task when tasks are copied between projects), or NULL if there was none. '
+        'It points one step back, so for a copy of a copy it is the ID of the intermediate copy, not of the first task',
     )
     updates = ['is_labeled']
     total_annotations = models.IntegerField(
@@ -255,8 +279,11 @@ class Task(TaskMixin, FsmHistoryStateModel):
                     return []
                 else:
                     return new_predictions
-            else:
+            elif project.model_version:
                 return predictions.filter(model_version=project.model_version)
+            else:
+                # No version selected (''): don't filter, matching DataManagerTaskSerializer.get_predictions
+                return predictions
         else:
             return []
 
@@ -469,6 +496,8 @@ class Task(TaskMixin, FsmHistoryStateModel):
                         reverse('projects-file-proxy', kwargs={'pk': project.pk})
                         + '?url='
                         + base64.urlsafe_b64encode(value.encode()).decode()
+                        + '&sig='
+                        + sign_file_proxy_url(project.pk, value)
                     )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
@@ -1019,8 +1048,15 @@ class AnnotationDraft(FsmHistoryStateModel):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        """Project access; users restricted to their own work (LSE annotators) also need their own draft on a
+        task they can open. Beyond project access the task check only restricts those users, so others skip it."""
+        project = self.task.project
+        user.project = project  # link for activity log
+        if not project.has_permission(user):
+            return False
+        if Annotation.restricted_to_own_work(user, project):
+            return self.user_id == user.id and self.task.has_permission(user)
+        return True
 
     def save(self, *args, **kwargs):
         # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
@@ -1381,7 +1417,13 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
     but call only tasks_number_changed section
     """
     try:
-        instance.project.update_tasks_states(
+        from projects.functions.summary_delta import schedule_tasks_states_after_delete, use_summary_delta
+
+        project = instance.project
+        if use_summary_delta(project.organization_id):
+            schedule_tasks_states_after_delete(project.id, project.organization_id)
+            return
+        project.update_tasks_states(
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True,
@@ -1396,7 +1438,24 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
     """Reduce data column counters after removing task"""
-    instance.decrease_project_summary_counters()
+    from projects.functions.summary_delta import (
+        SummaryDelta,
+        add_annotation_results,
+        add_draft_results,
+        add_task_data,
+        schedule_summary_delta,
+        use_summary_delta,
+    )
+
+    project = instance.project
+    if project is None or not use_summary_delta(project.organization_id):
+        instance.decrease_project_summary_counters()
+        return
+    # the cascade does not call Annotation/AnnotationDraft.delete(), so their counters are dropped here too
+    delta = add_task_data(SummaryDelta(), [instance.data])
+    add_annotation_results(delta, Annotation.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    add_draft_results(delta, AnnotationDraft.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    schedule_summary_delta(project.id, project.organization_id, delta)
 
 
 def _task_data_is_not_updated(update_fields):
@@ -1508,10 +1567,13 @@ def update_task_counters_after_annotation_delete(sender, instance, **kwargs):
     task.cancelled_annotations = task.annotations.filter(was_cancelled=True).count()
     task.update_is_labeled()
     # Use .update() (not .save()) to avoid re-triggering Task save signals / summary recounting.
+    # Explicit updated_at: QuerySet.update() does not honor auto_now, and incremental exports
+    # key off Task.updated_at (FIT-3092).
     Task.objects.filter(id=task_id).update(
         total_annotations=task.total_annotations,
         cancelled_annotations=task.cancelled_annotations,
         is_labeled=task.is_labeled,
+        updated_at=now(),
     )
     logger.debug(f'post_delete recomputed counters for task {task_id} after annotation deletion.')
 
@@ -1571,94 +1633,25 @@ def update_ml_backend(sender, instance, **kwargs):
                 ml_backend.train()
 
 
-def update_task_stats(task, stats=('is_labeled',), save=True):
-    """Update single task statistics:
-        accuracy
-        is_labeled
-    :param task: Task to update
-    :param stats: to update separate stats
-    :param save: to skip saving in some cases
-    :return:
-    """
-    logger.debug(f'Update stats {stats} for task {task}')
-    if 'is_labeled' in stats:
-        task.update_is_labeled(save=save)
-    if save:
-        task.save()
-
-
-def deprecated_bulk_update_stats_project_tasks(tasks, project=None):
-    """bulk Task update accuracy
-       ex: after change settings
-       apply several update queries size of batch
-       on updated Task objects
-       in single transaction as execute sql
-    :param tasks:
-    :return:
-    """
-    # recalc accuracy
-    if not tasks:
-        # break if tasks is empty
-        return
-    # get project if it's not in params
-    if project is None:
-        project = tasks[0].project
-
-    with transaction.atomic():
-        use_overlap = project._can_use_overlap()
-        # update filters if we can use overlap
-        if use_overlap:
-            # following definition of `completed_annotations` above, count cancelled annotations
-            # as completed if project is in IGNORE_SKIPPED mode
-            completed_annotations_f_expr = F('total_annotations')
-            if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
-                completed_annotations_f_expr += F('cancelled_annotations')
-            finished_q = Q(GreaterThanOrEqual(completed_annotations_f_expr, F('overlap')))
-            finished_tasks = tasks.filter(finished_q)
-            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
-            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
-
-        else:
-            # update objects without saving if we can't use overlap
-            for task in tasks:
-                update_task_stats(task, save=False)
-            try:
-                # start update query batches
-                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-            except OperationalError:
-                logger.error('Operational error while updating tasks: {exc}', exc_info=True)
-                # try to update query batches one more time
-                start_job_async_or_sync(
-                    bulk_update,
-                    tasks,
-                    in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT,
-                    update_fields=['is_labeled'],
-                    batch_size=settings.BATCH_SIZE,
-                )
-
-
 def bulk_update_stats_project_tasks(tasks, project=None):
     # Avoid circular import
     from projects.functions.utils import get_unique_ids_list
 
     bulk_update_is_labeled = load_func(settings.BULK_UPDATE_IS_LABELED)
 
-    if flag_set('fflag_fix_back_plt_802_update_is_labeled_20062025_short', user='auto'):
-        task_ids = get_unique_ids_list(tasks)
+    task_ids = get_unique_ids_list(tasks)
 
-        if not task_ids:
-            return
+    if not task_ids:
+        return
 
-        if project is None:
-            first_task = Task.objects.get(id=task_ids[0])
-            project = first_task.project
+    if project is None:
+        first_task = Task.objects.get(id=task_ids[0])
+        project = first_task.project
 
-        # Set user context so FSM checks work when this runs in an async worker
-        if project.created_by_id:
-            CurrentContext.set_user(project.created_by)
-        bulk_update_is_labeled(task_ids, project)
-    else:
-        return deprecated_bulk_update_stats_project_tasks(tasks, project)
+    # Set user context so FSM checks work when this runs in an async worker
+    if project.created_by_id:
+        CurrentContext.set_user(project.created_by)
+    bulk_update_is_labeled(task_ids, project)
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

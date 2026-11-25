@@ -6,6 +6,7 @@ import {
   type PropsWithChildren,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -58,7 +59,8 @@ const TooltipInner = forwardRef(
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(defaultVisible ? "visible" : null);
     const [injected, setInjected] = useState(false);
-    const [align, setAlign] = useState(alignment ?? "top-center");
+    const requestedAlign = alignment ?? "top-center";
+    const [align, setAlign] = useState(requestedAlign);
 
     const clearHideTimeout = () => {
       if (hideTimeoutRef.current) {
@@ -72,12 +74,25 @@ const TooltipInner = forwardRef(
       const target = tooltipElement.current as HTMLElement | null;
 
       if (isDefined(parent) && isDefined(target)) {
-        const { left, top, align: resultAlign } = alignElements(parent, target, align, 10, false, !disableAutoFlip);
+        const {
+          left,
+          top,
+          align: resultAlign,
+        } = alignElements(parent, target, requestedAlign, 10, false, !disableAutoFlip);
 
         setOffset({ left, top });
         setAlign(resultAlign);
       }
-    }, [align, disableAutoFlip]);
+    }, [requestedAlign, disableAutoFlip]);
+
+    // The alignment's pointer margin can push the box past the viewport edge once it keeps its full width.
+    useLayoutEffect(() => {
+      const target = tooltipElement.current;
+      if (!target || !("left" in offset)) return;
+      const rect = target.getBoundingClientRect();
+      const overflow = Math.max(0, rect.right - document.documentElement.clientWidth) || Math.min(0, rect.left);
+      if (overflow) setOffset((current) => ({ ...current, left: (current as { left: number }).left - overflow }));
+    }, [offset, align]);
 
     const performAnimation = useCallback(
       (visible: boolean) => {
@@ -158,7 +173,7 @@ const TooltipInner = forwardRef(
             </div>
           </div>
         ) : null,
-      [injected, offset, title, visibilityClasses, tooltipElement, performAnimation],
+      [injected, align, offset, title, visibilityClasses, tooltipElement, performAnimation],
     );
 
     useEffect(() => {
@@ -187,11 +202,13 @@ const TooltipInner = forwardRef(
       child.props.onMouseLeave?.(e);
     };
 
+    const childRef = child.ref;
     const clone = cloneElement(child, {
       ...child.props,
       ref(el: any) {
         setRef(triggerElement, el);
         setRef(ref, el);
+        setRef(childRef, el);
       },
       ...(!needFallback ? { onMouseEnter, onMouseLeave } : {}),
     });

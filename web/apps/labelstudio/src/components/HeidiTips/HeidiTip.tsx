@@ -41,7 +41,7 @@ export const HeidiTip: FC<HeidiTipProps> = ({ tip, onDismiss, onLinkClick }) => 
         <div className={cn("heidy-tip").elem("header").toClassName()}>
           <div className={cn("heidy-tip").elem("title").toClassName()}>{tip.title}</div>
           {tip.closable && (
-            <Button tooltip="Don't show" look="string" size="small" onClick={handleClick} className="!p-0">
+            <Button tooltip="Don't show" look="ghost" size="small" onClick={handleClick} className="!p-0">
               <IconCross />
             </Button>
           )}

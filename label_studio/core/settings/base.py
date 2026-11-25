@@ -305,6 +305,8 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 100,
+    # DRF 3.18 switched many=True validation errors to a dict; keep the list format API clients rely on
+    'LIST_SERIALIZER_ERRORS_AS_DICT': False,
 }
 SILENCED_SYSTEM_CHECKS += ['rest_framework.W001']
 
@@ -362,6 +364,8 @@ AUTH_PASSWORD_VALIDATORS = [
             'max_length': AUTH_PASSWORD_MAX_LENGTH,
         },
     },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Django templates
@@ -482,6 +486,10 @@ SPECTACULAR_SETTINGS = {
             ('remove', 'Remove'),
             ('requeue', 'Requeue'),
             ('redistribute', 'Redistribute'),
+        ),
+        'TaskDataColumnValueTypeEnum': (
+            ('String', 'String'),
+            ('Number', 'Number'),
         ),
         # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
         # FIT-2196), which can appear in responses but is never assignable via role APIs.
@@ -687,6 +695,13 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # dir for delayed export
 DELAYED_EXPORT_DIR = 'export'
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
+# Ephemeral incremental exports (FIT-3092): TTL for rqcron GC sweep (LSE cron_config).
+# Without rqcron (default on-prem), ephemeral rows stay unlisted until explicit DELETE.
+EPHEMERAL_EXPORT_TTL_HOURS = int(get_env('EPHEMERAL_EXPORT_TTL_HOURS', 24))
+# Subtract from server-defaulted `until` so long-running writes that commit after the
+# export query starts but stamp Task.updated_at before wall-clock now() are less likely
+# to fall into the gap between consecutive [since, until) windows.
+INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS = int(get_env('INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS', 5))
 
 # file / task size limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
@@ -728,6 +743,9 @@ BATCH_SIZE = 1000
 ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD = int(get_env('ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD', 100))
 # Batch size for updating data columns in the DB using jsonb_set, to not timeout on large projects
 UPDATE_COLUMN_BATCH_SIZE = int(get_env('UPDATE_COLUMN_BATCH_SIZE', 100))
+# POST /api/projects/<id>/tasks/data-column/ writes one value per task synchronously, so each request is bounded
+TASK_DATA_COLUMN_MAX_TASKS = int(get_env('TASK_DATA_COLUMN_MAX_TASKS', 1000))
+TASK_DATA_COLUMN_MAX_VALUE_LENGTH = int(get_env('TASK_DATA_COLUMN_MAX_VALUE_LENGTH', 65536))
 # Maximum number of tasks to process in a single batch during export operations
 MAX_TASK_BATCH_SIZE = int(get_env('MAX_TASK_BATCH_SIZE', 1000))
 # Total size of task data (in bytes) to process per batch - used to calculate dynamic batch sizes
@@ -788,6 +806,12 @@ POST_PROCESS_REIMPORT = 'core.utils.common.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 WHOAMI_USER_SERIALIZER = 'users.serializers.BaseWhoAmIUserSerializer'
 USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
+# Step-up authentication (users/step_up.py): how long a sign-in or password confirmation unlocks
+# credential and privilege actions on a cookie session, and the per-edition hooks
+STEP_UP_MAX_AGE_SECONDS = int(get_env('STEP_UP_MAX_AGE_SECONDS', 300))
+STEP_UP_METHOD = 'users.step_up.step_up_method'
+STEP_UP_CHECK_PASSWORD = 'users.step_up.check_password'
+STEP_UP_REAUTHENTICATE_URL = 'users.step_up.reauthenticate_url'
 ANNOTATOR_REVIEWER_FIREWALL = 'users.firewall.AnnotatorReviewerFirewall'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
@@ -799,6 +823,7 @@ DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
+DATA_MANAGER_COMBINED_FILTER_EXPRESSION = 'data_manager.functions.combined_filter_expression'
 DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
 DATA_MANAGER_LIST_FILTER_MAX_VALUES = int(get_env('DATA_MANAGER_LIST_FILTER_MAX_VALUES', 5000))
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
@@ -925,6 +950,8 @@ IMPORT_STALE_TIMEOUT = float(get_env('IMPORT_STALE_TIMEOUT', 300.0))
 # false fails when status is polled before Redis has registered the just-enqueued job.
 IMPORT_CREATED_NOT_FOUND_GRACE = float(get_env('IMPORT_CREATED_NOT_FOUND_GRACE', 60.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
+# Bounded wait for the project summary row after a task delete; on timeout the decrement goes to a background job.
+PROJECT_SUMMARY_LOCK_TIMEOUT = get_env('PROJECT_SUMMARY_LOCK_TIMEOUT', '500ms')
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
 STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
 
@@ -1005,7 +1032,7 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
 )
 
 # Hostnames whose iframes are allowed to survive the editor's HTML sanitizer
-# (see services/lso/web/libs/editor/src/utils/html.js: sanitizeHtml).
+# (see services/lso/web/libs/editor/src/utils/sanitizeHtml.js: sanitizeHtml).
 # Override with the LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS env var (comma-separated).
 ALLOWED_IFRAME_DOMAINS = get_env_list(
     'ALLOWED_IFRAME_DOMAINS',
@@ -1129,9 +1156,13 @@ QS_ITERATOR_DEFAULT_CHUNK_SIZE = int(get_env('QS_ITERATOR_DEFAULT_CHUNK_SIZE', 1
 DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
+FSM_ENABLED = get_bool_env('FSM_ENABLED', False)
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
 FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
+
+# Projects a user can access in their active organization, as one queryset (LSE adds role/workspace rules)
+ACCESSIBLE_PROJECTS_FUNCTION = 'projects.functions.access.accessible_projects'
 FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_name'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we

@@ -1,7 +1,13 @@
 from unittest.mock import patch
 
+import pytest
+
 from label_studio.core.feature_flags.base import flag_set, flag_set_for_org_id
-from label_studio.core.feature_flags.utils import get_user_repr_from_organization, get_user_repr_from_organization_id
+from label_studio.core.feature_flags.utils import (
+    get_user_repr,
+    get_user_repr_from_organization,
+    get_user_repr_from_organization_id,
+)
 
 
 def test_get_user_repr_from_organization_owner_email_and_org_id(django_user_model):
@@ -15,6 +21,7 @@ def test_get_user_repr_from_organization_owner_email_and_org_id(django_user_mode
                     self.email = email
 
             self.created_by = CreatedBy(email)
+            self.created_by_id = 1
 
     org = Org(123, 'owner@example.com')
 
@@ -41,6 +48,7 @@ def test_flag_set_with_organization_context_env_override(monkeypatch, settings):
                     self.email = email
 
             self.created_by = CreatedBy(email)
+            self.created_by_id = 1
 
     org = Org(42, 'owner@example.com')
 
@@ -77,3 +85,59 @@ def test_flag_set_for_org_id_uses_owner_free_context(mock_variation, monkeypatch
         },
         False,
     )
+
+
+@pytest.mark.django_db
+def test_user_repr_without_organization_owner():
+    """Feature flag contexts must not fail when the organization owner is gone.
+
+    Purpose: flag_set() runs in middleware on every request; a crash there turns any request into a 500.
+    Setup: An organization whose owner is unset (SET_NULL), and one whose owner row was deleted after the
+        organization was loaded (stale created_by_id, as in a concurrent cleanup).
+    Actions: Build the user and organization contexts.
+    Validations: The owner email is None and the organization id is kept; no exception.
+    Edge cases: Both the orphaned (created_by_id=None) and the stale-reference cases.
+    """
+    from organizations.tests.factories import OrganizationFactory
+    from users.tests.factories import UserFactory
+
+    org = OrganizationFactory()
+    member = UserFactory(active_organization=org)
+    org.created_by = None
+
+    member.active_organization = org
+    assert get_user_repr(member)['custom'] == {'organization': None, 'organization_id': org.id}
+    assert get_user_repr_from_organization(org)['custom'] == {'organization': None, 'organization_id': org.id}
+
+    owner = UserFactory()
+    stale_org = OrganizationFactory(created_by=owner)
+    stale_member = UserFactory(active_organization=stale_org)
+    owner_id = owner.pk
+    type(owner).objects.filter(pk=owner_id).delete()
+    stale_org.refresh_from_db()
+    stale_org.created_by_id = owner_id  # the in-memory reference predates the delete
+
+    stale_member.active_organization = stale_org
+    assert get_user_repr(stale_member)['custom'] == {'organization': None, 'organization_id': stale_org.id}
+
+
+@patch('label_studio.core.feature_flags.base.client.variation', return_value=True)
+def test_flag_set_organization_attributes_extend_the_organization_context(mock_variation, monkeypatch, settings):
+    settings.FEATURE_FLAGS_OFFLINE = False
+    settings.FEATURE_FLAGS_DEFAULT_VALUE = False
+    monkeypatch.delenv('fflag_feat_org_attributes', raising=False)
+
+    class Org:
+        id = 7
+        created_by_id = 1
+
+        class created_by:
+            email = 'owner@example.com'
+
+    assert flag_set('fflag_feat_org_attributes', organization=Org, organization_attributes={'early_adopter': False})
+    context = mock_variation.call_args.args[1]
+    assert context['early_adopter'] is False
+    assert context['custom'] == {'organization': 'owner@example.com', 'organization_id': 7}
+
+    flag_set('fflag_feat_org_attributes', organization=Org)
+    assert 'early_adopter' not in mock_variation.call_args.args[1]

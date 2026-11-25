@@ -625,7 +625,7 @@ class TestServeLocalUpload:
 
 
 class TestServeAvatar:
-    """FIT-2832: sandboxed History Userpics need cookie-less avatar bytes."""
+    """FIT-2832: sandboxed History avatars need cookie-less avatar bytes."""
 
     @pytest.fixture
     def setup(self):
@@ -642,16 +642,14 @@ class TestServeAvatar:
         return self.view(request, token=token)
 
     @override_settings(SECRET_KEY=TEST_SECRET_KEY, AVATAR_PATH='avatars')
+    @patch('io_storages.react_code_proxy.can_read_avatar', return_value=True)
     @patch('io_storages.react_code_proxy.Project.objects.get')
     @patch('io_storages.react_code_proxy.get_user_model')
-    def test_serves_avatar_for_org_member(self, mock_get_user_model, mock_project_get, setup):
+    def test_serves_avatar_for_org_member(self, mock_get_user_model, mock_project_get, mock_can_read_avatar, setup):
         import io
 
         UserModel = MagicMock()
         requester = MagicMock()
-        org = MagicMock()
-        org.has_user.return_value = True
-        requester.active_organization = org
         UserModel.objects.get.return_value = requester
 
         owner = MagicMock()
@@ -674,17 +672,17 @@ class TestServeAvatar:
         assert response['Content-Type'] == 'image/jpeg'
         assert _response_bytes(response) == b'\xff\xd8\xff\xe0'
         UserModel.objects.filter.assert_called_once_with(avatar='avatars/uuid-photo.jpg')
-        org.has_user.assert_called_once_with(owner)
+        mock_can_read_avatar.assert_called_once_with(requester, owner)
 
     @override_settings(SECRET_KEY=TEST_SECRET_KEY, AVATAR_PATH='avatars')
+    @patch('io_storages.react_code_proxy.can_read_avatar', return_value=False)
     @patch('io_storages.react_code_proxy.Project.objects.get')
     @patch('io_storages.react_code_proxy.get_user_model')
-    def test_forbids_avatar_outside_requester_org(self, mock_get_user_model, mock_project_get, setup):
+    def test_forbids_avatar_outside_requester_org(
+        self, mock_get_user_model, mock_project_get, mock_can_read_avatar, setup
+    ):
         UserModel = MagicMock()
         requester = MagicMock()
-        org = MagicMock()
-        org.has_user.return_value = False
-        requester.active_organization = org
         UserModel.objects.get.return_value = requester
         UserModel.objects.filter.return_value.first.return_value = MagicMock()
         mock_get_user_model.return_value = UserModel

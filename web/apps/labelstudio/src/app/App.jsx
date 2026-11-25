@@ -13,6 +13,7 @@ import { ProjectProvider } from "../providers/ProjectProvider";
 import { RoutesProvider } from "../providers/RoutesProvider";
 import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
+import { UNBLOCK_HISTORY_MESSAGE } from "./constants";
 import ErrorBoundary from "./ErrorBoundary";
 import { TourProvider } from "@humansignal/core";
 import { ToastProvider, ToastViewport } from "@humansignal/ui";
@@ -27,7 +28,6 @@ import "./App.prefix.css";
 import { AuthProvider } from "@humansignal/core/providers/AuthProvider";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
-export const UNBLOCK_HISTORY_MESSAGE = "UNBLOCK_HISTORY";
 
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",

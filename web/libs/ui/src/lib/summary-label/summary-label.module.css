@@ -1,0 +1,46 @@
+.root {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.wrap {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.item {
+  flex: none;
+  /* pre, not nowrap: the separator's trailing space ends each item's line, and nowrap would collapse it. */
+  white-space: pre;
+}
+
+/* The last value that shows takes the remaining width and cuts with an ellipsis before the count. */
+.last {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hidden {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.count {
+  flex: none;
+  white-space: nowrap;
+  color: var(--color-neutral-content-subtler);
+}
+
+.measure {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}

@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  gitleaks:
+  trufflehog:
     name: "Linter"
-    uses: ./.github/workflows/gitleaks.yml
+    uses: ./.github/workflows/trufflehog.yml
     with:
       head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -86,7 +86,7 @@ jobs:
     name: "Ready to ship"
     if: always()
     needs:
-      - gitleaks
+      - trufflehog
       - bandit
       - ruff
       - biome
@@ -100,5 +100,5 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf
+          allowed-skips: trufflehog, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf
           jobs: ${{ toJSON(needs) }}

@@ -5,7 +5,7 @@ import { Button } from "../button/button";
 
 export type CollapsiblePanelProps = {
   /** Visual variant of the panel */
-  variant?: "primary" | "default";
+  variant?: "primary" | "neutral" | "positive";
   /** Panel title */
   title: ReactNode;
   /** Optional count badge/number to display */
@@ -18,6 +18,8 @@ export type CollapsiblePanelProps = {
   className?: string;
   /** Whether the panel starts expanded */
   defaultExpanded?: boolean;
+  /** Keep controls mounted while collapsed to preserve drafts and expensive viewer state. */
+  keepMounted?: boolean;
   /** Controlled expanded state */
   expanded?: boolean;
   /** Callback when expanded state changes */
@@ -31,13 +33,14 @@ export type CollapsiblePanelProps = {
 };
 
 export const CollapsiblePanel = ({
-  variant = "default",
+  variant = "neutral",
   title,
   count,
   actions,
   children,
   className,
   defaultExpanded = true,
+  keepMounted = false,
   expanded: controlledExpanded,
   onExpandedChange,
   disableToggle = false,
@@ -68,9 +71,13 @@ export const CollapsiblePanel = ({
       container: "border-primary-border-subtlest",
       header: "bg-primary-background hover:bg-primary-background-hover",
     },
-    default: {
+    neutral: {
       container: "border-neutral-border",
       header: "bg-neutral-surface hover:bg-neutral-surface-hover",
+    },
+    positive: {
+      container: "border-positive-border-subtlest",
+      header: "bg-positive-background hover:bg-positive-emphasis",
     },
   };
 
@@ -78,7 +85,7 @@ export const CollapsiblePanel = ({
 
   return (
     <div
-      className={cn("flex flex-col border rounded-md overflow-hidden shrink-0", styles.container, className)}
+      className={cn("flex flex-col border rounded-small overflow-hidden shrink-0", styles.container, className)}
       data-testid={dataTestId}
     >
       {/* Header - Always visible */}
@@ -95,7 +102,7 @@ export const CollapsiblePanel = ({
         <Button
           type="button"
           variant="neutral"
-          look="string"
+          look="ghost"
           size="small"
           className={cn(
             "flex items-center justify-center text-neutral-content-subtle transition-colors",
@@ -132,8 +139,8 @@ export const CollapsiblePanel = ({
       </div>
 
       {/* Content - Collapsible */}
-      {isExpanded && children && (
-        <div className="border-t border-inherit" data-testid="collapsible-panel-content">
+      {(isExpanded || keepMounted) && children && (
+        <div hidden={!isExpanded} className="border-t border-inherit" data-testid="collapsible-panel-content">
           {children}
         </div>
       )}

@@ -15,9 +15,9 @@ describe("AiChatLoading", () => {
   });
 
   it("applies variant class for dots pattern", () => {
-    render(<AiChatLoading label="Loading" variant="dots" data-testid="ai-chat-loading" />);
+    render(<AiChatLoading label="Loading" animation="dots" data-testid="ai-chat-loading" />);
     const root = screen.getByTestId("ai-chat-loading");
-    expect(root.querySelector("[data-variant='dots']")).toBeInTheDocument();
+    expect(root.querySelector("[data-animation='dots']")).toBeInTheDocument();
   });
 
   it("accepts custom className", () => {
@@ -29,6 +29,6 @@ describe("AiChatLoading", () => {
 describe("AiChatLoadingIcon", () => {
   it("defaults to the dots variant for highwater rows", () => {
     render(<AiChatLoadingIcon />);
-    expect(screen.getByTestId("ai-chat-loading-icon")).toHaveAttribute("data-variant", "dots");
+    expect(screen.getByTestId("ai-chat-loading-icon")).toHaveAttribute("data-animation", "dots");
   });
 });

@@ -3,7 +3,7 @@ import { EnterpriseUpgradeOverlay } from "./enterprise-upgrade-overlay";
 
 const meta: Meta<typeof EnterpriseUpgradeOverlay> = {
   component: EnterpriseUpgradeOverlay,
-  title: "UI/EnterpriseUpgradeOverlay",
+  title: "Product/EnterpriseUpgradeOverlay",
   argTypes: {
     title: { control: "text" },
     description: { control: "text" },

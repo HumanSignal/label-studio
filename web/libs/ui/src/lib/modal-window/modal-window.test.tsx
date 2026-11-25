@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent, act } from "@testing-library/react"
 import "@testing-library/jest-dom";
 import { useState } from "react";
 import type { ComponentProps } from "react";
-import { Dialog, ModalWindow } from "./modal-window";
+import { ModalWindow } from "./modal-window";
 import { Button } from "../button/button";
 
 function ControlledModal(
@@ -76,6 +76,22 @@ describe("ModalWindow", () => {
       },
       { timeout: 5000 },
     );
+  });
+
+  it("stays open on Escape when onEscapeKeyDown prevents it", async () => {
+    const onOpenChange = mock<(open: boolean) => void>();
+    const onEscapeKeyDown = mock((event: KeyboardEvent) => event.preventDefault());
+    render(
+      <ModalWindow open onOpenChange={onOpenChange} onEscapeKeyDown={onEscapeKeyDown} title="Keep me" animate={false}>
+        <div>Content</div>
+      </ModalWindow>,
+    );
+
+    fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape", bubbles: true, cancelable: true });
+
+    expect(onEscapeKeyDown).toHaveBeenCalledTimes(1);
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByRole("dialog", { name: "Keep me" })).toBeInTheDocument();
   });
 
   it("closes when close button is activated", async () => {
@@ -208,55 +224,117 @@ describe("ModalWindow", () => {
     expect(screen.getByTestId("modal-window")).toHaveClass("max-w-6xl");
   });
 
-  it("sets data-variant and centered layout for variant dialog", async () => {
+  it("sets data-placement and centered layout for placement center", async () => {
     render(
-      <ControlledModal title="Confirm" variant="dialog" animate={false} initiallyOpen>
+      <ControlledModal title="Confirm" placement="center" animate={false} initiallyOpen>
         <div>OK</div>
       </ControlledModal>,
     );
 
     const panel = screen.getByTestId("modal-window");
-    expect(panel).toHaveAttribute("data-variant", "dialog");
+    expect(panel).toHaveAttribute("data-placement", "center");
     expect(panel).toHaveClass("top-1/2");
     expect(panel).toHaveClass("left-1/2");
     expect(panel).toHaveClass("-translate-x-1/2");
     expect(panel).toHaveClass("-translate-y-1/2");
   });
 
-  it("defaults to workflow variant on the panel", async () => {
+  it("defaults to the top placement on the panel", async () => {
     render(
       <ControlledModal title="Workflow" initiallyOpen>
         <div>Body</div>
       </ControlledModal>,
     );
 
-    expect(screen.getByTestId("modal-window")).toHaveAttribute("data-variant", "workflow");
+    expect(screen.getByTestId("modal-window")).toHaveAttribute("data-placement", "top");
   });
 
-  it("renders Dialog export as centered dialog variant", async () => {
-    function ControlledDialog(
-      props: Omit<ComponentProps<typeof Dialog>, "open" | "onOpenChange"> & { initiallyOpen?: boolean },
-    ) {
-      const { initiallyOpen, ...rest } = props;
-      const [open, setOpen] = useState(initiallyOpen ?? false);
-      return (
-        <>
-          <Button onClick={() => setOpen(true)} data-testid="open-dialog-btn">
-            Open
-          </Button>
-          <Dialog {...rest} open={open} onOpenChange={setOpen} />
-        </>
-      );
-    }
-
+  it("centers the panel with placement center", () => {
     render(
-      <ControlledDialog title="Dialog export" initiallyOpen>
+      <ModalWindow open title="Centered" placement="center">
         <div>Content</div>
-      </ControlledDialog>,
+      </ModalWindow>,
     );
 
     const panel = screen.getByTestId("modal-window");
-    expect(panel).toHaveAttribute("data-variant", "dialog");
+    expect(panel).toHaveAttribute("data-placement", "center");
     expect(panel).toHaveClass("top-1/2");
+  });
+});
+
+describe("ModalWindowCloseButton", () => {
+  it("closes the dialog from a custom header", async () => {
+    const { ModalWindowCloseButton } = await import("./modal-window");
+    const onOpenChange = mock();
+    render(
+      <ModalWindow
+        open
+        onOpenChange={onOpenChange}
+        title="Import learners"
+        showCloseButton={false}
+        header={
+          <div>
+            Import learners
+            <ModalWindowCloseButton />
+          </div>
+        }
+      >
+        Body
+      </ModalWindow>,
+    );
+
+    fireEvent.click(screen.getByTestId("modal-window-close-button"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});
+
+describe("ModalWindow trapFocus", () => {
+  const renderWithOutside = (props: Partial<ComponentProps<typeof ModalWindow>>) =>
+    render(
+      <>
+        <button type="button" data-testid="behind">
+          Behind
+        </button>
+        <ModalWindow open title="Trap" {...props}>
+          <button type="button" data-testid="inside-first">
+            First
+          </button>
+          <button type="button" data-testid="inside-last">
+            Last
+          </button>
+        </ModalWindow>
+      </>,
+    );
+
+  it("pulls focus that leaves the dialog back inside", async () => {
+    renderWithOutside({ trapFocus: true, showCloseButton: false });
+    screen.getByTestId("inside-first").focus();
+
+    act(() => {
+      screen.getByTestId("behind").focus();
+    });
+
+    await waitFor(() => expect(screen.getByRole("dialog").contains(document.activeElement)).toBe(true));
+  });
+
+  it("still wraps Tab from the last control to the first", () => {
+    renderWithOutside({ trapFocus: true, showCloseButton: false });
+    const last = screen.getByTestId("inside-last");
+    last.focus();
+
+    fireEvent.keyDown(last, { key: "Tab" });
+
+    expect(document.activeElement).toBe(screen.getByTestId("inside-first"));
+  });
+
+  it("lets focus leave a dialog without trapFocus (dropdowns portaled outside keep working)", () => {
+    renderWithOutside({ showCloseButton: false });
+    screen.getByTestId("inside-first").focus();
+
+    act(() => {
+      screen.getByTestId("behind").focus();
+    });
+
+    expect(document.activeElement).toBe(screen.getByTestId("behind"));
   });
 });

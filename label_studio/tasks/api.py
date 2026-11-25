@@ -2,7 +2,6 @@
 
 import logging
 
-from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -20,6 +19,7 @@ from django.utils.functional import cached_property
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from projects.functions.access import can_change_ground_truth, filter_accessible, strip_ground_truth_unless_allowed
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
@@ -329,9 +329,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
 
     def prefetch(self, queryset, request=None):
         ordering = parse_annotations_ordering_request(request)
-        annotations_stub = False
-        if request and flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False) if request else False
 
         if annotations_stub:
             from tasks.ordering import (
@@ -387,10 +385,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         """
         fields = ['drafts', 'predictions', 'annotations']
 
-        # Lazy load annotations behind feature flag (FIT-720)
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=request.user):
-            annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(request.GET, 'annotations_stub', False)
 
         return {
             'resolve_uri': bool_from_request(request.GET, 'resolve_uri', True),
@@ -464,9 +459,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         review = bool_from_request(self.request.GET, 'review', False)
         selected = {'all': False, 'included': [self.kwargs.get('pk')]}
 
-        annotations_stub = False
-        if flag_set('fflag_fix_all_fit_720_lazy_load_annotations', user=self.request.user):
-            annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
+        annotations_stub = bool_from_request(self.request.GET, 'annotations_stub', False)
 
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
@@ -751,6 +744,9 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(GET=all_permissions.tasks_view)
     queryset = Task.objects.all()
 
+    def check_summary_access(self, request, task):
+        """Hook for extra access checks once the task exists and the user is a project member."""
+
     def get(self, request, pk):
         include_predictions = bool_from_request(request.GET, 'include_predictions', False)
 
@@ -762,6 +758,7 @@ class TaskSummaryAPI(generics.RetrieveAPIView):
         # Check project access using LSO's native permission check
         if not task.project.has_permission(request.user):
             raise PermissionDenied('You do not have permission to view this task')
+        self.check_summary_access(request, task)
 
         # Fetch annotations with user info for the summary panel
         annotation_objs = list(
@@ -1015,6 +1012,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         # clients resend the current author, who may have left the organization since
         if completed_by is not None and completed_by.id != annotation.completed_by_id:
             check_annotation_author(annotation.project, completed_by)
+        strip_ground_truth_unless_allowed(serializer.validated_data, self.request.user, annotation.project)
         super().perform_update(serializer)
 
     def update(self, request, *args, **kwargs):
@@ -1024,7 +1022,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         Annotation.objects.filter(id=annotation.id).update(updated_by=request.user)
 
         task = annotation.task
-        if self.request.data.get('ground_truth'):
+        if self.request.data.get('ground_truth') and can_change_ground_truth(request.user, annotation.project):
             task.ensure_unique_groundtruth(annotation_id=annotation.id)
         task.update_is_labeled()
         task.save()  # refresh task metrics
@@ -1137,13 +1135,17 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
     def get_queryset(self):
-        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
-        return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+        user = self.request.user
+        task = generics.get_object_or_404(Task.objects.for_user(user), pk=self.kwargs.get('pk', 0))
+        # list() never runs Annotation.has_permission: check the task, then filter rows the same way
+        if not task.has_permission(user):
+            raise PermissionDenied(f"You don't have permission for task {task.id}")
+        annotations = Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
+        return Annotation.restrict_to_own_work(annotations, user, task.project)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        # Only needed for annotation create/update validation; avoid parent_object
-        # permission checks on GET list (url_smoke expects annotator list = 200).
+        # Only needed for annotation create/update validation; GET checks the task in get_queryset.
         if self.request.method != 'GET':
             context['task'] = self.parent_object
         return context
@@ -1166,6 +1168,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
 
         check_annotation_parents(task, ser.validated_data)
         check_annotation_author(task.project, ser.validated_data.get('completed_by'))
+        strip_ground_truth_unless_allowed(ser.validated_data, user, task.project)
 
         # Check if task is being skipped and if it's allowed
         was_cancelled_get = bool_from_request(self.request.GET, 'was_cancelled', False)
@@ -1226,7 +1229,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
             self.delete_draft(draft_id, annotation.id)
 
-        if self.request.data.get('ground_truth'):
+        if annotation.ground_truth:
             annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
         fill_history_annotation(user, task, annotation)
@@ -1251,7 +1254,9 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         return task
 
     def get_queryset(self):
-        return AnnotationDraft.objects.filter(task=self.task)
+        drafts = AnnotationDraft.objects.filter(task=self.task)
+        # list() never runs AnnotationDraft.has_permission: annotators only list their own drafts
+        return Annotation.restrict_to_own_work(drafts, self.request.user, self.task.project, author_field='user')
 
     def perform_create(self, serializer):
         task = self.task
@@ -1440,7 +1445,8 @@ class PredictionAPI(viewsets.ModelViewSet):
     filterset_fields = ['task', 'task__project', 'project']
 
     def get_queryset(self):
-        return Prediction.objects.filter(project__organization=self.request.user.active_organization)
+        # list() never runs Prediction.has_permission, so scope rows to accessible projects here
+        return filter_accessible(Prediction.objects.all(), self.request.user)
 
     def get_serializer(self, *args, **kwargs):
         serializer = super().get_serializer(*args, **kwargs)

@@ -21,7 +21,7 @@ import SelectedChoiceMixin from "../../../mixins/SelectedChoiceMixin";
 import { SharedStoreMixin } from "../../../mixins/SharedChoiceStore/mixin";
 import VisibilityMixin from "../../../mixins/Visibility";
 import { parseValue } from "../../../utils/data";
-import { FF_LSDV_4583, isFF } from "../../../utils/feature-flags";
+import { isFF } from "../../../utils/feature-flags";
 import { FF_ECHO_466_TAXONOMY_ANTD_REMOVAL } from "@humansignal/core/lib/utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
@@ -605,7 +605,7 @@ const TaxonomyModel = types.compose(
   Model,
   SharedStoreMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   TaxonomyLabelingResult,
   ReadOnlyControlMixin,
   SelectedChoiceMixin,
@@ -679,7 +679,7 @@ const HtxTaxonomy = observer(({ item }) => {
     return (
       <div className={className} style={visibleStyle}>
         <div className={cn("taxonomy").elem("loading").toClassName()} data-testid="taxonomy-loading">
-          <Spinner size={20} />
+          <Spinner size="smaller" />
         </div>
       </div>
     );

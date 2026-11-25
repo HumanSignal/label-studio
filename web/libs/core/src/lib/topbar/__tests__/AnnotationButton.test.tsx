@@ -140,6 +140,26 @@ describe("shared AnnotationButton", () => {
     expect(screen.getByText("Delete Prediction")).toBeInTheDocument();
   });
 
+  it("shows Duplicate disabled with its reason when the capability carries one", async () => {
+    const handlers = makeHandlers();
+    const annotation = makeAnnotation({ type: "annotation", pk: "7" });
+    render(
+      <AnnotationButton
+        annotation={annotation}
+        capabilities={{ ...fullCapabilities, duplicateDisabledReason: "Not available on file submission tasks" }}
+        handlers={handlers}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("annotation-button-menu-trigger"));
+    const item = screen.getByTestId("annotation-button-menu-duplicate");
+    expect(item).toHaveTextContent("Duplicate Annotation");
+    expect(item).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(item);
+    expect(handlers.onDuplicate).not.toHaveBeenCalled();
+    fireEvent.mouseEnter(item);
+    expect(await screen.findByText("Not available on file submission tasks")).toBeInTheDocument();
+  });
+
   it("uses Annotation labels for an annotation entity", () => {
     const handlers = makeHandlers();
     const annotation = makeAnnotation({ type: "annotation", pk: "7" });

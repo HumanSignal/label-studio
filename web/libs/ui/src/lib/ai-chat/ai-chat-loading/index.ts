@@ -3,5 +3,5 @@ export {
   AiChatLoadingIcon,
   type AiChatLoadingIconProps,
   type AiChatLoadingProps,
-  type AiChatLoadingVariant,
+  type AiChatLoadingAnimation,
 } from "./ai-chat-loading";

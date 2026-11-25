@@ -2,6 +2,7 @@ import { mock, describe, it, expect, beforeEach, afterEach, spyOn } from "bun:te
 import { destroy, types } from "mobx-state-tree";
 import { AppStore } from "./AppStore";
 import { History } from "../utils/history";
+import * as datamanagerTelemetry from "../utils/datamanagerTelemetry";
 
 describe("AppStore setTask annotation matching (FIT-1949)", () => {
   let store;
@@ -363,5 +364,65 @@ describe("AppStore project timer poll (FIT-2914)", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(project).not.toHaveBeenCalled();
+  });
+});
+
+describe("AppStore invokeAction telemetry (FIT-3264)", () => {
+  let store;
+  let mockView;
+  let emitSpy;
+
+  const TestAppStore = AppStore.views(() => ({
+    get currentView() {
+      return mockView;
+    },
+  }));
+
+  beforeEach(() => {
+    mockView = {
+      id: 7,
+      virtual: false,
+      selectedCount: 3,
+      ordering: null,
+      serializedFilters: [],
+      conjunction: "and",
+      selected: { snapshot: { all: false, included: [1, 2, 3] } },
+      reload: mock(() => Promise.resolve()),
+      clearSelection: mock(() => {}),
+      unlock: mock(() => {}),
+      lock: mock(() => {}),
+    };
+
+    store = TestAppStore.create({ toolbar: "" });
+
+    store._sdk = {
+      getAction: () => undefined,
+      invoke: mock(() => {}),
+      api: {
+        invokeAction: mock(() => Promise.resolve({ reload: false })),
+        project: mock(() => Promise.resolve({})),
+      },
+    };
+    emitSpy = spyOn(datamanagerTelemetry, "emitDatamanagerTabEvent").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    emitSpy.mockRestore();
+  });
+
+  it("records a bulk action with its outcome and selection size", async () => {
+    await store.invokeAction("delete_tasks");
+
+    expect(emitSpy).toHaveBeenCalledWith(
+      mockView,
+      "dm_action_invoked",
+      expect.objectContaining({ action_id: "delete_tasks", select_all: false, selected_count: 3, success: true }),
+    );
+  });
+
+  it("does not count next_task, which the label stream calls for every task", async () => {
+    await store.invokeAction("next_task", { reload: false });
+
+    expect(emitSpy).not.toHaveBeenCalledWith(mockView, "dm_action_invoked", expect.anything());
   });
 });

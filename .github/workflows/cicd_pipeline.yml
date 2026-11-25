@@ -105,10 +105,10 @@ jobs:
             });
             core.setOutput("membership", membership.state);
 
-  gitleaks:
+  trufflehog:
     name: "Linter"
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/gitleaks.yml
+    uses: ./.github/workflows/trufflehog.yml
     with:
       head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -469,7 +469,7 @@ jobs:
     name: "Ready to merge"
     if: always()
     needs:
-      - gitleaks
+      - trufflehog
       - bandit
       - ruff
       - biome
@@ -484,10 +484,10 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
+          allowed-skips: trufflehog, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
           allowed-failures: |
             [
-              "gitleaks",
+              "trufflehog",
               "cursor-review",
             ]
           jobs: ${{ toJSON(needs) }}

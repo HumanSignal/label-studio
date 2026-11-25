@@ -3,12 +3,12 @@
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection, ModelProviders
 from projects.models import Project
-from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, FailedPrediction, Prediction, PredictionMeta
 
 logger = logging.getLogger(__name__)
@@ -267,10 +267,13 @@ class ModelRun(models.Model):
         # affected tasks here so callers (ModelRun.delete, ModelVersion.delete,
         # prompt-version destroy) cannot leave the Data Manager counter stale.
         if task_ids:
-            from tasks.functions import update_tasks_counters
+            from tasks.functions import touch_tasks_updated_at, update_tasks_counters
             from tasks.models import Task
 
             update_tasks_counters(Task.objects.filter(id__in=task_ids))
+            # Predictions are part of the task export payload: bump Task.updated_at so incremental
+            # exports (FIT-3092) re-export these tasks without the deleted predictions.
+            touch_tasks_updated_at(task_ids)
 
         # LSE postprocess (e.g. recompute dimension scores)
         from core.utils.common import load_func

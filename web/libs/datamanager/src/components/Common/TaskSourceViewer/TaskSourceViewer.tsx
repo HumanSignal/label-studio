@@ -1,6 +1,5 @@
 import { type ChangeEvent, type FC, useEffect, useMemo, useState, useCallback } from "react";
 import { JsonViewer, type FilterConfig, Toggle } from "@humansignal/ui";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { CodeView } from "./CodeView";
 import styles from "./TaskSourceViewer.module.css";
 import { ViewToggle, type ViewMode } from "./ViewToggle";
@@ -27,8 +26,6 @@ export interface TaskSourceViewerProps {
   content: any;
   /** Function to load full task data */
   onTaskLoad: (options?: TaskLoadOptions) => Promise<any>;
-  /** SDK type (e.g., "DE" for Data Explorer) */
-  sdkType?: string;
   /** Storage key for project-scoped persistence (JSON viewer search/filters and Resolve URIs). View mode stays global. */
   storageKey?: string;
   /** Render toggle in external location (e.g., modal header) */
@@ -69,13 +66,7 @@ const TASK_SOURCE_FILTERS: FilterConfig[] = [
  * Loads task data and provides either code view or interactive JSON viewer.
  * Specific to the Data Manager and should not be part of the reusable UI library.
  */
-export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
-  content,
-  onTaskLoad,
-  sdkType,
-  storageKey,
-  renderToggle,
-}) => {
+export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({ content, onTaskLoad, storageKey, renderToggle }) => {
   const [taskData, setTaskData] = useState(content);
   const [loading, setLoading] = useState(true);
 
@@ -101,13 +92,9 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
       const formatted: any = {
         id: response.id,
         data: response.data,
+        annotations: response.annotations ?? [],
+        predictions: response.predictions ?? [],
       };
-
-      // Don't include annotations/predictions for Data Explorer
-      if (sdkType !== "DE" && !isFF(FF_LOPS_E_3)) {
-        formatted.annotations = response.annotations ?? [];
-        formatted.predictions = response.predictions ?? [];
-      }
 
       if (response.state) {
         formatted.state = response.state;
@@ -116,7 +103,7 @@ export const TaskSourceViewer: FC<TaskSourceViewerProps> = ({
       setTaskData(formatted);
       setLoading(false);
     });
-  }, [onTaskLoad, sdkType, resolveUrls]);
+  }, [onTaskLoad, resolveUrls]);
 
   // Handle resolve URIs toggle change
   const handleResolveUrlsChange = useCallback(

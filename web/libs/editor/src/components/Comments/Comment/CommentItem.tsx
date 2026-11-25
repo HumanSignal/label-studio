@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import type React from "react";
 import { type FC, useCallback, useContext, useMemo, useState } from "react";
-import { Tooltip, Userpic } from "@humansignal/ui";
+import { Tooltip, Avatar } from "@humansignal/ui";
 import { IconCheck, IconEllipsis } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
@@ -175,7 +175,8 @@ export const CommentItem: FC<CommentItemProps> = observer(
       >
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Userpic
+            <Avatar
+              size="medium"
               className={cn("comment-item").elem("userpic").toClassName()}
               user={hiddenUser ?? createdBy}
               showUsernameTooltip
@@ -231,7 +232,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   <Button
                     onClick={() => deleteComment()}
                     size="small"
-                    look="danger"
+                    variant="negative"
                     autoFocus
                     aria-label="Delete comment"
                   >
@@ -302,7 +303,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   </Menu>
                 }
               >
-                <Button size="small" look="string" icon={<IconEllipsis />} aria-label="Comment options" />
+                <Button size="small" look="ghost" icon={<IconEllipsis />} aria-label="Comment options" />
               </Dropdown.Trigger>
             )}
           </div>

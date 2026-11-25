@@ -1,8 +1,8 @@
 import insertAfter from "insert-after";
 import * as Checkers from "./utilities";
-import sanitizeHTML from "sanitize-html";
 import Canvas from "./canvas";
 import { cn } from "./bem";
+import { DEFAULT_ALLOWED_IFRAME_DOMAINS, sanitizeHtml } from "./sanitizeHtml";
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {
@@ -510,113 +510,6 @@ function findNodeAt(context, at) {
       node = node.nextSibling;
     }
   }
-}
-
-/**
- * Default allowlist of iframe domains permitted by the HTML sanitizer.
- *
- * Used as a fallback when `window.APP_SETTINGS.allowed_iframe_domains` is not
- * provided (e.g. standalone editor, unit tests, SSR). In production the value
- * is rendered into the page by Django via `settings.ALLOWED_IFRAME_DOMAINS`,
- * configurable through the `LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS` env var.
- *
- * Keep this list in sync with `ALLOWED_IFRAME_DOMAINS` in
- * `services/lso/label_studio/core/settings/base.py`.
- *
- * @type {string[]}
- */
-const DEFAULT_ALLOWED_IFRAME_DOMAINS = [
-  "www.youtube.com",
-  "youtube.com",
-  "www.youtube-nocookie.com",
-  "youtube-nocookie.com",
-  "youtu.be",
-  "www.canva.com",
-  "canva.com",
-];
-
-function getAllowedIframeDomains() {
-  const fromSettings =
-    (typeof window !== "undefined" && window.APP_SETTINGS && window.APP_SETTINGS.allowed_iframe_domains) || null;
-  if (Array.isArray(fromSettings) && fromSettings.length > 0) return fromSettings;
-  return DEFAULT_ALLOWED_IFRAME_DOMAINS;
-}
-
-/**
- * Sanitize html from scripts and iframes
- * @param {string} html
- * @returns {string}
- */
-function sanitizeHtml(html = []) {
-  if (!html) return "";
-
-  const ALLOWED_IFRAME_DOMAINS = getAllowedIframeDomains();
-
-  // Helper function to validate if iframe src is from an allowed domain
-  const isAllowedIframeSrc = (src) => {
-    if (!src) {
-      return false;
-    }
-
-    try {
-      const url = new URL(src);
-      // Only allow HTTPS for security
-      if (url.protocol !== "https:") {
-        return false;
-      }
-      // Check if hostname matches any allowed domain
-      const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
-      return isAllowed;
-    } catch (_e) {
-      // Invalid URL format
-      return false;
-    }
-  };
-
-  const disallowedTags = {
-    script: true,
-    iframe: true,
-  };
-
-  const result = sanitizeHTML(html, {
-    allowedTags: false,
-    allowedAttributes: false,
-    disallowedTagsMode: "discard",
-    allowVulnerableTags: true,
-    exclusiveFilter(frame) {
-      // For iframes, only block if NOT from whitelisted domain
-      if (frame.tag === "iframe") {
-        const src = frame.attribs?.src;
-        return !isAllowedIframeSrc(src);
-      }
-
-      // Check other disallowed tags
-      return disallowedTags[frame.tag];
-    },
-    nonTextTags: ["script", "textarea", "option", "noscript"],
-    transformTags: {
-      iframe: (tagName, attribs) => {
-        return {
-          tagName,
-          attribs,
-        };
-      },
-      "*": (tagName, attribs) => {
-        Object.keys(attribs).forEach((attr) => {
-          // Browsers treat every on* attribute as an event handler, so a fixed list always misses some
-          if (/^on/i.test(attr)) {
-            delete attribs[attr];
-          }
-        });
-        return {
-          tagName,
-          attribs,
-        };
-      },
-    },
-  });
-
-  return result;
 }
 
 export {

@@ -6,7 +6,6 @@ import Tree from "../core/Tree";
 import { AnnotationMixin } from "../mixins/AnnotationMixin";
 import { isNodeVisibleForItem } from "../mixins/Visibility";
 import { isDefined } from "../utils/utilities";
-import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 
 const resultTypes = [
   "labels",
@@ -421,7 +420,7 @@ const Result = types
 
       if (self.isSelfReadOnly()) data.readonly = true;
 
-      if (isFF(FF_LSDV_4583) && isDefined(self.area.item_index)) {
+      if (isDefined(self.area.item_index)) {
         data.item_index = self.area.item_index;
       }
 

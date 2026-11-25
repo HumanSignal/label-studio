@@ -381,12 +381,6 @@ describe("BrushRegion", () => {
       expect(isStateTreeNode(result.value.touches[0])).toBe(false);
     });
 
-    it("serialize() without fast returns null when stage is unavailable", () => {
-      root.image.setStageRef(null);
-      const result = region.serialize();
-      expect(result).toBeNull();
-    });
-
     it("serialize() without fast returns createSerializedResult when Region2RLE returns non-empty", () => {
       region.beginPath({ type: "add", strokeWidth: 25 });
       region.addPoint(0, 0);

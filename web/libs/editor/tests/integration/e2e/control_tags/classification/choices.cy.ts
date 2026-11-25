@@ -15,9 +15,6 @@ import {
   perItemChoicesResult,
   requiredPerItemMIGChoicesConfig,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Choices /> */
 describe("Classification - single image - Choices", () => {

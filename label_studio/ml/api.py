@@ -90,8 +90,8 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         return ml_backends
 
     def create(self, request, *args, **kwargs):
-        # MLBackendSerializer.validate() calls setup() on the submitted URL, handing it the
-        # project creator's API token, so authorize the target project before that runs.
+        # MLBackendSerializer.validate() calls setup() on the submitted URL, sending it the
+        # project's labeling config, so authorize the target project before that runs.
         try:
             project = Project.objects.filter(pk=request.data.get('project')).first()
         except (AttributeError, TypeError, ValueError):

@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { Stepper, type StepperStep } from "@humansignal/ui";
-import { useModalControls } from "@humansignal/ui/lib/modal";
 import { ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
 import { FormHeader } from "./components/form-header";
 import { FormFooter } from "./components/form-footer";
@@ -8,6 +7,7 @@ import { useStorageForm } from "./hooks/useStorageForm";
 import { useStorageApi } from "./hooks/useStorageApi";
 import { step1Schema, getProviderSchema } from "./schemas";
 import { addProvider } from "./providers";
+import { emitAppCommonEvent } from "../../utils/appCommonTelemetry";
 import type { ProviderConfig } from "./types/provider";
 import { InlineError } from "apps/labelstudio/src/components/Error/InlineError";
 
@@ -32,7 +32,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     { onSubmit, target, project, storage, title, storageTypes, providers, defaultValues, onClose = () => {}, onHide },
     ref,
   ) => {
-    const modal = useModalControls();
     const [type, setType] = useState<string | undefined>(storage?.type || storage?.provider || "s3");
     const [filesPreview, setFilesPreview] = useState<any[] | null>(null);
     const [connectionChecked, setConnectionChecked] = useState(false);
@@ -43,7 +42,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       setConnectionChecked(false);
       setType("s3");
       onClose();
-      modal?.hide();
     };
 
     // Initialize providers first
@@ -192,7 +190,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
           setConnectionChecked(false);
           setType("s3");
           onClose();
-          modal?.hide();
         },
       });
 
@@ -202,6 +199,12 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       handleProviderFieldChange(name, value, () => {
         setFilesPreview(null);
         setConnectionChecked(false);
+      });
+      emitAppCommonEvent("storage_provider_selected", {
+        surface: "project_setup",
+        provider: value,
+        target,
+        project_id: project ?? null,
       });
     };
 
@@ -241,9 +244,25 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         onSuccess: (response) => {
           const isSuccess = response?.$meta?.ok || response?.$meta?.status === 200;
           setConnectionChecked(isSuccess);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: Boolean(isSuccess),
+            status: response?.$meta?.status ?? null,
+          });
         },
         onError: () => {
           setConnectionChecked(false);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: false,
+            status: null,
+          });
         },
       });
     };

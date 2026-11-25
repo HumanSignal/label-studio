@@ -4,7 +4,13 @@ import { destroy, types, unprotect } from "mobx-state-tree";
 import { afterEach, describe, expect, it, mock } from "bun:test";
 import { observer } from "mobx-react";
 import { TabStore } from "../../../stores/Tabs/store";
-import { FilterLine, UnavailableFilterNotice, formatConjunctionLabel, isFilterEditingDisabled } from "./FilterLine";
+import {
+  FilterLine,
+  UnavailableFilterNotice,
+  childFilterScopeHint,
+  formatConjunctionLabel,
+  isFilterEditingDisabled,
+} from "./FilterLine";
 import { useRecentFilters } from "../../../hooks/useRecentFilters";
 import { filtersToPickerGroups } from "../../Common/ColumnPicker";
 
@@ -769,6 +775,7 @@ const reviewsColumnsRaw = [
     type: "List",
     target: "tasks",
     parent: "reviews",
+    help: "User who made the review",
     schema: { multiple: true },
     allowed_child_filters: ["reviewed_at", "annotators", "is_current_verdict"],
     visibility_defaults: { filter: true },
@@ -864,6 +871,21 @@ describe("Reviews filter section", () => {
     );
   });
 
+  it("shows the field help on the parent and the scope hint on the child conjunction", async () => {
+    const setup = createReviewsFilter([
+      { filter: "filter:tasks:reviews.is_current_verdict", operator: "equal", value: true },
+    ]);
+    root = setup.root;
+    const { unmount } = renderFilterLine(setup.view);
+
+    fireEvent.mouseEnter(screen.getByTestId("filter-line-column"));
+    expect(await screen.findByText("User who made the review")).toBeInTheDocument();
+
+    fireEvent.mouseEnter(screen.getByTestId("filter-line-child-conjunction"));
+    expect(await screen.findByText("Applies to the same review as the filter above")).toBeInTheDocument();
+    unmount();
+  });
+
   it("adds the sibling Reviewed at column as a child, not the root column", () => {
     const setup = createReviewsFilter();
     root = setup.root;
@@ -922,5 +944,25 @@ describe("Reviews filter section", () => {
     const operator = within(screen.getAllByTestId("filter-line-operator")[1]).getByRole("button");
     expect(operator).toHaveTextContent("is");
     expect(operator).toBeDisabled();
+  });
+});
+
+describe("childFilterScopeHint", () => {
+  it.each([
+    [
+      { id: "tasks:reviews.reviewed_by", isReviewsFilterColumn: true },
+      "Applies to the same review as the filter above",
+    ],
+    [
+      { id: "tasks:annotations_results_json.sentiment", isAnnotationResultsFilterColumn: true },
+      "Applies to the same annotation as the filter above",
+    ],
+    [
+      { id: "tasks:predictions_results_json.sentiment", isAnnotationResultsFilterColumn: true },
+      "Applies to the same prediction as the filter above",
+    ],
+    [{ id: "tasks:annotators" }, null],
+  ])("%o", (field, expected) => {
+    expect(childFilterScopeHint(field)).toBe(expected);
   });
 });

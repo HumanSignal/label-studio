@@ -123,7 +123,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
       <div className={cn("filters").elem("actions").toClassName()}>
         <Button
           size="small"
-          look="string"
+          look="ghost"
           disabled={isLocked}
           tooltip={isLocked ? lockedTooltip : undefined}
           onClick={() => currentView.createFilter()}
@@ -138,7 +138,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
           {filters.length > 0 && (
             <Button
               size="small"
-              look="string"
+              look="ghost"
               tooltip={copyFeedback ? "Copied!" : "Copy filters as JSON (SDK)"}
               onClick={handleCopyFilters}
               aria-label="Copy filters as JSON for SDK"
@@ -149,7 +149,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
 
           <Button
             size="small"
-            look="string"
+            look="ghost"
             disabled={isLocked}
             tooltip={isLocked ? lockedTooltip : pasteFeedback ? "Pasted!" : "Paste filters from JSON"}
             onClick={handlePasteFilters}
@@ -161,7 +161,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
           {prePasteSnapshot && (
             <Button
               size="small"
-              look="string"
+              look="ghost"
               disabled={isLocked}
               tooltip={isLocked ? lockedTooltip : "Undo paste — restore previous filters"}
               onClick={handleUndoPaste}
@@ -173,7 +173,7 @@ export const Filters = injector(({ store, views, currentView, filters, projectId
 
           {!sidebarEnabled ? (
             <Button
-              look="string"
+              look="ghost"
               size="small"
               tooltip="Pin filters to sidebar"
               onClick={() => views.expandFilters()}

@@ -14,7 +14,6 @@
  * - prompt bar (FIT-2471)
  * - chat shell (FIT-2471)
  */
-export * from "./ai-chat-loading";
 export * from "./ai-chat-thinking";
 export * from "./ai-chat-streaming-message";
 export * from "./ai-chat-tool-activity";

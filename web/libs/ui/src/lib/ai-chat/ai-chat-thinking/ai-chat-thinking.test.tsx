@@ -37,7 +37,7 @@ describe("AiChatThinking", () => {
   it("renders a dots loading icon while status is loading", () => {
     render(<AiChatThinking status="loading" label="Building your interface..." />);
     expect(screen.getByTestId("ai-chat-loading-icon")).toBeInTheDocument();
-    expect(screen.getByTestId("ai-chat-loading-icon")).toHaveAttribute("data-variant", "dots");
+    expect(screen.getByTestId("ai-chat-loading-icon")).toHaveAttribute("data-animation", "dots");
   });
 
   it("does not show the dots loading icon when idle", () => {

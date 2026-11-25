@@ -10,7 +10,14 @@ type ToggleProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">
   description?: string;
   checked?: boolean;
   defaultChecked?: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Draws the error state and sets `aria-invalid`. */
+  invalid?: boolean;
+  /**
+   * With a label: `start` puts the toggle before the label (the default); `end` puts it at the right
+   * edge, for narrow forms where it stays close to its label.
+   */
+  align?: "start" | "end";
   required?: boolean;
   style?: React.CSSProperties;
   disabled?: boolean;
@@ -30,6 +37,8 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       required,
       style,
       alwaysBlue,
+      invalid = false,
+      align = "start",
       ...props
     },
     ref,
@@ -58,6 +67,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             [styles.toggle_disabled]: props.disabled,
             [styles.toggle_checked]: isChecked,
             [styles.toggle_alwaysBlue]: alwaysBlue,
+            [styles.toggle_invalid]: invalid,
           },
           className,
         )}
@@ -69,6 +79,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           className={clsx(styles.toggle__input)}
           type="checkbox"
           checked={isChecked}
+          aria-invalid={invalid || undefined}
           onChange={onChangeHandler}
         />
         <span className={clsx(styles.toggle__indicator)} />
@@ -77,11 +88,11 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
 
     return label ? (
       <Label
-        placement="right"
+        placement={align === "end" ? "left" : "right"}
         required={required}
         text={label}
         description={description}
-        className="gap-2"
+        className={clsx(styles.toggle_label, align === "end" && styles.toggle_alignEnd)}
         {...(labelProps ?? {})}
       >
         {formField}

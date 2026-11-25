@@ -350,6 +350,8 @@ export function ColumnPicker({
   triggerClassName,
   dataTestid,
   footer,
+  onOpen,
+  onClose,
 }) {
   const groups = useMemo(() => {
     if (columns) return columnsToPickerGroups(columns, columnFilter);
@@ -397,6 +399,8 @@ export function ColumnPicker({
       triggerClassName={triggerClassName}
       showGroupActions={multiple}
       footer={footer}
+      onOpen={onOpen}
+      onClose={onClose}
       triggerProps={{
         ...triggerProps,
         style: {

@@ -23,17 +23,9 @@ export interface TaxonomySelectionChipProps {
   onAccentChange?: (code: string, accent: { code: string; label?: string }) => void;
 }
 
-const getCompoundBadgeProps = (
-  isComplete: boolean,
-  highlightIncomplete: boolean,
-): { variant: BadgeVariant; look: "filled" | "outline" } => {
-  if (isComplete) {
-    return { variant: "primary", look: "filled" };
-  }
-  if (highlightIncomplete) {
-    return { variant: "negative", look: "outline" };
-  }
-  return { variant: "warning", look: "outline" };
+const getCompoundBadgeVariant = (isComplete: boolean, highlightIncomplete: boolean): BadgeVariant => {
+  if (isComplete) return "primary";
+  return highlightIncomplete ? "negative" : "warning";
 };
 
 export const TaxonomySelectionChip = ({
@@ -55,7 +47,7 @@ export const TaxonomySelectionChip = ({
   const isLevelComplete = Boolean(selection.level?.trim());
   const isAccentComplete = !usesAccent || Boolean(selection.accent?.code?.trim());
   const isComplete = isLevelComplete && isAccentComplete;
-  const { variant: badgeVariant, look: badgeLook } = getCompoundBadgeProps(isComplete, highlightIncomplete);
+  const badgeVariant = getCompoundBadgeVariant(isComplete, highlightIncomplete);
   const handleClose = onRemove ? () => onRemove(selection.code) : undefined;
 
   if (!isCompound) {
@@ -87,7 +79,6 @@ export const TaxonomySelectionChip = ({
   return (
     <Badge
       variant={badgeVariant}
-      look={badgeLook}
       size="large"
       className={cnm(styles.compoundChip, chipLayout === "stacked" && styles.compoundChipStacked)}
       data-taxonomy-chip-state={isComplete ? "filled" : highlightIncomplete ? "invalid" : "unfilled"}

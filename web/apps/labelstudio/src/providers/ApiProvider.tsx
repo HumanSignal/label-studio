@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useEffect, forwardRef } from "react";
+import { type PropsWithChildren, useCallback, useEffect, forwardRef, useState } from "react";
 import {
   ApiProvider as CoreApiProvider,
   createApiInstance,
@@ -6,11 +6,10 @@ import {
   type FormattedError,
 } from "@humansignal/core";
 import type { ApiResponse } from "@humansignal/core/lib/api-proxy/types";
-import { ErrorWrapper } from "../components/Error/Error";
-import { modal } from "../components/Modal/Modal";
+import { StepUpProvider } from "@humansignal/app-common/components/step-up/step-up-provider";
+import { ErrorDialog, type ErrorDialogContent } from "../components/Error/ErrorDialog";
 import { API_CONFIG } from "../config/ApiConfig";
 import { absoluteURL, isDefined } from "../utils/helpers";
-import { FF_IMPROVE_GLOBAL_ERROR_MESSAGES, isFF } from "../utils/feature-flags";
 import { ToastType, useToast } from "@humansignal/ui";
 import { captureException } from "../config/Sentry";
 
@@ -37,32 +36,19 @@ export type ApiEndpoints = keyof typeof API.methods;
 
 let apiLocked = false;
 
-/**
- * Displays an error modal with the error details.
- */
-const displayErrorModal = (errorDetails: FormattedError) => {
+/** What the error dialog shows for an API error, and whether the user can close it. */
+const apiErrorDialog = (
+  errorDetails: FormattedError | null,
+): { error: ErrorDialogContent | null; closable: boolean } => {
+  if (!errorDetails) return { error: null, closable: true };
   const { isShutdown, title, message, stacktrace, ...formattedError } = errorDetails;
-
-  modal({
-    unique: "network-error",
-    allowClose: !isShutdown,
-    body: isShutdown ? (
-      <ErrorWrapper
-        possum={false}
-        title={"Connection refused"}
-        message={"Server not responding. Is it still running?"}
-      />
-    ) : (
-      <ErrorWrapper
-        {...formattedError}
-        title={title}
-        message={message}
-        stacktrace={isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) ? undefined : stacktrace}
-      />
-    ),
-    simple: true,
-    style: { width: 680 },
-  });
+  if (isShutdown) {
+    return {
+      error: { possum: false, title: "Connection refused", message: "Server not responding. Is it still running?" },
+      closable: false,
+    };
+  }
+  return { error: { ...formattedError, title, message }, closable: true };
 };
 
 /**
@@ -71,6 +57,8 @@ const displayErrorModal = (errorDetails: FormattedError) => {
  */
 export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<string, never>>>(({ children }, ref) => {
   const toast = useToast();
+  const [apiError, setApiError] = useState<FormattedError | null>(null);
+  const errorDialog = apiErrorDialog(apiError);
 
   /**
    * Handles errors with Label Studio-specific logic including:
@@ -97,7 +85,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
       }
 
       // Show toast for 4xx without validation errors
-      if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && is4xx && !containsValidationErrors) {
+      if (is4xx && !containsValidationErrors) {
         toast?.show({
           message: `${errorDetails.title}: ${errorDetails.message}`,
           type: ToastType.error,
@@ -105,7 +93,8 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
         });
       } else {
         // Show modal for validation errors or non-4xx
-        displayErrorModal(errorDetails);
+        // One error dialog at a time: the first stays until the user closes it
+        setApiError((current) => current ?? errorDetails);
       }
     },
     [toast],
@@ -127,7 +116,7 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
     }
 
     // Handle 404 redirects with improved error messages
-    if (isFF(FF_IMPROVE_GLOBAL_ERROR_MESSAGES) && status === 404) {
+    if (status === 404) {
       apiLocked = true;
       let redirectUrl = absoluteURL("/");
 
@@ -155,7 +144,12 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<Record<s
 
   return (
     <CoreApiProvider ref={ref} onError={handleError} onFatalError={handleFatalError}>
-      {children}
+      <StepUpProvider>{children}</StepUpProvider>
+      <ErrorDialog
+        error={errorDialog.error}
+        onClose={errorDialog.closable ? () => setApiError(null) : undefined}
+        dataTestId="api-error-dialog"
+      />
     </CoreApiProvider>
   );
 });

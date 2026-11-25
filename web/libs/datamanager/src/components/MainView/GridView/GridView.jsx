@@ -8,8 +8,6 @@ import { Checkbox, cnm } from "@humansignal/ui";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";
-import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
-import { SkeletonLoader } from "../../Common/SkeletonLoader";
 import { GridViewContext, GridViewProvider } from "./GridPreview";
 import "./GridView.prefix.css";
 import { groupBy } from "../../../utils/utils";
@@ -82,9 +80,7 @@ export const GridBody = observer(({ row, fields, columnCount }) => {
 export const GridDataGroup = observer(({ type, value, field, row, columnCount, hasImage }) => {
   const DataTypeComponent = DataGroups[type];
 
-  return isFF(FF_LOPS_E_3) && row.loading === field.alias ? (
-    <SkeletonLoader />
-  ) : DataTypeComponent ? (
+  return DataTypeComponent ? (
     <DataTypeComponent value={value} field={field} original={row} columnCount={columnCount} hasImage={hasImage} />
   ) : (
     <DataGroups.TextDataGroup value={value} field={field} original={row} hasImage={hasImage} />

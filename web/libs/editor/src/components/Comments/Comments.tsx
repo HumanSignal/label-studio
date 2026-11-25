@@ -6,7 +6,6 @@ import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
 import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS, isFF } from "@humansignal/core/lib/utils/feature-flags";
 
 import "./Comments.prefix.css";
 
@@ -32,9 +31,6 @@ export const Comments: FC<{
   const lastLoadedAnnotationId = useRef<string | null>(null);
   const prevTaskId = useRef<typeof taskId>(undefined);
 
-  // FIT-720: Check if lazy loading is enabled
-  const lazyLoadEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
-
   const loadComments = async () => {
     // Capture the current annotation id before the async call.
     // The store tree can be replaced while awaiting, so avoid reading
@@ -58,23 +54,18 @@ export const Comments: FC<{
       prevTaskId.current = taskId;
     }
 
-    if (lazyLoadEnabled) {
-      // FIT-720: Only load comments when active AND we haven't already loaded for this annotation
-      const needsLoad = annotationId && lastLoadedAnnotationId.current !== annotationId;
+    // Only load comments when active AND we haven't already loaded for this annotation
+    const needsLoad = annotationId && lastLoadedAnnotationId.current !== annotationId;
 
-      if (isActive && needsLoad) {
-        loadComments();
-      }
-    } else if (annotationId) {
-      // Original behavior: Load comments whenever annotation changes
+    if (isActive && needsLoad) {
       loadComments();
     }
     // id is internal id,
     // always different for different annotations, even empty ones;
     // remain the same when user submit draft, so no unneeded calls.
-  }, [annotationId, isActive, lazyLoadEnabled, taskId]);
+  }, [annotationId, isActive, taskId]);
 
-  const isLoading = lazyLoadEnabled && commentStore.isListLoading && !!commentStore.annotation;
+  const isLoading = commentStore.isListLoading && !!commentStore.annotation;
 
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {

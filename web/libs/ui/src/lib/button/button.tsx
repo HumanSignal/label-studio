@@ -1,3 +1,4 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import type { Align } from "@humansignal/core/lib/utils/dom";
 import { cn } from "../../utils/utils";
 import { forwardRef, type MouseEvent, type ButtonHTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
@@ -17,11 +18,11 @@ const variants = {
 
 const looks = {
   filled: styles["look-filled"],
-  string: styles["look-string"],
+  ghost: styles["look-ghost"],
   outlined: styles["look-outlined"],
 };
 
-const sizes = {
+const sizes: Record<ControlSize, string> = {
   medium: styles["size-medium"], // 40px
   small: styles["size-small"], // 32px
   smaller: styles["size-smaller"], // 24px
@@ -69,7 +70,7 @@ export function buttonVariant(
 ) {
   const buttonStyles = [styles.base, variants[variant], looks[look], sizes[size], alignment[align]];
   return cn(
-    "inline-flex items-center rounded-smaller border text-shadow-button box-border border transition-all",
+    "inline-flex items-center rounded-small border text-shadow-button box-border border transition-all",
     "font-medium text-[color:--text-color] bg-[color:--background-color] bg-[image:--background-image] border-[color:--border-color] shadow-[shadow:--emboss-shadow] text-center",
     "hover:text-[color:--text-color] hover:bg-[color:--background-color-hover] hover:border-[color:--border-color-hover]",
     "active:bg-[color:--background-color-active] active:border-[color:--border-color]",
@@ -83,15 +84,15 @@ export function buttonVariant(
 export type ButtonProps = {
   /**
    * Controls the color variant of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   variant?: keyof typeof variants;
   /**
    * Controls the look of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   look?: keyof typeof looks;
-  size?: keyof typeof sizes;
+  size?: ControlSize;
   align?: keyof typeof alignment;
   /**
    * Waiting state with stripes animation

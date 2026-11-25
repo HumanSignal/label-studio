@@ -14,21 +14,22 @@ import { EmptyState } from "../empty-state/empty-state";
 import { Message } from "../message/message";
 import { Stepper } from "../stepper/stepper";
 import { Typography } from "../typography/typography";
-import { ModalWindow } from "./modal-window";
+import { ConfirmDialog, InfoDialog } from "./confirm-dialog";
+import { ModalWindow, ModalWindowCloseButton } from "./modal-window";
 
 const meta: Meta<typeof ModalWindow> = {
   component: ModalWindow,
-  title: "UI/ModalWindow",
+  title: "Feedback/ModalWindow",
   args: {
-    variant: "workflow",
+    placement: "top",
     size: "medium",
   },
   argTypes: {
-    variant: {
+    placement: {
       control: "select",
-      options: ["workflow", "dialog"],
+      options: ["top", "center"],
       description:
-        "workflow: top-anchored (stable when content height changes). dialog: vertically centered for short prompts.",
+        "top: top-anchored (stable when content height changes). center: vertically centered for short prompts.",
     },
     size: {
       control: "select",
@@ -113,13 +114,13 @@ export const Small: Story = {
 };
 
 /**
- * **Dialog use** — `variant="dialog"` vertically centers the panel for short, blocking prompts (confirmations,
+ * **Centered** — `placement="center"` vertically centers the panel for short, blocking prompts (confirmations,
  * acknowledgements). Uses the dialog title scale; combine with `size="small"` or `medium` and footer actions.
  */
-export const DialogUse: Story = {
-  name: "Dialog use",
+export const Centered: Story = {
+  name: "Centered",
   args: {
-    variant: "dialog",
+    placement: "center",
     size: "small",
     title: "Delete project?",
   },
@@ -285,7 +286,7 @@ export const Fullscreen: Story = {
 };
 
 /**
- * No dimmed overlay — use sparingly; focus trap still applies.
+ * No dimmed overlay — use sparingly; focus stays in the panel only with `trapFocus`.
  *
  * **When to use:** Rare—only when keeping the background visible materially helps the task **and** the interruption is still justified. Default scrim makes the blocking mode obvious; without it, users may not realize the main UI is inactive.
  */
@@ -422,7 +423,7 @@ function WizardTopAlignedDemo() {
       >
         <div className="border-b border-neutral-border px-wide pb-tight pt-wide">
           <Stepper
-            size="compact"
+            size="small"
             aria-label="Wizard progress"
             steps={WIZARD_STEPS.map((s, i) => ({
               id: s.id,
@@ -498,7 +499,7 @@ export const CustomHeaderContent: Story = {
               Built from UI primitives instead of the default title row.
             </Typography>
           </div>
-          <Button look="string" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
+          <Button look="ghost" size="small" className="ml-auto" leading={<IconSettings />} aria-label="Settings" />
         </div>
       }
     >
@@ -510,7 +511,40 @@ export const CustomHeaderContent: Story = {
 };
 
 /**
- * No enter/exit motion — panel appears and disappears instantly (still focus-trapped when open).
+ * Custom header that lays out its own controls, including the close button.
+ *
+ * **When to use:** A header that places the close button itself (e.g. next to a stepper). Set `showCloseButton={false}`
+ * and render `ModalWindowCloseButton` where it belongs; never import `@radix-ui/react-dialog` in a screen.
+ */
+export const CustomHeaderWithCloseButton: Story = {
+  args: {
+    title: "Import learners",
+    showCloseButton: false,
+  },
+  render: (args) => (
+    <ModalStoryShell
+      {...args}
+      header={
+        <div className="flex items-center gap-base">
+          <Typography variant="title" size="medium">
+            Import learners
+          </Typography>
+          <Typography variant="body" size="small" className="text-neutral-content-subtle mx-auto">
+            Step 1 of 3
+          </Typography>
+          <ModalWindowCloseButton />
+        </div>
+      }
+    >
+      <Typography variant="body" size="small">
+        The close button sits in the custom header and closes the dialog like the default one.
+      </Typography>
+    </ModalStoryShell>
+  ),
+};
+
+/**
+ * No enter/exit motion — panel appears and disappears instantly.
  *
  * **When to use:** Reduced motion preference, distracting environments, or automated tests—behavior and semantics stay modal; only transition is suppressed.
  */
@@ -551,4 +585,140 @@ export const CustomWidthEscapeHatch: Story = {
       </Message>
     </ModalStoryShell>
   ),
+};
+
+/**
+ * `ConfirmDialog` is a one-line decision rendered by the component that owns it: keep `open` in state and
+ * render the dialog next to the trigger. Destructive actions pass `buttonLook="negative"`. When `onOk` returns
+ * a promise the confirm button waits and the dialog closes once it resolves.
+ *
+ * **When to use:** Every confirmation. It renders inside the app tree, so the body gets the app's context.
+ */
+export const Confirmation: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="negative" onClick={() => setOpen(true)}>
+          Delete tasks
+        </Button>
+        <ConfirmDialog
+          open={open}
+          onOpenChange={setOpen}
+          title="Delete 12 tasks?"
+          okText="Delete"
+          buttonLook="negative"
+          footerMeta="12 tasks selected"
+          onOk={() => new Promise((resolve) => setTimeout(resolve, 800))}
+        >
+          Their annotations are deleted too. This cannot be undone.
+        </ConfirmDialog>
+      </>
+    );
+  },
+};
+
+/**
+ * `InfoDialog` is a notice with a single OK button, rendered by its owner like `ConfirmDialog`.
+ *
+ * **When to use:** A result the user must acknowledge before going on. Use a toast when nothing is blocked.
+ */
+export const Notice: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button look="outlined" variant="neutral" onClick={() => setOpen(true)}>
+          Add seats
+        </Button>
+        <InfoDialog open={open} onOpenChange={setOpen} title="Seats added" okText="Got it">
+          Your organization now has 25 seats.
+        </InfoDialog>
+      </>
+    );
+  },
+};
+
+/**
+ * Only the modal on top is shown. A modal that opens another one stays mounted underneath, hidden, and comes
+ * back with its state when the one on top closes. The whole stack shares one scrim.
+ *
+ * **Try it:** type a title, press Close and cancel the confirmation: the editor returns with your text. Then
+ * press Save: the identity check opens over the editor, and its own "Forgot password?" goes one level deeper.
+ */
+export const Stacked: Story = {
+  render: function Render() {
+    const [editing, setEditing] = useState(false);
+    const [title, setTitle] = useState("");
+    const [discarding, setDiscarding] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [helping, setHelping] = useState(false);
+    const closeEditor = () => {
+      setEditing(false);
+      setTitle("");
+    };
+
+    return (
+      <>
+        <Button onClick={() => setEditing(true)}>Edit section</Button>
+        <ModalWindow
+          open={editing}
+          onOpenChange={(open) => {
+            if (open) return;
+            if (title) setDiscarding(true);
+            else closeEditor();
+          }}
+          title="Edit section"
+          description="Change the title, then try to close without saving."
+          footer={
+            <div className="flex justify-end gap-tight">
+              <Button look="outlined" variant="neutral" onClick={() => (title ? setDiscarding(true) : closeEditor())}>
+                Close
+              </Button>
+              <Button onClick={() => setVerifying(true)}>Save</Button>
+            </div>
+          }
+        >
+          <label className="flex flex-col gap-tight">
+            <Typography variant="label" size="small">
+              Section title
+            </Typography>
+            <input
+              className="rounded-smaller border border-neutral-border bg-neutral-background px-base py-tight"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Skills and expertise"
+            />
+          </label>
+          <ConfirmDialog
+            open={discarding}
+            onOpenChange={setDiscarding}
+            title="Discard changes?"
+            okText="Discard"
+            buttonLook="negative"
+            onOk={closeEditor}
+          >
+            Your edits to this section have not been saved and will be lost.
+          </ConfirmDialog>
+          <ConfirmDialog
+            open={verifying}
+            onOpenChange={setVerifying}
+            title="Confirm it's you"
+            okText="Confirm"
+            onOk={closeEditor}
+          >
+            <div className="flex flex-col items-start gap-tight">
+              <span>Saving this section needs your password.</span>
+              <Button look="string" onClick={() => setHelping(true)}>
+                Forgot password?
+              </Button>
+            </div>
+            <InfoDialog open={helping} onOpenChange={setHelping} title="Reset your password" okText="Got it">
+              Ask an organization owner to send you a reset link.
+            </InfoDialog>
+          </ConfirmDialog>
+        </ModalWindow>
+      </>
+    );
+  },
 };

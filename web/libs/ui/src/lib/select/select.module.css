@@ -6,12 +6,15 @@
   --select-trigger-height: var(--spacing-1000);
   --select-trigger-font-size: var(--font-size-label-medium);
   --select-trigger-line-height: var(--line-height-label-medium);
-  --select-trigger-caret-size: var(--spacing-400);
+  --select-trigger-caret-size: 20px;
+  --select-trigger-text-inset: var(--spacing-base);
+  --select-trigger-icon-gap: var(--spacing-tight);
 
+  /* The control icon rule: text a text inset from the edge, the caret a padding from it. */
   display: flex;
   align-items: center;
-  padding: 0 var(--spacing-tight) 0 var(--spacing-base);
-  gap: var(--spacing-tight);
+  padding: 0 var(--spacing-tight) 0 var(--select-trigger-text-inset);
+  gap: var(--select-trigger-icon-gap);
   overflow: hidden;
   color: var(--color-neutral-content-subtler);
   text-overflow: ellipsis;
@@ -36,7 +39,7 @@
   font-weight: var(--font-weight-400);
   line-height: var(--select-trigger-line-height);
   letter-spacing: var(--letter-spacing-base);
-  border-radius: var(--corner-radius-smaller);
+  border-radius: var(--corner-radius-small);
   border: 1px solid var(--color-neutral-border);
   max-width: 100%;
 
@@ -44,12 +47,20 @@
     border: 1px solid var(--color-neutral-border-bold);
   }
 
-  &:focus-visible {
-    background-color: var(--color-neutral-surface-hover);
-    box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%) inset;
-    color: var(--color-neutral-content);
-    outline: 2px solid var(--color-primary-focus-outline);
+  /* Same focus rule as the text fields: darker border on any focus, outline only after keyboard focus. */
+  &:focus {
     border-color: var(--color-neutral-border-bold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  &.isInvalid,
+  &.isInvalid:hover,
+  &.isInvalid:focus {
+    border-color: var(--color-negative-border);
   }
 
   &.isOpen {
@@ -71,13 +82,17 @@
     --select-trigger-height: var(--spacing-800);
     --select-trigger-font-size: var(--font-size-label-small);
     --select-trigger-line-height: var(--line-height-label-small);
+    --select-trigger-caret-size: 16px;
+    --select-trigger-text-inset: var(--spacing-tight);
   }
 
   &.sizeSmaller {
     --select-trigger-height: var(--spacing-600);
     --select-trigger-font-size: var(--font-size-label-smaller);
     --select-trigger-line-height: var(--line-height-label-smaller);
-    --select-trigger-caret-size: var(--spacing-300);
+    --select-trigger-caret-size: 12px;
+    --select-trigger-text-inset: var(--spacing-tight);
+    --select-trigger-icon-gap: var(--spacing-tighter);
   }
 
   &.isInline {
