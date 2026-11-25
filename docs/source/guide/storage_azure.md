@@ -491,6 +491,18 @@ With the API, set `auth_mode` to `workload_identity` and omit `client_secret` ([
 
 </div>
 
+### Create JSON Tasks
+In case you need to create tasks manually to be synchronized as json files, you need to configure the task url with **azure-blob://** prefix like that :
+```json
+{
+  "data":{
+    "image":"azure-blob://<container_name>/<filepath>"
+    ...
+  }
+  ...
+}
+```
+
 
 ## Add storage with the Label Studio API
 
