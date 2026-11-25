@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "bun:test";
+import { DS_RULES } from "../../ds-check/rules";
 import { MARKER } from "../compare";
 
 const lsoWebRoot = path.resolve(import.meta.dir, "../../..");
@@ -34,7 +35,9 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
       "clusters",
       "areas",
       "goals",
+      "measured_rules",
     ]);
+    expect(snap.measured_rules).toEqual([...DS_RULES]);
     expect(snap).toMatchObject({ version: 1, commit: "test0000", pr: 7 });
     expect(snap.totals.violations).toBe(Object.values(snap.rules as Record<string, number>).reduce((a, b) => a + b, 0));
     expect(Object.keys(snap.goals)).toEqual([
@@ -62,6 +65,30 @@ describe.skipIf(!bothWebs)("ds:metrics", () => {
     expect(run("--from", head, "--append", history).stdout.toString()).toContain("appended");
     expect(run("--from", head, "--append", history).stdout.toString()).toContain("already present");
     expect(fs.readFileSync(history, "utf-8").trim().split("\n")).toHaveLength(1);
+  });
+
+  test("--upsert replaces the line of the same commit", () => {
+    const history = path.join(dir, "upsert.ndjson");
+    const stale = { ...JSON.parse(fs.readFileSync(head, "utf-8")), measured_rules: ["color-literal"] };
+    fs.writeFileSync(history, `${JSON.stringify(stale)}\n`);
+    expect(run("--from", head, "--upsert", history).stdout.toString()).toContain("replaced");
+    const lines = fs.readFileSync(history, "utf-8").trim().split("\n");
+    expect(lines).toHaveLength(1);
+    expect(JSON.parse(lines[0]).measured_rules).toEqual([...DS_RULES]);
+  });
+
+  test("--stale lists the commits measured without one of today's rules, oldest first", () => {
+    const history = path.join(dir, "stale.ndjson");
+    const current = JSON.parse(fs.readFileSync(head, "utf-8"));
+    const lines = [
+      { ...current, commit: "new1", date: "2026-11-03T00:00:00Z" },
+      { ...current, commit: "old2", date: "2026-11-02T00:00:00Z", measured_rules: ["color-literal"] },
+      { ...current, commit: "old1", date: "2026-11-01T00:00:00Z", measured_rules: undefined },
+    ];
+    fs.writeFileSync(history, lines.map((l) => `${JSON.stringify(l)}\n`).join(""));
+    const r = run("--stale", history);
+    expect(r.exitCode).toBe(0);
+    expect(r.stdout.toString().trim().split("\n")).toEqual(["old1", "old2"]);
   });
 
   test("a missing base snapshot is a tool error", () => {

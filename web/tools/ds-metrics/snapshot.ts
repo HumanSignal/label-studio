@@ -39,6 +39,8 @@ export type SnapshotInput = {
    * and goal, and stay out of the rule counts the PR gate compares.
    */
   templates?: TemplateMeasure;
+  /** The rules the tool measured this checkout with (`DS_RULES` of ds-check). */
+  measuredRules: readonly string[];
 };
 
 /** The raw controls found in the template sources. */
@@ -61,6 +63,11 @@ export type Snapshot = {
   clusters: Record<string, { paths_remaining: number; importers: number }>;
   areas: Record<string, AreaMetrics>;
   goals: Record<string, Goal>;
+  /**
+   * The rules this snapshot was measured with. A rule missing here was not measured, which is not a count of 0: the
+   * point is stale and the backfill remeasures it. Points written before the field existed have none.
+   */
+  measured_rules?: string[];
 };
 
 /**
@@ -152,5 +159,6 @@ export function buildSnapshot(input: SnapshotInput): Snapshot {
     clusters: sorted(clusters),
     areas: sorted(areas),
     goals,
+    measured_rules: [...input.measuredRules].sort((a, b) => a.localeCompare(b)),
   };
 }

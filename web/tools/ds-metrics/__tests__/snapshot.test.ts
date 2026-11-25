@@ -83,6 +83,7 @@ const input: SnapshotInput = {
   manifest,
   webs: { lso, lse },
   exists: (p) => existing.has(p),
+  measuredRules: ["raw-control", "legacy-icon", "replaced-import"],
 };
 
 describe("areaOf", () => {
@@ -99,6 +100,10 @@ describe("areaOf", () => {
 
 describe("buildSnapshot", () => {
   const snap = buildSnapshot(input);
+
+  test("records the rules it was measured with, sorted", () => {
+    expect(snap.measured_rules).toEqual(["legacy-icon", "raw-control", "replaced-import"]);
+  });
 
   test("identity and totals", () => {
     expect(snap).toMatchObject({

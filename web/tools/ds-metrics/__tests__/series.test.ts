@@ -94,6 +94,30 @@ describe("buildSeries", () => {
     expect(series.week.rules["raw-control"]).toBe(469 - 480);
   });
 
+  test("a rule the older point was not measured with is new, not an increase, and stays out of the total", () => {
+    const measured = ["raw-control", "color-literal"];
+    const before = snap("old", "2026-11-01T10:00:00Z", 1000, { measured_rules: measured });
+    const after = snap("now", "2026-11-09T10:00:00Z", 1048, {
+      rules: { "raw-control": 100, "color-literal": 900, "control-size": 48 },
+      measured_rules: [...measured, "control-size"],
+    });
+    const week = buildSeries([before, after]).week;
+    expect(week.rules["control-size"]).toBeNull();
+    expect(week.rules["color-literal"]).toBe(0);
+    expect(week.violations).toBe(0);
+    expect(buildSeries([before, after]).points[1].measured_rules).toBe("raw-control,color-literal,control-size");
+  });
+
+  test("a rule counted at 0 by a point measured with it is a real increase", () => {
+    const measured = ["raw-control", "color-literal", "control-size"];
+    const before = snap("old", "2026-11-01T10:00:00Z", 1000, { measured_rules: measured });
+    const after = snap("now", "2026-11-09T10:00:00Z", 1003, {
+      rules: { "raw-control": 100, "color-literal": 900, "control-size": 3 },
+      measured_rules: measured,
+    });
+    expect(buildSeries([before, after]).week.rules["control-size"]).toBe(3);
+  });
+
   test("snapshots are ordered by time, whatever timezone offset their dates carry", () => {
     // 17:10+01:00 is 16:10Z, earlier than 16:34Z, although it sorts later as text
     const mixed = buildSeries([
