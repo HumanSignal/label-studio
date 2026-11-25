@@ -10,19 +10,19 @@ first occurrence so duplicate-id rows never land in `Annotation.result` or
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 
 def sanitize_null_bytes(value: Any) -> Any:
     """Return ``value`` with NUL (``U+0000``) characters stripped.
 
-    PostgreSQL ``jsonb``/``text`` columns cannot store ``\\u0000`` even though it
-    is a valid JSON escape sequence, so a stray NUL byte — e.g. copied from a
-    PDF's embedded OCR/text layer into an annotation ``result`` — raises
-    ``django.db.utils.DataError`` and 500s the write. Remove both the literal NUL
-    character and its escaped ``\\u0000`` form. See FIT-2353 (mirrors the
-    ActivityLog fix in FIT-2145 and the ML-prediction sanitizer in
-    ``lse_ml_models``).
+    PostgreSQL ``jsonb``/``text`` columns cannot store U+0000, so a stray NUL
+    byte copied from a PDF's OCR/text layer into an annotation result can
+    raise ``django.db.utils.DataError``. Strip actual NUL characters while
+    preserving literal backslash text such as ``\\u0000``. See FIT-2353
+    (mirrors the ActivityLog fix in FIT-2145 and the ML-prediction sanitizer
+    in ``lse_ml_models``).
 
     The value is only re-parsed when a NUL is actually present, so the common
     (clean) path pays a single ``json.dumps`` and returns the input unchanged.
@@ -32,15 +32,15 @@ def sanitize_null_bytes(value: Any) -> Any:
     if value is None:
         return value
     try:
-        # ensure_ascii=True escapes a literal NUL character to the six-character
-        # sequence ``\u0000`` in the JSON text, so a single ``.replace`` on the
-        # escaped form catches both representations after the dump.
+        # JSON encoding escapes both actual NUL characters and backslashes.
         raw = json.dumps(value)
     except (TypeError, ValueError):
         return value
-    if '\x00' not in raw and '\\u0000' not in raw:
+    if '\\u0000' not in raw:
         return value
-    return json.loads(raw.replace('\x00', '').replace('\\u0000', ''))
+    # Consume escaped backslashes in pairs before matching actual NUL escapes.
+    sanitized = re.sub(r'(\\\\)|\\u0000', r'\1', raw)
+    return value if sanitized == raw else json.loads(sanitized)
 
 
 def dedupe_annotation_result_list(result: Any) -> Any:
