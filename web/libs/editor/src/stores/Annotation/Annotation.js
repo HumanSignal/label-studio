@@ -474,6 +474,13 @@ const _Annotation = types
         !isNaN(self.pk)
       );
     },
+
+    // The host sets review:deny-own for roles that may not review their own work (Reviewers).
+    get isOwnReviewBlocked() {
+      const store = self.store;
+
+      return Boolean(store?.hasInterface("review:deny-own") && self.user?.id && store.user?.id === self.user.id);
+    },
   }))
   .actions((self) => ({
     reinitHistory(force = true) {

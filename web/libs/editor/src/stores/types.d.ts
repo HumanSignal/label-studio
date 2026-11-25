@@ -104,6 +104,7 @@ type MSTAnnotation = {
   user: MSTUserExtended;
   createdBy: string; // used for predictions
   canBeReviewed: boolean;
+  isOwnReviewBlocked: boolean;
   userGenerate: boolean;
   sentUserGenerate: boolean;
   skipped: boolean;
