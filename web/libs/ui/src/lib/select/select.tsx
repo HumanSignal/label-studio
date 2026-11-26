@@ -22,6 +22,7 @@ import React, {
 } from "react";
 import { VariableSizeList } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
+import { controlIconWeight } from "../../ds-manifest/control-sizes";
 import { cn, cnm } from "../../utils/utils";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
@@ -275,6 +276,7 @@ const SelectBase = forwardRef(
       triggerProps,
       triggerClassName,
       contentClassName,
+      contentProps,
       size,
       searchFilter,
       onSearch,
@@ -300,6 +302,9 @@ const SelectBase = forwardRef(
       showGroupActions = false,
       open: controlledOpen,
       align = "start",
+      invalid,
+      error,
+      onBlur,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -791,6 +796,7 @@ const SelectBase = forwardRef(
                 [styles.isInline]: isInline,
                 [styles.isOpen]: isOpen,
                 [styles.isDisabled]: disabled,
+                [styles.isInvalid]: invalid || error,
                 [styles.sizeSmaller]: size === "smaller",
                 [styles.sizeSmall]: size === "small",
               },
@@ -807,13 +813,15 @@ const SelectBase = forwardRef(
             data-name={props?.name}
             data-value={value ?? ""}
             aria-readonly={readOnly || undefined}
+            aria-invalid={invalid || error || undefined}
+            onBlur={onBlur}
             {...triggerProps}
           >
             <span className="flex flex-1 text-left gap-2 max-w-full overflow-hidden" data-testid="select-display-value">
               {renderSelected ? renderSelected?.(selectedOptions, props?.placeholder) : displayValue}
             </span>
             <CaretDownIcon
-              weight="bold"
+              weight={controlIconWeight(size)}
               className={cnm(
                 styles.selectCaret,
                 "shrink-0 text-neutral-content-subtler pointer-events-none transition-transform ease-out duration-150",
@@ -822,7 +830,12 @@ const SelectBase = forwardRef(
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent align={align} data-testid="select-popup" className={cnm("min-w-full", contentClassName)}>
+        <PopoverContent
+          {...contentProps}
+          align={align}
+          data-testid="select-popup"
+          className={cnm("min-w-full", contentClassName)}
+        >
           {isLoading ? (
             <span className={styles.selectLoading} tabIndex={-1}>
               Loading...

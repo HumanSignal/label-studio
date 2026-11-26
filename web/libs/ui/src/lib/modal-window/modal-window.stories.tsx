@@ -114,11 +114,11 @@ export const Small: Story = {
 };
 
 /**
- * **Dialog use** — `placement="center"` vertically centers the panel for short, blocking prompts (confirmations,
+ * **Centered** — `placement="center"` vertically centers the panel for short, blocking prompts (confirmations,
  * acknowledgements). Uses the dialog title scale; combine with `size="small"` or `medium` and footer actions.
  */
-export const DialogUse: Story = {
-  name: "Dialog use",
+export const Centered: Story = {
+  name: "Centered",
   args: {
     placement: "center",
     size: "small",
@@ -286,7 +286,7 @@ export const Fullscreen: Story = {
 };
 
 /**
- * No dimmed overlay — use sparingly; focus trap still applies.
+ * No dimmed overlay — use sparingly; focus stays in the panel only with `trapFocus`.
  *
  * **When to use:** Rare—only when keeping the background visible materially helps the task **and** the interruption is still justified. Default scrim makes the blocking mode obvious; without it, users may not realize the main UI is inactive.
  */
@@ -544,7 +544,7 @@ export const CustomHeaderWithCloseButton: Story = {
 };
 
 /**
- * No enter/exit motion — panel appears and disappears instantly (still focus-trapped when open).
+ * No enter/exit motion — panel appears and disappears instantly.
  *
  * **When to use:** Reduced motion preference, distracting environments, or automated tests—behavior and semantics stay modal; only transition is suppressed.
  */

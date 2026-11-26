@@ -37,6 +37,25 @@ body {
   border: 1px solid var(--color-neutral-border) !important;
 }
 
+/* Markdown tables in a docs description: Storybook stripes them with fixed light colours */
+#storybook-docs .sbdocs-content table:not(.docblock-argstable):not(.sbdocs-preview *) {
+  & tr,
+  & th,
+  & td {
+    color: var(--color-neutral-content) !important;
+    background-color: var(--color-neutral-background) !important;
+    border-color: var(--color-neutral-border) !important;
+  }
+
+  & tr:nth-of-type(2n) td {
+    background-color: var(--color-neutral-surface) !important;
+  }
+
+  & th {
+    color: var(--color-neutral-content-subtle) !important;
+  }
+}
+
 /* Style Storybook docs UI elements for dark mode support */
 #storybook-docs {
   /* Args table (props documentation) */

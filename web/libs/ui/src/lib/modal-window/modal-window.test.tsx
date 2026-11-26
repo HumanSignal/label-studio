@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent, act } from "@testing-library/react"
 import "@testing-library/jest-dom";
 import { useState } from "react";
 import type { ComponentProps } from "react";
-import { Dialog, ModalWindow } from "./modal-window";
+import { ModalWindow } from "./modal-window";
 import { Button } from "../button/button";
 
 function ControlledModal(
@@ -249,26 +249,11 @@ describe("ModalWindow", () => {
     expect(screen.getByTestId("modal-window")).toHaveAttribute("data-placement", "top");
   });
 
-  it("renders the Dialog export centered", async () => {
-    function ControlledDialog(
-      props: Omit<ComponentProps<typeof Dialog>, "open" | "onOpenChange"> & { initiallyOpen?: boolean },
-    ) {
-      const { initiallyOpen, ...rest } = props;
-      const [open, setOpen] = useState(initiallyOpen ?? false);
-      return (
-        <>
-          <Button onClick={() => setOpen(true)} data-testid="open-dialog-btn">
-            Open
-          </Button>
-          <Dialog {...rest} open={open} onOpenChange={setOpen} />
-        </>
-      );
-    }
-
+  it("centers the panel with placement center", () => {
     render(
-      <ControlledDialog title="Dialog export" initiallyOpen>
+      <ModalWindow open title="Centered" placement="center">
         <div>Content</div>
-      </ControlledDialog>,
+      </ModalWindow>,
     );
 
     const panel = screen.getByTestId("modal-window");
@@ -300,5 +285,56 @@ describe("ModalWindowCloseButton", () => {
 
     fireEvent.click(screen.getByTestId("modal-window-close-button"));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});
+
+describe("ModalWindow trapFocus", () => {
+  const renderWithOutside = (props: Partial<ComponentProps<typeof ModalWindow>>) =>
+    render(
+      <>
+        <button type="button" data-testid="behind">
+          Behind
+        </button>
+        <ModalWindow open title="Trap" {...props}>
+          <button type="button" data-testid="inside-first">
+            First
+          </button>
+          <button type="button" data-testid="inside-last">
+            Last
+          </button>
+        </ModalWindow>
+      </>,
+    );
+
+  it("pulls focus that leaves the dialog back inside", async () => {
+    renderWithOutside({ trapFocus: true, showCloseButton: false });
+    screen.getByTestId("inside-first").focus();
+
+    act(() => {
+      screen.getByTestId("behind").focus();
+    });
+
+    await waitFor(() => expect(screen.getByRole("dialog").contains(document.activeElement)).toBe(true));
+  });
+
+  it("still wraps Tab from the last control to the first", () => {
+    renderWithOutside({ trapFocus: true, showCloseButton: false });
+    const last = screen.getByTestId("inside-last");
+    last.focus();
+
+    fireEvent.keyDown(last, { key: "Tab" });
+
+    expect(document.activeElement).toBe(screen.getByTestId("inside-first"));
+  });
+
+  it("lets focus leave a dialog without trapFocus (dropdowns portaled outside keep working)", () => {
+    renderWithOutside({ showCloseButton: false });
+    screen.getByTestId("inside-first").focus();
+
+    act(() => {
+      screen.getByTestId("behind").focus();
+    });
+
+    expect(document.activeElement).toBe(screen.getByTestId("behind"));
   });
 });

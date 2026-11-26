@@ -293,6 +293,62 @@ describe("Controls", () => {
     expect(getByLabelText("reject-annotation")).toBeDisabled();
   });
 
+  test("shows no Accept or Reject on the reviewer's own annotation", () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+
+    const annotation = {
+      ...mockAnnotation,
+      isOwnReviewBlocked: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    const { queryByLabelText, getByText } = render(
+      <Provider store={mockStore}>
+        <Controls annotation={annotation} />
+      </Provider>,
+    );
+
+    expect(queryByLabelText("accept-annotation")).toBeNull();
+    expect(queryByLabelText("reject-annotation")).toBeNull();
+    expect(getByText("You can't review your own annotation")).toBeInTheDocument();
+  });
+
+  test("ignores reject requests from hotkeys on the reviewer's own annotation", async () => {
+    mockStore.hasInterface = (a: string) => a === "review" || a === "controls";
+    mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());
+    const previousButtons = mockStore.customButtons;
+    mockStore.customButtons = new Map([["reject", [{ name: "remove", title: "Remove", menu: false }]]]) as any;
+
+    const annotation = {
+      ...mockAnnotation,
+      isOwnReviewBlocked: true,
+      submissionInProgress: mock(),
+      history: { canUndo: false },
+    };
+    mockStore.annotationStore.selectedHistory = null;
+    mockStore.annotationStore.selected = annotation;
+
+    try {
+      render(
+        <Provider store={mockStore}>
+          <Controls annotation={annotation} />
+        </Provider>,
+      );
+
+      window.dispatchEvent(new CustomEvent("lsf:reject-with-action", { detail: { name: "remove" } }));
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(mockStore.commentStore.commentFormSubmit).not.toHaveBeenCalled();
+      expect(mockStore.handleCustomButton).not.toHaveBeenCalled();
+      expect(annotation.submissionInProgress).not.toHaveBeenCalled();
+    } finally {
+      mockStore.customButtons = previousButtons;
+    }
+  });
+
   test("renders configured reject actions in one menu", async () => {
     mockStore.hasInterface = (name: string) => name === "review" || name === "controls";
     mockStore.commentStore.commentFormSubmit = mock(() => Promise.resolve());

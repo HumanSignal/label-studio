@@ -19,3 +19,14 @@ export const Default: Story = {
 export const ImagesOnly: Story = {
   args: { text: "Choose an image", accept: "image/*" },
 };
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex items-center gap-base">
+      <InputFile text="Medium" size="medium" />
+      <InputFile text="Small" size="small" />
+      <InputFile text="Smaller" size="smaller" />
+    </div>
+  ),
+};

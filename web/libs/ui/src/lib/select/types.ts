@@ -1,4 +1,5 @@
-import type { FC, ReactNode } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
+import type { FC, ReactNode, HTMLAttributes } from "react";
 
 export type SelectOptionData<T = any> = {
   value: T;
@@ -74,11 +75,21 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   placeholder?: ReactNode;
   triggerClassName?: string;
   contentClassName?: string;
+  /** Attributes on the portaled option panel, including explicit viewer theme propagation. */
+  contentProps?: Omit<HTMLAttributes<HTMLDivElement>, "children" | "className"> & {
+    "data-theme"?: "light" | "dark";
+    "data-color-scheme"?: "light" | "dark";
+  };
   ghost?: boolean;
   width?: string;
   icon?: any;
   fieldProps?: any;
+  /** @deprecated Use `invalid`. */
   error?: boolean;
+  /** Draws the error state and sets `aria-invalid` on the trigger. */
+  invalid?: boolean;
+  /** Fires when the trigger loses focus, for form libraries that validate on blur. */
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   autoSelectFirst?: boolean;
   searchable?: boolean;
   /** Allow a search value that does not match an option to be selected as a new option. */
@@ -126,7 +137,7 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   isInline?: boolean;
   isLoading?: boolean;
   dataTestid?: string;
-  size?: SelectSize | `${SelectSize}` | undefined;
+  size?: ControlSize | SelectSize | undefined;
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;

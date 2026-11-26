@@ -1,5 +1,10 @@
+export type { ControlSize } from "./ds-manifest/control-sizes";
 export * from "./lib/InputFile/InputFile";
 export * from "./lib/indicator";
+export * from "./lib/input/input";
+export { Field, type FieldChromeProps, type FieldLayout, type FieldProps } from "./lib/field/field";
+export * from "./lib/number-input/number-input";
+export * from "./lib/radio-group/radio-group";
 export * from "./lib/summary-label";
 export * from "./lib/segmented-control/segmented-control";
 export * from "./lib/ThemeToggle/ThemeToggle";
@@ -9,6 +14,7 @@ export * from "./lib/badge/badge";
 export * from "./lib/card";
 export * from "./lib/button/button";
 export * from "./lib/checkbox/checkbox";
+export { CheckboxGroup, type CheckboxGroupProps } from "./lib/checkbox-group/checkbox-group";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
@@ -26,6 +32,7 @@ export * from "./lib/select/select";
 export { SelectSize, type SelectOption, type SelectOptionData } from "./lib/select/types";
 export * from "./lib/search-input/search-input";
 export * from "./lib/tag-autocomplete";
+export * from "./lib/text-area/text-area";
 // Named exports only — avoid `export *` so MultiTreeSelect's internal TreeSelect
 // does not collide with the public TreeSelect from ./lib/tree-select.
 export {
@@ -84,3 +91,5 @@ export * from "./hooks/useTokenColor";
 
 // TODO: Remove when DIA-2142 and DIA-2175 are delivered
 export { cn } from "./utils/utils";
+
+export * from "./lib/property-table";

@@ -208,6 +208,7 @@ function TypeFilterControl({ value, onChange }: TypeFilterControlProps) {
   return (
     <Label text="Result type" flat simple className={cn("annotations-list-filter").elem("typeFilter").toClassName()}>
       <SegmentedControl
+        size="small"
         fullWidth
         aria-label="Result type"
         className={cn("annotations-list-filter").elem("typeTabsList").toClassName()}
@@ -246,6 +247,7 @@ function BooleanFilterControl({ value, onChange, label, testIdPrefix, disabled =
 
   return (
     <SegmentedControl
+      size="small"
       aria-label={label}
       className={cn("annotations-list-filter").elem("booleanTabsList").toClassName()}
       selectedOption={tabValue}

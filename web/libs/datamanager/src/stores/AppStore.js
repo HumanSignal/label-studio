@@ -771,7 +771,7 @@ export const AppStore = types
           return result;
         }
 
-        // Done is not an "Errors occurred" chip. The app keeps an open stream, or sends the user home.
+        // Done is not an "Errors occurred" chip. The app ends the label stream on its finished screen.
         const displayReason =
           result?.response && typeof result.response === "object" ? result.response.display_context?.reason : undefined;
         if (resultStatusCode === 403 && displayReason === "PROJECT_DONE") {

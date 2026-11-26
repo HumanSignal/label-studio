@@ -10,6 +10,8 @@ export type PointRow = {
   violations: number;
   files_with_violations: number;
   prs: PrRef[];
+  /** The rules the point was measured with, comma-separated; absent on points written before the field existed. */
+  measured_rules?: string;
 } & Record<string, number | string | PrRef[]>;
 export type ClusterRow = { date: string; commit: string; cluster: string; importers: number; paths_remaining: number };
 export type AreaRow = { date: string; commit: string; area: string } & AreaMetrics;
@@ -19,7 +21,11 @@ export type Series = {
   clusters: ClusterRow[];
   areas: AreaRow[];
   targets: Record<string, number | null>;
-  week: { since: PointRow | null; latest: PointRow | null; violations: number; rules: Record<string, number> };
+  /**
+   * The change since the newest point at least a week old. A rule that point was not measured with has no change
+   * (null, shown as new), and its count stays out of the violations change.
+   */
+  week: { since: PointRow | null; latest: PointRow | null; violations: number; rules: Record<string, number | null> };
 };
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -31,9 +37,13 @@ const toPoint = (s: Snapshot): PointRow => ({
   files_with_violations: s.totals.files_with_violations,
   // points written before the field existed have none
   prs: s.prs ?? [],
+  ...(s.measured_rules ? { measured_rules: s.measured_rules.join(",") } : {}),
   ...Object.fromEntries(Object.entries(s.rules).map(([rule, n]) => [`rule_${rule}`, n])),
   ...Object.fromEntries(Object.entries(s.goals).map(([goal, g]) => [`goal_${goal}`, g.value])),
 });
+
+/** Whether the snapshot measured the rule; before the field existed, only a rule it counted is known. */
+const measured = (s: Snapshot, rule: string) => (s.measured_rules ? s.measured_rules.includes(rule) : rule in s.rules);
 
 export function buildSeries(history: Snapshot[]): Series {
   // by time, not as text: commit dates keep their committer's timezone offset
@@ -68,7 +78,12 @@ export function buildSeries(history: Snapshot[]): Series {
       week.since = toPoint(since);
       week.violations = latest.totals.violations - since.totals.violations;
       for (const rule of new Set([...Object.keys(latest.rules), ...Object.keys(since.rules)])) {
-        week.rules[rule] = (latest.rules[rule] ?? 0) - (since.rules[rule] ?? 0);
+        if (measured(since, rule)) {
+          week.rules[rule] = (latest.rules[rule] ?? 0) - (since.rules[rule] ?? 0);
+        } else {
+          week.rules[rule] = null;
+          week.violations -= latest.rules[rule] ?? 0;
+        }
       }
     }
   }

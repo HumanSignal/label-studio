@@ -58,7 +58,7 @@
 .inputField {
   padding: var(--spacing-tight) var(--spacing-tight);
   border: 1px solid var(--color-neutral-border);
-  border-radius: var(--corner-radius-smaller);
+  border-radius: var(--corner-radius-small);
   background-color: var(--color-neutral-background);
   color: var(--color-neutral-content);
   transition: border-color 0.15s ease-out;

@@ -1,5 +1,6 @@
 import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { memo, useEffect, useRef, useState } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
 import { Badge } from "../badge/badge";
 import { IdDelimiter, RootSymbol, type TreeAction, useTreeContext } from "./tree-context";
 
@@ -17,7 +18,10 @@ export const TreeSelected = memo(
     allLabel,
     placeholder,
     RootLevelIcon,
+    size,
   }: {
+    /** The trigger's size: its chips shrink with it so they fit a 24px trigger. */
+    size?: ControlSize;
     RootLevelIcon?: React.ReactNode;
     allLabel?: string;
     placeholder?: string;
@@ -89,6 +93,7 @@ export const TreeSelected = memo(
           <Badge
             key={id}
             icon={RootLevelIcon && isRootLevel ? RootLevelIcon : undefined}
+            size={size === "smaller" ? "small" : undefined}
             data-testid="multi-tree-select-tag"
           >
             {label}

@@ -155,6 +155,12 @@ export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflo
 export const FF_INTERFACES_SCENARIOS = "fflag_feat_interfaces_scenarios";
 
 /**
+ * FIT-3504: after the Interfaces agent creates a screen, screenshot it, have a UI/UX reviewer judge the layout and
+ * apply the reviewer's fixes (at most two rounds). Requires FF_INTERFACES_AGENT_WORKFLOW.
+ */
+export const FF_INTERFACES_VISUAL_REVIEW = "fflag_feat_fit_3504_interface_visual_review_short";
+
+/**
  * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
  */
 export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";

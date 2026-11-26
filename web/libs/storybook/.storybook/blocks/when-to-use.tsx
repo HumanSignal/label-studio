@@ -158,7 +158,7 @@ export const WhenToUse = () => {
         >
           {entry.intent.length ? (
             <Row label="Intent" tone="intent">
-              <div className="flex flex-col gap-tightest">
+              <div className="flex flex-col gap-tight">
                 {entry.intent.map((i) => (
                   <Typography key={i} variant="body" size="small">
                     {i}
@@ -190,6 +190,44 @@ export const WhenToUse = () => {
                   <PropRule key={r} text={r} />
                 ))}
               </TwoColumns>
+            </Row>
+          ) : null}
+          {entry.sizing === "control" ? (
+            <Row label="Sizes" tone="props">
+              <div className="flex flex-col gap-tight">
+                {Object.entries(manifest.controlSizes.sizes).map(([name, size]) => (
+                  <div key={name} className="flex items-start gap-tight">
+                    <div className="flex shrink-0" style={{ width: 54 }}>
+                      <Badge variant="plum" size="small">
+                        {name}
+                      </Badge>
+                    </div>
+                    <Typography variant="body" size="small">
+                      {size.px}px{name === manifest.controlSizes.default ? " (default)" : ""}: {size.use_when}
+                    </Typography>
+                  </div>
+                ))}
+                <Typography variant="body" size="small" className="text-neutral-content-subtle">
+                  Icons: {manifest.controlSizes.icons.rule}{" "}
+                  {Object.entries(manifest.controlSizes.icons.sizes)
+                    .map(
+                      ([name, i]) =>
+                        `${name}: icon ${i.icon}px, ${i.edge} from the edge, ${i.gap} to the text, text ${i.text_inset} from the edge without an icon`,
+                    )
+                    .join("; ")}
+                  .
+                </Typography>
+                <Typography variant="body" size="small" className="text-neutral-content-subtle">
+                  {manifest.controlSizes.rule}
+                </Typography>
+              </div>
+            </Row>
+          ) : null}
+          {entry.sizing === "fixed" ? (
+            <Row label="Sizes" tone="props">
+              <Typography variant="body" size="small">
+                {manifest.controlSizes.fixed}
+              </Typography>
             </Row>
           ) : null}
           {entry.replaces.length ? (

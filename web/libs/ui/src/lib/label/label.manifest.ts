@@ -4,6 +4,7 @@ export default defineManifest({
   name: "Label",
   tier: 1,
   category: "Inputs",
+  sizing: "none",
   exports: ["Label"],
   intent: ["A caption for a form control"],
   use_when: "The text, required marker and description attached to a control.",

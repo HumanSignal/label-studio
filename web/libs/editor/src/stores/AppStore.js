@@ -408,6 +408,7 @@ export default types
       if (entity.isReadOnly()) return;
       if (entity.hasIncompleteRegions) return;
       if (isReview && ownAcceptIsLive(entity)) return;
+      if (isReview && entity.isOwnReviewBlocked) return;
 
       entity?.submissionInProgress();
 
@@ -439,6 +440,7 @@ export default types
      * name an action and let it run, exactly as clicking that option would.
      */
     function requestReject(name) {
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
       window.dispatchEvent(new CustomEvent("lsf:reject-with-action", { detail: { name } }));
     }
 
@@ -449,6 +451,7 @@ export default types
       const entity = self.annotationStore.selected;
 
       if (self.hasInterface("review")) {
+        if (entity?.isOwnReviewBlocked) return;
         const buttons = configuredRejectButtons();
         // Same as clicking the split button: the project's default, never the menu.
         const primary = buttons.find((button) => button.isPrimary) ?? buttons[0];
@@ -853,6 +856,7 @@ export default types
     function acceptAnnotation() {
       if (self.isSubmitting || self.isLoading) return;
       if (ownAcceptIsLive(self.annotationStore.selected)) return;
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
@@ -875,6 +879,7 @@ export default types
 
     function rejectAnnotation({ comment = null }) {
       if (self.isSubmitting || self.isLoading) return;
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;

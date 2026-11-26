@@ -139,7 +139,7 @@ describe("DetailsPanel", () => {
         expect(learnMoreLink).toBeInTheDocument();
         expect(learnMoreLink).toHaveAttribute(
           "href",
-          "https://docs.example.com/guide/labeling#Add-relations-between-annotations",
+          "https://docs.example.com/guide/labeling#Add-relations-between-regions",
         );
         expect(learnMoreLink).toHaveAttribute("target", "_blank");
         expect(learnMoreLink).toHaveAttribute("rel", "noopener noreferrer");

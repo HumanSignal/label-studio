@@ -5,6 +5,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { controlSizeFindings, heightVariableFindings } from "./control-size";
 import type { Finding, ManifestSlice } from "./types";
 
 export type ScanContext = {
@@ -462,6 +463,7 @@ export function scanSource(absPath: string, source: string, ctx: ScanContext): F
       ...colorLiterals(file, source, true),
       ...unknownTokens(file, source, ctx.tokenNames),
       ...handBuiltOverlays(file, scannableCss(source), true),
+      ...heightVariableFindings(file, scannableCss(source)),
     ];
   if (!SOURCE_EXT.test(absPath)) return [];
   return [
@@ -469,6 +471,8 @@ export function scanSource(absPath: string, source: string, ctx: ScanContext): F
     ...tailwindPrimitives(file, source),
     ...imperativeDialogs(file, source),
     ...handBuiltOverlays(file, source, false),
+    ...controlSizeFindings(file, source),
+    ...heightVariableFindings(file, source),
     ...namedImports(file, source, ctx),
     ...moduleImports(file, source, ctx),
   ];

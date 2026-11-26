@@ -25,12 +25,36 @@
     @apply h-full w-full p-0 aspect-square;
   }
 
+  /*
+   * Label and icons follow the control icon rule: text inset without an icon, padding before an icon
+   * and the icon-to-text gap per size. The button's own padding stays for icon-only buttons, so the
+   * label and icons are offset from it.
+   */
+  & > span {
+    padding-inline: calc(var(--button-text-inset) - var(--button-padding));
+  }
+
   & > em {
     @apply inline-flex;
 
+    height: var(--button-icon-size);
+    min-width: var(--button-icon-size);
+
     & > svg {
-      @apply h-full aspect-square min-w-500;
+      flex: none;
+      width: var(--button-icon-size);
+      height: var(--button-icon-size);
     }
+  }
+
+  & > em:first-child {
+    margin-inline-start: calc(var(--spacing-tight) - var(--button-padding));
+    margin-inline-end: calc(var(--button-icon-gap) - var(--button-text-inset) + var(--button-padding));
+  }
+
+  & > em:last-child {
+    margin-inline-start: calc(var(--button-icon-gap) - var(--button-text-inset) + var(--button-padding));
+    margin-inline-end: calc(var(--spacing-tight) - var(--button-padding));
   }
 
   &:active {
@@ -121,38 +145,50 @@
 /* / SIZES */
 
 .size-medium {
+  --button-padding: var(--spacing-tight);
+  --button-text-inset: var(--spacing-base);
+  --button-icon-gap: var(--spacing-tight);
+  --button-icon-size: 20px;
+
   @apply p-tight text-label-medium h-1000;
 
-  & > span {
-    @apply px-tight gap-tight;
-  }
-
+  & > span,
   & > em {
-    @apply gap-tight h-600 min-w-600;
+    @apply gap-tight;
   }
 }
 
 .size-small {
+  --button-padding: var(--spacing-tighter);
+  --button-text-inset: var(--spacing-tight);
+  --button-icon-gap: var(--spacing-tight);
+  --button-icon-size: 16px;
+
   @apply p-tighter text-label-small h-800;
 
   & > span {
-    @apply px-tighter gap-tighter;
+    @apply gap-tighter;
   }
 
   & > em {
-    @apply gap-tighter h-400 min-w-400;
+    @apply gap-tighter;
   }
 }
 
 .size-smaller {
+  --button-padding: var(--spacing-tightest);
+  --button-text-inset: var(--spacing-tight);
+  --button-icon-gap: var(--spacing-tighter);
+  --button-icon-size: 12px;
+
   @apply p-tightest text-label-smaller h-600;
 
   & > span {
-    @apply px-tightest gap-tightest;
+    @apply gap-tightest;
   }
 
   & > em {
-    @apply gap-tighter h-400 min-w-400;
+    @apply gap-tighter;
   }
 }
 

@@ -67,7 +67,7 @@ const ImportButtonWithChecks = ({ size }) => {
 
 export const instruments = {
   "view-toggle": ({ size }) => {
-    return <ViewToggle size={size} style={style} />;
+    return <ViewToggle size={size} />;
   },
   "density-toggle": ({ size }) => {
     return <DensityToggle size={size} />;

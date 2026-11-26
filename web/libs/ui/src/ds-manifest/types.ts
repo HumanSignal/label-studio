@@ -3,6 +3,8 @@
  * `bun run ds:manifest` collects the fragments into `libs/ui/components.manifest.json` and renders
  * the design-system skill from them; `--check` is the lint gate.
  */
+import type { ControlSizing } from "./control-sizes";
+
 export type Tier = 1 | 2;
 
 /**
@@ -42,6 +44,12 @@ export type ComponentManifest = {
   use_when: string;
   never_when: string[];
   props_rules?: string[];
+  /**
+   * How the component takes part in the control size scale (`CONTROL_SIZES`): `control` takes `size` with the
+   * three shared values, `fixed` has one size and fits a row of any of them, `none` is not a row control
+   * (an editor, a drop area, a label). Required in the Inputs category.
+   */
+  sizing?: "control" | "fixed" | "none";
   /** Repo paths (from the monorepo root) or `jsx:`/`css:` patterns of the local look-alikes this replaces. */
   replaces: string[];
   /**
@@ -77,6 +85,7 @@ export type RegistryComponent = ComponentManifest & { dir: string };
 export type Manifest = {
   version: number;
   package: string;
+  controlSizes: ControlSizing;
   components: Record<string, RegistryComponent>;
   gaps: Record<string, GapManifest>;
   internal: Record<string, string>;

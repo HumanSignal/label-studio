@@ -5,6 +5,7 @@ feature that optimizes task API performance by excluding expensive fields.
 """
 
 import json
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 from data_manager.prepare_params import ConjunctionEnum, Filter, Filters, PrepareParams
@@ -483,6 +484,61 @@ class TestCastValueDatetimeBooleanValue(TestCase):
 
         # Should handle the bad value gracefully rather than raising TypeError.
         cast_value(_filter)
+
+
+class TestCastValueDatetimeIsUtcAware(TestCase):
+    """Datetime filter values end with Z, so cast_value must return UTC-aware datetimes.
+
+    A naive value makes Django emit "received a naive datetime while time zone support is active"
+    when it is compared with a DateTimeField, e.g. the annotated completed_at used by analytics KPIs.
+    """
+
+    def test_single_value_is_utc_aware(self):
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at', operator='less', type='Datetime', value='2026-11-24T23:59:00.000000Z'
+        )
+        cast_value(_filter)
+
+        assert _filter.value == datetime(2026, 11, 24, 23, 59, tzinfo=timezone.utc)
+        assert _filter.value.tzinfo is timezone.utc
+
+    def test_range_value_is_utc_aware(self):
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at',
+            operator='in',
+            type='Datetime',
+            value={'min': '2026-11-18T00:00:00.000Z', 'max': '2026-11-24T23:59:00.000Z'},
+        )
+        cast_value(_filter)
+
+        assert _filter.value.min == datetime(2026, 11, 18, tzinfo=timezone.utc)
+        assert _filter.value.max == datetime(2026, 11, 24, 23, 59, tzinfo=timezone.utc)
+
+    def test_filter_on_annotated_datetime_does_not_warn(self):
+        import warnings
+
+        from data_manager.managers import annotate_completed_at, apply_filters
+
+        project = ProjectFactory()
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter='filter:tasks:completed_at',
+                    operator='less',
+                    type='Datetime',
+                    value='2026-11-24T23:59:00.000000Z',
+                )
+            ],
+        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error', message='.*received a naive datetime.*', category=RuntimeWarning)
+            queryset = annotate_completed_at(Task.objects.filter(project=project))
+            list(apply_filters(queryset, filters, project, None))
 
 
 class TestApplyFiltersStaleAgreementFields(TestCase):

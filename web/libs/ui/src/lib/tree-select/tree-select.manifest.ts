@@ -4,6 +4,7 @@ export default defineManifest({
   name: "TreeSelect",
   tier: 2,
   category: "Inputs",
+  sizing: "none",
   exports: ["TreeSelect", "TreeSelectItem"],
   intent: [],
   use_when: "Choosing from a hierarchy, single or multiple, searchable.",

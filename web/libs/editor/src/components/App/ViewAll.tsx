@@ -40,6 +40,7 @@ export const ViewAll = ({ store: annotationStore, annotations, root }: Props) =>
           }
         >
           <SegmentedControl
+            size="small"
             aria-label="Annotations view"
             selectedOption={tab}
             onChange={handleCompareViewChange}

@@ -183,3 +183,30 @@ describe("InfoDialog", () => {
     await gone();
   });
 });
+
+describe("ConfirmDialog and InfoDialog keep keyboard focus", () => {
+  for (const [name, Component] of [
+    ["ConfirmDialog", ConfirmDialog],
+    ["InfoDialog", InfoDialog],
+  ] as const) {
+    it(`${name} pulls focus that leaves it back inside`, async () => {
+      render(
+        <>
+          <button type="button" data-testid="behind">
+            Behind
+          </button>
+          <Component open onOpenChange={() => {}} title="Heads up">
+            Body
+          </Component>
+        </>,
+      );
+      screen.getByTestId("dialog-ok-button").focus();
+
+      act(() => {
+        screen.getByTestId("behind").focus();
+      });
+
+      await waitFor(() => expect(screen.getByRole("dialog").contains(document.activeElement)).toBe(true));
+    });
+  }
+});

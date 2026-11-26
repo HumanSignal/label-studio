@@ -116,6 +116,7 @@ export function ConfirmDialog({ open, onOpenChange, ...current }: ConfirmDialogP
       showCloseButton={allowClose}
       closeOnScrimClick={allowClose && closeOnClickOutside}
       closeOnFocusOutside={false}
+      trapFocus
       footerMeta={footerMeta}
       bodyClassName={bodyClassName}
       dataTestId={dataTestId}
@@ -179,6 +180,7 @@ export function InfoDialog({ open, onOpenChange, ...current }: InfoDialogProps) 
       showCloseButton={allowClose}
       closeOnScrimClick={allowClose && closeOnClickOutside}
       closeOnFocusOutside={false}
+      trapFocus
       footerMeta={footerMeta}
       bodyClassName={bodyClassName}
       dataTestId={dataTestId}

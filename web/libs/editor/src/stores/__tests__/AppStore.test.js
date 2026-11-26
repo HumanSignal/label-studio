@@ -970,6 +970,74 @@ describe("AppStore", () => {
     });
   });
 
+  describe("own annotation in review (review:deny-own)", () => {
+    const ownAnnotationStore = (interfaces, extra = {}) => {
+      const store = createStore({ interfaces, user: { id: 7 }, users: [{ id: 7 }, { id: 8 }], ...extra });
+      store.initializeStore({
+        annotations: [
+          { id: 1, pk: 1, result: [], user: 7 },
+          { id: 2, pk: 2, result: [], user: 8 },
+        ],
+      });
+      return store;
+    };
+    const select = (store, pk) => {
+      const all = store.annotationStore.annotations;
+      store.annotationStore.selectAnnotation(all.find((a) => String(a.pk) === String(pk)).id);
+    };
+
+    it("acceptAnnotation and rejectAnnotation do nothing on the reviewer's own annotation", async () => {
+      const store = ownAnnotationStore(["basic", "review", "review:deny-own"]);
+      select(store, 1);
+
+      expect(store.annotationStore.selected.isOwnReviewBlocked).toBe(true);
+      store.acceptAnnotation();
+      store.rejectAnnotation({});
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+      expect(mockInvoke).not.toHaveBeenCalledWith("rejectAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit and reject hotkeys do nothing on the reviewer's own annotation", async () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = ownAnnotationStore(["basic", "review", "review:deny-own"], {
+          customButtons: { reject: [{ name: "remove", title: "Remove", menu: false }] },
+        });
+        select(store, 1);
+
+        store.handleSubmitHotkey();
+        store.handleSkipHotkey();
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(events.some((event) => event.type === "lsf:reject-with-action")).toBe(false);
+        expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+
+        select(store, 2);
+        store.handleSkipHotkey();
+        expect(events.find((event) => event.type === "lsf:reject-with-action")?.detail?.name).toBe("remove");
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+
+    it("does not block another user's annotation, or own annotations without review:deny-own", () => {
+      const store = ownAnnotationStore(["basic", "review", "review:deny-own"]);
+      select(store, 2);
+      expect(store.annotationStore.selected.isOwnReviewBlocked).toBe(false);
+
+      const managerStore = ownAnnotationStore(["basic", "review"]);
+      select(managerStore, 1);
+      expect(managerStore.annotationStore.selected.isOwnReviewBlocked).toBe(false);
+    });
+  });
+
   describe("isLoading guard", () => {
     it("submitAnnotation returns early when isLoading", async () => {
       const store = createStore();

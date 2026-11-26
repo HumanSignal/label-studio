@@ -1,0 +1,92 @@
+/*
+ * Side stepper: square minus and plus buttons at both ends, the same distance from the frame on
+ * every side, the number in between.
+ */
+.field {
+  --step-inset: var(--spacing-tighter);
+  --step-size: calc(var(--field-height) - 2px - 2 * var(--step-inset));
+
+  &[data-size="smaller"] {
+    --step-inset: var(--spacing-tightest);
+  }
+}
+
+.field input {
+  font-variant-numeric: tabular-nums;
+}
+
+.side.side {
+  padding-inline: var(--step-inset);
+}
+
+/* Without buttons, a short unit is centred in the slot the plus button would take, so `$`, `%`, the plus
+   and the arrows line up down a column of fields. */
+.unitEnd.unitEnd {
+  padding-right: var(--step-inset);
+}
+
+.unitSlot {
+  display: inline-flex;
+  justify-content: center;
+  min-width: var(--step-size);
+}
+
+/* A unit next to the plus button keeps the field's own gap from it. */
+.field > span:has(> .step) {
+  gap: var(--spacing-tight);
+}
+
+.centered {
+  text-align: center;
+}
+
+.field .step {
+  flex: none;
+  width: var(--step-size);
+  min-width: 0;
+  height: var(--step-size);
+  min-height: 0;
+  padding: 0;
+  justify-content: center;
+}
+
+/* The trailing slot stretches so the arrows can fill the frame; the unit keeps its gap to them. */
+.field > span:has(> .compact) {
+  align-self: stretch;
+  gap: var(--spacing-tight);
+}
+
+/*
+ * Compact stepper: two arrows that split the height of the frame. The column is as wide as the plus
+ * button's slot, so the arrows sit where the plus icon does.
+ */
+.compact {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  box-sizing: content-box;
+  width: calc(var(--step-size) + 2 * var(--step-inset));
+  margin-right: calc(-1 * var(--field-padding-end));
+  border-left: 1px solid var(--color-neutral-border);
+}
+
+/* Two arrows split the frame's height, so they keep a fixed small icon instead of the control's icon size. */
+.field .compactStep svg {
+  width: 12px;
+  height: 12px;
+}
+
+.field .compactStep {
+  flex: 1;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+
+  &:first-child {
+    border-top-right-radius: calc(var(--corner-radius-small) - 1px);
+  }
+
+  &:last-child {
+    border-bottom-right-radius: calc(var(--corner-radius-small) - 1px);
+  }
+}

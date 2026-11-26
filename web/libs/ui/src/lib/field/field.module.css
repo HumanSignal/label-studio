@@ -1,0 +1,96 @@
+/* Stacked: label, description, control, message. Horizontal: text left, control right, message full width under both. */
+.field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-tighter);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-family-base);
+
+  &[data-layout="horizontal"] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--spacing-wide);
+    align-items: start;
+
+    & .error,
+    & .hint {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tightest);
+  min-width: 0;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-tight);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: 0;
+  color: var(--color-neutral-content);
+  font-size: var(--font-size-label-small);
+  line-height: var(--line-height-label-small);
+  font-weight: var(--font-weight-medium);
+}
+
+.legend {
+  margin-bottom: var(--spacing-tighter);
+  float: left;
+  width: 100%;
+}
+
+.legend + * {
+  clear: both;
+}
+
+.info {
+  display: inline-flex;
+  color: var(--color-neutral-content-subtlest);
+}
+
+.action {
+  flex: none;
+  font-size: var(--font-size-label-small);
+}
+
+.description,
+.hint {
+  color: var(--color-neutral-content-subtler);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+}
+
+.control {
+  min-width: 0;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-tighter);
+  color: var(--color-negative-content);
+  font-size: var(--font-size-body-small);
+  line-height: var(--line-height-body-small);
+
+  & svg {
+    flex: none;
+    margin-top: 2px;
+  }
+}

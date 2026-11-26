@@ -167,6 +167,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         const button = listed.find((item) => item.name === name);
         const hasCustomReject = listed.length > 0;
         const selected = store.annotationStore?.selected;
+        if (selected?.isOwnReviewBlocked) return;
         closeRejectMenu();
 
         const runReject = () => {
@@ -238,7 +239,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       return <div className={cn("controls").toClassName()}>{buttons}</div>;
     }
 
-    if (isReview) {
+    if (isReview && annotation.isOwnReviewBlocked) {
+      buttons.push(
+        <div className={cn("controls").elem("skipped-info").toClassName()} key="own-review">
+          You can't review your own annotation
+        </div>,
+      );
+    } else if (isReview) {
       const hasChanges = Boolean(history?.canUndo || versions?.draft);
       const reviewState = normalizeReviewAcceptedState(annotation.acceptedState);
       const reviewCopy = resolveReviewBarCopy(reviewState, hasChanges);

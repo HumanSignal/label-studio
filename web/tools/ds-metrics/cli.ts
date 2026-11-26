@@ -7,6 +7,9 @@
  *   bun run ds:metrics --compare base.json   the PR comment markdown: this checkout vs a base snapshot
  *   bun run ds:metrics --gate base.json      exit 1 when a rule's whole-repo count rose against the base snapshot
  *   bun run ds:metrics --append history.ndjson   add this checkout to the series (one line per commit)
+ *   bun run ds:metrics --upsert history.ndjson   the same, replacing the line of the same commit (a remeasure)
+ *   bun run ds:metrics --stale history.ndjson    the commits measured without one of today's rules, oldest first,
+ *                                                one per line: the points to remeasure; no snapshot
  *   bun run ds:metrics --series history.ndjson   the dashboard data (points, clusters, goals, week delta); no snapshot
  *   --pr <n> --commit <sha> --date <iso>     identity of the snapshot (defaults: null, HEAD, now)
  *   --since <sha>                            the PRs merged after that commit up to --commit that changed web code
@@ -18,9 +21,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { DS_RULES } from "../ds-check/rules";
 import { TEMPLATE_RULE, listTemplateFiles, scanTemplateSource } from "../ds-check/templates";
 import { renderComparison, ruleIncreases } from "./compare";
-import { appendSnapshot, readHistory } from "./history";
+import { appendSnapshot, readHistory, staleCommits, upsertSnapshot } from "./history";
 import { mergedPrs } from "./prs";
 import { buildSeries } from "./series";
 import { type CheckAll, type Manifest, type Snapshot, type TemplateMeasure, type Web, buildSnapshot } from "./snapshot";
@@ -110,6 +114,7 @@ function snapshot(): Snapshot {
     webs: { lso: checkAll("lso"), lse: checkAll("lse") },
     exists: (p) => fs.existsSync(path.join(repoRoot, p)),
     templates: measureTemplates(),
+    measuredRules: DS_RULES,
   });
 }
 
@@ -117,6 +122,13 @@ const seriesFile = valueOf("--series");
 if (seriesFile) {
   if (!fs.existsSync(seriesFile)) fail(`history not found: ${seriesFile}`);
   console.log(JSON.stringify(buildSeries(readHistory(seriesFile)), null, 2));
+  process.exit(0);
+}
+
+const staleFile = valueOf("--stale");
+if (staleFile) {
+  if (!fs.existsSync(staleFile)) fail(`history not found: ${staleFile}`);
+  for (const commit of staleCommits(readHistory(staleFile), DS_RULES)) console.log(commit);
   process.exit(0);
 }
 
@@ -154,6 +166,12 @@ if (historyFile) {
   console.log(
     `[ds-metrics] ${written ? "appended" : "already present"}: ${snap.commit.slice(0, 10)} in ${historyFile}`,
   );
+  process.exit(0);
+}
+
+const upsertFile = valueOf("--upsert");
+if (upsertFile) {
+  console.log(`[ds-metrics] ${upsertSnapshot(upsertFile, snap)}: ${snap.commit.slice(0, 10)} in ${upsertFile}`);
   process.exit(0);
 }
 

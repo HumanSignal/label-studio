@@ -29,6 +29,36 @@ describe("scanTemplateSource", () => {
     expect(findings[0].file).toBe(FILE);
   });
 
+  test("finds raw text, number and radio inputs and textareas, but not sliders, colours, hidden or file inputs", () => {
+    const source = [
+      '<input type="text" value={v} />',
+      "React.createElement('input', {",
+      "  value: level,",
+      "  type: 'number',",
+      "})",
+      '<input type="range" min={0} max={1} />',
+      "h('input', { type: 'file', onChange: pick })",
+      "React.createElement('input', { type: 'color' })",
+      '<input type="hidden" value={id} />',
+      "<input value={q} onChange={search} />",
+      '<input type="radio" name="mode" />',
+      "<textarea value={notes} />",
+      "// ds-allow-raw: inline cell editor sized to the table cell",
+      '<input type="text" value={cell} />',
+    ].join("\n");
+    expect(scanTemplateSource(FILE, source).map((f) => f.line)).toEqual([1, 2, 10, 11, 12]);
+  });
+
+  test("finds raw controls created through a short alias for React.createElement", () => {
+    const source = [
+      "var h = React.createElement;",
+      'h("button", { onClick: go }, "Go")',
+      "h('svg', { viewBox: '0 0 24 24' })",
+      "const width = h(10);",
+    ].join("\n");
+    expect(scanTemplateSource(FILE, source).map((f) => f.line)).toEqual([2, 3]);
+  });
+
   test("finds native dialogs, which the sandbox blocks, and hand-built modal dialogs", () => {
     const source = [
       "if (confirm('Clear all regions?')) clear();",
