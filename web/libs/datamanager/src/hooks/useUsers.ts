@@ -1,5 +1,5 @@
-import { useCallback, useRef } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { type InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Extend Window interface to include DataManager properties
 declare global {
@@ -52,9 +52,6 @@ export const normalizeSelectedUserIds = (selectedValue: SelectedUserValue): numb
   return [...new Set(values)];
 };
 
-export const getUsersPageSize = (pageSize: number, selectedUserIds: number[]): number =>
-  Math.min(Math.max(pageSize, selectedUserIds.length), MAX_USERS_PAGE_SIZE);
-
 export const chunkSelectedUserIds = (selectedUserIds: number[]): number[][] => {
   const chunks: number[][] = [];
   for (let index = 0; index < selectedUserIds.length; index += MAX_USERS_PAGE_SIZE) {
@@ -63,21 +60,9 @@ export const chunkSelectedUserIds = (selectedUserIds: number[]): number[][] => {
   return chunks;
 };
 
-export const mergeSelectedUsers = (
-  response: UsersResponse,
-  cachedUsers: APIUser[],
-  selectedUserIds: number[],
-  inflateDisplayCount = true,
-): UsersResponse => {
-  const selectedIds = new Set(selectedUserIds);
-  const responseIds = new Set(response.results.map(({ id }) => id));
-  const selectedUsers = cachedUsers.filter(({ id }) => selectedIds.has(id) && !responseIds.has(id));
-
-  return {
-    ...response,
-    results: [...response.results, ...selectedUsers],
-    displayCount: response.count + (inflateDisplayCount ? selectedUsers.length : 0),
-  };
+export const appendSelectedUsers = (pagedUsers: APIUser[], selectedUsers: APIUser[]): APIUser[] => {
+  const pagedIds = new Set(pagedUsers.map(({ id }) => id));
+  return [...pagedUsers, ...selectedUsers.filter(({ id }) => !pagedIds.has(id))];
 };
 
 export const deduplicateUsers = (users: APIUser[]): APIUser[] => {
@@ -89,7 +74,19 @@ export const deduplicateUsers = (users: APIUser[]): APIUser[] => {
 export const getUsersItemCount = (serverCount: number, loadedUserCount: number, hasNextPage?: boolean): number =>
   hasNextPage === false ? loadedUserCount : serverCount;
 
-// DataManager-style user fetching with pagination using React Query
+const getStore = () => {
+  // Use the correct DataManager API pattern - window.DM is the AppStore
+  const store = window?.DM?.store || window?.DM;
+  if (!store) {
+    throw new Error("DataManager store not available");
+  }
+  return store;
+};
+
+// DataManager-style user fetching with pagination using React Query.
+// The option list keeps the server order whatever is selected: selected users are fetched on their own
+// so the picker can show them without the list re-sorting them to the top. Selected users are looked up
+// in the query cache, so a picker that remounts still finds the ones it loaded before.
 export const useDataManagerUsers = (
   projectId: string | number,
   pageSize = 20,
@@ -97,78 +94,36 @@ export const useDataManagerUsers = (
   selectedValue: SelectedUserValue = null,
   scope: DataManagerUserScope = {},
 ) => {
-  const seenUsersRef = useRef(new Map<number, APIUser>());
+  const queryClient = useQueryClient();
   const selectedUserIds = normalizeSelectedUserIds(selectedValue);
-  const selectedUserIdChunks = chunkSelectedUserIds(selectedUserIds);
-  const requestPageSize = getUsersPageSize(pageSize, selectedUserIds);
   // Include column so predicate-scoped pickers do not share React Query cache entries.
   // Do not reintroduce removed isDeleted/role — those were dropped from the options contract (FIT-2282).
-  const queryKey = ["projectUsers", projectId, scope.column, requestPageSize, search, selectedUserIds];
+  const queryKey = ["projectUsers", projectId, scope.column, pageSize, search];
 
   const { data, isLoading, isError, error, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     {
       queryKey,
       queryFn: async ({ pageParam = 1 }) => {
-        // Use the correct DataManager API pattern - window.DM is the AppStore
-        const store = window?.DM?.store || window?.DM;
-
-        if (!store) {
-          throw new Error("DataManager store not available");
-        }
-
         const params: any = {
           page: pageParam,
-          page_size: requestPageSize,
+          page_size: pageSize,
           project: projectId,
           ordering: "id",
         };
 
         if (search) params.search = search;
         if (scope.column) params.column = scope.column;
-        if (selectedUserIdChunks.length) params.selected_value = selectedUserIdChunks[0];
-        const apiResponse = await store.apiCall?.("projectUsers", params);
+        const apiResponse = await getStore().apiCall?.("projectUsers", params);
 
         if (!apiResponse) {
           throw new Error("No users found in response or response is invalid");
         }
-        const response = normalizeUsersResponse(apiResponse);
-        response.results.forEach((user) => seenUsersRef.current.set(user.id, user));
-        if (pageParam === 1 && selectedUserIdChunks.length && (search || selectedUserIdChunks.length > 1)) {
-          const chunksToFetch = search ? selectedUserIdChunks : selectedUserIdChunks.slice(1);
-          await Promise.all(
-            chunksToFetch.map(async (selectedIds) => {
-              const missingSelectedIds = selectedIds.filter((id) => !seenUsersRef.current.has(id));
-              if (!missingSelectedIds.length) return;
-
-              const selectedParams = {
-                ...params,
-                page: 1,
-                page_size: MAX_USERS_PAGE_SIZE,
-                selected_value: missingSelectedIds,
-              };
-              delete selectedParams.search;
-              const selectedApiResponse = await store.apiCall?.("projectUsers", selectedParams);
-              if (selectedApiResponse) {
-                const missingIds = new Set(missingSelectedIds);
-                normalizeUsersResponse(selectedApiResponse)
-                  .results.filter(({ id }) => missingIds.has(id))
-                  .forEach((user) => seenUsersRef.current.set(user.id, user));
-              }
-            }),
-          );
-          const selectedUsers = selectedUserIds.flatMap((id) => {
-            const user = seenUsersRef.current.get(id);
-            return user ? [user] : [];
-          });
-          return mergeSelectedUsers(response, selectedUsers, selectedUserIds, Boolean(search));
-        }
-
-        return response;
+        return normalizeUsersResponse(apiResponse);
       },
       getNextPageParam: (lastPage, allPages) => {
         const totalCount = lastPage.count || 0;
         const currentPage = allPages.length;
-        const hasMore = currentPage * requestPageSize < totalCount;
+        const hasMore = currentPage * pageSize < totalCount;
         return hasMore ? currentPage + 1 : undefined;
       },
       enabled: !!projectId,
@@ -178,9 +133,51 @@ export const useDataManagerUsers = (
     },
   );
 
-  // Flatten all pages into a single array
-  const users = deduplicateUsers(data?.pages.flatMap((page) => page.results) ?? []);
-  const serverTotal = data?.pages[0]?.displayCount ?? data?.pages[0]?.count ?? 0;
+  const knownUsers = new Map<number, APIUser>();
+  queryClient
+    .getQueriesData<InfiniteData<UsersResponse>>(["projectUsers", projectId, scope.column])
+    .forEach(([, cached]) => cached?.pages?.forEach((page) => page.results.forEach((u) => knownUsers.set(u.id, u))));
+  queryClient
+    .getQueriesData<APIUser[]>(["projectUsersSelected", projectId, scope.column])
+    .forEach(([, cached]) => cached?.forEach((u) => knownUsers.set(u.id, u)));
+
+  const missingSelectedIds = selectedUserIds.filter((id) => !knownUsers.has(id));
+  useQuery({
+    queryKey: ["projectUsersSelected", projectId, scope.column, missingSelectedIds],
+    queryFn: async () => {
+      const store = getStore();
+      const batches = await Promise.all(
+        chunkSelectedUserIds(missingSelectedIds).map(async (selectedIds) => {
+          const params: any = {
+            page: 1,
+            page_size: MAX_USERS_PAGE_SIZE,
+            project: projectId,
+            ordering: "id",
+            selected_value: selectedIds,
+          };
+          if (scope.column) params.column = scope.column;
+          const apiResponse = await store.apiCall?.("projectUsers", params);
+          if (!apiResponse) return [];
+          const requestedIds = new Set(selectedIds);
+          return normalizeUsersResponse(apiResponse).results.filter(({ id }) => requestedIds.has(id));
+        }),
+      );
+      return batches.flat();
+    },
+    enabled: !!projectId && missingSelectedIds.length > 0,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+  });
+
+  const pagedUsers = deduplicateUsers(data?.pages.flatMap((page) => page.results) ?? []);
+  const selectedUsers = selectedUserIds.flatMap((id) => {
+    const user = knownUsers.get(id);
+    return user ? [user] : [];
+  });
+  const users = appendSelectedUsers(pagedUsers, selectedUsers);
+  // Selected users outside a search result are extra rows the server did not count.
+  const appendedCount = search ? users.length - pagedUsers.length : 0;
+  const serverTotal = (data?.pages[0]?.count ?? 0) + appendedCount;
   const total = getUsersItemCount(serverTotal, users.length, hasNextPage);
 
   const loadMore = useCallback(() => {

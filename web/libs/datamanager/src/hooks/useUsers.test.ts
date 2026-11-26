@@ -1,10 +1,9 @@
 import { describe, expect, it } from "bun:test";
 import * as userHooks from "./useUsers";
 import {
+  appendSelectedUsers,
   deduplicateUsers,
   getUsersItemCount,
-  getUsersPageSize,
-  mergeSelectedUsers,
   normalizeSelectedUserIds,
   normalizeUsersResponse,
 } from "./useUsers";
@@ -24,17 +23,7 @@ describe("Data Manager user multiselect helpers", () => {
     expect(normalizeSelectedUserIds([7, 8, 7])).toEqual([7, 8]);
   });
 
-  it("requests enough first-page options to rehydrate every selected user", () => {
-    expect(getUsersPageSize(10, [1, 2])).toBe(10);
-    expect(
-      getUsersPageSize(
-        10,
-        Array.from({ length: 12 }, (_, index) => index + 1),
-      ),
-    ).toBe(12);
-  });
-
-  it("caps option requests and chunks large selected-value sets", () => {
+  it("chunks large selected-value sets", () => {
     const selectedIds = Array.from({ length: 205 }, (_, index) => index + 1);
     const chunkSelectedUserIds = (
       userHooks as typeof userHooks & {
@@ -42,7 +31,6 @@ describe("Data Manager user multiselect helpers", () => {
       }
     ).chunkSelectedUserIds;
 
-    expect(getUsersPageSize(10, selectedIds)).toBe(100);
     expect(typeof chunkSelectedUserIds).toBe("function");
     expect(chunkSelectedUserIds?.(selectedIds).map((chunk) => chunk.length)).toEqual([100, 100, 5]);
   });
@@ -64,15 +52,10 @@ describe("Data Manager user multiselect helpers", () => {
     expect(normalizeUsersResponse(response)).toEqual(response);
   });
 
-  it("preserves selected users during search without corrupting the server count", () => {
-    const response = { results: [user(3), user(4)], count: 25 };
-    const cachedUsers = [user(1), user(2), user(3)];
-
-    expect(mergeSelectedUsers(response, cachedUsers, [1, 2])).toEqual({
-      results: [user(3), user(4), user(1), user(2)],
-      count: 25,
-      displayCount: 27,
-    });
+  it("keeps the server order and appends only selected users the pages do not hold", () => {
+    expect(appendSelectedUsers([user(1), user(2), user(3)], [user(2), user(9)]).map(({ id }) => id)).toEqual([
+      1, 2, 3, 9,
+    ]);
   });
 
   it("deduplicates users by id while preserving their first-page order", () => {

@@ -96,7 +96,34 @@ describe("Data Manager user multi-select search", () => {
     ).toEqual(expect.arrayContaining([expect.arrayContaining(["projectUsers", 42, "annotators", 10])]));
   });
 
-  it("keeps the remaining matching user visible after selecting one", async () => {
+  it("opens the shared filter dropdown width with body-size option text", async () => {
+    const apiCall = mock(() => Promise.resolve({ results: [users.mattOne], count: 1 }));
+    window.DM = { store: { apiCall } };
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, cacheTime: 0 } },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <UserSelect
+          filter={{ view: { project: { id: 42 } } }}
+          multiple={true}
+          value={[]}
+          onChange={() => {}}
+          placeholder="Select annotators"
+        />
+      </QueryClientProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Select annotators" }));
+    const option = await screen.findByTestId("select-option-1");
+
+    expect(screen.getByTestId("select-popup")).toHaveClass("filter-dropdown-content");
+    expect(option.querySelector(".typography-body-medium")).toHaveTextContent("Matt One (matt.one@example.test)");
+    expect(option.querySelector(".typography-body-smallest")).toBeNull();
+  });
+
+  it("keeps the option list and its order when a user is selected", async () => {
     const methods: string[] = [];
     const requests: Array<Record<string, unknown>> = [];
     const apiCall = mock((method: string, params: Record<string, unknown>) => {
@@ -136,14 +163,23 @@ describe("Data Manager user multi-select search", () => {
     await screen.findByTestId("select-option-2");
 
     const requestCountBeforeSelection = requests.length;
-    fireEvent.click(screen.getByTestId("select-option-1"));
-    await waitFor(() => expect(requests.length).toBeGreaterThan(requestCountBeforeSelection));
+    fireEvent.click(screen.getByTestId("select-option-2"));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Selected items group/ })).toHaveAttribute(
+        "aria-label",
+        "Selected items group, 1 items selected",
+      ),
+    );
 
-    const requestAfterSelection = requests.at(-1);
-
-    expect(requestAfterSelection?.search).toBe("matt");
+    // Selecting a loaded user needs no request and does not move it to the top of the list.
+    expect(requests.length).toBe(requestCountBeforeSelection);
     expect(new Set(methods)).toEqual(new Set(["projectUsers"]));
-    await waitFor(() => expect(screen.getByTestId("select-option-2")).toBeInTheDocument());
+    expect(
+      screen
+        .getAllByTestId(/^select-option-\d+$/)
+        .filter((option) => !option.closest("[class*=selectedItemsGroup]"))
+        .map((option) => option.dataset.testid),
+    ).toEqual(["select-option-1", "select-option-2"]);
     expect(screen.queryByText("No results found.")).not.toBeInTheDocument();
   });
 
@@ -160,7 +196,7 @@ describe("Data Manager user multi-select search", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false, cacheTime: 0 } },
     });
-    queryClient.setQueryData(["projectUsers", 42, undefined, 10, null, selectedIds], {
+    queryClient.setQueryData(["projectUsers", 42, undefined, 10, null], {
       pages: [{ results: allUsers, count: allUsers.length }],
       pageParams: [undefined],
     });
@@ -176,7 +212,7 @@ describe("Data Manager user multi-select search", () => {
       </QueryClientProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /Matt One/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Matt One/ }));
     fireEvent.change(screen.getByTestId("select-search-field"), { target: { value: "matt" } });
     await waitFor(() => expect(requests.some((request) => request.search === "matt")).toBe(true));
 
@@ -197,57 +233,79 @@ describe("Data Manager user multi-select search", () => {
     expect(screen.queryByTestId("select-option-4")).not.toBeInTheDocument();
   });
 
-  it("keeps current search results visible while a selection request is pending", async () => {
-    let resolveSelectionRequest: (() => void) | undefined;
+  it("lists preselected users in server order instead of first", async () => {
+    const requests: Array<Record<string, unknown>> = [];
     const apiCall = mock((_method: string, params: Record<string, unknown>) => {
-      const response = { results: [users.mattOne, users.mattTwo], count: 2 };
-      if (Array.isArray(params.selected_value) && params.selected_value.length > 0) {
-        return new Promise((resolve) => {
-          resolveSelectionRequest = () => resolve(response);
-        });
-      }
-      return Promise.resolve(response);
+      requests.push(params);
+      const results = Array.isArray(params.selected_value)
+        ? [users.other]
+        : [users.mattOne, users.mattTwo, users.other];
+      return Promise.resolve({ results, count: results.length });
     });
     window.DM = { store: { apiCall } };
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false, cacheTime: 0 } },
     });
 
-    const ControlledUserSelect = () => {
-      const [value, setValue] = useState<number[]>([]);
-      return (
+    render(
+      <QueryClientProvider client={queryClient}>
         <UserSelect
           filter={{ view: { project: { id: 42 } } }}
           multiple={true}
-          value={value}
-          onChange={(nextValue: number[]) => setValue(nextValue)}
+          value={[users.other.id]}
+          onChange={() => {}}
           placeholder="Select annotators"
         />
-      );
-    };
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <ControlledUserSelect />
       </QueryClientProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Select annotators" }));
-    fireEvent.change(await screen.findByTestId("select-search-field"), { target: { value: "matt" } });
-    await screen.findByTestId("select-option-2");
-    fireEvent.click(screen.getByTestId("select-option-1"));
-    await waitFor(() => expect(resolveSelectionRequest).toBeDefined());
+    fireEvent.click(await screen.findByRole("button", { name: /Other User/ }));
+    await screen.findByTestId("select-option-1");
 
-    expect(screen.queryByText("No results found.")).not.toBeInTheDocument();
-    expect(screen.getByTestId("select-option-2")).toBeInTheDocument();
-
-    resolveSelectionRequest?.();
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Selected items group/ })).toHaveAttribute(
-        "aria-label",
-        "Selected items group, 1 items selected",
-      ),
+    const listRequests = requests.filter((request) => !("selected_value" in request));
+    expect(listRequests.length).toBeGreaterThan(0);
+    expect(
+      screen
+        .getAllByTestId(/^select-option-\d+$/)
+        .filter((option) => !option.closest("[class*=selectedItemsGroup]"))
+        .map((option) => option.dataset.testid),
+    ).toEqual(["select-option-1", "select-option-2", "select-option-3"]);
+    expect(screen.getByRole("button", { name: /Selected items group/ })).toHaveAttribute(
+      "aria-label",
+      "Selected items group, 1 items selected",
     );
+  });
+
+  it("still shows a selected user from beyond the loaded pages after the picker remounts", async () => {
+    const requests: Array<Record<string, unknown>> = [];
+    const apiCall = mock((_method: string, params: Record<string, unknown>) => {
+      requests.push(params);
+      const results = Array.isArray(params.selected_value) ? [users.reviewer] : [users.mattOne, users.mattTwo];
+      return Promise.resolve({ results, count: Array.isArray(params.selected_value) ? 1 : 4 });
+    });
+    window.DM = { store: { apiCall } };
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const picker = () => (
+      <QueryClientProvider client={queryClient}>
+        <UserSelect
+          filter={{ view: { project: { id: 42 } } }}
+          multiple={true}
+          value={[users.reviewer.id]}
+          onChange={() => {}}
+          placeholder="Select annotators"
+        />
+      </QueryClientProvider>
+    );
+
+    const first = render(picker());
+    await screen.findByRole("button", { name: /Review User/ });
+    first.unmount();
+    const selectedRequests = requests.filter((request) => "selected_value" in request).length;
+
+    render(picker());
+
+    expect(await screen.findByRole("button", { name: /Review User/ })).toBeTruthy();
+    expect(requests.filter((request) => "selected_value" in request)).toHaveLength(selectedRequests);
   });
 
   it("keeps current search results visible while an unselection request is pending", async () => {
@@ -382,11 +440,7 @@ describe("Data Manager user multi-select search", () => {
 
     fireEvent.change(searchField, { target: { value: "other" } });
     await waitFor(() =>
-      expect(
-        requests.some(
-          (request) => request.search === "other" && JSON.stringify(request.selected_value) === JSON.stringify([1, 2]),
-        ),
-      ).toBe(true),
+      expect(requests.some((request) => request.search === "other" && !("selected_value" in request))).toBe(true),
     );
     fireEvent.click(await screen.findByTestId("select-option-3"));
     await waitFor(() => expect(selectionChanges.at(-1)).toEqual([1, 2, 3]));
@@ -405,7 +459,7 @@ describe("Data Manager user multi-select search", () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false, cacheTime: 0 } },
     });
-    queryClient.setQueryData(["projectUsers", 42, undefined, 10, null, selectedIds], {
+    queryClient.setQueryData(["projectUsers", 42, undefined, 10, null], {
       pages: [{ results: allUsers, count: allUsers.length }],
       pageParams: [undefined],
     });

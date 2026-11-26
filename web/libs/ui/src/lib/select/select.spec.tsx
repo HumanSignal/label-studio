@@ -445,6 +445,32 @@ describe("Select Component", () => {
       }
     });
 
+    it("never renders the virtual list narrower than its popover", async () => {
+      const restoreWidths = mockElementWidths({ scrollWidth: 150, triggerWidth: 160 });
+
+      try {
+        render(
+          <Select
+            options={["ada", "bob"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.width).toBe(160);
+          expect(lastCall.style).toMatchObject({ minWidth: "100%", maxWidth: "100%" });
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
     it("does not render the width sizer while the dropdown is closed", () => {
       render(
         <Select

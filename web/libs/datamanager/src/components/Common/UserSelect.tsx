@@ -38,6 +38,15 @@ export const summarizeSelectedUsers = (
   return { primaryLabel, overflowCount: Math.max(0, selectedOptions.length - 1) };
 };
 
+const UserLabel = ({ user, title, children }) => (
+  <Tooltip title={title} alignment="top-left">
+    <div className="flex w-full min-w-0 items-center gap-tight">
+      <Avatar user={user} size="smaller" />
+      {children}
+    </div>
+  </Tooltip>
+);
+
 export const UserSelect = observer(({ filter, onChange, multiple, value, placeholder, disabled, readOnly }) => {
   const [search, setSearch] = useState(null);
   const selectedValue = useMemo(() => normalizeSelectedValue(value, multiple), [multiple, value]);
@@ -51,7 +60,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
     [],
   );
 
-  const { users, hasMore, total, loadMore, isLoading } = useDataManagerUsers(
+  const { users, total, loadMore, isLoading } = useDataManagerUsers(
     projectId,
     optionsPerRequest,
     search,
@@ -69,19 +78,18 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
       return {
         value: user.id,
         raw: { id: user.id, email: user.email, displayName, username: user.username },
+        user: displayUser,
+        optionLabel,
         label: (
-          <Tooltip title={optionLabel} alignment="top-left">
-            <div className="flex gap-2 w-full items-center">
-              <Avatar user={displayUser} size="smaller" key={`user-${user.id}`} showName={true} />
-              <Typography as="span" size="smallest" className="text-ellipsis text-nowrap overflow-hidden w-full">
-                {optionLabel}
-              </Typography>
-            </div>
-          </Tooltip>
+          <UserLabel user={displayUser} title={optionLabel}>
+            <Typography as="span" className="min-w-0 truncate">
+              {optionLabel}
+            </Typography>
+          </UserLabel>
         ),
       };
     });
-  }, [users, hasMore, loadMore]);
+  }, [users]);
 
   const _onChange = useCallback(
     (val) => {
@@ -109,29 +117,33 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
         return <span className="truncate w-full">{selectPlaceholder ?? placeholder}</span>;
       }
 
-      // Single selection: keep the rich option label in the trigger.
+      // Single selection keeps the full label; the text takes the trigger's font size.
       if (!multiple || selectedOptions.length === 1) {
+        const selected = selectedOptions[0];
+        if (selected?.user) {
+          return (
+            <UserLabel user={selected.user} title={selected.optionLabel}>
+              <span className="min-w-0 truncate">{selected.optionLabel}</span>
+            </UserLabel>
+          );
+        }
         return (
-          selectedOptions[0]?.label ?? (
-            <span className="truncate w-full">
-              {summarizeSelectedUsers(selectedOptions, selectPlaceholder).primaryLabel}
-            </span>
-          )
+          <span className="truncate w-full">
+            {summarizeSelectedUsers(selectedOptions, selectPlaceholder).primaryLabel}
+          </span>
         );
       }
 
       const { primaryLabel, overflowCount } = summarizeSelectedUsers(selectedOptions, selectPlaceholder);
-      const firstUser = selectedOptions[0]?.raw;
+      const firstUser = selectedOptions[0]?.user ?? selectedOptions[0]?.raw;
 
       return (
         <span
-          className="flex min-w-0 max-w-full items-center gap-1 overflow-hidden"
+          className="flex min-w-0 max-w-full items-center gap-tighter overflow-hidden"
           data-testid="user-select-trigger-summary"
         >
           {firstUser ? <Avatar user={firstUser} size="smaller" /> : null}
-          <Typography as="span" size="smallest" className="min-w-0 truncate">
-            {primaryLabel}
-          </Typography>
+          <span className="min-w-0 truncate">{primaryLabel}</span>
           {overflowCount > 0 ? (
             <span className="shrink-0 text-neutral-content-subtler" aria-label={`${overflowCount} more selected`}>
               +{overflowCount}
@@ -150,6 +162,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
       value={selectedValue}
       onChange={_onChange}
       triggerClassName={`${cn("form-select").elem("list").toString()} w-full max-w-[200px] min-w-0`}
+      contentClassName="filter-dropdown-content"
       loadMore={loadMore}
       size={SelectSize.SMALLER}
       placeholder={placeholder}
@@ -157,6 +170,7 @@ export const UserSelect = observer(({ filter, onChange, multiple, value, placeho
       readOnly={readOnly}
       multiple={multiple}
       isVirtualList={true}
+      withDynamicWidth={true}
       searchable={true}
       isLoading={isLoading}
       onSearch={debouncedSearch}
