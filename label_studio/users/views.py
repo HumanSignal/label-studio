@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_http_methods
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
 from users import forms
@@ -20,19 +21,32 @@ from users.functions import login, proceed_registration
 logger = logging.getLogger()
 
 
-@login_required
-def logout(request):
-    auth.logout(request)
-
+def _logout_redirect_url():
     if settings.LOGOUT_REDIRECT_URL:
-        return redirect(settings.LOGOUT_REDIRECT_URL)
+        return settings.LOGOUT_REDIRECT_URL
 
     if settings.HOSTNAME:
         redirect_url = settings.HOSTNAME
         if not redirect_url.endswith('/'):
             redirect_url += '/'
-        return redirect(redirect_url)
-    return redirect('/')
+        return redirect_url
+    return '/'
+
+
+@require_http_methods(['GET', 'POST'])
+def logout(request):
+    if request.method == 'GET':
+        # GET must not end the session: any third-party page can trigger a top-level GET navigation
+        if request.user.is_authenticated:
+            return render(request, 'users/user_logout.html')
+        return redirect(_logout_redirect_url())
+
+    auth.logout(request)
+    return redirect(_logout_redirect_url())
+
+
+# Set directly instead of @enforce_csrf_checks so the check does not depend on USE_ENFORCE_CSRF_CHECKS
+logout._dont_enforce_csrf_checks = False
 
 
 @enforce_csrf_checks

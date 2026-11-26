@@ -442,7 +442,13 @@ def signin(client, email, password):
 
 
 def signout(client):
-    return client.get('/logout')
+    """Log out like the UI: GET renders the confirmation form with a CSRF token, POST ends the session"""
+    response = client.get('/logout')
+    if response.status_code != 200:
+        # Anonymous client: GET already redirects to the post-logout page
+        return response
+    csrf_cookie = client.cookies.get(settings.CSRF_COOKIE_NAME)
+    return client.post('/logout', HTTP_X_CSRFTOKEN=csrf_cookie.value if csrf_cookie else '')
 
 
 def _client_is_annotator(client):

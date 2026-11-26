@@ -192,7 +192,20 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                   href={pages.AccountSettingsPage.path}
                 />
                 {/* <Menu.Item label="Dark Mode"/> */}
-                <Menu.Item icon={<IconDoor />} label="Log Out" href={absoluteURL("/logout")} data-external />
+                <Menu.Item
+                  icon={<IconDoor />}
+                  label="Log Out"
+                  href={absoluteURL("/logout")}
+                  data-external
+                  onClick={(e) => {
+                    // Logout is POST-only; without the form the link opens the confirmation page
+                    const form = document.getElementById("logout-form");
+                    if (form) {
+                      e.preventDefault();
+                      form.submit();
+                    }
+                  }}
+                />
                 {showNewsletterDot && (
                   <>
                     <Menu.Divider />

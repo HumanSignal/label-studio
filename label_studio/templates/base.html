@@ -62,6 +62,9 @@
 
 <div class="app-wrapper"></div>
 
+{# Logout is POST-only with CSRF; the SPA and Django pages submit this form to log out #}
+<form id="logout-form" method="post" action="{{ settings.HOSTNAME }}/logout" hidden>{% csrf_token %}</form>
+
 <template id="main-content">
   <main class="main">
 

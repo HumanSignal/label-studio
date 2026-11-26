@@ -4,7 +4,7 @@ import pytest
 from projects.models import ProjectSummary
 from tasks.models import Task
 from tests.conftest import project_choices
-from tests.utils import make_project
+from tests.utils import make_project, signout
 
 pytestmark = pytest.mark.django_db
 
@@ -201,7 +201,7 @@ def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labe
 
 def test_logged_out_user_cannot_reset_summary(business_client):
     project = make_project(project_choices(), business_client.user, use_ml_backend=False)
-    r = business_client.get('/logout')
+    r = signout(business_client)
     assert r.status_code == 302
     r = business_client.post(f'/api/projects/{project.id}/summary/reset')
     assert r.status_code == 401

@@ -450,6 +450,8 @@ stages:
 
 - id: get_invite_url
   type: ref
+- id: logout_page
+  type: ref
 - id: logout
   type: ref
 
