@@ -117,32 +117,34 @@ export const StorageSet = forwardRef(
             />
           ))
         )}
-        <ModalWindow
-          open={storageDialog !== null}
-          onOpenChange={(open) => !open && closeStorageDialog()}
-          title={storageDialog?.title}
-          hideHeader={useNewStorageScreen}
-          size="large"
-          closeOnScrimClick={false}
-          dataTestId="storage-form-modal"
-        >
-          {storageDialog &&
-            (useNewStorageScreen ? (
-              <StorageProviderForm
-                title={storageDialog.title}
-                target={target}
-                storage={storageDialog.storage}
-                project={project.id}
-                rootClass={rootClass}
-                storageTypes={storageTypes}
-                providers={providers}
-                onClose={closeStorageDialog}
-                onSubmit={async () => {
-                  closeStorageDialog();
-                  fetchStorages();
-                }}
-              />
-            ) : (
+        {useNewStorageScreen ? (
+          storageDialog && (
+            <StorageProviderForm
+              dataTestId="storage-form-modal"
+              title={storageDialog.title}
+              target={target}
+              storage={storageDialog.storage}
+              project={project.id}
+              rootClass={rootClass}
+              storageTypes={storageTypes}
+              providers={providers}
+              onClose={closeStorageDialog}
+              onSubmit={async () => {
+                closeStorageDialog();
+                fetchStorages();
+              }}
+            />
+          )
+        ) : (
+          <ModalWindow
+            open={storageDialog !== null}
+            onOpenChange={(open) => !open && closeStorageDialog()}
+            title={storageDialog?.title}
+            size="large"
+            closeOnScrimClick={false}
+            dataTestId="storage-form-modal"
+          >
+            {storageDialog && (
               <StorageForm
                 target={target}
                 storage={storageDialog.storage}
@@ -154,8 +156,9 @@ export const StorageSet = forwardRef(
                   closeStorageDialog();
                 }}
               />
-            ))}
-        </ModalWindow>
+            )}
+          </ModalWindow>
+        )}
         <ConfirmDialog
           {...pendingConfirm}
           open={pendingConfirm !== null}

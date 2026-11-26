@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import { Stepper, type StepperStep } from "@humansignal/ui";
+import { ModalWindow, Stepper, type StepperStep } from "@humansignal/ui";
 import { ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
-import { FormHeader } from "./components/form-header";
+import { FormError } from "./components/form-error";
 import { FormFooter } from "./components/form-footer";
 import { useStorageForm } from "./hooks/useStorageForm";
 import { useStorageApi } from "./hooks/useStorageApi";
@@ -9,7 +9,6 @@ import { step1Schema, getProviderSchema } from "./schemas";
 import { addProvider } from "./providers";
 import { emitAppCommonEvent } from "../../utils/appCommonTelemetry";
 import type { ProviderConfig } from "./types/provider";
-import { InlineError } from "apps/labelstudio/src/components/Error/InlineError";
 
 interface StorageProviderFormProps {
   onSubmit: () => void;
@@ -25,11 +24,26 @@ interface StorageProviderFormProps {
   defaultValues?: Record<string, Record<string, any>>;
   onClose?: () => void;
   onHide?: () => void;
+  open?: boolean;
+  dataTestId?: string;
 }
 
 export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>(
   (
-    { onSubmit, target, project, storage, title, storageTypes, providers, defaultValues, onClose = () => {}, onHide },
+    {
+      onSubmit,
+      target,
+      project,
+      storage,
+      title,
+      storageTypes,
+      providers,
+      defaultValues,
+      onClose = () => {},
+      onHide,
+      open = true,
+      dataTestId,
+    },
     ref,
   ) => {
     const [type, setType] = useState<string | undefined>(storage?.type || storage?.provider || "s3");
@@ -293,23 +307,55 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     };
 
     return (
-      <div className="flex flex-col h-full w-full">
-        <FormHeader title={title} onClose={handleClose} />
-
-        <div className="w-full mb-tight py-base bg-neutral-background border-b border-neutral-border px-wide">
-          <div className="flex justify-center">
-            <Stepper
-              aria-label="Storage setup progress"
-              className="w-auto"
-              steps={stepperSteps}
-              currentStepIndex={currentStep}
-              onStepSelect={handleStepClick}
-              data-testid="storage-provider-form-stepper"
-            />
-          </div>
+      <ModalWindow
+        open={open}
+        onOpenChange={(isOpen) => !isOpen && handleClose()}
+        title={title}
+        description="Import your data from cloud storage providers"
+        size="large"
+        closeOnScrimClick={false}
+        dataTestId={dataTestId}
+        footer={
+          <FormFooter
+            currentStep={currentStep}
+            totalSteps={currentSteps.length}
+            onPrevious={prevStep}
+            onNext={nextStep}
+            onSave={saveOnly}
+            isEditMode={isEditMode}
+            connectionChecked={connectionChecked}
+            filesPreview={filesPreview}
+            testConnection={{
+              isLoading: testConnectionMutation.isLoading,
+              mutate: testStorageConnection,
+            }}
+            loadPreview={{
+              isLoading: loadFilesPreviewMutation.isLoading,
+              mutate: loadFilesPreview,
+            }}
+            createStorage={{
+              isLoading: createStorageMutation.isLoading,
+            }}
+            saveStorage={{
+              isLoading: saveStorageMutation.isLoading,
+            }}
+            target={effectiveTarget}
+            isProviderDisabled={providers[formData.provider]?.disabled || false}
+          />
+        }
+      >
+        <div className="flex justify-center">
+          <Stepper
+            aria-label="Storage setup progress"
+            className="w-auto"
+            steps={stepperSteps}
+            currentStepIndex={currentStep}
+            onStepSelect={handleStepClick}
+            data-testid="storage-provider-form-stepper"
+          />
         </div>
 
-        <div className="px-wide py-base">
+        <div className="pt-base">
           {(() => {
             const actualStep = isEditMode ? currentStep + 1 : currentStep;
 
@@ -378,37 +424,8 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
           })()}
         </div>
 
-        <div className="p-tight">
-          <InlineError includeValidation minimal />
-        </div>
-
-        <FormFooter
-          currentStep={currentStep}
-          totalSteps={currentSteps.length}
-          onPrevious={prevStep}
-          onNext={nextStep}
-          onSave={saveOnly}
-          isEditMode={isEditMode}
-          connectionChecked={connectionChecked}
-          filesPreview={filesPreview}
-          testConnection={{
-            isLoading: testConnectionMutation.isLoading,
-            mutate: testStorageConnection,
-          }}
-          loadPreview={{
-            isLoading: loadFilesPreviewMutation.isLoading,
-            mutate: loadFilesPreview,
-          }}
-          createStorage={{
-            isLoading: createStorageMutation.isLoading,
-          }}
-          saveStorage={{
-            isLoading: saveStorageMutation.isLoading,
-          }}
-          target={effectiveTarget}
-          isProviderDisabled={providers[formData.provider]?.disabled || false}
-        />
-      </div>
+        <FormError />
+      </ModalWindow>
     );
   },
 );
