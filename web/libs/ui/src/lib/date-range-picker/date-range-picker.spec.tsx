@@ -161,3 +161,22 @@ describe("DateRangePicker nullMode", () => {
     expect(screen.getByRole("button", { name: "Apply date" })).toBeDisabled();
   });
 });
+
+describe("DateRangePicker with nothing applied", () => {
+  it("applies the prefilled range as is", () => {
+    const setAppliedDates = mock();
+    render(<DateRangePicker initialDates={initialDates} setAppliedDates={setAppliedDates} hasSelection={false} />);
+
+    const apply = screen.getByRole("button", { name: "Apply date" });
+    expect(apply).toBeEnabled();
+    fireEvent.click(apply);
+
+    expect(setAppliedDates).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps Apply disabled for an unchanged range that is already applied", () => {
+    render(<DateRangePicker initialDates={initialDates} setAppliedDates={mock()} />);
+
+    expect(screen.getByRole("button", { name: "Apply date" })).toBeDisabled();
+  });
+});

@@ -260,7 +260,10 @@ export const DateRangePicker = ({
   };
 
   const { value: numberOfDaysValue, text: numberOfDaysText } = getNumberOfDaysBetweenDatesToDisplay(selectedDates);
-  const applyEnabled = rangePending ? (dateChanged || timeModeChanged || modeChanged) && validDates : modeChanged;
+  // With nothing applied (`hasSelection` false) the prefilled range is only a suggestion, so it can be applied as is.
+  const applyEnabled = rangePending
+    ? (dateChanged || timeModeChanged || modeChanged || !hasSelection) && validDates
+    : modeChanged;
 
   return (
     <div className={`${styles.datePickerCalendar} ${standalone ? styles.standalone : ""}`}>
