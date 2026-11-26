@@ -31,7 +31,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from fsm.functions import backfill_fsm_states_for_tasks
 from fsm.utils import FF_IMPORT_BULK_TASK_STATES
-from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via_regex, parse_bucket_uri
+from io_storages.utils import (
+    StorageObject,
+    get_all_uris_via_regex,
+    get_uri_via_regex,
+    key_is_under_prefix,
+    parse_bucket_uri,
+)
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
@@ -381,6 +387,18 @@ class ImportStorage(Storage):
 
     def generate_http_url(self, url):
         raise NotImplementedError
+
+    def get_resolve_key(self, url: str) -> Union[str, None]:
+        """The object key a resolvable URL points at, relative to the bucket/container."""
+        uri = parse_bucket_uri(url, self)
+        return uri.path if uri else None
+
+    def prefix_allows_url(self, url: str) -> bool:
+        """True when the URL's object key is under this storage's prefix (or no prefix is set)."""
+        prefix = getattr(self, 'prefix', None)
+        if not prefix:
+            return True
+        return key_is_under_prefix(self.get_resolve_key(url), prefix)
 
     def get_bytes_stream(self, uri):
         """Get file bytes from storage as a stream and content type.

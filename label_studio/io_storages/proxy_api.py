@@ -17,7 +17,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
 
-from label_studio.io_storages.functions import get_storage_by_url, resolve_own_collection_export_storage
+from label_studio.io_storages.functions import (
+    resolve_import_storage_for_request,
+    resolve_own_collection_export_storage,
+)
 from label_studio.io_storages.utils import parse_range
 
 logger = logging.getLogger(__name__)
@@ -86,10 +89,10 @@ class ResolveStorageUriAPIMixin:
             )
             fileuri = unquote(fileuri)
 
-        # Try to find storage by URL
+        # Find an import storage that may serve this URI for this task/project: bucket match alone
+        # is not enough, the key must be under the storage prefix or referenced by the task/project.
         project = instance if isinstance(instance, Project) else instance.project
-        storage_objects = project.get_all_import_storage_objects
-        storage = get_storage_by_url(fileuri, storage_objects)
+        storage = resolve_import_storage_for_request(fileuri, instance)
         if not storage:
             # Fall back to the project's own export targets: assets the project
             # produced (Data Collection submissions) live there and must still
@@ -127,7 +130,7 @@ class ResolveStorageUriAPIMixin:
 
         if presign:
             # Redirect to presigned URL (original flow)
-            return self.redirect_to_presign_url(fileuri, instance, model_name)
+            return self.redirect_to_presign_url(fileuri, instance, model_name, storage=storage)
         else:
             return self.proxy_data_from_storage(request, fileuri, project, storage)
 
@@ -168,10 +171,20 @@ class ResolveStorageUriAPIMixin:
         response['X-Streamer-Action'] = 'delegate'
         return response
 
-    def redirect_to_presign_url(self, fileuri: str, instance: Union[Task, Project], model_name: str) -> Response:
-        """Generate and redirect to a presigned URL for the given file URI"""
+    def redirect_to_presign_url(
+        self, fileuri: str, instance: Union[Task, Project], model_name: str, storage=None
+    ) -> Response:
+        """Generate and redirect to a presigned URL for the given file URI.
+
+        ``storage`` is the storage resolve() authorized for this URI. It signs the URL itself:
+        instance.resolve_storage_uri() matches by bucket only, so with several storages on one
+        bucket it could sign with a different storage (other credentials, or presign disabled).
+        """
         try:
-            resolved = instance.resolve_storage_uri(fileuri)
+            if storage is not None:
+                resolved = {'url': storage.generate_http_url(fileuri), 'presign_ttl': storage.presign_ttl}
+            else:
+                resolved = instance.resolve_storage_uri(fileuri)
         except Exception as exc:
             logger.error(f'Failed to resolve storage uri {fileuri} for {model_name} {instance.id}: {exc}')
             return Response(status=status.HTTP_404_NOT_FOUND)

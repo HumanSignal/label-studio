@@ -120,6 +120,27 @@ def is_own_collection_key(key: str, organization_id, project_id) -> bool:
     return bool(re.search(pattern, key or ''))
 
 
+def key_is_under_prefix(key: Union[str, None], prefix: Union[str, None]) -> bool:
+    """True when an object key sits under an import storage prefix.
+
+    Uses the directory semantics listing uses (``prefix.rstrip('/') + '/'``), so
+    ``team-a`` does not cover ``team-ab/``. Dot segments are refused: some HTTP
+    clients normalize them, which could step out of the prefix. Control characters
+    are refused too: ``urlparse`` (used by the fetch and presign paths) drops tabs
+    and newlines, so ``.\t.`` would be fetched as ``..``.
+    """
+    normalized = str(prefix or '').rstrip('/')
+    if not normalized:
+        return True
+    if not key:
+        return False
+    if any(ord(char) < 0x20 or ord(char) == 0x7F for char in key):
+        return False
+    if any(part in ('.', '..') for part in key.split('/')):
+        return False
+    return key.startswith(normalized + '/')
+
+
 def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:
     data = str(data).strip()
     middle_check = False

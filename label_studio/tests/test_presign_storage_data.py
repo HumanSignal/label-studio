@@ -78,6 +78,8 @@ class TestTaskResolveStorageUri:
         # Add a mock storage that will match the URI
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself; here it yields nothing
+        mock_storage.generate_http_url.return_value = None
 
         def mock_can_resolve(url):
             return True  # Match any URL
@@ -153,6 +155,9 @@ class TestTaskResolveStorageUri:
 
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself
+        mock_storage.generate_http_url.return_value = 'https://presigned-url.com/fileuri'
+        mock_storage.presign_ttl = 3600
 
         def mock_can_resolve(url):
             return url == valid_decoded_uri
@@ -189,7 +194,7 @@ class TestTaskResolveStorageUri:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == 'https://presigned-url.com/fileuri'
         mock_storage.can_resolve_url.assert_called_with(valid_decoded_uri)
-        task.resolve_storage_uri.assert_called_once_with(valid_decoded_uri)
+        mock_storage.generate_http_url.assert_called_once_with(valid_decoded_uri)
 
     def test_successful_request_with_long_fileuri(self, view, task, project, user, monkeypatch):
         longest_allowable_cloud_storage_path = 'is/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/long/path/that/needs/to/be/1024/characters.png'
@@ -198,6 +203,9 @@ class TestTaskResolveStorageUri:
 
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself
+        mock_storage.generate_http_url.return_value = 'https://presigned-url.com/fileuri'
+        mock_storage.presign_ttl = 3600
 
         def mock_can_resolve(url):
             return url == longest_uri
@@ -247,7 +255,7 @@ class TestTaskResolveStorageUri:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == 'https://presigned-url.com/fileuri'
         mock_storage.can_resolve_url.assert_called_with(longest_uri)
-        task.resolve_storage_uri.assert_called_once_with(longest_uri)
+        mock_storage.generate_http_url.assert_called_once_with(longest_uri)
 
 
 @pytest.mark.django_db
@@ -310,6 +318,8 @@ class TestProjectResolveStorageUri:
         # Add a mock storage that will match the URI
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself; here it yields nothing
+        mock_storage.generate_http_url.return_value = None
 
         def mock_can_resolve(url):
             return True  # Match any URL
@@ -381,6 +391,9 @@ class TestProjectResolveStorageUri:
 
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself
+        mock_storage.generate_http_url.return_value = 'https://presigned-url.com/fileuri'
+        mock_storage.presign_ttl = 3600
 
         def mock_can_resolve(url):
             return url == valid_decoded_uri
@@ -415,7 +428,7 @@ class TestProjectResolveStorageUri:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == 'https://presigned-url.com/fileuri'
         mock_storage.can_resolve_url.assert_called_with(valid_decoded_uri)
-        project.resolve_storage_uri.assert_called_once_with(valid_decoded_uri)
+        mock_storage.generate_http_url.assert_called_once_with(valid_decoded_uri)
 
     def test_successful_request_with_long_fileuri(self, view, project, user, monkeypatch):
         longest_allowable_cloud_storage_path = 'is/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/a/long/path/that/needs/to/be/1024/characters/long/so/that/it/gets/hashedis/long/path/that/needs/to/be/1024/characters.png'
@@ -424,6 +437,9 @@ class TestProjectResolveStorageUri:
 
         mock_storage = MagicMock()
         mock_storage.presign = True
+        # the authorized storage signs the URL itself
+        mock_storage.generate_http_url.return_value = 'https://presigned-url.com/fileuri'
+        mock_storage.presign_ttl = 3600
 
         def mock_can_resolve(url):
             return url == longest_uri
@@ -473,4 +489,4 @@ class TestProjectResolveStorageUri:
         assert response.status_code == status.HTTP_303_SEE_OTHER
         assert response.url == 'https://presigned-url.com/fileuri'
         mock_storage.can_resolve_url.assert_called_with(longest_uri)
-        project.resolve_storage_uri.assert_called_once_with(longest_uri)
+        mock_storage.generate_http_url.assert_called_once_with(longest_uri)

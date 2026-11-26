@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List, Optional, Union
 
 from django.conf import settings
 from django.db.models import Prefetch
@@ -8,6 +8,7 @@ from io_storages.base_models import ImportStorage
 from projects.models import Project
 from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from tasks.models import Task
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
 from .gcs.api import GCSExportStorageListAPI, GCSImportStorageListAPI
@@ -128,6 +129,99 @@ def get_storage_by_url(url: Union[str, List, Dict], storage_objects: Iterable[Im
                 # note: only first found storage_object will be used for link resolving
                 # can_resolve_url now checks both the scheme and the bucket to ensure the correct storage is used
                 return storage_object
+
+
+# Characters that can sit right before/after a URI embedded in task data or a label config
+# (bare value, HTML attribute, JSON-ish text). A match bounded by anything else is a
+# different, longer URI that merely contains the requested one.
+_URI_LEFT_BOUNDARY = frozenset('"\'=([,>\t\n\r ')
+_URI_RIGHT_BOUNDARY = frozenset('"\')],<>\t\n\r ')
+# Cap on candidate tasks inspected when a project-level URI is not under any storage prefix.
+_REFERENCED_TASK_CANDIDATES = 20
+
+
+def _text_references(text: str, uri: str) -> bool:
+    start = text.find(uri)
+    while start != -1:
+        end = start + len(uri)
+        left_ok = start == 0 or text[start - 1] in _URI_LEFT_BOUNDARY
+        right_ok = end == len(text) or text[end] in _URI_RIGHT_BOUNDARY
+        if left_ok and right_ok:
+            return True
+        start = text.find(uri, start + 1)
+    return False
+
+
+def _data_references(data, uri: str) -> bool:
+    if isinstance(data, str):
+        return _text_references(data, uri)
+    if isinstance(data, dict):
+        return any(_data_references(value, uri) for value in data.values())
+    if isinstance(data, (list, tuple)):
+        return any(_data_references(item, uri) for item in data)
+    return False
+
+
+def _project_tasks_reference(project, uri: str) -> bool:
+    from django.db.models import TextField
+    from django.db.models.functions import Cast
+    from tasks.models import Task
+
+    candidates = (
+        Task.objects.filter(project_id=project.id)
+        .annotate(data_text=Cast('data', output_field=TextField()))
+        .filter(data_text__contains=uri)
+        .values_list('data', flat=True)[:_REFERENCED_TASK_CANDIDATES]
+    )
+    return any(_data_references(data, uri) for data in candidates)
+
+
+def uri_is_referenced(url: str, instance) -> bool:
+    """True when the task's data (Task) or the project's config or tasks (Project) reference `url`."""
+    from projects.models import Project
+
+    if isinstance(instance, Project):
+        if _text_references(instance.label_config or '', url):
+            return True
+        return _project_tasks_reference(instance, url)
+    return _data_references(getattr(instance, 'data', None), url)
+
+
+def resolve_import_storage_for_request(url, instance) -> Optional[ImportStorage]:
+    """The import storage that may serve a client-supplied URI for this task or project, or None.
+
+    Storage matching is bucket-wide and buckets are often shared between projects under
+    per-project prefixes, so naming the bucket is not enough. A storage serves the URI only
+    when the object key is under its prefix, or when the URI is referenced by the task
+    (task endpoint) or the project's config or tasks (project endpoint): JSON-task storages
+    sync task files from their prefix but point at media anywhere in the bucket.
+    `regex_filter` only selects files to sync and is deliberately not applied here.
+
+    URIs that appear only inside fetched content, such as assets that HyperText
+    `valueType="url"` rewrites from the loaded HTML, are not referenced by the task. They
+    resolve only when they are under the storage prefix, and are refused otherwise. To use
+    assets outside the prefix, store the HTML itself in the task data: URIs embedded there
+    are referenced by the task and keep resolving.
+    """
+    if not isinstance(url, str):
+        return None
+
+    project = instance.project if isinstance(instance, Task) else instance
+    candidates = [storage for storage in project.get_all_import_storage_objects if storage.can_resolve_url(url)]
+    if not candidates:
+        return None
+
+    for storage in candidates:
+        if storage.prefix_allows_url(url):
+            return storage
+
+    if uri_is_referenced(url, instance):
+        return candidates[0]
+
+    logger.warning(
+        f'Refusing import-storage resolution outside storage prefix for {type(instance).__name__} {instance.id}'
+    )
+    return None
 
 
 def resolve_own_collection_export_storage(url, project):

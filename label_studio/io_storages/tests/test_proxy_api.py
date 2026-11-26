@@ -38,7 +38,7 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         result = self.mixin.resolve(self.request, 'test_fileuri', self.task)
         assert result.status_code == status.HTTP_403_FORBIDDEN
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_with_base64_decoding(self, mock_get_storage):
         mock_get_storage.return_value = self.storage
         fileuri = base64.urlsafe_b64encode(b'test_uri').decode()
@@ -46,9 +46,9 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         with patch.object(self.mixin, 'redirect_to_presign_url') as mock_redirect:
             mock_redirect.return_value = Response()
             self.mixin.resolve(self.request, fileuri, self.task)
-            mock_redirect.assert_called_once_with('test_uri', self.task, 'Task')
+            mock_redirect.assert_called_once_with('test_uri', self.task, 'Task', storage=self.storage)
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_with_url_unquote_fallback(self, mock_get_storage):
         mock_get_storage.return_value = self.storage
 
@@ -56,15 +56,15 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             mock_redirect.return_value = Response()
             # Non-base64 uri to trigger fallback
             self.mixin.resolve(self.request, 's3://bucket/file.jpg', self.task)
-            mock_redirect.assert_called_once_with('s3://bucket/file.jpg', self.task, 'Task')
+            mock_redirect.assert_called_once_with('s3://bucket/file.jpg', self.task, 'Task', storage=self.storage)
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_storage_not_found(self, mock_get_storage):
         mock_get_storage.return_value = None
         result = self.mixin.resolve(self.request, 'fileuri', self.task)
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_storage_no_presign_support(self, mock_get_storage):
         mock_storage = MagicMock()
         delattr(mock_storage, 'presign')
@@ -72,7 +72,7 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         result = self.mixin.resolve(self.request, 'fileuri', self.task)
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_with_presign_true(self, mock_get_storage):
         mock_storage = MagicMock()
         mock_storage.presign = True
@@ -83,7 +83,7 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             self.mixin.resolve(self.request, 'fileuri', self.task)
             mock_redirect.assert_called_once()
 
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def test_resolve_with_presign_false(self, mock_get_storage):
         mock_storage = MagicMock()
         mock_storage.presign = False
@@ -528,7 +528,7 @@ class TestStreamerGCSDelegation(unittest.TestCase):
         return storage
 
     @patch('io_storages.proxy_api.get_streamer_storage_type')
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def _assert_delegates(self, streamer_type, mock_get_storage, mock_get_type):
         storage = self._storage(presign=False, storage_id=4242)
         mock_get_storage.return_value = storage
@@ -560,7 +560,7 @@ class TestStreamerGCSDelegation(unittest.TestCase):
         self._assert_delegates('gcswif')
 
     @patch('io_storages.proxy_api.get_streamer_storage_type')
-    @patch('io_storages.proxy_api.get_storage_by_url')
+    @patch('io_storages.proxy_api.resolve_import_storage_for_request')
     def _assert_presign_redirects(self, streamer_type, mock_get_storage, mock_get_type):
         # presign=true must NOT delegate even for delegated types; the
         # presigned-URL redirect flow is preserved.
