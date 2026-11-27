@@ -1,11 +1,16 @@
+import json
 from unittest.mock import ANY, patch
 
 from data_export.api import async_convert
 from data_export.models import ConvertedFormat, Export
 from django.core.files.base import ContentFile
+from django.db import connection
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
+from tasks.models import Prediction
+from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
 from tests.utils import mock_feature_flag
 
 ASYNC_EXPORT_FLAG = 'fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short'
@@ -195,3 +200,34 @@ class TestExportDownloadFilename(APITestCase):
         assert response['filename'] == expected
         assert 'X-Accel-Redirect' in response
         assert f'{self.project.id}/' not in response['Content-Disposition']
+
+
+class TestExportAPIPredictions(APITestCase):
+    """Direct export only writes prediction ids, so it must not load
+    prediction results into memory."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user = cls.project.created_by
+        cls.task = TaskFactory(project=cls.project)
+        cls.predictions = PredictionFactory.create_batch(
+            2, task=cls.task, result=[{'value': {'text': ['x' * 1000]}, 'from_name': 'a', 'to_name': 'b'}]
+        )
+        AnnotationFactory(task=cls.task, completed_by=cls.user)
+
+    def test_export_writes_prediction_ids_without_loading_results(self):
+        self.client.force_authenticate(user=self.user)
+        prediction_table = Prediction._meta.db_table
+
+        with CaptureQueriesContext(connection) as ctx:
+            response = self.client.get(f'/api/projects/{self.project.id}/export?exportType=JSON')
+
+        assert response.status_code == 200
+        tasks = json.loads(b''.join(response.streaming_content))
+        assert [task['id'] for task in tasks] == [self.task.id]
+        assert sorted(tasks[0]['predictions']) == sorted(p.id for p in self.predictions)
+
+        prediction_queries = [q['sql'] for q in ctx.captured_queries if f'FROM "{prediction_table}"' in q['sql']]
+        assert prediction_queries
+        assert all(f'"{prediction_table}"."result"' not in sql for sql in prediction_queries)
