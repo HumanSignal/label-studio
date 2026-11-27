@@ -1,9 +1,10 @@
 import logging
 import time
 
+from core.utils.db import route_queries_to_migrate_database
 from django.conf import settings
 from django.core.management.commands.migrate import Command as MigrateCommand
-from django.db import connections, transaction
+from django.db import DEFAULT_DB_ALIAS, connections, transaction
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,13 @@ class Command(MigrateCommand):
                 # Attempt to acquire the lock with retries
                 self.acquire_lock_with_retry(separate_lock_connection, lock_id)
                 # Run the standard Django migration once lock is acquired
-                super().handle(*args, **options)
+                database = options.get('database') or DEFAULT_DB_ALIAS
+                if database == DEFAULT_DB_ALIAS:
+                    super().handle(*args, **options)
+                else:
+                    # Keep data migrations that don't pass .using() on the connection the DDL runs on
+                    with route_queries_to_migrate_database(database):
+                        super().handle(*args, **options)
             logger.info('Migration complete, the migration lock has now been released.')
         finally:
             # Ensure the lock connection is closed to free resources

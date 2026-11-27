@@ -1,6 +1,8 @@
 import itertools
 import logging
 import time
+from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Dict, Optional, TypeVar
 
 from django.db import IntegrityError, OperationalError, connection, models, transaction
@@ -295,3 +297,26 @@ def migrations_running() -> bool:
     """True while migrate is applying migrations in this process, the only time model code
     can run against a table that lacks a column the model declares."""
     return _migrate_depth > 0
+
+
+# The database alias a running migrate command applies migrations to, when it is not 'default'.
+# Migration DDL runs on that alias's connection, but RunPython code that queries a model without
+# .using(schema_editor.connection.alias) (common in third-party apps) goes through the database
+# routers, which send it to another connection: that connection cannot see the migration's
+# uncommitted schema changes. Routers return this alias while it is set.
+_migrate_database_alias: ContextVar[Optional[str]] = ContextVar('migrate_database_alias', default=None)
+
+
+def migrate_database_alias() -> Optional[str]:
+    """The alias a running migrate command targets, or None outside of one."""
+    return _migrate_database_alias.get()
+
+
+@contextmanager
+def route_queries_to_migrate_database(alias: str):
+    """Route every ORM query to `alias` while migrations are applied to it."""
+    token = _migrate_database_alias.set(alias)
+    try:
+        yield
+    finally:
+        _migrate_database_alias.reset(token)
