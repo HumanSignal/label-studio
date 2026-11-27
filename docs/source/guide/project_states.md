@@ -68,8 +68,6 @@ To see who marked the project as Done and when, hover over the **Done** state on
 
 To undo it, select **Reset Project State** from the same menu. The project state is recalculated from its tasks. 
 
-The project also leaves the manual **Done** state if you publish or unpublish the project, change the labeling configuration, or move the project to another workspace. Annotation and review activity does not change it. 
-
 ### Annotators and reviewers in Done projects
 
 When a project is **Done**, whether it was marked as Done or all of its tasks were completed, annotators and reviewers can no longer get tasks from the label and review streams. The stream buttons on the project card are disabled. 
