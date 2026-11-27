@@ -211,7 +211,7 @@
     --button-color: var(--color-negative-content);
 
     &:disabled {
-      --button-color: var(--color-neutral-subtlest);
+      --button-color: var(--color-neutral-content-subtlest);
       --button-background-color: var(--color-neutral-surface);
     }
   }

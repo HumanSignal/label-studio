@@ -15,7 +15,7 @@
     margin-top: 5px;
     font-size: 14px;
     line-height: 22px;
-    color: var(--color-neutral-subtler);
+    color: var(--color-neutral-content-subtler);
   }
 
   &__field {

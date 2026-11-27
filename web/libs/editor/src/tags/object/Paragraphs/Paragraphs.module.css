@@ -235,7 +235,7 @@
 .selectAllLabel {
   margin-left: 6px;
   font-size: 13px;
-  color: var(--color-primary-text, #333);
+  color: var(--color-neutral-content);
   vertical-align: middle;
   white-space: nowrap;
 }

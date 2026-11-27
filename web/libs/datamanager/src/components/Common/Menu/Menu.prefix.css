@@ -127,7 +127,7 @@
     }
 
     &__item {
-      font-size: var(--font-size-small);
+      font-size: var(--font-size-body-small);
       padding: var(--spacing-tighter) var(--spacing-tighter);
     }
   }

@@ -1,7 +1,6 @@
 .space-dm {
   display: grid;
   grid-gap: 16px;
-  color: var(--color-neutral-subtler);
 
   &_direction {
     &_horizontal {

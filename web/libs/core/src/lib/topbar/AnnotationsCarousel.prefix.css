@@ -257,7 +257,7 @@
     }
 
     &_disabled {
-      background: var(--color-background-surface);
+      background: var(--color-neutral-surface);
 
       & svg {
         opacity: 0.4;

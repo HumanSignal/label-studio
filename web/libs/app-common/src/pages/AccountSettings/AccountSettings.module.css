@@ -30,7 +30,7 @@
     padding-block: var(--spacing-wide);
 
     & h1 {
-      font-size: var(--font-size-header, 28px);
+      font-size: var(--font-size-headline-small);
       margin: 0;
     }
   }

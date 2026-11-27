@@ -97,7 +97,7 @@
     background: none;
     height: calc(100% - 16px);
 
-    --icon-color: var(--color-neutral-subtlest);
+    --icon-color: var(--color-neutral-content-subtler);
 
     &:hover {
       --icon-color: var(--color-primary-icon);
