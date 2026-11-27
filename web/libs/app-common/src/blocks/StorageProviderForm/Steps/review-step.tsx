@@ -56,13 +56,13 @@ export const ReviewStep = ({ formData, filesPreview, formatSize }: ReviewStepPro
 
   return (
     <div>
-      <div className="border-b pb-4 mb-6">
+      <div className="border-b pb-base mb-wide">
         <h2 className="text-2xl font-bold text-gray-900">Ready to Connect</h2>
-        <p className="text-gray-600 mt-1">Review your connection details and confirm to start importing</p>
+        <p className="text-gray-600 mt-tighter">Review your connection details and confirm to start importing</p>
       </div>
 
       {/* Connection Details Section */}
-      <div className="grid grid-cols-2 gap-y-4 mb-8">
+      <div className="grid grid-cols-2 gap-y-base mb-wider">
         <div>
           <p className="text-sm text-gray-500">Provider</p>
           <p className="font-medium">{getProviderDisplayName(formData.provider)}</p>
@@ -96,8 +96,8 @@ export const ReviewStep = ({ formData, filesPreview, formatSize }: ReviewStepPro
       </div>
 
       {/* Import Process Section */}
-      <div className="bg-primary-background border border-primary-border-subtler rounded-small p-4 mb-8">
-        <h3 className="text-lg font-semibold mb-2">Import Process</h3>
+      <div className="bg-primary-background border border-primary-border-subtler rounded-small p-base mb-wider">
+        <h3 className="text-lg font-semibold mb-tight">Import Process</h3>
         <p>Files will be imported in the background. You can continue working while the import is in progress.</p>
       </div>
     </div>

@@ -81,13 +81,13 @@ export const PreviewStep = ({
   onImportSettingsChange,
 }: PreviewStepProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-wide">
       <div>
         <h2 className="text-xl font-semibold">Configure Import Settings & Preview Data</h2>
         <p className="text-muted-foreground">Set up filters for your files and preview what will be synchronized</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-wide">
         {/* Left Column Header */}
         <h4>Import Configuration</h4>
 
@@ -108,10 +108,10 @@ export const PreviewStep = ({
             autoFill="off"
             autoComplete="off"
           >
-            <div className="space-y-8">
+            <div className="space-y-wider">
               {/* Path/Bucket Prefix Section - Hide for localfiles since it has its own path field */}
               {type !== "localfiles" && (
-                <div className="space-y-2">
+                <div className="space-y-tight">
                   <Label text={`${type === "redis" ? "Path to Files" : "Bucket Prefix"} (optional)`} />
                   <p className="text-sm text-muted-foreground">
                     {type === "redis"
@@ -139,7 +139,7 @@ export const PreviewStep = ({
               )}
 
               {/* Import Method */}
-              <div className="space-y-2">
+              <div className="space-y-tight">
                 <Label text="Import Method (optional)" />
                 <p className="text-sm text-muted-foreground">Choose how to interpret your data from storage</p>
                 <Select
@@ -175,7 +175,7 @@ export const PreviewStep = ({
               </div>
 
               {/* File Filter Section */}
-              <div className="space-y-2">
+              <div className="space-y-tight">
                 <Label text="File Name Filter (optional)" />
                 <p className="text-sm text-muted-foreground">Use regex patterns to filter which files are imported</p>
                 <Input
@@ -206,7 +206,7 @@ export const PreviewStep = ({
                   tooltipIcon={null}
                 />
 
-                <div className="flex flex-wrap gap-x-2 items-center text-xs">
+                <div className="flex flex-wrap gap-x-tight items-center text-xs">
                   <span className="text-muted-foreground">Common filters:</span>
                   {regexFilters
                     .filter((r) => r.blob === formData.use_blob_urls)
@@ -239,7 +239,7 @@ export const PreviewStep = ({
               {/* Scan All Subfolders */}
               <div className="flex items-center justify-between">
                 <div>
-                  <Label text="Scan all sub-folders" className="block mb-2" />
+                  <Label text="Scan all sub-folders" className="block mb-tight" />
                   <p className="text-sm text-muted-foreground">Include files from all nested folders</p>
                 </div>
                 <Toggle
@@ -266,11 +266,11 @@ export const PreviewStep = ({
           <div className="bg-card h-full flex flex-col">
             {filesPreview === null ? (
               // No API response yet
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center flex-grow">
-                <div className="rounded-full bg-muted p-3 mb-4">
+              <div className="flex flex-col items-center justify-center py-12 px-base text-center flex-grow">
+                <div className="rounded-full bg-muted p-3 mb-base">
                   <IconDocument className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium mb-1">No Preview Available</h3>
+                <h3 className="font-medium mb-tighter">No Preview Available</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
                   Configure your import settings and click "Load Preview" to see a sample of files that will be
                   imported.
@@ -278,11 +278,11 @@ export const PreviewStep = ({
               </div>
             ) : filesPreview.length === 0 ? (
               // API returned empty array
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center flex-grow">
-                <div className="rounded-full bg-muted p-3 mb-4">
+              <div className="flex flex-col items-center justify-center py-12 px-base text-center flex-grow">
+                <div className="rounded-full bg-muted p-3 mb-base">
                   <IconSearch className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium mb-1">No Files Found</h3>
+                <h3 className="font-medium mb-tighter">No Files Found</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
                   No files matching your current criteria were found. Try adjusting your filter settings and reload the
                   preview.
@@ -290,13 +290,13 @@ export const PreviewStep = ({
               </div>
             ) : (
               // Files available - display in a table format with fixed height and scrolling
-              <div className="px-2 py-2 flex-grow overflow-auto">
-                <div className="grid grid-cols-1 text-xs gap-1">
+              <div className="px-tight py-tight flex-grow overflow-auto">
+                <div className="grid grid-cols-1 text-xs gap-tighter">
                   {filesPreview.map((file, index) => (
                     <div
                       key={index}
                       className={cn(
-                        "flex justify-between py-0.5 px-2 bg-neutral-surface border-b last:border-b-0 rounded-small",
+                        "flex justify-between py-tightest px-tight bg-neutral-surface border-b last:border-b-0 rounded-small",
                         {
                           "hover:bg-neutral-surface-hover": file.key !== null,
                         },
@@ -321,11 +321,11 @@ export const PreviewStep = ({
                           )}
                         </div>
                       </Tooltip>
-                      <div className="flex items-center space-x-1 text-muted-foreground whitespace-nowrap">
+                      <div className="flex items-center space-x-tighter text-muted-foreground whitespace-nowrap">
                         <span>
                           {file.last_modified && formatDistanceToNow(new Date(file.last_modified), { addSuffix: true })}
                         </span>
-                        <span className="mx-0.5">•</span>
+                        <span className="mx-tightest">•</span>
                         <span>{file.size && formatSize(file.size)}</span>
                       </div>
                     </div>

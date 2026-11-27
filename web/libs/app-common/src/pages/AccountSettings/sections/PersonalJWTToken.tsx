@@ -146,7 +146,7 @@ export function PersonalJWTToken() {
         ) : tokens.isSuccess && tokens.data && tokens.data.length ? (
           <div>
             <Label text="Access Token" className={styles.label} />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-tight">
               {tokens.data.map((token, index) => {
                 return (
                   <div key={`${token.expires_at}${index}`} className={styles.token}>
@@ -208,10 +208,10 @@ function CreateTokenForm() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-tight">
       <p>Copy your new access token from below and keep it secure. </p>
 
-      <div className="flex items-end w-full gap-2">
+      <div className="flex items-end w-full gap-tight">
         <Input
           label="Access Token"
           labelProps={{ className: "flex-1", rawClassName: "flex-1" }}

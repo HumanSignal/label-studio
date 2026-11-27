@@ -118,7 +118,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
           isEdition={isEdition}
         />
       </main>
-      <footer className="flex items-center justify-center gap-1">
+      <footer className="flex items-center justify-center gap-tighter">
         <IconInfo className={listClass.elem("info-icon").toClassName()} width="20" height="20" />
         <span>
           See the documentation to{" "}

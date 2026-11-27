@@ -62,7 +62,7 @@ export const TaskSummaryControlPanel = ({
     const showReviewCounter = reviewStats && reviewStats.reviewedCount > 0;
 
     return (
-      <div className="flex items-center gap-2 px-base py-tight border-t border-neutral-border bg-neutral-surface">
+      <div className="flex items-center gap-tight px-base py-tight border-t border-neutral-border bg-neutral-surface">
         {showReviewCounter && (
           <span className="text-label-small text-neutral-content-subtle">
             {reviewStats.reviewedCount} / {reviewStats.totalCount} reviewed
@@ -73,7 +73,7 @@ export const TaskSummaryControlPanel = ({
             {")"}
           </span>
         )}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-tight ml-auto">
           <Tooltip title={reviewTooltip}>
             <button
               type="button"
@@ -105,7 +105,7 @@ export const TaskSummaryControlPanel = ({
   const progress = totalCount > 0 ? resolvedCount / totalCount : 0;
 
   return (
-    <div className="flex items-center gap-2 px-base py-tight border-t border-neutral-border bg-neutral-background">
+    <div className="flex items-center gap-tight px-base py-tight border-t border-neutral-border bg-neutral-background">
       <div className="flex items-center gap-tight flex-shrink-0 ml-auto mr-base">
         {Boolean(totalCount) && (
           <>
@@ -121,7 +121,7 @@ export const TaskSummaryControlPanel = ({
           </>
         )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-tight">
         <button
           type="button"
           onClick={onCancel}

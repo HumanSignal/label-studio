@@ -148,7 +148,7 @@ const ConfigureControl = ({ control, template }) => {
           rows="5"
           ref={refLabels}
           onKeyPress={onKeyPress}
-          className="lsf-textarea-ls p-2 px-3"
+          className="lsf-textarea-ls p-tight px-3"
         />
         <Button type="button" size="small" look="outlined" onClick={onAddLabels} aria-label="Add labels">
           Add

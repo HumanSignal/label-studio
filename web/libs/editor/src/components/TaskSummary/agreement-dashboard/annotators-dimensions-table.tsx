@@ -224,7 +224,7 @@ export const AnnotatorsDimensionsTable = ({
                   <th
                     key={header.id}
                     className={cnm(
-                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-label-small bg-neutral-surface border-b border-neutral-border relative",
+                      "px-base py-2.5 text-left whitespace-nowrap font-semibold text-label-small bg-neutral-surface border-b border-neutral-border relative",
                       i === 0 && "border-r sticky left-0 z-20",
                     )}
                     style={{ minWidth: header.getSize() }}
@@ -259,7 +259,7 @@ export const AnnotatorsDimensionsTable = ({
                   {/* Annotator name cell — click navigates to the annotation */}
                   <td
                     className={cnm(
-                      "px-4 py-2.5 align-middle border-r border-neutral-border sticky left-0 z-10",
+                      "px-base py-2.5 align-middle border-r border-neutral-border sticky left-0 z-10",
                       isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                       "group-hover:bg-neutral-surface-hover",
                       rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
@@ -343,7 +343,7 @@ export const AnnotatorsDimensionsTable = ({
                     const chips = (
                       <ValueChips
                         value={value}
-                        className={conflictTooltip ? "flex flex-wrap gap-1 cursor-default" : undefined}
+                        className={conflictTooltip ? "flex flex-wrap gap-tighter cursor-default" : undefined}
                         conflictingLabels={conflictingLabels}
                         labelColors={dimensionLabelColors?.get(dim.name)}
                       />
@@ -353,7 +353,7 @@ export const AnnotatorsDimensionsTable = ({
                       <td
                         key={dim.dimensionId}
                         className={cnm(
-                          "px-4 py-2.5 align-middle text-label-small transition-colors",
+                          "px-base py-2.5 align-middle text-label-small transition-colors",
                           isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                           "group-hover:bg-neutral-surface-hover",
                           rowIndex < displayAnnotators.length - 1 && "border-b border-neutral-border-subtle",
@@ -372,7 +372,7 @@ export const AnnotatorsDimensionsTable = ({
             {scoreMap && (
               <tr>
                 <td
-                  className="px-4 py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t-2 border-r border-neutral-border-bold sticky left-0 z-10"
+                  className="px-base py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t-2 border-r border-neutral-border-bold sticky left-0 z-10"
                   style={{ minWidth: getColSize("annotator") }}
                 >
                   {groundTruthStatus === "saved" ? (
@@ -404,7 +404,7 @@ export const AnnotatorsDimensionsTable = ({
                     return (
                       <td
                         key={dim.dimensionId}
-                        className="px-4 py-2.5 align-middle text-label-small bg-neutral-background border-t-2 border-neutral-border-bold text-neutral-content-subtler italic"
+                        className="px-base py-2.5 align-middle text-label-small bg-neutral-background border-t-2 border-neutral-border-bold text-neutral-content-subtler italic"
                         style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                       >
                         —
@@ -430,7 +430,7 @@ export const AnnotatorsDimensionsTable = ({
                   return (
                     <td
                       key={dim.dimensionId}
-                      className="px-4 py-2.5 align-middle bg-neutral-background border-t-2 border-neutral-border-bold"
+                      className="px-base py-2.5 align-middle bg-neutral-background border-t-2 border-neutral-border-bold"
                       style={{ minWidth: getColSize(`dim-${dim.dimensionId}`) }}
                     >
                       <Tooltip title={cellTooltip}>

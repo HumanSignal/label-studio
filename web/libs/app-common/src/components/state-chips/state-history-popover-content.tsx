@@ -29,9 +29,9 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-neutral-border">
+      <div className="px-base py-3 border-b border-neutral-border">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-tight">
             <IconHistoryRewind className="w-4 h-4" />
             <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
               State History
@@ -53,9 +53,9 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-base">
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-8 gap-3">
+          <div className="flex flex-col items-center justify-center py-wider gap-3">
             <IconSync className="w-8 h-8 text-primary-icon animate-spin" />
             <Typography variant="body" size="small" className="text-neutral-content-subtle">
               Loading...
@@ -64,7 +64,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
         )}
 
         {isError && (
-          <div className="flex flex-col items-center justify-center py-8 gap-3">
+          <div className="flex flex-col items-center justify-center py-wider gap-3">
             <IconError className="w-8 h-8 text-negative-icon" />
             <Typography variant="body" size="small" className="text-neutral-foreground">
               Failed to load history
@@ -88,7 +88,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
         )}
 
         {!isLoading && !isError && history.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 gap-3">
+          <div className="flex flex-col items-center justify-center py-wider gap-3">
             <IconHistoryRewind className="w-8 h-8 text-neutral-content-subtler" />
             <Typography variant="body" size="small" className="text-neutral-content-subtle">
               No history available

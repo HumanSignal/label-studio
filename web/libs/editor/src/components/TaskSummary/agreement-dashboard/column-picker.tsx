@@ -161,8 +161,8 @@ export const ColumnPicker = ({
         onMouseDown={stopHeaderPropagation}
       >
         {/* All Columns */}
-        <div className="rounded-4 text-neutral-content-subtle overflow-hidden p-1 outline-none">
-          <div className="w-full pl-2 pr-4 py-1 hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
+        <div className="rounded-4 text-neutral-content-subtle overflow-hidden p-tighter outline-none">
+          <div className="w-full pl-tight pr-base py-tighter hover:bg-primary-emphasis-subtle rounded-4 duration-150 ease-out">
             <Checkbox checked={allSelected} onChange={() => handleSelectAllToggle()} className="w-full">
               All Columns
             </Checkbox>

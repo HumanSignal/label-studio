@@ -54,7 +54,7 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
   return (
     <span
       className={cnm(
-        "inline-flex items-center whitespace-nowrap rounded-4 px-2 py-0.5",
+        "inline-flex items-center whitespace-nowrap rounded-4 px-tight py-tightest",
         "text-xs border",
         !colors?.background && "bg-neutral-surface-active",
         !colors?.border && "border-neutral-border",

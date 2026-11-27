@@ -6,7 +6,7 @@ const ChannelLegend = observer(({ item }) => {
   const { channels, highlightedChannelId, isChannelHiddenMap } = item;
   return (
     <div
-      className={clsx(styles.channelLegend, "flex justify-center gap-2 mb-2", {
+      className={clsx(styles.channelLegend, "flex justify-center gap-tight mb-tight", {
         [styles.hovering]: highlightedChannelId !== null,
       })}
     >
@@ -29,7 +29,7 @@ const ChannelLegend = observer(({ item }) => {
               "--marker-color": channel.strokecolor,
             }}
           >
-            <span className={clsx(styles.channelMarker, "mr-1", { [styles.hidden]: !isVisible })} />
+            <span className={clsx(styles.channelMarker, "mr-tighter", { [styles.hidden]: !isVisible })} />
             <span className="channel-name">{channel.legend || channel.columnName}</span>
           </div>
         );

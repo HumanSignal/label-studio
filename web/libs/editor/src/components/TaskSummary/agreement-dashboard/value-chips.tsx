@@ -147,7 +147,7 @@ export function valueToChipStrings(value: unknown): string[] | null {
 }
 
 export const VALUE_CHIP_CLASS =
-  "inline-flex items-center whitespace-nowrap rounded-4 border px-2 py-0.5 text-label-small font-medium text-neutral-content-bold bg-neutral-surface border-neutral-border-subtle";
+  "inline-flex items-center whitespace-nowrap rounded-4 border px-tight py-tightest text-label-small font-medium text-neutral-content-bold bg-neutral-surface border-neutral-border-subtle";
 
 interface ValueChipsProps {
   value: unknown;
@@ -177,7 +177,7 @@ interface ValueChipsProps {
  */
 export function ValueChips({
   value,
-  className = "flex flex-wrap gap-1",
+  className = "flex flex-wrap gap-tighter",
   chipClassName,
   conflictingLabels,
   labelColors,

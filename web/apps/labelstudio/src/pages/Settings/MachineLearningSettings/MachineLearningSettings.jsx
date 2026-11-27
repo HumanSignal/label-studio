@@ -82,7 +82,7 @@ export const MachineLearningSettings = () => {
                       rel="noopener noreferrer"
                       data-testid="ml-help-link"
                       aria-label="Learn more about machine learning models (opens in new window)"
-                      className="inline-flex items-center gap-1 hover:underline"
+                      className="inline-flex items-center gap-tighter hover:underline"
                     >
                       Learn more
                       <IconExternal width={16} height={16} />

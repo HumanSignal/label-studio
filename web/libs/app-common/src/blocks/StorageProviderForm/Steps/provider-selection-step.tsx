@@ -49,14 +49,14 @@ export const ProviderSelectionStep = ({
   const messageContent = getMessageContent();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-wide">
       <div>
         <h2 className="text-xl font-semibold">Choose your cloud storage provider</h2>
         <p className="text-muted-foreground">Select the cloud storage service where your data is stored</p>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className="space-y-base">
+        <div className="space-y-tight">
           <Label text="Storage Provider" required />
           <ProviderGrid
             providers={providers}

@@ -96,7 +96,7 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-2 overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
+                    className="px-base py-tight overflow-hidden text-ellipsis text-left whitespace-nowrap font-normal relative"
                     style={{ minWidth: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -112,7 +112,7 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="px-4 py-2 overflow-hidden text-ellipsis align-top"
+                    className="px-base py-tight overflow-hidden text-ellipsis align-top"
                     style={{ minWidth: cell.column.getSize() }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

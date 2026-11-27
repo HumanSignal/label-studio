@@ -20,7 +20,7 @@ const NotificationCheckbox = ({ id, label, checked, onToggle }: NotificationChec
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-tight">
       <Checkbox checked={checked} disabled={isLoading} onChange={(e) => onToggle(e, id, setIsLoading)}>
         {label}
       </Checkbox>
@@ -72,7 +72,7 @@ export const EmailPreferences = () => {
   }, []);
 
   return (
-    <div id="email-preferences" className="flex flex-col gap-4">
+    <div id="email-preferences" className="flex flex-col gap-base">
       <NotificationCheckbox
         id="allow_newsletters"
         label={message}

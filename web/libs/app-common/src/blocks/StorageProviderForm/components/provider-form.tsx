@@ -27,7 +27,7 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({
     field.type === "hidden" && (!target || !field.target || field.target === target);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-wide">
       {/* Render hidden fields first, outside of layout */}
       {provider.fields.filter(getHiddenFields).map((field) => (
         <FieldRenderer
@@ -52,7 +52,7 @@ export const ProviderForm: React.FC<ProviderFormProps> = ({
           visibleFields.length > 0 && (
             <div
               key={rowIndex}
-              className="grid gap-6"
+              className="grid gap-wide"
               style={{
                 // Use visible fields count for grid columns to avoid empty spaces
                 gridTemplateColumns: `repeat(${visibleFields.length}, 1fr)`,

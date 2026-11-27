@@ -81,7 +81,7 @@ const renderEmptyStateLayout = ({
 
   const content = (
     <div className={wrapperClassName}>
-      <div className={`flex items-center justify-center ${iconBackground} ${iconColor} rounded-full p-tight mb-4`}>
+      <div className={`flex items-center justify-center ${iconBackground} ${iconColor} rounded-full p-tight mb-base`}>
         {iconWithSize}
       </div>
 
@@ -113,7 +113,7 @@ const renderEmptyStateLayout = ({
           );
         })()}
 
-      {footer && <div className="mt-6">{footer}</div>}
+      {footer && <div className="mt-wide">{footer}</div>}
     </div>
   );
 
@@ -139,22 +139,22 @@ const renderEmptyStateLayout = ({
 const StorageProviderIcons = () => (
   <div className="flex items-center justify-center gap-base mb-wide" data-testid="dm-storage-provider-icons">
     <Tooltip title="Amazon S3">
-      <div className="flex items-center justify-center p-2" aria-label="Amazon S3">
+      <div className="flex items-center justify-center p-tight" aria-label="Amazon S3">
         <IconCloudProviderS3 width={32} height={32} className="text-neutral-content-subtler" />
       </div>
     </Tooltip>
     <Tooltip title="Google Cloud Storage">
-      <div className="flex items-center justify-center p-2" aria-label="Google Cloud Storage">
+      <div className="flex items-center justify-center p-tight" aria-label="Google Cloud Storage">
         <IconCloudProviderGCS width={32} height={32} className="text-neutral-content-subtler" />
       </div>
     </Tooltip>
     <Tooltip title="Azure Blob Storage">
-      <div className="flex items-center justify-center p-2" aria-label="Azure Blob Storage">
+      <div className="flex items-center justify-center p-tight" aria-label="Azure Blob Storage">
         <IconCloudProviderAzure width={32} height={32} className="text-neutral-content-subtler" />
       </div>
     </Tooltip>
     <Tooltip title="Redis Storage">
-      <div className="flex items-center justify-center p-2" aria-label="Redis Storage">
+      <div className="flex items-center justify-center p-tight" aria-label="Redis Storage">
         <IconCloudProviderRedis width={32} height={32} className="text-neutral-content-subtler" />
       </div>
     </Tooltip>
@@ -173,7 +173,7 @@ const DocumentationLink = () => {
         href={getDocsUrl("guide/tasks")}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1"
+        className="inline-flex items-center gap-tighter"
         data-testid="dm-docs-data-import-link"
       >
         See docs on importing data

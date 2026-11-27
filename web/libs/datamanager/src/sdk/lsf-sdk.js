@@ -520,7 +520,7 @@ export class LSFWrapper {
               this.datamanager.invoke("toast:dismiss", { id: OVERLAP_TOAST_ID });
               this.handleOverlapNextTask();
             }}
-            className="ml-4"
+            className="ml-base"
             size="small"
             look="outlined"
           >

@@ -90,18 +90,18 @@ export const ListInput = observer(({ value, onChange, type = "string", placehold
   );
 
   return (
-    <div className="flex w-full flex-col gap-1">
+    <div className="flex w-full flex-col gap-tighter">
       <textarea
         rows={3}
         value={text}
         onChange={handleChange}
         placeholder={placeholder ?? "Paste values separated by newline, comma, or space"}
         disabled={disabled}
-        className="w-full min-w-[200px] resize-y rounded border border-neutral-border bg-neutral-background px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-neutral-surface disabled:text-neutral-content-subtlest"
+        className="w-full min-w-[200px] resize-y rounded border border-neutral-border bg-neutral-background px-tight py-tighter text-xs disabled:cursor-not-allowed disabled:bg-neutral-surface disabled:text-neutral-content-subtlest"
         data-testid="list-input-textarea"
         aria-label="List of filter values"
       />
-      <div className="flex flex-wrap items-center gap-1" data-testid="list-input-summary">
+      <div className="flex flex-wrap items-center gap-tighter" data-testid="list-input-summary">
         <Badge variant="neutral" size="small">{`${valid.length} valid`}</Badge>
         {invalid.length > 0 && (
           <>

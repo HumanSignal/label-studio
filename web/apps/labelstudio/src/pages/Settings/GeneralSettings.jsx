@@ -37,7 +37,7 @@ export const GeneralSettings = () => {
                 <div className={cn("workspace-placeholder").toClassName()}>
                   <div className={cn("workspace-placeholder").elem("badge-wrapper").toClassName()}>
                     <div className={cn("workspace-placeholder").elem("title").toClassName()}>Workspace</div>
-                    <EnterpriseBadge size="small" className="ml-2" />
+                    <EnterpriseBadge size="small" className="ml-tight" />
                   </div>
                   <Select placeholder="Select an option" disabled options={[]} />
                   <Typography size="small" className="my-tight">

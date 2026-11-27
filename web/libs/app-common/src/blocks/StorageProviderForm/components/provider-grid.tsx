@@ -39,7 +39,7 @@ export const ProviderGrid = ({ providers, selectedProvider, onProviderSelect, er
               <div className="flex-1 min-w-0 text-center">
                 <h3 className="text-body-medium truncate whitespace-pre">{provider.title}</h3>
                 {provider.badge && (
-                  <div className="mt-1 flex justify-center whitespace-pre absolute -bottom-tight left-1/2 -translate-x-[40px]">
+                  <div className="mt-tighter flex justify-center whitespace-pre absolute -bottom-tight left-1/2 -translate-x-[40px]">
                     {provider.badge}
                   </div>
                 )}

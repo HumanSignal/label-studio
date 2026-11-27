@@ -36,7 +36,7 @@ export function SampleDatasetSelect({
       label: (
         <div className="flex flex-col">
           <div className="font-bold">{sample.title}</div>
-          <div className="mt-2">{sample.description}</div>
+          <div className="mt-tight">{sample.description}</div>
         </div>
       ),
     }));

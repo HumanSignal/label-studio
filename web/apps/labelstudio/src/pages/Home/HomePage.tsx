@@ -137,10 +137,10 @@ export const HomePage: Page = () => {
   };
 
   return (
-    <main className="p-6">
-      <div className="grid grid-cols-[minmax(0,1fr)_450px] gap-6">
-        <section className="flex flex-col gap-6">
-          <div className="flex flex-col gap-1">
+    <main className="p-wide">
+      <div className="grid grid-cols-[minmax(0,1fr)_450px] gap-wide">
+        <section className="flex flex-col gap-wide">
+          <div className="flex flex-col gap-tighter">
             <Typography variant="headline" size="small">
               Welcome 👋
             </Typography>
@@ -148,14 +148,14 @@ export const HomePage: Page = () => {
               Let's get you started.
             </Typography>
           </div>
-          <div className="flex justify-start gap-4">
+          <div className="flex justify-start gap-base">
             {actions.map((action) => {
               return (
                 <Button
                   key={action.title}
                   look="outlined"
                   align="center"
-                  className="flex-grow-0 text-16/24 gap-2 text-primary-content text-left min-w-[250px] [&_svg]:w-6 [&_svg]:h-6 pl-2"
+                  className="flex-grow-0 text-16/24 gap-tight text-primary-content text-left min-w-[250px] [&_svg]:w-6 [&_svg]:h-6 pl-tight"
                   onClick={handleActions(action.type)}
                   leading={<action.icon />}
                 >
@@ -199,12 +199,12 @@ export const HomePage: Page = () => {
                 <Typography size="small" className="text-neutral-content-subtler">
                   Import your data and set up the labeling interface to start annotating
                 </Typography>
-                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
+                <Button className="mt-base" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
                   Create Project
                 </Button>
               </div>
             ) : isSuccess && data && sortedProjects.length > 0 ? (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-tighter">
                 {sortedProjects.map((project) => {
                   return <ProjectSimpleCard key={project.id} project={project} />;
                 })}
@@ -212,7 +212,7 @@ export const HomePage: Page = () => {
             ) : null}
           </Card>
         </section>
-        <section className="flex flex-col gap-6">
+        <section className="flex flex-col gap-wide">
           <HeidiTips collection="projectSettings" />
           <Card size="compact" title="Resources" description="Learn, explore and get help" data-testid="resources-card">
             <ul>
@@ -221,7 +221,7 @@ export const HomePage: Page = () => {
                   <li key={link.title}>
                     <a
                       href={link.url}
-                      className="py-2 px-1 flex justify-between items-center text-neutral-content"
+                      className="py-tight px-tighter flex justify-between items-center text-neutral-content"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -233,7 +233,7 @@ export const HomePage: Page = () => {
               })}
             </ul>
           </Card>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-tight items-center">
             <IconHumanSignal />
             <span className="text-neutral-content-subtle">Label Studio Version: Community</span>
           </div>
@@ -263,10 +263,10 @@ function ProjectSimpleCard({ project }: { project: APIProject }) {
       data-external
     >
       <div
-        className="grid grid-cols-[minmax(0,1fr)_150px] p-2 py-3 items-center border-l-[3px]"
+        className="grid grid-cols-[minmax(0,1fr)_150px] p-tight py-3 items-center border-l-[3px]"
         style={{ borderLeftColor: color }}
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-tighter">
           <Tooltip title={project.title}>
             <span className="text-neutral-content truncate">{project.title}</span>
           </Tooltip>

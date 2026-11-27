@@ -361,7 +361,7 @@ export const ImportPage = ({
       {highlightCsvHandling && <div className={importClass.elem("csv-splash").toClassName()} />}
       <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
-      <header className="flex gap-4">
+      <header className="flex gap-base">
         <form
           className={`${importClass.elem("url-form")} inline-flex items-stretch`}
           method="POST"
@@ -410,12 +410,12 @@ export const ImportPage = ({
       <main>
         <Upload sendFiles={sendFiles} project={project}>
           <div
-            className={scn("flex gap-4 w-full min-h-full", {
+            className={scn("flex gap-base w-full min-h-full", {
               "justify-center": !showList,
             })}
           >
             {!showList && (
-              <div className="flex gap-4 justify-center items-start w-full h-full">
+              <div className="flex gap-base justify-center items-start w-full h-full">
                 <label htmlFor="file-input" className="w-full h-full">
                   <div className={`${dropzoneClass.elem("content")} w-full`}>
                     <IconFileUpload height="64" className={dropzoneClass.elem("icon").toClassName()} />
@@ -431,7 +431,7 @@ export const ImportPage = ({
                       <dt>Audio</dt>
                       <dd>{supportedExtensions.audio.join(", ")}</dd>
                       <dt>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-tighter">
                           Video
                           <Tooltip title="Video format support depends on your browser. Click to learn more.">
                             <a
@@ -458,7 +458,7 @@ export const ImportPage = ({
                     </dl>
                     <div className="tips">
                       <b>Important:</b>
-                      <ul className="mt-2 ml-4 list-disc font-normal">
+                      <ul className="mt-tight ml-base list-disc font-normal">
                         <li>
                           We recommend{" "}
                           <a
@@ -519,7 +519,7 @@ export const ImportPage = ({
                       {sample && (
                         <tr key={sample.url}>
                           <td>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-tight">
                               {sample.title}
                               <Badge>Sample</Badge>
                             </div>

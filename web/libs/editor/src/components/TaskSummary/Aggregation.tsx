@@ -205,7 +205,7 @@ export const AggregationCell = ({
 };
 
 const DistributionSkeleton = () => (
-  <div className="flex items-center gap-2">
+  <div className="flex items-center gap-tight">
     <Skeleton className="h-5 w-16 rounded-small" />
     <Skeleton className="h-5 w-12 rounded-small" />
   </div>
@@ -341,7 +341,7 @@ export const AggregationTableRow = ({
           <td
             key={header.id}
             className={cnm(
-              "px-4 py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-neutral-background",
+              "px-base py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-neutral-background",
               "sticky left-0 z-20",
             )}
             style={{ width: header.getSize() }}
@@ -351,7 +351,7 @@ export const AggregationTableRow = ({
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="flex items-center gap-2 font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
+                  className="flex items-center gap-tight font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
                 >
                   <IconChevronDown size={16} className={cnm("transition-transform", isExpanded && "rotate-180")} />
                   Distribution
@@ -361,7 +361,7 @@ export const AggregationTableRow = ({
               )}
               {/* Show total count from API */}
               {useApiData && isFetching ? (
-                <Skeleton className="h-3.5 w-36 rounded-small mt-0.5" />
+                <Skeleton className="h-3.5 w-36 rounded-small mt-tightest" />
               ) : useApiData && distributionData ? (
                 <span className="text-xs text-neutral-content-subtle">
                   {distributionData.total_annotations} annotations
@@ -372,7 +372,7 @@ export const AggregationTableRow = ({
         ) : (
           <td
             key={header.id}
-            className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
+            className="px-base py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
             style={{ width: header.getSize() }}
           >
             {useApiData && isFetching ? (

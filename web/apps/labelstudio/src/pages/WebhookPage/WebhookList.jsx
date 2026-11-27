@@ -13,7 +13,7 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
   return (
     <li
       className={clsx(
-        "flex justify-between items-center p-2 text-base border border-neutral-border rounded-lg group",
+        "flex justify-between items-center p-tight text-base border border-neutral-border rounded-lg group",
         canChangeWebhooks && "hover:bg-neutral-surface",
       )}
     >
@@ -29,7 +29,7 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
           </div>
           <div
             className={clsx(
-              "max-w-[370px] overflow-hidden text-ellipsis font-medium ml-2",
+              "max-w-[370px] overflow-hidden text-ellipsis font-medium ml-tight",
               canChangeWebhooks && "cursor-pointer",
             )}
             onClick={canChangeWebhooks ? () => onSelectActive(webhook.id) : undefined}
@@ -37,12 +37,12 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
             {webhook.url}
           </div>
         </div>
-        <div className="text-neutral-content-subtler text-sm mt-1">
+        <div className="text-neutral-content-subtler text-sm mt-tighter">
           Created {format(new Date(webhook.created_at), "dd MMM yyyy, HH:mm")}
         </div>
       </div>
       {canChangeWebhooks && (
-        <div className="hidden group-hover:flex gap-2">
+        <div className="hidden group-hover:flex gap-tight">
           <Button variant="primary" look="outlined" onClick={() => onSelectActive(webhook.id)} icon={<IconPencil />}>
             Edit
           </Button>
@@ -127,7 +127,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                       href="https://docs.humansignal.com/guide/webhooks.html"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 hover:underline"
+                      className="inline-flex items-center gap-tighter hover:underline"
                       aria-label="Learn more about webhooks (opens in new window)"
                     >
                       Learn more
@@ -139,7 +139,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
             />
           </Card>
         ) : (
-          <ul className="space-y-4 mt-wide">
+          <ul className="space-y-base mt-wide">
             {webhooks.map((obj) => (
               <WebhookListItem
                 key={obj.id}

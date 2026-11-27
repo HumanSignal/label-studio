@@ -29,14 +29,14 @@ export const ProviderDetailsStep = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-wide">
       <div>
         <h2 className="text-xl font-semibold">{providerConfig.title}</h2>
         <p className="text-muted-foreground">{providerConfig.description}</p>
       </div>
 
       {/* Title field - common for all providers */}
-      <div className="space-y-2">
+      <div className="space-y-tight">
         <Input
           name="title"
           value={formData.title ?? ""}
@@ -68,8 +68,8 @@ export const ProviderDetailsStep = ({
 
       {/* Export-specific common fields */}
       {target === "export" && (
-        <div className="space-y-6">
-          <div className="space-y-2">
+        <div className="space-y-wide">
+          <div className="space-y-tight">
             <Toggle
               checked={formData.can_delete_objects ?? false}
               onChange={(e) => handleProviderFieldChange("can_delete_objects", e.target.checked)}

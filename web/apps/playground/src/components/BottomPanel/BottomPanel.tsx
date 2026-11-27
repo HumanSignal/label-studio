@@ -32,9 +32,9 @@ export const BottomPanel = forwardRef<BottomPanelRef, BottomPanelProps>(({ isCol
         style={{ minHeight: HEADER_HEIGHT, maxHeight: HEADER_HEIGHT }}
       >
         <div className="flex flex-row w-full">
-          <div className="flex-1 flex items-center font-semibold text-body-small px-4">Data Input</div>
+          <div className="flex-1 flex items-center font-semibold text-body-small px-base">Data Input</div>
           <div className="w-[1px] h-[33px] bg-neutral-border" />
-          <div className="flex-1 flex items-center font-semibold text-body-small px-4">Data Output</div>
+          <div className="flex-1 flex items-center font-semibold text-body-small px-base">Data Output</div>
         </div>
         {/* Floating collapse/expand button */}
         <button
@@ -51,11 +51,11 @@ export const BottomPanel = forwardRef<BottomPanelRef, BottomPanelProps>(({ isCol
       {!isCollapsed && (
         <div className="flex flex-1 min-h-0">
           {/* Sample Data Panel */}
-          <div className="flex-1 border-r border-neutral-border p-4 overflow-auto">
+          <div className="flex-1 border-r border-neutral-border p-base overflow-auto">
             <pre className="text-body-small whitespace-pre-wrap">{JSON.stringify(sampleTask.data, null, 2)}</pre>
           </div>
           {/* Annotation Output Panel */}
-          <div className="flex-1 p-4 overflow-auto">
+          <div className="flex-1 p-base overflow-auto">
             <pre className="text-body-small whitespace-pre-wrap">
               {JSON.stringify(currentAnnotation || {}, null, 2)}
             </pre>

@@ -165,7 +165,7 @@ const DialogFooter = ({ destructive, okText, validateApi, ctaApi, errorApi, onOk
   };
 
   return (
-    <div className="flex gap-2 justify-end">
+    <div className="flex gap-tight justify-end">
       <Button
         onClick={onClose}
         look="outlined"

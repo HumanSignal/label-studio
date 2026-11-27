@@ -150,7 +150,7 @@ export const DistributionRow = ({
     <tr ref={rowRef}>
       <td
         className={cnm(
-          "px-4 py-2.5 align-top text-label-small bg-neutral-background border-r border-t border-neutral-border-bold sticky left-0 z-10",
+          "px-base py-2.5 align-top text-label-small bg-neutral-background border-r border-t border-neutral-border-bold sticky left-0 z-10",
         )}
         style={{ minWidth: getColSize?.("annotator") ?? 160 }}
       >
@@ -159,7 +159,7 @@ export const DistributionRow = ({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
+              className="flex items-center gap-tight font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
             >
               <IconChevronDown size={16} className={cnm("transition-transform", isExpanded && "rotate-180")} />
               Distribution
@@ -175,7 +175,7 @@ export const DistributionRow = ({
       {dimensions.map((dim) => (
         <td
           key={dim.dimensionId}
-          className="px-4 py-2.5 align-top overflow-hidden bg-neutral-background border-t border-neutral-border-bold"
+          className="px-base py-2.5 align-top overflow-hidden bg-neutral-background border-t border-neutral-border-bold"
           style={{ minWidth: getColSize?.(`dim-${dim.dimensionId}`) }}
         >
           <DistributionCell

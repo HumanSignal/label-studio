@@ -69,7 +69,7 @@ export const StorageSettings = () => {
 
       {/* Always render StorageSet components (hidden when showing EmptyState) so refs are populated */}
       <div className={!hasAnyStorages && isLoaded ? "hidden" : ""}>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-wider">
           <StorageSet
             ref={sourceStorageRef}
             title="Source Cloud Storage"
@@ -111,22 +111,22 @@ export const StorageSettings = () => {
             additionalContent={
               <div className="flex items-center justify-center gap-base" data-testid="dm-storage-provider-icons">
                 <Tooltip title="Amazon S3">
-                  <div className="flex items-center justify-center p-2" aria-label="Amazon S3">
+                  <div className="flex items-center justify-center p-tight" aria-label="Amazon S3">
                     <IconCloudProviderS3 width={32} height={32} className="text-neutral-content-subtler" />
                   </div>
                 </Tooltip>
                 <Tooltip title="Google Cloud Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Google Cloud Storage">
+                  <div className="flex items-center justify-center p-tight" aria-label="Google Cloud Storage">
                     <IconCloudProviderGCS width={32} height={32} className="text-neutral-content-subtler" />
                   </div>
                 </Tooltip>
                 <Tooltip title="Azure Blob Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Azure Blob Storage">
+                  <div className="flex items-center justify-center p-tight" aria-label="Azure Blob Storage">
                     <IconCloudProviderAzure width={32} height={32} className="text-neutral-content-subtler" />
                   </div>
                 </Tooltip>
                 <Tooltip title="Redis Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Redis Storage">
+                  <div className="flex items-center justify-center p-tight" aria-label="Redis Storage">
                     <IconCloudProviderRedis width={32} height={32} className="text-neutral-content-subtler" />
                   </div>
                 </Tooltip>
@@ -159,7 +159,7 @@ export const StorageSettings = () => {
                     rel="noopener noreferrer"
                     data-testid="storage-help-link"
                     aria-label="Learn more about cloud storage (opens in new window)"
-                    className="inline-flex items-center gap-1 hover:underline"
+                    className="inline-flex items-center gap-tighter hover:underline"
                   >
                     Learn more
                     <IconExternal width={16} height={16} />

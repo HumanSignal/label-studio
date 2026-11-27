@@ -156,14 +156,14 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
           </Button>
 
           {/* Action buttons */}
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-tight">
             <Button variant="primary" onClick={handleSave} disabled={!editedKey || !!error}>
               Apply
             </Button>
             <Button variant="neutral" icon={<IconClose />} onClick={handleCancel} />
           </div>
         </div>
-        {error && <div className="text-sm text-destructive mt-1">{error}</div>}
+        {error && <div className="text-sm text-destructive mt-tighter">{error}</div>}
       </div>
     );
   }
@@ -174,7 +174,7 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
       className={clsx("flex items-center py-3 border-b border-border/10 last:border-0", !hotkey.active && "opacity-60")}
     >
       {/* Toggle switch */}
-      <div className="flex-none mr-4">
+      <div className="flex-none mr-base">
         <UiToggle
           checked={hotkey.active}
           onChange={handleToggle}
@@ -183,7 +183,7 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
       </div>
 
       {/* Label and description */}
-      <div className="flex-1 mr-4">
+      <div className="flex-1 mr-base">
         <div className="font-medium">{hotkey.label}</div>
         <div className="text-sm text-neutral-content-subtler">{hotkey.description}</div>
       </div>
@@ -191,7 +191,7 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
       {/* Current hotkey display (clickable to edit) */}
       <Tooltip title="Click to edit hotkey">
         <div
-          className="flex items-center gap-2 cursor-pointer hover:opacity-80 hover:bg-primary-emphasis-subtle px-base py-base rounded-small"
+          className="flex items-center gap-tight cursor-pointer hover:opacity-80 hover:bg-primary-emphasis-subtle px-base py-base rounded-small"
           onClick={handleEdit}
         >
           <KeyboardKey>{hotkey.key}</KeyboardKey>

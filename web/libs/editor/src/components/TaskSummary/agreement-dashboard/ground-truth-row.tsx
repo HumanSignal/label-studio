@@ -123,7 +123,7 @@ const GroundTruthCellComponent = ({
   if (!dimension.isCategorical) {
     return (
       <td
-        className="px-4 py-2.5 align-top text-label-small text-neutral-content-subtlest italic border-t-2 border-neutral-border-bold bg-neutral-surface"
+        className="px-base py-2.5 align-top text-label-small text-neutral-content-subtlest italic border-t-2 border-neutral-border-bold bg-neutral-surface"
         style={colSize ? { minWidth: colSize } : undefined}
       >
         <Tooltip title={`${dimension.controlTag} can't be used for most common answer`}>
@@ -136,7 +136,7 @@ const GroundTruthCellComponent = ({
   if (readOnly) {
     return (
       <td
-        className="px-4 py-2.5 align-top text-label-small border-t-2 border-neutral-border-bold bg-neutral-surface"
+        className="px-base py-2.5 align-top text-label-small border-t-2 border-neutral-border-bold bg-neutral-surface"
         style={colSize ? { minWidth: colSize } : undefined}
       >
         <ValueChips value={cell?.value} labelColors={labelColors} />
@@ -180,7 +180,7 @@ const GroundTruthCellComponent = ({
         const chips = (
           <ValueChips
             value={cell.value}
-            className={cnm("flex flex-wrap gap-1", isPreselected && "italic")}
+            className={cnm("flex flex-wrap gap-tighter", isPreselected && "italic")}
             chipClassName={isPreselected ? "text-neutral-content-subtle" : "text-positive-content"}
             labelColors={labelColors}
           />
@@ -201,7 +201,7 @@ const GroundTruthCellComponent = ({
 
   return (
     <td
-      className={cnm("px-4 py-2.5 align-top text-label-small border-t-2 border-neutral-border-bold", bgClass)}
+      className={cnm("px-base py-2.5 align-top text-label-small border-t-2 border-neutral-border-bold", bgClass)}
       style={colSize ? { minWidth: colSize } : undefined}
     >
       {selectEl}
@@ -233,7 +233,7 @@ export const MajorityVoteRow = ({
 }: MajorityVoteRowProps) => (
   <tr>
     <td
-      className="px-4 py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t border-r border-neutral-border sticky left-0 z-10"
+      className="px-base py-2.5 align-middle text-label-small font-semibold text-neutral-content bg-neutral-background border-t border-r border-neutral-border sticky left-0 z-10"
       style={{ minWidth: getColSize?.("annotator") ?? 160 }}
     >
       Most Common Answer
@@ -243,7 +243,7 @@ export const MajorityVoteRow = ({
         return (
           <td
             key={dim.dimensionId}
-            className="px-4 py-2.5 align-middle text-label-small text-neutral-content-subtlest italic bg-neutral-background border-t border-neutral-border"
+            className="px-base py-2.5 align-middle text-label-small text-neutral-content-subtlest italic bg-neutral-background border-t border-neutral-border"
             style={{ minWidth: getColSize?.(`dim-${dim.dimensionId}`) }}
           >
             <Tooltip title={`${dim.controlTag} can't be used for most common answer`}>
@@ -260,14 +260,14 @@ export const MajorityVoteRow = ({
       return (
         <td
           key={dim.dimensionId}
-          className="px-4 py-2.5 align-middle text-label-small bg-neutral-background border-t border-neutral-border"
+          className="px-base py-2.5 align-middle text-label-small bg-neutral-background border-t border-neutral-border"
           style={{ minWidth: getColSize?.(`dim-${dim.dimensionId}`) }}
         >
           {value !== null && value !== undefined ? (
-            <div className="flex flex-wrap items-center gap-1">
+            <div className="flex flex-wrap items-center gap-tighter">
               <ValueChips
                 value={value}
-                className="flex flex-wrap gap-1"
+                className="flex flex-wrap gap-tighter"
                 labelColors={dimensionLabelColors?.get(dim.name)}
               />
               {countLabel && (
@@ -309,7 +309,7 @@ export const GroundTruthRow = ({
       <style>{"@keyframes fadeInRow { from { opacity: 0; } to { opacity: 1; } }"}</style>
       {/* Left label cell */}
       <td
-        className="px-4 py-2.5 align-top text-label-small border-t-2 border-r border-neutral-border-bold sticky left-0 z-10 bg-neutral-surface text-neutral-content"
+        className="px-base py-2.5 align-top text-label-small border-t-2 border-r border-neutral-border-bold sticky left-0 z-10 bg-neutral-surface text-neutral-content"
         style={{ minWidth: getColSize?.("annotator") ?? 160, minHeight: 52 }}
       >
         <div className="flex items-start gap-tight">

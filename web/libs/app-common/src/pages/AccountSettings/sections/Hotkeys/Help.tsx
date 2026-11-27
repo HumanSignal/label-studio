@@ -111,21 +111,23 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
 
       return (
         <div key={sectionId} className="border border-neutral-border rounded-lg">
-          <div className="px-4 py-3 border-b border-neutral-border">
+          <div className="px-base py-3 border-b border-neutral-border">
             <h3 className="font-medium">{section.title}</h3>
             <p className="text-sm text-neutral-content-subtler">{section.description}</p>
           </div>
 
-          <div className="p-4">
-            <div className="space-y-2">
+          <div className="p-base">
+            <div className="space-y-tight">
               {subgroups.map((subgroup) => (
                 <div
                   key={subgroup}
-                  className={clsx(subgroup !== "default" && "mt-4 pt-2 border rounded-md border-neutral-border p-3")}
+                  className={clsx(
+                    subgroup !== "default" && "mt-base pt-tight border rounded-md border-neutral-border p-3",
+                  )}
                 >
                   {subgroup !== "default" && (
                     <div className="mb-3">
-                      <div className="text-sm font-medium mb-1 capitalize">
+                      <div className="text-sm font-medium mb-tighter capitalize">
                         {currentSections.find((s: Section) => s.id === subgroup)?.title || subgroup}
                       </div>
                       {currentSections.find((s: Section) => s.id === subgroup)?.description && (
@@ -137,7 +139,7 @@ const HotkeyHelpModal = ({ sectionsToShow }: HotkeyHelpModalProps) => {
                   )}
 
                   {groupedHotkeys[subgroup].map((hotkey: Hotkey) => (
-                    <div key={`${section.id}-${hotkey.element}`} className="flex items-center justify-between py-2">
+                    <div key={`${section.id}-${hotkey.element}`} className="flex items-center justify-between py-tight">
                       <div>
                         <div className="font-medium text-neutral-content">{hotkey.label}</div>
                         {hotkey.description && (

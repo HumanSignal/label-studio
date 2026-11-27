@@ -203,7 +203,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
         </div>
       }
     >
-      <div className="grid gap-4">
+      <div className="grid gap-base">
         <Typography
           variant="body"
           size="small"

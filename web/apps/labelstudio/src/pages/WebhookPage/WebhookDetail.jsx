@@ -79,7 +79,7 @@ const WebhookForm = ({
         </div>
       </Form.Row>
       <Form.Row columnCount={1}>
-        <div className="border border-neutral-border p-4 rounded-lg mb-4">
+        <div className="border border-neutral-border p-base rounded-lg mb-base">
           <div className="flex flex-col gap-tight">
             <div className="flex items-center justify-between">
               <Label text="Headers" large />
@@ -125,12 +125,12 @@ const WebhookForm = ({
           </div>
         </div>
       </Form.Row>
-      <div className="border border-neutral-border p-4 rounded-lg mb-4">
+      <div className="border border-neutral-border p-base rounded-lg mb-base">
         <div>
           <Label text="Payload" large />
         </div>
         <div>
-          <div className="my-2">
+          <div className="my-tight">
             <Toggle
               skip
               checked={sendPayload}
@@ -140,7 +140,7 @@ const WebhookForm = ({
               label="Send payload"
             />
           </div>
-          <div className="my-2">
+          <div className="my-tight">
             <Toggle
               skip
               checked={sendForAllActions}
@@ -177,7 +177,7 @@ const WebhookForm = ({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2 mt-base">
+      <div className="flex items-center gap-tight mt-base">
         {webhook !== null && (
           <Button
             type="button"
@@ -319,7 +319,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
 
   return (
     <>
-      <header className="page-header flex items-center gap-2">
+      <header className="page-header flex items-center gap-tight">
         <Typography
           as="a"
           variant="headline"

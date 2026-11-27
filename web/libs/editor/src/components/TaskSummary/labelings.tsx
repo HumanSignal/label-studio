@@ -124,7 +124,7 @@ export const renderers: Record<string, RendererType> = {
 
     // biome-ignore lint/suspicious/noArrayIndexKey: this piece won't be rerendered with updated data anyway and texts can be huge
     return (
-      <div className="text-sm text-ellipsis line-clamp-6 space-y-1">
+      <div className="text-sm text-ellipsis line-clamp-6 space-y-tighter">
         {texts.map((text, i) => (
           <p key={i} className="break-words">
             {text}

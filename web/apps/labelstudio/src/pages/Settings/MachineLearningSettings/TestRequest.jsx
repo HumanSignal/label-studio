@@ -34,8 +34,8 @@ export const TestRequest = ({ backend }) => {
       <Typography size="smaller" className="my-tight">
         This sends a test request to the prediction endpoint of the ML Backend using a random task.
       </Typography>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
+      <div className="grid grid-cols-2 gap-base">
+        <div className="flex flex-col gap-tighter">
           <Typography variant="title" size="medium">
             Request
           </Typography>
@@ -45,7 +45,7 @@ export const TestRequest = ({ backend }) => {
             </pre>
           </div>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-tighter">
           <Typography variant="title" size="medium">
             Response
           </Typography>

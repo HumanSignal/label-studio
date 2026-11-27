@@ -14,7 +14,7 @@ type CardProps = {
 const Card = ({ title, value, info, loading, valueWarningTooltip }: CardProps) => {
   return (
     <div className="w-40 shrink-0 border border-neutral-border rounded-small p-base bg-neutral-surface">
-      <div className="flex flex-row gap-tighter items-center text-xs font-semibold text-neutral-content-subtle uppercase tracking-wide mb-2">
+      <div className="flex flex-row gap-tighter items-center text-xs font-semibold text-neutral-content-subtle uppercase tracking-wide mb-tight">
         {title}
         {info && (
           <Tooltip title={info}>

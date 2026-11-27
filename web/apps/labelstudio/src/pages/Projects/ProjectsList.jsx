@@ -45,7 +45,7 @@ export const EmptyProjectsList = ({ openModal }) => {
       />
       <h1 className={cn("empty-projects-page").elem("header").toClassName()}>Heidi doesn't see any projects here!</h1>
       <p>Create one and start labeling your data.</p>
-      <Button onClick={openModal} className="my-8" aria-label="Create new project">
+      <Button onClick={openModal} className="my-wider" aria-label="Create new project">
         Create Project
       </Button>
     </div>

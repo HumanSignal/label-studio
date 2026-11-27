@@ -133,7 +133,7 @@ const TaxonomySearch = React.forwardRef<TaxonomySearchRef, TaxonomySearchProps>(
 
     return (
       <div className="htx-taxonomy-search w-full max-w-full min-w-0 shrink-0" data-testid="taxonomy-search-wrap">
-        <div className="box-border flex h-8 min-h-8 w-full min-w-0 flex-row items-center gap-2 rounded-smaller border border-neutral-border bg-neutral-background px-2 shadow-inner transition-colors hover:border-neutral-border-bold focus-within:border-neutral-border-bold focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-focus">
+        <div className="box-border flex h-8 min-h-8 w-full min-w-0 flex-row items-center gap-tight rounded-smaller border border-neutral-border bg-neutral-background px-tight shadow-inner transition-colors hover:border-neutral-border-bold focus-within:border-neutral-border-bold focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-focus">
           <span
             className="pointer-events-none inline-flex size-6 shrink-0 items-center justify-center text-neutral-content-subtlest [&_svg]:block [&_svg]:size-4 [&_svg]:shrink-0"
             aria-hidden

@@ -18,11 +18,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ icon, header, descriptio
   const isWhiteLabel = typeof window !== "undefined" && window.APP_SETTINGS?.whitelabel_is_active === true;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2 p-6 w-full" data-testid="empty-state">
-      <div className="flex items-center justify-center bg-primary-background text-primary-icon rounded-full p-2 mb-2">
+    <div className="flex flex-col items-center justify-center gap-tight p-wide w-full" data-testid="empty-state">
+      <div className="flex items-center justify-center bg-primary-background text-primary-icon rounded-full p-tight mb-tight">
         {icon}
       </div>
-      <div className="flex flex-col items-center w-full gap-1">
+      <div className="flex flex-col items-center w-full gap-tighter">
         <div
           className="font-medium text-body-medium leading-tight text-center text-neutral-content"
           data-testid="empty-state-header"
@@ -42,11 +42,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ icon, header, descriptio
             href={learnMore.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-body-small text-primary-link hover:underline"
+            className="inline-flex items-center gap-tighter text-body-small text-primary-link hover:underline"
             {...(learnMore.testId ? { "data-testid": learnMore.testId } : {})}
           >
             {learnMore.text}
-            <IconExternal width={16} height={16} className="ml-1" />
+            <IconExternal width={16} height={16} className="ml-tighter" />
           </a>
         </div>
       )}

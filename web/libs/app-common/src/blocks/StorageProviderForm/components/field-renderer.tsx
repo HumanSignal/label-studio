@@ -156,7 +156,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
       );
     case "select":
       return (
-        <div className="space-y-2">
+        <div className="space-y-tight">
           <Label text={field.label} description={field.description} />
           <Select
             name={field.name}
@@ -172,7 +172,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     case "toggle": {
       const isDisabled = isFieldDisabled();
       return (
-        <div className="flex items-start space-x-4">
+        <div className="flex items-start space-x-base">
           <Toggle
             checked={value || false}
             onChange={(e) => handleToggleChange(e.target.checked)}

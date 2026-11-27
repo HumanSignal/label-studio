@@ -89,7 +89,7 @@ const ObservableCell = observer(
       <span className="text-neutral-content-subtler text-sm">—</span>
     ) : (
       (render?.(results, control) ?? (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-4 bg-neutral-surface-active text-xs font-medium">
+        <span className="inline-flex items-center px-tight py-tightest rounded-4 bg-neutral-surface-active text-xs font-medium">
           {results.length} result{results.length > 1 ? "s" : ""}
         </span>
       ))
@@ -139,9 +139,9 @@ const SkeletonCell = ({ controlType }: { controlType?: string }) => {
 
 // FIT-720: Skeleton loader for the Annotator column (first column)
 const AnnotatorSkeletonCell = () => (
-  <div className="flex gap-tight items-center p-1 -ml-1">
+  <div className="flex gap-tight items-center p-tighter -ml-tighter">
     <Skeleton className="h-6 w-6 rounded-full shrink-0" />
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-tighter">
       <Skeleton className="h-3.5 w-20 rounded-small" />
       <Skeleton className="h-3 w-12 rounded-small" />
     </div>
@@ -385,7 +385,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         header: () => (
           <div>
             <span className="font-semibold text-sm pb-small">{getControlDisplayName(control)}</span>
-            <Chip prefix={control.per_region ? "per-region " : ""} className="px-small ml-2">
+            <Chip prefix={control.per_region ? "per-region " : ""} className="px-small ml-tight">
               {control.type}
             </Chip>
           </div>
@@ -413,7 +413,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
         return (
           <button
             type="button"
-            className="flex gap-tight items-center cursor-pointer hover:bg-neutral-surface-active transition-colors p-1 rounded-small -ml-1"
+            className="flex gap-tight items-center cursor-pointer hover:bg-neutral-surface-active transition-colors p-tighter rounded-small -ml-tighter"
             onClick={async () => {
               const mstAnnotation = annotation._mstAnnotation;
               if (mstAnnotation && needsSummaryHydration(mstAnnotation, summaryHydratedPksRef.current)) {
@@ -519,7 +519,7 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                   zIndex: isSticky ? 10 : "auto",
                 }}
                 className={cnm(
-                  "px-4 py-2.5 align-top overflow-hidden transition-colors",
+                  "px-base py-2.5 align-top overflow-hidden transition-colors",
                   isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                   "group-hover:bg-neutral-surface-hover",
                   !isLastRow && "border-b border-neutral-border-subtle",
@@ -586,11 +586,11 @@ export const LabelingSummary = observer(({ hideInfo, annotations: all, controls,
                     }}
                     className={cnm(
                       hideAggregation ? "border-b border-neutral-border" : "",
-                      "px-4 py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-active",
+                      "px-base py-2.5 text-left whitespace-nowrap font-semibold text-sm bg-neutral-surface-active",
                       index === 0 && "border-r border-neutral-border",
                     )}
                   >
-                    <div className="overflow-hidden text-ellipsis flex items-start gap-2">
+                    <div className="overflow-hidden text-ellipsis flex items-start gap-tight">
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </div>
                     <ResizeHandler header={header} />
