@@ -223,8 +223,8 @@ class DataExport(object):
                 return out, content_type, filename
 
             # otherwise pack output directory into archive
-            shutil.make_archive(tmp_dir, 'zip', tmp_dir)
-            out = path_to_open_binary_file(os.path.abspath(tmp_dir + '.zip'))
+            archive_path = shutil.make_archive(os.path.join(input_dir, name), 'zip', tmp_dir)
+            out = path_to_open_binary_file(archive_path)
             content_type = 'application/zip'
             filename = name + '.zip'
             return out, content_type, filename
