@@ -119,7 +119,6 @@ required-version = ">=0.13.5"
 exclude-newer = "4 days"
 exclude-newer-package = { certifi = false }
 
-
 [tool.uv.build-backend]
 module-name = "label_studio"
 module-root = ""
