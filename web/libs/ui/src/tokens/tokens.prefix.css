@@ -636,8 +636,8 @@
   --color-primary-content-raw: 109 135 241;
   --color-primary-content-hover: var(--color-grape-300);
   --color-primary-content-hover-raw: 153 171 245;
-  --color-primary-content-subtle: var(--color-grape-600);
-  --color-primary-content-subtle-raw: 87 108 193;
+  --color-primary-content-subtle: var(--color-grape-500);
+  --color-primary-content-subtle-raw: 97 122 218;
   --color-primary-icon: var(--color-grape-400);
   --color-primary-icon-raw: 109 135 241;
   --color-primary-background: var(--color-grape-950);
@@ -674,7 +674,7 @@
   --color-negative-surface-icon-raw: 255 214 205;
   --color-negative-content: var(--color-persimmon-400);
   --color-negative-content-hover: var(--color-persimmon-300);
-  --color-negative-content-subtle: var(--color-persimmon-700);
+  --color-negative-content-subtle: var(--color-persimmon-500);
   --color-negative-icon: var(--color-persimmon-400);
   --color-negative-background: var(--color-persimmon-950);
   --color-negative-background-raw: 38 18 13;
@@ -701,7 +701,7 @@
   --color-positive-surface-icon-raw: 212 241 235;
   --color-positive-content: var(--color-kale-400);
   --color-positive-content-hover: var(--color-kale-300);
-  --color-positive-content-subtle: var(--color-kale-700);
+  --color-positive-content-subtle: var(--color-kale-500);
   --color-positive-icon: var(--color-kale-400);
   --color-positive-background: var(--color-kale-950);
   --color-positive-background-raw: 18 38 37;
@@ -728,7 +728,7 @@
   --color-warning-surface-icon-raw: 255 228 208;
   --color-warning-content: var(--color-canteloupe-400);
   --color-warning-content-hover: var(--color-canteloupe-300);
-  --color-warning-content-subtle: var(--color-canteloupe-700);
+  --color-warning-content-subtle: var(--color-canteloupe-500);
   --color-warning-icon: var(--color-canteloupe-400);
   --color-warning-background: var(--color-canteloupe-950);
   --color-warning-background-raw: 51 28 20;

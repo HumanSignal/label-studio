@@ -642,7 +642,7 @@
             "figmaId": "VariableID:2525:26031",
             "modes": {
               "light": "{@primitives.$color.$grape.500}",
-              "dark": "{@primitives.$color.$grape.600}"
+              "dark": "{@primitives.$color.$grape.500}"
             }
           }
         },
@@ -904,7 +904,7 @@
             "figmaId": "VariableID:2525:26030",
             "modes": {
               "light": "{@primitives.$color.$persimmon.500}",
-              "dark": "{@primitives.$color.$persimmon.700}"
+              "dark": "{@primitives.$color.$persimmon.500}"
             }
           }
         },
@@ -1153,7 +1153,7 @@
             "figmaId": "VariableID:2525:26029",
             "modes": {
               "light": "{@primitives.$color.$kale.500}",
-              "dark": "{@primitives.$color.$kale.700}"
+              "dark": "{@primitives.$color.$kale.500}"
             }
           }
         },
@@ -1402,7 +1402,7 @@
             "figmaId": "VariableID:2525:26028",
             "modes": {
               "light": "{@primitives.$color.$canteloupe.500}",
-              "dark": "{@primitives.$color.$canteloupe.700}"
+              "dark": "{@primitives.$color.$canteloupe.500}"
             }
           }
         },
