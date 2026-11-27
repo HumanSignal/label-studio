@@ -25,6 +25,15 @@ const roundToStep = (num: number, step: number) => {
   return steps * step;
 };
 
+// Native scrollbar events still reach React handlers in Chromium. Keep them
+// out of the frame scrub/draw path, including the capture-phase click handler.
+const isScrollbarEvent = (event: MouseEvent<HTMLDivElement>) => {
+  const element = event.currentTarget;
+  if (element.offsetWidth <= element.clientWidth) return false;
+  const x = event.clientX - element.getBoundingClientRect().left - element.clientLeft;
+  return x < 0 || x >= element.clientWidth;
+};
+
 export const Frames: FC<TimelineViewProps> = ({
   offset = 0,
   position = 1,
@@ -58,7 +67,7 @@ export const Frames: FC<TimelineViewProps> = ({
     return length * step;
   }, [length, step]);
 
-  const { width: scrollableWidth } = useResizeObserver(scrollable.current || []);
+  const { width: scrollableWidth, height: scrollableHeight } = useResizeObserver(scrollable.current || []);
   const framesInView = useMemo(
     () => toSteps(roundToStep((scrollableWidth ?? 0) - timelineStartOffset, step), step),
     [step, timelineStartOffset, scrollableWidth],
@@ -117,7 +126,14 @@ export const Frames: FC<TimelineViewProps> = ({
   );
 
   const scrollHandler = useCallback(
-    (e) => {
+    (e: globalThis.WheelEvent) => {
+      // Browser zoom and trackpad pinch gestures also emit Ctrl+wheel events.
+      if (e.ctrlKey) return;
+
+      // Keep wheel input inside the timeline, including at its boundaries and
+      // when every row fits. Native page scrolling must not move the video.
+      e.preventDefault();
+      e.stopPropagation();
       const scroll = scrollable.current!;
 
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
@@ -180,6 +196,10 @@ export const Frames: FC<TimelineViewProps> = ({
 
   const hoverHandler = useCallback(
     (e) => {
+      if (isScrollbarEvent(e)) {
+        setHoverOffset(null);
+        return;
+      }
       if (scrollable.current) {
         const offsetLeft = scrollable.current.getBoundingClientRect().left;
         const currentOffset = e.pageX - offsetLeft - timelineStartOffset;
@@ -206,12 +226,16 @@ export const Frames: FC<TimelineViewProps> = ({
     [currentOffsetX, step],
   );
 
-  const scrollClickHandler = useCallback(() => {
-    if (hoverOffset) {
-      setIndicatorOffset(hoverOffset + currentOffsetX);
-      setHoverOffset(null);
-    }
-  }, [hoverOffset, currentOffsetX, step, setIndicatorOffset]);
+  const scrollClickHandler = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      if (isScrollbarEvent(e)) return;
+      if (hoverOffset) {
+        setIndicatorOffset(hoverOffset + currentOffsetX);
+        setHoverOffset(null);
+      }
+    },
+    [hoverOffset, currentOffsetX, step, setIndicatorOffset],
+  );
 
   const seekerOffset = useMemo(() => {
     const pixelOffset = clamp(position, 0, length) * step;
@@ -225,7 +249,8 @@ export const Frames: FC<TimelineViewProps> = ({
    * It's responsible for creating new regions, updating existing ones and updating the player position.
    */
   const onFrameScrub = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent<HTMLDivElement>) => {
+      if (isScrollbarEvent(e)) return;
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
@@ -313,27 +338,15 @@ export const Frames: FC<TimelineViewProps> = ({
     }
   }, [currentOffsetX, currentOffsetY]);
 
-  // wheel is a passive event, so we have to add proper event to prevent default scroll
+  // React's wheel listener is passive. Use one non-passive listener for both
+  // timeline scrolling and preventing scroll chaining to the surrounding editor.
   useEffect(() => {
     const target = scrollable.current!;
 
-    const handler = (e: globalThis.WheelEvent) => {
-      const currentScroll = target.scrollTop;
-      const maxScroll = target.scrollHeight - target.clientHeight;
-      const horizontalScroll = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    target.addEventListener("wheel", scrollHandler, { passive: false });
 
-      const { deltaY: delta } = e;
-
-      const allowScroll =
-        !horizontalScroll && ((currentScroll === 0 && delta < 0) || (currentScroll === maxScroll && delta > 0));
-
-      if (!allowScroll) e.preventDefault();
-    };
-
-    target.addEventListener("wheel", handler);
-
-    return () => target.removeEventListener("wheel", handler);
-  }, []);
+    return () => target.removeEventListener("wheel", scrollHandler);
+  }, [scrollHandler]);
 
   useEffect(() => {
     onResize?.(toSteps(scrollableWidth || 0, step));
@@ -437,7 +450,7 @@ export const Frames: FC<TimelineViewProps> = ({
       <div
         className={cn("timeline-frames").elem("scroll").toClassName()}
         ref={scrollable as any}
-        onWheel={scrollHandler}
+        onScroll={(e) => setScroll({ top: e.currentTarget.scrollTop })}
         onMouseMove={hoverHandler}
         onMouseLeave={() => setHoverOffset(null)}
         onClickCapture={scrollClickHandler}
@@ -448,7 +461,7 @@ export const Frames: FC<TimelineViewProps> = ({
             regions={regions}
             scrollTop={currentOffsetY}
             startOffset={timelineStartOffset}
-            viewportHeight={props.height ?? DEFAULT_TIMELINE_VIEWPORT_HEIGHT}
+            viewportHeight={scrollableHeight ?? props.height ?? DEFAULT_TIMELINE_VIEWPORT_HEIGHT}
             onSelectRegion={onSelectRegion}
             disabled={regionSelectionDisabled}
           />
@@ -479,18 +492,19 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({
   disabled,
   onSelectRegion,
 }) => {
+  const rowRegions = regions.filter((region) => region.sequence.length > 0 || region.timeline);
   const bounds = useMemo(
-    () => computeKeypointsVirtualBounds(scrollTop, regions.length, viewportHeight),
-    [scrollTop, regions.length, viewportHeight],
+    () => computeKeypointsVirtualBounds(scrollTop, rowRegions.length, viewportHeight),
+    [scrollTop, rowRegions.length, viewportHeight],
   );
 
   return (
     <div
       className={cn("timeline-frames").elem("keypoints").toClassName()}
-      style={{ height: regions.length * KEYPOINT_ROW_HEIGHT }}
+      style={{ height: rowRegions.length * KEYPOINT_ROW_HEIGHT }}
     >
-      {regions.map((region, i) => {
-        return region.sequence.length > 0 || region.timeline ? (
+      {rowRegions.map((region, i) => {
+        return (
           <Keypoints
             key={region.id}
             idx={region.index}
@@ -499,7 +513,7 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({
             onSelectRegion={disabled ? undefined : onSelectRegion}
             renderable={bounds[0] <= i && i <= bounds[1]}
           />
-        ) : null;
+        );
       })}
     </div>
   );

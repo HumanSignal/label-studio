@@ -1,7 +1,7 @@
 import { clamp } from "../../../../utils/utilities";
 import type { TimelineRegionKeyframe } from "../../Types";
 
-/** Default timeline viewport height when `timelineHeight` is not set on `<Video>`. */
+/** Fallback viewport height until the DOM is measured (or an explicit height is supplied). */
 export const DEFAULT_TIMELINE_VIEWPORT_HEIGHT = 64;
 
 const KEYPOINT_ROW_HEIGHT = 24;
