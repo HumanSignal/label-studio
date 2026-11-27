@@ -2,6 +2,8 @@
 
 import base64
 import fnmatch
+import functools
+import importlib.metadata
 import logging
 import mimetypes
 import re
@@ -22,6 +24,15 @@ from django.conf import settings
 from tldextract import TLDExtract
 
 logger = logging.getLogger(__name__)
+
+
+@functools.lru_cache(maxsize=1)
+def _get_user_agent_extra():
+    try:
+        version = importlib.metadata.version('label-studio')
+    except importlib.metadata.PackageNotFoundError:
+        version = 'dev'
+    return f'label-studio/{version}'
 
 
 def custom_endpoint_needs_own_keys():
@@ -103,7 +114,7 @@ def create_s3_client_and_resource(session, region_name=None, s3_endpoint=None):
         # storages saved before the serializer check or with SSRF protection off were never validated
         validate_url_for_ssrf(s3_endpoint, block_local_urls=True)
 
-    config = boto3.session.Config(signature_version='s3v4')
+    config = boto3.session.Config(signature_version='s3v4', user_agent_extra=_get_user_agent_extra())
     client = session.client('s3', config=config, **client_kwargs)
     resource = session.resource('s3', config=config, **client_kwargs)
     if guard_connections:
