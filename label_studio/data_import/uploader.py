@@ -5,6 +5,7 @@ import io
 import logging
 import mimetypes
 import os
+from urllib.parse import unquote, urlparse
 
 try:
     import ujson as json
@@ -119,26 +120,12 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
     """Download file using URL and read tasks from it"""
     # process URL with tasks
     try:
-        filename = url.rsplit('/', 1)[-1]
-
         response = ssrf_safe_get(
             url, verify=project.organization.should_verify_ssl_certs(), stream=True, headers={'Accept-Encoding': None}
         )
 
-        # Try to get filename from resolved URL after redirects
         resolved_url = response.url if hasattr(response, 'url') else url
-        if resolved_url != url:
-            # Parse filename from the resolved URL after redirect
-            from urllib.parse import unquote, urlparse
-
-            parsed_url = urlparse(resolved_url)
-            path = unquote(parsed_url.path)
-            resolved_filename = path.rsplit('/', 1)[-1]
-            # Remove query parameters
-            if '?' in resolved_filename:
-                resolved_filename = resolved_filename.split('?')[0]
-            _, resolved_ext = os.path.splitext(resolved_filename)
-            filename = resolved_filename
+        filename = unquote(urlparse(resolved_url).path).rsplit('/', 1)[-1]
 
         # Check file extension
         _, ext = os.path.splitext(filename)
