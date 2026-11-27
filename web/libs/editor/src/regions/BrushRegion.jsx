@@ -100,7 +100,13 @@ const Points = types
         self.relativePoints = points.map(
           (c, i) => (c / (i % 2 === 0 ? self.stage.stageWidth : self.stage.stageHeight)) * 100,
         );
-        self.relativeStrokeWidth = (self.strokeWidth / self.stage.stageWidth) * 100;
+        // Slider unit is one file pixel. The mask rasterizer multiplies this
+        // fraction by naturalWidth, so the basis has to be the file width.
+        const fileWidth = self.parent?.currentImageEntity?.naturalWidth;
+        const widthBasis = fileWidth > 1 ? fileWidth : self.stage.stageWidth;
+
+        self.relativeStrokeWidth = (self.strokeWidth / widthBasis) * 100;
+        self.strokeWidth = (self.relativeStrokeWidth * self.stage.stageWidth) / 100;
       },
 
       // rescale points to the new width and height from the original
@@ -362,7 +368,11 @@ const Model = types
         ctx.lineTo(...self.prepareCoords([x, y]));
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
-        ctx.lineWidth = pathPoints.strokeWidth * self.scaleX * self.parent.stageScale;
+        const fileWidth = self.currentImageEntity?.naturalWidth;
+        const stageWidth = self.parent?.stageWidth;
+        const toFilePixel = fileWidth > 1 && stageWidth ? stageWidth / fileWidth : 1;
+
+        ctx.lineWidth = pathPoints.strokeWidth * toFilePixel * self.scaleX * self.parent.stageScale;
         ctx.strokeStyle = self.strokeColor;
         ctx.globalCompositeOperation = pathPoints.compositeOperation;
         ctx.stroke();
