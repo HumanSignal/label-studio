@@ -4,9 +4,19 @@ This file tests the core functionality of the excluded_fields_for_evaluation
 feature that optimizes task API performance by excluding expensive fields.
 """
 
+import json
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
-from django.test import TestCase
+from data_manager.prepare_params import ConjunctionEnum, Filter, Filters, PrepareParams
+from django.conf import settings
+from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db.models import Q
+from django.test import TestCase, override_settings
+from projects.tests.factories import ProjectFactory
+from tasks.models import Annotation, Task
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestExcludedFieldsLogic(TestCase):
@@ -305,6 +315,34 @@ class TestPreparedTaskManagerBehavior(TestCase):
                 "Field 'predictions_results' should not be processed (not in fields_for_evaluation)",
             )
 
+    @override_settings(GET_DYNAMIC_DM_ANNOTATIONS='lse_data_manager.hooks.get_dynamic_annotations')
+    def test_dynamic_agreement_annotations_are_not_gated_by_raw_feature_flag(self):
+        """Dynamic Agreement V2 annotations are delegated to the configured hook for project-level gating."""
+        from data_manager.managers import PreparedTaskManager
+
+        mock_queryset = Mock()
+        mock_queryset.project = Mock(id=123)
+        called_functions = []
+
+        def dimension_agreement_annotator(queryset):
+            called_functions.append('dimension_agreement_1')
+            return queryset
+
+        def overlay_func(request=None, project=None):
+            return {'dimension_agreement_1': dimension_agreement_annotator}
+
+        with (
+            patch('data_manager.managers.get_annotations_map', return_value={}),
+            patch('data_manager.managers.load_func', return_value=overlay_func),
+        ):
+            manager = PreparedTaskManager()
+            manager.annotate_queryset(
+                queryset=mock_queryset,
+                fields_for_evaluation=['dimension_agreement_1'],
+            )
+
+        self.assertEqual(called_functions, ['dimension_agreement_1'])
+
 
 class TestGetQuerysetParameterPassing(TestCase):
     """Test that get_queryset properly passes excluded_fields_for_evaluation parameter.
@@ -398,3 +436,1503 @@ class TestGetQuerysetParameterPassing(TestCase):
                 call_kwargs.get('excluded_fields_for_evaluation'),
                 'excluded_fields_for_evaluation should default to None',
             )
+
+
+class TestApplyOrderingStaleAgreementFields(TestCase):
+    """Regression tests for stale agreement fields in saved Data Manager views."""
+
+    def test_stale_dimension_agreement_ordering_falls_back_to_id(self):
+        """Ordering by a stale dimension_agreement_* key should fail open and use default ordering."""
+        from data_manager.managers import apply_ordering
+
+        queryset = Mock()
+        queryset.order_by.side_effect = [FieldError('Cannot resolve keyword'), queryset]
+
+        with patch(
+            'data_manager.managers.load_func', return_value=lambda raw, project=None: ('dimension_agreement_1', True)
+        ):
+            result = apply_ordering(
+                queryset=queryset,
+                ordering=['tasks:dimension_agreement_1'],
+                project=Mock(),
+                request=Mock(),
+            )
+
+        self.assertIs(result, queryset)
+        self.assertEqual(queryset.order_by.call_count, 2)
+        self.assertEqual(queryset.order_by.call_args_list[-1].args, ('id',))
+
+
+class TestCastValueDatetimeBooleanValue(TestCase):
+    """Regression test for crashes when a saved view stores a non-string value for a Datetime filter."""
+
+    def test_cast_value_datetime_filter_with_boolean_value_does_not_raise(self):
+        # Reproduces: ENTERPRISE-V2-BACKEND-5NR
+        # TypeError: strptime() argument 1 must be str, not bool
+        # A saved Data Manager view persisted a Datetime filter whose value is a boolean
+        # (e.g. {filter: 'filter:tasks:completed_at', type: 'Datetime', value: true}).
+        # GET /api/tasks/ funnels that through cast_value, which calls
+        # datetime.strptime(_filter.value, ...) and crashes the request.
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at',
+            operator='less',
+            type='Datetime',
+            value=True,
+        )
+
+        # Should handle the bad value gracefully rather than raising TypeError.
+        cast_value(_filter)
+
+
+class TestCastValueDatetimeIsUtcAware(TestCase):
+    """Datetime filter values end with Z, so cast_value must return UTC-aware datetimes.
+
+    A naive value makes Django emit "received a naive datetime while time zone support is active"
+    when it is compared with a DateTimeField, e.g. the annotated completed_at used by analytics KPIs.
+    """
+
+    def test_single_value_is_utc_aware(self):
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at', operator='less', type='Datetime', value='2026-11-24T23:59:00.000000Z'
+        )
+        cast_value(_filter)
+
+        assert _filter.value == datetime(2026, 11, 24, 23, 59, tzinfo=timezone.utc)
+        assert _filter.value.tzinfo is timezone.utc
+
+    def test_range_value_is_utc_aware(self):
+        from data_manager.managers import cast_value
+
+        _filter = Filter(
+            filter='filter:tasks:completed_at',
+            operator='in',
+            type='Datetime',
+            value={'min': '2026-11-18T00:00:00.000Z', 'max': '2026-11-24T23:59:00.000Z'},
+        )
+        cast_value(_filter)
+
+        assert _filter.value.min == datetime(2026, 11, 18, tzinfo=timezone.utc)
+        assert _filter.value.max == datetime(2026, 11, 24, 23, 59, tzinfo=timezone.utc)
+
+    def test_filter_on_annotated_datetime_does_not_warn(self):
+        import warnings
+
+        from data_manager.managers import annotate_completed_at, apply_filters
+
+        project = ProjectFactory()
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter='filter:tasks:completed_at',
+                    operator='less',
+                    type='Datetime',
+                    value='2026-11-24T23:59:00.000000Z',
+                )
+            ],
+        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error', message='.*received a naive datetime.*', category=RuntimeWarning)
+            queryset = annotate_completed_at(Task.objects.filter(project=project))
+            list(apply_filters(queryset, filters, project, None))
+
+
+class TestApplyFiltersStaleAgreementFields(TestCase):
+    """Regression tests for stale agreement filters in saved Data Manager views."""
+
+    def test_stale_dimension_agreement_filter_is_skipped(self):
+        """Stale dimension_agreement_* filters should be ignored instead of raising FieldError."""
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.model._meta.get_field.side_effect = FieldDoesNotExist('missing')
+        queryset.filter.return_value = queryset
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter='filter:tasks:dimension_agreement_1',
+                    operator='equal',
+                    type='Number',
+                    value='0.6',
+                )
+            ],
+        )
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return lambda *_args, **_kwargs: None
+            if path == settings.PREPROCESS_FIELD_NAME:
+                return lambda _field, _project: ('dimension_agreement_1', True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda _filter, _field_name: _filter
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            result = apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock())
+
+        self.assertIs(result, queryset)
+        queryset.filter.assert_not_called()
+
+
+class TestPrepareParamsChildFilters(TestCase):
+    """The runtime Pydantic contract normalizes both child-filter wire formats."""
+
+    @staticmethod
+    def _filter(column):
+        return {
+            'filter': f'filter:tasks:data.{column}',
+            'operator': 'equal',
+            'type': 'String',
+            'value': column,
+        }
+
+    def test_legacy_singular_child_filter_is_normalized_to_plural(self):
+        """Legacy `child_filter` input remains valid and is exposed through `child_filters`."""
+        child = self._filter('legacy-child')
+        parent = {**self._filter('parent'), 'child_filter': child}
+
+        params = PrepareParams(project=1, filters={'conjunction': 'and', 'items': [parent]})
+
+        normalized_children = params.filters.items[0].child_filters
+        self.assertEqual([item.filter for item in normalized_children], [child['filter']])
+
+    def test_plural_child_filters_preserve_order(self):
+        """Plural wire input accepts siblings and keeps their order in the normalized list."""
+        children = [self._filter('first-child'), self._filter('second-child')]
+        parent = {**self._filter('parent'), 'child_filters': children}
+
+        params = PrepareParams(project=1, filters={'conjunction': 'and', 'items': [parent]})
+
+        normalized_children = params.filters.items[0].child_filters
+        self.assertEqual([item.filter for item in normalized_children], [item['filter'] for item in children])
+
+
+class TestApplyFiltersCustomResult(TestCase):
+    """Custom hooks can consume a parent/child pair as one expression."""
+
+    def test_custom_result_consumes_child_filter(self):
+        from data_manager.managers import CustomFilterResult, apply_filters
+        from django.db.models import Q
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.filter.return_value = queryset
+        project = Mock()
+        parent = Filter(
+            filter='filter:tasks:annotations_dimension_results.dimension_1',
+            operator='contains',
+            type='List',
+            value=['positive'],
+            child_filter=Filter(
+                filter='filter:tasks:annotators',
+                operator='contains',
+                type='List',
+                value=7,
+            ),
+        )
+        filters = Filters(conjunction=ConjunctionEnum.AND, items=[parent])
+        custom_hook = Mock(return_value=CustomFilterResult(Q(id=123), consume_child_filter=True))
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return custom_hook
+            if path == settings.PREPROCESS_FIELD_NAME:
+                return lambda raw, _project: (raw.removeprefix('filter:tasks:'), True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda filter_, _field_name: filter_
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            result = apply_filters(queryset=queryset, filters=filters, project=project, request=Mock())
+
+        self.assertIs(result, queryset)
+        custom_hook.assert_called_once()
+        self.assertIs(custom_hook.call_args.kwargs['child_filter'], parent.child_filter)
+        queryset.filter.assert_called_once()
+
+
+class TestNormalizeInListValue(TestCase):
+    """Unit tests for `_normalize_in_list_value` (BROS-1203)."""
+
+    def _filter(self, value, type_='String'):
+        return Filter(filter='filter:tasks:id', operator='in_list', type=type_, value=value)
+
+    def test_strips_whitespace_and_surrounding_quotes(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['  abc  ', '"def"', "'ghi'"])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['abc', 'def', 'ghi'])
+
+    def test_dedupes_preserving_order(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['a', 'b', 'a', 'c', 'b'])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['a', 'b', 'c'])
+
+    def test_drops_empty_strings(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter(['', ' ', 'x', '""'])
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, ['x'])
+
+    def test_number_type_drops_non_numeric_tokens(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter([1, '2', 'foo', '3.5', 'bar', None], type_='Number')
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, [1.0, 2.0, 3.5])
+
+    def test_handles_non_list_value(self):
+        from data_manager.managers import _normalize_in_list_value
+
+        f = self._filter('not a list')
+        _normalize_in_list_value(f)
+        self.assertEqual(f.value, [])
+
+
+class TestParseUserFilterIds(TestCase):
+    def test_scalar_value(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids(7), [7])
+        self.assertEqual(parse_user_filter_ids('9'), [9])
+
+    def test_list_value_dedupes(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids([1, 2, 2, '3']), [1, 2, 3])
+
+    def test_invalid_entries_rejected(self):
+        from data_manager.managers import parse_user_filter_ids
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            parse_user_filter_ids([1, 'bad', None])
+
+    def test_empty_and_none(self):
+        from data_manager.managers import parse_user_filter_ids
+
+        self.assertEqual(parse_user_filter_ids(None), [])
+        self.assertEqual(parse_user_filter_ids([]), [])
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=2)
+    def test_list_value_size_is_bounded(self):
+        from data_manager.managers import ResolvedUserFilterIds, parse_user_filter_ids
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            parse_user_filter_ids([1, 2, 3])
+        self.assertEqual(parse_user_filter_ids(ResolvedUserFilterIds([1, 2, 3])), [1, 2, 3])
+
+
+class TestValidateUserFilterOperator(TestCase):
+    """FIT-2435: unified allowlist for user-list filter + operator combos."""
+
+    # Operators that must never reach ORM fallthrough for these fields.
+    NAUGHTY_SCALAR_OPERATORS = (
+        'regex',
+        'less',
+        'greater',
+        'less_or_equal',
+        'greater_or_equal',
+        'in',
+        'not_in',
+        'unknown_op',
+    )
+    NAUGHTY_LIST_OPERATORS = (
+        'empty',
+        'equal',
+        'not_equal',
+        'regex',
+        'in_list',
+        'not_in_list',
+        'less',
+        'greater',
+    )
+
+    def test_empty_allowed_only_for_fields_that_implement_it(self):
+        from data_manager.managers import (
+            USER_FILTER_EMPTY_FIELDS,
+            USER_FILTER_FIELDS,
+            validate_user_filter_operator,
+        )
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            with self.subTest(field_name=field_name):
+                if field_name in USER_FILTER_EMPTY_FIELDS:
+                    validate_user_filter_operator(field_name, 'empty', True)
+                    validate_user_filter_operator(field_name, 'empty', False)
+                else:
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, 'empty', True)
+
+    def test_rejects_naughty_scalar_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_SCALAR_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, 1)
+
+    def test_rejects_naughty_list_operators_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+        from rest_framework.exceptions import ValidationError
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in self.NAUGHTY_LIST_OPERATORS:
+                with self.subTest(field_name=field_name, operator=operator):
+                    with self.assertRaises(ValidationError):
+                        validate_user_filter_operator(field_name, operator, [1])
+
+    def test_allows_contains_and_not_contains_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('contains', 'not_contains'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, [1, 2])
+                    validate_user_filter_operator(field_name, operator, 1)
+
+    def test_allows_legacy_scalar_equal_family_for_normalization(self):
+        from data_manager.managers import USER_FILTER_FIELDS, validate_user_filter_operator
+
+        for field_name in USER_FILTER_FIELDS:
+            for operator in ('equal', 'not_equal', 'in_list', 'not_in_list'):
+                with self.subTest(field_name=field_name, operator=operator):
+                    validate_user_filter_operator(field_name, operator, 1)
+
+
+class TestNormalizePersistedUserFilter(TestCase):
+    def test_recovers_historical_user_id_shapes_for_every_user_field(self):
+        from data_manager.managers import USER_FILTER_FIELDS, normalize_persisted_user_filter
+
+        historical_value = [
+            1,
+            '2',
+            3.0,
+            {'id': '4', 'email': 'deleted@example.com'},
+            {'value': 5, 'label': 'Former user'},
+            {'items': [{'value': '6', 'title': 'User 6'}], 'multiple': True},
+            'yes',
+            None,
+            True,
+            7.5,
+            ['8'],
+        ]
+
+        for field_name in USER_FILTER_FIELDS:
+            with self.subTest(field_name=field_name):
+                operator, value = normalize_persisted_user_filter(field_name, 'contains', historical_value)
+                self.assertEqual(operator, 'contains')
+                self.assertEqual(value, [1, 2, 3, 4, 5, 6, 8])
+
+    def test_resets_unrecoverable_values_and_operators(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        cases = [
+            ('contains', ['yes'], 'contains', []),
+            ('contains', '', 'contains', []),
+            ('contains', {'label': 'Matt'}, 'contains', []),
+            ('contains', False, 'contains', []),
+            ('contains', 1.5, 'contains', []),
+            ('regex', '7', 'contains', []),
+            ('unknown', [7], 'contains', []),
+        ]
+        for operator, value, expected_operator, expected_value in cases:
+            with self.subTest(operator=operator, value=value):
+                self.assertEqual(
+                    normalize_persisted_user_filter('annotators', operator, value),
+                    (expected_operator, expected_value),
+                )
+
+    def test_maps_unambiguous_legacy_operators_and_preserves_empty(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        self.assertEqual(normalize_persisted_user_filter('updated_by', 'equal', '7'), ('contains', 7))
+        self.assertEqual(
+            normalize_persisted_user_filter('skipped_by_annotator', 'not_equal', {'id': 8}),
+            ('not_contains', 8),
+        )
+        self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'yes'), ('empty', True))
+        self.assertEqual(normalize_persisted_user_filter('annotators', 'empty', 'O'), ('contains', []))
+        # FIT-2435: unsupported empty on skipped_by_annotator becomes a no-op contains.
+        self.assertEqual(normalize_persisted_user_filter('skipped_by_annotator', 'empty', True), ('contains', []))
+
+    @override_settings(DATA_MANAGER_LIST_FILTER_MAX_VALUES=3)
+    def test_deduplicates_and_bounds_recovered_ids(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        self.assertEqual(
+            normalize_persisted_user_filter('reviewers', 'contains', [1, '1', 2, 3, 4]),
+            ('contains', [1, 2, 3]),
+        )
+
+    def test_does_not_change_non_user_filters(self):
+        from data_manager.managers import normalize_persisted_user_filter
+
+        value = {'items': ['yes']}
+        self.assertEqual(
+            normalize_persisted_user_filter('predictions_model_versions', 'contains', value),
+            ('contains', value),
+        )
+
+
+class TestAddUserFilter(TestCase):
+    def test_contains_list_uses_in_lookup(self):
+        from data_manager.managers import Operator, add_user_filter
+
+        expressions = []
+        _filter = Filter(filter='filter:tasks:annotators', operator=Operator.CONTAINS, type='List', value=[1, 2])
+        result = add_user_filter(True, 'annotations__completed_by', _filter, expressions)
+        self.assertEqual(result, 'continue')
+        self.assertEqual(len(expressions), 1)
+        self.assertEqual(str(expressions[0]), str(Q(annotations__completed_by__in=[1, 2])))
+
+    def test_scalar_value_backward_compatible(self):
+        from data_manager.managers import Operator, add_user_filter
+
+        expressions = []
+        _filter = Filter(filter='filter:tasks:updated_by', operator=Operator.CONTAINS, type='List', value=5)
+        result = add_user_filter(True, 'updated_by', _filter, expressions)
+        self.assertEqual(result, 'continue')
+        self.assertEqual(str(expressions[0]), str(Q(updated_by__in=[5])))
+
+
+class TestUserFilterResults(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user_a = UserFactory()
+        cls.user_b = UserFactory()
+        cls.user_c = UserFactory()
+        cls.task_a = TaskFactory(project=cls.project, updated_by=cls.user_a)
+        cls.task_b = TaskFactory(project=cls.project, updated_by=cls.user_b)
+        cls.task_c = TaskFactory(project=cls.project, updated_by=cls.user_c)
+        AnnotationFactory(task=cls.task_a, project=cls.project, completed_by=cls.user_a)
+        AnnotationFactory(task=cls.task_b, project=cls.project, completed_by=cls.user_b)
+        AnnotationFactory(task=cls.task_c, project=cls.project, completed_by=cls.user_c)
+
+    def _filter(self, field, operator, value):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction='and',
+            items=[
+                Filter(
+                    filter=f'filter:tasks:{field}',
+                    operator=operator,
+                    type='List',
+                    value=value,
+                )
+            ],
+        )
+        return apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+
+    def test_contains_matches_any_selected_user(self):
+        expected = {self.task_a.id, self.task_b.id}
+
+        annotator_ids = set(
+            self._filter('annotators', 'contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        updated_by_ids = set(
+            self._filter('updated_by', 'contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        self.assertSetEqual(annotator_ids, expected)
+        self.assertSetEqual(updated_by_ids, expected)
+
+    def test_not_contains_excludes_every_selected_user(self):
+        expected = {self.task_c.id}
+
+        annotator_ids = set(
+            self._filter('annotators', 'not_contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        updated_by_ids = set(
+            self._filter('updated_by', 'not_contains', [self.user_a.id, self.user_b.id]).values_list('id', flat=True)
+        )
+        self.assertSetEqual(annotator_ids, expected)
+        self.assertSetEqual(updated_by_ids, expected)
+
+    def test_empty_list_adds_no_user_constraint(self):
+        expected = {self.task_a.id, self.task_b.id, self.task_c.id}
+
+        for field in ('annotators', 'updated_by'):
+            for operator in ('contains', 'not_contains'):
+                actual = set(self._filter(field, operator, []).values_list('id', flat=True))
+                self.assertSetEqual(actual, expected)
+
+    def test_empty_root_user_filter_does_not_apply_child_standalone(self):
+        from data_manager.managers import apply_filters
+
+        expected = {self.task_a.id, self.task_b.id, self.task_c.id}
+        for conjunction in ('and', 'or'):
+            with self.subTest(conjunction=conjunction):
+                filters = Filters(
+                    conjunction=conjunction,
+                    items=[
+                        Filter(
+                            filter='filter:tasks:annotators',
+                            operator='contains',
+                            type='List',
+                            value=[],
+                            child_filters=[
+                                Filter(
+                                    filter='filter:tasks:updated_by',
+                                    operator='contains',
+                                    type='List',
+                                    value=[self.user_a.id],
+                                )
+                            ],
+                        )
+                    ],
+                )
+                actual = set(
+                    apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+                    .values_list('id', flat=True)
+                    .distinct()
+                )
+                self.assertSetEqual(actual, expected)
+
+    def test_empty_child_user_filter_keeps_valid_parent_constraint(self):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction='and',
+            items=[
+                Filter(
+                    filter='filter:tasks:annotators',
+                    operator='contains',
+                    type='List',
+                    value=[self.user_a.id],
+                    child_filters=[
+                        Filter(
+                            filter='filter:tasks:updated_by',
+                            operator='contains',
+                            type='List',
+                            value=[],
+                        )
+                    ],
+                )
+            ],
+        )
+        actual = set(
+            apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+            .values_list('id', flat=True)
+            .distinct()
+        )
+        self.assertSetEqual(actual, {self.task_a.id})
+
+    def test_unsupported_user_filter_operator_is_rejected(self):
+        from rest_framework.exceptions import ValidationError
+
+        for field in ('annotators', 'updated_by'):
+            with self.subTest(field=field), self.assertRaises(ValidationError):
+                self._filter(field, 'equal', [self.user_a.id])
+
+
+class TestValidateInListFilter(TestCase):
+    """Unit tests for `validate_in_list_filter` (BROS-1203)."""
+
+    def test_passthrough_for_non_list_operators(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='equal', type='Number', value=1)
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'ok')
+
+    def test_allowlisted_id_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[1, 2, 3])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'ok')
+        self.assertEqual(f.value, [1.0, 2.0, 3.0])
+
+    def test_allowlisted_inner_id_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:inner_id', operator='in_list', type='Number', value=[5])
+        self.assertEqual(validate_in_list_filter(f, 'inner_id'), 'ok')
+
+    def test_allowlisted_data_field_returns_ok(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:data.object_id', operator='in_list', type='String', value=['a'])
+        self.assertEqual(validate_in_list_filter(f, 'data__object_id'), 'ok')
+
+    def test_rejects_unsupported_annotations_ids(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:annotations_ids', operator='in_list', type='Number', value=[1])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'annotations_ids')
+
+    def test_rejects_unsupported_annotators(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:annotators', operator='in_list', type='Number', value=[1])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'annotators')
+
+    def test_allowlisted_counter_columns_return_ok(self):
+        """FIT-2416: denormalized annotation/prediction counters accept in_list."""
+        from data_manager.managers import validate_in_list_filter
+
+        for field in ('total_annotations', 'total_predictions', 'cancelled_annotations'):
+            f = Filter(filter=f'filter:tasks:{field}', operator='in_list', type='Number', value=[1, 2])
+            assert validate_in_list_filter(f, field) == 'ok', field
+
+    def test_rejects_unsupported_created_at(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:created_at', operator='in_list', type='Datetime', value=['2024'])
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'created_at')
+
+    def test_rejects_non_list_value(self):
+        from data_manager.managers import validate_in_list_filter
+        from rest_framework.exceptions import ValidationError
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value='not a list')
+        with self.assertRaises(ValidationError):
+            validate_in_list_filter(f, 'id')
+
+    def test_empty_in_list_returns_none(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
+
+    def test_empty_not_in_list_returns_skip(self):
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'skip')
+
+    def test_normalization_to_empty_for_number_returns_none(self):
+        """All-garbage Number list normalizes to empty → behave like empty list."""
+        from data_manager.managers import validate_in_list_filter
+
+        f = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=['foo', 'bar'])
+        self.assertEqual(validate_in_list_filter(f, 'id'), 'none')
+
+
+class TestAnnotationIdFilterQ(TestCase):
+    """Unit tests for `annotation_id_filter_q` (FIT-2432)."""
+
+    def test_not_contains_skips_blank_tokens_from_trailing_separators(self):
+        """Empty fragments are not malformed; ``"12,"`` still excludes only 12."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12,')
+
+        assert expression == ~Q(pk__in=[12])
+
+    def test_contains_skips_blank_tokens_from_trailing_separators(self):
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.CONTAINS, '12,')
+
+        assert expression == Q(pk__in=[12])
+
+    def test_not_contains_malformed_token_still_fail_closes(self):
+        """Dropping a malformed token would broaden not_contains, so reject the line."""
+        from data_manager.managers import Operator, annotation_id_filter_q
+
+        expression = annotation_id_filter_q('pk', Operator.NOT_CONTAINS, '12, malformed')
+
+        assert expression == Q(pk__in=[])
+
+
+class TestApplyFiltersInList(TestCase):
+    """Integration of in_list / not_in_list with the apply_filters() pipeline (BROS-1203)."""
+
+    def _run(self, _filter, conjunction=ConjunctionEnum.AND):
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.query.annotations = {}
+        queryset.model._meta.get_field.return_value = Mock()
+        queryset.filter.return_value = queryset
+        queryset.exists.return_value = False
+
+        filters = Filters(conjunction=conjunction, items=[_filter])
+
+        def _load_func(path):
+            if path == settings.DATA_MANAGER_COMBINED_FILTER_EXPRESSION:
+                return lambda *_args, **_kwargs: None
+            if path == settings.DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS:
+                return lambda *_args, **_kwargs: None
+            if path == settings.PREPROCESS_FIELD_NAME:
+                field = _filter.filter.removeprefix('filter:tasks:').replace('.', '__')
+                return lambda _field, _project: (field, True)
+            if path == settings.DATA_MANAGER_PREPROCESS_FILTER:
+                return lambda f, _field_name: f
+            raise AssertionError(f'unexpected load_func path: {path}')
+
+        with patch('data_manager.managers.load_func', side_effect=_load_func):
+            return apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock()), queryset
+
+    def test_id_in_list_builds_q_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[1, 2, 3])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_id_not_in_list_builds_q_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[1, 2])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_empty_in_list_appends_contradiction(self):
+        """Empty in_list results in `Q(pk__in=[])` so the filter line matches no rows.
+
+        This works for both AND and OR conjunctions (always-false predicate).
+        """
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+    def test_empty_not_in_list_drops_filter(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_not_called()
+
+    def test_unsupported_field_raises_400(self):
+        from rest_framework.exceptions import ValidationError
+
+        _filter = Filter(filter='filter:tasks:annotations_ids', operator='in_list', type='Number', value=[1, 2])
+        with self.assertRaises(ValidationError):
+            self._run(_filter)
+
+    def test_annotations_ids_legacy_contains_smart_rewrite_still_works(self):
+        """Legacy `annotations_ids` smart-contains hack must remain intact.
+
+        The validator only fires when the *original* operator is in_list / not_in_list, so
+        `{annotations_ids, contains, "1 2,3"}` still hits the annotation-ID compiler
+        in `data_manager.managers.apply_filters`.
+        """
+        # `contains` (not in_list) — validator returns 'ok', compiler proceeds.
+        _filter = Filter(
+            filter='filter:tasks:annotations_ids',
+            operator='contains',
+            type='String',
+            value='1 2,3',
+        )
+        result, queryset = self._run(_filter)
+        self.assertIs(result, queryset)
+        queryset.filter.assert_called_once()
+
+
+class TestApplyFiltersInListDB(TestCase):
+    """DB-backed integration tests for in_list against real columns (BROS-1203).
+
+    These verify the SQL path end-to-end: Number-type values are coerced to floats
+    by `_normalize_in_list_value`, then passed to `Q(field__in=...)`. Critical for
+    `Task.id` and `Task.inner_id` (IntegerField PKs) where float→int comparison must
+    work in Postgres.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        from projects.tests.factories import ProjectFactory
+        from tasks.tests.factories import TaskFactory
+
+        cls.project = ProjectFactory()
+        cls.tasks = [
+            TaskFactory(project=cls.project, data={'text': 'a', 'object_id': '1'}),
+            TaskFactory(project=cls.project, data={'text': 'b', 'object_id': '2'}),
+            TaskFactory(project=cls.project, data={'text': 'c', 'object_id': '3'}),
+        ]
+
+    def _apply(self, _filter):
+        from data_manager.managers import apply_filters
+        from tasks.models import Task
+
+        queryset = Task.objects.filter(project=self.project)
+        filters = Filters(conjunction=ConjunctionEnum.AND, items=[_filter])
+        return apply_filters(queryset=queryset, filters=filters, project=self.project, request=None)
+
+    def test_task_id_in_list_returns_listed_tasks(self):
+        """Integer PK + float values from normalize — verifies Postgres coercion."""
+        target_ids = [self.tasks[0].id, self.tasks[2].id]
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=target_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == set(target_ids)
+
+    def test_task_id_not_in_list_returns_complement(self):
+        excluded_ids = [self.tasks[0].id]
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=excluded_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[1].id, self.tasks[2].id}
+
+    def test_task_id_in_list_accepts_string_values(self):
+        """Users may paste IDs as strings; normalize coerces them to numbers."""
+        target_ids = [str(self.tasks[0].id), str(self.tasks[1].id)]
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=target_ids)
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[1].id}
+
+    def test_data_field_string_in_list_works(self):
+        _filter = Filter(
+            filter='filter:tasks:data.object_id',
+            operator='in_list',
+            type='String',
+            value=['1', '3'],
+        )
+
+        result = self._apply(_filter)
+
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[2].id}
+
+    def test_empty_in_list_returns_no_tasks(self):
+        _filter = Filter(filter='filter:tasks:id', operator='in_list', type='Number', value=[])
+
+        result = self._apply(_filter)
+
+        assert result.count() == 0
+
+    def test_empty_not_in_list_returns_all_tasks(self):
+        _filter = Filter(filter='filter:tasks:id', operator='not_in_list', type='Number', value=[])
+
+        result = self._apply(_filter)
+
+        assert result.count() == 3
+
+    def test_total_annotations_in_list_returns_matching_tasks(self):
+        """FIT-2416: counter columns use a single __in filter instead of N OR equals."""
+        from tasks.models import Task
+
+        Task.objects.filter(id=self.tasks[0].id).update(total_annotations=2)
+        Task.objects.filter(id=self.tasks[1].id).update(total_annotations=5)
+        Task.objects.filter(id=self.tasks[2].id).update(total_annotations=2)
+
+        _filter = Filter(
+            filter='filter:tasks:total_annotations',
+            operator='in_list',
+            type='Number',
+            value=[2, 9],
+        )
+        result = self._apply(_filter)
+        assert set(result.values_list('id', flat=True)) == {self.tasks[0].id, self.tasks[2].id}
+
+
+class TestVisibleDataColumnKeys(TestCase):
+    """FIT-2416: visible task.data keys from hiddenColumns for payload trimming."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from projects.tests.factories import ProjectFactory
+        from tasks.tests.factories import TaskFactory
+
+        cls.project = ProjectFactory(
+            label_config="""
+            <View>
+              <Text name="text" value="$text"/>
+              <Image name="image" value="$image"/>
+              <Choices name="label" toName="text">
+                <Choice value="a"/>
+              </Choices>
+            </View>
+            """
+        )
+        TaskFactory(project=cls.project, data={'text': 'hello', 'image': 's3://bucket/a.jpg', 'extra': 'x'})
+        summary = cls.project.summary
+        summary.all_data_columns = {'text': 1, 'image': 1, 'extra': 1}
+        summary.save(update_fields=['all_data_columns'])
+
+    def test_returns_none_without_hidden_columns(self):
+        from data_manager.managers import get_visible_data_column_keys
+        from data_manager.prepare_params import PrepareParams
+        from users.tests.factories import UserFactory
+
+        user = UserFactory()
+        prepare_params = PrepareParams(project=self.project.id, data={})
+        assert get_visible_data_column_keys(prepare_params, user) is None
+
+    def test_excludes_data_keys_hidden_in_both_modes(self):
+        from data_manager.managers import get_visible_data_column_keys
+        from data_manager.prepare_params import PrepareParams
+        from users.tests.factories import UserFactory
+
+        user = UserFactory()
+        prepare_params = PrepareParams(
+            project=self.project.id,
+            data={
+                'hiddenColumns': {
+                    'explore': ['tasks:data.extra', 'tasks:data.image'],
+                    'labeling': ['tasks:data.extra', 'tasks:id'],
+                }
+            },
+        )
+        visible = get_visible_data_column_keys(prepare_params, user)
+        assert visible is not None
+        assert 'extra' not in visible
+        assert 'text' in visible
+        # image is only hidden in explore, not both — still visible
+        assert 'image' in visible
+
+
+class TestApplyFiltersUnqueryableDataColumns(TestCase):
+    """UTC-1221: imported task.data keys can hold characters Django refuses in query aliases.
+
+    Those filters used to crash with `ValueError: Column aliases cannot contain whitespace
+    characters, ...` (a 500), so they must surface as a client validation error instead.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.task = TaskFactory(project=cls.project, data={'my column': 'keep me', 'my number': 1})
+
+    def _apply(self, column, operator, filter_type, value):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[
+                Filter(
+                    filter=f'filter:tasks:data.{column}',
+                    operator=operator,
+                    type=filter_type,
+                    value=value,
+                )
+            ],
+        )
+        queryset = apply_filters(Task.objects.filter(project=self.project), filters, self.project, request=None)
+        return list(queryset.values_list('id', flat=True))
+
+    def test_string_filter_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my column', 'contains', 'String', 'keep')
+
+    def test_empty_operator_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my column', 'empty', 'String', 'true')
+
+    def test_number_filter_on_unqueryable_column_reports_validation_error(self):
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            self._apply('my number', 'equal', 'Number', '1')
+
+    def test_queryable_data_column_filters_are_unaffected(self):
+        task = TaskFactory(project=self.project, data={'safe_column': 'keep me'})
+
+        assert self._apply('safe_column', 'contains', 'String', 'keep') == [task.id]
+
+
+class TestApplyFiltersInvalidRegex(TestCase):
+    """FIT-2460: invalid regex fails closed before custom emitters run."""
+
+    def test_invalid_child_regex_empties_queryset_before_custom_hook(self):
+        """Invalid child regex under OR returns none before custom emitters load."""
+        from data_manager.managers import apply_filters
+
+        queryset = Mock()
+        queryset.none.return_value = 'EMPTY'
+        filters = Filters(
+            conjunction=ConjunctionEnum.OR,
+            items=[
+                Filter(
+                    filter='filter:tasks:annotations_results',
+                    operator='contains',
+                    type='String',
+                    value='Airplane',
+                    child_filters=[
+                        Filter(
+                            filter='filter:tasks:comments',
+                            operator='regex',
+                            type='String',
+                            value='[',
+                        )
+                    ],
+                ),
+                Filter(
+                    filter='filter:tasks:id',
+                    operator='equal',
+                    type='Number',
+                    value=1,
+                ),
+            ],
+        )
+
+        with patch('data_manager.managers.load_func') as load_func:
+            result = apply_filters(queryset=queryset, filters=filters, project=Mock(), request=Mock())
+
+        assert result == 'EMPTY'
+        load_func.assert_not_called()
+        queryset.none.assert_called_once_with()
+
+
+class TestAnnotateStateProjectScoped(TestCase):
+    """The DM state column reads the latest TaskState through the project-scoped index."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from fsm.state_models import TaskState
+
+        cls.project = ProjectFactory()
+        cls.other_project = ProjectFactory()
+        cls.moved_on = TaskFactory(project=cls.project)
+        cls.single = TaskFactory(project=cls.project)
+        cls.stateless = TaskFactory(project=cls.project)
+        cls.other = TaskFactory(project=cls.other_project)
+        TaskState.objects.filter(task__in=[cls.moved_on, cls.single, cls.stateless, cls.other]).delete()
+
+        def add_state(task, state):
+            TaskState.objects.create(
+                task=task,
+                project_id=task.project_id,
+                organization_id=task.project.organization_id,
+                state=state,
+                transition_name='test',
+            )
+
+        add_state(cls.moved_on, 'CREATED')
+        add_state(cls.moved_on, 'IN_PROGRESS')
+        add_state(cls.moved_on, 'COMPLETED')
+        add_state(cls.single, 'IN_PROGRESS')
+        add_state(cls.other, 'COMPLETED')
+
+    def _states(self, queryset):
+        from data_manager.managers import annotate_state
+        from django.test import override_settings
+
+        with override_settings(FSM_ENABLED=True):
+            annotated = annotate_state(queryset)
+            return annotated, dict(annotated.values_list('id', 'state'))
+
+    def test_latest_state_per_task(self):
+        annotated, states = self._states(Task.objects.filter(project=self.project))
+
+        assert states == {self.moved_on.id: 'COMPLETED', self.single.id: 'IN_PROGRESS', self.stateless.id: None}
+        assert '."project_id" = ("task"."project_id")' in str(annotated.query).split('AS "current_state"')[0]
+
+    def test_filter_and_order_by_state(self):
+        from data_manager.managers import annotate_state
+        from django.test import override_settings
+
+        with override_settings(FSM_ENABLED=True):
+            annotated = annotate_state(Task.objects.filter(project=self.project))
+            completed = list(annotated.filter(state__icontains='complet').values_list('id', flat=True))
+            ordered = list(annotated.exclude(state=None).order_by('state').values_list('id', flat=True))
+
+        assert completed == [self.moved_on.id]
+        assert ordered == [self.moved_on.id, self.single.id]
+
+
+class TestBaseAnnotateCompletedAt(TestCase):
+    """completed_at keeps the newest-annotation subquery out of GROUP BY (UTC-1491).
+
+    In GROUP BY, Postgres evaluates the subquery once per joined annotation row, which is
+    O(annotations²) per task on high-overlap projects whenever another column aggregates annotations.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        from django.utils import timezone
+
+        cls.project = ProjectFactory()
+        now = timezone.now()
+        cls.older_task = TaskFactory(project=cls.project)
+        cls.newer_task = TaskFactory(project=cls.project)
+        cls.unlabeled_task = TaskFactory(project=cls.project)
+        cls.expected = {}
+        for task, newest_offset in ((cls.older_task, 10), (cls.newer_task, 1)):
+            for offset in (newest_offset + 20, newest_offset + 10, newest_offset):
+                annotation = AnnotationFactory(task=task, project=cls.project)
+                created_at = now - timezone.timedelta(days=offset)
+                Annotation.objects.filter(id=annotation.id).update(created_at=created_at)
+            cls.expected[task.id] = created_at
+        AnnotationFactory(task=cls.unlabeled_task, project=cls.project)
+        Task.objects.filter(id__in=[cls.older_task.id, cls.newer_task.id]).update(is_labeled=True)
+        Task.objects.filter(id=cls.unlabeled_task.id).update(is_labeled=False)
+        cls.expected[cls.unlabeled_task.id] = None
+
+    def _annotated(self):
+        from data_manager.managers import base_annotate_completed_at
+        from django.contrib.postgres.aggregates import ArrayAgg
+
+        queryset = Task.objects.filter(project=self.project).annotate(
+            annotators=ArrayAgg('annotations__completed_by', distinct=True)
+        )
+        return base_annotate_completed_at(queryset)
+
+    def test_values_with_annotations_join(self):
+        assert dict(self._annotated().values_list('id', 'completed_at')) == self.expected
+
+    def test_order_by_completed_at_with_annotations_join(self):
+        from django.db.models import F
+
+        ordered = list(
+            self._annotated().order_by(F('completed_at').desc(nulls_last=True)).values_list('id', flat=True)
+        )
+
+        assert ordered == [self.newer_task.id, self.older_task.id, self.unlabeled_task.id]
+
+    def test_subquery_is_not_a_group_by_key(self):
+        sql = str(self._annotated().query)
+        group_by = sql[sql.index('GROUP BY') + len('GROUP BY') :].split('ORDER BY')[0]
+        terms = [term.strip() for term in group_by.split(',')]
+
+        # A grouped annotation renders as its select position (e.g. `"task"."id", 20`); Postgres
+        # collapses the task columns to `"task"."id"`, SQLite lists them all.
+        assert '"task"."id"' in terms
+        assert all(term.startswith('"task".') for term in terms), terms
+
+
+REAL_RESULT = [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['pos']}}]
+OTHER_RESULT = [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['neg']}}]
+
+
+def legacy_annotation_results_empty_q(is_empty):
+    """The join-based "annotation results is empty" lookup used before UTC-1491."""
+    if is_empty:
+        return Q(annotations__result__isnull=True) | Q(annotations__result=[])
+    return Q(annotations__result__isnull=False) & ~Q(annotations__result=[])
+
+
+def results_filter_params(project, operator, value, ordering=('tasks:id',)):
+    item = {'filter': 'filter:tasks:annotations_results', 'operator': operator, 'type': 'String', 'value': value}
+    return PrepareParams(project=project.id, filters={'conjunction': 'and', 'items': [item]}, ordering=list(ordering))
+
+
+class TestAnnotationResultsFilter(TestCase):
+    """Annotation results filters use EXISTS and skip the results aggregate on the filter pass (UTC-1491).
+
+    Results must match the join-based filters evaluated with the aggregate annotated, as before.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.tasks = {}
+        for name, results in {
+            'no_annotations': [],
+            'null': [None],
+            'empty_list': [[]],
+            'real': [REAL_RESULT],
+            'real_and_empty_list': [REAL_RESULT, []],
+            'real_and_null': [REAL_RESULT, None],
+            'same_real_twice': [REAL_RESULT, REAL_RESULT],
+            'two_results': [REAL_RESULT, OTHER_RESULT],
+        }.items():
+            task = TaskFactory(project=cls.project)
+            for result in results:
+                annotation = AnnotationFactory(task=task, project=cls.project)
+                Annotation.objects.filter(id=annotation.id).update(result=result)
+            cls.tasks[name] = task.id
+        TaskFactory(project=ProjectFactory(), data={'other': 'project'})
+
+    def _with_aggregate(self):
+        from data_manager.managers import annotate_annotations_results
+
+        return annotate_annotations_results(Task.objects.filter(project=self.project))
+
+    def _legacy_ids(self, operator, value):
+        from data_manager.managers import apply_filters
+
+        queryset = self._with_aggregate()
+        if operator == 'empty':
+            queryset = queryset.filter(legacy_annotation_results_empty_q(value == 'true'))
+        else:
+            params = results_filter_params(self.project, operator, value)
+            queryset = apply_filters(queryset, params.filters, self.project, request=None)
+        return sorted(queryset.values_list('id', flat=True))
+
+    def _ids(self, operator, value):
+        params = results_filter_params(self.project, operator, value)
+        ids = list(Task.prepared.only_filtered(prepare_params=params).values_list('id', flat=True))
+        assert len(ids) == len(set(ids)), ids
+        return ids
+
+    def test_matches_legacy_for_every_operator(self):
+        cases = [
+            ('empty', 'true'),
+            ('empty', 'false'),
+            ('equal', json.dumps(REAL_RESULT)),
+            ('not_equal', json.dumps(REAL_RESULT)),
+            ('contains', 'pos'),
+            ('not_contains', 'pos'),
+        ]
+        for operator, value in cases:
+            with self.subTest(operator=operator, value=value):
+                assert self._ids(operator, value) == self._legacy_ids(operator, value)
+
+    def test_empty_semantics(self):
+        tasks = self.tasks
+        assert self._ids('empty', 'true') == sorted(
+            tasks[name] for name in ('no_annotations', 'null', 'empty_list', 'real_and_empty_list', 'real_and_null')
+        )
+        # A [] result anywhere on the task excludes it from "not empty"
+        assert self._ids('empty', 'false') == sorted(
+            tasks[name] for name in ('real', 'real_and_null', 'same_real_twice', 'two_results')
+        )
+
+    def test_direct_apply_filters_keeps_join_semantics(self):
+        """Callers outside the Data Manager filter plain task querysets: "not empty" is per annotation."""
+        from data_manager.managers import apply_filters
+
+        plain = Task.objects.filter(project=self.project)
+        for value in ('true', 'false'):
+            with self.subTest(value=value):
+                legacy = plain.filter(legacy_annotation_results_empty_q(value == 'true'))
+                params = results_filter_params(self.project, 'empty', value)
+                ids = set(
+                    apply_filters(plain, params.filters, self.project, request=None).values_list('id', flat=True)
+                )
+                assert ids == set(legacy.values_list('id', flat=True))
+        assert self.tasks['real_and_empty_list'] in ids
+
+    def test_empty_with_annotators_in_the_same_line_matches_that_annotators_rows(self):
+        """Results and annotators in one filter line constrain the same annotation, as before UTC-1491."""
+        task, task_with_empty_list = TaskFactory(project=self.project), TaskFactory(project=self.project)
+        with_null, with_result, with_empty_list = UserFactory(), UserFactory(), UserFactory()
+        for annotation_task, user, result in (
+            (task, with_null, None),
+            (task, with_result, REAL_RESULT),
+            (task_with_empty_list, with_result, REAL_RESULT),
+            (task_with_empty_list, with_empty_list, []),
+        ):
+            annotation = AnnotationFactory(task=annotation_task, project=self.project, completed_by=user)
+            Annotation.objects.filter(id=annotation.id).update(result=result)
+
+        def matches(is_empty, user, results_is_parent, task=task):
+            results = {
+                'filter': 'filter:tasks:annotations_results',
+                'operator': 'empty',
+                'type': 'Boolean',
+                'value': is_empty,
+            }
+            annotators = {
+                'filter': 'filter:tasks:annotators',
+                'operator': 'contains',
+                'type': 'List',
+                'value': [user.id],
+            }
+            parent, child = (results, annotators) if results_is_parent else (annotators, results)
+            params = PrepareParams(
+                project=self.project.id,
+                filters={'conjunction': 'and', 'items': [{**parent, 'child_filters': [child]}]},
+                ordering=['tasks:id'],
+            )
+            return task.id in Task.prepared.only_filtered(prepare_params=params).values_list('id', flat=True)
+
+        for results_is_parent in (True, False):
+            with self.subTest(results_is_parent=results_is_parent):
+                assert matches(False, with_result, results_is_parent)
+                assert not matches(False, with_null, results_is_parent)
+                assert matches(True, with_null, results_is_parent)
+                assert not matches(True, with_result, results_is_parent)
+                # "Not empty" still excludes a task where another annotation's result is []
+                assert not matches(False, with_result, results_is_parent, task=task_with_empty_list)
+
+    def test_filter_pass_skips_results_aggregate(self):
+        params = results_filter_params(self.project, 'empty', 'false')
+        sql = str(Task.prepared.only_filtered(prepare_params=params).query)
+        assert 'JOIN "task_completion"' not in sql
+        assert 'GROUP BY' not in sql
+
+    def test_ordering_by_results_keeps_aggregate(self):
+        params = results_filter_params(self.project, 'empty', 'false', ordering=('tasks:annotations_results',))
+        queryset = Task.prepared.only_filtered(prepare_params=params)
+
+        assert 'annotations_results' in queryset.query.annotations
+        ids = list(queryset.values_list('id', flat=True))
+        assert sorted(ids) == self._ids('empty', 'false')
+
+    def test_results_ored_with_other_filters_keep_aggregate_and_join_form(self):
+        """Correlated EXISTS under OR runs per joined annotation row, so OR keeps the pre-UTC-1491 form."""
+        from data_manager.managers import annotate_annotations_results, apply_filters
+
+        for value in ('true', 'false'):
+            items = [
+                {'filter': 'filter:tasks:annotations_results', 'operator': 'empty', 'type': 'String', 'value': value},
+                {'filter': 'filter:tasks:annotators', 'operator': 'empty', 'type': 'List', 'value': True},
+            ]
+            params = PrepareParams(
+                project=self.project.id, filters={'conjunction': 'or', 'items': items}, ordering=['tasks:id']
+            )
+            with self.subTest(value=value):
+                queryset = Task.prepared.only_filtered(prepare_params=params)
+                assert 'annotations_results' in queryset.query.annotations
+                legacy = apply_filters(
+                    annotate_annotations_results(Task.objects.filter(project=self.project)),
+                    params.filters,
+                    self.project,
+                    request=None,
+                )
+                assert set(queryset.values_list('id', flat=True)) == set(legacy.values_list('id', flat=True))
+
+    def test_get_fields_for_filter_pass(self):
+        from data_manager.managers import get_fields_for_filter_pass
+
+        def fields(operator='empty', value='false', ordering=('tasks:id',)):
+            return get_fields_for_filter_pass(results_filter_params(self.project, operator, value, ordering=ordering))
+
+        def or_fields(*others):
+            params = results_filter_params(self.project, 'empty', 'false')
+            params.filters.conjunction = ConjunctionEnum.OR
+            params.filters.items += [
+                Filter(filter=f'filter:tasks:{column}', operator='empty', type='Boolean', value=True)
+                for column in others
+            ]
+            return get_fields_for_filter_pass(params)
+
+        assert or_fields() == ['id']
+        assert 'annotations_results' in or_fields('completed_at')
+
+        assert fields() == ['id']
+        assert fields(operator='contains', value='x') == ['id']
+        # "Results are empty" stays on the join: its EXISTS form is slower on large projects
+        assert fields(value='true') == ['id', 'annotations_results']
+        assert fields(value='x') == ['id', 'annotations_results']
+        assert fields(ordering=()) == []
+        assert fields(ordering=('tasks:-annotations_results',)) == ['annotations_results', 'annotations_results']
+        # Operators add_result_filter does not handle fall back to filtering the annotated column
+        assert fields(operator='regex') == ['id', 'annotations_results']
+
+
+class TestHiddenColumnsListForm(TestCase):
+    """Virtual-tab queries send hiddenColumns as one list to keep the GET URL short (FIT-3167).
+
+    The backend only ever uses columns hidden in both explore and labeling modes, so a flat
+    list of those columns must yield the same fields and visible data keys as the dict form.
+    """
+
+    COLUMNS = {
+        'columns': [
+            {'id': 'agreement'},
+            {'id': 'annotators'},
+            {'id': 'total_annotations'},
+            {'id': 'image', 'parent': 'data'},
+            {'id': 'text', 'parent': 'data'},
+            {'id': 'data'},
+        ]
+    }
+    DICT_FORM = {
+        'explore': ['tasks:agreement', 'tasks:data.image', 'tasks:total_annotations'],
+        'labeling': ['tasks:agreement', 'tasks:data.image', 'tasks:annotators'],
+    }
+    LIST_FORM = ['tasks:agreement', 'tasks:data.image']
+
+    def _evaluate(self, hidden_columns):
+        from data_manager.managers import get_fields_for_evaluation, get_visible_data_column_keys
+
+        params = PrepareParams(project=1, data={'hiddenColumns': hidden_columns})
+        with patch('data_manager.managers._get_all_project_columns', return_value=self.COLUMNS):
+            fields = get_fields_for_evaluation(params, user=None)
+            visible_data_keys = get_visible_data_column_keys(params, user=None)
+        return set(fields), visible_data_keys
+
+    def test_list_form_matches_dict_form(self):
+        """A flat list of columns hidden in both modes is evaluated like the equivalent dict."""
+        dict_fields, dict_keys = self._evaluate(self.DICT_FORM)
+        list_fields, list_keys = self._evaluate(self.LIST_FORM)
+
+        # total_annotations is a regular Task field, so it is never annotated
+        self.assertEqual(dict_fields, {'annotators'})
+        self.assertEqual(list_fields, dict_fields)
+        self.assertEqual(dict_keys, frozenset({'text'}))
+        self.assertEqual(list_keys, dict_keys)
+
+    def test_empty_list_shows_every_column(self):
+        """Nothing hidden in both modes ([]) still evaluates every column, like the empty dict."""
+        dict_fields, dict_keys = self._evaluate({'explore': [], 'labeling': []})
+        list_fields, list_keys = self._evaluate([])
+
+        self.assertEqual(dict_fields, {'agreement', 'annotators'})
+        self.assertEqual(list_fields, dict_fields)
+        self.assertEqual(dict_keys, frozenset({'image', 'text'}))
+        self.assertEqual(list_keys, dict_keys)
+
+
+class TestApplyFiltersDatetimeOnTaskData(TestCase):
+    """Datetime filters on task.data keys compare parsed values and skip values that are not dates."""
+
+    VALUES = {
+        'iso_utc': '2024-05-10T12:00:00Z',
+        'iso_offset': '2024-05-10T12:00:00+03:00',
+        'offset_next_day': '2024-05-09T23:00:00-03:00',
+        'naive_space': '2024-05-10 12:00:00',
+        'date_only': '2024-05-10',
+        'old': '2023-01-01T00:00:00.000Z',
+        'us_format': '05/10/2024',
+        'invalid_day': '2024-02-30',
+        'time_only': '12:00:00',
+        'epoch': 1715342400,
+        'year_number': 2024,
+        'null': None,
+    }
+    MAY_10 = {'min': '2024-05-10T00:00:00.000Z', 'max': '2024-05-10T23:59:59.000Z'}
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        for name, value in cls.VALUES.items():
+            TaskFactory(project=cls.project, data={'name': name, 'dt': value, 'дата/created': value})
+        TaskFactory(project=cls.project, data={'name': 'missing'})
+
+    def _matched(self, operator, value, key='dt'):
+        from data_manager.managers import apply_filters
+
+        filters = Filters(
+            conjunction=ConjunctionEnum.AND,
+            items=[Filter(filter=f'filter:tasks:data.{key}', operator=operator, type='Datetime', value=value)],
+        )
+        queryset = apply_filters(Task.objects.filter(project=self.project), filters, self.project, None)
+        return sorted(task.data['name'] for task in queryset)
+
+    AFTER_MAY_10_MIDNIGHT = ['iso_offset', 'iso_utc', 'naive_space', 'offset_next_day']
+
+    def test_greater(self):
+        # a date-only value is midnight UTC, so it is not after midnight
+        self.assertEqual(self._matched('greater', '2024-05-10T00:00:00.000Z'), self.AFTER_MAY_10_MIDNIGHT)
+
+    def test_less(self):
+        # +03:00 is 09:00 UTC, -03:00 on May 9 is 02:00 UTC on May 10
+        self.assertEqual(
+            self._matched('less', '2024-05-10T10:00:00.000Z'), ['date_only', 'iso_offset', 'offset_next_day', 'old']
+        )
+
+    def test_in_range(self):
+        self.assertEqual(self._matched('in', dict(self.MAY_10)), sorted(['date_only', *self.AFTER_MAY_10_MIDNIGHT]))
+
+    def test_not_in_range_skips_values_that_are_not_dates(self):
+        self.assertEqual(self._matched('not_in', dict(self.MAY_10)), ['old'])
+
+    def test_key_with_non_ascii_and_slash(self):
+        self.assertEqual(
+            self._matched('greater', '2024-05-10T00:00:00.000Z', key='дата/created'), self.AFTER_MAY_10_MIDNIGHT
+        )

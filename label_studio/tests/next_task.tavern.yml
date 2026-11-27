@@ -13,7 +13,7 @@ stages:
 - name: create_task_with_2_predictions
   request:
     files:
-      json_file: tests/test_suites/samples/text_with_2_predictions.json
+      json_file: label_studio/tests/test_suites/samples/text_with_2_predictions.json
     headers:
       content-type: multipart/form-data
     method: POST
@@ -115,7 +115,7 @@ stages:
 - name: create_2_tasks
   request:
     files:
-      json_file: tests/test_suites/samples/text_with_2_tasks.json
+      json_file: label_studio/tests/test_suites/samples/text_with_2_tasks.json
     headers:
       content-type: multipart/form-data
     method: POST

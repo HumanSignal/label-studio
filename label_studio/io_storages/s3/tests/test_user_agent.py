@@ -10,6 +10,9 @@ import unittest
 
 from io_storages.s3.utils import _get_user_agent_extra, get_client_and_resource
 
+# Explicit dummy credentials keep boto3 from probing IMDS/ECS for real ones.
+CREDENTIALS = {'aws_access_key_id': 'test-key-id', 'aws_secret_access_key': 'test-secret'}
+
 
 class TestS3ClientUserAgent(unittest.TestCase):
     def test_user_agent_extra_format(self):
@@ -17,18 +20,18 @@ class TestS3ClientUserAgent(unittest.TestCase):
         assert ua.startswith('label-studio/')
 
     def test_client_and_resource_carry_user_agent(self):
-        client, resource = get_client_and_resource()
+        client, resource = get_client_and_resource(**CREDENTIALS)
         expected = _get_user_agent_extra()
         assert expected in (client.meta.config.user_agent_extra or '')
         assert expected in (resource.meta.client.meta.config.user_agent_extra or '')
 
     def test_signature_version_preserved(self):
-        client, _ = get_client_and_resource()
+        client, _ = get_client_and_resource(**CREDENTIALS)
         assert client.meta.config.signature_version == 's3v4'
 
     def test_custom_endpoint_preserved(self):
         endpoint = 'https://your-s3-endpoint.example.com'
-        client, resource = get_client_and_resource(s3_endpoint=endpoint)
+        client, resource = get_client_and_resource(s3_endpoint=endpoint, **CREDENTIALS)
         assert client.meta.endpoint_url == endpoint
         assert resource.meta.client.meta.endpoint_url == endpoint
         assert _get_user_agent_extra() in (client.meta.config.user_agent_extra or '')

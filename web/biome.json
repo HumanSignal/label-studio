@@ -1,7 +1,18 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
-  "plugins": ["./tools/biome/plugins/cn-to-classname.grit"],
-  "assist": { "actions": { "source": { "organizeImports": "off" } } },
+  "plugins": [
+    "./tools/biome/plugins/cn-to-classname.grit",
+    "./tools/biome/plugins/ds-raw-control.grit",
+    "./tools/biome/plugins/ds-inline-style.grit",
+    "./tools/biome/plugins/ds-props.grit"
+  ],
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
   "files": {
     "includes": [
       "**",
@@ -11,7 +22,8 @@
       "!**/libs/editor/examples/**/*.json",
       "!**/libs/editor/src/examples/**/annotations/1.json",
       "!**/apps/labelstudio-e2e",
-      "!**/libs/datamanager/public/index.html"
+      "!**/libs/datamanager/public/index.html",
+      "!**/antd-no-reset.css"
     ],
     "maxSize": 3670016
   },
@@ -61,7 +73,9 @@
       },
       "suspicious": {
         "noUnknownAtRules": {
-          "options": { "ignore": ["tailwind", "apply", "layer", "theme", "source", "variant"] }
+          "options": {
+            "ignore": ["tailwind", "apply", "layer", "theme", "source", "variant"]
+          }
         },
         "noExplicitAny": "off",
         "noAssignInExpressions": "off",
@@ -73,9 +87,8 @@
         "noShadowRestrictedNames": "off",
         "useGetterReturn": "off",
         "noDuplicateProperties": "warn",
-        "noShorthandPropertyOverrides": "warn",
         "useIterableCallbackReturn": "off",
-        "noUselessEscapeInString": "off",
+        "noUselessEscapeInString": "error",
         "noTsIgnore": "off"
       },
       "complexity": {
@@ -129,5 +142,13 @@
         "noDangerouslySetInnerHtml": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["libs/ui/components.manifest.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

@@ -5,20 +5,20 @@ import logging
 import os
 import shutil
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ujson as json
-from core import version
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
+from data_export.functions import CONVERTER_ACCESS_TOKEN, converter_http_session
 from django.conf import settings
-from django.db import models
-from django.db.models.signals import post_save
+from django.db import models, transaction
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
-from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +82,80 @@ class Export(ExportMixin, models.Model):
         null=True,
         verbose_name=_('created by'),
     )
+    since = models.DateTimeField(
+        _('since'),
+        null=True,
+        blank=True,
+        help_text='Inclusive lower bound for Task.updated_at when this snapshot is incremental',
+    )
+    until = models.DateTimeField(
+        _('until'),
+        null=True,
+        blank=True,
+        help_text='Exclusive upper bound for Task.updated_at; use as next since for cron hops',
+    )
+    ephemeral = models.BooleanField(
+        _('ephemeral'),
+        default=False,
+        null=True,
+        db_default=False,
+        help_text='When true, excluded from list endpoints; TTL GC via RQ cron when enabled',
+    )
+
+    def _detach_shared_files(self):
+        """Blank this export's file fields whose blob another export still uses.
+
+        ``delete_export_file_on_commit`` removes the file of every deleted Export / ConvertedFormat row. Blanking a
+        shared field first (in the same transaction as the row delete) makes that receiver skip the blob, so the
+        export that still points at it keeps its file.
+        """
+        for converted in self.converted_formats.all():
+            if converted.file and self._blob_referenced_elsewhere(converted.file.name):
+                ConvertedFormat.objects.filter(pk=converted.pk).update(file='')
+        if self.file and self._blob_referenced_elsewhere(self.file.name):
+            Export.objects.filter(pk=self.pk).update(file='')
+            self.file = ''
+
+    def _blob_referenced_elsewhere(self, name):
+        """True when another export (or another export's converted format) points at the same blob.
+
+        Export file names are ``project-<id>-at-<minute>-<md5[:8]>``, so a listed export and an ephemeral one
+        with identical content finished in the same minute share a key: the sweep must not delete it. The key
+        embeds the project id, so only this project's rows can share it; filtering by project keeps the lookup
+        on the project index instead of scanning the unindexed ``file`` columns.
+        """
+        return (
+            Export.objects.filter(project_id=self.project_id, file=name).exclude(pk=self.pk).exists()
+            or ConvertedFormat.objects.filter(export__project_id=self.project_id, file=name)
+            .exclude(export_id=self.pk)
+            .exists()
+        )
+
+    @classmethod
+    def cleanup_expired_ephemeral(cls, ttl_hours=None):
+        """Delete ephemeral exports older than TTL (default settings.EPHEMERAL_EXPORT_TTL_HOURS).
+
+        Intended for the LSE RQ cron sweep (``htx.cron_jobs.cleanup_expired_ephemeral_exports``).
+        Not invoked from export list/create request paths. Files are removed on commit by
+        ``delete_export_file_on_commit``, like any export delete, except blobs another export still uses.
+        One export's failure is logged and the sweep moves on.
+        """
+        from core.utils.iterators import iterate_queryset
+
+        if ttl_hours is None:
+            ttl_hours = getattr(settings, 'EPHEMERAL_EXPORT_TTL_HOURS', 24)
+        cutoff = timezone.now() - timedelta(hours=ttl_hours)
+        deleted = 0
+        qs = cls.objects.filter(ephemeral=True, created_at__lt=cutoff)
+        for export in iterate_queryset(qs):
+            try:
+                with transaction.atomic():
+                    export._detach_shared_files()
+                    export.delete()
+                deleted += 1
+            except Exception:
+                logger.exception('Failed to delete expired ephemeral export id=%s', export.id)
+        return deleted
 
 
 @receiver(post_save, sender=Export)
@@ -92,47 +166,14 @@ def set_export_default_name(sender, instance, created, **kwargs):
 
 
 class DataExport(object):
-    # TODO: deprecated
-    @staticmethod
-    def save_export_files(project, now, get_args, data, md5, name):
-        """Generate two files: meta info and result file and store them locally for logging"""
-        filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
-        filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
-        annotation_number = Annotation.objects.filter(project=project).count()
-        try:
-            platform_version = version.get_git_version()
-        except:  # noqa: E722
-            platform_version = 'none'
-            logger.error('Version is not detected in save_export_files()')
-        info = {
-            'project': {
-                'title': project.title,
-                'id': project.id,
-                'created_at': project.created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'created_by': project.created_by.email,
-                'task_number': project.tasks.count(),
-                'annotation_number': annotation_number,
-            },
-            'platform': {'version': platform_version},
-            'download': {
-                'GET': dict(get_args),
-                'time': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'result_filename': filename_results,
-                'md5': md5,
-            },
-        }
-
-        with open(filename_results, 'w', encoding='utf-8') as f:
-            f.write(data)
-        with open(filename_info, 'w', encoding='utf-8') as f:
-            json.dump(info, f, ensure_ascii=False)
-        return filename_results
-
     @staticmethod
     def get_export_formats(project):
         converter = Converter(config=project.get_parsed_config(), project_dir=None)
         formats = []
         supported_formats = set(converter.supported_formats)
+        lse_project = getattr(project, 'lse_project', None)
+        if lse_project and getattr(lse_project, 'use_custom_interface', False):
+            supported_formats.add('DOCLANG')
         for format, format_info in converter.all_formats().items():
             format_info = deepcopy(format_info)
             format_info['name'] = format.name
@@ -142,9 +183,10 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, download_resources, get_args, hostname=None):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args, hostname=None, user=None):
         """Generate export file and return it as an open file object.
 
+        Media stored in Label Studio is fetched from ``hostname`` as ``user``, the user who exports.
         Be sure to close the file after using it, to avoid wasting disk space.
         """
 
@@ -154,17 +196,21 @@ class DataExport(object):
         md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()  # nosec
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
-        input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
-
         converter = Converter(
             config=project.get_parsed_config(),
             project_dir=None,
             upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR),
             download_resources=download_resources,
-            access_token=project.organization.created_by.auth_token.key,
+            access_token=CONVERTER_ACCESS_TOKEN,
             hostname=hostname,
+            local_files_resolver=project_local_files_resolver(project),
+            http_session=converter_http_session(hostname, user),
         )
-        with get_temp_dir() as tmp_dir:
+        # The converter input lives in its own temp dir so it is neither kept on disk nor packed into the output
+        with get_temp_dir() as input_dir, get_temp_dir() as tmp_dir:
+            input_json = os.path.join(input_dir, name + '.json')
+            with open(input_json, 'w', encoding='utf-8') as f:
+                f.write(data)
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)
             # if only one file is exported - no need to create archive
@@ -246,8 +292,26 @@ class ConvertedFormat(models.Model):
         verbose_name=_('created by'),
     )
 
-    def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-            if self.file:
-                self.file.delete()
-        super().delete(*args, **kwargs)
+
+def delete_file_from_storage(field_file):
+    """Delete the file behind a FileField value; a file that is already gone is not an error"""
+    if field_file and field_file.storage.exists(field_file.name):
+        field_file.storage.delete(field_file.name)
+
+
+@receiver(post_delete, sender=Export)
+@receiver(post_delete, sender=ConvertedFormat)
+def delete_export_file_on_commit(sender, instance, using, **kwargs):
+    """Remove the file once the row deletion is committed, including deletions cascaded
+    from a project, an organization or a parent export. Storage errors are only logged here;
+    ExportDetailAPI deletes files itself and reports storage errors to the client."""
+    field_file = instance.file
+
+    def delete_file():
+        try:
+            delete_file_from_storage(field_file)
+        except Exception:
+            logger.warning(f'Could not delete export file {field_file.name} from storage', exc_info=True)
+
+    if field_file:
+        transaction.on_commit(delete_file, using=using)

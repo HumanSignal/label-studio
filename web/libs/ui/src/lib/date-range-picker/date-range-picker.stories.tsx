@@ -8,7 +8,7 @@ import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 
 const meta: Meta<typeof DateRangePicker> = {
   component: DateRangePicker,
-  title: "UI/DateRangePicker",
+  title: "Inputs/DateRangePicker",
   parameters: {
     layout: "centered",
   },
@@ -269,6 +269,48 @@ export const WithClear: Story = {
 };
 
 /**
+ * With Null Mode
+ *
+ * Example of a filter that also has to answer "no date at all". The entry sits under the range
+ * presets in the sidebar and stays unselected while the calendar range is the answer. Picking it
+ * takes the calendar out of reach; re-picking it hands the answer back to the range.
+ */
+export const WithNullMode: Story = {
+  render: (args) => {
+    const [dates, setDates] = useState<DateOrDateTimeRange | null>(defaultInitialDates);
+    const [never, setNever] = useState(false);
+
+    return (
+      <div className="flex flex-col gap-base">
+        <DateRangePickerTrigger selected={never ? null : dates}>
+          <DateRangePicker
+            {...args}
+            initialDates={dates ?? defaultInitialDates}
+            nullMode={{
+              label: "Never",
+              summary: "Never active",
+              selected: never,
+              onChange: (selected) => {
+                setNever(selected);
+                if (selected) setDates(null);
+              },
+            }}
+            setAppliedDates={(selected, datesString) => {
+              setDates(selected);
+              args.setAppliedDates?.(selected, datesString);
+            }}
+          />
+        </DateRangePickerTrigger>
+        <div className="text-body-small text-neutral-content-subtle">Applied: {never ? "Never" : "a date range"}</div>
+      </div>
+    );
+  },
+  args: {
+    initialDates: defaultInitialDates,
+  },
+};
+
+/**
  * With Custom Button Trigger
  *
  * Example showing how to use DateRangePicker with a custom Button trigger
@@ -310,4 +352,17 @@ export const WithCustomButtonTrigger: Story = {
   args: {
     initialDates: defaultInitialDates,
   },
+};
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col items-start gap-base">
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <DateRangePickerTrigger key={size} size={size} selected={defaultInitialDates}>
+          <DateRangePicker initialDates={defaultInitialDates} setAppliedDates={() => {}} />
+        </DateRangePickerTrigger>
+      ))}
+    </div>
+  ),
 };

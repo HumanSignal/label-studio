@@ -1,11 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { EmptyState, type EmptyStateProps } from "./empty-state";
 import { IconInbox } from "@humansignal/icons";
 import { Button } from "../button/button";
 
 // Mock the styles since they're SCSS modules
-jest.mock("./empty-state.module.css", () => ({
+mockModule("./empty-state.module.css", () => ({
   base: "base",
   // Size classes
   "size-large": "size-large",

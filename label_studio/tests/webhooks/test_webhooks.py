@@ -1,9 +1,11 @@
 import json
+from pathlib import Path
 from unittest import TestCase
 
 import pytest
 import requests
 import requests_mock
+from django.test import override_settings
 from django.urls import reverse
 from projects.models import Project
 from webhooks.models import Webhook, WebhookAction
@@ -195,7 +197,7 @@ def test_webhooks_for_tasks_import(configured_project, business_client, organiza
 
     webhook = organization_webhook
 
-    IMPORT_CSV = 'tests/test_suites/samples/test_5.csv'
+    IMPORT_CSV = Path(__file__).parent.parent / 'test_suites' / 'samples' / 'test_5.csv'
 
     with open(IMPORT_CSV, 'rb') as file_:
         data = SimpleUploadedFile('test_5.csv', file_.read(), content_type='multipart/form-data')
@@ -442,10 +444,8 @@ def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook,
 
 
 @pytest.mark.django_db
-def test_webhook_batching_with_feature_flag(configured_project, organization_webhook):
-    """Test that webhooks are sent in batches when feature flag is enabled."""
-    from unittest.mock import patch
-
+def test_webhook_batching(configured_project, organization_webhook):
+    """Test that webhooks for a collection are sent in batches of WEBHOOK_BATCH_SIZE."""
     from django.conf import settings
     from tasks.models import Task
     from webhooks.utils import emit_webhooks_for_instance_sync
@@ -459,76 +459,162 @@ def test_webhook_batching_with_feature_flag(configured_project, organization_web
         task = Task.objects.create(data={'text': f'Test task {i}'}, project=project)
         tasks.append(task)
 
-    # Test with feature flag enabled
-    with patch('webhooks.utils.flag_set') as mock_flag_set:
-        mock_flag_set.return_value = True
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
 
-        with requests_mock.Mocker(real_http=True) as m:
-            m.register_uri('POST', webhook.url)
+        # Set batch size to 100 for testing
+        original_batch_size = getattr(settings, 'WEBHOOK_BATCH_SIZE', 100)
+        settings.WEBHOOK_BATCH_SIZE = 100
 
-            # Set batch size to 100 for testing
-            original_batch_size = getattr(settings, 'WEBHOOK_BATCH_SIZE', 100)
-            settings.WEBHOOK_BATCH_SIZE = 100
-
-            try:
-                emit_webhooks_for_instance_sync(
-                    webhook.organization, webhook.project, WebhookAction.TASKS_CREATED, instance=tasks
-                )
-
-                # Should have 3 requests (250 tasks / 100 batch size = 3 batches)
-                webhook_requests = list(filter(lambda x: x.url == webhook.url, m.request_history))
-                assert len(webhook_requests) == 3
-
-                # Check first batch has 100 tasks
-                first_batch = webhook_requests[0].json()
-                assert 'tasks' in first_batch
-                assert len(first_batch['tasks']) == 100
-
-                # Check second batch has 100 tasks
-                second_batch = webhook_requests[1].json()
-                assert len(second_batch['tasks']) == 100
-
-                # Check third batch has 50 tasks (remaining)
-                third_batch = webhook_requests[2].json()
-                assert len(third_batch['tasks']) == 50
-
-            finally:
-                settings.WEBHOOK_BATCH_SIZE = original_batch_size
-
-
-@pytest.mark.django_db
-def test_webhook_no_batching_without_feature_flag(configured_project, organization_webhook):
-    """Test that webhooks are sent in single request when feature flag is disabled."""
-    from unittest.mock import patch
-
-    from tasks.models import Task
-    from webhooks.utils import emit_webhooks_for_instance_sync
-
-    webhook = organization_webhook
-    project = configured_project
-
-    # Create multiple tasks
-    tasks = []
-    for i in range(150):
-        task = Task.objects.create(data={'text': f'Test task {i}'}, project=project)
-        tasks.append(task)
-
-    # Test with feature flag disabled
-    with patch('webhooks.utils.flag_set') as mock_flag_set:
-        mock_flag_set.return_value = False
-
-        with requests_mock.Mocker(real_http=True) as m:
-            m.register_uri('POST', webhook.url)
-
+        try:
             emit_webhooks_for_instance_sync(
                 webhook.organization, webhook.project, WebhookAction.TASKS_CREATED, instance=tasks
             )
 
-            # Should have only 1 request (no batching)
+            # Should have 3 requests (250 tasks / 100 batch size = 3 batches)
             webhook_requests = list(filter(lambda x: x.url == webhook.url, m.request_history))
-            assert len(webhook_requests) == 1
+            assert len(webhook_requests) == 3
 
-            # Check all 150 tasks are in single request
-            request_data = webhook_requests[0].json()
-            assert 'tasks' in request_data
-            assert len(request_data['tasks']) == 150
+            # Check first batch has 100 tasks
+            first_batch = webhook_requests[0].json()
+            assert 'tasks' in first_batch
+            assert len(first_batch['tasks']) == 100
+
+            # Check second batch has 100 tasks
+            second_batch = webhook_requests[1].json()
+            assert len(second_batch['tasks']) == 100
+
+            # Check third batch has 50 tasks (remaining)
+            third_batch = webhook_requests[2].json()
+            assert len(third_batch['tasks']) == 50
+
+        finally:
+            settings.WEBHOOK_BATCH_SIZE = original_batch_size
+
+
+@pytest.mark.django_db
+def test_auto_disable_increments_on_connection_error(organization_webhook):
+    webhook = organization_webhook
+    assert webhook.consecutive_failures == 0
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, exc=requests.exceptions.ConnectTimeout)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 1
+    assert webhook.is_active is True
+
+
+@pytest.mark.django_db
+def test_auto_disable_non_2xx_counts_and_2xx_resets(organization_webhook):
+    webhook = organization_webhook
+    # a 500 response is a failure and increments the counter
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=500)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 1
+
+    # a subsequent 2xx response resets the counter
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=200)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 0
+    assert webhook.is_active is True
+
+
+@pytest.mark.django_db
+@override_settings(WEBHOOK_MAX_CONSECUTIVE_FAILURES=3)
+def test_auto_disable_at_threshold(organization_webhook):
+    webhook = organization_webhook
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=500)
+        for _ in range(3):
+            run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 3
+    assert webhook.is_active is False
+
+
+@pytest.mark.django_db
+@override_settings(WEBHOOK_MAX_CONSECUTIVE_FAILURES=3)
+def test_success_midstreak_prevents_disable(organization_webhook):
+    webhook = organization_webhook
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=500)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 2
+
+    # a success resets the streak so the next failure doesn't cross the threshold
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=200)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=500)
+        run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 1
+    assert webhook.is_active is True
+
+
+@pytest.mark.django_db
+@override_settings(WEBHOOK_MAX_CONSECUTIVE_FAILURES=0)
+def test_auto_disable_kill_switch(organization_webhook):
+    webhook = organization_webhook
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url, status_code=500)
+        for _ in range(5):
+            run_webhook(webhook, WebhookAction.PROJECT_CREATED)
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 0
+    assert webhook.is_active is True
+
+
+@pytest.mark.django_db
+def test_reenable_resets_failure_counter(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+    Webhook.objects.filter(pk=webhook.pk).update(consecutive_failures=50, is_active=False)
+
+    response = business_client.patch(
+        f'/api/webhooks/{webhook.pk}/',
+        data=json.dumps({'is_active': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    webhook.refresh_from_db()
+    assert webhook.is_active is True
+    assert webhook.consecutive_failures == 0
+
+
+@pytest.mark.django_db
+def test_url_change_resets_failure_counter(configured_project, business_client, organization_webhook):
+    webhook = organization_webhook
+    Webhook.objects.filter(pk=webhook.pk).update(consecutive_failures=10)
+
+    response = business_client.patch(
+        f'/api/webhooks/{webhook.pk}/',
+        data=json.dumps({'url': 'http://127.0.0.1:8000/api/organization/new/'}),
+        content_type='application/json',
+    )
+    assert response.status_code == 200
+    webhook.refresh_from_db()
+    assert webhook.consecutive_failures == 0
+
+
+@pytest.mark.django_db
+@override_settings(SSRF_PROTECTION_ENABLED=True)
+def test_webhook_api_rejects_local_url_when_ssrf_enabled(configured_project, business_client):
+    payload = {
+        'project': configured_project.id,
+        'url': 'http://127.0.0.1:9000/webhook',
+        'send_payload': True,
+        'send_for_all_actions': True,
+        'headers': {},
+        'is_active': True,
+        'actions': [WebhookAction.PROJECT_UPDATED],
+    }
+
+    response = business_client.post('/api/webhooks/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code in (400, 403)

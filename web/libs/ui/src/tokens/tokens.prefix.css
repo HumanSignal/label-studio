@@ -551,7 +551,7 @@
   --line-height-title-large: var(--line-height-28);
   --line-height-headline-small: var(--line-height-32);
   --line-height-headline-medium: var(--line-height-36);
-  --line-height-headline-large: var(--line-height-40);
+  --line-height-headline-large: var(--line-height-60);
   --line-height-display-small: var(--line-height-48);
   --line-height-display-medium: var(--line-height-56);
   --line-height-display-large: var(--line-height-72);
@@ -861,4 +861,31 @@
   --color-accent-sand-subtler-raw: 38 37 34;
   --color-accent-sand-subtlest: var(--color-sand-950);
   --color-accent-sand-subtlest-raw: 13 12 9;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --font-size-body-smaller: var(--font-size-11);
+    --font-size-body-small: var(--font-size-12);
+    --font-size-body-medium: var(--font-size-14);
+    --font-size-label-smallest: var(--font-size-10);
+    --font-size-label-smaller: var(--font-size-11);
+    --font-size-label-small: var(--font-size-12);
+    --font-size-label-medium: var(--font-size-14);
+    --font-size-title-small: var(--font-size-16);
+    --font-size-title-medium: var(--font-size-18);
+    --font-size-title-large: var(--font-size-22);
+    --font-size-headline-small: var(--font-size-24);
+    --font-size-headline-medium: var(--font-size-28);
+    --font-size-headline-large: var(--font-size-32);
+    --font-size-display-small: var(--font-size-36);
+    --font-size-display-medium: var(--font-size-48);
+    --font-size-display-large: var(--font-size-56);
+    --line-height-body-medium: var(--line-height-20);
+    --line-height-label-medium: var(--line-height-20);
+    --line-height-headline-large: var(--line-height-40);
+    --line-height-display-small: var(--line-height-40);
+    --line-height-display-medium: var(--line-height-52);
+    --line-height-display-large: var(--line-height-64);
+  }
 }

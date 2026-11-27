@@ -62,7 +62,7 @@ const setStoredPageSize = (name: string, pageSize: number) => {
 export const Pagination: FC<PaginationProps> = forwardRef(
   (
     { allowInput = true, allowRewind = true, disabled = false, size = "medium", pageSizeOptions = [], ...props },
-    ref,
+    _ref,
   ) => {
     const [inputMode, setInputMode] = useState(false);
     const [currentPage, setCurrentPage] = useValueTracker(props.page);

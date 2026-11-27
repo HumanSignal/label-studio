@@ -1,12 +1,10 @@
-import { flow, getEnv, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { flow, getEnv, getParent, getRoot, getSnapshot, types, isAlive } from "mobx-state-tree";
 import { when } from "mobx";
 import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
 import { parseCommentClassificationConfig } from "../../utils/commentClassification";
 import { Comment } from "./Comment";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
-
 export const CommentStore = types
   .model("CommentStore", {
     loading: types.optional(types.maybeNull(types.string), "list"),
@@ -19,6 +17,11 @@ export const CommentStore = types
     currentComment: {},
     inputRef: {},
     tooltipMessage: "",
+    /**
+     * FIT-2813: bumped whenever a non-empty validation tooltip is set so SideTabsPanels
+     * re-expands the collapsed Comments sidebar even if focusTab stays "comments".
+     */
+    panelFocusRequest: 0,
     /**
      * A key that indicates affiliation of the current loaded comment list to the annotation/draft.
      * It's used to check if the current comment list is related to the current opened annotation.
@@ -68,10 +71,7 @@ export const CommentStore = types
       return self.task?.id;
     },
     get canPersist() {
-      if (isFF(FF_DEV_3034)) {
-        return self.taskId !== null && self.taskId !== undefined;
-      }
-      return self.annotationId !== null && self.annotationId !== undefined;
+      return self.taskId !== null && self.taskId !== undefined;
     },
     get isCommentable() {
       return !self.annotation || ["annotation"].includes(self.annotation.type);
@@ -168,6 +168,9 @@ export const CommentStore = types
 
     function setTooltipMessage(tooltipMessage) {
       self.tooltipMessage = tooltipMessage;
+      if (tooltipMessage) {
+        self.panelFocusRequest += 1;
+      }
     }
 
     function setAddedCommentThisSession(isAddedCommentThisSession = false) {
@@ -220,8 +223,9 @@ export const CommentStore = types
 
       if (!self.canPersist || !toPersist.length) return;
 
-      if (isFF(FF_DEV_3034) && !self.annotationId && !self.draftId) {
+      if (!self.annotationId && !self.draftId) {
         await self.store.submitDraft(self.annotation);
+        if (!isAlive(self)) return;
       }
 
       try {
@@ -235,6 +239,7 @@ export const CommentStore = types
             comment.task = self.taskId;
           }
           const [persistedComment] = await self.sdk.invoke("comments:create", comment);
+          if (!isAlive(self)) return;
 
           if (persistedComment) {
             self.replaceId(comment.id, persistedComment);
@@ -243,7 +248,7 @@ export const CommentStore = types
       } catch (err) {
         console.error(err);
       } finally {
-        self.setLoading(null);
+        if (isAlive(self)) self.setLoading(null);
       }
     }
 
@@ -268,7 +273,7 @@ export const CommentStore = types
       let refetchList = false;
       const { annotation } = self;
 
-      if (isFF(FF_DEV_3034) && !self.annotationId && !self.draftId) {
+      if (!self.annotationId && !self.draftId) {
         // rare case: draft is already saving, commit the outstanding draft before adding a comment
         if (annotation.history.hasChanges && !annotation.draftSaved) {
           // commit the pending draft
@@ -283,6 +288,7 @@ export const CommentStore = types
           annotation.setDraftSelected();
           annotation.setDraftSaving(true);
           yield self.store.submitDraft(self.annotation);
+          if (!isAlive(self)) return;
           annotation.onDraftSaved();
         }
         refetchList = true;
@@ -301,6 +307,7 @@ export const CommentStore = types
       if (self.canPersist) {
         try {
           const [newComment] = yield self.sdk.invoke("comments:create", comment);
+          if (!isAlive(self)) return;
 
           if (newComment) {
             self.replaceId(now, newComment);
@@ -312,10 +319,10 @@ export const CommentStore = types
           self.updateAnnotationCommentCounts();
           throw err;
         } finally {
-          self.setLoading(null);
+          if (isAlive(self)) self.setLoading(null);
         }
       } else {
-        self.setLoading(null);
+        if (isAlive(self)) self.setLoading(null);
       }
     });
 
@@ -383,7 +390,9 @@ export const CommentStore = types
     const listComments = flow(function* ({ mounted = { current: true }, suppressClearComments } = {}) {
       if (!self.draftId && !self.annotationId) {
         if (!suppressClearComments) self.setComments([]);
-        if (mounted.current) self.setLoading(null);
+        // Always clear list loading: the store outlives the React tree (e.g. DM refresh /
+        // unmount mid-fetch). Gating on mounted strands loading === "list".
+        self.setLoading(null);
         return;
       }
 
@@ -409,17 +418,22 @@ export const CommentStore = types
           annotation,
           draft: self.draftId,
         });
+        if (!isAlive(self)) return;
 
-        if (mounted.current && annotation === self.annotationId) {
+        // Apply by annotation id only — do not gate on React mounted. If we skip setComments
+        // but Comments.tsx still advances lastLoadedAnnotationId, comments never load.
+        if (annotation === self.annotationId) {
           self.setComments(comments, commentsKey);
         }
       } catch (err) {
         console.error(err);
       } finally {
-        if (fetchKey === self._fetchingCommentsForAnnotation) {
-          self._fetchingCommentsForAnnotation = null;
-        }
-        if (mounted.current) {
+        if (isAlive(self)) {
+          if (fetchKey === self._fetchingCommentsForAnnotation) {
+            self._fetchingCommentsForAnnotation = null;
+          }
+          // Always clear list loading when the flow ends. Skipping this when the Comments
+          // component unmounted mid-request leaves isListLoading true forever.
           self.setLoading(null);
         }
       }

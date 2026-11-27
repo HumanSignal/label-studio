@@ -62,12 +62,13 @@ def test_visible_manager_skips_filter_without_column(monkeypatch):
     """Manager should not reference missing deleted_at during early migrations.
 
     Purpose: Avoid schema errors before column exists.
-    Setup: Force has_column_cached to return False; create active+deleted rows.
+    Setup: Simulate a running migrate; force has_column_cached to return False; create active+deleted rows.
     Actions: Query via Project.objects.
     Validations: Both rows are returned (no filter applied).
     Edge cases: N/A.
     """
     monkeypatch.setattr(project_models, 'has_column_cached', lambda *_: False, raising=True)
+    monkeypatch.setattr(project_models, 'migrations_running', lambda: True, raising=True)
 
     org = OrganizationFactory()
     p1 = ProjectFactory(organization=org, title='active')
@@ -76,6 +77,65 @@ def test_visible_manager_skips_filter_without_column(monkeypatch):
     # Without column, the filter is skipped, so both come back
     titles = set(Project.objects.values_list('title', flat=True))
     assert {'active', 'deleted'} <= titles
+
+
+def test_visible_manager_filters_without_introspection_outside_migrate(monkeypatch):
+    """Outside migrate, querysets filter deleted rows without checking the schema.
+
+    Purpose: Class-level `queryset = Project.objects.all()` in views/serializers is built once and
+        kept. Building it during app init or during migrate's system checks on an empty database
+        must not freeze a "no deleted_at column" answer into it (PR 3974: duplicate API found a
+        soft-deleted project and returned 403 instead of 404).
+    Setup: No migrate running; has_column_cached reports the column missing and records calls.
+    Actions: Build Project.objects.all(), then evaluate it after restoring has_column_cached.
+    Validations: has_column_cached is never called; the queryset hides soft-deleted rows.
+    Edge cases: N/A.
+    """
+    calls = []
+
+    def column_missing(*args):
+        calls.append(args)
+        return False
+
+    org = OrganizationFactory()
+    p1 = ProjectFactory(organization=org, title='active')
+    _ = ProjectFactory(organization=org, title='deleted', deleted_at=p1.created_at)
+
+    monkeypatch.setattr(project_models, 'migrations_running', lambda: False, raising=True)
+    monkeypatch.setattr(project_models, 'has_column_cached', column_missing, raising=True)
+    qs = Project.objects.all()
+    monkeypatch.undo()
+
+    titles = set(qs.values_list('title', flat=True))
+    assert calls == []
+    assert 'active' in titles and 'deleted' not in titles
+
+
+def test_migrations_running_tracks_migrate_signals(monkeypatch):
+    """migrations_running follows pre_migrate/post_migrate, including nested and flush-only runs.
+
+    Purpose: The manager introspects deleted_at only while migrate applies migrations.
+    Setup: Reset the depth counter.
+    Actions: Call the pre/post_migrate receivers in pairs (one nested), then a lone post_migrate as flush does.
+    Validations: True between the signals, False after; a lone post_migrate does not go negative.
+    Edge cases: Nested migrate (activity_log migrates its database from a pre_migrate handler).
+    """
+    enter, exit_ = db_utils.signal_enter_migrate, db_utils.signal_exit_migrate
+    monkeypatch.setattr(db_utils, '_migrate_depth', 0)
+    assert db_utils.migrations_running() is False
+
+    enter()
+    enter()
+    exit_()
+    assert db_utils.migrations_running() is True
+    exit_()
+    assert db_utils.migrations_running() is False
+
+    exit_()
+    enter()
+    assert db_utils.migrations_running() is True
+    exit_()
+    assert db_utils.migrations_running() is False
 
 
 def test_has_column_cached_memoization_and_clear(monkeypatch):

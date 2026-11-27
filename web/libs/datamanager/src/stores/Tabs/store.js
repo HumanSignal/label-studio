@@ -8,7 +8,16 @@ import { TabColumn } from "./tab_column";
 import { TabFilterType } from "./tab_filter_type";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { serializeJsonForUrl, deserializeJsonFromUrl } from "@humansignal/core";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { isEmpty } from "../../utils/helpers";
+import { projectDefaultsForNewTab } from "./project_column_defaults";
+import { resolvePreloaded } from "../../sdk/resolve-preloaded";
+import {
+  clearUnavailableVirtualFilters,
+  noticeKeyForView,
+  notifyVirtualFiltersRemoved,
+  stripUnavailableFiltersFromVirtualSnapshot,
+} from "./unavailable_filters";
 
 const storeValue = (name, value) => {
   window.localStorage.setItem(name, value);
@@ -21,7 +30,7 @@ const restoreValue = (name) => {
   return value ? value === "true" : false;
 };
 
-const dataCleanup = (tab, columns) => {
+export const dataCleanup = (tab, columns) => {
   const { data } = tab;
 
   if (!data) return { ...tab };
@@ -36,19 +45,94 @@ const dataCleanup = (tab, columns) => {
     data[key] = Object.fromEntries(
       Object.entries(data[key] ?? {}).filter(([col]) => {
         const match = columns.find((c) => c.id === col);
-        return !!match && !match.isAnnotationResultsFilterColumn;
+        return !!match && !match.isFilterOnlyColumn;
       }),
     );
   });
 
-  Object.entries(data.hiddenColumns ?? {}).forEach(([key, list]) => {
-    data.hiddenColumns[key] = list.filter((k) => {
-      const match = columns.find((c) => c.id === k);
-      return !!match && !match.isAnnotationResultsFilterColumn;
-    });
-  });
+  // Keep synthetic table columns (select / show-source) in drag order; validate catalog ids.
+  data.columnOrder = Object.fromEntries(
+    Object.entries(data.columnOrder ?? {}).filter(([col]) => {
+      if (col === "select" || col === "show-source") return true;
+      const match = columns.find((c) => c.id === col);
+      return !!match && !match.isFilterOnlyColumn;
+    }),
+  );
+
+  // Only compatibility filter columns are pruned from the hidden lists. IDs of columns this
+  // session cannot see stay untouched: agreement columns are role-gated and dimension columns
+  // follow the project's dimensions, so dropping them would erase a manager's saved column
+  // configuration as soon as such a session saves the view (FIT-2406).
+  if (data.hiddenColumns) {
+    const hiddenColumns = Object.fromEntries(
+      Object.entries(data.hiddenColumns).map(([key, list]) => [
+        key,
+        (list ?? []).filter((columnID) => {
+          const match = columns.find((c) => c.id === columnID);
+
+          return !match?.isFilterOnlyColumn;
+        }),
+      ]),
+    );
+
+    return { ...tab, data: { ...data, hiddenColumns } };
+  }
 
   return { ...tab, data };
+};
+
+const nextTempTabId = (views) => {
+  const usedIds = new Set(views.map((view) => view.id));
+  let candidate = -Date.now();
+
+  while (usedIds.has(candidate)) {
+    candidate -= 1;
+  }
+
+  return candidate;
+};
+
+// Must match ViewSaveConflictError.default_detail in data_manager/serializers.py.
+const VIEW_SAVE_CONFLICT_MESSAGE = "This tab is being saved by another request. Please try again.";
+
+/** 409 when another save of the same tab holds the row lock: keep local edits so the next save stores them. */
+const isViewSaveConflict = (result) => result?.response?.detail === VIEW_SAVE_CONFLICT_MESSAGE;
+
+const lockedViewResponseMessage = (result) => {
+  if (isViewSaveConflict(result)) return null;
+
+  const status = result?.status ?? result?.$meta?.status ?? result?.response?.status ?? result?.response?.status_code;
+  const code = result?.response?.code;
+  const detail = result?.response?.detail;
+
+  if (status === 409 || code === "view_locked") {
+    return typeof detail === "string" ? detail : "This tab has been locked. Refresh to see the latest tab settings.";
+  }
+  return null;
+};
+
+/** Race-condition save toast when an unlocked client discovers the tab is now locked. */
+export const raceConditionLockToastMessage = (result, canManageLock = true) => {
+  const lockedByName = canManageLock ? result.locked_by?.name || result.locked_by?.email : null;
+
+  return lockedByName
+    ? `This tab was locked by ${lockedByName}. Your changes could not be saved.`
+    : "This tab was locked. Your changes could not be saved.";
+};
+
+const serverViewSnapshot = (view, columns, response) => {
+  const { data, ...tab } = dataCleanup(response, columns ?? []);
+
+  return {
+    ...getSnapshot(view),
+    ...tab,
+    ...(data ?? {}),
+    // MST identifiers are immutable; never overwrite id when refreshing an existing view.
+    id: view.id,
+    saved: true,
+    virtual: false,
+    hasData: !!data,
+  };
 };
 
 const createNameCopy = (name) => {
@@ -71,6 +155,23 @@ const createNameCopy = (name) => {
   return newName;
 };
 
+const ORDERING_NOTICE = "This tab is sorted by a column you can't see, so that sort isn't applied.";
+
+function notifyUnavailableOrdering(view) {
+  if (!view?.ordering?.length) return;
+  const columns = view.columns ?? [];
+  if (!columns.length) return;
+  const hiddenSort = view.ordering.some(
+    (field) => !columns.some((column) => column.id === String(field).replace(/^-/, "")),
+  );
+  if (!hiddenSort) return;
+  const notices = view.root?.viewsStore?.orderingNoticesShown;
+  const noticeKey = noticeKeyForView(view);
+  if (notices?.has(noticeKey)) return;
+  notices?.add(noticeKey);
+  view.root?.SDK?.invoke("toast", { message: ORDERING_NOTICE, type: "info" });
+}
+
 export const TabStore = types
   .model("TabStore", {
     selected: types.maybeNull(types.late(() => types.reference(Tab))),
@@ -83,6 +184,10 @@ export const TabStore = types
   })
   .volatile(() => ({
     defaultHidden: null,
+    // Per TabStore instance, keyed by `${projectId}_${viewId}` so SPA nav across
+    // projects/orgs does not permanently suppress the ordering / filter notices.
+    orderingNoticesShown: new Set(),
+    filterNoticesShown: new Set(),
   }))
   .views((self) => ({
     get all() {
@@ -117,6 +222,25 @@ export const TabStore = types
     serialize() {
       return self.views.map((v) => v.serialize());
     },
+
+    /**
+     * Soft project defaults for a newly created tab (FIT-2846).
+     * Never call for existing saved/URL/browser tabs — only when constructing a new snapshot.
+     */
+    projectDefaultsSnapshot(hasCustomization = false) {
+      const root = getRoot(self);
+      const catalogDefaultHidden = self.defaultHidden ? getSnapshot(self.defaultHidden) : { explore: [], labeling: [] };
+
+      return projectDefaultsForNewTab({
+        enabled: isActive(FF_PROJECT_DM_COLUMN_DEFAULTS),
+        defaults: root.project?.dm_column_defaults ?? null,
+        surface: "explore",
+        role: root.SDK?.role ?? null,
+        columns: self.columns ?? [],
+        catalogDefaultHidden,
+        hasCustomization,
+      });
+    },
   }))
   .actions((self) => ({
     setSelected: flow(function* (view, options = {}) {
@@ -146,10 +270,30 @@ export const TabStore = types
         self.dataStore.clear();
         self.selected = selected;
 
-        yield selected.reload();
-
         const root = getRoot(self);
 
+        // Paint tasks from the view-list payload immediately. Refresh the
+        // selected view beside that request so a lock changed by someone else
+        // is still picked up, without sitting in front of the task list.
+        // Virtual-tab reload strips denied filters before the tasks request
+        // (same policy as RefreshButton / initial apply).
+        const queryBefore = selected.query;
+        let tasksPromise = selected.reload();
+
+        if (selected.saved && selected.id) {
+          const latest = yield root.apiCall("tab", { tabId: selected.id });
+          if (self.selected === selected && !latest?.error && (latest.id == null || latest.id === selected.id)) {
+            applySnapshot(selected, serverViewSnapshot(selected, self.columns, latest));
+            // View-list payload can be stale on later tab switches. If the
+            // single-view refresh changed filters/ordering, fetch tasks again.
+            if (self.selected === selected && selected.query !== queryBefore) {
+              tasksPromise = selected.reload();
+            }
+          }
+        }
+
+        yield tasksPromise;
+        notifyUnavailableOrdering(selected);
         root.SDK.invoke("tabChanged", selected);
         selected.selected._invokeChangeEvent();
       }
@@ -187,15 +331,25 @@ export const TabStore = types
       const urlTabNotEmpty = !isEmpty(existingTabUrlParsed);
       const existingTab = urlTabNotEmpty ? existingTabUrlParsed : existingTabStorageParsed;
       const existingTabKey = urlTabNotEmpty ? viewSnapshot.tab : existingTabStorageParsed?.tab;
-      const snapshot = {
+      let snapshot = {
         ...viewSnapshot,
         key: existingTabKey,
         tab: existingTabKey,
         ...(existingTab ?? viewSnapshot ?? {}),
+        virtual: isVirtual || !!viewSnapshot?.virtual,
       };
-      const lastView = self.views[self.views.length - 1];
+      const stripped = stripUnavailableFiltersFromVirtualSnapshot(snapshot, self.availableFilters);
+      snapshot = stripped.snapshot;
       const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
-      const newID = snapshot.id ?? (lastView?.id ? lastView.id + 1 : 0);
+      const newID = nextTempTabId(self.views);
+
+      const hasCustomization = !!(
+        existingTab ||
+        snapshot.hiddenColumns ||
+        (snapshot.columnOrder && Object.keys(snapshot.columnOrder).length > 0)
+      );
+
+      const projectDefaults = self.projectDefaultsSnapshot(hasCustomization);
 
       const defaultHiddenColumns = self.defaultHidden
         ? clone(self.defaultHidden)
@@ -205,25 +359,37 @@ export const TabStore = types
           };
 
       return {
-        ...snapshot,
-        id: newID,
-        title: newTitle,
-        key: snapshot.key ?? guidGenerator(),
-        hiddenColumns: snapshot.hiddenColumns ?? defaultHiddenColumns,
+        snapshot: {
+          ...snapshot,
+          id: newID,
+          title: newTitle,
+          key: snapshot.key ?? guidGenerator(),
+          hiddenColumns: snapshot.hiddenColumns ?? projectDefaults.hiddenColumns ?? defaultHiddenColumns,
+          ...(projectDefaults.columnOrder && !snapshot.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
+        },
+        deniedFiltersRemoved: stripped.removed,
       };
     },
 
     addView: flow(function* (viewSnapshot = {}, options) {
       const { autoselect = true, autosave = true, reload = true } = options ?? {};
 
-      const newSnapshot = self.createSnapshot(viewSnapshot);
+      const { snapshot: newSnapshot, deniedFiltersRemoved } = self.createSnapshot(viewSnapshot);
 
       self.views.push(newSnapshot);
       const newView = self.views[self.views.length - 1];
 
+      if (deniedFiltersRemoved) {
+        notifyVirtualFiltersRemoved(newView);
+      }
+
       if (autosave) {
         // with autosave it will be reloaded anyway
         yield newView.save({ reload: !autosave && reload });
+      } else if (deniedFiltersRemoved && newView.virtual) {
+        // Annotator virtual tabs load with autosave off, so nothing else rewrites
+        // localStorage or the URL tab key. Persist the stripped snapshot now.
+        newView.persistVirtual();
       }
 
       if (autoselect) {
@@ -255,10 +421,14 @@ export const TabStore = types
     }),
 
     createDefaultView: flow(function* () {
+      const projectDefaults = self.projectDefaultsSnapshot(false);
+      const hiddenColumns = projectDefaults.hiddenColumns ?? self.defaultHidden;
+
       self.views.push({
         id: 0,
         title: "Default",
-        hiddenColumns: self.defaultHidden,
+        hiddenColumns,
+        ...(projectDefaults.columnOrder ? { columnOrder: projectDefaults.columnOrder } : {}),
       });
 
       let defaultView = self.views[self.views.length - 1];
@@ -301,11 +471,65 @@ export const TabStore = types
       const root = getRoot(self);
       const apiMethod = !view.saved && root.apiVersion === 2 ? "createTab" : "updateTab";
 
-      const result = yield root.apiCall(apiMethod, params, body, { allowToCancel: root.SDK.type === "DE" });
+      const result = yield root.apiCall(apiMethod, params, body, {
+        errorHandler: isViewSaveConflict,
+      });
 
       if (result.isCanceled) {
         return view;
       }
+
+      const lockedMessage = lockedViewResponseMessage(result);
+
+      if (lockedMessage) {
+        root.SDK.invoke("toast", { message: lockedMessage, type: "error" });
+        view.unlock();
+        if (view.saved) {
+          const latest = yield root.apiCall("tab", { tabId: view.id });
+          if (!latest?.error) {
+            applySnapshot(view, serverViewSnapshot(view, self.columns, latest));
+          }
+        }
+        return view;
+      }
+
+      if (result.error) {
+        view.unlock();
+        // Nothing was stored, so the next tab.save() must not be deduped against this snapshot.
+        view.snapshot = null;
+        const detail = result?.response?.detail;
+        root.SDK.invoke("toast", {
+          message:
+            typeof detail === "string"
+              ? detail
+              : "This tab could not be saved. Your filters or other changes were not stored.",
+          type: "error",
+        });
+        return view;
+      }
+
+      // Locked tabs: backend may return 200 while silently ignoring non-allowlisted
+      // config (filters/conjunction). Trust the server payload (including is_locked)
+      // so a stale unlocked client does not keep local filters the backend dropped.
+      // Unlocked tabs keep client filters (optimistic).
+      if (result.is_locked === true && result.id === view.id) {
+        if (!view.isLockedByManager) {
+          const canManageLock = root.SDK?.tabControls?.lock !== false;
+          const message = raceConditionLockToastMessage(result, canManageLock);
+
+          root.SDK.invoke("toast", { message, type: "error" });
+        }
+
+        applySnapshot(view, serverViewSnapshot(view, self.columns, result));
+
+        if (reload !== false) {
+          view.reload({ interaction });
+        }
+
+        view.unlock();
+        return view;
+      }
+
       const viewSnapshot = getSnapshot(view);
       const newViewSnapshot = {
         ...viewSnapshot,
@@ -317,6 +541,17 @@ export const TabStore = types
       };
 
       if (result.id !== view.id) {
+        const existingView = self.views.find((v) => v !== view && v.id === result.id);
+
+        if (existingView) {
+          applySnapshot(existingView, { ...newViewSnapshot, saved: true, virtual: false });
+          root.SDK.hasInterface("tabs") && existingView.reload();
+          self.setSelected(existingView);
+          destroy(view);
+
+          return existingView;
+        }
+
         self.views.push({ ...newViewSnapshot, saved: true, virtual: false });
         const newView = self.views[self.views.length - 1];
 
@@ -335,6 +570,28 @@ export const TabStore = types
       view.unlock();
       return view;
     }),
+    updateViewLock: flow(function* (view, isLocked) {
+      const root = getRoot(self);
+
+      // Optimistically update so the lock icon reacts immediately.
+      const previousLocked = view.is_locked;
+      view.setLockState(isLocked);
+
+      const result = yield root.apiCall("updateTab", { tabID: view.id }, { body: { is_locked: isLocked } });
+
+      if (result.error) {
+        view.setLockState(previousLocked);
+        const detail = result?.response?.detail;
+        root.SDK.invoke("toast", {
+          message: typeof detail === "string" ? detail : "Unable to update the tab lock.",
+          type: "error",
+        });
+        return view;
+      }
+
+      applySnapshot(view, serverViewSnapshot(view, self.columns, result));
+      return view;
+    }),
 
     updateViewOrder: flow(function* (source, destination) {
       // Detach the view from the original position
@@ -344,14 +601,22 @@ export const TabStore = types
       // Insert the view at the new position
       self.views.splice(destination, 0, sn);
 
+      const root = getRoot(self);
       const idList = {
-        project: getRoot(self).project.id,
+        project: root.project.id,
         ids: self.views.map((obj) => {
           return obj.id;
         }),
       };
 
-      getRoot(self).apiCall("orderTab", {}, { body: idList }, { alwaysExpectJSON: false });
+      const result = yield root.apiCall("orderTab", {}, { body: idList }, { alwaysExpectJSON: false });
+
+      if (result?.error) {
+        // Revert the local reorder so the UI matches the server state
+        const [reinserted] = self.views.splice(destination, 1);
+        self.views.splice(source, 0, getSnapshot(reinserted));
+        root.SDK.invoke("toast", { message: "Unable to save tab order.", type: "error" });
+      }
     }),
     duplicateView: flow(function* (view) {
       const sn = getSnapshot(view);
@@ -389,7 +654,7 @@ export const TabStore = types
       self.sidebarVisible = storeValue("sidebarVisible", !self.sidebarVisible);
     },
 
-    fetchColumns() {
+    fetchColumns({ deferSelectedReload = false } = {}) {
       const columns = self.columnsRaw;
       const targets = unique(columns.map((c) => c.target));
       const hiddenColumns = {};
@@ -473,11 +738,28 @@ export const TabStore = types
       });
 
       self.defaultHidden = TabHiddenColumns.create(hiddenColumns);
+
+      for (const view of self.views) {
+        if (view.virtual && clearUnavailableVirtualFilters(view)) {
+          // RefreshButton refetches columns then reloads once; persist without a
+          // nested tasks fetch so denied filters are gone before that reload.
+          if (deferSelectedReload) {
+            view.persistVirtual();
+          } else {
+            view.save({ reload: view === self.selected });
+          }
+        }
+      }
+
+      notifyUnavailableOrdering(self.selected);
     },
 
     fetchTabs: flow(function* (tab, taskID, labeling) {
       const tabId = Number.parseInt(tab);
-      const response = yield getRoot(self).apiCall("tabs");
+      const root = getRoot(self);
+      const preloadedViews = root.SDK?.explorerPreload?.views ?? null;
+      if (root.SDK?.explorerPreload) root.SDK.explorerPreload.views = null;
+      const response = yield resolvePreloaded(preloadedViews, () => root.apiCall("tabs"));
       const tabs = response.tabs ?? response ?? [];
 
       const snapshots = tabs.map((t) => {

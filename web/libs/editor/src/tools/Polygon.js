@@ -1,4 +1,3 @@
-import { ff } from "@humansignal/core";
 import { isAlive, types } from "mobx-state-tree";
 
 import BaseTool, { DEFAULT_DIMENSIONS } from "./Base";
@@ -115,9 +114,6 @@ const _Tool = types
         self.mode = "drawing";
         self.currentArea = self.createRegion(self.createRegionOptions({ x: point.x, y: point.y }), true);
         self.setDrawing(true);
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          self.applyActiveStates(self.currentArea);
-        }
       },
 
       _finishDrawing() {

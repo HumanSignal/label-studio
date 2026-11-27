@@ -3,6 +3,7 @@ import { Shape } from "react-konva";
 import type { BezierPoint } from "../types";
 import { GHOST_LINE_STYLING, DEFAULT_STROKE_COLOR, HIT_RADIUS } from "../constants";
 import { findClosestPointOnPath, getDistance } from "../eventHandlers/utils";
+import { resolveDrawingOriginPointId } from "../utils";
 
 interface GhostLineProps {
   initialPoints: BezierPoint[];
@@ -60,42 +61,16 @@ export const GhostLine: React.FC<GhostLineProps> = ({
       y: Math.round(point.y),
     };
   };
-  // Get the active point for the ghost line
+  // Get the active point for the ghost line. Resolved with the same shared logic the
+  // point-creation manager uses, so the dashed preview always starts from the point the
+  // committed segment will connect from (BROS-1412).
   const getActivePoint = () => {
-    // Always check activePointId first (works for both skeleton and non-skeleton mode)
-    // In skeleton mode: can be any point
-    // In non-skeleton mode: should be the endpoint we're drawing from
-    if (activePointId) {
-      const activePoint = initialPoints.find((p) => p.id === activePointId);
-      if (activePoint) {
-        return activePoint;
-      }
-    }
-
-    // If a point is selected, use that point for the ghost line
-    if (
-      selectedPointIndex !== null &&
-      selectedPointIndex !== undefined &&
-      selectedPointIndex >= 0 &&
-      selectedPointIndex < initialPoints.length
-    ) {
-      return initialPoints[selectedPointIndex];
-    }
-
-    // Fallback to lastAddedPointId for backward compatibility
-    if (lastAddedPointId) {
-      const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
-      if (lastAddedPoint) {
-        return lastAddedPoint;
-      }
-    }
-
-    // Final fallback: use the last point in the array
-    if (initialPoints.length > 0) {
-      const lastPoint = initialPoints[initialPoints.length - 1];
-      return lastPoint;
-    }
-    return null;
+    const originId = resolveDrawingOriginPointId(initialPoints, {
+      activePointId,
+      selectedPointIndex,
+      lastAddedPointId,
+    });
+    return originId ? (initialPoints.find((p) => p.id === originId) ?? null) : null;
   };
 
   const activePoint = getActivePoint();

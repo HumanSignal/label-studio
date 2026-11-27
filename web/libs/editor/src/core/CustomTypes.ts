@@ -50,7 +50,28 @@ const CSSColor = types.custom<any, string>({
   },
 });
 
+const PositiveInteger = types.custom<any, string | null>({
+  name: "number",
+  fromSnapshot(value) {
+    return value;
+  },
+  toSnapshot(value) {
+    return value;
+  },
+  isTargetType(value) {
+    if (value === null || value === undefined) return true;
+    const parsed = Number.parseInt(value, 10);
+
+    return Number.isFinite(parsed) && parsed > 0 && String(parsed) === String(value).trim();
+  },
+  getValidationMessage(value) {
+    if (this.isTargetType(value)) return "";
+    return `"${value}" is not a valid positive number.`;
+  },
+});
+
 export const customTypes = {
   range: Range,
   color: CSSColor,
+  positiveInteger: PositiveInteger,
 };

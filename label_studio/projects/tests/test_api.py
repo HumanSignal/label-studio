@@ -1,11 +1,124 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from organizations.models import OrganizationMember
+from organizations.tests.factories import OrganizationFactory
+from projects.api import ProjectListAPI
+from projects.models import ProjectManager, ProjectQuerySetWithFSM
 from projects.tests.factories import ProjectFactory
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient, APIRequestFactory, APITestCase, force_authenticate
 from tasks.models import Task
-from tasks.tests.factories import PredictionFactory, TaskFactory
+from tasks.tests.factories import AnnotationFactory, PredictionFactory, TaskFactory
+from users.tests.factories import UserFactory
+
+
+class TestProjectListAPI(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.matching_project = ProjectFactory(title='Needle Project')
+        cls.user = cls.matching_project.created_by
+        cls.other_project = ProjectFactory(
+            title='Unrelated Project',
+            organization=cls.matching_project.organization,
+            created_by=cls.user,
+        )
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def get_view_queryset(self, **params):
+        request = APIRequestFactory().get(reverse('projects:api:project-list'), params)
+        force_authenticate(request, user=self.user)
+        view = ProjectListAPI()
+        view.request = view.initialize_request(request)
+        view.args = ()
+        view.kwargs = {}
+        return view.get_queryset()
+
+    def test_search_filters_projects_by_title(self):
+        """The project list search parameter returns only projects whose title matches."""
+        response = self.client.get(reverse('projects:api:project-list'), {'search': 'needle'})
+
+        assert response.status_code == 200
+        assert [project['id'] for project in response.json()['results']] == [self.matching_project.id]
+
+    def test_fields_returns_sparse_project_shape(self):
+        """The project list fields parameter limits each serialized project to the requested fields."""
+        response = self.client.get(reverse('projects:api:project-list'), {'fields': 'id,title'})
+
+        assert response.status_code == 200
+        assert response.json()['results']
+        assert all(set(project) == {'id', 'title'} for project in response.json()['results'])
+
+    def test_fields_with_whitespace_matches_enrichment_skips(self):
+        """Whitespace around fields tokens must not desync serializer flex-fields vs enrichment gating."""
+        with (
+            override_settings(FSM_ENABLED=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset(fields='id, title')
+            response = self.client.get(reverse('projects:api:project-list'), {'fields': 'id, title'})
+
+        with_counts.assert_not_called()
+        with_state.assert_not_called()
+        assert queryset._prefetch_related_lookups == ()
+        assert response.status_code == 200
+        assert response.json()['results']
+        assert all(set(project) == {'id', 'title'} for project in response.json()['results'])
+
+    def test_sparse_fields_skip_counts_state_and_related_prefetches(self):
+        """The picker shape avoids unrelated list enrichment work."""
+        with (
+            override_settings(FSM_ENABLED=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset(fields='id,title', search='needle')
+
+        with_counts.assert_not_called()
+        with_state.assert_not_called()
+        assert queryset._prefetch_related_lookups == ()
+
+    def test_default_fields_preserve_project_list_enrichment(self):
+        """The normal project list keeps its existing counts, state, and related prefetches."""
+        with (
+            override_settings(FSM_ENABLED=True),
+            patch(
+                'projects.api.ProjectManager.with_counts_annotate',
+                wraps=ProjectManager.with_counts_annotate,
+            ) as with_counts,
+            patch.object(
+                ProjectQuerySetWithFSM,
+                'with_state',
+                autospec=True,
+                side_effect=ProjectQuerySetWithFSM.with_state,
+            ) as with_state,
+        ):
+            queryset = self.get_view_queryset()
+
+        with_counts.assert_called_once()
+        with_state.assert_called_once()
+        assert queryset._prefetch_related_lookups == ('members', 'created_by')
 
 
 class TestProjectCountsListAPI(TestCase):
@@ -90,3 +203,58 @@ class TestProjectModelVersionsAPI(APITestCase):
         assert response.json()['static'][1]['count'] == 1
         assert response.json()['static'][2]['model_version'] == 'model_1'
         assert response.json()['static'][2]['count'] == 2
+
+
+class TestProjectAnnotatorsAPI(APITestCase):
+    def test_options_are_project_scoped_and_exclude_deleted_members(self):
+        project = ProjectFactory()
+        visible = UserFactory(active_organization=project.organization)
+        deleted = UserFactory(active_organization=project.organization)
+        other_project = ProjectFactory(organization=project.organization, created_by=project.created_by)
+        other_project_user = UserFactory(active_organization=project.organization)
+        AnnotationFactory(project=project, task=TaskFactory(project=project), completed_by=visible)
+        AnnotationFactory(project=project, task=TaskFactory(project=project), completed_by=deleted)
+        AnnotationFactory(
+            project=other_project,
+            task=TaskFactory(project=other_project),
+            completed_by=other_project_user,
+        )
+        OrganizationMember.objects.get(organization=project.organization, user=deleted).soft_delete()
+        self.client.force_authenticate(user=project.created_by)
+
+        response = self.client.get(f'/api/projects/{project.id}/annotators/')
+
+        assert response.status_code == 200
+        assert [user['id'] for user in response.json()] == [visible.id]
+
+
+class TestProjectOrganizationIsReadOnly(APITestCase):
+    """organization is set from the caller's active organization at creation and never from the request body"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user = cls.project.created_by
+        cls.own_organization = cls.project.organization
+        cls.foreign_organization = OrganizationFactory()
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_patch_cannot_move_project_into_another_organization(self):
+        response = self.client.patch(
+            f'/api/projects/{self.project.id}/', {'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 200
+        assert response.json()['organization'] == self.own_organization.id
+        self.project.refresh_from_db()
+        assert self.project.organization_id == self.own_organization.id
+
+    def test_create_ignores_organization_in_body(self):
+        response = self.client.post(
+            '/api/projects/', {'title': 'Created', 'organization': self.foreign_organization.id}, format='json'
+        )
+
+        assert response.status_code == 201
+        assert response.json()['organization'] == self.own_organization.id

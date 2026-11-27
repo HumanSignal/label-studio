@@ -2,9 +2,9 @@ import { isDefined } from "../utils/helpers";
 import { atom, useAtomValue } from "jotai";
 import { JotaiStore } from "../utils/jotai-store";
 
-const initialBreadcrumbs = [];
+const _initialBreadcrumbs = [];
 
-const noop = () => {
+const _noop = () => {
   if (process.env.NODE_ENV === "development") {
     console.warn("Breadcrumbs must be initialized first");
   }

@@ -1,9 +1,9 @@
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Checkbox, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { Button, Checkbox, ModalWindow } from "@humansignal/ui";
+import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
 import { observer } from "mobx-react";
 import type { PropsWithChildren } from "react";
-import { createContext, useCallback, useEffect, useRef, useState } from "react";
-import { modal } from "../../Common/Modal/Modal";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { Icon } from "../../Common/Icon/Icon";
 import { Tooltip } from "@humansignal/ui";
 import { ImagePreview } from "./ImagePreview";
@@ -115,7 +115,7 @@ const TaskModal = observer(({ view, tasks, imageField, currentTaskId, setCurrent
           type="button"
           className="h-full [&_span]:aspect-auto !p-0"
           variant="primary"
-          look="string"
+          look="ghost"
           onClick={goToPrev}
           disabled={index === 0}
         >
@@ -126,7 +126,7 @@ const TaskModal = observer(({ view, tasks, imageField, currentTaskId, setCurrent
           type="button"
           className="h-full [&_span]:aspect-auto !p-0"
           variant="primary"
-          look="string"
+          look="ghost"
           onClick={goToNext}
           disabled={index === tasks.length - 1}
         >
@@ -145,53 +145,35 @@ type GridViewProviderProps = PropsWithChildren<{
 
 export const GridViewProvider: React.FC<GridViewProviderProps> = ({ children, data, view, fields }) => {
   const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
-  const modalRef = useRef<{ update: (props: object) => void; close: () => void } | null>(null);
   const imageField = fields.find((f) => f.currentType === "Image")?.alias;
   const hasImage = fields.some((f) => f.currentType === "Image");
 
-  const onClose = useCallback(() => {
-    modalRef.current = null;
-    setCurrentTaskId(null);
-  }, []);
-
-  useEffect(() => {
-    if (currentTaskId === null) {
-      modalRef.current?.close();
-      return;
-    }
-
-    if (!imageField) return;
-
-    const children = (
-      <TaskModal
-        view={view}
-        tasks={data}
-        imageField={imageField}
-        currentTaskId={currentTaskId}
-        setCurrentTaskId={setCurrentTaskId}
-        hasImage={hasImage}
-      />
-    );
-
-    if (!modalRef.current) {
-      modalRef.current = modal({
-        bare: true,
-        title: "Task Preview",
-        style: { width: 800 },
-        children,
-        onHidden: onClose,
-      });
-    } else {
-      modalRef.current.update({ children });
-    }
-  }, [currentTaskId, data, onClose]);
-
-  // close the modal when we leave the view (by browser controls or by hotkeys)
-  useEffect(() => () => modalRef.current?.close(), []);
+  const onClose = useCallback(() => setCurrentTaskId(null), []);
+  const previewOpen = currentTaskId !== null && Boolean(imageField);
 
   return (
     <GridViewContext.Provider value={{ tasks: data, imageField, currentTaskId, setCurrentTaskId, hasImage }}>
       {children}
+      <ModalWindow
+        open={previewOpen}
+        onOpenChange={(open) => !open && onClose()}
+        title="Task Preview"
+        hideHeader
+        size="large"
+        bodyClassName="p-0"
+        dataTestId="grid-task-preview-modal"
+      >
+        {previewOpen && (
+          <TaskModal
+            view={view}
+            tasks={data}
+            imageField={imageField}
+            currentTaskId={currentTaskId}
+            setCurrentTaskId={setCurrentTaskId}
+            hasImage={hasImage}
+          />
+        )}
+      </ModalWindow>
     </GridViewContext.Provider>
   );
 };

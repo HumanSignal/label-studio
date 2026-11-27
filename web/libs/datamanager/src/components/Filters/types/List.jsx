@@ -7,38 +7,41 @@ function defaultFilterItems(items) {
   return items?.toJSON ? items.toJSON() : items;
 }
 
-export const VariantSelect = observer(({ filter, schema, onChange, multiple, value, placeholder, disabled }) => {
-  if (!schema) return <></>;
-  const { items } = schema;
+export const VariantSelect = observer(
+  ({ filter, schema, onChange, multiple, value, placeholder, disabled, readOnly }) => {
+    if (!schema) return <></>;
+    const { items } = schema;
 
-  const selectedValue = useMemo(() => {
-    if (!multiple) {
-      return Array.isArray(value) ? value[0] : value;
-    }
-    return Array.isArray(value) ? value : (value ?? []);
-  }, [multiple, value]);
-  const filterItems = filter.cellView?.filterItems || defaultFilterItems;
-  const FilterItem = filter.cellView?.FilterItem;
-  return (
-    <FilterDropdown
-      items={filterItems(items)}
-      value={selectedValue}
-      multiple={multiple}
-      optionRender={FilterItem}
-      outputFormat={
-        multiple
-          ? (value) => {
-              return value ? [].concat(value) : [];
-            }
-          : undefined
+    const selectedValue = useMemo(() => {
+      if (!multiple) {
+        return Array.isArray(value) ? value[0] : value;
       }
-      searchFilter={filter.cellView?.searchFilter}
-      onChange={(value) => onChange(value)}
-      placeholder={placeholder ?? "Select value"}
-      disabled={disabled}
-    />
-  );
-});
+      return Array.isArray(value) ? value : (value ?? []);
+    }, [multiple, value]);
+    const filterItems = filter.cellView?.filterItems || defaultFilterItems;
+    const FilterItem = filter.cellView?.FilterItem;
+    return (
+      <FilterDropdown
+        items={filterItems(items)}
+        value={selectedValue}
+        multiple={multiple}
+        optionRender={FilterItem}
+        outputFormat={
+          multiple
+            ? (value) => {
+                return value ? [].concat(value) : [];
+              }
+            : undefined
+        }
+        searchFilter={filter.cellView?.searchFilter}
+        onChange={(value) => onChange(value)}
+        placeholder={placeholder ?? "Select value"}
+        disabled={disabled}
+        readOnly={readOnly}
+      />
+    );
+  },
+);
 
 export const ListFilter = [
   {

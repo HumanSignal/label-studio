@@ -28,8 +28,10 @@ describe("View all - Raadonly", () => {
   it("Should not allow user to edit an annotation - Taxonomy", () => {
     LabelStudio.params().config(taxonomyConfig).data(textData).withResult(taxonomyResult).init();
     ToolBar.viewAllBtn.click();
-    Taxonomy.open();
-    Taxonomy.dropdown.should("not.exist");
+    // Read-only trigger uses pointer-events-none; do not use Taxonomy.open() — it uses click({ force: true })
+    // and would open the popover anyway. Assert the control is disabled instead.
+    cy.get(".taxonomy").find(".htx-taxonomy-trigger").first().should("have.attr", "aria-disabled", "true");
+    cy.get("[data-testid='taxonomy-root']").first().should("have.attr", "data-taxonomy-open", "false");
   });
   it("Should not allow user to edit an annotation - Audio region", () => {
     LabelStudio.params().config(audioConfig).data(audioData).withResult(audioResult).init();

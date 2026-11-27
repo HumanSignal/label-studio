@@ -1,0 +1,10 @@
+# Isolate React resolution for json-viewer-benchmark (monorepo hoists LSE's React otherwise).
+[resolve]
+alias = {
+  "react" = "./node_modules/react/index.js",
+  "react-dom" = "./node_modules/react-dom/index.js",
+  "react-dom/client" = "./node_modules/react-dom/client.js",
+  "react-dom/test-utils" = "./node_modules/react-dom/test-utils.js",
+  "react/jsx-runtime" = "./node_modules/react/jsx-runtime.js",
+  "react/jsx-dev-runtime" = "./node_modules/react/jsx-dev-runtime.js",
+}

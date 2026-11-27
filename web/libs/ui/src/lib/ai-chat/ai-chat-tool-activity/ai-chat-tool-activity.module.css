@@ -1,0 +1,130 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  width: 100%;
+  max-width: 40rem;
+}
+
+.summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-tighter);
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-neutral-content-subtle);
+  cursor: pointer;
+}
+
+.summary:focus-visible {
+  outline: 2px solid var(--color-primary-border);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-small, 4px);
+}
+
+.summaryLabel {
+  color: var(--color-neutral-content-subtle);
+}
+
+.chevron {
+  transition: transform 150ms ease;
+}
+
+.chevronClosed {
+  transform: rotate(-90deg);
+}
+
+.panel {
+  padding-left: var(--spacing-base);
+}
+
+/* Beautiful UI Task Rows: flat rows with breathing room, not stacked bordered cards. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight) var(--spacing-base);
+  border: 1px solid transparent;
+  border-radius: var(--corner-radius-small, 8px);
+  background: var(--color-neutral-surface);
+}
+
+.item:hover {
+  border-color: var(--color-neutral-border);
+}
+
+.itemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.15rem;
+  color: var(--color-neutral-content-subtle);
+}
+
+.itemBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-tighter);
+  min-width: 0;
+}
+
+.itemLabel {
+  color: var(--color-neutral-content);
+}
+
+.itemDetail {
+  color: var(--color-neutral-content-subtle);
+  line-height: 1.4;
+}
+
+.itemBadge {
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.statusCompleted {
+  color: var(--color-positive-content);
+}
+
+.statusFailed {
+  color: var(--color-negative-content);
+}
+
+.statusBusy {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  align-content: center;
+  justify-items: center;
+}
+
+.statusPending {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-neutral-content-subtler, var(--color-neutral-content-subtle));
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

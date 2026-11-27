@@ -4,6 +4,7 @@ import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, w
 
 import { uniqBy } from "@humansignal/core/lib/utils/lodash-replacements";
 import InfoModal from "../components/Infomodal/Infomodal";
+import { showConfirmModal } from "../components/Infomodal/infomodal-dispatch";
 import { Hotkey } from "../core/Hotkey";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 import ToolsManager from "../tools/Manager";
@@ -17,16 +18,11 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
-import {
-  FF_CUSTOM_SCRIPT,
-  FF_LSDV_4620_3_ML,
-  FF_LSDV_4998,
-  FF_REVIEWER_FLOW,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../utils/feature-flags";
+import { emitRegionDeleted } from "../utils/labelingTelemetry";
+import { FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { CustomButton } from "./CustomButton";
+import { REJECT_ACTION_HOTKEY_NAMES } from "../utils/rejectHotkeys";
 
 const hotkeys = Hotkey("AppStore", "Global Hotkeys");
 
@@ -209,8 +205,28 @@ export default types
   .volatile(() => ({
     version: typeof LSF_VERSION === "string" ? LSF_VERSION : "0.0.0",
     initialized: false,
-    hydrated: false,
+    // Submit/skip hotkeys are inert while false. Defaults to true so hosts that
+    // don't manage it keep hotkeys live; hosts with async task loading (DM) hold
+    // it false until the task and its annotations are fully presented.
+    hydrated: true,
     suggestionsRequest: null,
+    onDemandCourses: [],
+    hideInstructionsForCourses: false,
+    onOpenOnDemandCourse: null,
+    // Optional host-provided React component rendered in every comment header, right after the
+    // author name, with props { comment, text }. Lets the host app add its own per-comment control
+    // without forking the comment UI. Volatile (never serialized); null means nothing is rendered.
+    // Added for the UTC-1446 experiment.
+    commentHeaderExtra: null,
+    // Optional host-provided side-panel tab (one), set with setHostPanel. Volatile (never serialized).
+    // { title, shown, badge, onElement(el | null), onAvailability(available) }. While it is set, the side
+    // panels tell the host through onAvailability whether they are on screen as columns. While `shown`,
+    // a tab named `title` sits in the panel holding Info (or wherever the user dragged it), its empty
+    // body element is handed to onElement while the tab is open (null once it closes) so the host can
+    // render into it through a portal, and `badge` puts a dot on its label. Added for UTC-1446.
+    hostPanel: null,
+    // Bumped by focusHostPanel; the side panels then bring the host tab forward.
+    hostPanelFocusRequest: 0,
     // @todo should be removed along with the FF; it's used to detect FF in other parts
     simpleInit: isFF(FF_SIMPLE_INIT),
   }))
@@ -258,19 +274,6 @@ export default types
     },
   }))
   .actions((self) => {
-    let appControls;
-
-    function setAppControls(controls) {
-      appControls = controls;
-    }
-
-    function clearApp() {
-      appControls?.clear();
-    }
-
-    function renderApp() {
-      appControls?.render();
-    }
     /**
      * Update settings display state
      */
@@ -302,6 +305,10 @@ export default types
       for (const n of names) if (n in flags) self[n] = flags[n];
     }
 
+    function setHydrated(value) {
+      self.hydrated = value;
+    }
+
     /**
      * Check for interfaces
      * @param {string} name
@@ -327,6 +334,41 @@ export default types
       }
     }
 
+    function setCourseBottomBar({ courses, hideInstructionsForCourses, onOpenOnDemandCourse }) {
+      self.onDemandCourses = courses;
+      self.hideInstructionsForCourses = hideInstructionsForCourses;
+      self.onOpenOnDemandCourse = onOpenOnDemandCourse;
+      toggleInterface("learning:on-demand", courses.length > 0);
+      toggleInterface("instruction", false);
+    }
+
+    /**
+     * Set or clear (null) the host component rendered in each comment header.
+     * Volatile fields are observable, so comments already on screen pick up the change.
+     * @param {import("react").ComponentType<{ comment: object, text: string }> | null} component
+     */
+    function setCommentHeaderExtra(component) {
+      self.commentHeaderExtra = component ?? null;
+    }
+
+    /**
+     * Register, update or clear (null) the host-provided side-panel tab — see `hostPanel`.
+     * @param {{ title: string, shown: boolean, badge?: boolean, onElement?: (el: HTMLElement | null) => void,
+     *   onAvailability?: (available: boolean) => void } | null} config
+     */
+    function setHostPanel(config) {
+      self.hostPanel = config ?? null;
+    }
+
+    /** Bring the host tab forward: make it active, expand its collapsed side, show or raise its panel. */
+    function focusHostPanel() {
+      self.hostPanelFocusRequest += 1;
+    }
+
+    function setDescription(value) {
+      self.description = value;
+    }
+
     function toggleComments(state) {
       return (self.showComments = state);
     }
@@ -345,6 +387,116 @@ export default types
       getEnv(self).events.invoke("labelStudioLoad", self);
     }
 
+    function handleSubmitHotkey() {
+      // Stay inert until the host marks the task fully presented (hydrated):
+      // before that the selected annotation can be a blank placeholder, and
+      // submitting it would create a duplicate instead of updating the existing one.
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      const annotationStore = self.annotationStore;
+      const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
+      const entity = annotationStore.selected;
+      const areResultsEmpty = entity.results.length === 0;
+      const isReview = self.hasInterface("review") || entity.canBeReviewed;
+      const isUpdate = !isReview && isDefined(entity.pk);
+      // FIT-2742: parity with Controls — draft snapshot counts even when draftId is still 0.
+      const noChanges = !entity.history?.canUndo && !entity.draftId && !entity.versions?.draft;
+      const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
+
+      if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
+      if (annotationStore.viewingAll) return;
+      if (isUpdateDisabled) return;
+      if (entity.isReadOnly()) return;
+      if (entity.hasIncompleteRegions) return;
+      if (isReview && ownAcceptIsLive(entity)) return;
+      if (isReview && entity.isOwnReviewBlocked) return;
+
+      entity?.submissionInProgress();
+
+      if (self.hasInterface("annotation:bulk")) {
+        const customButtons = self.customButtons?.get("_replace");
+        const submitButton = customButtons?.find((btn) => btn.name === "submit");
+        if (submitButton && !submitButton.disabled) {
+          self.handleCustomButton?.(submitButton);
+        }
+      } else if (isReview) {
+        self.acceptAnnotation();
+      } else if (!isUpdate && self.hasInterface("submit")) {
+        self.submitAnnotation();
+      } else if (self.hasInterface("update")) {
+        self.updateAnnotation();
+      }
+    }
+
+    /** Reject buttons the host configured for this project, in the order it sent them. */
+    function configuredRejectButtons() {
+      const configured = self.customButtons?.get("reject");
+      const buttons = Array.isArray(configured) ? configured : configured ? [configured] : [];
+
+      return buttons.filter((button) => typeof button !== "string");
+    }
+
+    /**
+     * The bottom bar owns the reject flow (comment gate, in-progress state), so the hotkeys
+     * name an action and let it run, exactly as clicking that option would.
+     */
+    function requestReject(name) {
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
+      window.dispatchEvent(new CustomEvent("lsf:reject-with-action", { detail: { name } }));
+    }
+
+    function handleSkipHotkey() {
+      if (!self.hydrated || self.isLoading || self.noTask) return;
+      if (self.annotationStore.viewingAll) return;
+
+      const entity = self.annotationStore.selected;
+
+      if (self.hasInterface("review")) {
+        if (entity?.isOwnReviewBlocked) return;
+        const buttons = configuredRejectButtons();
+        // Same as clicking the split button: the project's default, never the menu.
+        const primary = buttons.find((button) => button.isPrimary) ?? buttons[0];
+
+        if (primary) {
+          requestReject(primary.name);
+        } else {
+          entity?.submissionInProgress();
+          self.rejectAnnotation();
+        }
+      } else {
+        entity?.submissionInProgress();
+        self.skipTask();
+      }
+    }
+
+    /**
+     * One fixed key per allowed reject action, so a key always means the same action whatever
+     * its place in the menu. Actions the project has not configured stay unbound, hence inert.
+     */
+    function attachRejectActionHotkeys() {
+      if (!self.hasInterface("review")) return;
+
+      for (const button of configuredRejectButtons()) {
+        const named = REJECT_ACTION_HOTKEY_NAMES[button.name];
+        if (!named) continue;
+        hotkeys.addNamed(named, () => {
+          if (!self.hydrated || self.isLoading || self.noTask) return;
+          if (self.annotationStore.viewingAll) return;
+          requestReject(button.name);
+        });
+      }
+    }
+
+    function confirmDeleteAllRegions() {
+      const { selected } = self.annotationStore;
+
+      showConfirmModal({
+        title: "Delete all regions",
+        content: getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS,
+        okText: "Delete",
+        onOk: () => selected.deleteAllRegions(),
+      });
+    }
+
     function attachHotkeys() {
       // Unbind previous keys in case LS was re-initialized
       hotkeys.unbindAll();
@@ -353,70 +505,22 @@ export default types
        * Hotkey for submit
        */
       if (self.hasInterface("submit", "update", "review")) {
-        hotkeys.addNamed("annotation:submit", () => {
-          const annotationStore = self.annotationStore;
-          const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
-          const entity = annotationStore.selected;
-          const areResultsEmpty = entity.results.length === 0;
-          const isReview = self.hasInterface("review") || entity.canBeReviewed;
-          const isUpdate = !isReview && isDefined(entity.pk);
-          // no changes were made over previously submitted version — no drafts, no pending changes
-          const noChanges = !entity.history.canUndo && !entity.draftId;
-          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
-
-          if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
-          if (annotationStore.viewingAll) return;
-          if (isUpdateDisabled) return;
-          if (entity.isReadOnly()) return;
-          if (entity.hasIncompletePolygons) return;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("annotation:bulk")) {
-            const customButtons = self.customButtons?.get("_replace");
-            const submitButton = customButtons?.find((btn) => btn.name === "submit");
-            if (submitButton && !submitButton.disabled) {
-              self.handleCustomButton?.(submitButton);
-            }
-          } else if (isReview) {
-            self.acceptAnnotation();
-          } else if (!isUpdate && self.hasInterface("submit")) {
-            self.submitAnnotation();
-          } else if (self.hasInterface("update")) {
-            self.updateAnnotation();
-          }
-        });
+        hotkeys.addNamed("annotation:submit", self.handleSubmitHotkey);
       }
 
       /**
        * Hotkey for skip task
        */
       if (self.hasInterface("skip", "review")) {
-        hotkeys.addNamed("annotation:skip", () => {
-          if (self.annotationStore.viewingAll) return;
-
-          const entity = self.annotationStore.selected;
-
-          entity?.submissionInProgress();
-
-          if (self.hasInterface("review")) {
-            self.rejectAnnotation();
-          } else {
-            self.skipTask();
-          }
-        });
+        hotkeys.addNamed("annotation:skip", self.handleSkipHotkey);
       }
+
+      attachRejectActionHotkeys();
 
       /**
        * Hotkey for delete
        */
-      hotkeys.addNamed("region:delete-all", () => {
-        const { selected } = self.annotationStore;
-
-        if (window.confirm(getEnv(self).messages.CONFIRM_TO_DELETE_ALL_REGIONS)) {
-          selected.deleteAllRegions();
-        }
-      });
+      hotkeys.addNamed("region:delete-all", self.confirmDeleteAllRegions);
 
       // create relation
       hotkeys.addNamed("region:relation", () => {
@@ -480,6 +584,19 @@ export default types
         annotation.undo();
       });
 
+      // Quick toggle for Auto-Annotation so the user can temporarily drop
+      // out of SAM capture to select / edit an existing region and flip
+      // back without reaching for the bottombar switch. Mirrors the
+      // DynamicPreannotationsToggle click handler.
+      hotkeys.addNamed("annotation:toggle-auto-annotation", () => {
+        if (!self.hasInterface("auto-annotation") || self.forceAutoAnnotation) return;
+        const next = !self.autoAnnotation;
+        self.setAutoAnnotation(next);
+        if (!next) {
+          ToolsManager.allInstances().forEach((inst) => inst.selectDefault());
+        }
+      });
+
       hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
@@ -497,9 +614,37 @@ export default types
           .map((m) => m.findSelectedTool())
           .filter(Boolean)
           .filter((t) => t.isDrawing);
+        const selectedCompleteDrawingRegions =
+          c?.selectedRegions?.filter((region) => region?.isDrawing && !region.incomplete) ?? [];
+        const shouldUnselectAfterCompletingDrawing =
+          tools.some((t) => t.currentArea?.selected) || selectedCompleteDrawingRegions.length > 0;
+        const clearSelectedCompleteDrawingRegions = () => {
+          // Defer until tool completion and after-create selection have settled.
+          setTimeout(() => {
+            selectedCompleteDrawingRegions.forEach((region) => {
+              region.setDrawing(false);
+              region.notifyDrawingFinished?.();
+            });
+            c?.setIsDrawing(false);
+            c?.unselectAll();
+          });
+        };
 
         if (tools.length > 0) {
           tools.forEach((t) => t.complete?.());
+
+          // BROS-1451: VideoVector skeleton editing can resume drawing from an
+          // already-selected region while the user is adding a branch. In that state
+          // Esc used to only complete the tool, forcing a second Esc to unselect.
+          if (shouldUnselectAfterCompletingDrawing && c) {
+            if (selectedCompleteDrawingRegions.length > 0) {
+              clearSelectedCompleteDrawingRegions();
+            } else {
+              setTimeout(() => c.unselectAll());
+            }
+          }
+        } else if (selectedCompleteDrawingRegions.length > 0) {
+          clearSelectedCompleteDrawingRegions();
         } else if (c && c.isLinkingMode) {
           c.stopLinkingMode();
         } else if (!c.isDrawing) {
@@ -511,6 +656,12 @@ export default types
         const c = self.annotationStore.selected;
 
         if (c) {
+          for (const region of c.selectedRegions) {
+            emitRegionDeleted(c.store, c, {
+              region_id: region.id,
+              region_type: region.type ?? null,
+            });
+          }
           c.deleteSelectedRegions();
         }
       });
@@ -604,7 +755,7 @@ export default types
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
     function handleSubmittingFlag(fn, defaultMessage = "Error during submit") {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       self.setFlags({ isSubmitting: true });
       const res = fn();
 
@@ -625,7 +776,7 @@ export default types
     }
 
     function submitAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
       const event = entity.exists ? "updateAnnotation" : "submitAnnotation";
@@ -634,30 +785,20 @@ export default types
 
       if (!entity.validate()) return;
 
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
-        entity.sendUserGenerate();
-      }
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          await self.waitForDraftSubmission();
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        await self.waitForDraftSubmission();
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
-          entity.sendUserGenerate();
-        }
+        entity.sendUserGenerate();
         await getEnv(self).events.invoke(event, self, entity);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
-      }
+      });
     }
 
     function updateAnnotation(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
 
       const entity = self.annotationStore.selected;
 
@@ -666,27 +807,20 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "updateAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "updateAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
+        entity.setAcceptedState?.(null);
         self.incrementQueuePosition();
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          entity.dropDraft();
-          !entity.sentUserGenerate && entity.sendUserGenerate();
-        }
-      });
-      if (!isFF(FF_CUSTOM_SCRIPT)) {
         entity.dropDraft();
         !entity.sentUserGenerate && entity.sendUserGenerate();
-      }
+      });
     }
 
     function skipTask(extraData) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
 
       // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
@@ -707,26 +841,32 @@ export default types
     }
 
     function unskipTask() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       handleSubmittingFlag(() => {
         getEnv(self).events.invoke("unskipTask", self);
       }, "Error during cancel skipping task, try again");
     }
 
+    // FIT-3230: the reviewer's own live accept spends a plain Accept (same rule as AcceptButton);
+    // Fix + Accept and other reviewers' Accept stay available (multi-layer review).
+    function ownAcceptIsLive(entity) {
+      return Boolean(entity?.acceptedByCurrentUser) && !(entity.history?.canUndo || entity.versions?.draft);
+    }
+
     function acceptAnnotation() {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
+      if (ownAcceptIsLive(self.annotationStore.selected)) return;
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "acceptAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "acceptAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         // changes in current sessions or saved draft should send the result along with approval
         const isDirty = entity.history.canUndo || entity.versions.draft;
@@ -738,19 +878,18 @@ export default types
     }
 
     function rejectAnnotation({ comment = null }) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
+      if (self.annotationStore.selected?.isOwnReviewBlocked) return;
 
       handleSubmittingFlag(async () => {
         const entity = self.annotationStore.selected;
 
         entity.beforeSend();
         if (!entity.validate()) return;
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
-            event: "rejectAnnotation",
-          });
-          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
-        }
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+          event: "rejectAnnotation",
+        });
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         const isDirty = entity.history.canUndo;
 
@@ -761,7 +900,7 @@ export default types
     }
 
     function handleCustomButton(button) {
-      if (self.isSubmitting) return;
+      if (self.isSubmitting || self.isLoading) return;
       const buttonName = button.name;
 
       handleSubmittingFlag(async () => {
@@ -806,9 +945,7 @@ export default types
 
       if (oldAnnotationStore) {
         oldAnnotationStore.beforeReset?.();
-        if (isFF(FF_LSDV_4998)) {
-          destroySharedStore();
-        }
+        destroySharedStore();
         detach(oldAnnotationStore);
         destroy(oldAnnotationStore);
       }
@@ -844,9 +981,6 @@ export default types
 
       if (!as.initialized) {
         as.initRoot(self.config);
-        if (isFF(FF_LSDV_4620_3_ML) && !appControls?.isRendered()) {
-          appControls?.render();
-        }
       }
 
       // Ensure users referenced by annotations exist in the users store
@@ -893,12 +1027,10 @@ export default types
         // simple logging to detect if simple init is used on users' machines
         console.log("LSF: deserialization is finished");
 
-        // next line might be unclear after removing FF_SIMPLE_INIT
-        // reversing the list caused problems before when task is reloaded and list is reversed again.
-        // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
-        // as simple as possible.
-        const current = as.annotations.at(-1);
-        const currentPrediction = !current && as.predictions.at(-1);
+        // Server payloads are appended in API order (newest first — see AnnotationStore.addAnnotation).
+        // Select the newest annotation (index 0), not the oldest (last index).
+        const current = as.annotations[0];
+        const currentPrediction = !current && as.predictions[0];
 
         if (current) {
           as.selectAnnotation(current.id);
@@ -932,7 +1064,14 @@ export default types
           obj.reinitHistory();
         });
 
-        const current = as.annotations.at(-1);
+        // Last iteration left the oldest annotation selected; select the newest (API order: index 0).
+        if (as.annotations.length) {
+          as.selectAnnotation(as.annotations[0].id);
+        } else if (as.predictions.length) {
+          as.selectPrediction(as.predictions[0].id);
+        }
+
+        const current = as.annotations[0];
 
         if (current) current.setInitialValues();
 
@@ -965,12 +1104,19 @@ export default types
      * Hydrate a stubbed history item with full result (FIT-720 lazy load).
      * Called when the host fetches GET /api/annotation-history/<id>/ and passes the response.
      */
-    function hydrateHistoryItem(historyId, fullItem) {
+    function hydrateHistoryItem(historyItemId, fullItem) {
       const as = self.annotationStore;
-      // historyId is the numeric API id (pk); store items have id=guid and pk=numeric from createItem
-      const item = as.history.find((h) => h.pk && Number(h.pk) === Number(historyId));
+      // historyItemId is the MST guid (item.id from AnnotationHistory.tsx), which is unique per
+      // history entry. We cannot match by pk because the API can return multiple history records
+      // with the same pk (e.g. "accepted" and "updated" both share pk=248 for the same review).
+      const item = as.history.find((h) => h.id === historyItemId);
       if (!item) return;
       item.deserializeResults(fullItem?.result ?? [], { hidden: true });
+      // Mark as no longer a stub so subsequent clicks use selectHistory() directly
+      // instead of re-invoking the async hydration callback. Without this, clicking
+      // A → B → A again re-hydrates A and area.addResult() accumulates duplicate
+      // label results per region ("Car" → "Car, Car").
+      item.is_stub = false;
       as.selectHistory(item);
     }
 
@@ -1015,7 +1161,7 @@ export default types
     async function postponeTask() {
       const annotation = self.annotationStore.selected;
 
-      // save draft before postponing; this can be new draft with FF_DEV_4174 off
+      // save draft before postponing; this can be a new draft
       // or annotation created from prediction
       await annotation.saveDraft({ was_postponed: true });
       await getEnv(self).events.invoke("nextTask");
@@ -1068,9 +1214,15 @@ export default types
 
     return {
       setFlags,
+      setHydrated,
       addInterface,
       hasInterface,
       toggleInterface,
+      setCourseBottomBar,
+      setCommentHeaderExtra,
+      setHostPanel,
+      focusHostPanel,
+      setDescription,
 
       afterCreate,
       assignTask,
@@ -1081,6 +1233,10 @@ export default types
       setHistory,
       hydrateHistoryItem,
       attachHotkeys,
+      confirmDeleteAllRegions,
+      attachRejectActionHotkeys,
+      handleSubmitHotkey,
+      handleSkipHotkey,
 
       skipTask,
       unskipTask,
@@ -1113,12 +1269,8 @@ export default types
       incrementQueuePosition,
       beforeDestroy() {
         ToolsManager.removeAllTools();
-        appControls = null;
       },
 
-      setAppControls,
-      clearApp,
-      renderApp,
       selfDestroy() {
         const children = [];
 

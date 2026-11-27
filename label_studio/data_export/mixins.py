@@ -6,31 +6,54 @@ import shutil
 from datetime import datetime
 from functools import reduce
 
-from core.feature_flags import flag_set
 from core.redis import redis_connected, start_job_async_or_sync
 from core.utils.common import batch
 from core.utils.io import (
-    SerializableGenerator,
     get_all_dirs_from_dir,
     get_all_files_from_dir,
     get_temp_dir,
 )
+from data_export.functions import CONVERTER_ACCESS_TOKEN, converter_http_session
 from data_manager.models import View
 from django.conf import settings
 from django.core.files import File
 from django.core.files import temp as tempfile
-from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
+from fsm.serializer_fields import FSM_STATE_FIELDS_CONTEXT_KEY, fsm_state_fields_enabled
+from io_storages.localfiles.functions import project_local_files_resolver
 from label_studio_sdk.converter import Converter
-from tasks.models import Annotation, AnnotationDraft, Task
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from users.models import User
 
 ONLY = 'only'
 EXCLUDE = 'exclude'
 
 
 logger = logging.getLogger(__name__)
+
+
+def _with_state(queryset):
+    return queryset.with_state() if hasattr(queryset, 'with_state') else queryset
+
+
+def _is_expanded(field, expand):
+    return expand is None or field in expand
+
+
+def write_json_array(items, file):
+    """Stream items to a binary file as a JSON array.
+
+    Output must stay byte-identical to json.JSONEncoder(ensure_ascii=False).iterencode(list(items)); dumping item by
+    item uses the C encoder, which iterencode does not.
+    """
+    file.write(b'[')
+    for i, item in enumerate(items):
+        if i:
+            file.write(b', ')
+        file.write(json.dumps(item, ensure_ascii=False).encode('utf-8'))
+    file.write(b']')
 
 
 class ExportMixin:
@@ -41,6 +64,30 @@ class ExportMixin:
     def get_default_title(self):
         return f'{self.project.title.replace(" ", "-")}-at-{dateformat.format(timezone.now(), "Y-m-d-H-i")}'
 
+    def get_download_filename(self, file_name: str) -> str:
+        """Build a user-facing download filename from ``Export.title``.
+
+        Uses the slugified title combined with the 8-char md5 suffix already
+        present in the stored basename for uniqueness/cache-busting. Falls
+        back to the storage basename when the title is empty or slugifies
+        away (e.g. all special characters), preserving the legacy
+        ``project-{id}-at-{timestamp}-{md5}.{ext}`` pattern.
+        """
+        from django.utils.text import slugify
+
+        stored_basename = pathlib.PurePosixPath(file_name).name
+        stem, dot, ext = stored_basename.rpartition('.')
+        if not dot:
+            stem, ext = stored_basename, ''
+
+        slug = slugify(self.title or '')[:120].strip('-')
+        if not slug:
+            return stored_basename
+
+        md5_suffix = stem.rsplit('-', 1)[-1] if '-' in stem else ''
+        base = f'{slug}-{md5_suffix}' if md5_suffix else slug
+        return f'{base}.{ext}' if ext else base
+
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
         """
         task_filter_options: None or Dict({
@@ -48,43 +95,54 @@ class ExportMixin:
             skipped: optional None or str:("include|exclude")
             finished: optional None or str:("include|exclude")
             annotated: optional None or str:("include|exclude")
+            task_ids: optional list of task ids, internal use only (not exposed by the export API)
         })
+        Incremental window uses Export.since / Export.until (half-open [since, until)) even when
+        task_filter_options is omitted.
         """
-        if not isinstance(task_filter_options, dict):
-            return tasks
-        if 'view' in task_filter_options:
-            try:
-                value = int(task_filter_options['view'])
-                prepare_params = View.objects.get(project=self.project, id=value).get_prepare_tasks_params(
-                    add_selected_items=True
-                )
-                tab_tasks = Task.prepared.only_filtered(prepare_params=prepare_params).values_list('id', flat=True)
-                tasks = tasks.filter(id__in=tab_tasks)
-            except (ValueError, View.DoesNotExist) as exc:
-                logger.warning(f'Incorrect view params {exc}')
-        if 'skipped' in task_filter_options:
-            value = task_filter_options['skipped']
-            if value == ONLY:
-                tasks = tasks.filter(annotations__was_cancelled=True)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(annotations__was_cancelled=True)
-        if 'finished' in task_filter_options:
-            value = task_filter_options['finished']
-            if value == ONLY:
-                tasks = tasks.filter(is_labeled=True)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(is_labeled=True)
-        if 'annotated' in task_filter_options:
-            value = task_filter_options['annotated']
-            # if any annotation exists and is not cancelled
-            if value == ONLY:
-                tasks = tasks.filter(annotations__was_cancelled=False)
-            elif value == EXCLUDE:
-                tasks = tasks.exclude(annotations__was_cancelled=False)
+        if isinstance(task_filter_options, dict):
+            if 'task_ids' in task_filter_options:
+                tasks = tasks.filter(id__in=task_filter_options['task_ids'])
+            if 'view' in task_filter_options:
+                try:
+                    value = int(task_filter_options['view'])
+                    prepare_params = View.objects.get(project=self.project, id=value).get_prepare_tasks_params(
+                        add_selected_items=True
+                    )
+                    tab_tasks = Task.prepared.only_filtered(prepare_params=prepare_params).values_list('id', flat=True)
+                    tasks = tasks.filter(id__in=tab_tasks)
+                except (ValueError, View.DoesNotExist) as exc:
+                    logger.warning(f'Incorrect view params {exc}')
+            if 'skipped' in task_filter_options:
+                value = task_filter_options['skipped']
+                if value == ONLY:
+                    tasks = tasks.filter(annotations__was_cancelled=True)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(annotations__was_cancelled=True)
+            if 'finished' in task_filter_options:
+                value = task_filter_options['finished']
+                if value == ONLY:
+                    tasks = tasks.filter(is_labeled=True)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(is_labeled=True)
+            if 'annotated' in task_filter_options:
+                value = task_filter_options['annotated']
+                # if any annotation exists and is not cancelled
+                if value == ONLY:
+                    tasks = tasks.filter(annotations__was_cancelled=False)
+                elif value == EXCLUDE:
+                    tasks = tasks.exclude(annotations__was_cancelled=False)
+
+        since = getattr(self, 'since', None)
+        until = getattr(self, 'until', None)
+        if since is not None:
+            tasks = tasks.filter(updated_at__gte=since)
+        if until is not None:
+            tasks = tasks.filter(updated_at__lt=until)
 
         return tasks
 
-    def _get_filtered_annotations_queryset(self, annotation_filter_options=None):
+    def _get_filtered_annotations_queryset(self, annotation_filter_options=None, with_state=False, expand=None):
         """
         Filtering using disjunction of conditions
 
@@ -93,6 +151,8 @@ class ExportMixin:
             ground_truth: optional None or bool:("true|false")
             skipped: optional None or bool:("true|false")
         })
+        with_state: annotate prefetched reviews with their FSM state
+        expand: see get_task_queryset
         """
         queryset = Annotation.objects.all()
         if isinstance(annotation_filter_options, dict):
@@ -107,20 +167,29 @@ class ExportMixin:
                 q = reduce(lambda x, y: x | y, q_list)
                 queryset = queryset.filter(q)
 
-        # pre-select completed_by user info
-        queryset = queryset.select_related('completed_by')
+        if _is_expanded('annotations.completed_by', expand):
+            queryset = queryset.select_related('completed_by')
         # prefetch reviews in LSE
         if hasattr(queryset.model, 'reviews'):
             from reviews.models import AnnotationReview
 
-            queryset = queryset.prefetch_related(
-                Prefetch('reviews', queryset=AnnotationReview.objects.select_related('created_by'))
-            )
+            if _is_expanded('annotations.reviews', expand):
+                # the review serializer reads both history results
+                reviews_qs = AnnotationReview.objects.select_related(
+                    'previous_annotation_history', 'fixed_annotation_history'
+                )
+                if _is_expanded('annotations.reviews.created_by', expand):
+                    reviews_qs = reviews_qs.select_related('created_by')
+                if with_state:
+                    reviews_qs = _with_state(reviews_qs)
+            else:
+                reviews_qs = AnnotationReview.objects.only('id', 'annotation_id')
+            queryset = queryset.prefetch_related(Prefetch('reviews', queryset=reviews_qs.order_by('id')))
 
         return queryset
 
     @staticmethod
-    def _get_export_serializer_option(serialization_options):
+    def _get_export_serializer_option(serialization_options, project=None):
         options = {'expand': []}
         if isinstance(serialization_options, dict):
             if (
@@ -140,6 +209,8 @@ class ExportMixin:
             ].get('only_id'):
                 options['expand'].append('annotations.completed_by')
             options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
+            if project is not None:
+                options['context']['project'] = project
             if 'interpolate_key_frames' in serialization_options:
                 options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
             if serialization_options.get('include_annotation_history') is False:
@@ -149,40 +220,53 @@ class ExportMixin:
                 options['download_resources'] = True
         return options
 
-    def get_task_queryset(self, ids, annotation_filter_options):
-        from core.feature_flags import flag_set
+    def get_task_queryset(self, ids, annotation_filter_options, expand=None):
+        """expand: the export serializer's expand list. Relations it doesn't expand are serialized as IDs only, so
+        their payload isn't loaded. None loads everything."""
 
-        annotations_qs = self._get_filtered_annotations_queryset(annotation_filter_options=annotation_filter_options)
-
-        # Only annotate FSM state if both feature flags are enabled
+        # Only annotate FSM state if FSM state fields are enabled
         # This prevents unnecessary query annotations when state won't be serialized
-        user = getattr(self, 'created_by', None)
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(annotations_qs, 'with_state')
-        ):
-            annotations_qs = annotations_qs.with_state()
+        with_state = fsm_state_fields_enabled()
+
+        annotations_qs = self._get_filtered_annotations_queryset(
+            annotation_filter_options=annotation_filter_options, with_state=with_state, expand=expand
+        )
+        if _is_expanded('drafts', expand):
+            drafts_qs = AnnotationDraft.objects.select_related('user')
+            if with_state:
+                drafts_qs = _with_state(drafts_qs)
+        else:
+            drafts_qs = AnnotationDraft.objects.only('id', 'task_id')
+        if _is_expanded('predictions', expand):
+            predictions_qs = Prediction.objects.all()
+        else:
+            predictions_qs = Prediction.objects.only('id', 'task_id')
+        if with_state:
+            annotations_qs = _with_state(annotations_qs)
 
         qs = (
+            # everything is ordered by id: without it the output order depends on the query plan
             Task.objects.filter(id__in=ids)
+            .order_by('id')
             .select_related('file_upload')  # select_related more efficient for regular foreign-key relationship
             .prefetch_related(
-                Prefetch('annotations', queryset=annotations_qs),
-                Prefetch('drafts', queryset=AnnotationDraft.objects.select_related('user')),
-                'comment_authors',
+                Prefetch('annotations', queryset=annotations_qs.order_by('id')),
+                Prefetch('drafts', queryset=drafts_qs.order_by('id')),
+                Prefetch('predictions', queryset=predictions_qs.order_by('id')),
+                # only serialized as a list of IDs
+                Prefetch('comment_authors', queryset=User.objects.only('id').order_by('id')),
             )
         )
 
         # Add FSM state annotation to tasks as well to avoid N+1 queries during export
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(qs, 'with_state')
-        ):
-            qs = qs.with_state()
+        if with_state:
+            qs = _with_state(qs)
 
         return qs
+
+    def prepare_export_tasks(self, tasks, task_filter_options=None):
+        """Hook for subclasses to enrich task instances before serialization (e.g. agreement)."""
+        return tasks
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
@@ -212,43 +296,47 @@ class ExportMixin:
         logger.debug('Run get_task_queryset')
 
         start = datetime.now()
-        with transaction.atomic():
-            # TODO: make counters from queryset
-            # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
-            self.counters = {'task_number': 0}
-            all_tasks = self.project.tasks
-            logger.debug('Tasks filtration')
-            task_ids = list(
-                self._get_filtered_tasks(all_tasks, task_filter_options=task_filter_options)
-                .distinct()
-                .values_list('id', flat=True)
-            )
-            base_export_serializer_option = self._get_export_serializer_option(serialization_options)
-            i = 0
+        # TODO: make counters from queryset
+        # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
+        self.counters = {'task_number': 0}
+        all_tasks = self.project.tasks
+        logger.debug('Tasks filtration')
+        task_ids = list(
+            self._get_filtered_tasks(all_tasks, task_filter_options=task_filter_options)
+            .distinct()
+            .order_by('id')
+            .values_list('id', flat=True)
+        )
+        base_export_serializer_option = self._get_export_serializer_option(serialization_options, project=self.project)
+        # evaluated once instead of several times per task, annotation, review and draft
+        base_export_serializer_option.setdefault('context', {})[FSM_STATE_FIELDS_CONTEXT_KEY] = (
+            fsm_state_fields_enabled()
+        )
+        expand = base_export_serializer_option['expand']
+        i = 0
 
-            if flag_set('fflag_fix_back_plt_807_batch_size_26062025_short', self.project.organization.created_by):
-                BATCH_SIZE = self.project.get_task_batch_size()
-            else:
-                BATCH_SIZE = settings.BATCH_SIZE
+        BATCH_SIZE = self.project.get_task_batch_size()
 
-            for ids in batch(task_ids, BATCH_SIZE):
-                i += 1
-                tasks = list(self.get_task_queryset(ids, annotation_filter_options))
-                logger.debug(f'Batch: {i * BATCH_SIZE}')
-                if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
-                    tasks = [task for task in tasks if task.annotations.exists()]
+        for ids in batch(task_ids, BATCH_SIZE):
+            i += 1
+            tasks = list(self.get_task_queryset(ids, annotation_filter_options, expand=expand))
+            logger.debug(f'Batch: {i * BATCH_SIZE}')
+            if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
+                tasks = [task for task in tasks if task.annotations.exists()]
 
-                if serialization_options and serialization_options.get('include_annotation_history') is True:
-                    task_ids = [task.id for task in tasks]
-                    annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
-                    base_export_serializer_option = self.update_export_serializer_option(
-                        base_export_serializer_option, annotation_ids
-                    )
+            tasks = self.prepare_export_tasks(tasks, task_filter_options=task_filter_options)
 
-                serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
-                self.counters['task_number'] += len(tasks)
-                for task in serializer.data:
-                    yield task
+            if serialization_options and serialization_options.get('include_annotation_history') is True:
+                task_ids = [task.id for task in tasks]
+                annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
+                base_export_serializer_option = self.update_export_serializer_option(
+                    base_export_serializer_option, annotation_ids
+                )
+
+            serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
+            self.counters['task_number'] += len(tasks)
+            for task in serializer.data:
+                yield task
         duration = datetime.now() - start
         logger.info(
             f'{self.counters["task_number"]} tasks from project {self.project_id} exported in {duration.total_seconds():.2f} seconds'
@@ -285,19 +373,13 @@ class ExportMixin:
             f'serialization_options: {serialization_options}\n'
         )
         try:
-            iter_json = json.JSONEncoder(ensure_ascii=False).iterencode(
-                SerializableGenerator(
-                    self.get_export_data(
-                        task_filter_options=task_filter_options,
-                        annotation_filter_options=annotation_filter_options,
-                        serialization_options=serialization_options,
-                    )
-                )
+            export_data = self.get_export_data(
+                task_filter_options=task_filter_options,
+                annotation_filter_options=annotation_filter_options,
+                serialization_options=serialization_options,
             )
             with tempfile.NamedTemporaryFile(suffix='.export.json', dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
-                for chunk in iter_json:
-                    encoded_chunk = chunk.encode('utf-8')
-                    file.write(encoded_chunk)
+                write_json_array(export_data, file)
                 file.seek(0)
 
                 md5 = self.eval_md5(file)
@@ -340,7 +422,7 @@ class ExportMixin:
                 serialization_options=serialization_options,
             )
 
-    def convert_file(self, to_format, download_resources=False, hostname=None):
+    def convert_file(self, to_format, download_resources=False, hostname=None, user=None):
         logger.info(
             ('Starting export conversion: export_id=%s project_id=%s to_format=%s download_resources=%s hostname=%s'),
             self.id,
@@ -359,9 +441,10 @@ class ExportMixin:
                 project_dir=None,
                 upload_dir=out_dir,
                 download_resources=download_resources,
-                # for downloading resource we need access to the API
-                access_token=self.project.organization.created_by.auth_token.key,
+                access_token=CONVERTER_ACCESS_TOKEN,
                 hostname=hostname,
+                local_files_resolver=project_local_files_resolver(self.project),
+                http_session=converter_http_session(hostname, user),
             )
             input_name = pathlib.Path(self.file.name).name
             input_file_path = pathlib.Path(tmp_dir) / input_name

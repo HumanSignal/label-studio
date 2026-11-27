@@ -16,7 +16,7 @@ stages:
     name: create_tasks
     request:
       files:
-        json_file: tests/data_manager/filters/float_tasks.json
+        json_file: label_studio/tests/data_manager/filters/float_tasks.json
       headers:
         content-type: multipart/form-data
       method: POST

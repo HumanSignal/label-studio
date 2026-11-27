@@ -1,10 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { Message, type MessageProps } from "./message";
 import { IconUpload } from "@humansignal/icons";
 
 // Mock the styles since they're SCSS modules
-jest.mock("./message.module.css", () => ({
+mockModule("./message.module.css", () => ({
   base: "base",
   // Size classes
   "size-medium": "size-medium",
@@ -15,6 +14,9 @@ jest.mock("./message.module.css", () => ({
   "variant-negative": "variant-negative",
   "variant-positive": "variant-positive",
   "variant-warning": "variant-warning",
+  // Look classes
+  "look-filled": "look-filled",
+  "look-ghost": "look-ghost",
   // Element classes
   icon: "icon",
   content: "content",
@@ -57,6 +59,20 @@ describe("Message Component", () => {
     expect(screen.getByTestId("message")).toHaveClass("variant-primary");
   });
 
+  it("applies correct look classes", () => {
+    const { rerender } = render(<Message {...defaultProps} look="filled" data-testid="message" />);
+
+    expect(screen.getByTestId("message")).toHaveClass("look-filled");
+
+    rerender(<Message {...defaultProps} look="ghost" data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("look-ghost");
+  });
+
+  it("defaults to card look", () => {
+    render(<Message {...defaultProps} data-testid="message" />);
+    expect(screen.getByTestId("message")).toHaveClass("look-filled");
+  });
+
   it("applies correct size classes", () => {
     const { rerender } = render(<Message {...defaultProps} size="medium" data-testid="message" />);
 
@@ -71,14 +87,14 @@ describe("Message Component", () => {
     expect(screen.getByTestId("message")).toHaveClass("size-medium");
   });
 
-  it("normalizes variant aliases to primary variants", () => {
-    const { rerender } = render(<Message {...defaultProps} variant="info" data-testid="message" />);
+  it("applies the class of each colour", () => {
+    const { rerender } = render(<Message {...defaultProps} variant="primary" data-testid="message" />);
     expect(screen.getByTestId("message")).toHaveClass("variant-primary");
 
-    rerender(<Message {...defaultProps} variant="error" data-testid="message" />);
+    rerender(<Message {...defaultProps} variant="negative" data-testid="message" />);
     expect(screen.getByTestId("message")).toHaveClass("variant-negative");
 
-    rerender(<Message {...defaultProps} variant="success" data-testid="message" />);
+    rerender(<Message {...defaultProps} variant="positive" data-testid="message" />);
     expect(screen.getByTestId("message")).toHaveClass("variant-positive");
   });
 
@@ -149,7 +165,7 @@ describe("Message Component", () => {
     expect(boldElement.tagName).toBe("STRONG");
 
     // Verify the full title text is present
-    const titleElement = screen.getByText((content, element) => {
+    const titleElement = screen.getByText((_content, element) => {
       return element?.textContent === "This is a bold title";
     });
     expect(titleElement).toBeInTheDocument();
@@ -181,7 +197,7 @@ describe("Message Component", () => {
   });
 
   it("calls onClose when close button is clicked", () => {
-    const onClose = jest.fn();
+    const onClose = mock();
     render(<Message {...defaultProps} closable onClose={onClose} />);
 
     const closeButton = screen.getByTestId("message-dismiss-button");
@@ -261,7 +277,7 @@ describe("Message Component", () => {
   });
 
   it("renders with all features combined", () => {
-    const onClose = jest.fn();
+    const onClose = mock();
     render(
       <Message
         variant="warning"

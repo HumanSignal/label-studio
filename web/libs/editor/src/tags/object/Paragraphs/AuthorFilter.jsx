@@ -22,7 +22,7 @@ const AuthorTag = ({ name, selected }) => {
   );
 };
 
-const renderMultipleSelected = (selected) => {
+const _renderMultipleSelected = (selected) => {
   if (selected.length === 0) return null;
 
   return (
@@ -65,14 +65,7 @@ export const AuthorFilter = observer(({ item, onChange }) => {
 
   return (
     <div className={styles.authorFilter}>
-      <Select
-        placeholder={placeholder}
-        options={options}
-        onChange={onFilterChange}
-        size="compact"
-        multiple={true}
-        searchable={true}
-      />
+      <Select placeholder={placeholder} options={options} onChange={onFilterChange} multiple={true} searchable={true} />
     </div>
   );
 });

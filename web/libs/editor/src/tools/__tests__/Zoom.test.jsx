@@ -10,11 +10,11 @@ function makeMockObj() {
     zoomScale: 2,
     zoomingPositionX: 0,
     zoomingPositionY: 0,
-    setZoomPosition: jest.fn(),
-    handleZoom: jest.fn(),
-    sizeToFit: jest.fn(),
-    sizeToAuto: jest.fn(),
-    sizeToOriginal: jest.fn(),
+    setZoomPosition: mock(),
+    handleZoom: mock(),
+    sizeToFit: mock(),
+    sizeToAuto: mock(),
+    sizeToOriginal: mock(),
     container,
   };
 }

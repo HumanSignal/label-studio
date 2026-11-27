@@ -1,0 +1,17 @@
+{% extends 'simple.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<div class="login_page">
+  <h1>Are you sure you want to log out?</h1>
+  <form id="logout-confirm-form" method="post" action="{{ settings.HOSTNAME }}/logout">
+    {% csrf_token %}
+    <p><button id="logout-confirm" type="submit" class="ls-button ls-button_look_primary">Log out</button></p>
+  </form>
+  <p><a href="{{ settings.HOSTNAME }}/">Cancel</a></p>
+</div>
+{% endblock %}

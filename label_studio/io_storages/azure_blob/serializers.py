@@ -2,13 +2,13 @@
 
 from core.utils.exceptions import extract_message
 from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 
 class AzureBlobImportStorageSerializer(ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default='azure')
+    type = StorageTypeField(default='azure')
     presign = serializers.BooleanField(required=False, default=True)
     secure_fields = ['account_name', 'account_key']
 
@@ -42,7 +42,7 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
 
 
 class AzureBlobExportStorageSerializer(ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default='azure')
+    type = StorageTypeField(default='azure')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

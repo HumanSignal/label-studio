@@ -32,7 +32,7 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 - `3.233.209.176`
 
 #### Outbound connections IP addresses
-*Used for Import/Export, ML backends, and Prompts*
+*Used for Import/Export, storage proxy, ML backends, and Prompts*
 
 - `3.219.3.197`
 - `34.237.73.3`
@@ -46,7 +46,7 @@ app.humansignal.eu sends emails from the `humansignal.eu` domain by using [SendG
 - `18.153.87.16`
 
 #### Outbound connections IP addresses
-*Used for Import/Export, ML backends, and Prompts*
+*Used for Import/Export, storage proxy, ML backends, and Prompts*
 
 - `52.59.18.15`
 - `18.194.85.62`
@@ -79,6 +79,16 @@ Label Studio imposes rate limits on a per-Access Token basis. If a request excee
 |--------------------------|---------------|
 | Maximum import file size | 200 MB        |
 | Timeout for page load    | 90 seconds    |
+
+## Webhook limits
+
+The following limits apply to [webhooks](webhooks.html):
+
+| Setting                    | Limit      |
+|----------------------------|------------|
+| Timeout for webhook response | 10 seconds |
+
+If a webhook fails 50 times in a row, it is automatically disabled by the system. A failure includes any non-`2xx` response, connection errors, or a response that exceeds the 10 second timeout. To re-enable a disabled webhook, resolve the issue with the receiving endpoint and reactivate the webhook in the project or organization webhook settings.
 
 ## Activity log retention
 

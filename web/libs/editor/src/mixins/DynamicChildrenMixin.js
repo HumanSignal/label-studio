@@ -78,6 +78,9 @@ const DynamicChildrenMixin = types
           if (!valueFromTask) return;
 
           self.updateWithDynamicChildren(valueFromTask, store);
+          // Refresh the RandomizableMixin snapshot now that children have
+          // been replaced; the previous shuffled order is stale.
+          self.reshuffle?.();
           if (self.annotation) {
             self.annotation.setupHotKeys();
             self.needsUpdate?.();

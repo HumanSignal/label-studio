@@ -1,5 +1,5 @@
 import type React from "react";
-import { IconExternal } from "@humansignal/ui";
+import { IconExternal } from "@humansignal/icons";
 
 interface EmptyStateProps {
   icon: React.ReactNode;

@@ -1,12 +1,12 @@
 /**
  * Unit tests for SpanText mixin (mixins/SpanText.js)
  */
-import { getRoot, types } from "mobx-state-tree";
+import { types } from "mobx-state-tree";
 
 const mockSpans = () => {
   const spans = [
-    { style: {}, className: "", setAttribute: jest.fn(), scrollIntoView: jest.fn(), scrollIntoViewIfNeeded: jest.fn() },
-    { style: {}, className: "", setAttribute: jest.fn() },
+    { style: {}, className: "", setAttribute: mock(), scrollIntoView: mock(), scrollIntoViewIfNeeded: mock() },
+    { style: {}, className: "", setAttribute: mock() },
   ];
   spans.forEach((s) => {
     s.onmouseover = null;
@@ -17,19 +17,25 @@ const mockSpans = () => {
   return spans;
 };
 
-jest.mock("../../utils/html", () => ({
-  highlightRange: jest.fn((_self, _cssClass, _cssStyle) => mockSpans()),
+mockModule("../../utils/html", () => ({
+  highlightRange: mock((_self, _cssClass, _cssStyle) => mockSpans()),
 }));
 
-jest.mock("../../utils", () => ({
+mockModule("../../utils", () => ({
+  ...(requireActual("../../utils") ?? {}),
   __esModule: true,
   default: {
+    ...((requireActual("../../utils") ?? {}).default ?? {}),
     Colors: {
-      convertToRGBA: jest.fn((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : null)),
-      rgbaChangeAlpha: jest.fn((_color, alpha) => `rgba(0,0,0,${alpha})`),
+      ...(((requireActual("../../utils") ?? {}).default ?? {}).Colors ?? {}),
+      getScaleGradient:
+        (requireActual("../../utils") ?? {}).Colors?.getScaleGradient ??
+        ((requireActual("../../utils") ?? {}).default ?? {}).Colors?.getScaleGradient,
+      convertToRGBA: mock((color, alpha) => (color ? `rgba(0,0,0,${alpha})` : null)),
+      rgbaChangeAlpha: mock((_color, alpha) => `rgba(0,0,0,${alpha})`),
     },
     HTML: {
-      labelWithCSS: jest.fn(() => "htx-label-test"),
+      labelWithCSS: mock(() => "htx-label-test"),
     },
   },
 }));
@@ -54,9 +60,9 @@ const Base = types
     highlighted: false,
     annotation: { isLinkingMode: false },
     _highlighted: false,
-    toggleHighlight: jest.fn(),
-    setHighlight: jest.fn(),
-    onClickRegion: jest.fn(),
+    toggleHighlight: mock(),
+    setHighlight: mock(),
+    onClickRegion: mock(),
   }))
   .actions((self) => ({
     setParent(p) {
@@ -191,7 +197,7 @@ describe("SpanTextMixin", () => {
 
     it("sets className when parent.showlabels and settings.showLabels", () => {
       const { model } = getTestTree();
-      const span = { style: {}, className: "", setAttribute: jest.fn() };
+      const span = { style: {}, className: "", setAttribute: mock() };
       model.applyCSSClass(span);
       expect(span.className).toContain("htx-highlight");
     });
@@ -200,7 +206,7 @@ describe("SpanTextMixin", () => {
       const root = Root.create({ settings: { showLabels: false }, region: {} });
       const model = root.region;
       model.setParent({ showlabels: false });
-      const span = { style: {}, className: "", setAttribute: jest.fn() };
+      const span = { style: {}, className: "", setAttribute: mock() };
       model.applyCSSClass(span);
       expect(span.className).toContain("htx-no-label");
     });
@@ -227,7 +233,7 @@ describe("SpanTextMixin", () => {
       const spans = mockSpans();
       model.addEventsToSpans(spans);
       model.setHidden(true);
-      expect(() => spans[0].onmouseover({ stopPropagation: jest.fn() })).not.toThrow();
+      expect(() => spans[0].onmouseover({ stopPropagation: mock() })).not.toThrow();
     });
 
     it("onmouseover when isLinkingMode calls toggleHighlight and stopPropagation", () => {
@@ -235,7 +241,7 @@ describe("SpanTextMixin", () => {
       const spans = mockSpans();
       model.addEventsToSpans(spans);
       model.setAnnotation({ isLinkingMode: true });
-      const ev = { stopPropagation: jest.fn() };
+      const ev = { stopPropagation: mock() };
       spans[0].onmouseover(ev);
       expect(ev.stopPropagation).toHaveBeenCalled();
       expect(model.toggleHighlight).toHaveBeenCalled();
@@ -245,7 +251,7 @@ describe("SpanTextMixin", () => {
       const { model } = getTestTree();
       const spans = mockSpans();
       model.addEventsToSpans(spans);
-      spans[0].onmouseover({ stopPropagation: jest.fn() });
+      spans[0].onmouseover({ stopPropagation: mock() });
       expect(spans[0].style.cursor).toBeDefined();
     });
 
@@ -274,7 +280,7 @@ describe("SpanTextMixin", () => {
       const { model } = getTestTree();
       const spans = mockSpans();
       model.addEventsToSpans(spans);
-      const ev = { stopPropagation: jest.fn() };
+      const ev = { stopPropagation: mock() };
       const spanEl = spans[0];
       spanEl.onmousedown.call(spanEl, ev);
       expect(ev.stopPropagation).toHaveBeenCalled();
@@ -320,7 +326,7 @@ describe("SpanTextMixin", () => {
       const { model } = getTestTree();
       const spans = mockSpans();
       delete spans[0].scrollIntoViewIfNeeded;
-      spans[0].scrollIntoView = jest.fn();
+      spans[0].scrollIntoView = mock();
       model._spans = spans;
       model.selectRegion();
       expect(spans[0].scrollIntoView).toHaveBeenCalledWith({ block: "center", behavior: "smooth" });
@@ -371,7 +377,7 @@ describe("SpanTextMixin", () => {
 
     it("accepts event with stopPropagation", () => {
       const { model } = getTestTree();
-      const e = { stopPropagation: jest.fn() };
+      const e = { stopPropagation: mock() };
       model.toggleHidden(e);
       expect(e.stopPropagation).toHaveBeenCalled();
     });

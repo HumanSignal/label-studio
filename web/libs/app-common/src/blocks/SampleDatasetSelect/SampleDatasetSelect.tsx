@@ -16,7 +16,7 @@ export function SampleDatasetSelect({
   sample?: Sample;
   onSampleApplied: (sample?: Sample) => void;
 }) {
-  const title = useMemo(() => {
+  const _title = useMemo(() => {
     return sample?.title ?? "Select sample";
   }, [sample]);
 

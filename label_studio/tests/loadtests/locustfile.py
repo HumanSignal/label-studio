@@ -124,7 +124,7 @@ class WebsiteUser(HttpUser):
         response = self.client.get('/')
         csrftoken = response.cookies['csrftoken']
         username = str(uuid4())
-        payload = {'email': f'{username}@loadtest.me', 'password': '12345678', 'title': username.upper()}
+        payload = {'email': f'{username}@loadtest.me', 'password': 'qNpC-opxvYm.ttg4', 'title': username.upper()}
         self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
         response = self.client.get('/api/current-user/token').json()
         self.client.token = response['detail']

@@ -4,7 +4,7 @@ import { guidGenerator } from "../core/Helpers";
 import Result from "../regions/Result";
 import { PER_REGION_MODES } from "./PerRegion";
 import { ReadOnlyRegionMixin } from "./ReadOnlyMixin";
-import { FF_LSDV_4930, FF_TAXONOMY_LABELING, isFF } from "../utils/feature-flags";
+import { FF_LSDV_4930, isFF } from "../utils/feature-flags";
 
 let ouid = 1;
 
@@ -68,8 +68,6 @@ export const AreaMixinBase = types
 
     // special tags that can be used for labeling (only <Taxonomy isLabeling/> for now)
     get labelingTags() {
-      if (!isFF(FF_TAXONOMY_LABELING)) return [];
-
       return self.annotation.toNames.get(self.object.name)?.filter((tag) => tag.classification && tag.isLabeling) || [];
     },
 

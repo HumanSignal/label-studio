@@ -19,12 +19,6 @@ const suiteConfig = {
 };
 
 describe("Video Timeline Region Loop Playback", suiteConfig, () => {
-  beforeEach(() => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short: true,
-    });
-  });
-
   describe("Single Region Playback", () => {
     it("Should play selected region from beginning to end and stop", () => {
       LabelStudio.params()

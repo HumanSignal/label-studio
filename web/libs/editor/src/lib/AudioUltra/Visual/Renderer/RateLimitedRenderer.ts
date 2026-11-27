@@ -11,6 +11,7 @@ export class RateLimitedRenderer {
     drawFn: (context: any) => void;
   } | null = null;
   private drawScheduled = false;
+  private executing = false;
   private _fps = RATE_LIMITED_RENDER_FPS;
   private _minFrameTime: number = 1000 / RATE_LIMITED_RENDER_FPS;
   private currentWindowStart = 0;
@@ -73,10 +74,13 @@ export class RateLimitedRenderer {
     const timeSinceWindowStart = now - this.currentWindowStart;
 
     if (timeSinceWindowStart >= this.minFrameTime) {
-      // We're in a new time window, draw immediately
-      this.executeDraw();
-      this.lastDrawTime = now;
+      // Advance the window before drawing so reentrant scheduleDraw calls during
+      // executeDraw() defer via setTimeout instead of recursing synchronously.
       this.currentWindowStart = now;
+      if (!this.executing) {
+        this.executeDraw();
+      }
+      this.lastDrawTime = now;
     } else if (!this.drawScheduled) {
       // Schedule the draw for the start of the next time window
       this.drawScheduled = true;
@@ -95,13 +99,17 @@ export class RateLimitedRenderer {
   }
 
   private executeDraw() {
-    if (this.pendingDraw) {
+    if (!this.pendingDraw || this.executing) return;
+    this.executing = true;
+    try {
       const { getContext, drawFn } = this.pendingDraw;
       // Get fresh context values at draw time
       const context = getContext();
       drawFn(context);
       this.pendingDraw = null;
       this.drawScheduled = false;
+    } finally {
+      this.executing = false;
     }
   }
 
@@ -112,6 +120,7 @@ export class RateLimitedRenderer {
     this.lastDrawTime = 0;
     this.pendingDraw = null;
     this.drawScheduled = false;
+    this.executing = false;
     this.currentWindowStart = performance.now();
     if (this.zoomDebounce) {
       clearTimeout(this.zoomDebounce);

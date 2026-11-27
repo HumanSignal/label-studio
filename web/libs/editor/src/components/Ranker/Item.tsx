@@ -53,7 +53,7 @@ const Item = (props: ItemProps) => {
                     type="button"
                     variant="neutral"
                     leading={collapsed ? <IconChevronDown /> : <IconChevron />}
-                    look="string"
+                    look="ghost"
                     size="small"
                     className="ml-auto"
                   />

@@ -16,13 +16,12 @@ from io_storages.api import (
 )
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImportStorageSerializer
+from io_storages.serializers import build_storage_validate_serializer, build_storage_write_serializer
 
-from .openapi_schema import (
-    _redis_export_storage_schema,
-    _redis_export_storage_schema_with_id,
-    _redis_import_storage_schema,
-    _redis_import_storage_schema_with_id,
-)
+RedisImportStorageWriteSerializer = build_storage_write_serializer(RedisImportStorageSerializer)
+RedisImportStorageValidateSerializer = build_storage_validate_serializer(RedisImportStorageSerializer)
+RedisExportStorageWriteSerializer = build_storage_write_serializer(RedisExportStorageSerializer)
+RedisExportStorageValidateSerializer = build_storage_validate_serializer(RedisExportStorageSerializer)
 
 
 @method_decorator(
@@ -54,9 +53,7 @@ from .openapi_schema import (
         tags=['Storage: Redis'],
         summary='Create import storage',
         description='Create a new Redis import storage connection.',
-        request={
-            'application/json': _redis_import_storage_schema,
-        },
+        request=RedisImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'redis'],
             'x-fern-sdk-method-name': 'create',
@@ -89,9 +86,7 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
         tags=['Storage: Redis'],
         summary='Update import storage',
         description='Update a specific Redis import storage connection.',
-        request={
-            'application/json': _redis_import_storage_schema,
-        },
+        request=RedisImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'redis'],
             'x-fern-sdk-method-name': 'update',
@@ -168,9 +163,7 @@ class RedisExportStorageSyncAPI(ExportStorageSyncAPI):
         tags=['Storage: Redis'],
         summary='Validate import storage',
         description='Validate a specific Redis import storage connection.',
-        request={
-            'application/json': _redis_import_storage_schema_with_id,
-        },
+        request=RedisImportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'redis'],
@@ -189,9 +182,7 @@ class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
         tags=['Storage: Redis'],
         summary='Validate export storage',
         description='Validate a specific Redis export storage connection.',
-        request={
-            'application/json': _redis_export_storage_schema_with_id,
-        },
+        request=RedisExportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'redis'],
@@ -232,9 +223,7 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Redis'],
         summary='Create export storage',
         description='Create a new Redis export storage connection to store annotations.',
-        request={
-            'application/json': _redis_export_storage_schema,
-        },
+        request=RedisExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'redis'],
             'x-fern-sdk-method-name': 'create',
@@ -267,9 +256,7 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
         tags=['Storage: Redis'],
         summary='Update export storage',
         description='Update a specific Redis export storage connection.',
-        request={
-            'application/json': _redis_export_storage_schema,
-        },
+        request=RedisExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'redis'],
             'x-fern-sdk-method-name': 'update',

@@ -20,7 +20,11 @@ class Command(BaseCommand):
 
         for project in projects:
             logger.debug(f'Start processing project {project.id}.')
-            start_job_async_or_sync(update_tasks_counters, project.tasks.all())
+            start_job_async_or_sync(
+                update_tasks_counters,
+                project.tasks.all(),
+                job_tenant=project.organization_id,
+            )
             logger.debug(f'End processing project {project.id}.')
 
         logger.debug(f'Organization {options["organization"]} stats were recalculated.')

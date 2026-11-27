@@ -9,7 +9,7 @@ from wsgiref.util import FileWrapper
 import pandas as pd
 import requests
 from core import utils
-from core.feature_flags import all_flags, flag_set, get_feature_file_path
+from core.feature_flags import all_flags, get_feature_file_path
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 from core.utils.io import find_file
@@ -37,10 +37,7 @@ def main(request):
             return redirect(reverse('user-login'))
 
         # business mode access
-        if flag_set('fflag_all_feat_dia_1777_ls_homepage_short', user):
-            return render(request, 'home/home.html')
-        else:
-            return redirect(reverse('projects:project-index'))
+        return render(request, 'home/home.html')
 
     # not authenticated
     return redirect(reverse('user-login'))
@@ -200,9 +197,19 @@ def static_file_with_host_resolver(path_on_disk, content_type):
 def feature_flags(request):
     user = request.user
     if not user.is_authenticated:
-        return HttpResponseForbidden()
+        from jwt_auth.auth import TokenAuthenticationPhaseout
+        from rest_framework.exceptions import AuthenticationFailed
 
-    flags = all_flags(request.user)
+        try:
+            auth_result = TokenAuthenticationPhaseout().authenticate(request)
+        except AuthenticationFailed:
+            return HttpResponseForbidden()
+        if auth_result is None:
+            return HttpResponseForbidden()
+        user, _ = auth_result
+        request.user = user
+
+    flags = all_flags(user)
     flags['$system'] = {
         'FEATURE_FLAGS_DEFAULT_VALUE': settings.FEATURE_FLAGS_DEFAULT_VALUE,
         'FEATURE_FLAGS_FROM_FILE': settings.FEATURE_FLAGS_FROM_FILE,

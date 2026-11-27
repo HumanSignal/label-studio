@@ -3,11 +3,11 @@ import { EnterpriseBadge } from "./enterprise-badge";
 
 const meta: Meta<typeof EnterpriseBadge> = {
   component: EnterpriseBadge,
-  title: "UI/EnterpriseBadge",
+  title: "Product/EnterpriseBadge",
   argTypes: {
-    style: {
+    look: {
       control: "select",
-      options: ["filled", "outline", "ghost", "solid"],
+      options: ["filled", "outlined", "ghost", "solid"],
     },
     shape: {
       control: "select",
@@ -30,35 +30,35 @@ export const Default: Story = {
 export const WithLabel: Story = {
   args: {
     children: "Enterprise",
-    style: "filled",
+    look: "filled",
   },
 };
 
 export const Ghost: Story = {
   args: {
     children: "Enterprise",
-    style: "ghost",
+    look: "ghost",
   },
 };
 
 export const Outline: Story = {
   args: {
     children: "Enterprise",
-    style: "outline",
+    look: "outlined",
   },
 };
 
 export const Solid: Story = {
   args: {
     children: "Enterprise",
-    style: "solid",
+    look: "solid",
   },
 };
 
 export const IconOnlyAndGhost: Story = {
   args: {
     children: "",
-    style: "ghost",
+    look: "ghost",
   },
 };
 
@@ -94,9 +94,9 @@ export const AllStyles: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3 items-center">
       <EnterpriseBadge>Enterprise</EnterpriseBadge>
-      <EnterpriseBadge style="outline">Enterprise</EnterpriseBadge>
-      <EnterpriseBadge style="ghost">Enterprise</EnterpriseBadge>
-      <EnterpriseBadge style="solid">Enterprise</EnterpriseBadge>
+      <EnterpriseBadge look="outlined">Enterprise</EnterpriseBadge>
+      <EnterpriseBadge look="ghost">Enterprise</EnterpriseBadge>
+      <EnterpriseBadge look="solid">Enterprise</EnterpriseBadge>
     </div>
   ),
 };

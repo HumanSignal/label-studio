@@ -148,3 +148,38 @@ export const absoluteURL = (path = "") => {
 export const isDefined = <T>(value?: T): value is NonNullable<T> => {
   return value !== null && value !== undefined;
 };
+
+/**
+ * Parse the Data Manager `query` URL param (JSON with selectedItems, filters, ordering).
+ * Tolerates single- and double-encoded values from routing (URLSearchParams + manual encode).
+ */
+export const parseDmQueryParam = (query: string | undefined | null): Record<string, unknown> => {
+  if (!query) return {};
+
+  const candidates = new Set<string>([query]);
+
+  try {
+    candidates.add(decodeURIComponent(query));
+  } catch {
+    // ignore malformed escape sequences
+  }
+
+  try {
+    candidates.add(decodeURIComponent(decodeURIComponent(query)));
+  } catch {
+    // ignore double-encoded malformed payloads
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // try next decode candidate
+    }
+  }
+
+  return {};
+};

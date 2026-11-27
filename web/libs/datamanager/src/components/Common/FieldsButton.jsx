@@ -1,12 +1,16 @@
 import { EnterpriseBadge, Tooltip } from "@humansignal/ui";
+import { FF_PROJECT_DM_COLUMN_DEFAULTS, isActive } from "@humansignal/core/lib/utils/feature-flags";
 import { inject, observer } from "mobx-react";
 import { useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "../../utils/bem";
+import { currentUserIsManagingDmRole } from "../../stores/Tabs/project_column_defaults";
 import { ColumnPicker } from "./ColumnPicker";
+import { ResetColumnsButton } from "../DataManager/Toolbar/ResetColumnsButton";
 
 const injector = inject(({ store }) => {
   return {
+    view: store.currentView,
     columns: Array.from(store.currentView?.targetColumns ?? []),
   };
 });
@@ -14,62 +18,95 @@ const injector = inject(({ store }) => {
 /**
  * Columns visibility picker (multi-select). Used by toolbar and Table quick view.
  * Single-select pickers (Order By, Filter column) use ColumnPicker directly.
+ *
+ * `showProjectDefaultsFooter` — main-grid Columns only (FIT-2847). Quick View omits the
+ * Reset / Manage Defaults / Save as Default footer because defaults apply to explore only.
+ * Annotators/Reviewers also omit the footer slot entirely (FIT-2991) — Select still mounts
+ * the bordered footer chrome when `footer` is a React element, even if children render null.
  */
 
 export const FieldsButton = injector(
-  observer(({ columns, title, icon, filter, tooltip, className, "data-testid": dataTestId }) => {
-    const value = useMemo(() => columns.filter((c) => !c.is_hidden).map((c) => c.key), [columns]);
+  observer(
+    ({
+      view,
+      columns,
+      title,
+      icon,
+      filter,
+      tooltip,
+      className,
+      showProjectDefaultsFooter = false,
+      "data-testid": dataTestId,
+    }) => {
+      // `is_hidden` is observable, so it has to be read on every render: memoizing on `columns`
+      // alone froze the selection at whatever was visible when the column list was last rebuilt,
+      // and the picker restored that stale selection whenever it remounted (FIT-2406). The memo
+      // only keeps the array reference stable, since ColumnPicker re-seeds on a new `value`.
+      const visibleColumnKeys = columns.filter((c) => !c.is_hidden).map((c) => c.key);
+      const visibleColumnsSignature = visibleColumnKeys.join("\u0000");
+      const value = useMemo(() => visibleColumnKeys, [visibleColumnsSignature]);
+      const readOnly = view?.isLockedByManager;
+      // Do not pass a React element as `footer` for AN/RE — Select treats elements as truthy and
+      // still draws the bordered padded shell even when ResetColumnsButton returns null.
+      const showDefaultsFooter =
+        showProjectDefaultsFooter && isActive(FF_PROJECT_DM_COLUMN_DEFAULTS) && currentUserIsManagingDmRole();
 
-    const handleChange = useCallback(
-      (keys) => {
-        const selectedSet = new Set(keys ?? []);
-        flushSync(() => {
-          for (const col of columns) {
-            if (!col.toggleVisibility) continue;
-            const shouldBeVisible = selectedSet.has(col.key);
-            const isVisible = !col.is_hidden;
-            if (shouldBeVisible !== isVisible) col.toggleVisibility();
+      const handleChange = useCallback(
+        (keys) => {
+          if (readOnly) return;
+          const selectedSet = new Set(keys ?? []);
+          flushSync(() => {
+            for (const col of columns) {
+              if (!col.toggleVisibility) continue;
+              const shouldBeVisible = selectedSet.has(col.key);
+              const isVisible = !col.is_hidden;
+              if (shouldBeVisible !== isVisible) col.toggleVisibility();
+            }
+          });
+        },
+        [columns, readOnly],
+      );
+
+      const picker = (
+        <ColumnPicker
+          columns={columns}
+          columnFilter={filter}
+          value={value}
+          onChange={handleChange}
+          multiple
+          placeholder={title}
+          renderSelected={() =>
+            icon ? (
+              <>
+                {icon} {title}
+              </>
+            ) : (
+              title
+            )
           }
-        });
-      },
-      [columns],
-    );
+          dataTestid={dataTestId}
+          readOnly={readOnly}
+          triggerClassName={className}
+          triggerProps={{
+            style: {
+              minWidth: 110,
+            },
+          }}
+          footer={showDefaultsFooter ? <ResetColumnsButton enableSaveAsDefault /> : undefined}
+        />
+      );
 
-    const picker = (
-      <ColumnPicker
-        columns={columns}
-        columnFilter={filter}
-        value={value}
-        onChange={handleChange}
-        multiple
-        placeholder={title}
-        renderSelected={() =>
-          icon ? (
-            <>
-              {icon} {title}
-            </>
-          ) : (
-            title
-          )
-        }
-        dataTestid={dataTestId}
-        triggerClassName={className}
-        triggerProps={{
-          style: {
-            minWidth: 110,
-          },
-        }}
-      />
-    );
-
-    return tooltip ? (
-      <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
-        <Tooltip title={tooltip}>{picker}</Tooltip>
-      </div>
-    ) : (
-      picker
-    );
-  }),
+      return tooltip && !readOnly ? (
+        <Tooltip title={tooltip}>
+          <div className={`${cn("field-button").toClassName()} flex items-center`} style={{ zIndex: 1000 }}>
+            {picker}
+          </div>
+        </Tooltip>
+      ) : (
+        picker
+      );
+    },
+  ),
 );
 
 // Kept for backward compatibility — no longer used internally but may be
@@ -89,7 +126,7 @@ FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge 
       </div>
       {enterpriseBadge && (
         <div style={{ flexShrink: 0 }}>
-          <EnterpriseBadge style="ghost" />
+          <EnterpriseBadge look="ghost" />
         </div>
       )}
     </div>

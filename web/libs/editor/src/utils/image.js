@@ -222,7 +222,7 @@ export function getTransformedImageData(
   imageDisplayedInBrowserHeight,
   viewportWidth,
   viewportHeight,
-  zoomScale,
+  _zoomScale,
   zoomingPositionX,
   zoomingPositionY,
   negativezoom,
@@ -295,7 +295,7 @@ export function getTransformedImageData(
 
   try {
     transformedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  } catch (err) {
+  } catch (_err) {
     const msg = "Please configure CORS cross-domain headers correctly for getting image labeling data";
 
     alert(msg);

@@ -1,8 +1,7 @@
-import { flow, getRoot, types } from "mobx-state-tree";
+import { flow, getRoot, types, isAlive } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { isDefined } from "../../utils/utils";
 import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pagination/Pagination";
-import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 const listIncludes = (list, id) => {
   const index = id !== undefined ? Array.from(list).findIndex((item) => item.id === id) : -1;
@@ -66,7 +65,8 @@ const MixinBase = types
         self.selected = selected;
         self.highlighted = selected;
 
-        getRoot(self).SDK.invoke("taskSelected");
+        const root = getRoot(self);
+        root.SDK?.invoke?.("taskSelected");
       }
     },
 
@@ -125,6 +125,8 @@ const MixinBase = types
       self.list = [];
       self.page = 0;
       self.total = 0;
+      // FIT-2376: keep Spinner (not EmptyState) while tab switch fetch is in flight
+      self.loading = true;
     },
   }));
 
@@ -159,6 +161,8 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
     .volatile(() => ({
       requestId: null,
       debouncedFetch: null,
+      // First page of a visit should not sit behind the filter/search debounce.
+      initialFetchDispatched: false,
     }))
     .actions((self) => ({
       updateItem(itemID, patch) {
@@ -258,7 +262,9 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
+        const data = yield root.apiCall(apiMethod, params);
+
+        if (!isAlive(self)) return;
 
         // We cancel current request processing if request id
         // changed during the request. It indicates that something
@@ -269,20 +275,13 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         }
 
         const highlightedID = self.highlighted;
-        const apiMethodSettings = root.API.getSettingsByMethodName(apiMethod);
         const { total, [apiMethod]: list } = data;
-        let associatedList = [];
-
-        if (isFF(FF_LOPS_E_3) && apiMethodSettings?.associatedType) {
-          associatedList = data[apiMethodSettings?.associatedType];
-        }
 
         if (list)
           self.setList({
             total,
             list,
             reload: reload || isDefined(pageNumber),
-            associatedList,
           });
 
         if (isDefined(highlightedID) && !listIncludes(self.list, highlightedID)) {
@@ -296,18 +295,18 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
         root.SDK.invoke("dataFetched", self);
       }),
 
-      // Public fetch function that uses debouncing
+      // Public fetch function. The first reload paints the grid immediately.
+      // Later filter and search updates keep the debounce so typing does not
+      // fire a request per keystroke.
       fetch({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
         const params = { id, query, pageNumber, reload, interaction, pageSize };
-        const root = getRoot(self);
-        // Only use debouncing for virtual tabs that use queries (like search/filter tabs)
-        const currentView = root.viewsStore.selected;
-        // const isVirtualTab = currentView?.virtual && currentView?.query;
 
-        // Initialize debounced function if not already done
+        if (!self.initialFetchDispatched) {
+          self.initialFetchDispatched = true;
+          return self._performFetch(params);
+        }
+
         self.initDebouncedFetch();
-
-        // For virtual tabs with queries, use debounced version
         return self.debouncedFetch(params);
       },
 

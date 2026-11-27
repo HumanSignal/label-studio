@@ -15,9 +15,6 @@ import {
   perItemNumberResult,
   requiredPerItemMIGNumberConfig,
 } from "../../../data/control_tags/per-item";
-import { commonBeforeEach } from "./common";
-
-beforeEach(commonBeforeEach);
 
 /* <Number /> */
 describe("Classification - single image - Number", () => {

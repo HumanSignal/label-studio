@@ -1,23 +1,21 @@
-import { ff } from "@humansignal/core";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { Events } from "../Common/Events";
 import { audioDecoderPool } from "./AudioDecoderPool";
 import { type BaseAudioDecoder, DEFAULT_FREQUENCY_HZ } from "./BaseAudioDecoder";
 
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
-
 export interface WaveformAudioOptions {
   src?: string;
   splitChannels?: boolean;
-  decoderType?: "ffmpeg" | "webaudio" | "none";
+  decoderType?: "ffmpeg" | "webaudio" | "none" | "wasm-stream";
   playerType?: "html5" | "webaudio";
+  wf?: any;
 }
 
 interface WaveformAudioEvents {
   decodingProgress: (chunk: number, total: number) => void;
+  chunkLoaded: (chunk: number) => void;
   canplay: () => void;
   resetSource: () => void;
-  waiting: () => void;
 }
 
 export class WaveformAudio extends Events<WaveformAudioEvents> {
@@ -31,12 +29,13 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   // private backed by audio element and getters/setters
   // underscored to keep the public API clean
   private splitChannels = false;
-  private decoderType: "ffmpeg" | "webaudio" | "none" = "ffmpeg";
+  private decoderType: "ffmpeg" | "webaudio" | "none" | "wasm-stream" = "ffmpeg";
   private playerType: "html5" | "webaudio" = "html5";
   private src?: string;
   private mediaResolve?: () => void;
   private hasLoadedSource = false;
   private _durationOverride?: number; // Used when decoder is "none"
+  private wf?: any;
 
   constructor(options: WaveformAudioOptions) {
     super();
@@ -44,6 +43,7 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     this.decoderType = options.decoderType ?? this.decoderType;
     this.playerType = options.playerType ?? this.playerType;
     this.src = options.src;
+    this.wf = options.wf;
     this.createAudioDecoder();
     this.createMediaElement();
   }
@@ -79,7 +79,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     } catch {
       // ignore
     }
-    this.decoder?.cancel();
   }
 
   /**
@@ -140,8 +139,12 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   async initDecoder(arraybuffer?: ArrayBuffer) {
     if (!this.decoder) return;
 
-    if (!this.decoderPromise && arraybuffer) {
-      this.decoderPromise = this.decoder.init(arraybuffer);
+    if (!this.decoderPromise) {
+      if (this.decoderType === "wasm-stream") {
+        this.decoderPromise = this.decoder.init();
+      } else if (arraybuffer) {
+        this.decoderPromise = this.decoder.init(arraybuffer);
+      }
     }
 
     return this.decoderPromise;
@@ -187,9 +190,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
 
     this.el.addEventListener("canplaythrough", this.mediaReady);
     this.el.addEventListener("error", this.mediaError);
-    if (isSyncedBuffering) {
-      this.el.addEventListener("waiting", this.mediaWaiting);
-    }
     this.loadMedia();
   }
 
@@ -202,15 +202,6 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
       // otherwise it's an unrecoverable error
       this.mediaReject?.(this.el?.error);
     }
-  };
-
-  mediaWaiting = () => {
-    // If this has already buffered the time segment we are on, we don't need to report waiting
-    if (this.el && this.el.buffered.length > 0 && this.el.currentTime > this.el.buffered.end(0)) {
-      return;
-    }
-
-    this.invoke("waiting");
   };
 
   mediaReady = () => {
@@ -238,10 +229,14 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
 
     if (!this.src || this.decoder) return;
 
-    this.decoder = audioDecoderPool.getDecoder(this.src, this.splitChannels, this.decoderType);
+    this.decoder = audioDecoderPool.getDecoder(this.src, this.splitChannels, this.decoderType, this.wf);
 
     this.decoder.on("progress", (chunk, total) => {
       this.invoke("decodingProgress", [chunk, total]);
+    });
+
+    this.decoder.on("chunkLoaded", (chunk) => {
+      this.invoke("chunkLoaded", [chunk]);
     });
   }
 }

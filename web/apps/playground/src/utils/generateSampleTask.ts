@@ -1,18 +1,23 @@
 import { createUtcFormatter } from "./date";
 
-// Wikimedia Commons public domain sample URLs
-const SAMPLE_IMAGE = "https://app.heartex.ai/static/samples/sample.jpg";
-const SAMPLE_IMAGE2 = "https://app.heartex.ai/static/samples/sample.jpg"; //"https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg";
+// Serves `Access-Control-Allow-Origin: *`, which the Image tag needs because it loads
+// with crossOrigin="anonymous" by default, and is same-origin with the deployed playground.
+const SAMPLE_ASSETS_BASE = "https://labelstud.io/static/samples";
+const SAMPLE_IMAGE = `${SAMPLE_ASSETS_BASE}/sample.jpg`;
+const SAMPLE_IMAGE2 = `${SAMPLE_ASSETS_BASE}/sample.jpg`; //"https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg";
+// Wikimedia Commons public domain sample URL
 const SAMPLE_AUDIO =
   "https://upload.wikimedia.org/wikipedia/commons/9/9d/Bach_-_Cello_Suite_no._1_in_G_major,_BWV_1007_-_I._Pr%C3%A9lude.ogg";
-const SAMPLE_VIDEO = "https://app.heartex.ai/static/samples/opossum_snow.mp4";
+const SAMPLE_VIDEO = `${SAMPLE_ASSETS_BASE}/opossum_snow.mp4`;
 const SAMPLE_VIDEO_EMBED = `<video src='${SAMPLE_VIDEO}' width=100% controls></video>`;
 const SAMPLE_HTML =
   '<div style="max-width: 750px"><div style="clear: both"><div style="float: right; display: inline-block; border: 1px solid #F2F3F4; background-color: #F8F9F9; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>Jules</b>: No no, Mr. Wolfe, it\'s not like that. Your help is definitely appreciated.</p></div></div><div style="clear: both"><div style="float: right; display: inline-block; border: 1px solid #F2F3F4; background-color: #F8F9F9; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>Vincent</b>: Look, Mr. Wolfe, I respect you. I just don\'t like people barking orders at me, that\'s all.</p></div></div><div style="clear: both"><div style="display: inline-block; border: 1px solid #D5F5E3; background-color: #EAFAF1; border-radius: 5px; padding: 7px; margin: 10px 0;"><p><b>The Wolf</b>: If I\'m curt with you, it\'s because time is a factor. I think fast, I talk fast, and I need you two guys to act fast if you want to get out of this. So pretty please, with sugar on top, clean the car.</p></div></div></div>';
 const SAMPLE_WEBSITE = "<a href='https://labelstud.io'>https://labelstud.io</a>";
-const SAMPLE_PDF_EMBED = "<embed src='https://app.heartex.ai/static/samples/sample.pdf' width='100%' height='600px'/>";
+const SAMPLE_PDF_EMBED = `<embed src='${SAMPLE_ASSETS_BASE}/sample.pdf' width='100%' height='600px'/>`;
 const SAMPLE_WEBSITE_EMBED = "<iframe src='https://labelstud.io' width='100%' height='600px'/>";
-const SAMPLE_CSV = "https://app.heartex.ai/samples/time-series.csv";
+// Not under SAMPLE_ASSETS_BASE: this endpoint generates the series from query params
+// (time/values/sep/tf/type) and is only served by the app host.
+const SAMPLE_CSV = "https://app.humansignal.com/samples/time-series.csv";
 const SAMPLE_OCR_IMAGE = "https://htx-pub.s3.amazonaws.com/demo/ocr/example.jpg";
 
 const randomFloat = (min: number, max: number) => Math.random() * (max - min) + min;
@@ -79,9 +84,10 @@ const generateTimeseriesData = (
 // Override fetch for CSV and other static files that would produce a CORS error potentially
 const originalFetch = global.fetch;
 // @ts-ignore
-global.fetch = async (url: string) => {
-  if (url.startsWith(SAMPLE_CSV)) {
-    const params = new URLSearchParams(url.split("?")[1]);
+global.fetch = async (url: any, ...args: any[]) => {
+  const urlString = url instanceof URL ? url.toString() : String(url);
+  if (urlString.startsWith(SAMPLE_CSV)) {
+    const params = new URLSearchParams(urlString.split("?")[1]);
     const timeColumn = params.get("time") || "None";
     const values = params.get("values");
     const separator = params.get("sep") || ",";
@@ -96,7 +102,7 @@ global.fetch = async (url: string) => {
     });
     return new Response(data as string);
   }
-  return originalFetch(url);
+  return originalFetch(url, ...args);
 };
 
 // Format based on timeFormat
@@ -129,7 +135,7 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
   let xml: Document;
   try {
     xml = parser.parseFromString(`<View>${config}</View>`, "text/xml");
-  } catch (e) {
+  } catch (_e) {
     return { id: 1, data: {}, annotations: [{ id: 1, result: [] }], predictions: [] };
   }
 
@@ -157,7 +163,7 @@ export async function generateSampleTaskFromConfig(config: string): Promise<{
               break;
             }
           }
-        } catch (e) {
+        } catch (_e) {
           // Ignore invalid JSON in comments
         }
       }

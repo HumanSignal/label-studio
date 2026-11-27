@@ -16,20 +16,31 @@ Usage:
             fields = ['id', 'data', 'state', ...]
 
 Note:
-    All state serialization functionality is guarded by TWO feature flags:
-    1. 'fflag_feat_fit_568_finite_state_management' - Controls FSM background calculations
-    2. 'fflag_feat_fit_710_fsm_state_fields' - Controls state field display in APIs
-
-    When either flag is disabled, fields return None. This allows enabling FSM background
-    work while keeping state fields hidden during incremental rollout and testing.
+    All state serialization functionality is guarded by `settings.FSM_ENABLED`.
+    When FSM is disabled (e.g., in LSO), fields return None.
 """
 
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
+from django.conf import settings
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from fsm.state_manager import StateManager
 from rest_framework import serializers
 
+FSM_STATE_FIELDS_CONTEXT_KEY = 'fsm_state_fields_enabled'
 
+
+def fsm_state_fields_enabled(context=None):
+    """Whether FSM state fields are enabled.
+
+    Serializers that render many objects (e.g. exports) can resolve this once and put it in their context
+    under FSM_STATE_FIELDS_CONTEXT_KEY; otherwise `settings.FSM_ENABLED` is evaluated.
+    """
+    if context and FSM_STATE_FIELDS_CONTEXT_KEY in context:
+        return context[FSM_STATE_FIELDS_CONTEXT_KEY]
+    return bool(getattr(settings, 'FSM_ENABLED', False))
+
+
+@extend_schema_field(OpenApiTypes.STR)
 class FSMStateField(serializers.ReadOnlyField):
     """
     Read-only DRF field for exposing FSM state.
@@ -87,11 +98,7 @@ class FSMStateField(serializers.ReadOnlyField):
         # Check both feature flags (works for both core and enterprise)
         # 1. General FSM functionality (background calculations)
         # 2. State field display control (API exposure)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             return None
 
         if instance is None:

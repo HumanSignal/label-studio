@@ -1,82 +1,43 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom";
 import { ViewToggle } from "./ViewToggle";
 
-// Mock the UI components
-jest.mock("@humansignal/ui", () => ({
-  Tabs: ({ children, value, onValueChange }: any) => (
-    <div
-      data-testid="tabs"
-      data-value={value}
-      onClick={(e: any) => {
-        const target = e.target as HTMLElement;
-        if (target.dataset.value) {
-          onValueChange(target.dataset.value);
-        }
-      }}
-    >
-      {children}
-    </div>
-  ),
-  TabsList: ({ children, className }: any) => (
-    <div data-testid="tabs-list" className={className}>
-      {children}
-    </div>
-  ),
-  TabsTrigger: ({ children, value }: any) => (
-    <button type="button" data-testid={`tab-${value}`} data-value={value}>
-      {children}
-    </button>
-  ),
-}));
-
 describe("ViewToggle Component", () => {
-  const defaultProps = {
-    view: "code" as const,
-    onViewChange: jest.fn(),
-  };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe("View Mode Toggle", () => {
-    it("should render code and interactive view tabs", () => {
-      render(<ViewToggle {...defaultProps} />);
+    it("should render code and interactive view options", () => {
+      render(<ViewToggle view="code" onViewChange={mock()} />);
 
-      expect(screen.getByTestId("tab-code")).toBeInTheDocument();
-      expect(screen.getByTestId("tab-interactive")).toBeInTheDocument();
-      expect(screen.getByTestId("tab-code")).toHaveTextContent("Code");
-      expect(screen.getByTestId("tab-interactive")).toHaveTextContent("Interactive");
+      expect(screen.getByRole("radio", { name: "Code" })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: "Interactive" })).toBeInTheDocument();
     });
 
     it("should call onViewChange when switching view modes", async () => {
       const user = userEvent.setup();
-      const mockOnViewChange = jest.fn();
+      const onViewChange = mock();
 
-      render(<ViewToggle {...defaultProps} onViewChange={mockOnViewChange} />);
+      render(<ViewToggle view="code" onViewChange={onViewChange} />);
 
-      await user.click(screen.getByTestId("tab-interactive"));
+      await user.click(screen.getByRole("radio", { name: "Interactive" }));
 
-      expect(mockOnViewChange).toHaveBeenCalledWith("interactive");
+      expect(onViewChange).toHaveBeenCalledWith("interactive");
     });
 
-    it("should reflect current view value in tabs", () => {
-      render(<ViewToggle {...defaultProps} view="interactive" />);
+    it("should reflect current view value", () => {
+      render(<ViewToggle view="interactive" onViewChange={mock()} />);
 
-      expect(screen.getByTestId("tabs")).toHaveAttribute("data-value", "interactive");
+      expect(screen.getByRole("radio", { name: "Interactive" })).toHaveAttribute("aria-checked", "true");
+      expect(screen.getByRole("radio", { name: "Code" })).toHaveAttribute("aria-checked", "false");
     });
 
     it("should switch from interactive to code view", async () => {
       const user = userEvent.setup();
-      const mockOnViewChange = jest.fn();
+      const onViewChange = mock();
 
-      render(<ViewToggle view="interactive" onViewChange={mockOnViewChange} />);
+      render(<ViewToggle view="interactive" onViewChange={onViewChange} />);
 
-      await user.click(screen.getByTestId("tab-code"));
+      await user.click(screen.getByRole("radio", { name: "Code" }));
 
-      expect(mockOnViewChange).toHaveBeenCalledWith("code");
+      expect(onViewChange).toHaveBeenCalledWith("code");
     });
   });
 });

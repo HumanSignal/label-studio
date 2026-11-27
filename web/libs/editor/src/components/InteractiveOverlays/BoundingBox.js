@@ -73,6 +73,26 @@ const stageRelatedBBox = (region, bbox) => {
   };
 };
 
+const videoRegionBBox = (region, getShapeBbox) => {
+  const wa = region.parent?.workingArea;
+  const stage = region.parent?.stageRef;
+  if (!wa || !stage) return DEFAULT_BBOX;
+
+  const shapeBbox = getShapeBbox();
+  if (!shapeBbox) return DEFAULT_BBOX;
+
+  const stageContainer = stage.content || stage.container?.();
+  const stageDomBbox = Geometry.getDOMBBox(stageContainer, true);
+  if (!stageDomBbox) return DEFAULT_BBOX;
+
+  return {
+    x: stageDomBbox.x + shapeBbox.left * wa.scale + wa.x,
+    y: stageDomBbox.y + shapeBbox.top * wa.scale + wa.y,
+    width: (shapeBbox.right - shapeBbox.left) * wa.scale,
+    height: (shapeBbox.bottom - shapeBbox.top) * wa.scale,
+  };
+};
+
 const _detect = (region) => {
   // that's a tricky way to detect bbox of exact result instead of whole region
   // works for global classifications and per-regions
@@ -137,6 +157,28 @@ const _detect = (region) => {
             height: bbox.bottom - bbox.top,
           })
         : DEFAULT_BBOX;
+    }
+    case "videovectorregion": {
+      return videoRegionBBox(region, () => {
+        const shapeBbox = region.vectorRef?.getShapeBoundingBox?.();
+        if (!shapeBbox || shapeBbox.left === undefined) return null;
+        return shapeBbox;
+      });
+    }
+    case "videoregion":
+    case "videorectangleregion": {
+      return videoRegionBBox(region, () => {
+        const frame = region.parent?.currentFrame ?? region.parent?.frame;
+        const shape = region.getShape?.(frame);
+        if (!shape) return null;
+        const wa = region.parent?.workingArea;
+        if (!wa) return null;
+        const left = (shape.x / 100) * wa.realWidth;
+        const top = (shape.y / 100) * wa.realHeight;
+        const right = left + (shape.width / 100) * wa.realWidth;
+        const bottom = top + (shape.height / 100) * wa.realHeight;
+        return { left, top, right, bottom };
+      });
     }
     default: {
       console.warn(`Unknown region type: ${region.type}`);

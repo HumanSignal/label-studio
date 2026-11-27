@@ -1,15 +1,12 @@
+/**
+ * Canonical registry for all frontend feature flag constants (FF_*).
+ * Add new flags here only — do not define new constants in editor, datamanager,
+ * LSE, or app-level feature-flags files. Use via `import { ff } from "@humansignal/core"`.
+ * See `.agents/skills/feature-flags/SKILL.md`.
+ */
+
 //// LEGACY FLAGS ////
 // Consider all pre-XFN flags legacy. Should be revised and removed.
-
-/**
- * Fix displaying of created_at in the review mode
- */
-export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short";
-
-/**
- * Model version selector per model backend
- */
-export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
 
 /**
  * Enables "Enterprise Awareness" features
@@ -27,47 +24,16 @@ export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
  * Joyride
  */
 export const FF_PRODUCT_TOUR = "fflag_feat_dia_1697_product_tour_short";
-/**
- * It adds an unsaved changes warning and fix some caching problems on a saving project
- */
-export const FF_UNSAVED_CHANGES = "fflag_feat_front_leap_1198_unsaved_changes_180724";
 
 /**
  * Enables JWT tokens
  */
 export const FF_AUTH_TOKENS = "fflag__feature_develop__prompts__dia_1829_jwt_token_auth";
 
-export const FF_IMPROVE_GLOBAL_ERROR_MESSAGES = "fflag_feat_front_optic_1746_improve_global_error_messages_short";
-
-/**
- * Enable new home page for LSO and LSE
- */
-export const FF_HOMEPAGE = "fflag_all_feat_dia_1777_ls_homepage_short";
-
 /**
  * Sample datasets UI for the import flow
  */
 export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_data_short";
-
-/**
- * JSON preview window for the import flow
- */
-export const FF_JSON_PREVIEW = "fflag_feat_dia_1925_view_sample_raw_json_short";
-
-/**
- * Enables the theme toggle in the UI to enable the dark mode
- */
-export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
-
-/**
- * Fixes synced audio/video buffering
- */
-export const FF_SYNCED_BUFFERING = "fflag_fix_front_fit_31_synced_media_buffering";
-
-/**
- * Enables enterprise email notifications
- */
-export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email_notifications_short";
 
 /**
  * New storage providers experience
@@ -76,24 +42,9 @@ export const FF_ENTERPRISE_EMAIL_NOTIFICATIONS = "fflag_feat_front_fit_183_email
 export const FF_NEW_STORAGES = "fflag_feat_bros_193_new_cloud_storage_providers_short";
 
 /**
- * Datamanager filter members
- */
-export const FF_DM_FILTER_MEMBERS = "fflag_feat_fit_449_datamanager_filter_members_short";
-
-/**
  * Modify MST models to allow custom tags
  */
 export const FF_CUSTOM_TAGS = "fflag_feat_front_bros_194_custom_tags_short";
-
-/**
- * Multiple labels support for region creation - improved label blocks handling
- */
-export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_labels_regions_short";
-
-/**
- * Agreement Filtered
- */
-export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
 
 /**
  * Consensus control-tag agreement (v2) — enables dimension-based agreement calculation
@@ -103,9 +54,17 @@ export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_co
 export const FF_UTC_428_CONSENSUS_CONTROL_TAG_AGREEMENT = "fflag_utc_428_consensus_control_tag_agreement";
 
 /**
- * FSM State Fields
+ * Add or update task-data columns from the Data Manager.
  */
-export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
+export const FF_UTC_1012_ADD_OR_MODIFY_COLUMNS = "fflag_utc_1012_add_or_modify_columns";
+
+/**
+ * Reusable organization members filtering engine.
+ */
+export const FF_UTC_1206_REUSEABLE_MEMBERS_FILTERING = "fflag_utc_1206_reuseable_members_filtering";
+
+/** Replace the existing table filter bar with FilterShell (UTC-1166). */
+export const FF_UTC_1166_FILTER_SHELL = "fflag_utc_1166_filter_shell";
 
 /**
  * Starter Cloud (Self Serve) plan
@@ -114,19 +73,241 @@ export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
 export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 
 /**
- * Preview performance improvements - uses lightweight static preview for large configs
+ * Use agreement dashboard v2 in Task Summary ViewAll summary tab
  */
-export const FF_PREVIEW_PERFORMANCE = "fflag_fix_all_fit_287_preview_performance_improvements";
+export const FF_UTC_554_AGREEMENT_V2_IN_TASK_SUMMARY_VIEW = "fflag_feat_utc_554_agreement_v2_in_task_summary_view";
+/**
+ * LSE project hub: Dashboard + Members under a shared layout
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3 = "fflag_feat_front_lse_project_dashboards_v3_short";
 
 /**
- * Lazy load annotations in LabelStream to improve performance for tasks with many annotations
- * Also enables virtualization of annotation tabs carousel
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_all_fit_720_lazy_load_annotations
+ * LSE project throughput: Velocity and Diagnostics replacement of the old Project Dashboard view.
  */
-export const FF_FIT_720_LAZY_LOAD_ANNOTATIONS = "fflag_fix_all_fit_720_lazy_load_annotations";
+export const FF_LSE_PROJECT_DASHBOARDS_V3_THROUGHPUT = "fflag_feat_lse_project_dashboards_v3_throughput_short";
 
 /**
- * Analytics Label Distribution page
+ * LSE project throughput: Velocity / Diagnostics tabbed UI and Diagnostics tab (FIT-1678).
  */
-export const FF_FIT_1443_ANALYTICS_LABEL_DISTRIBUTION_PAGE =
-  "fflag_feat_all_fit_1443_analytics_label_distribution_page";
+export const FF_LSE_PROJECT_DASHBOARDS_V3_DIAGNOSTICS = "fflag_feat_lse_project_dashboards_v3_diagnostics_short";
+
+/**
+ * LSE project hub: redesigned Members dashboard (performance + inter-rater reliability) under Dashboard V3.
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3_MEMBERS = "fflag_feat_lse_project_dashboards_v3_members_short";
+
+/**
+ * LSE project hub: Data Quality tab (FIT-1634) — Agreement analysis sub-tab consumes
+ * the FIT-1633 endpoints; Label distribution sub-tab is a placeholder owned by FIT-1536.
+ */
+export const FF_LSE_PROJECT_DASHBOARDS_V3_DATA_QUALITY = "fflag_feat_lse_project_dashboards_v3_data_quality_short";
+
+/**
+ * Enables filtered Label Distribution reads and their Data Quality filter-state shell.
+ */
+export const FF_FILTERED_LABEL_DISTRIBUTION = "fflag_feat_all_fit_2318_filtered_label_distribution";
+
+/**
+ * Show per-item classifications (like Choices or Taxonomy) alongside regions in the Outliner panel
+ */
+export const FF_CLASSIFICATIONS_IN_OUTLINER = "fflag_feat_front_bros_766_per_item_in_outliner";
+
+/**
+ * Segment Anything via ML backend — server-side SAM2 flow. Controls the
+ * editor-side interactive UI (point / box prompts, Accept, Track).
+ */
+export const FF_SEGMENT_ANYTHING_ML_BACKEND = "fflag_feat_bros_951_ml_backend_short";
+
+/**
+ * Non-antd Taxonomy control (design-system tree + search) for the Taxonomy tag and comment classifications.
+ */
+export const FF_ECHO_466_TAXONOMY_ANTD_REMOVAL = "fflag_feat_all_echo_466_taxonomy_antd_removal_short";
+
+/**
+ * New drafts + undo/redo architecture in the new editor (`editor-shell`).
+ * When OFF, both editors behave exactly as today (existing draft / `screenHistoryAtom` path).
+ * When ON, the editor-shell routes changes through the Canvas / UndoRedoStack / Draft / DraftBridge
+ * model (per-annotation undo/redo, draft as a separate concept, host-owned debounce/persistence).
+ * See docs/drafts/DRAFTS.md.
+ */
+export const FF_INTERFACES_NEW_DRAFTS = "fflag_feat_interfaces_new_drafts";
+
+/**
+ * Annotation course builder for project onboarding and workforce learning.
+ */
+export const FF_ANNOTATION_COURSE_BUILDER = "fflag_feat_annotation_course_builder";
+
+/**
+ * Enable Interfaces section for custom labeling interface builder.
+ */
+export const FF_INTERFACES = "fflag_feat_all_optic_interfaces_short";
+
+/**
+ * AI agent workflow inside Custom Interfaces (chat, plan mode, tool loop).
+ * Requires FF_INTERFACES; when off, users can still author interfaces manually in the code editor.
+ */
+export const FF_INTERFACES_AGENT_WORKFLOW = "fflag_feat_interfaces_agent_workflow";
+
+/**
+ * In-browser interface interaction tests (scenarios.js, Tests tab, agent scenario tools).
+ * Requires FF_INTERFACES; when off, the Create Interface agent does not author or run tests.
+ */
+export const FF_INTERFACES_SCENARIOS = "fflag_feat_interfaces_scenarios";
+
+/**
+ * FIT-3504: after the Interfaces agent creates a screen, screenshot it, have a UI/UX reviewer judge the layout and
+ * apply the reviewer's fixes (at most two rounds). Requires FF_INTERFACES_AGENT_WORKFLOW.
+ */
+export const FF_INTERFACES_VISUAL_REVIEW = "fflag_feat_fit_3504_interface_visual_review_short";
+
+/**
+ * Dynamic Interface Components (e.g. AudioCanvas) and component-level skills/hotkeys for Custom Interfaces.
+ */
+export const FF_INTERFACES_COMPONENTS = "fflag_interfaces_components";
+
+/**
+ * WASM FFmpeg Streaming Decoder (progressive seek/decode) for long compressed audio files
+ */
+export const FF_FIT_2003_WASM_STREAMING_DECODER = "fflag_feat_front_fit_2003_wasm_streaming_decoder";
+
+/**
+ * Virtualized JSON viewer (Task Source, Code tab) and CodeMirror 6 editor path.
+ * When off, JsonViewer and CodeEditor use the legacy json-edit-react / CM5 implementations.
+ */
+export const FF_FIT_2007_VIRTUALIZED_JSON_EDITOR = "fflag_feat_fit_2007_virtualized_json_editor_short";
+
+/**
+ * LSE-only "Description (Internal)" project field — a manager-only notes field stored on
+ * LseProject, editable in Project Settings and Create Project, and displayed on the Projects
+ * page (cards/table) under the public description.
+ */
+export const FF_LSE_PROJECT_INTERNAL_DESCRIPTION = "fflag_feat_lse_project_internal_description_short";
+
+/**
+ * Project Settings: Managers+ default Data Manager column visibility and order
+ * for the main grid (FIT-2808 / FIT-2845).
+ */
+export const FF_PROJECT_DM_COLUMN_DEFAULTS = "fflag_feat_all_fit_2808_project_dm_column_defaults";
+
+/**
+ * Project Settings: Annotator/Reviewer Data Manager column hard access
+ * (Available / Unavailable). FIT-2808 / FIT-2850.
+ */
+export const FF_PROJECT_DM_COLUMN_ACCESS = "fflag_feat_all_fit_2808_dm_column_access";
+
+/**
+ * Vertical annotations sidebar with filtering and resizable column in labeling UI.
+ */
+export const FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT = "fflag_feat_front_fit_annotations_vertical_layout_short";
+
+/**
+ * View-Only users: free, bounded read-only billing seat type.
+ * Rollout flag for the backend foundation (membership type,
+ * `max_view_only_users` entitlement, paid-seat exclusion, reporting).
+ */
+export const FF_VIEW_ONLY_USERS = "fflag_feat_back_fit_2196_view_only_users_short";
+
+/**
+ * Flex Seats: enterprise-only, time-boxed working memberships.
+ */
+export const FF_FLEX_SEATS = "fflag_feat_back_fit_2313_flex_seats_short";
+
+/**
+ * Contributor opt-in to projects: project setting that lets contributors join
+ * eligible projects themselves (workforce/services organizations only).
+ */
+export const FF_CONTRIBUTOR_OPT_IN = "fflag_feat_utc_1064_contributor_opt_in";
+
+/**
+ * Review stream "By Annotator" task ordering: review one annotator's work at a
+ * time for a configured coverage percent before rotating to another annotator.
+ */
+export const FF_UTC_1079_REVIEW_ORDER_BY_ANNOTATOR = "fflag_feat_utc_1079_review_order_by_annotator";
+
+/**
+ * Ask AI "Annotator mode" (UTC-1233): a switch in the assistant panel that lets somebody running a
+ * project be answered exactly as one of their own annotators would be, so they can see for
+ * themselves what their workforce is told. Experiment gate, off by default, and layered on top of
+ * the workforce rollout flag — with that one off the server refuses every question asked in this
+ * mode, so the switch is not offered either.
+ */
+export const FF_ASK_AI_ANNOTATOR_MODE = "fflag_utc_1233_admin_sees_worker_toggle_ask_ai";
+
+/**
+ * Ask AI "Agent" (UTC-1233): the assistant answers by looking things up for itself — the project,
+ * the task, the annotation, the courses — instead of being handed one fixed bundle of context. The
+ * only thing this flag decides in the browser is whether the "Think longer" control is offered in
+ * the composer; whether a question is actually answered by the agent is decided per organization
+ * on the assistant's own side, so with the flag on but the agent not enabled the control is simply
+ * a slower ordinary answer rather than a broken one.
+ */
+export const FF_ASK_AI_AGENT = "fflag_utc_1233_ask_ai_agent";
+
+/**
+ * Manual payment batches (UTC-1260): an org admin creates, on a Program's Pay runs tab, a batch of
+ * fixed-amount corrections (worker email + amount + note) as a draft, and approves it in a separate,
+ * explicit step. Off everywhere until switched on per organization — an absent flag means OFF, so the
+ * frontend checks it with an explicit ``false`` default rather than the app-wide flag default.
+ */
+export const FF_MANUAL_BATCHES = "fflag_feat_utc_1260_manual_batches_short";
+
+/**
+ * Azure SPI secretless authentication: auth_mode=workload_identity uses constrained
+ * DefaultAzureCredential (workload identity + managed identity only). Default off.
+ */
+export const FF_AZURE_SPI_WORKLOAD_IDENTITY = "fflag_feat_back_fit_2608_azure_spi_workload_identity_short";
+
+/**
+ * Persist Data Manager column drag-order on the shared tab (like visibility) and
+ * disable the personal browser key `dm:columnorder`. Independent of FIT-2808
+ * project defaults (`FF_PROJECT_DM_COLUMN_DEFAULTS`). FIT-2882.
+ */
+export const FF_DM_SHARED_COLUMN_ORDER = "fflag_feat_fit_2882_dm_shared_column_order";
+
+/** Owner/Administrator "Close account" button in the Organization → Members drawer. UTC-1373. */
+export const FF_UTC_1373_USER_REMOVAL_ORG_PAGE = "fflag_feat_utc1373_user_removal_org_page";
+
+/**
+ * Interface workspaces (UTC-1367): Personal Sandbox interfaces private to their owner, the
+ * interface Workspace control and move confirmation modal, `can_edit` gating, and the workspace
+ * delete guard for workspaces that still hold interfaces. Ships with the backend flag of the same name.
+ */
+export const FF_UTC_1367_INTERFACE_WORKSPACES = "fflag_feat_utc_1367_interface_workspaces";
+
+/**
+ * Analytics → Member Performance "Submitted by Project" / "Reviewed by Project" columns, their export
+ * fields, and the backend user × project KPI segmentation they read. UTC-1389.
+ */
+export const FF_UTC_1389_ANALYTICS_PERFORMANCE_PROJECT_BREAKDOWN =
+  "fflag_feat_utc_1389_analytics_performance_project_breakdown";
+
+/**
+ * Verified Skills and Onboarding (workforce organizations only): skill assessments that test
+ * contributors, onboarding projects and verified skill statuses.
+ */
+export const FF_VERIFIED_SKILLS_AND_ONBOARDING = "fflag_feat_utc_1407_verified_skills_and_onboarding";
+
+/**
+ * UTC-1437 restricted locations (workforce organizations only): contributors who must verify their identity
+ * also need a reviewed tax form before they can be added to projects or join them. Ships with the backend
+ * flag of the same name.
+ */
+export const FF_RESTRICTED_LOCATIONS = "fflag_feat_utc_1437_restricted_locations_short";
+
+/**
+ * UTC-1446 experiment: the "Ask AI" pill in the labeling editor's comment headers, which prefills Ask AI
+ * with the comment. Also needs the per-project switch in Django admin. Checked as an explicit `true` only,
+ * never the installation default (which is `true` on-prem). Remove with the AskAIInComments folder.
+ */
+export const FF_UTC_1446_ASK_AI_IN_COMMENTS = "fflag_feat_utc_1446_ask_ai_in_comments";
+
+/**
+ * UTC-1459: Managers+ can mark a project as Done from the project actions menu and reset its state later.
+ */
+export const FF_MANUAL_PROJECT_DONE = "fflag_feat_utc_1459_manual_project_done";
+
+/**
+ * Reviewed status follows the project's review criteria everywhere, including rejections with no rework.
+ * Read by the backend for the Data Manager column; the review settings label follows it.
+ */
+export const FF_UNIFIED_REVIEWED_STATUS = "fflag_fix_utc_1339_unified_reviewed_status_short";

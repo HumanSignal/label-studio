@@ -189,7 +189,15 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
     const paddingLeft = this.config.padding?.left ?? 0;
     const zero = height * channelNumber + (this.config.reservedSpace ?? 0);
     const y = zero + paddingTop + height / 2;
-    let total = 0;
+
+    const samplesPerChunk = audio.decoder?.samplesPerChunk;
+    const startIndex = samplesPerChunk ? Math.max(0, Math.floor(iStart / samplesPerChunk)) : 0;
+    const endIndex = samplesPerChunk
+      ? Math.min(bufferChunkSize - 1, Math.floor(iEnd / samplesPerChunk))
+      : bufferChunkSize - 1;
+
+    let total = samplesPerChunk ? startIndex * samplesPerChunk : 0;
+
     layer.save();
     const waveColor = this.config.waveColor?.toString?.() ?? "#000";
     layer.strokeStyle = waveColor;
@@ -198,7 +206,7 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
     layer.beginPath();
     layer.moveTo(x, y);
     const now = performance.now();
-    for (let i = 0; i < bufferChunkSize; i++) {
+    for (let i = startIndex; i <= endIndex; i++) {
       const slice = bufferChunks[i];
       const sliceLength = slice.length;
       const chunkStart = Math.floor(clamp(iStart - total, 0, sliceLength));
@@ -208,6 +216,10 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
         const chunks = slice.slice(chunkStart, chunkEnd);
         const l = chunks.length - 1;
         let i = l + 1;
+        const step = context.samplesPerPx;
+        if (step <= 0) {
+          continue;
+        }
         while (i > 0) {
           const index = l - i;
           const chunk = chunks.slice(index, index + context.samplesPerPx);
@@ -218,7 +230,7 @@ export class WaveformRenderer implements Renderer<WaveformRendererConfig> {
             this.renderChunk(chunk, layer, height, x + paddingLeft, zero, context);
           }
           x += 1;
-          i = clamp(i - context.samplesPerPx, 0, l);
+          i = clamp(i - step, 0, l);
         }
       } catch {
         // Ignore any out-of-bounds errors if they occur

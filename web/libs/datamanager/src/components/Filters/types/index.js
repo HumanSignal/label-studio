@@ -4,5 +4,6 @@ export { DateFilter as Date } from "./Date";
 export { DatetimeFilter as Datetime } from "./Datetime";
 export { ListFilter as List } from "./List";
 export { NumberFilter as Number, NumberFilter as AgreementSelected, NumberFilter as Time } from "./Number";
+export { PaymentStatusFilter as PaymentStatus } from "./PaymentStatusFilter";
 export { StringFilter as Image, StringFilter as String } from "./String";
 export { TaskStateFilter as TaskState } from "./TaskStateFilter";

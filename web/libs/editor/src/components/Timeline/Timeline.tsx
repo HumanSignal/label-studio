@@ -34,6 +34,8 @@ const TimelineComponent: FC<TimelineProps> = ({
   className,
   formatPosition,
   readonly = false,
+  navigationBlocked = false,
+  navigationBlockedTooltip,
   ...props
 }) => {
   const View = Views[mode];
@@ -52,6 +54,8 @@ const TimelineComponent: FC<TimelineProps> = ({
   const getCurrentPosition = useRef(() => {
     return currentPosition;
   });
+
+  getCurrentPosition.current = () => currentPosition;
 
   const step = useMemo(() => defaultStepSize * zoom, [zoom, defaultStepSize]);
 
@@ -77,7 +81,7 @@ const TimelineComponent: FC<TimelineProps> = ({
       const clampedValue = clamp(newPosition, 1, length);
 
       if (clampedValue !== currentPosition) {
-        handlers.onPositionChange?.(clampedValue);
+        if (handlers.onPositionChange?.(clampedValue) === false) return currentPosition;
         return clampedValue;
       }
 
@@ -151,6 +155,8 @@ const TimelineComponent: FC<TimelineProps> = ({
         onPositionChange={setInternalPosition}
         onToggleCollapsed={setViewCollapsed}
         formatPosition={formatPosition}
+        navigationBlocked={navigationBlocked}
+        navigationBlockedTooltip={navigationBlockedTooltip}
         extraControls={
           View.Controls && !disableView ? (
             <View.Controls
@@ -173,6 +179,8 @@ const TimelineComponent: FC<TimelineProps> = ({
           seekVisible={seekVisibleWidth}
           onIndicatorMove={setSeekOffset}
           onSeek={setInternalPosition}
+          disabled={navigationBlocked}
+          title={navigationBlocked ? navigationBlockedTooltip : undefined}
           minimap={View.Minimap ? <View.Minimap /> : null}
         />
       )}

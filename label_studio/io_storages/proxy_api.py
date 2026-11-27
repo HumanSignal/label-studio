@@ -3,11 +3,12 @@ import logging
 import mimetypes
 import time
 from typing import Union
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
+from core.utils.common import load_func
 from core.utils.exceptions import extract_message
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, StreamingHttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from drf_spectacular.utils import extend_schema
 from projects.models import Project
 from rest_framework import status
@@ -16,10 +17,59 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
 
-from label_studio.io_storages.functions import get_storage_by_url
+from label_studio.io_storages.functions import (
+    resolve_import_storage_for_request,
+    resolve_own_collection_export_storage,
+)
 from label_studio.io_storages.utils import parse_range
 
 logger = logging.getLogger(__name__)
+
+# Storage types the Go streamer can natively delegate (proxy mode): it reads
+# credentials from Postgres by storage_id and streams bytes from cloud
+# storage itself. Must stay in sync with the `providers` map in
+# services/streamer/internal/storageproxy/storages/storages.go.
+#
+# Note: uploaded files (the default/persistent bucket) use a separate
+# 's3_default' type emitted by DownloadStorageData.build_streamer_delegation in
+# data_import/api.py. It is NOT in this set: it has no io_storages row / no
+# storage_id, and the streamer streams it with ambient credentials via its
+# DefaultS3Streamer rather than a storage_id-keyed provider.
+STREAMER_DELEGATED_STORAGE_TYPES = {'s3', 's3s', 'gcs', 'gcs_sa', 'gcswif', 'azure', 'azure_spi'}
+
+
+def split_streamer_uri(fileuri: str) -> tuple[str, str]:
+    """Split a storage URI into the (bucket, key) pair the streamer fetches.
+
+    For scheme URIs (s3://, gs://, azure-blob://, azure-spi://) the bucket or
+    container is the netloc. azure_spi also resolves direct blob URLs
+    (https://<account>.blob.core.windows.net/<container>/<blob>), where netloc
+    is the account host and the container is the first path segment.
+    """
+    parsed = urlparse(fileuri, allow_fragments=False)
+    if parsed.scheme in ('http', 'https'):
+        bucket, _, key = parsed.path.lstrip('/').partition('/')
+        return bucket, key
+    return parsed.netloc, parsed.path.lstrip('/')
+
+
+def get_streamer_storage_type(storage):
+    """Resolve the Go streamer provider key for an import storage instance.
+
+    Reuses the storage registry (GET_STORAGE_LIST): each declaration's `name`
+    is the provider key the streamer expects, and its model is reachable via
+    the list API serializer (same chain as get_storage_classes()). Returns
+    None when the storage type isn't one the streamer can natively delegate.
+    Routing is by registry name, not url_scheme: LSO 's3' and LSE 's3s' share
+    url_scheme='s3' but resolve to different models/providers.
+    """
+    for decl in load_func(settings.GET_STORAGE_LIST)():
+        if decl['name'] not in STREAMER_DELEGATED_STORAGE_TYPES:
+            continue
+        model = decl['import_list_api'].serializer_class.Meta.model
+        if isinstance(storage, model):
+            return decl['name']
+    return None
 
 
 class ResolveStorageUriAPIMixin:
@@ -39,10 +89,15 @@ class ResolveStorageUriAPIMixin:
             )
             fileuri = unquote(fileuri)
 
-        # Try to find storage by URL
+        # Find an import storage that may serve this URI for this task/project: bucket match alone
+        # is not enough, the key must be under the storage prefix or referenced by the task/project.
         project = instance if isinstance(instance, Project) else instance.project
-        storage_objects = project.get_all_import_storage_objects
-        storage = get_storage_by_url(fileuri, storage_objects)
+        storage = resolve_import_storage_for_request(fileuri, instance)
+        if not storage:
+            # Fall back to the project's own export targets: assets the project
+            # produced (Data Collection submissions) live there and must still
+            # preview. Import first, so existing resolution is unchanged.
+            storage = resolve_own_collection_export_storage(fileuri, project)
         if not storage:
             logger.error(f'Could not find storage for URI {fileuri}')
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -57,16 +112,79 @@ class ResolveStorageUriAPIMixin:
         # If storage.presign is False, it means an admin doesn't want to expose presigned URLs anyhow,
         # and all files are proxied through Label Studio using LS auth and RBAC control.
 
+        # When the request comes from the streamer service (validated by
+        # StreamerSecretMiddleware) AND we're in proxy mode (not presign) AND
+        # the storage type is one the streamer can natively delegate, return
+        # a JSON delegation payload. The streamer then loads credentials from
+        # Postgres itself and streams bytes from cloud storage. For everything
+        # else (presign=True or unsupported types), fall through to Django's
+        # native flow; the streamer relays the response verbatim.
+        # Resolve the streamer provider key from the storage registry (not
+        # url_scheme): the LSE IAM-role storage shares url_scheme='s3' but must
+        # be routed to the streamer's 's3s' provider, which reads the LSE table
+        # and assumes a role. get_streamer_storage_type returns None for types
+        # the streamer can't natively delegate.
+        streamer_type = get_streamer_storage_type(storage)
+        if getattr(request, 'is_streamer_delegation', False) and not presign and streamer_type is not None:
+            return self.delegate_to_streamer(request, fileuri, project, storage, streamer_type)
+
         if presign:
             # Redirect to presigned URL (original flow)
-            return self.redirect_to_presign_url(fileuri, instance, model_name)
+            return self.redirect_to_presign_url(fileuri, instance, model_name, storage=storage)
         else:
             return self.proxy_data_from_storage(request, fileuri, project, storage)
 
-    def redirect_to_presign_url(self, fileuri: str, instance: Union[Task, Project], model_name: str) -> Response:
-        """Generate and redirect to a presigned URL for the given file URI"""
+    def delegate_to_streamer(
+        self,
+        request: HttpRequest,
+        fileuri: str,
+        project: Project,
+        storage,
+        streamer_type: str,
+    ) -> JsonResponse:
+        """Return JSON delegation payload for the streamer service.
+
+        Only emitted when the streamer can natively delegate this storage
+        type (proxy mode). Sets X-Streamer-Action: delegate so the streamer
+        knows to JSON-decode the body rather than relaying it.
+
+        ``streamer_type`` selects the streamer-side provider (and thus the DB
+        table + credential strategy); it is not the same as ``url_scheme``.
+
+        Credentials are intentionally NOT included: the streamer looks them
+        up from Postgres directly using (storage_type, storage_id).
+        """
+        bucket, key = split_streamer_uri(fileuri)
+        content_type = mimetypes.guess_type(fileuri)[0] or 'application/octet-stream'
+
+        response = JsonResponse(
+            {
+                'action': 'proxy',
+                'storage_type': streamer_type,
+                'storage_id': storage.id,
+                'uri': fileuri,
+                'bucket': bucket,
+                'key': key,
+                'content_type': content_type,
+            }
+        )
+        response['X-Streamer-Action'] = 'delegate'
+        return response
+
+    def redirect_to_presign_url(
+        self, fileuri: str, instance: Union[Task, Project], model_name: str, storage=None
+    ) -> Response:
+        """Generate and redirect to a presigned URL for the given file URI.
+
+        ``storage`` is the storage resolve() authorized for this URI. It signs the URL itself:
+        instance.resolve_storage_uri() matches by bucket only, so with several storages on one
+        bucket it could sign with a different storage (other credentials, or presign disabled).
+        """
         try:
-            resolved = instance.resolve_storage_uri(fileuri)
+            if storage is not None:
+                resolved = {'url': storage.generate_http_url(fileuri), 'presign_ttl': storage.presign_ttl}
+            else:
+                resolved = instance.resolve_storage_uri(fileuri)
         except Exception as exc:
             logger.error(f'Failed to resolve storage uri {fileuri} for {model_name} {instance.id}: {exc}')
             return Response(status=status.HTTP_404_NOT_FOUND)

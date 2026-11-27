@@ -13,10 +13,11 @@ describe("Annotation ID", () => {
       </View>`,
       task: {
         id: 1,
+        // API returns annotations newest-first (id descending)
         annotations: [
-          { id: 1001, result: [] },
-          { id: 1002, result: [] },
           { id: 1003, result: [] },
+          { id: 1002, result: [] },
+          { id: 1001, result: [] },
         ],
         predictions: [],
         data: {
@@ -30,14 +31,12 @@ describe("Annotation ID", () => {
     // Get all annotation buttons
     cy.get(".lsf-annotation-button").should("have.length", 3);
 
-    // Annotations are displayed in reverse order (newest first)
-    // Verify each annotation button has the correct data-annotation-id attribute
+    // Tabs follow API order (newest / highest id first)
     cy.log("Verifying data-annotation-id attributes");
     cy.get('[data-annotation-id="1003"]').should("exist");
     cy.get('[data-annotation-id="1002"]').should("exist");
     cy.get('[data-annotation-id="1001"]').should("exist");
 
-    // Verify the attributes are on the annotation buttons in the correct order
     cy.get(".lsf-annotation-button").eq(0).should("have.attr", "data-annotation-id", "1003");
     cy.get(".lsf-annotation-button").eq(1).should("have.attr", "data-annotation-id", "1002");
     cy.get(".lsf-annotation-button").eq(2).should("have.attr", "data-annotation-id", "1001");

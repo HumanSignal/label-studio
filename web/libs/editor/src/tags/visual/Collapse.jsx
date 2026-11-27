@@ -8,7 +8,6 @@ import Tree from "../../core/Tree";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
 import { isStarterCloudPlan } from "@humansignal/core";
-import { FF_BULK_ANNOTATION, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 
 const { Panel } = Collapse;
@@ -137,7 +136,7 @@ const Model = types
 const CollapseModel = types.compose("CollapseModel", AnnotationMixin, Model, ProcessAttrsMixin);
 
 const HtxCollapse = observer(({ item }) => {
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && !isStarterCloudPlan() && item.store.hasInterface("annotation:bulk");
+  const isBulkMode = !isStarterCloudPlan() && item.store.hasInterface("annotation:bulk");
   const visibleChildren = item.children.filter((i) => i.type === "panel" && (!isBulkMode || i.isIndependent));
 
   // Get default active keys based on both Collapse-level and Panel-level open properties

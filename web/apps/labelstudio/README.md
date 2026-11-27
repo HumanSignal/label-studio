@@ -6,11 +6,11 @@ The Label Studio App is the cornerstone of the frontend aspect of Label Studio. 
 
 _Important Note: These scripts must be executed within the web folder or its subfolders. This is crucial for the scripts to function correctly, as they are designed to work within the context of the web directory's structure and dependencies._
 
-- **`yarn ls:watch`: Build LSF continuously**
+- **`bun run ls:watch`: Build LSF continuously**
     - Automatically builds the Label Studio on every change, providing a real-time development experience.
-- **`yarn ls:e2e`: Execute end-to-end (e2e) tests on LS**
+- **`bun run ls:e2e`: Execute end-to-end (e2e) tests on LS**
     - Executes comprehensive tests simulating user interactions from start to end, ensuring the frontend's overall functionality and integrity.
-- **`yarn ls:unit`: Run unit tests on LS**
+- **`bun run ls:unit`: Run unit tests on LS**
     - Runs tests on individual components to maintain high quality and reliability, crucial in collaborative development.
 
 ### Creating pages

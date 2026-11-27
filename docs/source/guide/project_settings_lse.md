@@ -468,7 +468,7 @@ Use [agreement scores](stats) to determine which and how many tasks enter the **
 
 </dd>
 
-<dt id="task-ordering">Task Ordering</dt>
+<dt id="review-task-ordering">Task Ordering</dt>
 
 <dd>
 
@@ -500,7 +500,35 @@ Tasks are ordered by their numeric ID (ascending). Annotation order within a tas
 </td>
 <td>
 
-Tasks are shown in randomized task order while preserving the stable order of annotations within each task. 
+Tasks are shown in randomized task order while preserving the stable order of annotations within each task.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**By Annotator** <br/>
+<span class="badge"></span>
+</td>
+<td>
+
+Review one annotator's annotations at a time. The stream covers a set percentage of each annotator's remaining work before prioritizing another annotator.
+
+<p>When this option is selected, set <b>Review Coverage per Annotator (%)</b>:</p>
+
+<ul>
+<li>The percentage of that annotator's remaining submitted annotations to review before the stream moves on. The default is 20. Enter a value from 1 to 100. The percentage is rounded up to a whole annotation.</li>
+<li>Coverage counts submitted annotations. Skipped annotations are left out, and reviews that are already recorded count toward the percentage.</li>
+<li>Annotations submitted during a round count as remaining work, so the round grows with them.</li>
+<li>The stream stays with one annotator until the current round reaches the percentage. That annotator's annotations are shown in task ID order.</li>
+<li>Annotators who are still below the percentage are reviewed before annotators who have reached it. Among annotators below the percentage, those who have not finished a round yet come first. An annotator whose newer submissions drop them back below the percentage is picked up after those unfinished first rounds.</li>
+<li>After every annotator has reached the percentage, the next round starts with the annotator who finished their previous round earliest.</li>
+<li>Changing the percentage, or switching to another task ordering, starts coverage over.</li>
+</ul>
+
+<p>For example, at 20% an annotator with 10 annotations is reviewed for 2 annotations. When 8 annotations are still waiting, the next round reviews 2 of those 8.</p>
+
+<p>This order applies to the automatic review stream. Tasks assigned to the reviewer, and annotations an annotator updated after a rejection, are still served first. A review started from a Data Manager selection follows that selection. If another reviewer has locked every remaining task for the current annotator, the stream moves to the next annotator until that work is available.</p>
 
 </td>
 </tr>
@@ -512,7 +540,9 @@ Tasks are shown in randomized task order while preserving the stable order of an
 
 <dd>
 
-Configure what rejection options are available to reviewers. 
+Select which reject options are available to reviewers, and which one is the default. 
+
+Use the **Available** column to choose the options. At least one option must be available. Use the **Default** column to choose the option that is applied when a reviewer clicks **Reject** without opening the menu. 
 
 <table>
 <thead>
@@ -524,44 +554,59 @@ Configure what rejection options are available to reviewers.
 <tr>
 <td>
 
-**Requeue rejected annotations back to annotators**
+**Reject and do not require rework**
 </td>
 <td>
 
-When a reviewer clicks **Reject**, the annotation is reassigned back to the annotator. 
+The annotation is rejected and is not sent back to the annotator for rework. 
 
-</td>
-</tr>
-<td>
-
-**Remove rejected annotations from labeling queue**
-</td>
-<td>
-
-When a reviewer clicks **Reject**, the annotation is not reassigned back to the annotator. 
+This is the default for new projects.
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Allow reviewer to choose: Requeue or Remove**
+**Reject and return to annotator**
 </td>
 <td>
 
-Reviewers see the following options:
+The annotation is rejected and sent back to the original annotator for rework. The annotator sees the rejected annotation in their labeling stream and can update it. The updated annotation is then shown to reviewers again in the review stream. 
 
-* **Accept**
-* **Remove** -- When selected, the annotation is rejected and removed from the labeling queue. 
-* **Requeue** -- When selected, the annotation is rejected and then reassigned back to the annotator.  
+</td>
+</tr>
+<tr>
+<td>
 
-For example, a reviewer might decide to requeue an annotation that is nearly correct but just needs a slight change. However, an annotation with numerous errors may be easier to simply reject entirely and remove from the queue. 
+**Reject and pass to another annotator**
+</td>
+<td>
 
-Note that when you click **Remove**, the annotation is also marked as cancelled/skipped. This is reflected in various metrics (for example, Data Manager columns and dashboards), and differentiates between the two rejection actions in the API with `was_cancelled: true`. 
+The annotation is rejected and the task is sent to a different annotator for a new annotation. 
+
+The rejected annotation no longer counts toward the project's [overlap](#overlap), which opens one slot on the task for another annotator. The original annotator can no longer update the rejected annotation. The annotation, its rejection, and the time spent on it remain in the Data Manager and in dashboards.
+
+This option is only available when [**Task Assignment**](#distribute-tasks) is set to **Automatic**.
 
 </td>
 </tr>
 </table>
+
+When only one option is available, reviewers see a single **Reject** button that applies it. When more than one option is available, reviewers can click **Reject** to apply the default option, or open the reject menu to choose another option:
+
+* **No Rework** -- Reject without sending for rework.
+* **Return to Annotator** -- Reject and send back to the original annotator for rework.
+* **Pass to Another Annotator** -- Reject and send to a different annotator.
+
+![Screenshot of the reject menu](/images/review/reject-menu.png)
+
+For example, a reviewer might return an annotation that is nearly correct and only needs a small change. For an annotation with numerous errors, they might pass the task to another annotator instead. 
+
+The same options are available when reviewers reject annotations in bulk from the Data Manager. 
+
+Changing the available options only affects future rejections. Annotations that were already rejected keep the outcome that the reviewer chose. For example, annotations that were returned to an annotator can still be updated by that annotator after you make **Reject and return to annotator** unavailable. 
+
+Separately, you can enable **Reviewers must leave a comment on reject** to require reviewers to add a comment before they can reject an annotation from the review stream. This does not apply to bulk rejections from the Data Manager.
 
 </dd>
 
@@ -722,7 +767,7 @@ Note that enforcement only applies when the user submitting the annotation is in
 
 Set limits on how many tasks each individual user can annotate. This can be useful if you are concerned with preventing any potential bias that might arise from a small set of power users completing a majority of project tasks. 
 
-When an annotator reaches their limit, they will see a notification telling them that they have been paused. When paused, an annotator can no longer access the project. 
+When an annotator reaches their limit, they will see a notification telling them that they have been paused. This is a flexible pause: the annotator cannot begin any new annotation work, but they keep access to the project so that they can update annotations that reviewers have rejected. For more information, see [Full and flexible pauses](quality#Full-and-flexible-pauses). 
 
 When **Limit tasks per annotator** is enabled, you will see the following options:
 
@@ -743,7 +788,7 @@ For more information about pausing annotators, including how to manually pause s
 !!! note
     Pauses are enforced for users in Annotator and Reviewer roles. 
     
-    So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they can continue reviewing other people's annotations. 
 
     Users in the Manager, Administrator, or Owner role are unaffected by the task limit.
 
@@ -758,12 +803,14 @@ For more information about pausing annotators, including how to manually pause s
     
     If you switch a project from Automatic to Manual distribution, annotator evaluation is automatically disabled.
 
-Evaluate annotators against [ground truths](ground_truths) within a project. A "ground truth" annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
+Evaluate annotators against [ground truths](ground_truths) or against their **acceptance score** from review outcomes. You can then automatically pause annotators who do not meet the threshold you set.
 
-When enabled, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
+Use ground truth evaluation when the project has verified labels to score against. Use acceptance score when you want to evaluate annotators from review outcomes instead, including projects that do not have ground truth.
+
+The **Members** dashboard shows each annotator's evaluation status. If you do not enable pausing, scores are still calculated and can be reviewed there. See [Members dashboard](dashboard_members).
 
 !!! note 
-    Enabling annotator evaluation means that ground truth tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
+    When you evaluate against ground truth, those tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
 
 !!! info Tip
     You can specify that ground truth tasks should be unskippable by adding `"allow_skip": false` as part of the JSON task definition that you import to your project. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
@@ -778,11 +825,17 @@ When enabled, this setting looks at the agreement score for the annotator when c
 <tr>
 <td>
 
-**Evaluate all annotators against ground truth** 
+**Evaluation** 
 </td>
 <td>
 
-Select this to enable annotator evaluation for the project. 
+Select how annotators should be evaluated:
+
+* **Don't evaluate annotators**: Evaluation is turned off.
+* **Evaluate against ground truth**: Require annotators to complete ground truth tasks. Overlap is ignored for these tasks.
+* **Evaluate against acceptance score (accepted / reviewed)**: Score annotators by how often their submitted annotations are accepted during review. This includes annotations that were fixed and then accepted.
+
+Acceptance score is calculated as (accepted + fix and accepted) / reviewed. The score uses the latest review outcome for each annotation. If an annotator updates a rejected annotation, that rejection still counts until a reviewer records a new verdict.
 
 </td>
 </tr>
@@ -792,6 +845,8 @@ Select this to enable annotator evaluation for the project.
 **Onboarding evaluation**
 </td>
 <td>
+
+Only available when evaluating against ground truth.
 
 When annotators enter the labeling stream, they are first presented with tasks that have a ground truth annotation. This ensures that annotators meet your evaluation standards before progressing through the remaining project tasks. 
 
@@ -807,6 +862,8 @@ Set this counter to zero if you want to skip onboarding and only use continuous 
 </td>
 <td>
 
+Only available when evaluating against ground truth.
+
 Annotators are presented with ground truth tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
 
 To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero and set this number equal to the number of ground truth tasks in your project. 
@@ -818,56 +875,60 @@ You can also use a combination of both, so that annotators see a subset of groun
 <tr>
 <td>
 
+**Number of tasks for evaluation** / **Minimum reviewed annotations before evaluation**
+</td>
+<td>
+
+The minimum sample an annotator must complete before they can fail evaluation (and be paused, if pausing is enabled).
+
+When evaluating against ground truth, this is the number of ground truth tasks they must complete. For example, if you set this to `10`, even if the annotator gets every single task wrong, they will not be paused until after they have completed 10 ground truth tasks.
+
+When evaluating against acceptance score, this is the number of **reviewed** annotations they must have. Evaluation does not start until reviewers have recorded that many verdicts.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Score required to pass evaluation** / **Minimum acceptance score**
+</td>
+<td>
+
+The percent threshold an annotator must meet to pass evaluation.
+
+When evaluating against ground truth, this is the agreement score threshold compared to ground truth annotations. How agreement is calculated depends on what you select in the [**Agreement** section](#task-agreement).
+
+When evaluating against acceptance score, this is the minimum acceptance score. Annotators below this threshold fail evaluation.
+
+</td>
+</tr>
+<tr>
+<td>
+
 **Pause annotator on failed evaluation** 
 </td>
 <td>
 
-Determines whether annotators should be paused if they do not meet the required score set below. If they fail to meet the score, they are immediately paused and unable to access the project. 
+Determines whether annotators should be paused if they do not meet the required score. If they fail to meet the score, they are paused and cannot submit additional annotations.
 
-If you do not enable pausing, the other **Annotator Evaluation** options are simply calculated in the background and can be reviewed in the [Members dashboard](dashboard_members).
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Score required to pass evaluation** 
-</td>
-<td>
-
-This is the agreement score threshold that an annotator must meet when evaluated against ground truth annotations. How agreement is calculated depends on what you select in the [**Agreement** section](#task-agreement). 
-
-If they do not meet this score, they are paused. 
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Number of tasks for evaluation** 
-</td>
-<td>
-
-This is the number of tasks a user has to complete before they can potentially be paused.  
-
-For example, if you set this to `10`, even if the annotator gets every single task wrong, they will not be paused until after they have completed 10 ground truth tasks. 
-
-If they reach 10 tasks and meet the required score, they will continue progressing through the remaining ground truth tasks until they either fall below the score (in which case they are paused), or they finish their evaluation and continue on to the rest of the project queue. 
+If you do not enable pausing, evaluation still runs and the results can be reviewed in the [Members dashboard](dashboard_members).
 
 </td>
 </tr>
 </table> 
 
-You can see which users are paused from the **Members** page. 
+You can see each annotator's evaluation status and who is paused from the **Members** page. 
 
-When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them. To unpause a user, you will need to relax the evaluation settings for the project by increasing the minimum number of tasks or the score threshold.  
+When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them from the Members pause toggle. They are unpaused automatically if their score recovers. You can also relax the evaluation settings for the project, for example by increasing the minimum sample or changing the score threshold.
+
+If your project requeues rejected annotations, paused annotators can still receive and update their rejected work from the labeling stream and the Data Manager. When you evaluate against acceptance score, updating a rejected annotation does not lift the pause by itself; a reviewer has to record a new verdict that improves the score. For more information, see [Recover from a flexible pause](quality#Recover-from-a-flexible-pause).
 
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
     Pauses are enforced for users in Annotator and Reviewer roles.  
     
-    So, for example, if a Reviewer is also annotating tasks and they fail to meet the required ground truth agreement score, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Because this is a flexible pause, it only stops new annotation work. So, for example, if a Reviewer is also annotating tasks and they fail evaluation, they can continue reviewing other people's annotations. 
 
     Users in the Manager, Administrator, or Owner role are unaffected by evaluation requirements. 
 

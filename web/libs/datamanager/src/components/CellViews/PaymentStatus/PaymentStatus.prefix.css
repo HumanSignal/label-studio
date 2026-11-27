@@ -1,0 +1,17 @@
+.payment-status {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 4px;
+
+  &__item {
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    position: relative;
+
+    &:hover {
+      z-index: 10;
+    }
+  }
+}

@@ -262,7 +262,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td colspan="4" style="text-align:center"><b>Analytics and Reporting</b></td>
   </tr>
   <tr>
-    <td><b>Project dashboards</b><br/><a href="https://docs.humansignal.com/guide/dashboard_project">Dashboards for monitoring project progress.</a></td>
+    <td><b>Project dashboards</b><br/><a href="https://docs.humansignal.com/guide/dashboards">Dashboards for monitoring project progress.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
@@ -349,7 +349,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td><b>Label distribution charts</b><br/><a href="https://docs.humansignal.com/guide/dashboard_project#Label-distribution">Identify possible problems with your dataset distribution, such as an unbalanced dataset.</a></td>
+    <td><b>Label distribution charts</b><br/><a href="https://docs.humansignal.com/guide/dashboard_distribution">Identify possible problems with your dataset distribution, such as an unbalanced dataset.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>

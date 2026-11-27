@@ -2,11 +2,13 @@ import Loggable = Cypress.Loggable;
 import Timeoutable = Cypress.Timeoutable;
 import Thresholdable = Cypress.Thresholdable;
 import CompareScreenshotOptions = Cypress.CompareScreenshotOptions;
-import { addMatchImageSnapshotCommand } from "cypress-image-snapshot/command";
+
+import { addMatchImageSnapshotCommand } from "../../cypress-image-snapshot/command";
 
 addMatchImageSnapshotCommand({
   failureThreshold: 0.1,
   failureThresholdType: "percent",
+  e2eSpecDir: "tests/integration/",
 });
 
 const Screenshots = new Map<string, string>();
@@ -20,6 +22,34 @@ const getName = (suffix: string) => {
   const spec = Cypress.spec.name;
 
   return `${spec.replace(/.([jt]s)/, "")}-${suffix}`.toLowerCase();
+};
+
+/**
+ * Block until the subject's rendered size stops changing.
+ *
+ * A fixed delay before a screenshot is a guess about how long layout takes, and on a slow machine it
+ * loses: in the editor, the Outliner appearing after the first region is drawn narrows the canvas by
+ * ~40px, so a capture taken mid-shift and a comparison taken after it describe differently-sized
+ * elements and ``compareScreenshots`` can only reject the pair ("Image sizes do not match").
+ *
+ * Polls the bounding box and resolves once two consecutive reads agree, so both halves of a comparison
+ * are taken at whatever size the layout actually settled on. Uses ``should`` so it inherits Cypress's
+ * retry loop and its timeout, rather than sleeping longer and hoping.
+ */
+const waitForStableSize = (element: HTMLElement) => {
+  const measure = () => {
+    const { width, height } = element.getBoundingClientRect();
+    return `${Math.round(width)}x${Math.round(height)}`;
+  };
+  let previous: string | null = null;
+
+  cy.wrap(null, { log: false }).should(() => {
+    const current = measure();
+    const settled = previous === current;
+
+    previous = current;
+    expect(settled, `element size settled at ${current}`).to.equal(true);
+  });
 };
 
 Cypress.Commands.add(
@@ -51,7 +81,9 @@ Cypress.Commands.add(
       cy.get(hiddenSelector).invoke("css", "visibility", "hidden");
     }
 
-    // Add a small delay before taking capture screenshot
+    // Both halves of a comparison must be taken at the same element size, so settle before capturing.
+    waitForStableSize(subject.get(0));
+    // Then a small delay for the repaint itself.
     cy.wait(100);
 
     obj.screenshot(
@@ -108,7 +140,9 @@ Cypress.Commands.add(
       cy.get(hiddenSelector).invoke("css", "visibility", "hidden");
     }
 
-    // Add a small delay before taking comparison screenshot
+    // Same settle as the capture: comparing a mid-layout-shift image against a settled one can only fail.
+    waitForStableSize(subject.get(0));
+    // Then a small delay for the repaint itself.
     cy.wait(100);
 
     obj.screenshot(
@@ -154,10 +188,11 @@ Cypress.Commands.add("throttleCPU", (rate: number) => {
         command: "Emulation.setCPUThrottlingRate",
         params: { rate },
       }),
+      { log: false },
     )
     .then(() => {
       cy.log(`CPU throttling set to ${rate}x slower`);
-    });
+    }) as Cypress.Chainable<void>;
 });
 
 Cypress.Commands.add("waitForFrames", (frameCount = 1) => {
@@ -198,12 +233,13 @@ Cypress.Commands.add("throttleNetwork", (downloadThroughput: number, uploadThrou
           latency, // milliseconds
         },
       }),
+      { log: false },
     )
     .then(() => {
       cy.log(
         `Network throttling set: ${Math.round(downloadThroughput / 1024)}KB/s down, ${Math.round(uploadThroughput / 1024)}KB/s up, ${latency}ms latency`,
       );
-    });
+    }) as Cypress.Chainable<void>;
 });
 
 Cypress.Commands.add("resetNetwork", () => {
@@ -218,10 +254,11 @@ Cypress.Commands.add("resetNetwork", () => {
           latency: 0,
         },
       }),
+      { log: false },
     )
     .then(() => {
       cy.log("Network throttling reset to normal");
-    });
+    }) as Cypress.Chainable<void>;
 });
 
 // Preset network conditions

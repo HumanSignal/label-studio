@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 from unittest.mock import Mock
 
@@ -9,6 +10,7 @@ from django.http import HttpResponse
 from organizations.models import Organization
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
+from storages.backends.s3boto3 import S3Boto3Storage
 from users.models import User
 
 """
@@ -159,15 +161,15 @@ class TestDownloadStorageData:
         response = view.get(request)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @mock.patch('data_import.api.can_read_avatar', return_value=False)
     @mock.patch('data_import.api.User.objects.filter')
-    def test_avatar_user_no_organization_access_returns_403(self, mock_filter, api_factory, user, other_user, view):
+    def test_avatar_user_no_organization_access_returns_403(
+        self, mock_filter, mock_can_read_avatar, api_factory, user, other_user, view
+    ):
         """Test that avatar user from different organization returns 403"""
         mock_avatar_user = Mock()
         mock_avatar_user.avatar = Mock()
         mock_filter.return_value.first.return_value = mock_avatar_user
-
-        # Mock organization access check to return False
-        user.active_organization.has_user = Mock(return_value=False)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user
@@ -213,9 +215,48 @@ class TestDownloadStorageData:
         assert response == mock_response_instance
         mock_ranged_response.assert_called_once()
 
+    @pytest.mark.parametrize(
+        'filename,expected_csp',
+        [
+            ('page.html', 'sandbox'),
+            ('image.svg', 'sandbox'),
+            ('doc.xml', 'sandbox'),
+            ('doc.pdf', None),
+            ('photo.png', None),
+        ],
+    )
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', False)
+    @mock.patch('data_import.api.RangedFileResponse')
+    def test_direct_serving_sandboxes_document_types(
+        self,
+        mock_ranged_response,
+        mock_filter,
+        filename,
+        expected_csp,
+        api_factory,
+        user,
+        view,
+        mock_file_upload,
+    ):
+        """Documents render on the app origin, so they are sandboxed; other types are not"""
+        mock_filter.return_value.last.return_value = mock_file_upload
+        headers = {}
+        mock_response_instance = Mock()
+        mock_response_instance.__setitem__ = Mock(side_effect=headers.__setitem__)
+        mock_ranged_response.return_value = mock_response_instance
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/{filename}'})
+        request.user = user
+
+        view.get(request)
+
+        assert headers.get('Content-Security-Policy') == expected_csp
+
+    @mock.patch('data_import.api.can_read_avatar', return_value=True)
     @mock.patch('data_import.api.User.objects.filter')
     @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', True)
-    def test_avatar_file_nginx_serving(self, mock_filter, api_factory, user, view):
+    def test_avatar_file_nginx_serving(self, mock_filter, mock_can_read_avatar, api_factory, user, view):
         """Test avatar file serving through NGINX"""
         mock_avatar_user = Mock()
         mock_avatar_file = Mock()
@@ -225,9 +266,6 @@ class TestDownloadStorageData:
         mock_avatar_file.name = 'avatar.jpg'
         mock_avatar_user.avatar = mock_avatar_file
         mock_filter.return_value.first.return_value = mock_avatar_user
-
-        # Mock organization access check to return True
-        user.active_organization.has_user = Mock(return_value=True)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user
@@ -239,10 +277,13 @@ class TestDownloadStorageData:
         assert 'X-Accel-Redirect' in response
         assert 'Content-Disposition' in response
 
+    @mock.patch('data_import.api.can_read_avatar', return_value=True)
     @mock.patch('data_import.api.User.objects.filter')
     @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', False)
     @mock.patch('data_import.api.RangedFileResponse')
-    def test_avatar_file_direct_serving(self, mock_ranged_response, mock_filter, api_factory, user, view):
+    def test_avatar_file_direct_serving(
+        self, mock_ranged_response, mock_filter, mock_can_read_avatar, api_factory, user, view
+    ):
         """Test avatar file serving directly (without NGINX)"""
         mock_avatar_user = Mock()
         mock_avatar_file = Mock()
@@ -252,9 +293,6 @@ class TestDownloadStorageData:
         mock_response_instance = Mock()
         mock_response_instance.__setitem__ = Mock()  # Allow item assignment
         mock_ranged_response.return_value = mock_response_instance
-
-        # Mock organization access check to return True
-        user.active_organization.has_user = Mock(return_value=True)
 
         request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.AVATAR_PATH}/avatar.jpg'})
         request.user = user
@@ -334,3 +372,97 @@ class TestDownloadStorageData:
         view.get(request)
 
         mock_unquote.assert_called_once_with(encoded_filepath)
+
+    # --- Streamer delegation (s3_default) -----------------------------------
+
+    def _s3_file(self, key='upload/1/abc-photo.jpg', region='us-west-2', endpoint=None):
+        """Build a mock FileUpload.file backed by an S3Boto3Storage."""
+        storage = Mock(spec=S3Boto3Storage)
+        storage._clean_name = Mock(return_value=key)
+        storage._normalize_name = Mock(return_value=key)
+        storage.bucket_name = 'persist-bucket'
+        storage.region_name = region
+        storage.endpoint_url = endpoint
+        mock_file = Mock()
+        mock_file.storage = storage
+        mock_file.name = key
+        return mock_file
+
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    def test_s3_upload_delegates_to_streamer(self, mock_filter, api_factory, user, view):
+        """A streamer request for an S3-backed upload returns a delegation payload."""
+        file_upload = Mock(spec=FileUpload)
+        file_upload.has_permission = Mock(return_value=True)
+        file_upload.file = self._s3_file()
+        mock_filter.return_value.last.return_value = file_upload
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/abc-photo.jpg'})
+        request.user = user
+        request.is_streamer_delegation = True
+
+        response = view.get(request)
+
+        assert response['X-Streamer-Action'] == 'delegate'
+        data = json.loads(response.content)
+        assert data['action'] == 'proxy'
+        assert data['storage_type'] == 's3_default'
+        assert data['storage_id'] == 0
+        assert data['bucket'] == 'persist-bucket'
+        assert data['key'] == 'upload/1/abc-photo.jpg'
+        assert data['region'] == 'us-west-2'
+        assert data['endpoint'] == ''
+        assert data['content_type'] == 'image/jpeg'
+
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', True)
+    def test_s3_upload_without_streamer_uses_nginx(self, mock_filter, api_factory, user, view):
+        """Without the streamer flag, an S3 upload keeps the legacy X-Accel path."""
+        file_upload = Mock(spec=FileUpload)
+        file_upload.has_permission = Mock(return_value=True)
+        s3_file = self._s3_file()
+        # NGINX mode resolves the raw cloud URL via storage.url(..., storage_url=True).
+        s3_file.storage.url = Mock(return_value='https://s3.amazonaws.com/persist-bucket/abc-photo.jpg')
+        file_upload.file = s3_file
+        mock_filter.return_value.last.return_value = file_upload
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/abc-photo.jpg'})
+        request.user = user
+        # No request.is_streamer_delegation attribute → not a streamer request.
+
+        response = view.get(request)
+
+        assert 'X-Streamer-Action' not in response
+        assert 'X-Accel-Redirect' in response
+
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    @mock.patch('data_import.api.settings.USE_NGINX_FOR_UPLOADS', True)
+    def test_non_s3_upload_falls_through_to_nginx(self, mock_filter, api_factory, user, view, mock_file_upload):
+        """A streamer request for a non-S3 backend (GCS/Azure) is not delegated."""
+        # mock_file_upload uses a plain Mock storage (not S3Boto3Storage).
+        mock_file_upload.file.storage.url = Mock(return_value='https://storage.googleapis.com/b/test.pdf')
+        mock_filter.return_value.last.return_value = mock_file_upload
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/test.pdf'})
+        request.user = user
+        request.is_streamer_delegation = True
+
+        response = view.get(request)
+
+        assert 'X-Streamer-Action' not in response
+        assert 'X-Accel-Redirect' in response
+
+    @mock.patch('data_import.api.FileUpload.objects.filter')
+    def test_streamer_request_without_permission_returns_403(self, mock_filter, api_factory, user, view):
+        """Permission is enforced before any delegation, even for streamer requests."""
+        file_upload = Mock(spec=FileUpload)
+        file_upload.has_permission = Mock(return_value=False)
+        file_upload.file = self._s3_file()
+        mock_filter.return_value.last.return_value = file_upload
+
+        request = api_factory.get('/storage-data/uploaded/', {'filepath': f'{settings.UPLOAD_DIR}/abc-photo.jpg'})
+        request.user = user
+        request.is_streamer_delegation = True
+
+        response = view.get(request)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN

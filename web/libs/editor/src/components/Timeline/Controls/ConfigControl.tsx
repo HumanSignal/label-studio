@@ -46,7 +46,7 @@ export const ConfigControl: FC<ConfigControlProps> = ({
   waveform,
 }) => {
   const { settings, changeSetting } = useContext(TimelineContext);
-  const playbackSpeed = speed ?? 1;
+  const _playbackSpeed = speed ?? 1;
   const [isTimeline, setTimeline] = useState(true);
   const [isAudioWave, setAudioWave] = useState(true);
   const [isSpectrogram, setSpectrogram] = useState(false);

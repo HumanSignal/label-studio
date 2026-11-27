@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { Button } from "@humansignal/ui";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@humansignal/shad/components/ui/dialog";
-import { Alert, AlertDescription, AlertTitle } from "@humansignal/shad/components/ui/alert";
+import { Button, ModalWindow, Message, Typography } from "@humansignal/ui";
 
 // Type definitions
 interface Hotkey {
@@ -33,7 +24,7 @@ interface ImportData {
 interface ImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImport: (data: ImportData | Hotkey[]) => void | Promise<void>;
+  onImport: (data: ImportData | Hotkey[]) => boolean | Promise<boolean>;
 }
 
 /**
@@ -50,6 +41,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
   const [importText, setImportText] = useState<string>("");
   // State for validation errors
   const [error, setError] = useState<string>("");
+  const [isImporting, setIsImporting] = useState(false);
 
   /**
    * Validates a single hotkey object structure
@@ -74,7 +66,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
    * Handles the import process
    * Parses JSON, validates structure, and calls the onImport callback
    */
-  const handleImport = (): void => {
+  const handleImport = async (): Promise<void> => {
     try {
       // Clear any previous errors
       setError("");
@@ -120,14 +112,15 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
       });
 
       // If validation passes, proceed with import
-      onImport(parsedData as ImportData | Hotkey[]);
-
-      // Reset the dialog state
-      resetDialogState();
+      setIsImporting(true);
+      const imported = await onImport(parsedData as ImportData | Hotkey[]);
+      if (imported) resetDialogState();
     } catch (err: unknown) {
       // Set error message for display
       const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -151,7 +144,7 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
    * Handles textarea input changes
    * @param {React.ChangeEvent<HTMLTextAreaElement>} e - The change event
    */
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setImportText(e.target.value);
     // Clear error when user starts typing
     if (error) {
@@ -159,50 +152,68 @@ export const ImportDialog = ({ open, onOpenChange, onImport }: ImportDialogProps
     }
   };
 
+  const importInstructions =
+    "Paste your exported hotkeys JSON below. This will replace your current hotkeys. Make sure the JSON contains an array of hotkey objects with the required fields.";
+
+  const importFormBody = (
+    <>
+      <label
+        htmlFor="import-json"
+        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      >
+        Hotkeys JSON
+      </label>
+      <textarea
+        id="import-json"
+        className="flex min-h-[150px] w-full rounded-md border border-neutral-border bg-transparent px-tight py-tighter typography-body-small placeholder:text-neutral-content-subtler focus-visible:ring-4 focus-visible:ring-primary-focus-outline focus-visible:border-neutral-border-bolder focus-visible:outline-0 transition-all resize-none"
+        placeholder='[{"id": 1, "section": "annotation-actions", "element": "button", "label": "Save", "key": "Ctrl+S"}]'
+        value={importText}
+        onChange={handleTextareaChange}
+        aria-describedby={error ? "hotkeys-import-instructions import-error" : "hotkeys-import-instructions"}
+      />
+
+      {error && (
+        <Message variant="negative" title="Import Error" id="import-error">
+          {error}
+        </Message>
+      )}
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px] bg-neutral-surface">
-        <DialogHeader>
-          <DialogTitle>Import Hotkeys</DialogTitle>
-          <DialogDescription>
-            Paste your exported hotkeys JSON below. This will replace your current hotkeys. Make sure the JSON contains
-            an array of hotkey objects with the required fields.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-4 py-4">
-          <label
-            htmlFor="import-json"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Hotkeys JSON
-          </label>
-          <textarea
-            id="import-json"
-            className="flex min-h-[150px] w-full rounded-md border border-neutral-border bg-transparent px-tight py-tighter typography-body-small placeholder:text-neutral-content-subtler focus-visible:ring-4 focus-visible:ring-primary-focus-outline focus-visible:border-neutral-border-bolder focus-visible:outline-0 transition-all resize-none"
-            placeholder='[{"id": 1, "section": "annotation-actions", "element": "button", "label": "Save", "key": "Ctrl+S"}]'
-            value={importText}
-            onChange={handleTextareaChange}
-            aria-describedby={error ? "import-error" : undefined}
-          />
-
-          {error && (
-            <Alert variant="destructive" id="import-error">
-              <AlertTitle>Import Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </div>
-
-        <DialogFooter>
-          <Button variant="neutral" onClick={handleCancel}>
+    <ModalWindow
+      open={open}
+      onOpenChange={onOpenChange}
+      size="small"
+      title="Import Hotkeys"
+      dataTestId="hotkeys-import-modal"
+      footer={
+        <div className="flex w-full justify-end gap-tight">
+          <Button variant="neutral" onClick={handleCancel} data-testid="hotkeys-import-cancel">
             Cancel
           </Button>
-          <Button onClick={handleImport} disabled={!importText.trim()}>
+          <Button
+            variant="primary"
+            onClick={handleImport}
+            disabled={!importText.trim() || isImporting}
+            data-testid="hotkeys-import-submit"
+          >
             Import Hotkeys
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      }
+    >
+      <div className="grid gap-4">
+        <Typography
+          variant="body"
+          size="small"
+          className="text-neutral-content-subtle m-0"
+          id="hotkeys-import-instructions"
+        >
+          {importInstructions}
+        </Typography>
+        {importFormBody}
+      </div>
+    </ModalWindow>
   );
 };

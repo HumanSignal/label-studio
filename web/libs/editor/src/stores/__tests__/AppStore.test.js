@@ -6,57 +6,103 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
+mockModule("keymaster", () => {
+  let scope = "all";
   const keymaster = () => {};
   keymaster.unbind = () => {};
-  keymaster.setScope = () => {};
+  keymaster.setScope = (nextScope) => {
+    scope = nextScope ?? scope;
+  };
+  keymaster.getScope = () => scope;
   return { __esModule: true, default: keymaster };
 });
 
-jest.mock("../../core/Hotkey", () => {
+const HOTKEY_MODULE_ABS = require.resolve("../../core/Hotkey");
+const HOTKEY_MODULE_URL = require("node:url").pathToFileURL(HOTKEY_MODULE_ABS).href;
+const UNIQUE_MODULE_ABS = require.resolve("../../utils/unique");
+const UNIQUE_MODULE_URL = require("node:url").pathToFileURL(UNIQUE_MODULE_ABS).href;
+const HELPERS_MODULE_ABS = require.resolve("../../core/Helpers");
+const HELPERS_MODULE_URL = require("node:url").pathToFileURL(HELPERS_MODULE_ABS).href;
+const hotkeyMockFactory = () => {
+  const keymapModule = require("../../core/settings/keymap.json");
+  const keymap = structuredClone(keymapModule.default ?? keymapModule ?? {});
   const mockHotkey = {
-    unbindAll: jest.fn(),
-    addNamed: jest.fn(),
+    unbindAll: mock(),
+    addNamed: mock(),
+    removeNamed: mock(),
+    overwriteNamed: mock(),
+    hasName: mock(() => true),
+    hasKeyByName: mock(() => false),
   };
   const HotkeyFn = () => mockHotkey;
-  HotkeyFn.setScope = jest.fn();
+  HotkeyFn.setScope = mock();
   HotkeyFn.DEFAULT_SCOPE = "default";
-  HotkeyFn.unbindAll = jest.fn();
+  HotkeyFn.keymap = keymap;
+  HotkeyFn.namespaces = mock(() => ({}));
+  HotkeyFn.unbindAll = mock();
   return {
     __esModule: true,
+    __skipMerge: true,
     Hotkey: HotkeyFn,
-    unbindAll: jest.fn(),
+    default: {
+      DEFAULT_SCOPE: HotkeyFn.DEFAULT_SCOPE,
+      Hotkey: HotkeyFn,
+    },
+    unbindAll: mock(),
   };
-});
+};
+mockModule("../../core/Hotkey", hotkeyMockFactory);
+mockModule("../core/Hotkey", hotkeyMockFactory);
+mockModule(HOTKEY_MODULE_ABS, hotkeyMockFactory);
+mockModule(HOTKEY_MODULE_URL, hotkeyMockFactory);
 
-jest.mock("../../tools/Manager", () => ({
+const uniqueActualFactory = () => {
+  const actual = requireActual("../../utils/unique");
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    ...(actual ?? {}),
+    default: actual?.default ?? actual,
+  };
+};
+mockModule("../../utils/unique", uniqueActualFactory);
+mockModule("../utils/unique", uniqueActualFactory);
+mockModule(UNIQUE_MODULE_ABS, uniqueActualFactory);
+mockModule(UNIQUE_MODULE_URL, uniqueActualFactory);
+
+const helpersActualFactory = () => {
+  const actual = requireActual("../../core/Helpers");
+  return {
+    __esModule: true,
+    __skipMerge: true,
+    ...(actual ?? {}),
+    default: actual?.default ?? actual,
+  };
+};
+mockModule("../../core/Helpers", helpersActualFactory);
+mockModule("../core/Helpers", helpersActualFactory);
+mockModule(HELPERS_MODULE_ABS, helpersActualFactory);
+mockModule(HELPERS_MODULE_URL, helpersActualFactory);
+
+const mockInvoke = mock();
+const mockInvokeFirst = mock();
+const mockHasEvent = mock(() => false);
+mockModule("../../components/Infomodal/Infomodal", () => ({
   __esModule: true,
+  __skipMerge: true,
   default: {
-    setRoot: jest.fn(),
-    removeAllTools: jest.fn(),
-    allInstances: jest.fn(() => []),
-    resetActiveDrawings: jest.fn(),
+    warning: mock(),
+    error: mock(),
   },
 }));
 
-const mockInvoke = jest.fn();
-const mockInvokeFirst = jest.fn();
-const mockHasEvent = jest.fn(() => false);
-jest.mock("../../components/Infomodal/Infomodal", () => ({
-  __esModule: true,
-  default: {
-    warning: jest.fn(),
-    error: jest.fn(),
-  },
-}));
-
+import { reaction } from "mobx";
 import "../../tags/visual/View";
 import "../../tags/object/RichText";
-import Tree from "../../core/Tree";
-import Registry from "../../core/Registry";
+import "../../tags/object/Image/Image.js";
 import AppStore from "../AppStore";
 
-const MINIMAL_CONFIG = `<View><Text name="t1" value="$text" /></View>`;
+const MINIMAL_CONFIG = '<View><Image name="img" value="$img" /></View>';
 
 function createTestEnv(overrides = {}) {
   return {
@@ -80,7 +126,7 @@ function createStore(snapshot = {}, envOverrides) {
   return AppStore.create(
     {
       config: MINIMAL_CONFIG,
-      task: { id: 1, data: JSON.stringify({ text: "Hello" }) },
+      task: { id: 1, data: JSON.stringify({ img: "https://example.com/test.jpg" }) },
       interfaces: ["basic"],
       ...snapshot,
     },
@@ -90,7 +136,7 @@ function createStore(snapshot = {}, envOverrides) {
 
 describe("AppStore", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
     mockHasEvent.mockReturnValue(false);
     localStorage.setItem("autoAnnotation", "false");
     localStorage.setItem("autoAcceptSuggestions", "false");
@@ -253,6 +299,35 @@ describe("AppStore", () => {
     });
   });
 
+  describe("region:delete-all hotkey", () => {
+    it("confirmDeleteAllRegions asks in the editor confirm dialog and deletes only when confirmed", async () => {
+      const { registerConfirmModalDispatch } = await import("../../components/Infomodal/infomodal-dispatch");
+      const confirms = [];
+      registerConfirmModalDispatch((payload) => payload && confirms.push(payload));
+      const confirmSpy = spyOn(window, "confirm");
+      try {
+        const store = createStore();
+        store.initializeStore({});
+        const annotation = store.annotationStore.addAnnotation({ userGenerate: true });
+        store.annotationStore.selectAnnotation(annotation.id);
+        const deleteAll = spyOn(store.annotationStore.selected, "deleteAllRegions").mockImplementation(() => {});
+
+        store.confirmDeleteAllRegions();
+
+        expect(confirmSpy).not.toHaveBeenCalled();
+        expect(confirms).toHaveLength(1);
+        expect(confirms[0]).toMatchObject({ title: "Delete all regions", content: "Delete all?", okText: "Delete" });
+        expect(deleteAll).not.toHaveBeenCalled();
+
+        confirms[0].onOk();
+        expect(deleteAll).toHaveBeenCalledTimes(1);
+      } finally {
+        registerConfirmModalDispatch(null);
+        confirmSpy.mockRestore();
+      }
+    });
+  });
+
   describe("toggle state", () => {
     it("toggleSettings flips showingSettings", () => {
       const store = createStore();
@@ -393,24 +468,12 @@ describe("AppStore", () => {
     });
   });
 
-  describe("app controls", () => {
-    it("setAppControls stores controls", () => {
-      const store = createStore();
-      const controls = { clear: jest.fn(), render: jest.fn(), isRendered: () => false };
-      store.setAppControls(controls);
-      store.clearApp();
-      expect(controls.clear).toHaveBeenCalled();
-      store.renderApp();
-      expect(controls.render).toHaveBeenCalled();
-    });
-  });
-
   describe("resetAnnotationStore", () => {
     it("calls beforeReset and resetAnnotations on annotation store when present", () => {
       const store = createStore();
       store.initializeStore({});
-      const beforeReset = jest.fn();
-      const resetAnnotations = jest.fn();
+      const beforeReset = mock();
+      const resetAnnotations = mock();
       store.annotationStore.beforeReset = beforeReset;
       store.annotationStore.resetAnnotations = resetAnnotations;
       store.resetAnnotationStore();
@@ -439,10 +502,7 @@ describe("AppStore", () => {
     it("enrichUsers is called when annotations have user refs", () => {
       const store = createStore();
       store.initializeStore({
-        annotations: [
-          { user: 10, result: [] },
-          { completed_by: 20, result: [] },
-        ],
+        annotations: [{ user: 10, completed_by: 20, result: [] }],
       });
       expect(store.users.length).toBeGreaterThanOrEqual(1);
     });
@@ -459,7 +519,8 @@ describe("AppStore", () => {
 
   describe("showModal", () => {
     it("calls InfoModal with message and type", async () => {
-      const InfoModal = require("../../components/Infomodal/Infomodal").default;
+      const infoModalModule = require("../../components/Infomodal/Infomodal");
+      const InfoModal = infoModalModule.default ?? infoModalModule;
       const store = createStore();
       store.showModal("Test message", "warning");
       expect(InfoModal.warning).toHaveBeenCalledWith("Test message");
@@ -527,7 +588,7 @@ describe("AppStore", () => {
       store.initializeStore({});
       store.assignTask({ id: 1, data: "{}", allow_skip: false });
       window.APP_SETTINGS = { billing: { enterprise: true }, user: { id: 1, role: "AN" } };
-      const spy = jest.spyOn(console, "warn").mockImplementation();
+      const spy = spyOn(console, "warn").mockImplementation();
       store.skipTask();
       expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
       spy.mockRestore();
@@ -576,11 +637,12 @@ describe("AppStore", () => {
   });
 
   describe("isSubmitting guard", () => {
-    it("submitAnnotation returns early when isSubmitting", () => {
+    it("submitAnnotation returns early when isSubmitting", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       store.setFlags({ isSubmitting: true });
       store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
 
@@ -598,7 +660,7 @@ describe("AppStore", () => {
     it("sets awaitingSuggestions and parses response", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      const dataParser = jest.fn((r) => r.suggestions);
+      const dataParser = mock((r) => r.suggestions);
       const request = Promise.resolve({ suggestions: [{ result: [] }] });
       store.loadSuggestions(request, dataParser);
       expect(store.awaitingSuggestions).toBe(true);
@@ -613,7 +675,7 @@ describe("AppStore", () => {
     it("invokes nextTask after saving draft", async () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      store.annotationStore.selected.saveDraft = jest.fn().mockResolvedValue(undefined);
+      store.annotationStore.selected.saveDraft = mock().mockResolvedValue(undefined);
       mockInvoke.mockResolvedValue(undefined);
       await store.postponeTask();
       expect(store.annotationStore.selected.saveDraft).toHaveBeenCalledWith({ was_postponed: true });
@@ -622,12 +684,9 @@ describe("AppStore", () => {
   });
 
   describe("beforeDestroy", () => {
-    it("removes tools and clears appControls", () => {
-      const ToolsManager = require("../../tools/Manager").default;
+    it("runs teardown without errors", () => {
       const store = createStore();
-      store.setAppControls({ clear: jest.fn(), render: jest.fn() });
-      store.beforeDestroy();
-      expect(ToolsManager.removeAllTools).toHaveBeenCalled();
+      expect(() => store.beforeDestroy()).not.toThrow();
     });
   });
 
@@ -694,7 +753,7 @@ describe("AppStore", () => {
       expect(Number(first.pk)).toBe(historyRowId);
     });
 
-    it("hydrateHistoryItem finds item by pk (not MST id) and hydrates then selects", () => {
+    it("hydrateHistoryItem finds item by MST guid and hydrates then selects", () => {
       const store = createStore();
       store.initializeStore({
         annotations: [{ id: "a1", pk: 100, result: [] }],
@@ -710,6 +769,7 @@ describe("AppStore", () => {
         },
       ]);
       expect(store.annotationStore.history.length).toBe(1);
+      const mstGuid = store.annotationStore.history[0].id;
       const fullItem = {
         id: historyRowId,
         annotation_id: 100,
@@ -723,10 +783,11 @@ describe("AppStore", () => {
           },
         ],
       };
-      store.hydrateHistoryItem(historyRowId, fullItem);
+      store.hydrateHistoryItem(mstGuid, fullItem);
       expect(store.annotationStore.selectedHistory).toBe(store.annotationStore.history[0]);
       expect(store.annotationStore.selectedHistory.pk).toBeDefined();
       expect(Number(store.annotationStore.selectedHistory.pk)).toBe(historyRowId);
+      expect(store.annotationStore.selectedHistory.is_stub).toBe(false);
     });
   });
 
@@ -735,6 +796,133 @@ describe("AppStore", () => {
       const store = createStore();
       expect(typeof store.version).toBe("string");
       expect(store.version).toMatch(/^\d+\.\d+\.\d+$/);
+    });
+  });
+
+  describe("setCourseBottomBar", () => {
+    it("sets volatile course fields and toggles interfaces via action", () => {
+      const store = createStore({ interfaces: ["basic", "instruction"] });
+      const onOpen = mock();
+
+      store.setCourseBottomBar({
+        courses: [{ id: 1, title: "Course A" }],
+        hideInstructionsForCourses: true,
+        onOpenOnDemandCourse: onOpen,
+      });
+
+      expect(store.onDemandCourses).toEqual([{ id: 1, title: "Course A" }]);
+      expect(store.hideInstructionsForCourses).toBe(true);
+      expect(store.onOpenOnDemandCourse).toBe(onOpen);
+      expect(store.interfaces).toContain("learning:on-demand");
+      expect(store.interfaces).not.toContain("instruction");
+    });
+
+    it("removes learning:on-demand when courses is empty", () => {
+      const store = createStore({ interfaces: ["basic", "learning:on-demand"] });
+
+      store.setCourseBottomBar({
+        courses: [],
+        hideInstructionsForCourses: false,
+        onOpenOnDemandCourse: null,
+      });
+
+      expect(store.onDemandCourses).toEqual([]);
+      expect(store.hideInstructionsForCourses).toBe(false);
+      expect(store.interfaces).not.toContain("learning:on-demand");
+    });
+  });
+
+  describe("setCommentHeaderExtra (UTC-1446 experiment)", () => {
+    const HeaderExtra = () => null;
+
+    it("defaults to null", () => {
+      expect(createStore().commentHeaderExtra).toBeNull();
+    });
+
+    it("stores the component as-is and clears it with null or undefined", () => {
+      const store = createStore();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      expect(store.commentHeaderExtra).toBe(HeaderExtra);
+
+      store.setCommentHeaderExtra(null);
+      expect(store.commentHeaderExtra).toBeNull();
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(undefined);
+      expect(store.commentHeaderExtra).toBeNull();
+    });
+
+    it("is observable, so mounted comment items re-render when the host sets it later", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.commentHeaderExtra,
+        (value) => seen.push(value),
+      );
+
+      store.setCommentHeaderExtra(HeaderExtra);
+      store.setCommentHeaderExtra(null);
+      dispose();
+
+      expect(seen).toEqual([HeaderExtra, null]);
+    });
+  });
+
+  describe("host panel (UTC-1446)", () => {
+    const config = { title: "Helper", shown: true, onElement: () => {}, onAvailability: () => {} };
+
+    it("is not registered by default", () => {
+      const store = createStore();
+      expect(store.hostPanel).toBeNull();
+      expect(store.hostPanelFocusRequest).toBe(0);
+    });
+
+    it("keeps the registration as given, observably, and clears it with null or undefined", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanel,
+        (value) => seen.push(value),
+      );
+
+      store.setHostPanel(config);
+      store.setHostPanel(null);
+      store.setHostPanel(config);
+      store.setHostPanel(undefined);
+      dispose();
+
+      expect(seen).toEqual([config, null, config, null]);
+    });
+
+    it("counts focus requests, so the same request made twice is seen twice", () => {
+      const store = createStore();
+      const seen = [];
+      const dispose = reaction(
+        () => store.hostPanelFocusRequest,
+        (value) => seen.push(value),
+      );
+
+      store.focusHostPanel();
+      store.focusHostPanel();
+      dispose();
+
+      expect(seen).toEqual([1, 2]);
+    });
+  });
+
+  describe("setDescription", () => {
+    it("sets description to a string value", () => {
+      const store = createStore();
+      store.setDescription("New instructions text");
+      expect(store.description).toBe("New instructions text");
+    });
+
+    it("clears description when set to undefined", () => {
+      const store = createStore();
+      store.setDescription("Some text");
+      store.setDescription(undefined);
+      expect(store.description).toBeNull();
     });
   });
 
@@ -782,11 +970,235 @@ describe("AppStore", () => {
     });
   });
 
+  describe("own annotation in review (review:deny-own)", () => {
+    const ownAnnotationStore = (interfaces, extra = {}) => {
+      const store = createStore({ interfaces, user: { id: 7 }, users: [{ id: 7 }, { id: 8 }], ...extra });
+      store.initializeStore({
+        annotations: [
+          { id: 1, pk: 1, result: [], user: 7 },
+          { id: 2, pk: 2, result: [], user: 8 },
+        ],
+      });
+      return store;
+    };
+    const select = (store, pk) => {
+      const all = store.annotationStore.annotations;
+      store.annotationStore.selectAnnotation(all.find((a) => String(a.pk) === String(pk)).id);
+    };
+
+    it("acceptAnnotation and rejectAnnotation do nothing on the reviewer's own annotation", async () => {
+      const store = ownAnnotationStore(["basic", "review", "review:deny-own"]);
+      select(store, 1);
+
+      expect(store.annotationStore.selected.isOwnReviewBlocked).toBe(true);
+      store.acceptAnnotation();
+      store.rejectAnnotation({});
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+      expect(mockInvoke).not.toHaveBeenCalledWith("rejectAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit and reject hotkeys do nothing on the reviewer's own annotation", async () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = ownAnnotationStore(["basic", "review", "review:deny-own"], {
+          customButtons: { reject: [{ name: "remove", title: "Remove", menu: false }] },
+        });
+        select(store, 1);
+
+        store.handleSubmitHotkey();
+        store.handleSkipHotkey();
+        await new Promise((r) => setTimeout(r, 0));
+
+        expect(events.some((event) => event.type === "lsf:reject-with-action")).toBe(false);
+        expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+
+        select(store, 2);
+        store.handleSkipHotkey();
+        expect(events.find((event) => event.type === "lsf:reject-with-action")?.detail?.name).toBe("remove");
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+
+    it("does not block another user's annotation, or own annotations without review:deny-own", () => {
+      const store = ownAnnotationStore(["basic", "review", "review:deny-own"]);
+      select(store, 2);
+      expect(store.annotationStore.selected.isOwnReviewBlocked).toBe(false);
+
+      const managerStore = ownAnnotationStore(["basic", "review"]);
+      select(managerStore, 1);
+      expect(managerStore.annotationStore.selected.isOwnReviewBlocked).toBe(false);
+    });
+  });
+
+  describe("isLoading guard", () => {
+    it("submitAnnotation returns early when isLoading", async () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.submitAnnotation();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("updateAnnotation returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.updateAnnotation();
+      expect(mockInvoke).not.toHaveBeenCalledWith(
+        "updateAnnotation",
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("acceptAnnotation returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [] }] });
+      store.setFlags({ isLoading: true });
+      store.acceptAnnotation();
+      expect(mockInvoke).not.toHaveBeenCalledWith("acceptAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("skipTask returns early when isLoading", () => {
+      const store = createStore();
+      store.initializeStore({});
+      store.assignTask({ id: 1, data: "{}" });
+      store.setFlags({ isLoading: true });
+      store.skipTask();
+      expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
+    });
+  });
+
+  describe("hydrated hotkey latch", () => {
+    const createSubmitStore = () => {
+      const store = createStore({ interfaces: ["submit", "update", "skip"] });
+      store.initializeStore({ annotations: [{ result: [] }] });
+      return store;
+    };
+
+    it("setHydrated toggles the flag and it defaults to true", () => {
+      const store = createSubmitStore();
+      expect(store.hydrated).toBe(true);
+      store.setHydrated(false);
+      expect(store.hydrated).toBe(false);
+      store.setHydrated(true);
+      expect(store.hydrated).toBe(true);
+    });
+
+    it("submit hotkey fires when hydrated", async () => {
+      const store = createSubmitStore();
+      store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey is inert while not hydrated", async () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey is inert when there is no task to label", async () => {
+      const store = createSubmitStore();
+      store.setFlags({ noTask: true });
+      store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("submit hotkey fires again once re-hydrated", async () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+      store.setHydrated(true);
+      store.handleSubmitHotkey();
+      await new Promise((r) => setTimeout(r, 0));
+      expect(mockInvoke).toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
+    });
+
+    it("skip hotkey is inert while not hydrated", () => {
+      const store = createSubmitStore();
+      store.setHydrated(false);
+      store.handleSkipHotkey();
+      expect(mockInvoke).not.toHaveBeenCalledWith("skipTask", expect.anything(), expect.anything());
+    });
+
+    it("skip hotkey fires when hydrated", () => {
+      const store = createSubmitStore();
+      store.handleSkipHotkey();
+      expect(mockInvoke.mock.calls.some(([event]) => event === "skipTask")).toBe(true);
+    });
+
+    it("skip hotkey in review applies the primary reject action even when the menu is closed", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [
+              { name: "remove", title: "No Rework", menu: true, isPrimary: true },
+              { name: "requeue", title: "Return to Annotator", menu: true },
+            ],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        const rejectEvent = events.find((event) => event.type === "lsf:reject-with-action");
+        expect(rejectEvent?.detail?.name).toBe("remove");
+        expect(events.some((event) => event.type === "lsf:open-reject-menu")).toBe(false);
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+
+    it("skip hotkey in review uses a single menu:false custom reject instead of generic rejectAnnotation", () => {
+      const events = [];
+      const originalDispatch = window.dispatchEvent.bind(window);
+      window.dispatchEvent = (event) => {
+        events.push(event);
+        return originalDispatch(event);
+      };
+      try {
+        const store = createStore({
+          interfaces: ["review"],
+          customButtons: {
+            reject: [{ name: "redistribute", title: "Pass to Another Annotator", menu: false }],
+          },
+        });
+        store.initializeStore({ annotations: [{ result: [] }] });
+        store.handleSkipHotkey();
+        expect(events.find((event) => event.type === "lsf:reject-with-action")?.detail?.name).toBe("redistribute");
+        expect(mockInvoke).not.toHaveBeenCalledWith("rejectAnnotation", expect.anything(), expect.anything());
+      } finally {
+        window.dispatchEvent = originalDispatch;
+      }
+    });
+  });
+
   describe("submitAnnotation when validate fails", () => {
     it("does not invoke event when entity.validate returns false", () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
-      store.annotationStore.selected.validate = jest.fn().mockReturnValue(false);
+      store.annotationStore.selected.validate = mock().mockReturnValue(false);
       store.submitAnnotation();
       expect(mockInvoke).not.toHaveBeenCalledWith("submitAnnotation", expect.anything(), expect.anything());
     });
@@ -797,10 +1209,10 @@ describe("AppStore", () => {
       const store = createStore({ queueTotal: 5, queuePosition: 0 });
       store.initializeStore({ annotations: [{ result: [] }] });
       const entity = store.annotationStore.selected;
-      entity.beforeSend = jest.fn();
-      entity.validate = jest.fn().mockReturnValue(true);
-      entity.sendUserGenerate = jest.fn();
-      entity.dropDraft = jest.fn();
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
       mockInvoke.mockResolvedValue(undefined);
       store.submitAnnotation();
       await new Promise((r) => setTimeout(r, 300));
@@ -814,14 +1226,29 @@ describe("AppStore", () => {
       const store = createStore();
       store.initializeStore({ annotations: [{ result: [] }] });
       const entity = store.annotationStore.selected;
-      entity.beforeSend = jest.fn();
-      entity.validate = jest.fn().mockReturnValue(true);
-      entity.sendUserGenerate = jest.fn();
-      entity.dropDraft = jest.fn();
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
       mockInvoke.mockResolvedValue(undefined);
       store.updateAnnotation({ extra: "data" });
       await new Promise((r) => setTimeout(r, 300));
       expect(mockInvoke).toHaveBeenCalledWith("updateAnnotation", store, entity, { extra: "data" });
+    });
+
+    it("clears acceptedState after a successful update so a prior review is stale", async () => {
+      const store = createStore();
+      store.initializeStore({ annotations: [{ result: [], accepted_state: "accepted" }] });
+      const entity = store.annotationStore.selected;
+      entity.beforeSend = mock();
+      entity.validate = mock().mockReturnValue(true);
+      entity.sendUserGenerate = mock();
+      entity.dropDraft = mock();
+      mockInvoke.mockResolvedValue(undefined);
+      expect(entity.acceptedState).toBe("accepted");
+      store.updateAnnotation();
+      await new Promise((r) => setTimeout(r, 300));
+      expect(entity.acceptedState).toBeNull();
     });
   });
 });

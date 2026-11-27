@@ -17,13 +17,12 @@ from io_storages.api import (
 )
 from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesImportStorage
 from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer, LocalFilesImportStorageSerializer
+from io_storages.serializers import build_storage_validate_serializer, build_storage_write_serializer
 
-from .openapi_schema import (
-    _local_files_export_storage_schema,
-    _local_files_export_storage_schema_with_id,
-    _local_files_import_storage_schema,
-    _local_files_import_storage_schema_with_id,
-)
+LocalFilesImportStorageWriteSerializer = build_storage_write_serializer(LocalFilesImportStorageSerializer)
+LocalFilesImportStorageValidateSerializer = build_storage_validate_serializer(LocalFilesImportStorageSerializer)
+LocalFilesExportStorageWriteSerializer = build_storage_write_serializer(LocalFilesExportStorageSerializer)
+LocalFilesExportStorageValidateSerializer = build_storage_validate_serializer(LocalFilesExportStorageSerializer)
 
 
 @method_decorator(
@@ -55,9 +54,7 @@ from .openapi_schema import (
         tags=['Storage: Local'],
         summary='Create import storage',
         description='Create a new local file import storage connection.',
-        request={
-            'application/json': _local_files_import_storage_schema,
-        },
+        request=LocalFilesImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'local'],
             'x-fern-sdk-method-name': 'create',
@@ -90,9 +87,7 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
         tags=['Storage: Local'],
         summary='Update import storage',
         description='Update a specific local file import storage connection.',
-        request={
-            'application/json': _local_files_import_storage_schema,
-        },
+        request=LocalFilesImportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'local'],
             'x-fern-sdk-method-name': 'update',
@@ -169,9 +164,7 @@ class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
         tags=['Storage: Local'],
         summary='Validate import storage',
         description='Validate a specific local file import storage connection.',
-        request={
-            'application/json': _local_files_import_storage_schema_with_id,
-        },
+        request=LocalFilesImportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['import_storage', 'local'],
@@ -190,9 +183,7 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
         tags=['Storage: Local'],
         summary='Validate export storage',
         description='Validate a specific local file export storage connection.',
-        request={
-            'application/json': _local_files_export_storage_schema_with_id,
-        },
+        request=LocalFilesExportStorageValidateSerializer,
         responses={200: OpenApiResponse(description='Validation successful')},
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'local'],
@@ -233,9 +224,7 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
         tags=['Storage: Local'],
         summary='Create export storage',
         description='Create a new local file export storage connection to store annotations.',
-        request={
-            'application/json': _local_files_export_storage_schema,
-        },
+        request=LocalFilesExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'local'],
             'x-fern-sdk-method-name': 'create',
@@ -268,9 +257,7 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
         tags=['Storage: Local'],
         summary='Update export storage',
         description='Update a specific local file export storage connection.',
-        request={
-            'application/json': _local_files_export_storage_schema,
-        },
+        request=LocalFilesExportStorageWriteSerializer,
         extensions={
             'x-fern-sdk-group-name': ['export_storage', 'local'],
             'x-fern-sdk-method-name': 'update',

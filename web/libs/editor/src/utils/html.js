@@ -1,8 +1,8 @@
 import insertAfter from "insert-after";
 import * as Checkers from "./utilities";
-import sanitizeHTML from "sanitize-html";
 import Canvas from "./canvas";
 import { cn } from "./bem";
+import { DEFAULT_ALLOWED_IFRAME_DOMAINS, sanitizeHtml } from "./sanitizeHtml";
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {
@@ -512,178 +512,6 @@ function findNodeAt(context, at) {
   }
 }
 
-/**
- * Sanitize html from scripts and iframes
- * @param {string} html
- * @returns {string}
- */
-function sanitizeHtml(html = []) {
-  if (!html) return "";
-
-  // Whitelist of allowed iframe domains - easily extensible for future additions
-  const ALLOWED_IFRAME_DOMAINS = [
-    "www.youtube.com",
-    "youtube.com",
-    "www.youtube-nocookie.com",
-    "youtube-nocookie.com",
-    "youtu.be", // YouTube's shortened URL format
-  ];
-
-  // Helper function to validate if iframe src is from an allowed domain
-  const isAllowedIframeSrc = (src) => {
-    if (!src) {
-      return false;
-    }
-
-    try {
-      const url = new URL(src);
-      // Only allow HTTPS for security
-      if (url.protocol !== "https:") {
-        return false;
-      }
-      // Check if hostname matches any allowed domain
-      const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
-      return isAllowed;
-    } catch (e) {
-      // Invalid URL format
-      return false;
-    }
-  };
-
-  const disallowedAttributes = [
-    "onauxclick",
-    "onafterprint",
-    "onbeforematch",
-    "onbeforeprint",
-    "onbeforeunload",
-    "onbeforetoggle",
-    "onblur",
-    "oncancel",
-    "oncanplay",
-    "oncanplaythrough",
-    "onchange",
-    "onclick",
-    "onclose",
-    "oncontextlost",
-    "oncontextmenu",
-    "oncontextrestored",
-    "oncopy",
-    "oncuechange",
-    "oncut",
-    "ondblclick",
-    "ondrag",
-    "ondragend",
-    "ondragenter",
-    "ondragleave",
-    "ondragover",
-    "ondragstart",
-    "ondrop",
-    "ondurationchange",
-    "onemptied",
-    "onended",
-    "onerror",
-    "onfocus",
-    "onformdata",
-    "onhashchange",
-    "oninput",
-    "oninvalid",
-    "onkeydown",
-    "onkeypress",
-    "onkeyup",
-    "onlanguagechange",
-    "onload",
-    "onloadeddata",
-    "onloadedmetadata",
-    "onloadstart",
-    "onmessage",
-    "onmessageerror",
-    "onmousedown",
-    "onmouseenter",
-    "onmouseleave",
-    "onmousemove",
-    "onmouseout",
-    "onmouseover",
-    "onmouseup",
-    "onoffline",
-    "ononline",
-    "onpagehide",
-    "onpageshow",
-    "onpaste",
-    "onpause",
-    "onplay",
-    "onplaying",
-    "onpopstate",
-    "onprogress",
-    "onratechange",
-    "onreset",
-    "onresize",
-    "onrejectionhandled",
-    "onscroll",
-    "onscrollend",
-    "onsecuritypolicyviolation",
-    "onseeked",
-    "onseeking",
-    "onselect",
-    "onslotchange",
-    "onstalled",
-    "onstorage",
-    "onsubmit",
-    "onsuspend",
-    "ontimeupdate",
-    "ontoggle",
-    "onunhandledrejection",
-    "onunload",
-    "onvolumechange",
-    "onwaiting",
-    "onwheel",
-  ];
-
-  const disallowedTags = {
-    script: true,
-    iframe: true,
-  };
-
-  const result = sanitizeHTML(html, {
-    allowedTags: false,
-    allowedAttributes: false,
-    disallowedTagsMode: "discard",
-    allowVulnerableTags: true,
-    exclusiveFilter(frame) {
-      // For iframes, only block if NOT from whitelisted domain
-      if (frame.tag === "iframe") {
-        const src = frame.attribs?.src;
-        return !isAllowedIframeSrc(src);
-      }
-
-      // Check other disallowed tags
-      return disallowedTags[frame.tag];
-    },
-    nonTextTags: ["script", "textarea", "option", "noscript"],
-    transformTags: {
-      iframe: (tagName, attribs) => {
-        return {
-          tagName,
-          attribs,
-        };
-      },
-      "*": (tagName, attribs) => {
-        Object.keys(attribs).forEach((attr) => {
-          // If the attribute is in the disallowed list, remove it
-          if (disallowedAttributes.includes(attr)) {
-            delete attribs[attr];
-          }
-        });
-        return {
-          tagName,
-          attribs,
-        };
-      },
-    },
-  });
-
-  return result;
-}
-
 export {
   toggleLabelsAndScores,
   labelWithCSS,
@@ -699,4 +527,5 @@ export {
   createClass,
   moveStylesBetweenHeadTags,
   applyHighlightStylesToDoc,
+  DEFAULT_ALLOWED_IFRAME_DOMAINS,
 };

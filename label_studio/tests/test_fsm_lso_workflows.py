@@ -14,6 +14,7 @@ LSE-specific transitions (reviews, project settings, annotation drafts) are test
 
 import pytest
 from core.current_request import CurrentContext
+from django.core.cache import cache
 from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import StateManager
 from label_studio_sdk.client import LabelStudio
@@ -23,9 +24,19 @@ from tasks.models import Annotation, Task
 pytestmark = pytest.mark.django_db
 
 
+@pytest.fixture(autouse=True)
+def clear_fsm_cache(settings):
+    settings.FSM_ENABLED = True
+    cache.clear()
+    yield
+    CurrentContext.clear()
+    cache.clear()
+
+
 @pytest.fixture
-def fsm_context(business_client):
+def fsm_context(business_client, settings):
     """Set CurrentContext so FSM state lookups (e.g. in assert_*_state) work in tests."""
+    settings.FSM_ENABLED = True
     CurrentContext.set_user(business_client.user)
     try:
         yield

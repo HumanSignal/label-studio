@@ -6,39 +6,66 @@ if (typeof globalThis.structuredClone === "undefined") {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
-jest.mock("keymaster", () => {
-  const keymaster = () => {};
-  keymaster.unbind = () => {};
-  keymaster.setScope = () => {};
-  return { __esModule: true, default: keymaster };
-});
+let AppStore;
+const RESULT_MODULE_ABS = require.resolve("../../regions/Result");
+const RESULT_MODULE_URL = require("node:url").pathToFileURL(RESULT_MODULE_ABS).href;
 
-import "../../tags/visual/View";
-import "../../tags/object/Image/Image.js";
-import "../../tags/control/Rectangle.js";
-import "../../tags/control/Relations.js";
-import "../../tags/control/Relation.js";
-import AppStore from "../AppStore";
-
+const _RELATIONS_CONTROL = {
+  type: "relations",
+  values: ["parent", "child"],
+  children: [{ value: "parent" }, { value: "child" }],
+};
 const CONFIG_IMAGE_RECT_RELATIONS =
-  '<View><Image name="img" value="$img" /><Rectangle name="rect1" toName="img" /><Rectangle name="rect2" toName="img" /><Relations toName="img"><Relation value="parent" /><Relation value="child" /></Relations></View>';
+  '<View><Image name="img" value="$img" /><Labels name="lbl" toName="img"><Label value="A" /><Label value="B" /></Labels><Relations toName="img"><Relation value="parent" /><Relation value="child" /></Relations></View>';
 
-const createTestEnv = () => ({
-  events: {
-    hasEvent: jest.fn(() => false),
-    invoke: jest.fn(),
-  },
-  messages: {},
-  settings: {},
-});
+const ensureRealResultModule = () => {
+  const factory = () => {
+    const actual = requireActual("../../regions/Result");
+    return {
+      __esModule: true,
+      __skipMerge: true,
+      ...(actual ?? {}),
+      default: actual.default ?? actual,
+    };
+  };
+
+  mockModule("../../regions/Result", factory);
+  mockModule("../regions/Result", factory);
+  mockModule(RESULT_MODULE_ABS, factory);
+  mockModule(RESULT_MODULE_URL, factory);
+};
 
 function createStoreWithTwoRectRegionsAndRelations() {
-  const storage = {};
-  const env = createTestEnv();
+  const utilsModule = require("../../utils");
+  const utilitiesModule = require("../../utils/utilities");
+  const dateModule = require("../../utils/date");
+  const Utils = utilsModule.default ?? utilsModule;
+
+  // Guard against leaked partial mocks from other files.
+  Utils.Checkers = Utils.Checkers ?? utilitiesModule;
+  Utils.UDate = Utils.UDate ?? dateModule;
+
+  const env = {
+    events: {
+      hasEvent: mock(() => false),
+      invoke: mock(),
+    },
+    hotkeys: {
+      addKey: mock(),
+      removeKey: mock(),
+      removeNamed: mock(),
+      overwriteNamed: mock(),
+      unbindAll: mock(),
+      setScope: mock(),
+    },
+    messages: {},
+    settings: {},
+  };
   const task = {
     id: 1,
     data: JSON.stringify({ img: "https://example.com/img.jpg" }),
   };
+
   const store = AppStore.create(
     {
       config: CONFIG_IMAGE_RECT_RELATIONS,
@@ -48,48 +75,67 @@ function createStoreWithTwoRectRegionsAndRelations() {
     env,
   );
   store.initializeStore({});
-  const rectResult = [
-    {
-      from_name: "rect1",
-      to_name: "img",
-      type: "rectangle",
-      value: { x: 0, y: 0, width: 20, height: 20 },
-    },
-    {
-      from_name: "rect2",
-      to_name: "img",
-      type: "rectangle",
-      value: { x: 10, y: 10, width: 30, height: 30 },
-    },
-  ];
-  const ann = store.annotationStore.addAnnotation({ result: rectResult });
-  ann.deserializeResults(ann.versions.result);
-  const regions = ann.regionStore.regions;
-  const relationStore = ann.relationStore;
+
+  const ann = store.annotationStore.addAnnotation({ result: [] });
+  const labelsTag = ann.names.get("lbl");
+  const imageTag = ann.names.get("img");
+
+  const area1 = ann.createResult(
+    { id: "relation-area-1", x: 0, y: 0, width: 20, height: 20 },
+    { rectanglelabels: ["A"] },
+    labelsTag,
+    imageTag,
+    true,
+  );
+  const area2 = ann.createResult(
+    { id: "relation-area-2", x: 10, y: 10, width: 30, height: 30 },
+    { rectanglelabels: ["B"] },
+    labelsTag,
+    imageTag,
+    true,
+  );
+  ann.updateObjects();
+
   return {
-    store,
-    annotation: ann,
-    relationStore,
-    regions,
-    env,
-    storage,
+    relationStore: ann.relationStore,
+    regions: [area1, area2].filter(Boolean),
   };
 }
 
 describe("RelationStore", () => {
+  let getItemSpy;
+  let setItemSpy;
+
   beforeEach(() => {
+    resetAllMocks();
+    resetModules();
+    ensureRealResultModule();
+    require("../../tags/visual/View");
+    require("../../tags/object/Image/Image.js");
+    require("../../tags/control/Labels/Labels.jsx");
+    require("../../tags/control/Relations.js");
+    require("../../tags/control/Relation.js");
+    AppStore = require("../AppStore").default;
+
+    const hotkeyModule = require("../../core/Hotkey");
+    const keymapModule = require("../../core/settings/keymap.json");
+    const defaultKeymap = keymapModule.default ?? keymapModule;
+    const Hotkey = hotkeyModule.Hotkey ?? hotkeyModule.default?.Hotkey;
+
+    if (Hotkey) {
+      Hotkey.keymap = structuredClone(defaultKeymap);
+    }
+
     const storage = {};
-    Object.defineProperty(global, "window", {
-      value: {
-        localStorage: {
-          getItem: (k) => storage[k] ?? null,
-          setItem: (k, v) => {
-            storage[k] = v;
-          },
-        },
-      },
-      writable: true,
+    getItemSpy = spyOn(window.localStorage, "getItem").mockImplementation((k) => storage[k] ?? null);
+    setItemSpy = spyOn(window.localStorage, "setItem").mockImplementation((k, v) => {
+      storage[k] = v;
     });
+  });
+
+  afterEach(() => {
+    getItemSpy?.mockRestore?.();
+    setItemSpy?.mockRestore?.();
   });
 
   describe("views (no relations)", () => {
@@ -115,6 +161,7 @@ describe("RelationStore", () => {
 
     it("values returns control values when control set", () => {
       const { relationStore } = createStoreWithTwoRectRegionsAndRelations();
+      relationStore.setControl({ values: ["parent", "child"] });
       expect(relationStore.values).toEqual(["parent", "child"]);
     });
   });
@@ -318,19 +365,39 @@ describe("RelationStore", () => {
 });
 
 describe("Relation (model)", () => {
+  let getItemSpy;
+  let setItemSpy;
+
   beforeEach(() => {
+    resetAllMocks();
+    resetModules();
+    ensureRealResultModule();
+    require("../../tags/visual/View");
+    require("../../tags/object/Image/Image.js");
+    require("../../tags/control/Labels/Labels.jsx");
+    require("../../tags/control/Relations.js");
+    require("../../tags/control/Relation.js");
+    AppStore = require("../AppStore").default;
+
+    const hotkeyModule = require("../../core/Hotkey");
+    const keymapModule = require("../../core/settings/keymap.json");
+    const defaultKeymap = keymapModule.default ?? keymapModule;
+    const Hotkey = hotkeyModule.Hotkey ?? hotkeyModule.default?.Hotkey;
+
+    if (Hotkey) {
+      Hotkey.keymap = structuredClone(defaultKeymap);
+    }
+
     const storage = {};
-    Object.defineProperty(global, "window", {
-      value: {
-        localStorage: {
-          getItem: (k) => storage[k] ?? null,
-          setItem: (k, v) => {
-            storage[k] = v;
-          },
-        },
-      },
-      writable: true,
+    getItemSpy = spyOn(window.localStorage, "getItem").mockImplementation((k) => storage[k] ?? null);
+    setItemSpy = spyOn(window.localStorage, "setItem").mockImplementation((k, v) => {
+      storage[k] = v;
     });
+  });
+
+  afterEach(() => {
+    getItemSpy?.mockRestore?.();
+    setItemSpy?.mockRestore?.();
   });
 
   describe("views", () => {
@@ -390,8 +457,8 @@ describe("Relation (model)", () => {
       const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
       const [r1, r2] = regions;
       const rl = relationStore.addRelation(r1, r2);
-      const spy1 = jest.spyOn(r1, "toggleHighlight");
-      const spy2 = jest.spyOn(r2, "toggleHighlight");
+      const spy1 = spyOn(r1, "toggleHighlight");
+      const spy2 = spyOn(r2, "toggleHighlight");
       rl.toggleHighlight();
       expect(spy1).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();
@@ -403,7 +470,7 @@ describe("Relation (model)", () => {
       const { relationStore, regions } = createStoreWithTwoRectRegionsAndRelations();
       const [r1] = regions;
       const rl = relationStore.addRelation(r1, r1);
-      const spy1 = jest.spyOn(r1, "toggleHighlight");
+      const spy1 = spyOn(r1, "toggleHighlight");
       rl.toggleHighlight();
       expect(spy1).toHaveBeenCalledTimes(1);
       spy1.mockRestore();

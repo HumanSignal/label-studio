@@ -121,11 +121,30 @@ if DOMAIN_FROM_REQUEST:
     if HOSTNAME and not HOSTNAME.startswith('/'):
         raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
+
+def _get_secure_proxy_ssl_header():
+    value = get_env('SECURE_PROXY_SSL_HEADER')
+    if not value:
+        return None
+
+    parts = [part.strip() for part in value.split(',')]
+    if len(parts) != 2 or not all(parts):
+        raise ImproperlyConfigured(
+            'SECURE_PROXY_SSL_HEADER must be configured as "<header>,<value>", '
+            'for example "HTTP_X_FORWARDED_PROTO,https".'
+        )
+    return tuple(parts)
+
+
+SECURE_PROXY_SSL_HEADER = _get_secure_proxy_ssl_header()
+USE_X_FORWARDED_HOST = get_bool_env('USE_X_FORWARDED_HOST', False)
+USE_X_FORWARDED_PORT = get_bool_env('USE_X_FORWARDED_PORT', False)
+
 INTERNAL_PORT = '8080'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool_env('DEBUG', True)
-DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', True)
+DEBUG_MODAL_EXCEPTIONS = get_bool_env('DEBUG_MODAL_EXCEPTIONS', False)
 
 # Whether to verify SSL certs when making external requests, eg in the uploader
 # ⚠️ Turning this off means assuming risk. ⚠️
@@ -142,7 +161,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DATA_DIR = get_env('BASE_DATA_DIR')
 if BASE_DATA_DIR is None:
     BASE_DATA_DIR = get_data_dir()
-os.makedirs(BASE_DATA_DIR, exist_ok=True)
+os.makedirs(BASE_DATA_DIR, mode=0o700, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # This indicates whether the code is running in a Continuous Integration environment.
@@ -256,6 +275,7 @@ MIDDLEWARE = [
     'core.middleware.XApiKeySupportMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'core.middleware.NoindexUrlMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
@@ -264,6 +284,12 @@ MIDDLEWARE = [
     'core.current_request.ThreadLocalMiddleware',
     'jwt_auth.middleware.JWTAuthenticationMiddleware',
 ]
+
+# Extension points for downstream apps (e.g. enterprise features) to contribute extra noindex URL
+# patterns (NoindexUrlMiddleware) and secured contextlog view names without adding feature-specific
+# routes to OSS. Each is a tuple appended to the OSS defaults.
+ADDITIONAL_NOINDEX_URL_PATTERNS = ()
+ADDITIONAL_CONTEXTLOG_SECURED_VIEWS = ()
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
@@ -279,6 +305,8 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 100,
+    # DRF 3.18 switched many=True validation errors to a dict; keep the list format API clients rely on
+    'LIST_SERIALIZER_ERRORS_AS_DICT': False,
 }
 SILENCED_SYSTEM_CHECKS += ['rest_framework.W001']
 
@@ -315,6 +343,11 @@ AUTHENTICATION_BACKENDS = [
 USE_USERNAME_FOR_LOGIN = False
 
 DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
+# Organization invite links stop working this many days after they are issued or reset; 0 disables expiration
+ORG_INVITE_EXPIRATION_DAYS = int(get_env('ORG_INVITE_EXPIRATION_DAYS', 30))
+
+# Creating extra organizations via POST /api/organizations/ is opt-in: most deployments are single-org
+ALLOW_ORGANIZATION_CREATION = get_bool_env('ALLOW_ORGANIZATION_CREATION', False)
 
 # Password validation settings
 AUTH_PASSWORD_MIN_LENGTH = 8
@@ -331,6 +364,8 @@ AUTH_PASSWORD_VALIDATORS = [
             'max_length': AUTH_PASSWORD_MAX_LENGTH,
         },
     },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Django templates
@@ -384,6 +419,15 @@ RQ_QUEUES = {
     },
 }
 
+# django-rq >= 4 defaults this to True, which mounts an unwrapped stats.json under /admin/
+RQ_SHOW_ADMIN_LINK = False
+
+RQ = {
+    # django-rq >= 4 defaults to 'on_db_commit', which defers the enqueue and returns None
+    # from enqueue() inside an atomic block; callers here rely on the returned job
+    'COMMIT_MODE': 'auto',
+}
+
 # How long to keep failed RQ jobs (in seconds); default is 30 days
 RQ_FAILED_JOB_TTL = int(get_env('RQ_FAILED_JOB_TTL', 30 * 24 * 60 * 60))
 
@@ -413,6 +457,120 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {'url': 'https://labelstud.io'},
     'X_LOGO': {'url': '../../static/icons/logo-black.svg'},
     'ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE': False,
+    'ENUM_NAME_OVERRIDES': {
+        'AnnotationHistoryActionEnum': (
+            ('prediction', 'Created from prediction'),
+            ('propagated_annotation', 'Created from another annotation'),
+            ('imported', 'Imported'),
+            ('submitted', 'Submitted'),
+            ('updated', 'Updated'),
+            ('skipped', 'Skipped'),
+            ('accepted', 'Accepted'),
+            ('rejected', 'Rejected'),
+            ('fixed_and_accepted', 'Fixed and accepted'),
+            ('deleted_review', 'Deleted review'),
+        ),
+        'DataManagerFilterModeEnum': (
+            ('only', 'only'),
+            ('exclude', 'exclude'),
+            (None, None),
+        ),
+        'FsmBackfillJobStatusEnum': (
+            ('PENDING', 'Pending'),
+            ('QUEUED', 'Queued'),
+            ('RUNNING', 'Running'),
+            ('COMPLETED', 'Completed'),
+            ('FAILED', 'Failed'),
+        ),
+        'RejectActionEnum': (
+            ('remove', 'Remove'),
+            ('requeue', 'Requeue'),
+            ('redistribute', 'Redistribute'),
+        ),
+        'TaskDataColumnValueTypeEnum': (
+            ('String', 'String'),
+            ('Number', 'Number'),
+        ),
+        # Stored organization roles: includes the hidden VIEW_ONLY backing role ('VO',
+        # FIT-2196), which can appear in responses but is never assignable via role APIs.
+        'OrganizationRoleEnum': (
+            ('OW', 'Owner'),
+            ('AD', 'Administrator'),
+            ('MA', 'Manager'),
+            ('RE', 'Reviewer'),
+            ('AN', 'Annotator'),
+            ('DI', 'Deactivated'),
+            ('NO', 'Not Activated'),
+            ('VO', 'View Only'),
+        ),
+        # Assignable roles (OrganizationRole.public_choices()): what role-assignment
+        # inputs accept — hidden backing roles are excluded.
+        'AssignableOrganizationRoleEnum': (
+            ('OW', 'Owner'),
+            ('AD', 'Administrator'),
+            ('MA', 'Manager'),
+            ('RE', 'Reviewer'),
+            ('AN', 'Annotator'),
+            ('DI', 'Deactivated'),
+            ('NO', 'Not Activated'),
+        ),
+        # Provenance for how a member/project role was set (RoleSource.choices).
+        'RoleSourceEnum': (
+            ('manual', 'Manual'),
+            ('saml', 'SAML'),
+            ('scim', 'SCIM'),
+            ('ldap', 'LDAP'),
+            ('api', 'API'),
+            ('billing', 'Billing'),
+        ),
+        # Seat types assignable through invite/membership APIs
+        # (UserType.assignable_choices()): Service Accounts are provisioned via
+        # their dedicated API and are excluded.
+        'AssignableUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('flex', 'Flex'),
+            ('viewonly', 'View Only'),
+        ),
+        # Membership updates accept Standard or Flex (View-Only creation stays on invite).
+        'StandardUserTypeEnum': (
+            ('standard', 'Standard'),
+            ('flex', 'Flex'),
+        ),
+        'OrganizationPermissionRoleEnum': (
+            'OW',
+            'AD',
+            'MA',
+            'RE',
+            'AN',
+            'DI',
+            'NO',
+            'VO',
+        ),
+        'ProjectImportStatusEnum': (
+            ('created', 'Created'),
+            ('in_progress', 'In progress'),
+            ('failed', 'Failed'),
+            ('completed', 'Completed'),
+        ),
+        'ProjectSamplingEnum': (
+            ('Sequential sampling', 'Tasks are ordered by Data manager ordering'),
+            ('Uniform sampling', 'Tasks are chosen randomly'),
+            ('Uncertainty sampling', 'Tasks are chosen according to model uncertainty scores (active learning mode)'),
+        ),
+        'StorageStatusEnum': (
+            ('initialized', 'Initialized'),
+            ('queued', 'Queued'),
+            ('in_progress', 'In progress'),
+            ('failed', 'Failed'),
+            ('completed', 'Completed'),
+            ('completed_with_errors', 'Completed with errors'),
+        ),
+        # Task assignment type (Annotate / Review) used by assignees mutation APIs.
+        'AssignmentTypeEnum': (
+            ('AN', 'Annotate'),
+            ('RE', 'Review'),
+        ),
+    },
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -486,7 +644,7 @@ MAX_SESSION_AGE = int(get_env('MAX_SESSION_AGE', timedelta(days=14).total_second
 # The most time that can elapse between activity with the server before the user is logged out
 MAX_TIME_BETWEEN_ACTIVITY = int(get_env('MAX_TIME_BETWEEN_ACTIVITY', timedelta(days=5).total_seconds()))
 
-SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', False)
+SSRF_PROTECTION_ENABLED = get_bool_env('SSRF_PROTECTION_ENABLED', True)
 USE_DEFAULT_BANNED_SUBNETS = get_bool_env('USE_DEFAULT_BANNED_SUBNETS', True)
 USER_ADDITIONAL_BANNED_SUBNETS = get_env_list('USER_ADDITIONAL_BANNED_SUBNETS', default=[])
 
@@ -537,11 +695,17 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 # dir for delayed export
 DELAYED_EXPORT_DIR = 'export'
 os.makedirs(os.path.join(BASE_DATA_DIR, MEDIA_ROOT, DELAYED_EXPORT_DIR), exist_ok=True)
+# Ephemeral incremental exports (FIT-3092): TTL for rqcron GC sweep (LSE cron_config).
+# Without rqcron (default on-prem), ephemeral rows stay unlisted until explicit DELETE.
+EPHEMERAL_EXPORT_TTL_HOURS = int(get_env('EPHEMERAL_EXPORT_TTL_HOURS', 24))
+# Subtract from server-defaulted `until` so long-running writes that commit after the
+# export query starts but stamp Task.updated_at before wall-clock now() are less likely
+# to fall into the gap between consecutive [since, until) windows.
+INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS = int(get_env('INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS', 5))
 
 # file / task size limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
 DATA_UPLOAD_MAX_NUMBER_FILES = int(get_env('DATA_UPLOAD_MAX_NUMBER_FILES', 100))
-TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
 TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL', default=86400))
@@ -575,6 +739,13 @@ REACT_APP_ROOT = os.path.join(BASE_DIR, '../../web/dist/apps/labelstudio')
 
 # per project settings
 BATCH_SIZE = 1000
+# Stage Add or Update Columns mutations above 100 tasks so the current Data Manager page updates promptly.
+ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD = int(get_env('ADD_OR_MODIFY_COLUMNS_ASYNC_THRESHOLD', 100))
+# Batch size for updating data columns in the DB using jsonb_set, to not timeout on large projects
+UPDATE_COLUMN_BATCH_SIZE = int(get_env('UPDATE_COLUMN_BATCH_SIZE', 100))
+# POST /api/projects/<id>/tasks/data-column/ writes one value per task synchronously, so each request is bounded
+TASK_DATA_COLUMN_MAX_TASKS = int(get_env('TASK_DATA_COLUMN_MAX_TASKS', 1000))
+TASK_DATA_COLUMN_MAX_VALUE_LENGTH = int(get_env('TASK_DATA_COLUMN_MAX_VALUE_LENGTH', 65536))
 # Maximum number of tasks to process in a single batch during export operations
 MAX_TASK_BATCH_SIZE = int(get_env('MAX_TASK_BATCH_SIZE', 1000))
 # Total size of task data (in bytes) to process per batch - used to calculate dynamic batch sizes
@@ -635,15 +806,28 @@ POST_PROCESS_REIMPORT = 'core.utils.common.empty'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 WHOAMI_USER_SERIALIZER = 'users.serializers.BaseWhoAmIUserSerializer'
 USER_SERIALIZER_UPDATE = 'users.serializers.BaseUserSerializerUpdate'
+# Step-up authentication (users/step_up.py): how long a sign-in or password confirmation unlocks
+# credential and privilege actions on a cookie session, and the per-edition hooks
+STEP_UP_MAX_AGE_SECONDS = int(get_env('STEP_UP_MAX_AGE_SECONDS', 300))
+STEP_UP_METHOD = 'users.step_up.step_up_method'
+STEP_UP_CHECK_PASSWORD = 'users.step_up.check_password'
+STEP_UP_REAUTHENTICATE_URL = 'users.step_up.reauthenticate_url'
+ANNOTATOR_REVIEWER_FIREWALL = 'users.firewall.AnnotatorReviewerFirewall'
 TASK_SERIALIZER = 'tasks.serializers.BaseTaskSerializer'
 EXPORT_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializer'
 DATA_MANAGER_GET_ALL_COLUMNS = 'data_manager.functions.get_all_columns'
+DATA_MANAGER_VALIDATE_COLUMN_ACCESS = 'data_manager.functions.noop_validate_column_access'
+DATA_MANAGER_SANITIZE_COLUMN_ORDERING = 'data_manager.functions.noop_sanitize_column_ordering'
+DATA_MANAGER_GET_PROJECT_USER_IDS = 'users.project_access.get_user_ids_in_projects'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
+DATA_MANAGER_COMBINED_FILTER_EXPRESSION = 'data_manager.functions.combined_filter_expression'
 DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
+DATA_MANAGER_LIST_FILTER_MAX_VALUES = int(get_env('DATA_MANAGER_LIST_FILTER_MAX_VALUES', 5000))
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
+BULK_CREATE_ANNOTATIONS_FSM_INITIALIZER = None
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
@@ -651,6 +835,7 @@ LSE_PROJECT = None
 GET_TASKS_AGREEMENT_QUERYSET = None
 SHOULD_ATTEMPT_GROUND_TRUTH_FIRST = None
 IS_USER_IN_GT_EVALUATION_WINDOW = None
+ANNOTATE_CURRENT_OVERLAP = None
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
@@ -669,6 +854,8 @@ DELETE_PREDICTIONS_POSTPROCESS = None
 PROJECT_SAVE_DIMENSIONS_POSTPROCESS = None
 FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
 FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION = 'core.feature_flags.utils.get_user_repr_from_organization'
+FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION_ID = 'core.feature_flags.utils.get_user_repr_from_organization_id'
+JOB_TENANCY_ENQUEUED_HOOK = None
 
 # Test factories
 ORGANIZATION_FACTORY = 'organizations.tests.factories.OrganizationFactory'
@@ -692,8 +879,10 @@ PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
 
-WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
+WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 10.0))
 WEBHOOK_BATCH_SIZE = int(get_env('WEBHOOK_BATCH_SIZE', 5000))
+# Auto-disable a webhook after this many consecutive failed deliveries (<= 0 disables the feature)
+WEBHOOK_MAX_CONSECUTIVE_FAILURES = int(get_env('WEBHOOK_MAX_CONSECUTIVE_FAILURES', 50))
 WEBHOOK_SERIALIZERS = {
     'project': 'webhooks.serializers_for_hooks.ProjectWebhookSerializer',
     'task': 'webhooks.serializers_for_hooks.TaskWebhookSerializer',
@@ -732,7 +921,7 @@ COLLECT_ANALYTICS = get_bool_env('COLLECT_ANALYTICS', get_bool_env('collect_anal
 # Strip harmful content from SVG files by default
 SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
 
-ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', False)
+ML_BLOCK_LOCAL_IP = get_bool_env('ML_BLOCK_LOCAL_IP', True)
 
 RQ_LONG_JOB_TIMEOUT = int(get_env('RQ_LONG_JOB_TIMEOUT', 36000))
 
@@ -742,8 +931,27 @@ BATCH_JOB_RETRY_TIMEOUT = int(get_env('BATCH_JOB_RETRY_TIMEOUT', 60))
 
 FUTURE_SAVE_TASK_TO_STORAGE = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False)
 FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT', default=True)
+# TTL for presigned reads of export-target objects. Export connections have no
+# per-connection presign settings (nothing to configure on a write target), so
+# previews of project-produced assets sign with this instead. Long enough to
+# scrub a video without re-resolving; short enough to bound a leaked link.
+EXPORT_STORAGE_PRESIGN_TTL_MINUTES = int(get_env('EXPORT_STORAGE_PRESIGN_TTL_MINUTES', 15))
+# Whether reads of export-target objects are presigned. Turning this off keeps
+# an org that requires proxy-only access proxying these objects through Label
+# Studio's own auth, exactly as the presign flag does on import connections.
+EXPORT_STORAGE_PRESIGN = get_bool_env('EXPORT_STORAGE_PRESIGN', default=True)
+
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
+# Absolute wall-clock stale timeout (seconds) for import/reimport when Redis is down
+# or RQ status is finishing/unknown. Keyed off ProjectImport/ProjectReimport.updated_at.
+# Live RQ jobs (queued/started/…) are never failed by this timer — see projects.import_health.
+IMPORT_STALE_TIMEOUT = float(get_env('IMPORT_STALE_TIMEOUT', 300.0))
+# Grace (seconds) before a CREATED row with RQ ``not found`` is marked failed — avoids
+# false fails when status is polled before Redis has registered the just-enqueued job.
+IMPORT_CREATED_NOT_FOUND_GRACE = float(get_env('IMPORT_CREATED_NOT_FOUND_GRACE', 60.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
+# Bounded wait for the project summary row after a task delete; on timeout the decrement goes to a background job.
+PROJECT_SUMMARY_LOCK_TIMEOUT = get_env('PROJECT_SUMMARY_LOCK_TIMEOUT', '500ms')
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
 STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
 
@@ -823,6 +1031,22 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
     ],
 )
 
+# Hostnames whose iframes are allowed to survive the editor's HTML sanitizer
+# (see services/lso/web/libs/editor/src/utils/sanitizeHtml.js: sanitizeHtml).
+# Override with the LABEL_STUDIO_ALLOWED_IFRAME_DOMAINS env var (comma-separated).
+ALLOWED_IFRAME_DOMAINS = get_env_list(
+    'ALLOWED_IFRAME_DOMAINS',
+    default=[
+        'www.youtube.com',
+        'youtube.com',
+        'www.youtube-nocookie.com',
+        'youtube-nocookie.com',
+        'youtu.be',
+        'www.canva.com',
+        'canva.com',
+    ],
+)
+
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
 PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
@@ -847,7 +1071,6 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
         "'report-sample'",
         "'unsafe-inline'",
         'blob:',
-        'browser.sentry-cdn.com',
         'https://*.googletagmanager.com',
     )
     CSP_IMG_SRC = (
@@ -933,11 +1156,29 @@ QS_ITERATOR_DEFAULT_CHUNK_SIZE = int(get_env('QS_ITERATOR_DEFAULT_CHUNK_SIZE', 1
 DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
+FSM_ENABLED = get_bool_env('FSM_ENABLED', False)
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
 FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
+
+# Projects a user can access in their active organization, as one queryset (LSE adds role/workspace rules)
+ACCESSIBLE_PROJECTS_FUNCTION = 'projects.functions.access.accessible_projects'
 FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_name'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
 SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
+
+# Delay (seconds) before a migration-scheduled RQ job actually starts. Gives a rolling deploy
+# time to finish so the job runs on NEW workers, not stale ones still alive during the deploy.
+MIGRATION_JOB_START_DELAY_SECONDS = int(get_env('MIGRATION_JOB_START_DELAY_SECONDS', 15 * 60))
+
+# Delay (seconds) before a migration runner retries when the target import fails (stale worker
+# not yet upgraded during a rolling deploy). Short, since this is a fast retry loop.
+MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS = int(get_env('MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS', 30))
+
+# When an async migration waits on another AsyncMigrationStatus row, retry this often.
+MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS = int(get_env('MIGRATION_DEPENDENCY_RETRY_DELAY_SECONDS', 15 * 60))
+
+# Cap how long a dependent job waits (delay * max retries ~= 24 hours at the defaults).
+MIGRATION_DEPENDENCY_MAX_RETRIES = int(get_env('MIGRATION_DEPENDENCY_MAX_RETRIES', 96))

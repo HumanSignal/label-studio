@@ -1,0 +1,9 @@
+:global(.htx-taxonomy-item-color) {
+  padding: 4px;
+  border-radius: 2px;
+}
+
+/* Create Project popup has 2000 in LSE and 10000 in LSO */
+:global(.htx-taxonomy-dropdown) {
+  z-index: 11000;
+}

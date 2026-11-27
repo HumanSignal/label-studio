@@ -1,0 +1,72 @@
+/* Shared resize handle — zero-size element with invisible hit area and pill indicator. */
+
+.handle {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+
+  &:hover > .pill,
+  &:active > .pill {
+    background: var(--color-primary-content);
+    opacity: 0.4;
+  }
+}
+
+/* Pill indicator centered on the handle edge */
+.pill {
+  position: absolute;
+  border-radius: 2px;
+  background: var(--color-neutral-border-bold);
+  pointer-events: none;
+  transition:
+    background 0.15s,
+    opacity 0.15s;
+}
+
+/* --- Horizontal (col-resize) --- */
+
+.horizontal {
+  width: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    width: 9px;
+    cursor: col-resize;
+  }
+
+  & > .pill {
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 32px;
+  }
+}
+
+/* --- Vertical (row-resize) --- */
+
+.vertical {
+  height: 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    height: 9px;
+    cursor: row-resize;
+  }
+
+  & > .pill {
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 3px;
+    width: 32px;
+  }
+}

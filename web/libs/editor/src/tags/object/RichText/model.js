@@ -1,10 +1,8 @@
-import * as ff from "@humansignal/core/lib/utils/feature-flags/ff";
-import { destroy as destroyNode, flow, types } from "mobx-state-tree";
+import { flow, types } from "mobx-state-tree";
 import { createRef } from "react";
 import Constants from "../../../core/Constants";
 import { customTypes } from "../../../core/CustomTypes";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
-import { cloneNode } from "../../../core/Helpers";
 import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
 import { STATE_CLASS_MODS } from "../../../mixins/HighlightMixin";
 import IsReadyMixin from "../../../mixins/IsReadyMixin";
@@ -12,10 +10,10 @@ import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import RegionsMixin from "../../../mixins/Regions";
 import Utils from "../../../utils";
 import { parseValue } from "../../../utils/data";
-import { FF_SAFE_TEXT, isFF } from "../../../utils/feature-flags";
 import { sanitizeHtml } from "../../../utils/html";
 import messages from "../../../utils/messages";
 import { rangeToGlobalOffset } from "../../../utils/selection-tools";
+import { presignUrls } from "../../../utils/storage";
 import { escapeHtml, isValidObjectURL } from "../../../utils/utilities";
 import ObjectBase from "../Base";
 import DomManager from "./domManager";
@@ -74,6 +72,8 @@ const TagAttrs = types.model("RichTextModel", {
   encoding: types.optional(types.enumeration(["none", "base64", "base64unicode"]), "none"),
 
   granularity: types.optional(types.enumeration(["symbol", "word", "sentence", "paragraph"]), "symbol"),
+
+  resolveurls: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -213,7 +213,17 @@ const Model = types
 
             if (!ok) throw new Error(`${status} ${statusText}`);
 
-            self.setRemoteValue(yield response.text());
+            let content = yield response.text();
+
+            // When HTML is loaded via valueType="url" (e.g. from S3), it may contain
+            // embedded storage URIs in resource attributes (src, href) that the browser
+            // can't resolve directly. Replace them with /tasks/{id}/resolve/ proxy URLs
+            // so images and other assets load through LS auth and presigning.
+            if (self.resolveurls && self.type !== "text") {
+              content = presignUrls(content, store.task?.id);
+            }
+
+            self.setRemoteValue(content);
           } catch (error) {
             const message = messages.ERR_LOADING_HTTP({ attr: self.value, error: String(error), url });
 
@@ -234,7 +244,7 @@ const Model = types
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
         // we should not sanitize text tasks because we already have htmlEscape in view.js
-        if (isFF(FF_SAFE_TEXT) && self.type === "text") {
+        if (self.type === "text") {
           self._value = String(val);
         } else {
           self._value = sanitizeHtml(String(val));
@@ -390,24 +400,9 @@ const Model = types
         const [control, ...rest] = states;
         const values = doubleClickLabel?.value ?? control.selectedValues();
         const labels = { [control.valueType]: values };
-        let restSelectedStates;
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          // Clone labels nodes to avoid unselecting them on creating result
-          restSelectedStates = rest.map((state) => cloneNode(state));
-        }
 
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult(range, labels, control, self, false, rest)
-          : self.annotation.createResult(range, labels, control, self, false);
+        const area = self.annotation.createResult(range, labels, control, self, false, rest);
         const root = self.getRootNode();
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          //when user is using two different labels tag to draw a region, the other labels will be added to the region
-          restSelectedStates.forEach((state) => {
-            area.setValue(state);
-            destroyNode(state);
-          });
-        }
 
         area._range = range._range;
 

@@ -4,6 +4,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
 stages:
   - id: signup
     type: ref
@@ -11,7 +12,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -89,6 +90,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
 stages:
   - id: signup
     type: ref
@@ -96,7 +98,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -228,6 +230,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
   - mock_ml_auto_update
 stages:
   - id: signup
@@ -236,7 +239,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'
@@ -348,6 +351,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - mock_gethostbyname
   - mock_ml_backend_auto_update_disabled
 stages:
   - id: signup
@@ -356,7 +360,7 @@ stages:
     request:
       data:
         email: test_ml_backend_creation@test.com
-        password: 12345678
+        password: StrongPassw0rd
         title: test_ml_backend_creation
       method: POST
       url: '{django_live_url}/user/signup'

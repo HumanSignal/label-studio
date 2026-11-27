@@ -47,6 +47,11 @@ def test_columns_api_returns_expected_ids(business_client):
         'data',
     ]
 
+    annotators_column = next(c for c in columns if c['id'] == 'annotators')
+    updated_by_column = next(c for c in columns if c['id'] == 'updated_by')
+    assert annotators_column['schema'] == {'multiple': True}
+    assert updated_by_column['schema'] == {'multiple': True}
+
 
 def test_columns_api_annotates_default_columns_with_project_defined_false(business_client):
     columns = _get_columns(business_client)

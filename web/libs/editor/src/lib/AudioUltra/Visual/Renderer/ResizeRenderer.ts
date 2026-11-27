@@ -217,7 +217,7 @@ export class ResizeRenderer implements Renderer<ResizeRendererConfig>, Interacti
     return x >= hitX && x <= hitX + hitWidth && y >= hitY && y <= hitY + hitHeight;
   }
 
-  onMouseEnter?(event: MouseEvent): void {
+  onMouseEnter?(_event: MouseEvent): void {
     if (!this.isHovered) {
       this.isHovered = true;
       if (this.lastRenderContext) {
@@ -226,7 +226,7 @@ export class ResizeRenderer implements Renderer<ResizeRendererConfig>, Interacti
     }
   }
 
-  onMouseLeave?(event: MouseEvent): void {
+  onMouseLeave?(_event: MouseEvent): void {
     // Don't clear hover state if we're currently dragging
     if (this.isHovered && !this.isDragging) {
       this.isHovered = false;
@@ -259,7 +259,7 @@ export class ResizeRenderer implements Renderer<ResizeRendererConfig>, Interacti
     document.addEventListener("mouseup", this.handleGlobalMouseUp);
   }
 
-  onMouseUp?(event: MouseEvent): void {
+  onMouseUp?(_event: MouseEvent): void {
     if (this.isDragging) {
       this.isDragging = false;
       this.removeGlobalMouseListeners();
@@ -277,7 +277,7 @@ export class ResizeRenderer implements Renderer<ResizeRendererConfig>, Interacti
     }
   };
 
-  private handleGlobalMouseUp = (event: MouseEvent): void => {
+  private handleGlobalMouseUp = (_event: MouseEvent): void => {
     if (this.isDragging) {
       this.isDragging = false;
       this.removeGlobalMouseListeners();
@@ -289,7 +289,7 @@ export class ResizeRenderer implements Renderer<ResizeRendererConfig>, Interacti
     document.removeEventListener("mouseup", this.handleGlobalMouseUp);
   }
 
-  onClick?(event: MouseEvent): void {
+  onClick?(_event: MouseEvent): void {
     // Handle click events if needed
   }
 

@@ -61,7 +61,7 @@ type CMHintOptions = {
  * @param self list of all hints
  * @param data current hint
  */
-function richHint(el: Element, self: any, data: CMHintResult) {
+function richHint(el: Element, _self: any, data: CMHintResult) {
   const name = document.createElement("b");
 
   name.appendChild(document.createTextNode(data.name ?? data.text));
@@ -237,4 +237,10 @@ function getHints(cm: any, options: CMHintOptions) {
   return returnHints();
 }
 
-CM.registerHelper("hint", "xml", getHints);
+/**
+ * `@humansignal/ui` is declared side-effect free (package.json `sideEffects`), so a bare
+ * `import "./config-hint"` is tree-shaken out of production builds. Call this explicitly instead.
+ */
+export function registerConfigHint() {
+  CM.registerHelper("hint", "xml", getHints);
+}

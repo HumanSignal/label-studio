@@ -9,7 +9,7 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
 import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
 
-const hotkeys = Hotkey("Vectors");
+const _hotkeys = Hotkey("Vectors");
 
 /**
  * The `Vector` tag is used to add vectors to an image without selecting a label. This can be useful when you have only one label to assign to the vector. Use for image segmentation tasks.

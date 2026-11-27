@@ -35,7 +35,8 @@
  * toolbar?: string,
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
- * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
+ * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean, lock?: boolean },
+ * AgreementSettingsSummary?: import("react").ComponentType<{ filters: unknown }>,
  * }} DMConfig
  */
 
@@ -53,8 +54,45 @@ import { createApp } from "./app-create";
 import { LSFWrapper } from "./lsf-sdk";
 import { taskToLSFormat } from "./lsf-utils";
 
+/**
+ * Load the editor and project hotkeys before a labeling session starts.
+ * Returns the keymap to pass into Label Studio, or null if DM was destroyed
+ * while those requests were in flight.
+ * @param {{
+ *   loadEditor?: () => Promise<unknown>,
+ *   beforeLabeling?: () => Promise<unknown>,
+ *   keymap?: Record<string, unknown>,
+ *   isDestroyed?: () => boolean,
+ * }} options
+ */
+export async function prepareLabelingRuntime({ loadEditor, beforeLabeling, keymap, isDestroyed } = {}) {
+  if (loadEditor && !window.LabelStudio) {
+    await loadEditor();
+  }
+  if (isDestroyed?.()) return null;
+  if (beforeLabeling) {
+    await beforeLabeling();
+  }
+  if (isDestroyed?.()) return null;
+
+  return {
+    ...(keymap ?? {}),
+    ...(window.APP_SETTINGS?.editor_keymap ?? {}),
+  };
+}
+
+export function labelingEditorLoadFailedMessage() {
+  const isMac =
+    typeof navigator !== "undefined" &&
+    (String(navigator.platform).startsWith("Mac") || navigator.platform === "iPhone");
+
+  return `Oops! We're having trouble loading this page. Please refresh the page by pressing ${
+    isMac ? "CMD" : "CTRL"
+  } + SHIFT + R. If this doesn't work, try closing and reopening your browser.`;
+}
+
 const DEFAULT_TOOLBAR =
-  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button density-toggle grid-size view-toggle";
+  "grid-select-all actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button density-toggle grid-size view-toggle";
 
 const prepareInstruments = (instruments) => {
   const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);
@@ -131,6 +169,7 @@ export class DataManager {
     delete: true,
     edit: true,
     duplicate: true,
+    lock: true,
   };
 
   /** @type {"dm" | "labelops"} */
@@ -191,14 +230,17 @@ export class DataManager {
 
     Object.assign(this.tabControls, config.tabControls ?? {});
 
-    // Store LSE-specific callbacks and components
+    // Store enterprise-host callbacks and components (LSE); OSS Data Manager does not set these.
     this.onViewAnalytics = config.onViewAnalytics;
     this.onViewReviewerAnalytics = config.onViewReviewerAnalytics;
     this.RowContextMenuComponent = config.RowContextMenuComponent;
+    /** LSE only: rich agreement header tooltip (`filters` prop). OSS uses built-in plain summary. */
+    this.AgreementSettingsSummary = config.AgreementSettingsSummary ?? null;
 
     this.updateActions(config.actions);
 
     this.type = config.type ?? "dm";
+    this.explorerPreload = config.explorerPreload ?? null;
 
     this.initApp();
   }
@@ -406,20 +448,87 @@ export class DataManager {
 
   /** @private */
   async initApp() {
-    this.store = await createApp(this.root, this);
+    const store = await this._createApp(this.root, this);
+    if (this._destroyed) {
+      this._discardCreatedApp(store);
+      return;
+    }
+    this.store = store;
     this.invoke("ready", [this]);
   }
 
-  initLSF(element) {
-    if (this.lsf) return;
+  /** @private */
+  _createApp(root, datamanager) {
+    return createApp(root, datamanager);
+  }
 
-    this.lsf = new LSFWrapper(this, element, {
-      ...this.labelStudioOptions,
-      task: this.store.taskStore.selected,
-      preload: this.preload,
-      // annotation: this.store.annotationStore.selected,
-      isLabelStream: this.mode === "labelstream",
-    });
+  /** @private Drop a store created after destroy() so its poll / render cannot leak. */
+  _discardCreatedApp(store) {
+    try {
+      unmountComponentAtNode(this.root);
+    } catch (err) {
+      console.error("initApp: unmount leftover app failed", err);
+    }
+    if (typeof window !== "undefined" && window.DM === store) {
+      window.DM = null;
+    }
+    if (store) {
+      try {
+        destroy(store);
+      } catch (err) {
+        console.error("initApp: destroy leftover store failed", err);
+      }
+    }
+  }
+
+  initLSF(element) {
+    if (this.lsf) return this._lsfInit;
+    if (this._lsfInit) return this._lsfInit;
+
+    const generation = {};
+    this._lsfGeneration = generation;
+    const isStale = () => this._lsfGeneration !== generation;
+    this._lsfInit = (async () => {
+      // Do not create a second editor while the previous one is saving its
+      // draft and tearing down.
+      if (this._destroyLSFInFlight) await this._destroyLSFInFlight;
+      if (this._destroyed || isStale()) return;
+      return this._initLSF(element, isStale);
+    })();
+    return this._lsfInit;
+  }
+
+  async _initLSF(element, isStale = () => false) {
+    const options = this.labelStudioOptions ?? {};
+
+    try {
+      const keymap = await prepareLabelingRuntime({
+        loadEditor: options.loadEditor,
+        beforeLabeling: options.beforeLabeling,
+        keymap: options.keymap,
+        isDestroyed: () => this._destroyed === true || isStale(),
+      });
+
+      if (!keymap || this._destroyed || isStale()) return;
+
+      this.lsf = new LSFWrapper(this, element, {
+        ...options,
+        keymap,
+        task: this.store.taskStore.selected,
+        preload: this.preload,
+        isLabelStream: this.mode === "labelstream",
+      });
+    } catch (err) {
+      if (isStale() || this._destroyed) return;
+      console.error("Failed to load labeling editor", err);
+      this._lsfInit = undefined;
+      this._lsfGeneration = null;
+      this.invoke("toast", {
+        message: labelingEditorLoadFailedMessage(),
+        type: "error",
+        duration: -1,
+      });
+    }
   }
 
   /**
@@ -429,6 +538,7 @@ export class DataManager {
    * @param {import("../stores/Tasks").TaskModel} task
    */
   async startLabeling() {
+    if (this._lsfInit) await this._lsfInit;
     if (!this.lsf) return;
 
     const [task, annotation] = [this.store.taskStore.selected, this.store.annotationStore.selected];
@@ -443,21 +553,57 @@ export class DataManager {
     }
 
     if (!isLabelStream && (!taskSelected || isDefined(annotation))) {
-      const annotationID = annotation?.id ?? task.lastAnnotation?.id;
+      // When opening a task from Data Manager rows (without explicit annotation),
+      // let LSF pick the default annotation from the loaded task payload.
+      const annotationID = annotation?.id;
 
       // this.lsf.loadTask(task.id, annotationID);
       this.lsf.selectTask(task, annotationID);
     }
   }
 
-  destroyLSF() {
-    this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
-    this.lsf?.destroy();
-    this.lsf = undefined;
+  async destroyLSF() {
+    if (this._destroyLSFInFlight) return this._destroyLSFInFlight;
+
+    this._destroyLSFInFlight = this._destroyLSFImpl();
+    return this._destroyLSFInFlight;
   }
 
-  destroy(detachCallbacks = true) {
-    this.destroyLSF();
+  async _destroyLSFImpl() {
+    const lsf = this.lsf;
+    this._lsfGeneration = null;
+    this._lsfInit = undefined;
+    this.lsf = undefined;
+
+    try {
+      // A failed draft save (network error, page teardown) must never abort
+      // teardown: skipping lsf.destroy() leaves a fully alive second editor
+      // (store, message listeners, autosave) parked on the old task, which then
+      // absorbs postMessage mutations meant for the next session.
+      try {
+        await lsf?.saveDraft?.();
+      } catch (err) {
+        console.error("destroyLSF: saveDraft failed, continuing teardown", err);
+      }
+      try {
+        await this.invoke("beforeLsfDestroy", this, lsf?.lsfInstance);
+      } catch (err) {
+        console.error("destroyLSF: beforeLsfDestroy failed, continuing teardown", err);
+      }
+      try {
+        lsf?.destroy();
+      } catch (err) {
+        console.error("destroyLSF: lsf.destroy failed, continuing teardown", err);
+      }
+    } finally {
+      this._destroyLSFInFlight = null;
+    }
+  }
+
+  async destroy(detachCallbacks = true) {
+    this._destroyed = true;
+    await this.destroyLSF();
+    this._lsfInit = undefined;
     unmountComponentAtNode(this.root);
 
     if (this.store) {
@@ -467,12 +613,15 @@ export class DataManager {
     if (detachCallbacks) {
       this.callbacks.forEach((callbacks) => callbacks.clear());
       this.callbacks.clear();
+    } else {
+      // reload() reuses this instance; keep labeling init allowed after teardown.
+      this._destroyed = false;
     }
   }
 
-  reload() {
-    this.destroy(false);
-    this.initApp();
+  async reload() {
+    await this.destroy(false);
+    await this.initApp();
     this.installActions();
   }
 

@@ -1,0 +1,35 @@
+.title {
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-headings);
+  font-weight: var(--font-weight-medium);
+}
+
+.description {
+  color: var(--color-neutral-content-subtler);
+  font-family: var(--font-family-body);
+}
+
+.card[data-size="regular"] {
+  & .title {
+    font-size: var(--font-size-headline-medium);
+    line-height: var(--line-height-headline-medium);
+    letter-spacing: var(--letter-spacing-denser);
+  }
+
+  & .description {
+    font-size: var(--font-size-body-medium);
+    line-height: var(--line-height-body-medium);
+  }
+}
+
+.card[data-size="compact"] {
+  & .title {
+    font-size: var(--font-size-title-large);
+    line-height: var(--line-height-title-large);
+  }
+
+  & .description {
+    font-size: var(--font-size-body-small);
+    line-height: var(--line-height-body-small);
+  }
+}

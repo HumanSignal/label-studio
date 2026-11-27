@@ -12,28 +12,41 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_http_methods
 from organizations.forms import OrganizationSignupForm
 from organizations.models import Organization
-from rest_framework.authtoken.models import Token
 from users import forms
 from users.functions import login, proceed_registration
 
 logger = logging.getLogger()
 
 
-@login_required
-def logout(request):
-    auth.logout(request)
-
+def _logout_redirect_url():
     if settings.LOGOUT_REDIRECT_URL:
-        return redirect(settings.LOGOUT_REDIRECT_URL)
+        return settings.LOGOUT_REDIRECT_URL
 
     if settings.HOSTNAME:
         redirect_url = settings.HOSTNAME
         if not redirect_url.endswith('/'):
             redirect_url += '/'
-        return redirect(redirect_url)
-    return redirect('/')
+        return redirect_url
+    return '/'
+
+
+@require_http_methods(['GET', 'POST'])
+def logout(request):
+    if request.method == 'GET':
+        # GET must not end the session: any third-party page can trigger a top-level GET navigation
+        if request.user.is_authenticated:
+            return render(request, 'users/user_logout.html')
+        return redirect(_logout_redirect_url())
+
+    auth.logout(request)
+    return redirect(_logout_redirect_url())
+
+
+# Set directly instead of @enforce_csrf_checks so the check does not depend on USE_ENFORCE_CSRF_CHECKS
+logout._dont_enforce_csrf_checks = False
 
 
 @enforce_csrf_checks
@@ -45,10 +58,7 @@ def user_signup(request):
 
     # checks if the URL is a safe redirection.
     if not next_page or not url_has_allowed_host_and_scheme(url=next_page, allowed_hosts=request.get_host()):
-        if flag_set('fflag_all_feat_dia_1777_ls_homepage_short', user):
-            next_page = reverse('main')
-        else:
-            next_page = reverse('projects:project-index')
+        next_page = reverse('main')
 
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
@@ -59,11 +69,14 @@ def user_signup(request):
     # make a new user
     if request.method == 'POST':
         organization = Organization.objects.first()
+        token_is_valid = bool(
+            token and organization and token == organization.token and not organization.is_invite_token_expired
+        )
         if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
-            if not (token and organization and token == organization.token):
+            if not token_is_valid:
                 raise PermissionDenied()
         else:
-            if token and organization and token != organization.token:
+            if token and organization and not token_is_valid:
                 raise PermissionDenied()
 
         user_form = forms.UserSignupForm(request.POST)
@@ -108,10 +121,7 @@ def user_login(request):
 
     # checks if the URL is a safe redirection.
     if not next_page or not url_has_allowed_host_and_scheme(url=next_page, allowed_hosts=request.get_host()):
-        if flag_set('fflag_all_feat_dia_1777_ls_homepage_short', user):
-            next_page = reverse('main')
-        else:
-            next_page = reverse('projects:project-index')
+        next_page = reverse('main')
 
     login_form = load_func(settings.USER_LOGIN_FORM)
     form = login_form()
@@ -142,6 +152,16 @@ def user_login(request):
 
 
 @login_required
+def user_reauthenticate(request):
+    """Sign out and back in to prove identity for a step-up protected action (users/step_up.py)."""
+    next_url = request.GET.get('next') or '/'
+    if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+        next_url = '/'
+    auth.logout(request)
+    return redirect(f'{reverse("user-login")}?next={quote(next_url)}')
+
+
+@login_required
 def user_account(request, sub_path=None):
     """
     Handle user account view and profile updates.
@@ -162,7 +182,6 @@ def user_account(request, sub_path=None):
 
     Notes:
         - Authentication is required (enforced by @login_required decorator)
-        - Retrieves the user's API token for display in the template
         - Form validation happens on POST requests
     """
     user = request.user
@@ -171,7 +190,6 @@ def user_account(request, sub_path=None):
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)
-    token = Token.objects.get(user=user)
 
     if request.method == 'POST':
         form = forms.UserProfileForm(request.POST, instance=user)
@@ -182,5 +200,5 @@ def user_account(request, sub_path=None):
     return render(
         request,
         'users/user_account.html',
-        {'settings': settings, 'user': user, 'user_profile_form': form, 'token': token},
+        {'settings': settings, 'user': user, 'user_profile_form': form},
     )

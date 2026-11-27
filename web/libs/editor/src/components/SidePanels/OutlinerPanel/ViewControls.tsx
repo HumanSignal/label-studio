@@ -17,6 +17,7 @@ import { Dropdown } from "@humansignal/ui";
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
 import { cn } from "../../../utils/bem";
+import { emitRegionVisibilityToggled } from "../../../utils/labelingTelemetry";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.prefix.css";
 import { observer } from "mobx-react";
@@ -237,7 +238,7 @@ const Grouping = <T extends string>({
         variant="neutral"
         size="smaller"
         data-testid={`grouping-${value}`}
-        look="string"
+        look="ghost"
         leading={readableValue.icon}
         trailing={extraIcon}
       >
@@ -291,6 +292,11 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
     (e) => {
       e.preventDefault();
       e.stopPropagation();
+      const annotation = regions?.annotation;
+      emitRegionVisibilityToggled(annotation?.store, annotation, {
+        visible: Boolean(regions?.isAllHidden),
+        scope: "all",
+      });
       regions.toggleVisibility();
     },
     [regions],
@@ -303,7 +309,7 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
     <Button
       variant="neutral"
       size="smaller"
-      look="string"
+      look="ghost"
       disabled={isDisabled}
       onClick={toggleRegionsVisibility}
       aria-label={isAllHidden ? "Show all regions" : "Hide all regions"}

@@ -1,5 +1,3 @@
-import { FF_DEV_3034, isFF } from "../utils/feature-flags";
-
 export class CommentsSdk {
   constructor(lsf, dm) {
     this.lsf = lsf;
@@ -26,12 +24,10 @@ export class CommentsSdk {
 
     if (comment.annotation) {
       body.annotation = comment.annotation;
-    } else if (isFF(FF_DEV_3034) && comment.draft) {
+    } else if (comment.draft) {
       body.draft = comment.draft;
     }
-    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, {
-      body,
-    });
+    const { $meta: _, ...newComment } = await this.dm.apiCall("createComment", undefined, { body });
 
     return newComment;
   };
@@ -45,6 +41,11 @@ export class CommentsSdk {
   };
 
   listComments = async (params) => {
+    // Custom interface hosts (quick view / shell) own comment fetching via editor-comments.
+    if (this.dm?.store?.project?.use_custom_interface) {
+      return [];
+    }
+
     const listParams = {
       ordering: params.ordering || "-id",
       expand_created_by: true,
@@ -52,7 +53,7 @@ export class CommentsSdk {
 
     if (params.annotation) {
       listParams.annotation = params.annotation;
-    } else if (isFF(FF_DEV_3034) && params.draft) {
+    } else if (params.draft) {
       listParams.draft = params.draft;
     } else {
       return [];

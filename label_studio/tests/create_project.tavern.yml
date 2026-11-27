@@ -42,7 +42,7 @@ stages:
 - name: stage
   request:
     files:
-      file: tests/test_suites/samples/image_urls.csv
+      file: label_studio/tests/test_suites/samples/image_urls.csv
     headers:
       content-type: multipart/form-data
     method: POST

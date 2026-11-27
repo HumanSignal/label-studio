@@ -14,7 +14,7 @@
 #       url: "{django_live_url}/user/signup"
 #       data:
 #         email: test_suites_user@heartex.com
-#         password: 12345678
+#         password: qNpC-opxvYm.ttg4
 #       method: POST
 #     response:
 #       status_code: 302

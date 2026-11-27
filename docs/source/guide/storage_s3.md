@@ -128,7 +128,7 @@ Complete the following fields and then click **Test connection**:
   <tr>
     <td>Bucket Name</td>
     <td>
-      Enter the name of your S3 bucket.
+      Enter the name of your S3 bucket. Bucket names cannot contain dots (<code>.</code>).
     </td>
   </tr>
 

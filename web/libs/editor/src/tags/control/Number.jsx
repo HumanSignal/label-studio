@@ -12,7 +12,6 @@ import ControlBase from "./Base";
 import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
 import ClassificationBase from "./ClassificationBase";
 import PerItemMixin from "../../mixins/PerItem";
-import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 import { cn } from "../../utils/bem";
 import { safeNumber, positiveNumber } from "../../utils/number";
 
@@ -196,7 +195,7 @@ const NumberModel = types.compose(
   RequiredMixin,
   ReadOnlyControlMixin,
   PerRegionMixin,
-  ...(isFF(FF_LSDV_4583) ? [PerItemMixin] : []),
+  PerItemMixin,
   AnnotationMixin,
   TagAttrs,
   Model,

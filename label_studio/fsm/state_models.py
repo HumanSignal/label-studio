@@ -96,6 +96,10 @@ class BaseState(models.Model):
         help_text='Human-readable timestamp for debugging (UUID7 id contains precise timestamp)',
     )
 
+    # Fields copied from the entity that always equal the entity's own value. with_state() adds them
+    # to the latest-state lookup so a scoped index (e.g. task_project_latest_idx) can serve it.
+    latest_state_scope_fields: tuple = ()
+
     class Meta:
         abstract = True
         # UUID7 provides natural ordering, reducing index requirements
@@ -241,6 +245,9 @@ class TaskState(BaseState):
         db_index=True, help_text='From task.project_id - denormalized for performance'
     )
 
+    # Tasks never change project, so state rows always carry their task's project_id.
+    latest_state_scope_fields = ('project_id',)
+
     class Meta:
         app_label = 'fsm'
         indexes = [
@@ -249,6 +256,13 @@ class TaskState(BaseState):
             models.Index(fields=['task_id', '-id'], name='task_current_state_idx'),
             # Reporting and filtering
             models.Index(fields=['project_id', 'state', '-id'], name='task_project_state_idx'),
+            # Project-scoped latest state per task, e.g. "give me tasks in project X with state Y"
+            # (filter by state after selecting the latest row).
+            models.Index(
+                fields=['project_id', 'task_id', '-id'],
+                include=['state'],
+                name='task_project_latest_idx',
+            ),
             models.Index(fields=['organization_id', 'state', '-id'], name='task_org_reporting_idx'),
             # History queries
             models.Index(fields=['task_id', 'id'], name='task_history_idx'),

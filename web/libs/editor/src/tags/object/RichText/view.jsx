@@ -18,10 +18,15 @@ import {
   trimSelection,
 } from "../../../utils/selection-tools";
 import { isDefined } from "../../../utils/utilities";
+import { RegionResizeHandles } from "./RegionResizeHandles";
 import "./RichText.prefix.css";
 
 const DBLCLICK_TIMEOUT = 450; // ms
 const DBLCLICK_RANGE = 5; // px
+
+// The sandbox keeps allow-same-origin (the editor reads contentDocument) and allow-scripts (allowlisted
+// embeds run their own scripts), so the document itself must not be able to run script.
+const IFRAME_DOCUMENT_CSP = `<meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">`;
 
 class RichTextPieceView extends Component {
   _regionSpanSelector = ".htx-highlight";
@@ -138,7 +143,7 @@ class RichTextPieceView extends Component {
     const classes = [STATE_CLASS_MODS.leftHandle, STATE_CLASS_MODS.rightHandle];
     const isHandle = target.classList.contains(classes[0]) || target.classList.contains(classes[1]);
 
-    if (ev.buttons === 1 && region?.selected && isHandle) {
+    if (ev.buttons === 1 && region?.selected && !region.isReadOnly?.() && isHandle) {
       const tag = item.mountNodeRef.current;
       const doc = tag?.contentDocument ?? tag?.ownerDocument ?? tag;
 
@@ -192,7 +197,7 @@ class RichTextPieceView extends Component {
 
       // don't collapse region into nothing
       if (selection.isCollapsed) return false;
-      if (!area) return false;
+      if (!area || area.isReadOnly?.()) return false;
 
       let range = fixRange(selection.getRangeAt(0));
 
@@ -239,9 +244,8 @@ class RichTextPieceView extends Component {
         area.updateXPathsFromGlobalOffsets();
       }
 
-      // recreating spans + attach handles because region stays selected
+      // handles will be reattached to the new spans by RegionResizeHandles, region stays selected
       area.applyHighlight();
-      area.attachHandles();
 
       area.notifyDrawingFinished();
       area.updateHighlightedText({ force: true });
@@ -555,13 +559,15 @@ class RichTextPieceView extends Component {
         onMouseMove: this._onMouseMove,
         onMouseUp: this._onMouseUp,
         onMouseOverCapture: this._onRegionMouseOver,
+        // Task HTML may contain forms; submitting one navigates the labeling app away (iframe mode: sandbox has no allow-forms)
+        onSubmitCapture: (ev) => ev.preventDefault(),
       };
 
       return (
         <ObjectTag item={item} className={cn("richtext").toClassName()}>
           <div
             key="root"
-            className={cn("richtext").elem("container").mix("htx-richtext").toClassName()}
+            className={cn("richtext").elem("container").mod({ hypertext: !isText }).mix("htx-richtext").toClassName()}
             ref={(el) => {
               item.mountNodeRef.current = el;
               el && this.markObjectAsLoaded();
@@ -570,6 +576,7 @@ class RichTextPieceView extends Component {
             dangerouslySetInnerHTML={{ __html: val }}
             {...eventHandlers}
           />
+          <RegionResizeHandles item={item} />
         </ObjectTag>
       );
     }
@@ -588,9 +595,10 @@ class RichTextPieceView extends Component {
             item.setReady(false);
             item.mountNodeRef.current = el;
           }}
-          srcDoc={val}
+          srcDoc={IFRAME_DOCUMENT_CSP + val}
           onLoad={this.onIFrameLoad}
         />
+        <RegionResizeHandles item={item} />
       </ObjectTag>
     );
   }

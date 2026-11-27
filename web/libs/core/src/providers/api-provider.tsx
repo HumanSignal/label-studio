@@ -4,13 +4,14 @@ import {
   type PropsWithChildren,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
 import type { ApiResponse, WrappedResponse } from "../lib/api-proxy/types";
 import { getApiInstance } from "../lib/api-provider/api-instance";
 import type { ApiCallOptions, ApiContextType, ErrorHandlerOptions, FormattedError } from "../lib/api-provider/types";
+import { stepUpChallengeOf } from "../lib/utils/step-up";
 
 export const ApiContext = createContext<ApiContextType | null>(null);
 ApiContext.displayName = "ApiContext";
@@ -113,6 +114,11 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<ApiProvi
         const result = await api.invoke<T>(method, params, rest);
 
         if (result?.error) {
+          // The caller answers a step-up challenge with useStepUp (@humansignal/app-common): not an error to show
+          if (stepUpChallengeOf(result)) {
+            return result;
+          }
+
           const shouldShowGlobalError = !errorFilter || errorFilter(result) === false;
 
           if (suppressError !== true) {
@@ -148,7 +154,9 @@ export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<ApiProvi
       [api, callApi, handleError, resetError, error],
     );
 
-    useEffect(() => {
+    // Assign ref in the layout phase so class components (e.g. Form) see a non-null api ref
+    // before synchronous submit handlers run in tests or in the same tick as mount.
+    useLayoutEffect(() => {
       if (ref && !(ref instanceof Function)) {
         ref.current = contextValue;
       }

@@ -37,6 +37,9 @@ stages:
   id: get_invite_url
 
 - type: ref
+  id: logout_page
+
+- type: ref
   id: logout
 
 # signup 2 new users
@@ -45,10 +48,13 @@ stages:
     url: "{django_live_url}{invite_url}"
     data:
       email: test_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302
+
+- type: ref
+  id: logout_page
 
 - type: ref
   id: logout
@@ -58,7 +64,7 @@ stages:
     url: "{django_live_url}{invite_url}"
     data:
       email: test_second_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302
@@ -69,6 +75,8 @@ stages:
 - id: get_user_token
   type: ref
 
+- id: logout_page
+  type: ref
 - id: logout
   type: ref
 
@@ -87,7 +95,7 @@ stages:
     url: "{django_live_url}/user/login"
     data:
       email: test_user@heartextest.com
-      password: 12345678
+      password: StrongPassw0rd
     method: POST
   response:
     status_code: 302
@@ -99,6 +107,8 @@ stages:
   response:
     status_code: 403
 
+- id: logout_page
+  type: ref
 - id: logout
   type: ref
 
@@ -119,5 +129,7 @@ stages:
   response:
     status_code: 404
 
+- id: logout_page
+  type: ref
 - id: logout
   type: ref

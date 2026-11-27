@@ -1,3 +1,5 @@
+import type { ControlSize } from "../../ds-manifest/control-sizes";
+import type { Align } from "@humansignal/core/lib/utils/dom";
 import { cn } from "../../utils/utils";
 import { forwardRef, type MouseEvent, type ButtonHTMLAttributes, type PropsWithChildren, type ReactNode } from "react";
 import styles from "./button.module.css";
@@ -16,11 +18,11 @@ const variants = {
 
 const looks = {
   filled: styles["look-filled"],
-  string: styles["look-string"],
+  ghost: styles["look-ghost"],
   outlined: styles["look-outlined"],
 };
 
-const sizes = {
+const sizes: Record<ControlSize, string> = {
   medium: styles["size-medium"], // 40px
   small: styles["size-small"], // 32px
   smaller: styles["size-smaller"], // 24px
@@ -68,7 +70,7 @@ export function buttonVariant(
 ) {
   const buttonStyles = [styles.base, variants[variant], looks[look], sizes[size], alignment[align]];
   return cn(
-    "inline-flex items-center rounded-smaller border text-shadow-button box-border border transition-all",
+    "inline-flex items-center rounded-small border text-shadow-button box-border border transition-all",
     "font-medium text-[color:--text-color] bg-[color:--background-color] bg-[image:--background-image] border-[color:--border-color] shadow-[shadow:--emboss-shadow] text-center",
     "hover:text-[color:--text-color] hover:bg-[color:--background-color-hover] hover:border-[color:--border-color-hover]",
     "active:bg-[color:--background-color-active] active:border-[color:--border-color]",
@@ -82,15 +84,15 @@ export function buttonVariant(
 export type ButtonProps = {
   /**
    * Controls the color variant of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   variant?: keyof typeof variants;
   /**
    * Controls the look of the button
-   * See [Storybook](https://labelstud.io/storybook?path=/docs/ui-button--docs)
+   * See [Storybook](https://labelstud.io/storybook?path=/docs/inputs-button--docs)
    */
   look?: keyof typeof looks;
-  size?: keyof typeof sizes;
+  size?: ControlSize;
   align?: keyof typeof alignment;
   /**
    * Waiting state with stripes animation
@@ -115,7 +117,9 @@ export type ButtonProps = {
   /**
    * Adds a tooltip to the button
    */
-  tooltip?: string;
+  tooltip?: ReactNode;
+  /** Where the tooltip opens relative to the button (default above) */
+  tooltipAlignment?: Align;
   /**
    * When in waiting state with `waitingClickable` enabled, this function will be used
    * as `onClick` if provided. Otherwise default `onClick` will be used.
@@ -150,6 +154,7 @@ const Button = forwardRef(
       leading = icon,
       trailing,
       tooltip,
+      tooltipAlignment,
       onClick,
       secondaryOnClick,
       ...buttonProps
@@ -183,7 +188,11 @@ const Button = forwardRef(
 
     if (tooltip) {
       // For disabled buttons, wrap in a container that can receive hover events
-      return <Tooltip title={tooltip}>{buttonBody}</Tooltip>;
+      return (
+        <Tooltip title={tooltip} alignment={tooltipAlignment}>
+          {buttonBody}
+        </Tooltip>
+      );
     }
 
     return buttonBody as JSX.Element;

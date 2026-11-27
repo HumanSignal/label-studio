@@ -1,0 +1,13 @@
+/* Context menus reuse Dropdown's appear/disappear transitions.
+   Slightly softer timing than the default kebab/dropdown spring. */
+.dropdown[data-context-menu] {
+  --menu-animation-duration: 0.2s;
+  --menu-animation-curve: ease-out;
+  --menu-animation-start: -8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown[data-context-menu] {
+    --menu-animation-duration: 0s;
+  }
+}

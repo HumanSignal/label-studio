@@ -13,6 +13,7 @@ export const Common = [
           { value: false, label: "no" },
         ]}
         disabled={props.disabled}
+        readOnly={props.readOnly}
       />
     ),
   },

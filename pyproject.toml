@@ -2,9 +2,8 @@
 name = "label-studio"
 version = "1.24.0.dev0"
 description = "Label Studio annotation tool"
-authors = [
-    { name = "HumanSignal", email = "support@humansignal.com" },
-]
+authors = [{ name = "HumanSignal", email = "support@humansignal.com" }]
+requires-python = ">=3.11,<4"
 readme = "README.md"
 license = "Apache-2.0"
 classifiers = [
@@ -12,31 +11,29 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
-requires-python = ">=3.10,<4"
 dependencies = [
     "wheel (>=0.46.3)",
     "appdirs (>=1.4.3)",
-    "attr (==0.3.1)",
     "attrs (>=19.2.0)",
     "pyyaml (>=6.0.0)",
     "azure-storage-blob (>=12.6.0)",
     "boto3 (>=1.28.58,<2.0.0)",
     "botocore (>=1.39.3,<2.0.0)",
-    "bleach (>=6.4.0,<6.5.0)",
-    "cryptography (>=48.0.1)",
-    "Django (>=5.1.8,<5.2.0)",
+    "bleach (>=6.4.0)",
+    "cryptography (>=44.0.1)",
+    "Django (>=5.2.16,<5.3.0)",
     "django-storages (==1.12.3)",
     "django-annoying (==0.10.6)",
     "django-debug-toolbar (==3.2.1)",
-    "django-environ (==0.10.0)",
+    "django-environ (==0.14.0)",
     "django-filter (==24.3)",
-    "django-rq (>=3.1,<3.2)",
+    "django-rq (>=4.1.1,<4.2)",
     "django-cors-headers (==4.7.0)",
     "django-extensions (==3.2.3)",
     "django-user-agents (==0.4.0)",
     "django-ranged-fileresponse (>=0.1.2)",
     "drf-dynamic-fields (==0.3.0)",
-    "djangorestframework (==3.15.2)",
+    "djangorestframework (==3.18.3)",
     "drf-flex-fields (==0.9.5)",
     "drf-spectacular (==0.28.0)",
     "drf-generators (==0.3.0)",
@@ -46,34 +43,41 @@ dependencies = [
     "ordered-set (==4.0.2)",
     "pandas (>=2.2.3)",
     "psycopg[binary] (>=3.2.0,<4.0.0)",
-    "pyarrow (>=23.0.1,<24.0.0)",
+    "pyarrow (>=26.0.1,<27.0.0)",
     "pydantic (>=2.9.2)",
     "python-dateutil (>=2.8.1)",
     "pytz (>=2022.1,<2023.0)",
-    "requests (>=2.33.0,<2.34.0)",
+    "requests>=2.33.1,<2.35.0",
     "rq (>=2.6,<2.7)",
     "rules (==3.4)",
-    "ujson (>=5.13.0)",
+    "ujson (>=5.12.1)",
     "ijson (>=3.4.0,<4.0.0)",
     "xmljson (==0.2.1)",
     "colorama (>=0.4.4)",
     "pyboxen (>=1.3.0)",
     "redis (>=5.2.1,<5.3.0)",
-    "sentry-sdk (>=2.16.0)",
+    "sentry-sdk (>=2.69.0)",
     "launchdarkly-server-sdk (==8.2.1)",
     "python-json-logger (==2.0.4)",
     "google-cloud-storage (>=3.8.0,<4.0.0)",
     "google-cloud-logging (>=3.10.0,<4.0.0)",
     "django-csp (==3.7)",
     "openai (>=1.10.0,<2.0.0)",
-    "django-migration-linter (>=5.1.0,<6.0.0)",
-    "setuptools (>=75.4.0)",
+    "django-migration-linter (>=6.0.0,<7.0.0)",
+    "setuptools>=83.0.0",
     "djangorestframework-simplejwt[crypto] (>=5.4.0,<6.0.0)",
     "tldextract (>=5.1.3)",
     "uuid-utils (>=0.11.0,<1.0.0)",
-    ## HumanSignal repo dependencies :start
-    "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/54d1aeca71fe7b572c8028e7fe82c4b54457e8f0.zip",
-    ## HumanSignal repo dependencies :end
+    "label-studio-sdk",
+]
+
+[tool.uv.sources]
+label-studio-sdk = { git = "https://github.com/HumanSignal/label-studio-sdk.git", rev = "7a9172c509ed0854a5f7ca72db1bbc92d28090e1" }
+
+[project.optional-dependencies]
+uwsgi = [
+    "pyuwsgi (==2.0.30.post1)",
+    "uwsgitop (==0.12)",
 ]
 
 [project.urls]
@@ -82,12 +86,47 @@ Repository = "https://github.com/HumanSignal/label-studio"
 [project.scripts]
 label-studio = "label_studio.server:main"
 
-[project.optional-dependencies]
-uwsgi = ['pyuwsgi (==2.0.28.post1)', 'uwsgitop (==0.12)']
+[dependency-groups]
+test = [
+    "pytest==9.0.3",
+    "pytest-cov==7.1.0",
+    "pytest-django==4.12.0",
+    "pytest-mock==3.15.1",
+    "tavern==3.3.3",
+    "fakeredis~=2.26.1",
+    "pytest-env==1.6.0",
+    "responses==0.13.0",
+    "pytest-xdist==3.8.0",
+    "psutil==7.0.0",
+    "freezegun~=1.5.1",
+    "s3transfer>=0.16.0",
+    "mock>=5.1.0",
+    "moto>=4.2.6",
+    "requests-mock==1.12.1",
+    "factory-boy>=3.3.3,<4",
+]
+build = [
+    "twine>=6.1.0",
+    "packaging>=24.2",
+]
+
+[build-system]
+requires = ["uv_build<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+required-version = ">=0.13.5"
+exclude-newer = "4 days"
+exclude-newer-package = { certifi = false }
+
+
+[tool.uv.build-backend]
+module-name = "label_studio"
+module-root = ""
 
 [tool.ruff]
-# Assume Python 3.10 at a minimum
-target-version = "py310"
+# Assume Python 3.11 at a minimum
+target-version = "py311"
 
 line-length = 119
 
@@ -118,6 +157,7 @@ exclude = [
     "venv",
     "**/migrations/*.py",
     "scripts",
+    "*.md",
 ]
 
 [tool.ruff.lint]
@@ -153,57 +193,15 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.ruff.format]
 quote-style = "single"
 
-[tool.poetry]
-
-packages = [
-    { include = "label_studio" },
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.settings.label_studio"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-p no:warnings"
+tavern-global-cfg = ["label_studio/tests/shared_stages.yml"]
+env = [
+    "D:SENTRY_RATE=0",
+    "D:SENTRY_DSN=",
+    "D:USE_ENFORCE_CSRF_CHECKS=0",
+    "D:TEST_ENVIRONMENT=1",
+    "COLLECT_ANALYTICS=0",
 ]
-include = [
-    { path = "web/dist/libs/datamanager/**/*", format = ["sdist", "wheel"] },
-    { path = "web/dist/libs/editor/**/*", format = ["sdist", "wheel"] },
-    { path = "web/dist/apps/labelstudio/**/*", format = ["sdist", "wheel"] },
-    { path = "label_studio/annotation_templates/**/*", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/static/**/*", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/static_build/**/*", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/utils/schema/*.json", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/templatetags/*.py", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/version_.py", format = ["sdist", "wheel"] },
-    { path = "label_studio/core/all_urls.json", format = ["sdist", "wheel"] },
-    { path = "label_studio/io_storages/**/*.yml", format = ["sdist", "wheel"] },
-]
-
-exclude = [
-    { path = "label_studio/frontend", format = ["sdist", "wheel"] },
-]
-
-requires-poetry = '>=2.0.0,<3.0.0'
-
-[tool.poetry.dependencies]
-python = ">=3.10,<4"
-
-[tool.poetry.group.test.dependencies]
-pytest = "7.2.2"
-pytest-cov = "5.0.0"
-pytest-django = "4.9.0"
-pytest-mock = "3.14.0"
-tavern = "2.3.0"
-fakeredis = "~=2.26.1"
-pytest-env = "0.6.2"
-responses = "0.13.0"
-pytest-xdist = "3.6.1"
-psutil = "7.0.0"
-freezegun = "~=1.5.1"
-pre-commit = "3.3.3"
-s3transfer = "0.13.0"
-mock = ">=5.1.0"
-moto = ">=4.2.6"
-requests-mock = "1.12.1"
-factory-boy = "^3.3.3"
-
-[tool.poetry.group.build.dependencies]
-twine = ">=6.1.0"
-packaging = ">=24.2"
-
-[build-system]
-requires = ['poetry-core (>=2.0.0,<3.0.0)']
-build-backend = "poetry.core.masonry.api"

@@ -1,5 +1,6 @@
 .keypoints {
   --hover: transparent;
+  --row-overlay-opacity: 8%;
 
   height: 24px;
   display: flex;
@@ -102,12 +103,12 @@
   }
 
   &:hover {
-    --hover: rgb(var(--color-neutral-shadow-raw) / calc(8% * var(--shadow-intensity)));
+    --hover: rgb(var(--color-neutral-shadow-raw) / calc(var(--row-overlay-opacity) * var(--shadow-intensity)));
   }
 
   &_selected,
   &_selected:hover {
-    --hover: rgb(var(--color-neutral-shadow-raw) / calc(8% * var(--shadow-intensity)));
+    --hover: rgb(var(--color-neutral-shadow-raw) / calc(var(--row-overlay-opacity) * var(--shadow-intensity)));
   }
 }
 
@@ -131,4 +132,8 @@
   &_danger {
     color: var(--color-negative-content);
   }
+}
+
+[data-color-scheme="dark"] .keypoints {
+  --row-overlay-opacity: 20%;
 }

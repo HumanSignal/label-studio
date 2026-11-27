@@ -74,8 +74,8 @@ def disable_sentry(settings):
 
 
 @pytest.fixture()
-def debug_modal_exceptions_false(settings):
-    settings.DEBUG_MODAL_EXCEPTIONS = False
+def debug_modal_exceptions_true(settings):
+    settings.DEBUG_MODAL_EXCEPTIONS = True
 
 
 @pytest.fixture(scope='function')
@@ -395,6 +395,13 @@ def ml_backend():
         yield m
 
 
+@pytest.fixture
+def mock_gethostbyname():
+    """ML backend hosts in tests are fake, pin them to a public IP so ML_BLOCK_LOCAL_IP validation passes."""
+    with mock.patch('socket.gethostbyname', return_value='121.21.21.21'):
+        yield
+
+
 @pytest.fixture(name='import_from_url')
 def import_from_url():
     with import_from_url_mock() as m:
@@ -675,19 +682,6 @@ def get_server_url(live_server):
     yield live_server.url
 
 
-@pytest.fixture(name='ff_front_dev_1682_model_version_dropdown_070622_short_off', autouse=True)
-def ff_front_dev_1682_model_version_dropdown_070622_short_off():
-    from core.feature_flags import flag_set
-
-    def fake_flag_set(*args, **kwargs):
-        if args[0] == 'ff_front_dev_1682_model_version_dropdown_070622_short':
-            return False
-        return flag_set(*args, **kwargs)
-
-    with mock.patch('tasks.serializers.flag_set', wraps=fake_flag_set):
-        yield
-
-
 @pytest.fixture(name='async_import_off', autouse=True)
 def async_import_off():
     from core.feature_flags import flag_set
@@ -733,26 +727,13 @@ def fflag_fix_all_lsdv_4813_async_export_conversion_22032023_short_on():
         yield
 
 
-@pytest.fixture(name='ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on')
-def ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short_on():
-    from core.feature_flags import flag_set
-
-    def fake_flag_set(*args, **kwargs):
-        if args[0] == 'ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short':
-            return True
-        return flag_set(*args, **kwargs)
-
-    with mock.patch('data_export.api.flag_set', wraps=fake_flag_set):
-        yield
-
-
 @pytest.fixture(name='local_files_storage')
 def local_files_storage(settings):
     settings.LOCAL_FILES_SERVING_ENABLED = True
     tempdir = Path(tempfile.gettempdir()) / Path('files')
     subdir = tempdir / Path('subdir')
     os.makedirs(str(subdir), exist_ok=True)
-    test_image = Path(*'tests/test_suites/samples/test_image.png'.split('/'))
+    test_image = Path(__file__).parent / 'test_suites' / 'samples' / 'test_image.png'
     shutil.copyfile(str(test_image), str(tempdir / Path('test_image1.png')))
     shutil.copyfile(str(test_image), str(subdir / Path('test_image2.png')))
 

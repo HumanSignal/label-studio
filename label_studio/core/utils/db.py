@@ -3,9 +3,9 @@ import logging
 import time
 from typing import Dict, Optional, TypeVar
 
-from django.db import OperationalError, connection, models, transaction
+from django.db import IntegrityError, OperationalError, connection, models, transaction
 from django.db.models import Model, QuerySet, Subquery
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, pre_migrate
 from django.db.utils import DatabaseError, ProgrammingError
 from django.dispatch import receiver
 
@@ -62,7 +62,7 @@ def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fi
                 break
             except OperationalError as e:
                 last_error = e
-                if 'deadlock detected' in str(e):
+                if 'deadlock detected' in str(e).lower():
                     retry_count += 1
                     wait_time = 0.1 * (2**retry_count)  # Exponential backoff
                     logger.warning(
@@ -75,6 +75,73 @@ def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fi
         else:
             logger.error(f'Failed to update batch after {max_retries} retries. Batch: {i}-{i + len(batch_ids)}')
             raise last_error
+
+
+_ANNOTATION_DELETE_MAX_RETRIES = 3
+
+
+def delete_annotation_with_retry(annotation, max_retries=_ANNOTATION_DELETE_MAX_RETRIES):
+    """Delete a single ``Annotation`` with retry on deadlock or FK violation.
+
+    Calls ``annotation.delete()`` (not ``QuerySet.delete``) so
+    ``Annotation.delete`` hooks run: task updates, project summary counters,
+    and FSM bulk-delete context.
+    """
+    for attempt in range(max_retries):
+        try:
+            with transaction.atomic():
+                annotation.delete()
+            return
+        except (IntegrityError, OperationalError) as exc:
+            is_deadlock = isinstance(exc, OperationalError) and 'deadlock detected' in str(exc).lower()
+            is_fk = isinstance(exc, IntegrityError)
+            if not (is_deadlock or is_fk):
+                raise
+            if attempt < max_retries - 1:
+                logger.warning(
+                    'Annotation.delete attempt %d/%d failed (%s), retrying…',
+                    attempt + 1,
+                    max_retries,
+                    exc,
+                )
+                time.sleep(0.2 * (attempt + 1))
+            else:
+                raise
+
+
+def delete_annotations_queryset_with_retry(annotations_qs, max_retries=_ANNOTATION_DELETE_MAX_RETRIES):
+    """Delete annotations with retry on deadlock or FK constraint violation.
+
+    Background workers (e.g. Enterprise dimension score flush) may concurrently
+    insert rows referencing the same annotations, causing deadlocks or FK
+    violations when Django's delete collector removes parent rows. Retrying
+    after a short back-off lets the concurrent transaction finish so the next
+    attempt succeeds cleanly.
+
+    Args:
+        annotations_qs: QuerySet of ``tasks.Annotation`` rows to delete.
+        max_retries: Maximum attempts including the first try.
+    """
+    for attempt in range(max_retries):
+        try:
+            with transaction.atomic():
+                annotations_qs.delete()
+            return
+        except (IntegrityError, OperationalError) as exc:
+            is_deadlock = isinstance(exc, OperationalError) and 'deadlock detected' in str(exc).lower()
+            is_fk = isinstance(exc, IntegrityError)
+            if not (is_deadlock or is_fk):
+                raise
+            if attempt < max_retries - 1:
+                logger.warning(
+                    'Annotation deletion attempt %d/%d failed (%s), retrying…',
+                    attempt + 1,
+                    max_retries,
+                    exc,
+                )
+                time.sleep(0.2 * (attempt + 1))
+            else:
+                raise
 
 
 def batch_delete(queryset, batch_size=500):
@@ -183,6 +250,8 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
         present = any(getattr(col, 'name', '').lower() == col_key for col in cols)
     except (DatabaseError, ProgrammingError):
         present = False
+    except RuntimeError:
+        return False
     finally:
         # Restore the previous value
         if in_async_context:
@@ -201,3 +270,28 @@ def signal_clear_column_presence_cache(**_kwargs):
     so that the next migration can introspect the new column using has_column_cached()."""
     logger.debug('Clearing column presence cache in post_migrate signal')
     _column_presence_cache.clear()
+
+
+# migrate sends pre_migrate and then post_migrate once per app, so the depth is positive only
+# while a migrate run is applying migrations. A nested migrate (activity_log's pre_migrate
+# handler migrates its own database) keeps the counts balanced. flush sends post_migrate
+# alone, hence the floor at zero.
+_migrate_depth = 0
+
+
+@receiver(pre_migrate)
+def signal_enter_migrate(**_kwargs):
+    global _migrate_depth
+    _migrate_depth += 1
+
+
+@receiver(post_migrate)
+def signal_exit_migrate(**_kwargs):
+    global _migrate_depth
+    _migrate_depth = max(0, _migrate_depth - 1)
+
+
+def migrations_running() -> bool:
+    """True while migrate is applying migrations in this process, the only time model code
+    can run against a table that lacks a column the model declares."""
+    return _migrate_depth > 0

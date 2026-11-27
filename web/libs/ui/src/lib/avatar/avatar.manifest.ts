@@ -1,0 +1,23 @@
+import { defineManifest } from "../../ds-manifest";
+
+export default defineManifest([
+  {
+    name: "Avatar",
+    tier: 1,
+    category: "Data display",
+    exports: ["Avatar", "AvatarStack"],
+    intent: ["A person or several people"],
+    use_when:
+      "One person (initials or photo, tooltip, a dot top right, a status bottom right) or a stack of people with a +N tile.",
+    never_when: [
+      "A hand-rolled row of avatars or +N tile",
+      "A badge drawn on an avatar by hand",
+      "Userpic classes mixed onto Avatar",
+    ],
+    props_rules: [
+      "size is a name (smaller, small, medium, large, larger), never a px number or CSS size",
+      "indicator is the top-right dot (presence, something new); badge is the bottom-right status, usually with an icon",
+    ],
+    replaces: ["services/lse/web/apps/labelstudio/src/pages/Organization/Models/@components/RunHistory/RunHistory.tsx"],
+  },
+]);

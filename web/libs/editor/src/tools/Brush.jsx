@@ -193,6 +193,7 @@ const _Tool = types
 
         // Reset the timer if a user started drawing again
         if (brush && brush.type === "brushregion") {
+          if (brush.isReadOnly() || brush.hidden) return;
           self.annotation.history.freeze();
           self.mode = "drawing";
           brush.setDrawing(true);
@@ -231,7 +232,9 @@ const BrushCursorMixin = types
   .model("BrushCursorMixin")
   .views((self) => ({
     get cursorStyleRule() {
-      const val = self.strokeWidth;
+      const scaleX = self.obj?.scaleX || 1;
+      const stageScale = self.obj?.stageScale || 1;
+      const val = self.strokeWidth * scaleX * stageScale;
       return Canvas.createBrushSizeCircleCursor(val);
     },
   }))

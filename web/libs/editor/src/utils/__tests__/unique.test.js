@@ -1,6 +1,14 @@
 /* global it, expect */
-import { guidGenerator } from "../unique";
+let guidGenerator;
+
+beforeAll(async () => {
+  const uniqueAbs = require.resolve("../unique");
+  const uniqueUrl = require("node:url").pathToFileURL(uniqueAbs).href;
+  const uniqueModule = await import(`${uniqueUrl}?bun_reload=${Date.now()}`);
+  guidGenerator = uniqueModule.guidGenerator;
+});
 
 it("Random ID generate", () => {
-  expect(guidGenerator(10)).toHaveLength(10);
+  const value = guidGenerator(10);
+  expect(value).toHaveLength(10);
 });

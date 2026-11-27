@@ -38,7 +38,7 @@ jobs:
 
       - name: Checkout
         if: github.event_name == 'push'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
 
@@ -48,7 +48,7 @@ jobs:
           filters: |
             src:
               - 'label_studio/!(frontend)/**'
-              - 'poetry.lock'
+              - 'uv.lock'
               - 'pyproject.toml'
               - 'scripts/*.py'
               - '.github/workflows/bandit.yml'
@@ -64,7 +64,7 @@ jobs:
               - 'web/**'
               - 'deploy/**'
               - 'Dockerfile**'
-              - 'poetry.lock'
+              - 'uv.lock'
               - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
@@ -105,10 +105,10 @@ jobs:
             });
             core.setOutput("membership", membership.state);
 
-  gitleaks:
+  trufflehog:
     name: "Linter"
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/gitleaks.yml
+    uses: ./.github/workflows/trufflehog.yml
     with:
       head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -160,7 +160,7 @@ jobs:
     name: "Build"
     needs:
       - changed_files
-    if: startsWith(github.ref_name, 'ls-release/')
+    if: github.repository_owner == 'HumanSignal' && startsWith(github.ref_name, 'ls-release/')
     permissions:
       contents: read
       checks: write
@@ -230,14 +230,14 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub
@@ -251,6 +251,7 @@ jobs:
           RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
           DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
         with:
+          github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
             const target_commitish = process.env.TARGET_COMMITISH;
@@ -468,7 +469,7 @@ jobs:
     name: "Ready to merge"
     if: always()
     needs:
-      - gitleaks
+      - trufflehog
       - bandit
       - ruff
       - biome
@@ -483,10 +484,10 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
+          allowed-skips: trufflehog, bandit, ruff, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-lsf, cursor-review
           allowed-failures: |
             [
-              "gitleaks",
+              "trufflehog",
               "cursor-review",
             ]
           jobs: ${{ toJSON(needs) }}

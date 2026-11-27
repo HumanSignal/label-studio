@@ -1,48 +1,47 @@
 import { inject, observer } from "mobx-react";
-import { RadioGroup } from "../../Common/RadioGroup/RadioGroup";
-import { IconGrid, IconList } from "@humansignal/icons";
-import { Tooltip } from "@humansignal/ui";
+import { SquaresFourIcon, ListIcon } from "@humansignal/icons";
+import { SegmentedControl, Tooltip } from "@humansignal/ui";
 
 const viewInjector = inject(({ store }) => ({
   view: store.currentView,
 }));
 
 export const ViewToggle = viewInjector(
-  observer(({ view, size, ...rest }) => {
-    return (
-      <RadioGroup
+  observer(({ view, size }) => {
+    const isLocked = view?.isLockedByManager;
+
+    const control = (
+      <SegmentedControl
         size={size}
-        value={view.type}
-        onChange={(e) => view.setType(e.target.value)}
-        {...rest}
-        style={{ "--button-padding": "0 var(--spacing-tighter)" }}
-      >
-        <Tooltip title="List view">
-          <div>
-            <RadioGroup.Button value="list" aria-label="Switch to list view">
-              <IconList />
-            </RadioGroup.Button>
-          </div>
-        </Tooltip>
-        <Tooltip title="Grid view">
-          <div>
-            <RadioGroup.Button value="grid" aria-label="Switch to grid view">
-              <IconGrid />
-            </RadioGroup.Button>
-          </div>
-        </Tooltip>
-      </RadioGroup>
+        aria-label="View"
+        data-testid="dm-view-toggle"
+        selectedOption={view.type}
+        onChange={(type) => view.setType(type)}
+        disabled={isLocked}
+        options={[
+          {
+            value: "list",
+            label: <ListIcon weight="bold" />,
+            tooltip: isLocked ? undefined : "List view",
+            "aria-label": "Switch to list view",
+          },
+          {
+            value: "grid",
+            label: <SquaresFourIcon weight="bold" />,
+            tooltip: isLocked ? undefined : "Grid view",
+            "aria-label": "Switch to grid view",
+          },
+        ]}
+      />
+    );
+
+    // Disabled buttons ignore hover, so the lock reason sits on a wrapper.
+    return isLocked ? (
+      <Tooltip title={view?.lockedUpdateMessage}>
+        <div>{control}</div>
+      </Tooltip>
+    ) : (
+      control
     );
   }),
 );
-
-export const DataStoreToggle = viewInjector(({ view, size, ...rest }) => {
-  return (
-    <RadioGroup value={view.target} size={size} onChange={(e) => view.setTarget(e.target.value)} {...rest}>
-      <RadioGroup.Button value="tasks">Tasks</RadioGroup.Button>
-      <RadioGroup.Button value="annotations" disabled>
-        Annotations
-      </RadioGroup.Button>
-    </RadioGroup>
-  );
-});

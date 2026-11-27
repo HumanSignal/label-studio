@@ -5,8 +5,18 @@
   flex-direction: column;
   overflow-y: auto;
 
-  .modal-ls__header {
+  &__header {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    box-sizing: content-box;
     border-bottom: 1px solid var(--color-neutral-border);
+    background: var(--color-neutral-background);
+    position: sticky;
+    top: 0;
+    z-index: 1;
 
     & h1 {
       width: 224px;

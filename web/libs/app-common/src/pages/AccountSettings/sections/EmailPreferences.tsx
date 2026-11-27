@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Checkbox, Spinner } from "@humansignal/ui";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
-import { ff, useAPI } from "@humansignal/core";
+import { useAPI } from "@humansignal/core";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
@@ -30,8 +30,7 @@ const NotificationCheckbox = ({ id, label, checked, onToggle }: NotificationChec
 };
 
 export const EmailPreferences = () => {
-  const isEnterpriseEmailNotificationsEnabled =
-    ff.isActive(ff.FF_ENTERPRISE_EMAIL_NOTIFICATIONS) && window.APP_SETTINGS?.billing?.enterprise;
+  const isEnterpriseEmailNotificationsEnabled = window.APP_SETTINGS?.billing?.enterprise;
   const config = useConfig();
   const { user, refetch } = useAuth();
   const api = useAPI();

@@ -1,10 +1,7 @@
-import { ff } from "@humansignal/core";
 import { Destructable } from "../Common/Destructable";
 import type { WaveformAudio } from "../Media/WaveformAudio";
 import { clamp } from "../Common/Utils";
 import type { Waveform } from "../Waveform";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 export abstract class Player extends Destructable {
   protected audio?: WaveformAudio;
@@ -143,7 +140,6 @@ export abstract class Player extends Destructable {
   init(audio: WaveformAudio) {
     this.audio = audio;
     this.audio.on("canplay", this.handleCanPlay);
-    this.audio.on("waiting", this.handleWaiting);
   }
 
   seek(time: number) {
@@ -191,17 +187,7 @@ export abstract class Player extends Destructable {
   };
 
   protected handleCanPlay = () => {
-    if (isSyncedBuffering) {
-      this.updateBuffering();
-    } else {
-      this.bufferResolve?.();
-    }
-  };
-
-  protected handleWaiting = () => {
-    if (isSyncedBuffering) {
-      this.updateBuffering();
-    }
+    this.bufferResolve?.();
   };
 
   private playEnded() {
@@ -362,10 +348,8 @@ export abstract class Player extends Destructable {
   protected watch = () => {
     if (!this.playing) return;
 
-    if (!isSyncedBuffering || !this.buffering) {
-      this.updateCurrentTime();
-      this.updateLoop(this.time);
-    }
+    this.updateCurrentTime();
+    this.updateLoop(this.time);
 
     this.timer = requestAnimationFrame(this.watch);
   };

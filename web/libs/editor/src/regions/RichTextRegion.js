@@ -97,7 +97,7 @@ const Model = types
             ...xpathRange,
             globalOffsets: self.globalOffsets.serialized,
           });
-        } catch (e) {
+        } catch (_e) {
           // regions may be broken, so they don't have globalOffsets
           // or they can't be applied on current html, so just keep them untouched
           const { start, end, startOffset, endOffset } = self;

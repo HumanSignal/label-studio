@@ -1,0 +1,14 @@
+import { defineManifest } from "../../ds-manifest";
+
+export default defineManifest({
+  name: "DateRangePicker",
+  tier: 2,
+  category: "Inputs",
+  sizing: "control",
+  exports: ["DateRangePicker", "DateRangePickerTrigger"],
+  intent: ["Pick a date or date-time range"],
+  use_when:
+    "Filtering or scoping by a period: a calendar with preset ranges and optional times, opened from DateRangePickerTrigger.",
+  never_when: ["A single date with no range", "Raw <input type=date> pairs"],
+  replaces: ["services/lse/web/apps/labelstudio/src/components/DateTimePicker/DateRangePicker.tsx"],
+});

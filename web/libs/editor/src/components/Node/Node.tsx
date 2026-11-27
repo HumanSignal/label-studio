@@ -8,6 +8,7 @@ import "./Node.prefix.css";
 import {
   IconBrushTool,
   IconBrushToolSmart,
+  IconChecklist,
   IconCircleTool,
   IconCircleToolSmart,
   IconKeypointsTool,
@@ -139,6 +140,11 @@ const NodeViews: Record<string, NodeViewProps> = {
   ChoicesModel: {
     name: "Classification",
     icon: ApartmentOutlined,
+  },
+
+  ClassificationArea: {
+    name: "Classification",
+    icon: IconChecklist,
   },
 
   TextAreaModel: {

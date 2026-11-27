@@ -135,6 +135,13 @@ If the webhook URL is inaccessible by Label Studio, you can see this in a traceb
 
 Label Studio does not retry webhook connections that fail. You can see successful webhook deliveries in the logs in DEBUG mode. 
 
+<div class="enterprise-only">
+
+!!! note
+    On Label Studio Enterprise Cloud (SaaS), webhook responses time out after 10 seconds. If a webhook fails 50 times in a row, it is automatically disabled by the system and must be reactivated in the webhook settings. For more details, see [Webhook limits](saas.html#Webhook-limits).
+
+</div>
+
 
 
 

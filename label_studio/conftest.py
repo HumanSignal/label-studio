@@ -18,3 +18,9 @@ def clear_current_context_after_test():
     from core.current_request import CurrentContext
 
     CurrentContext.clear()
+
+
+@pytest.fixture(autouse=True)
+def disable_ssrf_protection(settings):
+    # Prod default is now on, but tests use local/mock URLs; SSRF-specific tests opt back in.
+    settings.SSRF_PROTECTION_ENABLED = False

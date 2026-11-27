@@ -1,0 +1,207 @@
+import { describe, expect, it, mock, spyOn, afterEach, beforeEach } from "bun:test";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { Provider } from "mobx-react";
+import * as coreFf from "@humansignal/core/lib/utils/feature-flags";
+import * as SDKProvider from "../../../providers/SDKProvider";
+import { ResetColumnsButton, SAVE_AS_DEFAULT_EVENT } from "./ResetColumnsButton";
+
+/**
+ * Prefer Provider + spyOn over mock.module.
+ * Process-wide mock.module("mobx-react") leaks across Bun's shared worker and
+ * breaks later suites (GridSelectAll Provider, Hotkey Help Modal).
+ */
+describe("ResetColumnsButton (FIT-2846 / FIT-2847 / FIT-2991)", () => {
+  let isActiveSpy;
+  let useSDKSpy;
+  let previousAppSettings;
+  const invoke = mock();
+  const hasHandler = mock((event) => event === "dataManagerSettingsClicked" || event === SAVE_AS_DEFAULT_EVENT);
+
+  beforeEach(() => {
+    previousAppSettings = window.APP_SETTINGS;
+    window.APP_SETTINGS = {
+      ...(previousAppSettings ?? {}),
+      user: { ...(previousAppSettings?.user ?? {}), role: "OW" },
+    };
+    useSDKSpy = spyOn(SDKProvider, "useSDK").mockReturnValue({ hasHandler, invoke });
+  });
+
+  afterEach(() => {
+    isActiveSpy?.mockRestore();
+    useSDKSpy?.mockRestore();
+    invoke.mockClear();
+    hasHandler.mockClear();
+    hasHandler.mockImplementation((event) => event === "dataManagerSettingsClicked" || event === SAVE_AS_DEFAULT_EVENT);
+    window.APP_SETTINGS = previousAppSettings;
+  });
+
+  const renderButton = (viewOverrides = {}, props = {}) => {
+    const view = {
+      isLockedByManager: false,
+      resetColumnsToProjectDefaults: mock(),
+      columns: [
+        { id: "tasks:id", is_hidden: false },
+        { id: "tasks:agreement", is_hidden: true },
+      ],
+      columnOrderSnapshot: { "tasks:id": 1, "tasks:agreement": 2 },
+      ...viewOverrides,
+    };
+    render(
+      <Provider store={{ currentView: view }}>
+        <ResetColumnsButton enableSaveAsDefault {...props} />
+      </Provider>,
+    );
+    return view;
+  };
+
+  it("renders nothing when the feature flag is off", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(false);
+    const { container } = render(
+      <Provider store={{ currentView: {} }}>
+        <ResetColumnsButton enableSaveAsDefault />
+      </Provider>,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it.each([
+    "AN",
+    "RE",
+    "ANNOTATOR",
+    "REVIEWER",
+  ])("hides the entire defaults footer for Annotator/Reviewer role %s (FIT-2991)", (role) => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    window.APP_SETTINGS = { user: { role } };
+    const { container } = render(
+      <Provider store={{ currentView: { isLockedByManager: false, columns: [], columnOrderSnapshot: {} } }}>
+        <ResetColumnsButton enableSaveAsDefault />
+      </Provider>,
+    );
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTestId("dm-reset-columns")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dm-manage-defaults")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
+  });
+
+  it.each(["OW", "AD", "MA", "OWNER", "MANAGER"])("shows the footer for managing role %s (FIT-2991)", (role) => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    window.APP_SETTINGS = { user: { role } };
+    renderButton();
+    expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
+  });
+
+  it("opens a confirmation dialog before resetting the tab", async () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    const reset = mock(() => true);
+    renderButton({ resetColumnsToProjectDefaults: reset });
+
+    fireEvent.click(screen.getByTestId("dm-reset-columns"));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(/order and visibility/i);
+    const ok = screen.getByTestId("dialog-ok-button");
+    expect(ok).toHaveTextContent("Reset");
+    expect(ok.className).toMatch(/negative/);
+    expect(reset).not.toHaveBeenCalled();
+
+    fireEvent.click(ok);
+    expect(reset).toHaveBeenCalled();
+  });
+
+  it("labels the controls Manage Defaults, Reset, and Save as Default", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    renderButton();
+
+    expect(screen.getByRole("button", { name: "Manage Defaults" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reset" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save as Default" })).toBeInTheDocument();
+  });
+
+  it("places Reset leftmost, then Manage Defaults, then Save as Default", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    renderButton();
+
+    const buttons = screen.getAllByRole("button").map((el) => el.getAttribute("aria-label"));
+    expect(buttons).toEqual(["Reset", "Manage Defaults", "Save as Default"]);
+  });
+
+  it("navigates to Data Manager settings from Manage Defaults", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    renderButton();
+
+    fireEvent.click(screen.getByTestId("dm-manage-defaults"));
+    expect(invoke).toHaveBeenCalledWith("dataManagerSettingsClicked");
+  });
+
+  it("hides Manage Defaults when the host has no settings handler", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    hasHandler.mockImplementation((event) => event === SAVE_AS_DEFAULT_EVENT);
+    renderButton();
+
+    expect(screen.queryByTestId("dm-manage-defaults")).not.toBeInTheDocument();
+    expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
+    expect(screen.getByTestId("dm-save-as-default")).toBeInTheDocument();
+  });
+
+  it("hides Save as Default when enableSaveAsDefault is false", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    render(
+      <Provider store={{ currentView: { isLockedByManager: false, columns: [], columnOrderSnapshot: {} } }}>
+        <ResetColumnsButton enableSaveAsDefault={false} />
+      </Provider>,
+    );
+
+    expect(screen.getByTestId("dm-reset-columns")).toBeInTheDocument();
+    expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
+  });
+
+  it("hides Save as Default when the host has no save handler", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    hasHandler.mockImplementation((event) => event === "dataManagerSettingsClicked");
+    renderButton();
+
+    expect(screen.queryByTestId("dm-save-as-default")).not.toBeInTheDocument();
+  });
+
+  it("confirms before saving the tab layout as the project default", async () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    renderButton();
+
+    fireEvent.click(screen.getByTestId("dm-save-as-default"));
+    const dialog = await screen.findByRole("dialog", { name: /Save as Default/i });
+    expect(dialog).toHaveTextContent(/current tab/i);
+    expect(dialog).toHaveTextContent(/column order and visibility/i);
+    expect(dialog).toHaveTextContent(/default for this project/i);
+    expect(invoke).not.toHaveBeenCalled();
+
+    const ok = screen.getByTestId("dialog-ok-button");
+    expect(ok).toHaveTextContent("Save as Default");
+    fireEvent.click(ok);
+    expect(invoke).toHaveBeenCalledWith(SAVE_AS_DEFAULT_EVENT, {
+      order: ["id", "agreement"],
+      visibleIds: ["id"],
+    });
+  });
+
+  it("does not save when the confirmation is cancelled", async () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    renderButton();
+
+    fireEvent.click(screen.getByTestId("dm-save-as-default"));
+    fireEvent.click(await screen.findByTestId("dialog-cancel-button"));
+    expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it("is disabled when the tab is locked", () => {
+    isActiveSpy = spyOn(coreFf, "isActive").mockReturnValue(true);
+    const reset = mock(() => true);
+    renderButton({ isLockedByManager: true, resetColumnsToProjectDefaults: reset });
+
+    expect(screen.getByTestId("dm-reset-columns")).toBeDisabled();
+    expect(screen.getByTestId("dm-save-as-default")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("dm-reset-columns"));
+    fireEvent.click(screen.getByTestId("dm-save-as-default"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(reset).not.toHaveBeenCalled();
+    expect(invoke).not.toHaveBeenCalled();
+  });
+});

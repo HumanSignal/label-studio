@@ -14,9 +14,8 @@ from typing import Callable, Optional, TypedDict, Union
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
-from data_manager.functions import DataManagerException
 from django.conf import settings
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +27,27 @@ class DataManagerAction(TypedDict):
     order: int
     experimental: Optional[bool]
     dialog: dict
-    hidden: Optional[bool]
+    hidden: Optional[Union[bool, Callable]]
     disabled: Optional[Callable]
     disabled_reason: Optional[str]
     enterprise_badge: Optional[bool]
+
+
+def user_option_label(user):
+    """Label for a user option in action dropdowns, keeping name and email searchable.
+
+    When the annotator/reviewer firewall is active for the current requester, the
+    label is reduced to the user's role so no name/email leaks (these actions are
+    permission-gated, so this is defense-in-depth)."""
+    from core.current_request import CurrentContext
+    from users.serializers import AnnotatorReviewerFirewall
+
+    requester = CurrentContext.get_user()
+    if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+        return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+    display = user.get_full_name() or user.username
+    return f'{display} ({user.email})' if display else user.email
 
 
 def check_action_permission(user, action, project):
@@ -61,10 +77,15 @@ def get_all_actions(user, project):
     actions: list[DataManagerAction] = sorted(actions, key=lambda x: x['order'])
 
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
+
+    def _is_hidden(action):
+        hidden = action.get('hidden', False)
+        return hidden(user, project) if callable(hidden) else hidden
+
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions
-        if not action.get('hidden', False) and check_permission(user, action, project)
+        if not _is_hidden(action) and check_permission(user, action, project)
     ]
     # remove experimental features if they are disabled
     if not (
@@ -79,6 +100,10 @@ def get_all_actions(user, project):
         form_generator = action.get('dialog', {}).get('form')
         if callable(form_generator):
             action['dialog']['form'] = None
+
+        hidden_value = action.get('hidden')
+        if callable(hidden_value):
+            action['hidden'] = False
 
         disabled_generator = action.get('disabled')
         if callable(disabled_generator):
@@ -133,7 +158,7 @@ def register_actions_from_dir(base_module, action_dir):
 def perform_action(action_id, project, queryset, user, **kwargs):
     """Perform action using entry point from actions"""
     if action_id not in settings.DATA_MANAGER_ACTIONS:
-        raise DataManagerException("Can't find '" + action_id + "' in registered actions")
+        raise ValidationError("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
@@ -154,7 +179,7 @@ def perform_action(action_id, project, queryset, user, **kwargs):
 
 def get_action_form(action_id, project, user):
     if action_id not in settings.DATA_MANAGER_ACTIONS:
-        raise DataManagerException("Can't find '" + action_id + "' in registered actions")
+        raise ValidationError("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
     check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)

@@ -1,11 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { CaretDownIcon } from "@humansignal/icons";
+import { type ReactNode, useState } from "react";
 import { cn } from "../../utils/utils";
-import { IconChevronDown } from "@humansignal/icons";
 import { Button } from "../button/button";
 
 export type CollapsiblePanelProps = {
   /** Visual variant of the panel */
-  variant?: "primary" | "default";
+  variant?: "primary" | "neutral" | "positive";
   /** Panel title */
   title: ReactNode;
   /** Optional count badge/number to display */
@@ -18,6 +18,8 @@ export type CollapsiblePanelProps = {
   className?: string;
   /** Whether the panel starts expanded */
   defaultExpanded?: boolean;
+  /** Keep controls mounted while collapsed to preserve drafts and expensive viewer state. */
+  keepMounted?: boolean;
   /** Controlled expanded state */
   expanded?: boolean;
   /** Callback when expanded state changes */
@@ -26,20 +28,24 @@ export type CollapsiblePanelProps = {
   disableToggle?: boolean;
   /** Test ID for the panel container */
   dataTestId?: string;
+  /** Name used in the toggle's accessible label, e.g. "Expand Languages" */
+  toggleLabel?: string;
 };
 
 export const CollapsiblePanel = ({
-  variant = "default",
+  variant = "neutral",
   title,
   count,
   actions,
   children,
   className,
   defaultExpanded = true,
+  keepMounted = false,
   expanded: controlledExpanded,
   onExpandedChange,
   disableToggle = false,
   dataTestId,
+  toggleLabel = "panel",
 }: CollapsiblePanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
 
@@ -65,9 +71,13 @@ export const CollapsiblePanel = ({
       container: "border-primary-border-subtlest",
       header: "bg-primary-background hover:bg-primary-background-hover",
     },
-    default: {
+    neutral: {
       container: "border-neutral-border",
       header: "bg-neutral-surface hover:bg-neutral-surface-hover",
+    },
+    positive: {
+      container: "border-positive-border-subtlest",
+      header: "bg-positive-background hover:bg-positive-emphasis",
     },
   };
 
@@ -75,13 +85,13 @@ export const CollapsiblePanel = ({
 
   return (
     <div
-      className={cn("flex flex-col border rounded-md overflow-hidden shrink-0", styles.container, className)}
+      className={cn("flex flex-col border rounded-small overflow-hidden shrink-0", styles.container, className)}
       data-testid={dataTestId}
     >
       {/* Header - Always visible */}
       <div
         className={cn(
-          "flex items-center gap-2 px-base py-tight",
+          "flex items-center gap-tight px-tight py-tight",
           styles.header,
           !disableToggle && "cursor-pointer",
           "transition-colors",
@@ -90,8 +100,9 @@ export const CollapsiblePanel = ({
         data-testid={dataTestId ? `${dataTestId}-header` : undefined}
       >
         <Button
+          type="button"
           variant="neutral"
-          look="string"
+          look="ghost"
           size="small"
           className={cn(
             "flex items-center justify-center text-neutral-content-subtle transition-colors",
@@ -99,11 +110,12 @@ export const CollapsiblePanel = ({
             disableToggle && "opacity-40 cursor-not-allowed pointer-events-none",
           )}
           disabled={disableToggle}
-          aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
+          aria-label={`${isExpanded ? "Collapse" : "Expand"} ${toggleLabel}`}
           aria-expanded={isExpanded}
           data-testid="collapsible-panel-toggle"
         >
-          <IconChevronDown
+          <CaretDownIcon
+            weight="bold"
             size={16}
             className={cn("transition-transform ease-out duration-200", !isExpanded && "-rotate-90")}
           />
@@ -127,8 +139,8 @@ export const CollapsiblePanel = ({
       </div>
 
       {/* Content - Collapsible */}
-      {isExpanded && children && (
-        <div className="border-t border-inherit" data-testid="collapsible-panel-content">
+      {(isExpanded || keepMounted) && children && (
+        <div hidden={!isExpanded} className="border-t border-inherit" data-testid="collapsible-panel-content">
           {children}
         </div>
       )}

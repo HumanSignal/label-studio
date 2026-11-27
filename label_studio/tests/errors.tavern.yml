@@ -4,6 +4,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - debug_modal_exceptions_true
 stages:
 - id: signup
   type: ref
@@ -23,7 +24,6 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
-  - debug_modal_exceptions_false
 stages:
 - id: signup
   type: ref

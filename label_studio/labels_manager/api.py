@@ -1,12 +1,15 @@
 import logging
 
 from core.permissions import ViewClassPermission, all_permissions
+from core.utils.common import load_func
+from django.conf import settings
 from django.db.models import CharField, Count, Q
 from django.db.models.functions import Cast
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from labels_manager.serializers import (
+    LabelBulkUpdateResponseSerializer,
     LabelBulkUpdateSerializer,
     LabelCreateSerializer,
     LabelLinkSerializer,
@@ -92,6 +95,7 @@ logger = logging.getLogger(__name__)
 )
 @method_decorator(name='update', decorator=extend_schema(exclude=True))
 class LabelAPI(viewsets.ModelViewSet):
+    queryset = Label.objects.none()
     pagination_class = PageNumberPagination
     serializer_class = LabelSerializer
     permission_required = ViewClassPermission(
@@ -193,6 +197,7 @@ class LabelAPI(viewsets.ModelViewSet):
 )
 @method_decorator(name='update', decorator=extend_schema(exclude=True))
 class LabelLinkAPI(viewsets.ModelViewSet):
+    queryset = LabelLink.objects.none()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
         'project': ['exact'],
@@ -209,13 +214,17 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
-        return LabelLink.objects.filter(label__organization=self.request.user.active_organization).annotate(
-            annotations_count=Count(
-                'project__tasks__annotations',
-                filter=Q(
-                    project__tasks__annotations__result__icontains=Cast('label__value', output_field=CharField())
-                ),
+        return (
+            LabelLink.objects.filter(label__organization=self.request.user.active_organization)
+            .annotate(
+                annotations_count=Count(
+                    'project__tasks__annotations',
+                    filter=Q(
+                        project__tasks__annotations__result__icontains=Cast('label__value', output_field=CharField())
+                    ),
+                )
             )
+            .order_by('id')
         )
 
     @api_webhook('LABEL_LINK_UPDATED')
@@ -235,6 +244,8 @@ class LabelLinkAPI(viewsets.ModelViewSet):
         description="""
         If you want to update the labels in saved annotations, use this endpoint.
         """,
+        request=LabelBulkUpdateSerializer,
+        responses={200: LabelBulkUpdateResponseSerializer},
         extensions={
             'x-fern-sdk-group-name': ['projects', 'labels'],
             'x-fern-sdk-method-name': 'update_many',
@@ -249,13 +260,19 @@ class LabelBulkUpdateAPI(views.APIView):
         serializer = LabelBulkUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         project = serializer.validated_data['project']
+        project_ids = None
         if project is not None:
             self.check_object_permissions(self.request, project)
+        else:
+            # Without `project`, only touch projects this user can access (FIT-3296),
+            # resolved in one query instead of a per-project object check.
+            project_ids = load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(self.request.user).values('id')
 
         updated_count = bulk_update_label(
             old_label=serializer.validated_data['old_label'],
             new_label=serializer.validated_data['new_label'],
             organization=self.request.user.active_organization,
             project=project,
+            project_ids=project_ids,
         )
         return Response({'annotations_updated': updated_count})

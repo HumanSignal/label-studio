@@ -2,6 +2,7 @@
 
 import base64
 import fnmatch
+import functools
 import importlib.metadata
 import logging
 import mimetypes
@@ -9,7 +10,15 @@ import re
 from urllib.parse import urlparse
 
 import boto3
+from botocore.awsrequest import (
+    AWSHTTPConnection,
+    AWSHTTPConnectionPool,
+    AWSHTTPSConnection,
+    AWSHTTPSConnectionPool,
+)
 from botocore.exceptions import ClientError
+from core.utils.exceptions import SsrfBlockedUrlError
+from core.utils.io import _SsrfGuardedConnectionMixin, validate_url_for_ssrf
 from core.utils.params import get_env
 from django.conf import settings
 from tldextract import TLDExtract
@@ -17,6 +26,7 @@ from tldextract import TLDExtract
 logger = logging.getLogger(__name__)
 
 
+@functools.lru_cache(maxsize=1)
 def _get_user_agent_extra():
     try:
         version = importlib.metadata.version('label-studio')
@@ -25,9 +35,23 @@ def _get_user_agent_extra():
     return f'label-studio/{version}'
 
 
+def custom_endpoint_needs_own_keys():
+    # On a cloud instance the app's credentials (AWS_* env, instance role, IRSA) belong to the platform, not to the
+    # user, so they must never be sent to a user-supplied endpoint. Self-hosted operators own both, and may keep
+    # S3-compatible keys in env with blank storage fields.
+    return settings.SSRF_PROTECTION_ENABLED and getattr(settings, 'CLOUD_INSTANCE', False)
+
+
+def check_custom_endpoint_has_own_keys(s3_endpoint, aws_access_key_id):
+    """Refuse a user-supplied s3_endpoint without its own access key, so the app's credentials are never sent there."""
+    if s3_endpoint and not aws_access_key_id and custom_endpoint_needs_own_keys():
+        raise SsrfBlockedUrlError('A custom S3 endpoint requires an access key ID and secret access key.')
+
+
 def get_client_and_resource(
     aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region_name=None, s3_endpoint=None
 ):
+    check_custom_endpoint_has_own_keys(s3_endpoint, aws_access_key_id)
     aws_access_key_id = aws_access_key_id or get_env('AWS_ACCESS_KEY_ID')
     aws_secret_access_key = aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY')
     aws_session_token = aws_session_token or get_env('AWS_SESSION_TOKEN')
@@ -42,13 +66,60 @@ def get_client_and_resource(
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token=aws_session_token,
     )
-    settings = {'region_name': region_name or get_env('S3_region') or 'us-east-1'}
-    s3_endpoint = s3_endpoint or get_env('S3_ENDPOINT')
-    if s3_endpoint:
-        settings['endpoint_url'] = s3_endpoint
+    return create_s3_client_and_resource(session, region_name, s3_endpoint)
+
+
+class _SsrfGuardedAWSHTTPConnection(_SsrfGuardedConnectionMixin, AWSHTTPConnection):
+    pass
+
+
+class _SsrfGuardedAWSHTTPSConnection(_SsrfGuardedConnectionMixin, AWSHTTPSConnection):
+    pass
+
+
+class _SsrfGuardedAWSHTTPConnectionPool(AWSHTTPConnectionPool):
+    ConnectionCls = _SsrfGuardedAWSHTTPConnection
+
+
+class _SsrfGuardedAWSHTTPSConnectionPool(AWSHTTPSConnectionPool):
+    ConnectionCls = _SsrfGuardedAWSHTTPSConnection
+
+
+_SSRF_GUARDED_AWS_POOL_CLASSES = {
+    'http': _SsrfGuardedAWSHTTPConnectionPool,
+    'https': _SsrfGuardedAWSHTTPSConnectionPool,
+}
+
+
+def _guard_client_connections(client):
+    # botocore resolves the endpoint host on every new connection, so a check at save time can be rebound
+    http_session = client._endpoint.http_session
+    http_session._pool_classes_by_scheme = _SSRF_GUARDED_AWS_POOL_CLASSES
+    http_session._manager.pool_classes_by_scheme = _SSRF_GUARDED_AWS_POOL_CLASSES
+
+
+def create_s3_client_and_resource(session, region_name=None, s3_endpoint=None):
+    """Create the S3 client and resource from a boto3 session.
+
+    A user-supplied s3_endpoint is checked for SSRF on every connection; the operator's
+    S3_ENDPOINT env fallback is trusted and may point to an internal host.
+    """
+    client_kwargs = {'region_name': region_name or get_env('S3_region') or 'us-east-1'}
+    endpoint_url = s3_endpoint or get_env('S3_ENDPOINT')
+    if endpoint_url:
+        client_kwargs['endpoint_url'] = endpoint_url
+
+    guard_connections = bool(s3_endpoint) and settings.SSRF_PROTECTION_ENABLED
+    if guard_connections:
+        # storages saved before the serializer check or with SSRF protection off were never validated
+        validate_url_for_ssrf(s3_endpoint, block_local_urls=True)
+
     config = boto3.session.Config(signature_version='s3v4', user_agent_extra=_get_user_agent_extra())
-    client = session.client('s3', config=config, **settings)
-    resource = session.resource('s3', config=config, **settings)
+    client = session.client('s3', config=config, **client_kwargs)
+    resource = session.resource('s3', config=config, **client_kwargs)
+    if guard_connections:
+        _guard_client_connections(client)
+        _guard_client_connections(resource.meta.client)
     return client, resource
 
 

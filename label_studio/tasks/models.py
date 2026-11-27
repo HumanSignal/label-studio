@@ -12,11 +12,9 @@ from typing import Any, Mapping, Optional, Union, cast
 from urllib.parse import urljoin
 
 import ujson as json
-from core.bulk_update_utils import bulk_update
 from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import SINGLE_VALUED_TAGS
-from core.redis import start_job_async_or_sync
 from core.utils.common import (
     find_first_one_to_one_related_field_by_prefix,
     load_func,
@@ -28,12 +26,13 @@ from core.utils.params import get_env
 from data_import.models import FileUpload
 from data_manager.managers import PreparedTaskManager, TaskManager
 from django.conf import settings
-from django.db import OperationalError, models, transaction
-from django.db.models import CheckConstraint, F, JSONField, Q
-from django.db.models.lookups import GreaterThanOrEqual
+from django.core.signing import Signer
+from django.db import models, transaction
+from django.db.models import CheckConstraint, JSONField, Q
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
+from django.utils.crypto import constant_time_compare
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -42,10 +41,26 @@ from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
+from tasks.result_utils import sanitize_null_bytes
 
 logger = logging.getLogger(__name__)
 
 TaskMixin = load_func(settings.TASK_MIXIN)
+
+_FILE_PROXY_SIGNER = Signer(salt='projects-file-proxy')
+
+
+def sign_file_proxy_url(project_id: int, url: str) -> str:
+    """Signature proving that ``url`` came from the task data of project ``project_id``.
+
+    The file proxy sends the project's task-data credentials only with a signed URL,
+    so a caller can't make it send them to a host of their choice.
+    """
+    return _FILE_PROXY_SIGNER.signature(f'{project_id}:{url}')
+
+
+def is_signed_file_proxy_url(project_id: int, url: str, signature: Optional[str]) -> bool:
+    return bool(signature) and constant_time_compare(signature, sign_file_proxy_url(project_id, url))
 
 
 class Task(TaskMixin, FsmHistoryStateModel):
@@ -122,6 +137,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
         default=0,
         null=True,
         help_text='Internal task ID in the project, starts with 1',
+    )
+    # Provenance, like Annotation.import_id: one hop back, never reused as this task's own id.
+    # No index on purpose: nothing filters by it, and `task` is too large for a synchronous index.
+    import_id = models.BigIntegerField(
+        _('import id'),
+        null=True,
+        blank=True,
+        help_text='Original task ID that was at the import step (the "id" of the task in the imported data, '
+        'or the source task when tasks are copied between projects), or NULL if there was none. '
+        'It points one step back, so for a copy of a copy it is the ID of the intermediate copy, not of the first task',
     )
     updates = ['is_labeled']
     total_annotations = models.IntegerField(
@@ -241,13 +266,24 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 # tasks where there is no predictions matching current
                 # model version. In case it will return a model_version
                 # and we can grab predictions explicitly
-                if isinstance(new_predictions, str):
+                #
+                # A backend may report model_version as a non-string scalar
+                # (e.g. an int from its setup response), so treat any scalar
+                # as the model_version fast-path rather than only ``str``.
+                if isinstance(new_predictions, (str, int)):
                     model_version = new_predictions
                     return predictions.filter(model_version=model_version)
+                elif new_predictions is None:
+                    # predict_tasks() returns None when the backend is not
+                    # ready; degrade to an empty (iterable) result.
+                    return []
                 else:
                     return new_predictions
-            else:
+            elif project.model_version:
                 return predictions.filter(model_version=project.model_version)
+            else:
+                # No version selected (''): don't filter, matching DataManagerTaskSerializer.get_predictions
+                return predictions
         else:
             return []
 
@@ -279,7 +315,13 @@ class Task(TaskMixin, FsmHistoryStateModel):
             if rejected_q:
                 q &= rejected_q
 
-        return q | Q(ground_truth=True)
+        exclude_q = q | Q(ground_truth=True)
+
+        extra_q = self.get_lock_extra_exclude_query()
+        if extra_q:
+            exclude_q |= extra_q
+
+        return exclude_q
 
     def has_lock(self, user=None):
         """
@@ -440,61 +482,11 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 'presign_ttl': storage.presign_ttl,
             }
 
-    def resolve_uri(self, task_data, project):
-        # DEPRECATED: use resolve_uris instead.
-        from io_storages.functions import get_storage_by_url
-
-        if project.task_data_login and project.task_data_password:
-            protected_data = {}
-            for key, value in task_data.items():
-                if isinstance(value, str) and string_is_url(value):
-                    path = (
-                        reverse('projects-file-proxy', kwargs={'pk': project.pk})
-                        + '?url='
-                        + base64.urlsafe_b64encode(value.encode()).decode()
-                    )
-                    value = urljoin(settings.HOSTNAME, path)
-                protected_data[key] = value
-            return protected_data
-        else:
-            storage_objects = project.get_all_import_storage_objects
-
-            # try resolve URLs via storage associated with that task
-            for field in task_data:
-                # file saved in django file storage
-                prepared_filename = self.prepare_filename(task_data[field])
-                if settings.CLOUD_FILE_STORAGE_ENABLED and self.is_upload_file(prepared_filename):
-                    # permission check: resolve uploaded files to the project only
-                    file_upload = fast_first(FileUpload.objects.filter(project=project, file=prepared_filename))
-                    if file_upload is not None:
-                        task_data[field] = file_upload.url
-                    # it's very rare case, e.g. user tried to reimport exported file from another project
-                    # or user wrote his django storage path manually
-                    else:
-                        task_data[field] = task_data[field] + '?not_uploaded_project_file'
-                    continue
-
-                # project storage
-                # TODO: to resolve nested lists and dicts we should improve get_storage_by_url(),
-                # Now always using get_storage_by_url to ensure the storage with the correct bucket is used
-                # As a last fallback we can use self.storage which is the storage the Task was imported from
-                storage = get_storage_by_url(task_data[field], storage_objects) or self.storage
-                if storage:
-                    try:
-                        resolved_uri = storage.resolve_uri(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved_uri = None
-                    if resolved_uri:
-                        task_data[field] = resolved_uri
-            return task_data
-
     def resolve_uris(self, task_data, project):
         """Resolve all cloud storage URIs across all project storages.
 
-        Unlike resolve_uri which picks one storage per field and resolves
-        only the first URI, this iterates all storages per field and resolves
-        every URI each storage can handle.
+        Iterates all storages per field and resolves every URI each storage
+        can handle (vs. picking a single storage per field).
         """
         if project.task_data_login and project.task_data_password:
             protected_data = {}
@@ -504,12 +496,15 @@ class Task(TaskMixin, FsmHistoryStateModel):
                         reverse('projects-file-proxy', kwargs={'pk': project.pk})
                         + '?url='
                         + base64.urlsafe_b64encode(value.encode()).decode()
+                        + '&sig='
+                        + sign_file_proxy_url(project.pk, value)
                     )
                     value = urljoin(settings.HOSTNAME, path)
                 protected_data[key] = value
             return protected_data
 
         storage_objects = project.get_all_import_storage_objects
+        project_storage_keys = {(storage.__class__, storage.id) for storage in storage_objects}
 
         for field in task_data:
             prepared_filename = self.prepare_filename(task_data[field])
@@ -530,17 +525,27 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 if resolved:
                     task_data[field] = resolved
 
-            fallback_storage = self.storage
+            storage_link = self.get_storage_link()
+            if storage_link:
+                storage_model = storage_link._meta.get_field('storage').remote_field.model
+                fallback_storage = (
+                    storage_link.storage
+                    if (storage_model, storage_link.storage_id) not in project_storage_keys
+                    else None
+                )
+            else:
+                fallback_storage = self.storage
+                if fallback_storage and (fallback_storage.__class__, fallback_storage.id) in project_storage_keys:
+                    fallback_storage = None
+
             if fallback_storage:
-                storage_ids = {s.id for s in storage_objects}
-                if fallback_storage.id not in storage_ids:
-                    try:
-                        resolved = fallback_storage.resolve_uris(task_data[field], self)
-                    except Exception as exc:
-                        logger.debug(exc, exc_info=True)
-                        resolved = None
-                    if resolved:
-                        task_data[field] = resolved
+                try:
+                    resolved = fallback_storage.resolve_uris(task_data[field], self)
+                except Exception as exc:
+                    logger.debug(exc, exc_info=True)
+                    resolved = None
+                if resolved:
+                    task_data[field] = resolved
 
         return task_data
 
@@ -571,13 +576,14 @@ class Task(TaskMixin, FsmHistoryStateModel):
             return self.annotations.filter(Q_finished_annotations)
 
     def increase_project_summary_counters(self):
-        if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+        # AutoOneToOneField opens a savepoint on every access, even when cached
+        summary = getattr(self.project, 'summary', None)
+        if summary is not None:
             summary.update_data_columns([self])
 
     def decrease_project_summary_counters(self):
-        if hasattr(self.project, 'summary'):
-            summary = self.project.summary
+        summary = getattr(self.project, 'summary', None)
+        if summary is not None:
             summary.remove_data_columns([self])
 
     def ensure_unique_groundtruth(self, annotation_id):
@@ -607,8 +613,18 @@ class Task(TaskMixin, FsmHistoryStateModel):
             (post_delete, update_all_task_states_after_deleting_task, Task),
             (pre_delete, remove_data_columns, Task),
         ]
-        with temporary_disconnect_list_signal(signals):
-            return batch_delete(queryset, batch_size=500)
+        # Suppress LSE FSM review/annotation state writes during CASCADE deletes.
+        # Without this flag, `handle_review_deletion` tries to persist an
+        # AnnotationState row whose project_id is read from task.project_id —
+        # which is NULL when delete_tasks has just unlinked the task from the
+        # project, causing a NOT NULL violation and leaving orphaned tasks.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            with temporary_disconnect_list_signal(signals):
+                return batch_delete(queryset, batch_size=500)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
 
     @staticmethod
     def delete_tasks_without_signals_from_task_ids(task_ids):
@@ -617,7 +633,16 @@ class Task(TaskMixin, FsmHistoryStateModel):
 
     def delete(self, *args, **kwargs):
         self.before_delete_actions()
-        result = super().delete(*args, **kwargs)
+        # Task deletion cascades to annotations and reviews. During that cascade,
+        # review post_delete signals may fire before parent annotations are gone.
+        # Guard FSM handlers so they don't create transient AnnotationState rows
+        # that reference annotations being deleted in the same transaction.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         # set updated_at field of task to now()
         return result
 
@@ -856,9 +881,17 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         return result
 
     def delete(self, *args, **kwargs):
-        # Store task and project references before deletion
-
-        result = super().delete(*args, **kwargs)
+        # Guard against FK violations from FSM signal handlers during CASCADE.
+        # When Django's collector deletes child AnnotationReviews before this
+        # annotation, the review post_delete handler (handle_review_deletion)
+        # would otherwise try to INSERT new AnnotationState rows referencing
+        # this soon-to-be-deleted annotation, causing an IntegrityError.
+        previous = CurrentContext.get('bulk_annotation_delete_in_progress')
+        CurrentContext.set('bulk_annotation_delete_in_progress', True)
+        try:
+            result = super().delete(*args, **kwargs)
+        finally:
+            CurrentContext.set('bulk_annotation_delete_in_progress', previous)
         self.update_task()
         self.on_delete_update_counters()
 
@@ -1015,21 +1048,25 @@ class AnnotationDraft(FsmHistoryStateModel):
         return timesince(self.created_at)
 
     def has_permission(self, user):
-        user.project = self.task.project  # link for activity log
-        return self.task.project.has_permission(user)
+        """Project access; users restricted to their own work (LSE annotators) also need their own draft on a
+        task they can open. Beyond project access the task check only restricts those users, so others skip it."""
+        project = self.task.project
+        user.project = project  # link for activity log
+        if not project.has_permission(user):
+            return False
+        if Annotation.restricted_to_own_work(user, project):
+            return self.user_id == user.id and self.task.has_permission(user)
+        return True
 
     def save(self, *args, **kwargs):
-        with transaction.atomic():
-            project = self.task.project
-            # Lock projectsummary first to avoid deadlocks with annotation-reviews
-            # which accesses projectsummary before annotationdraft
-            if hasattr(project, 'summary'):
-                from projects.models import ProjectSummary
-
-                ProjectSummary.objects.select_for_update().filter(pk=project.summary.pk).first()
-            super().save(*args, **kwargs)
-            if hasattr(project, 'summary'):
-                project.summary.update_created_labels_drafts([self])
+        # Strip NUL (U+0000) bytes that Postgres JSONB cannot store. Source PDFs with an
+        # embedded OCR/text layer can leak \x00 into value.ocrtext, which otherwise 500s the
+        # draft write with a DataError. See FIT-2353.
+        self.result = sanitize_null_bytes(self.result)
+        super().save(*args, **kwargs)
+        project = self.task.project
+        if hasattr(project, 'summary'):
+            project.summary.update_created_labels_drafts([self])
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
@@ -1380,7 +1417,13 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
     but call only tasks_number_changed section
     """
     try:
-        instance.project.update_tasks_states(
+        from projects.functions.summary_delta import schedule_tasks_states_after_delete, use_summary_delta
+
+        project = instance.project
+        if use_summary_delta(project.organization_id):
+            schedule_tasks_states_after_delete(project.id, project.organization_id)
+            return
+        project.update_tasks_states(
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
             tasks_number_changed=True,
@@ -1395,19 +1438,42 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
     """Reduce data column counters after removing task"""
-    instance.decrease_project_summary_counters()
+    from projects.functions.summary_delta import (
+        SummaryDelta,
+        add_annotation_results,
+        add_draft_results,
+        add_task_data,
+        schedule_summary_delta,
+        use_summary_delta,
+    )
+
+    project = instance.project
+    if project is None or not use_summary_delta(project.organization_id):
+        instance.decrease_project_summary_counters()
+        return
+    # the cascade does not call Annotation/AnnotationDraft.delete(), so their counters are dropped here too
+    delta = add_task_data(SummaryDelta(), [instance.data])
+    add_annotation_results(delta, Annotation.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    add_draft_results(delta, AnnotationDraft.objects.filter(task_id=instance.id).values_list('result', flat=True))
+    schedule_summary_delta(project.id, project.organization_id, delta)
 
 
 def _task_data_is_not_updated(update_fields):
-    if update_fields and list(update_fields) == ['is_labeled']:
-        return True
+    """True when this save cannot affect project.summary data columns.
+
+    The summary's data columns are derived from task.data alone, so only a full
+    save or a save that writes task.data needs to recompute them.
+    """
+    if not update_fields:
+        return False
+    return 'data' not in update_fields
 
 
 @receiver(pre_save, sender=Task)
 def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
     """Before updating task fields - ensure previous info removed from project.summary"""
-    if _task_data_is_not_updated(update_fields):
-        # we don't need to update counters when other than task.data fields are updated
+    if _task_data_is_not_updated(update_fields) or instance.pk is None:
+        # we don't need to update counters when other than task.data fields are updated, or for a new task
         return
     try:
         old_task = sender.objects.get(id=instance.id)
@@ -1470,17 +1536,62 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
     logger.debug(f'Updated total_annotations and cancelled_annotations for {instance.task.id}.')
 
 
+@receiver(post_delete, sender=Annotation)
+def update_task_counters_after_annotation_delete(sender, instance, **kwargs):
+    """Safety net: keep task.total_annotations / cancelled_annotations correct on deletion.
+
+    Counter upkeep on delete otherwise lives only in ``Annotation.delete()`` (single) and the
+    explicit recompute calls in the bulk delete jobs. A raw ``Annotation.objects.filter(...).delete()``
+    (SDK/script) or a dropped async recompute job would leave ``total_annotations`` stale above the
+    real annotation count — the drift surfaced in the Data Manager (e.g. a task showing 1 annotation
+    while empty).
+
+    The first-class paths set ``bulk_annotation_delete_in_progress`` and either recompute counters
+    themselves (single ``Annotation.delete()``, bulk DM/API delete) or intentionally leave them alone
+    (task/project CASCADE deletion, where the tasks are being removed anyway). We no-op in that case to
+    avoid redundant per-row work and to avoid touching tasks that are mid-deletion; we only recompute
+    for the unguarded paths that would otherwise drift.
+    """
+    if CurrentContext.get('bulk_annotation_delete_in_progress'):
+        return
+
+    task_id = instance.task_id
+    if task_id is None:
+        return
+
+    task = Task.objects.filter(id=task_id).first()
+    if task is None:
+        return
+
+    task.total_annotations = task.annotations.filter(was_cancelled=False).count()
+    task.cancelled_annotations = task.annotations.filter(was_cancelled=True).count()
+    task.update_is_labeled()
+    # Use .update() (not .save()) to avoid re-triggering Task save signals / summary recounting.
+    # Explicit updated_at: QuerySet.update() does not honor auto_now, and incremental exports
+    # key off Task.updated_at (FIT-3092).
+    Task.objects.filter(id=task_id).update(
+        total_annotations=task.total_annotations,
+        cancelled_annotations=task.cancelled_annotations,
+        is_labeled=task.is_labeled,
+        updated_at=now(),
+    )
+    logger.debug(f'post_delete recomputed counters for task {task_id} after annotation deletion.')
+
+
 @receiver(pre_delete, sender=Prediction)
 def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
-    instance.task.total_predictions = instance.task.predictions.all().count() - 1
+    instance.task.total_predictions = max(instance.task.predictions.all().count() - 1, 0)
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f'Updated total_predictions for {instance.task.id}.')
 
 
 @receiver(post_save, sender=Prediction)
-def save_predictions_to_project(sender, instance, **kwargs):
+def save_predictions_to_project(sender, instance, created, **kwargs):
     """Add predictions counters"""
+    if not created:
+        # post_save also fires on updates, which don't change the count
+        return
     instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
     logger.debug(f'Updated total_predictions for {instance.task.id}.')
@@ -1522,94 +1633,25 @@ def update_ml_backend(sender, instance, **kwargs):
                 ml_backend.train()
 
 
-def update_task_stats(task, stats=('is_labeled',), save=True):
-    """Update single task statistics:
-        accuracy
-        is_labeled
-    :param task: Task to update
-    :param stats: to update separate stats
-    :param save: to skip saving in some cases
-    :return:
-    """
-    logger.debug(f'Update stats {stats} for task {task}')
-    if 'is_labeled' in stats:
-        task.update_is_labeled(save=save)
-    if save:
-        task.save()
-
-
-def deprecated_bulk_update_stats_project_tasks(tasks, project=None):
-    """bulk Task update accuracy
-       ex: after change settings
-       apply several update queries size of batch
-       on updated Task objects
-       in single transaction as execute sql
-    :param tasks:
-    :return:
-    """
-    # recalc accuracy
-    if not tasks:
-        # break if tasks is empty
-        return
-    # get project if it's not in params
-    if project is None:
-        project = tasks[0].project
-
-    with transaction.atomic():
-        use_overlap = project._can_use_overlap()
-        # update filters if we can use overlap
-        if use_overlap:
-            # following definition of `completed_annotations` above, count cancelled annotations
-            # as completed if project is in IGNORE_SKIPPED mode
-            completed_annotations_f_expr = F('total_annotations')
-            if project.skip_queue == project.SkipQueue.IGNORE_SKIPPED:
-                completed_annotations_f_expr += F('cancelled_annotations')
-            finished_q = Q(GreaterThanOrEqual(completed_annotations_f_expr, F('overlap')))
-            finished_tasks = tasks.filter(finished_q)
-            finished_tasks_ids = finished_tasks.values_list('id', flat=True)
-            tasks.update(is_labeled=Q(id__in=finished_tasks_ids))
-
-        else:
-            # update objects without saving if we can't use overlap
-            for task in tasks:
-                update_task_stats(task, save=False)
-            try:
-                # start update query batches
-                bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
-            except OperationalError:
-                logger.error('Operational error while updating tasks: {exc}', exc_info=True)
-                # try to update query batches one more time
-                start_job_async_or_sync(
-                    bulk_update,
-                    tasks,
-                    in_seconds=settings.BATCH_JOB_RETRY_TIMEOUT,
-                    update_fields=['is_labeled'],
-                    batch_size=settings.BATCH_SIZE,
-                )
-
-
 def bulk_update_stats_project_tasks(tasks, project=None):
     # Avoid circular import
     from projects.functions.utils import get_unique_ids_list
 
     bulk_update_is_labeled = load_func(settings.BULK_UPDATE_IS_LABELED)
 
-    if flag_set('fflag_fix_back_plt_802_update_is_labeled_20062025_short', user='auto'):
-        task_ids = get_unique_ids_list(tasks)
+    task_ids = get_unique_ids_list(tasks)
 
-        if not task_ids:
-            return
+    if not task_ids:
+        return
 
-        if project is None:
-            first_task = Task.objects.get(id=task_ids[0])
-            project = first_task.project
+    if project is None:
+        first_task = Task.objects.get(id=task_ids[0])
+        project = first_task.project
 
-        # Set user context so FSM checks work when this runs in an async worker
-        if project.created_by_id:
-            CurrentContext.set_user(project.created_by)
-        bulk_update_is_labeled(task_ids, project)
-    else:
-        return deprecated_bulk_update_stats_project_tasks(tasks, project)
+    # Set user context so FSM checks work when this runs in an async worker
+    if project.created_by_id:
+        CurrentContext.set_user(project.created_by)
+    bulk_update_is_labeled(task_ids, project)
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

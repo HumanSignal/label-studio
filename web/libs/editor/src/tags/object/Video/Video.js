@@ -7,12 +7,8 @@ import PersistentStateMixin from "../../../mixins/PersistentState";
 import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { SyncableMixin } from "../../../mixins/Syncable";
 import { parseValue } from "../../../utils/data";
-import { FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../../utils/feature-flags";
-import { ff } from "@humansignal/core";
 import ObjectBase from "../Base";
 import { isDefined } from "../../../utils/utilities";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 /**
  * Video tag plays a simple video file. Use for video annotation tasks such as classification and transcription.
@@ -110,6 +106,8 @@ const Model = types
     length: 1,
     drawingRegion: null,
     loopTimelineRegion: false,
+    stageRef: null,
+    workingArea: null,
   }))
   .views((self) => ({
     get store() {
@@ -117,7 +115,7 @@ const Model = types
     },
 
     get currentFrame() {
-      return self.ref.current?.position ?? 1;
+      return self.ref.current?.currentFrame ?? self.frame;
     },
 
     get timelineControl() {
@@ -219,6 +217,17 @@ const Model = types
       self.speed = self.defaultplaybackspeed;
     },
   }))
+  .actions((self) => ({
+    setStageRef(ref) {
+      self.stageRef = ref;
+    },
+    setWorkingArea(wa) {
+      self.workingArea = wa;
+    },
+    handleLoadError(message) {
+      self.errors = [message];
+    },
+  }))
   ////// Sync actions
   .actions((self) => ({
     ////// Outgoing
@@ -241,27 +250,12 @@ const Model = types
       );
     },
 
-    triggerSyncPlay(isManual = false) {
-      if (isSyncedBuffering && self.isBuffering && !isManual) return;
-      self.wasPlayingBeforeBuffering = true;
+    triggerSyncPlay() {
       self.triggerSync("play", { playing: true });
     },
 
-    triggerSyncPause(isManual = false) {
-      if (isSyncedBuffering && self.isBuffering && !isManual) return;
-      self.wasPlayingBeforeBuffering = false;
+    triggerSyncPause() {
       self.triggerSync("pause", { playing: false });
-    },
-
-    triggerSyncBuffering(isBuffering) {
-      if (!self.ref.current) return;
-
-      const playing = self.wasPlayingBeforeBuffering;
-
-      self.triggerSync("buffering", {
-        buffering: isBuffering,
-        playing,
-      });
     },
 
     ////// Incoming
@@ -271,49 +265,24 @@ const Model = types
         self.syncHandlers.set(event, self.handleSync);
       }
       self.syncHandlers.set("speed", self.handleSyncSpeed);
-      if (isSyncedBuffering) {
-        self.syncHandlers.set("buffering", self.handleSyncBuffering);
-      }
     },
 
-    handleSyncBuffering({ playing, ...data }) {
-      self.isBuffering = self.syncManager?.isBuffering;
-      if (data.buffering) {
-        self.wasPlayingBeforeBuffering = playing;
-        self.ref.current?.pause();
-      }
-      if (!self.isBuffering && !data.buffering) {
-        if (playing) {
-          self.ref.current?.play();
-        }
-      }
-      // process other data
-      self.handleSync(data);
-    },
-
-    handleSync(data, event) {
+    handleSync(data) {
       if (!self.ref.current) return;
 
       const video = self.ref.current;
-      const isBuffering = self.syncManager?.isBuffering;
 
-      if (!isSyncedBuffering || (!isBuffering && isDefined(data.playing))) {
-        if (data.playing) {
-          if (!video.playing) video.play();
-        } else {
-          if (video.playing) video.pause();
-        }
-      }
-      // during the buffering only these events has real `playing` values (in other cases it's paused all the time)
-      if (["play", "pause"].indexOf(event) > -1) {
-        self.wasPlayingBeforeBuffering = data.playing;
+      if (data.playing) {
+        if (!video.playing) video.play();
+      } else {
+        if (video.playing) video.pause();
       }
 
       if (data.speed) {
         self.speed = data.speed;
       }
 
-      if (isDefined(data.time) && (!isSyncedBuffering || video.currentTime !== data.time)) {
+      if (isDefined(data.time)) {
         video.currentTime = data.time;
       }
     },
@@ -333,34 +302,7 @@ const Model = types
     },
 
     handleSeek() {
-      self.triggerSync("seek", isSyncedBuffering ? { playing: self.wasPlayingBeforeBuffering } : {});
-    },
-
-    handleBuffering(isBuffering) {
-      if (!isSyncedBuffering) return;
-      if (self.syncManager?.isBufferingOrigin(self.name) === isBuffering) return;
-      const isAlreadyBuffering = self.syncManager?.isBuffering;
-      const isLastCauseOfBuffering =
-        self.syncManager?.bufferingOrigins.size === 1 && self.syncManager?.isBufferingOrigin(self.name);
-      const willStartBuffering = !isAlreadyBuffering && isBuffering;
-      const willStopBuffering = isLastCauseOfBuffering && !isBuffering;
-
-      if (willStopBuffering) {
-        if (self.wasPlayingBeforeBuffering) {
-          self.ref.current?.play();
-        }
-      }
-
-      self.triggerSyncBuffering(isBuffering);
-
-      // The real value, relevant for all medias synced together we have only after triggering the buffering event
-      self.isBuffering = self.syncManager?.isBuffering;
-
-      if (willStartBuffering) {
-        if (self.ref.current?.playing) {
-          self.ref.current?.pause();
-        }
-      }
+      self.triggerSync("seek", {});
     },
 
     syncMuted(muted) {
@@ -391,11 +333,7 @@ const Model = types
           if (!self.ref.current) return;
 
           try {
-            if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
-              self.ref.current.goToFrame(frame);
-            } else {
-              self.ref.current.currentTime = frame / self.framerate;
-            }
+            self.ref.current.goToFrame(frame);
           } catch (error) {
             console.warn("Error seeking video:", error);
           }
@@ -420,16 +358,7 @@ const Model = types
         ];
 
         const activeStates = self.activeStates();
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult({ sequence }, {}, control, self, false, activeStates)
-          : self.annotation.createResult({ sequence }, {}, control, self, false);
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          // add labels
-          for (const tag of self.activeStates()) {
-            area.setValue(tag);
-          }
-        }
+        const area = self.annotation.createResult({ sequence }, {}, control, self, false, activeStates);
         return area;
       },
 
@@ -450,15 +379,7 @@ const Model = types
         ];
 
         const activeStates = self.activeStates();
-        const area = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult({ sequence }, {}, control, self, true, activeStates)
-          : self.annotation.createResult({ sequence }, {}, control, self, true);
-
-        if (!ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          for (const tag of self.activeStates()) {
-            area.setValue(tag);
-          }
-        }
+        const area = self.annotation.createResult({ sequence }, {}, control, self, true, activeStates);
         return area;
       },
 
@@ -474,24 +395,13 @@ const Model = types
         const value = {
           ranges: [{ start: frame, end: frame }],
         };
-        let labeling;
-        let additionalStates;
-        if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          const activeStates = self.activeStates();
-          additionalStates = activeStates.filter((state) => state !== control);
-          labeling = {
-            [control.valueType]: control.selectedValues(),
-          };
-        } else {
-          const labels = self.activeStates()?.[0];
-          labeling = {
-            [labels.valueType]: labels.selectedValues(),
-          };
-        }
+        const activeStates = self.activeStates();
+        const additionalStates = activeStates.filter((state) => state !== control);
+        const labeling = {
+          [control.valueType]: control.selectedValues(),
+        };
 
-        return ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-          ? self.annotation.createResult(value, labeling, control, self, false, additionalStates)
-          : self.annotation.createResult(value, labeling, control, self, false);
+        return self.annotation.createResult(value, labeling, control, self, false, additionalStates);
       },
 
       deleteRegion(id) {

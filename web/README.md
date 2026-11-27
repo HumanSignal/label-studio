@@ -16,7 +16,7 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 ## Installation Instructions
 
 1 - **Dependencies Installation:**
-- Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
+- Execute `bun install --frozen-lockfile` to install all necessary dependencies.
 
 2 - **Environment Configuration (Optional for HMR):**
 - If you want to enable Hot Module Replacement (HMR), create an `.env` file in the root Label Studio directory.
@@ -32,7 +32,7 @@ If using Docker Compose with HMR:
 - Rerun the app or docker compose service from the project root for changes to take effect.
 
 To start the development server with HMR:
-- From the `web` directory: Run `yarn dev`
+- From the `web` directory: Run `bun run dev`
 - Or from the project root: Run `make frontend-dev`
 
 #### Custom Configuration for DataManager:
@@ -46,26 +46,26 @@ To start the development server with HMR:
 ## Usage Instructions
 ### Key Development and Build Commands
 - **Label Studio App:**
-    - `yarn ls:dev`: Build the main Label Studio app with Hot Module Reload for development.
-    - `yarn ls:watch`: Build the main Label Studio app continuously for development.
-    - `yarn ls:e2e`: Run end-to-end tests for the Label Studio app.
-    - `yarn ls:unit`: Run unit tests for the Label Studio app.
+    - `bun run ls:dev`: Build the main Label Studio app with Hot Module Reload for development.
+    - `bun run ls:watch`: Build the main Label Studio app continuously for development.
+    - `bun run ls:e2e`: Run end-to-end tests for the Label Studio app.
+    - `bun run ls:unit`: Run unit tests for the Label Studio app.
 - **Label Studio Frontend (Editor):**
-    - `yarn lsf:watch`: Continuously build the frontend editor.
-    - `yarn lsf:serve`: Run the frontend editor standalone.
-    - `yarn lsf:integration`: Run integration tests for the frontend editor.
-    - `yarn lsf:unit`: Run unit tests for the frontend editor.
+    - `bun run lsf:watch`: Continuously build the frontend editor.
+    - `bun run lsf:serve`: Run the frontend editor standalone.
+    - `bun run lsf:integration`: Run integration tests for the frontend editor.
+    - `bun run lsf:unit`: Run unit tests for the frontend editor.
 - **Datamanager**
-    - `yarn dm:watch`: Continuously build Datamanager.
-    - `yarn dm:unit`: Run unit tests for Datamanager.
+    - `bun run dm:watch`: Continuously build Datamanager.
+    - `bun run dm:unit`: Run unit tests for Datamanager.
 - **General**
-    - `yarn build`: Build all apps and libraries in the project.
-    - `yarn ui:serve`: Serve the Storybook instance for the shared UI library.
-    - `yarn test:e2e`: Run end-to-end tests for all apps and libraries.
-    - `yarn test:integration`: Run integration tests for all apps and libraries.
-    - `yarn test:unit`: Run unit tests for all apps and libraries.
-    - `yarn lint`: Run biome linter across all files with autofix.
-    - `yarn lint-css`: Run Biome CSS linter across all CSS files with autofix.
+    - `bun run build`: Build all apps and libraries in the project.
+    - `bun run ui:serve`: Serve the Storybook instance for the shared UI library.
+    - `bun run test:e2e`: Run end-to-end tests for all apps and libraries.
+    - `bun run test:integration`: Run integration tests for all apps and libraries.
+    - `bun run test:unit`: Run unit tests for all apps and libraries.
+    - `bun run lint`: Run biome linter across all files with autofix.
+    - `bun run lint-css`: Run Biome CSS linter across all CSS files with autofix.
 
 ### Git Hooks
 This project uses python `pre-commit` hooks to ensure code quality. To install the hooks, run `make configure-hooks` in the project root directory.

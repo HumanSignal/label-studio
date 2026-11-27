@@ -5,8 +5,11 @@ import os
 
 from botocore.exceptions import ClientError, ParamValidationError
 from botocore.handlers import validate_bucket_name
+from core.utils.io import validate_url_for_ssrf
+from django.conf import settings
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
-from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from io_storages.s3.utils import custom_endpoint_needs_own_keys
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer, StorageTypeField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -14,13 +17,20 @@ logger = logging.getLogger(__name__)
 
 
 class S3StorageSerializerMixin:
-    secure_fields = ['aws_access_key_id', 'aws_secret_access_key']
+    secure_fields = ['aws_access_key_id', 'aws_secret_access_key', 'aws_session_token']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
         for attr in self.secure_fields:
-            result.pop(attr)
+            # tolerate subclasses that narrow Meta.fields/exclude
+            result.pop(attr, None)
         return result
+
+    def validate_s3_endpoint(self, value):
+        # on the mixin: both import and export storages accept s3_endpoint
+        if value and settings.SSRF_PROTECTION_ENABLED:
+            validate_url_for_ssrf(value, block_local_urls=True)
+        return value
 
     def validate_bucket(self, value):
         if not value:
@@ -46,6 +56,10 @@ class S3StorageSerializerMixin:
                 for attr in self.secure_fields:
                     data[attr] = data.get(attr) or getattr(storage_object, attr)
             storage = self.Meta.model(**data)
+        if storage.s3_endpoint and not storage.aws_access_key_id and custom_endpoint_needs_own_keys():
+            raise ValidationError(
+                {'aws_access_key_id': ['A custom S3 endpoint requires an access key ID and secret access key.']}
+            )
         try:
             storage.validate_connection()
         except ParamValidationError:
@@ -74,7 +88,7 @@ class S3StorageSerializerMixin:
 
 
 class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
     presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
@@ -83,7 +97,7 @@ class S3ImportStorageSerializer(S3StorageSerializerMixin, ImportStorageSerialize
 
 
 class S3ExportStorageSerializer(S3StorageSerializerMixin, ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    type = StorageTypeField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = S3ExportStorage

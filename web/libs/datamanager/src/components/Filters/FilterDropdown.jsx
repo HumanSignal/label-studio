@@ -9,6 +9,7 @@ export const FilterDropdown = observer(
     items,
     style,
     disabled,
+    readOnly,
     onChange,
     multiple,
     value,
@@ -44,6 +45,9 @@ export const FilterDropdown = observer(
       [optionRender],
     );
     const options = useMemo(() => items.map(parseItems), [items, parseItems]);
+    // Short operator/value lists do not benefit from windowing; keeping them fully
+    // mounted avoids flaky a11y queries (FIT-2480) when Select skips no-op re-renders.
+    const useVirtualList = items.length > 20;
 
     return (
       <Select
@@ -53,12 +57,13 @@ export const FilterDropdown = observer(
         value={value}
         onChange={(value) => onChange(outputFormat?.(value) ?? value)}
         disabled={disabled}
-        size="small"
+        readOnly={readOnly}
+        size="smaller"
         options={options}
         searchable={true}
         triggerClassName="whitespace-nowrap"
         searchFilter={searchFilter}
-        isVirtualList={true}
+        isVirtualList={useVirtualList}
         virtualListMaxVisible={8}
         contentClassName={`${dropdownClassName || ""} filter-dropdown-content`.trim()}
       />

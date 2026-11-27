@@ -1,0 +1,99 @@
+name: "TruffleHog"
+
+# Secret scan of the commits between the base and the head.
+# Unverified results fail the job too: candidates are never sent to their providers.
+# Not a secret? Add `trufflehog:ignore` on its line after the value (not before), or a path regex to .trufflehogignore.
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      base_sha:
+        required: true
+        type: string
+
+env:
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+  HEAD_SHA: ${{ inputs.head_sha }}
+  BASE_SHA: ${{ inputs.base_sha }}
+
+jobs:
+  trufflehog:
+    name: "TruffleHog"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Install
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Authenticated call: unauthenticated api.github.com requests are rate-limited per IP on shared runners
+          TRUFFLEHOG_VERSION="$(curl -fsS -H "Authorization: token ${{ github.token }}" https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r .tag_name | sed 's/^v//')"
+          if [[ -z "$TRUFFLEHOG_VERSION" || "$TRUFFLEHOG_VERSION" == "null" ]]; then
+            echo "::error::Failed to resolve trufflehog version (got '${TRUFFLEHOG_VERSION}')"
+            exit 1
+          fi
+          echo "TRUFFLEHOG_VERSION=$TRUFFLEHOG_VERSION" >> "$GITHUB_ENV"
+
+      - name: Cache trufflehog archive
+        id: cache_trufflehog
+        uses: actions/cache@v6
+        with:
+          path: /usr/local/bin/trufflehog
+          key: trufflehog-linux-amd64-${{ env.TRUFFLEHOG_VERSION }}
+
+      - name: Download and configure trufflehog
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.cache_trufflehog.outputs.cache-hit }}" != "true" ]]; then
+            DOWNLOAD_URL="https://github.com/trufflesecurity/trufflehog/releases/download/v${{ env.TRUFFLEHOG_VERSION }}/trufflehog_${{ env.TRUFFLEHOG_VERSION }}_linux_amd64.tar.gz"
+            echo "Download trufflehog ${{ env.TRUFFLEHOG_VERSION }} from ${DOWNLOAD_URL}"
+            curl -fsSL "$DOWNLOAD_URL" | tar xzf - -C /usr/local/bin trufflehog
+          fi
+          chmod +x /usr/local/bin/trufflehog
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # 2147483647 is git's "infinite" depth: full history of this ref only, unlike 0 which
+          # also fetches every branch and tag.
+          fetch-depth: 2147483647
+          ref: ${{ inputs.head_sha }}
+      - name: Fetch base commit
+        if: env.BASE_SHA != '' && env.BASE_SHA != '0000000000000000000000000000000000000000'
+        run: |
+          set -euo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+
+          # A PR base (base branch tip) is not always an ancestor of the head. Fetch it with full history
+          # so the merge base can be computed; shared history is not re-downloaded.
+          git fetch --no-tags --depth=2147483647 origin "$BASE_SHA"
+
+      - name: Run trufflehog
+        run: |
+          set -uo pipefail ${ACTIONS_STEP_DEBUG:+-x}
+
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            echo "No base commit (new branch): its commits were scanned on the branch they came from."
+            exit 0
+          fi
+          flags=(--no-verification --fail --no-update --json)
+          if [[ -f .trufflehogignore ]]; then
+            flags+=(--exclude-paths=.trufflehogignore)
+          fi
+          # --since-commit must be an ancestor of --branch, otherwise trufflehog scans nothing and
+          # reports success. The merge base always is; the PR base is not once the base branch moves on.
+          trufflehog git file://. \
+            --since-commit="$(git merge-base "$BASE_SHA" "$HEAD_SHA")" \
+            --branch="$HEAD_SHA" \
+            "${flags[@]}" > trufflehog.json
+          rc=$?
+
+          # Print locations only; the JSON holds raw secret values, so it is not uploaded.
+          jq -r '.SourceMetadata.Data.Git as $m
+            | "\(.DetectorName)\t\($m.file):\($m.line)\t\(($m.commit // "")[0:12])"' trufflehog.json
+          exit $rc

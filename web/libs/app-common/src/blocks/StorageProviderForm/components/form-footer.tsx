@@ -1,4 +1,4 @@
-import { Button, cnm } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
 
 interface FormFooterProps {
   currentStep: number;
@@ -44,7 +44,7 @@ export const FormFooter = ({
   isProviderDisabled = false,
 }: FormFooterProps) => {
   return (
-    <div className="flex items-center justify-between p-wide border-t border-neutral-border bg-neutral-background">
+    <div className="flex items-center justify-between">
       <Button look="outlined" onClick={onPrevious} disabled={currentStep === 0}>
         Previous
       </Button>
@@ -56,11 +56,6 @@ export const FormFooter = ({
               waiting={testConnection.isLoading}
               onClick={testConnection.mutate}
               variant={connectionChecked ? "positive" : "primary"}
-              className={cnm({
-                "border-none shadow-none bg-positive-surface-content-subtle text-positive-content pointer-events-none":
-                  connectionChecked,
-              })}
-              style={connectionChecked ? { textShadow: "none" } : {}}
             >
               {connectionChecked ? "Connection Verified" : "Test Connection"}
             </Button>

@@ -3,12 +3,14 @@ import { info } from "../Common/Utils";
 
 interface AudioDecoderEvents {
   progress: (chunk: number, total: number) => void;
+  chunkLoaded: (chunk: number) => void;
 }
 
 export const DEFAULT_FREQUENCY_HZ = 44100;
 
 export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
   chunks?: Float32Array[][];
+  samplesPerChunk?: number;
   protected cancelled = false;
   protected decodeId = 0; // if id=0, decode is not in progress
   protected _dataLength = 0;
@@ -91,6 +93,10 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
    */
   renew() {
     this.cancelled = false;
+    if (this.removalId) {
+      clearTimeout(this.removalId);
+      this.removalId = null;
+    }
   }
 
   /**
@@ -112,6 +118,6 @@ export abstract class BaseAudioDecoder extends Events<AudioDecoderEvents> {
     info("decode:cleanup", this.src);
   }
 
-  abstract init(arraybuffer: ArrayBuffer): Promise<void>;
+  abstract init(arraybuffer?: ArrayBuffer): Promise<void>;
   abstract decode(options?: { multiChannel?: boolean }): Promise<void | AudioBuffer>;
 }

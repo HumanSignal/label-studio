@@ -1,10 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+from datetime import timedelta
+
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
 from django.conf import settings
-from fsm.serializer_fields import FSMStateField
+from django.utils import timezone
+from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import is_video_object_tracking
 from label_studio_sdk._extensions.label_studio_tools.postprocessing.video import extract_key_frames
 from ml.mixins import InteractiveMixin
@@ -13,12 +16,12 @@ from rest_framework import serializers
 from tasks.models import Annotation, Task
 from tasks.serializers import AnnotationDraftSerializer, PredictionSerializer
 from users.models import User
-from users.serializers import UserSimpleSerializer
+from users.serializers import BaseUserSerializer, UserSimpleSerializer
 
 from .models import ConvertedFormat, Export
 
 
-class CompletedBySerializer(serializers.ModelSerializer):
+class CompletedBySerializer(BaseUserSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
@@ -36,17 +39,10 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
 
     def to_representation(self, instance):
         """Override to conditionally exclude FSM state field when feature flags are disabled."""
-        from core.current_request import CurrentContext
-        from core.feature_flags import flag_set
-
         ret = super().to_representation(instance)
 
         # Remove state field from output if either feature flag is disabled
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
 
         return ret
@@ -56,7 +52,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if (
             obj.result
             and self.context.get('interpolate_key_frames', False)
-            and is_video_object_tracking(parsed_config=obj.project.get_parsed_config())
+            and is_video_object_tracking(
+                parsed_config=(self.context.get('project') or obj.project).get_parsed_config()
+            )
         ):
             return extract_key_frames(obj.result)
         return obj.result
@@ -71,9 +69,6 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
-        from core.current_request import CurrentContext
-        from core.feature_flags import flag_set
-
         # avoid long project initializations
         project = getattr(self, '_project', None)
         if project is None:
@@ -91,11 +86,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         ret = super().to_representation(task)
 
         # Remove state field from output if either feature flag is disabled
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
 
         return ret
@@ -140,10 +131,32 @@ class ExportSerializer(serializers.ModelSerializer):
             'counters',
             'converted_formats',
         ]
-        fields = ['title'] + read_only
+        fields = ['title', 'since', 'until', 'ephemeral'] + read_only
 
     created_by = UserSimpleSerializer(required=False)
     converted_formats = ConvertedFormatSerializer(many=True, required=False)
+    since = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text='Inclusive lower bound on Task.updated_at for an incremental snapshot. '
+        'Omit for a full export. Pair with until for a half-open window [since, until).',
+    )
+    until = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+        default=None,
+        help_text='Exclusive upper bound on Task.updated_at. If omitted, or later than create/request time minus '
+        'INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS, the server uses that time instead. '
+        'Use the returned value as since on the next incremental create.',
+    )
+    ephemeral = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text='When true, the export is omitted from list endpoints. Detail and download by id '
+        'still work. TTL deletion (EPHEMERAL_EXPORT_TTL_HOURS, default 24) runs via the RQ cron '
+        'scheduler when enabled (SaaS; on-prem `rqcron.enabled`); otherwise delete explicitly.',
+    )
 
 
 ONLY_OR_EXCLUDE_CHOICE = [
@@ -230,6 +243,29 @@ class ExportCreateSerializer(ExportSerializer):
     task_filter_options = TaskFilterOptionsSerializer(required=False, default=None)
     annotation_filter_options = AnnotationFilterOptionsSerializer(required=False, default=None)
     serialization_options = SerializationOptionsSerializer(required=False, default=None)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        since = attrs.get('since')
+        until = attrs.get('until')
+        if until is not None and since is None:
+            raise serializers.ValidationError({'until': 'until requires since'})
+        if since is not None:
+            # The exclusive upper bound may not pass create time (minus a small lag, so writes that commit after
+            # the export query but stamp updated_at before now() are less likely to fall between consecutive
+            # windows; the lag is dropped when it would invert a very recent since). A later until (omitted, or
+            # a client clock running ahead) is capped there: the export runs now, so anything changed after it
+            # but before a future until would otherwise fall into neither this snapshot nor the next one.
+            now = timezone.now()
+            if since >= now:
+                raise serializers.ValidationError({'since': 'since must be in the past'})
+            lagged = now - timedelta(seconds=settings.INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS)
+            latest_until = lagged if lagged > since else now
+            if until is None or until > latest_until:
+                attrs['until'] = until = latest_until
+        if since is not None and since >= until:
+            raise serializers.ValidationError({'until': 'until must be after since ([since, until) window)'})
+        return attrs
 
 
 class ExportParamSerializer(serializers.Serializer):

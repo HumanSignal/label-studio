@@ -3,66 +3,23 @@
  * Added virtualization support for large annotation counts
  */
 
-import React, { Component, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spin } from "antd";
-import { Button, Tooltip } from "@humansignal/ui";
+import { Button } from "@humansignal/ui";
 import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { observer } from "mobx-react";
 import styles from "./Grid.module.css";
 import { EntityTab } from "../AnnotationTabs/AnnotationTabs";
-import { observe } from "mobx";
-import Konva from "konva";
 import { Annotation } from "./Annotation";
-import { isDefined } from "../../utils/utilities";
-import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
-import { moveStylesBetweenHeadTags } from "../../utils/html";
 import { useAnnotationFetcher } from "../../hooks/useAnnotationQuery";
+import { applyAnnotationHydrationFromApi } from "@humansignal/core/lib/utils/annotationLazyHydration";
+import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
 
 // FIT-720: Virtualization constants for Compare view
 const PANEL_WIDTH = 500; // Width of each annotation panel (approximately 50% of typical viewport)
 const PANEL_GAP = 30; // Gap between panels (matches $gap in Grid.module.css)
-
-/***** DON'T TRY THIS AT HOME *****/
-/*
-Grid renders a container which remains untouched all the process.
-On every rerender it renders Item with next annotation in the list.
-Rendered annotation is cloned into the container. And index of "current" annotation increases.
-This triggers next rerender with next annotation until all the annotations are rendered.
-*/
-
-// Exported for unit tests (coverage)
-export class Item extends Component {
-  componentDidMount() {
-    Promise.all(
-      this.props.annotation.objects.map((o) => {
-        // as the image has lazy load, and the image is not being added to the viewport
-        // until it's loaded we need to skip the validation assuming that it's always ready,
-        // otherwise we'll get a blank canvas
-        if (o.type === "image") return Promise.resolve();
-
-        /* istanbul ignore next: observe path requires mobx in test env */
-        return o.isReady
-          ? Promise.resolve(o.isReady)
-          : new Promise((resolve) => {
-              const dispose = observe(o, "isReady", () => {
-                dispose();
-                resolve();
-              });
-            });
-      }),
-    ).then(() => {
-      // ~2 ticks for canvas to be rendered and resized completely
-      setTimeout(this.props.onFinish, 32);
-    });
-  }
-
-  render() {
-    return <Annotation root={this.props.root} annotation={this.props.annotation} />;
-  }
-}
 
 // FIT-720: Virtualized annotation panel with lazy hydration (exported for tests)
 export const VirtualizedAnnotationPanel = observer(
@@ -106,7 +63,7 @@ export const VirtualizedAnnotationPanel = observer(
 );
 
 // FIT-720: Virtualized Grid component
-const VirtualizedGrid = observer(({ store, annotations, root }) => {
+const VirtualizedGrid = observer(({ store, annotations, root, includePredictions = false }) => {
   const listRef = useRef(null);
   const [hydratingIds, setHydratingIds] = useState(new Set());
   const [containerWidth, setContainerWidth] = useState(0);
@@ -116,14 +73,25 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
   // Debounce timer for scroll-based hydration
   const scrollHydrationTimer = useRef(null);
 
-  // FIT-720: Use TanStack Query for annotation fetching
-  const { fetchAnnotationCached, getCachedAnnotation } = useAnnotationFetcher();
+  const taskId = store?.store?.task?.id ?? store?.task?.id;
+  const viewingAll = Boolean(store?.viewingAll);
+  // FIT-720: TanStack Query for annotation fetches (task-scoped keys for prefix invalidation)
+  const { fetchAnnotationCached, getCachedAnnotation } = useAnnotationFetcher(taskId);
+
+  const annotationPkSignature = useMemo(
+    () => annotations.map((a) => (a.pk != null ? String(a.pk) : "")).join(","),
+    [annotations],
+  );
+
+  // After task reload / annotation list changes, allow Compare All panels to re-fetch (FIT-1660).
+  useEffect(() => {
+    hydratedIds.current.clear();
+    initialHydrationDone.current = false;
+  }, [taskId, annotationPkSignature]);
 
   // FIT-720: On mount, initialize hydratedIds with annotations that already have data
   // This handles the case where user navigated away and came back
   useEffect(() => {
-    if (!isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS)) return;
-
     annotations.forEach((annotation) => {
       if (!annotation.pk || annotation.type === "prediction" || annotation.userGenerate) return;
 
@@ -136,8 +104,11 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       const hasRegions = regions && regions.length > 0;
 
       if (hasDataInMST || hasRegions) {
-        // This annotation was previously hydrated or has data
-        hydratedIds.current.add(annotation.id);
+        // FIT-1660: Do not mark hydrated from MST regions alone — Compare All can show stale regions
+        // after a sibling save + task reload; onItemsRendered / viewingAll hydration must re-sync from API.
+        if (!viewingAll) {
+          hydratedIds.current.add(annotation.id);
+        }
         return;
       }
 
@@ -155,10 +126,13 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         hydratedIds.current.add(annotation.id);
       }
     });
-  }, []); // Only run once on mount
+  }, [taskId, viewingAll, annotations, getCachedAnnotation]); // Re-run when task / compare mode changes
 
-  // Filter visible annotations
-  const visibleAnnotations = useMemo(() => annotations.filter((c) => !c.hidden), [annotations]);
+  // Filter visible annotations (optionally exclude predictions)
+  const visibleAnnotations = useMemo(
+    () => annotations.filter((c) => !c.hidden && (includePredictions || c.type !== "prediction")),
+    [annotations, includePredictions],
+  );
 
   // Calculate panel width based on container (aim for ~50% width, min PANEL_WIDTH)
   const panelWidth = useMemo(() => {
@@ -198,9 +172,13 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
 
   const select = useCallback(
     (c) => {
-      c.type === "annotation"
-        ? store.selectAnnotation(c.id, { exitViewAll: true })
-        : store.selectPrediction(c.id, { exitViewAll: true });
+      const previous = store.selected;
+      if (c.type === "annotation") {
+        store.selectAnnotation(c.id, { exitViewAll: true });
+      } else {
+        store.selectPrediction(c.id, { exitViewAll: true });
+      }
+      emitAnnotationTabSelected(store.store, c, previous, { exitViewAll: true });
     },
     [store],
   );
@@ -214,74 +192,36 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       setHydratingIds((prev) => new Set([...prev, annotationId]));
 
       try {
-        // Access the root store to get the SDK
         const rootStore = store.store;
         const sdk = rootStore?.SDK;
 
         let fullAnnotation = null;
 
         if (sdk?.ensureAnnotationLoaded) {
-          // Try the SDK method (works for labelStream)
-          await sdk.ensureAnnotationLoaded(annotationPk);
-          return; // SDK method handles everything
+          fullAnnotation = await sdk.ensureAnnotationLoaded(annotationPk);
         }
 
-        if (sdk?.datamanager?.store?.taskStore?.loadAnnotation) {
-          // Fallback: directly load annotation via taskStore
-          fullAnnotation = await sdk.datamanager.store.taskStore.loadAnnotation(annotationPk);
-        } else {
-          // Use TanStack Query for caching and deduplication
+        const loadViaDm = sdk?.datamanager?.store?.taskStore?.loadAnnotation;
+        if ((!fullAnnotation || fullAnnotation.error || fullAnnotation.result === undefined) && loadViaDm) {
+          const fromDm = await loadViaDm(annotationPk);
+          if (fromDm && !fromDm.error) {
+            fullAnnotation = fromDm;
+          }
+        }
+
+        if (!fullAnnotation || fullAnnotation.error || fullAnnotation.result === undefined) {
           fullAnnotation = await fetchAnnotationCached(annotationPk);
         }
 
-        if (fullAnnotation && !fullAnnotation.error && fullAnnotation.result) {
-          // IMPORTANT: Re-fetch the annotation from the store after async operation
-          // The original reference might be stale (user navigated, scrolled, etc.)
-          // which causes MST "object is protected" errors
+        if (fullAnnotation && !fullAnnotation.error) {
           const freshAnnotation = annotations.find((a) => a.id === annotationId);
-          if (!freshAnnotation) {
-            // Annotation no longer exists in the store
-            return;
+          if (freshAnnotation) {
+            applyAnnotationHydrationFromApi(annotations, annotationPk, fullAnnotation);
+            freshAnnotation.setEditable?.(false);
           }
-
-          // Check if annotation is still valid and not already hydrated
-          const versionsResult = freshAnnotation.versions?.result;
-          const hasVersionsResult = Array.isArray(versionsResult) && versionsResult.length > 0;
-          const regions = freshAnnotation.regions;
-          const hasRegions = regions && regions.length > 0;
-
-          if (hasVersionsResult || hasRegions) {
-            // Already hydrated (possibly by another code path)
-            hydratedIds.current.add(annotationId);
-            return;
-          }
-
-          // Hydrate the annotation with the loaded result
-          freshAnnotation.history?.freeze?.();
-          freshAnnotation.deserializeResults?.(fullAnnotation.result);
-
-          // Ensure dynamically hydrated annotation is strictly read-only when viewing all (Compare All)
-          freshAnnotation.setEditable?.(false);
-
-          // Critical: updateObjects() is required to render visual regions after deserializing
-          freshAnnotation.updateObjects?.();
-
-          // Unfreeze history
-          freshAnnotation.history?.safeUnfreeze?.();
-
-          // reinitHistory cancels autosave and sets initial values so the hydration
-          // isn't treated as a user modification (prevents unwanted draft creation)
-          freshAnnotation.reinitHistory?.();
-
-          // Mark as successfully hydrated to avoid re-hydrating
-          // Note: Don't directly modify MST model (is_stub) - it causes protection errors
-          hydratedIds.current.add(annotationId);
-        } else {
-          // Even if no results, mark as hydrated to avoid repeated attempts
-          hydratedIds.current.add(annotationId);
         }
+        hydratedIds.current.add(annotationId);
       } catch (error) {
-        // Silently ignore cancellation errors - they're expected when scrolling
         /* istanbul ignore next: non-cancel path is hard to trigger in tests */
         if (error?.name === "CancelledError" || error?.revert === true) {
           return;
@@ -322,14 +262,16 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           const regions = annotation.regions;
           const hasRegions = regions && regions.length > 0;
           const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+          const needsCompareResync =
+            viewingAll && annotation.pk && !annotation.userGenerate && annotation.type !== "prediction";
 
-          if (isStub) {
+          if (isStub || needsCompareResync) {
             hydrateAnnotation(annotation);
           }
         }
       }, 150); // Debounce for 150ms to avoid rapid-fire hydration
     },
-    [visibleAnnotations, hydratingIds, hydrateAnnotation],
+    [visibleAnnotations, hydratingIds, hydrateAnnotation, viewingAll],
   );
 
   // FIT-720: Initial hydration on mount - hydrate first visible annotations
@@ -355,12 +297,14 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
       const regions = annotation.regions;
       const hasRegions = regions && regions.length > 0;
       const isStub = !hasVersionsResult && !hasRegions && annotation.pk && !annotation.userGenerate;
+      const needsCompareResync =
+        viewingAll && annotation.pk && !annotation.userGenerate && annotation.type !== "prediction";
 
-      if (isStub) {
+      if (isStub || needsCompareResync) {
         hydrateAnnotation(annotation);
       }
     }
-  }, [containerWidth, visibleAnnotations, panelWidth, hydrateAnnotation]);
+  }, [containerWidth, visibleAnnotations, panelWidth, hydrateAnnotation, viewingAll]);
 
   // Item data for virtualized list
   const itemData = useMemo(
@@ -421,7 +365,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
         <>
           <Button
             size="small"
-            look="string"
+            look="ghost"
             onClick={scrollLeft}
             className={styles.left}
             aria-label="Move left"
@@ -431,7 +375,7 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
           </Button>
           <Button
             size="small"
-            look="string"
+            look="ghost"
             onClick={scrollRight}
             className={styles.right}
             aria-label="Move right"
@@ -447,202 +391,6 @@ const VirtualizedGrid = observer(({ store, annotations, root }) => {
 
 export { VirtualizedGrid };
 
-// Original Grid class component (used when FF is off or few annotations)
-class GridClassComponent extends Component {
-  state = {
-    item: 0,
-    loaded: new Set(),
-  };
-  container = React.createRef();
-
-  shouldComponentUpdate(nextProps, nexState) {
-    return (
-      !nextProps.store.selected.selected ||
-      nexState.item >= nextProps.annotations.length ||
-      nextProps.annotations[nexState.item] === nextProps.store.selected
-    );
-  }
-
-  componentDidMount() {
-    if (!isFF(FF_DEV_3391) && this.props.annotations[0] !== this.props.store.selected) {
-      this.startRenderCycle();
-    }
-  }
-
-  startRenderCycle() {
-    this.renderNext(0);
-  }
-
-  renderNext(idx) {
-    this.setState({ item: isDefined(idx) ? idx : this.state.item + 1 }, () => {
-      if (this.state.item < this.props.annotations.length) {
-        this.props.store._selectItem(this.props.annotations[this.state.item]);
-      } else {
-        this.props.store._unselectAll();
-      }
-    });
-  }
-
-  onFinish = () => {
-    const c = this.container.current;
-
-    if (!c) return;
-
-    const itemWrapper = c.children[c.children.length - 1];
-    const item = itemWrapper.children[itemWrapper.children.length - 1];
-    const clone = item.cloneNode(true);
-
-    c.children[this.state.item].appendChild(clone);
-
-    // Force redraw
-    /* istanbul ignore next: Konva not testable in jsdom */
-    Konva.stages.map((stage) => stage.draw());
-
-    /* canvases are cloned empty, so clone their content */
-    const sourceCanvas = item.querySelectorAll("canvas");
-    const clonedCanvas = clone.querySelectorAll("canvas");
-
-    /* istanbul ignore next: canvas clone not testable in jsdom */
-    clonedCanvas.forEach((canvas, i) => {
-      canvas.getContext("2d").drawImage(sourceCanvas[i], 0, 0);
-    });
-
-    /*
-      Procedure created style rules are not clonable so for
-      iframe we should take care about them (highlight styles)
-    */
-    const sourceIframe = item.querySelectorAll("iframe");
-    const clonedIframe = clone.querySelectorAll("iframe");
-
-    /* istanbul ignore next: iframe clone not testable in jsdom */
-    clonedIframe.forEach((iframe, idx) => {
-      iframe.contentWindow.document.open();
-      iframe.contentWindow.document.write(sourceIframe[idx].contentDocument.documentElement.outerHTML);
-      moveStylesBetweenHeadTags(sourceIframe[idx].contentDocument.head, iframe.contentDocument.head);
-    });
-
-    this.setState((state) => {
-      return {
-        ...state,
-        loaded: new Set([...state.loaded, this.props.store.selected.id]),
-      };
-    });
-
-    this.renderNext();
-  };
-
-  shift = (delta) => {
-    const container = this.container.current;
-    const children = container.children;
-
-    const current = Array.from(children).findIndex((child) => container.scrollLeft <= child.offsetLeft);
-
-    if (!container) return;
-
-    const count = this.props.annotations.length;
-    const next = current + delta;
-
-    if (next < 0 || next > count - 1) return;
-    const newPosition = children[next].offsetLeft;
-
-    container.scrollTo({ left: newPosition, top: 0, behavior: "smooth" });
-  };
-
-  left = () => {
-    this.shift(-1);
-  };
-
-  right = () => {
-    this.shift(1);
-  };
-
-  select = (c) => {
-    const { store } = this.props;
-
-    c.type === "annotation"
-      ? store.selectAnnotation(c.id, { exitViewAll: true })
-      : store.selectPrediction(c.id, { exitViewAll: true });
-  };
-
-  render() {
-    const i = this.state.item;
-    const { annotations } = this.props;
-    const selected = isFF(FF_DEV_3391) ? null : this.props.store.selected;
-    const isRenderingNext = i < annotations.length && annotations[i] === selected;
-
-    return (
-      <div className={styles.container}>
-        <div ref={this.container} className={styles.grid}>
-          {annotations
-            .filter((c) => !c.hidden)
-            .map((c) => (
-              <div id={`c-${c.id}`} key={`anno-${c.id}`} style={{ position: "relative" }}>
-                <Tooltip title="Open Annotation Tab">
-                  <div>
-                    <EntityTab
-                      entity={c}
-                      onClick={() => this.select(c)}
-                      prediction={c.type === "prediction"}
-                      bordered={false}
-                      style={{ height: 44 }}
-                    />
-                  </div>
-                </Tooltip>
-                {isFF(FF_DEV_3391) ? (
-                  <Annotation root={this.props.root} annotation={c} />
-                ) : (
-                  !this.state.loaded.has(c.id) && (
-                    <div
-                      style={{
-                        top: 0,
-                        left: 0,
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Spin size="large" />
-                    </div>
-                  )
-                )}
-              </div>
-            ))}
-          {isRenderingNext && (
-            <div id={"c-tmp"} key={"anno-tmp"} style={{ opacity: 0, position: "relative", right: 99999 }}>
-              <EntityTab
-                entity={selected}
-                prediction={selected.type === "prediction"}
-                bordered={false}
-                style={{ height: 44 }}
-              />
-              <Item root={this.props.root} onFinish={this.onFinish} key={i} annotation={selected} />
-            </div>
-          )}
-        </div>
-        <Button size="small" look="string" onClick={this.left} className={styles.left} aria-label="Move left">
-          <LeftCircleOutlined />
-        </Button>
-        <Button size="small" look="string" onClick={this.right} className={styles.right} aria-label="Move right">
-          <RightCircleOutlined />
-        </Button>
-      </div>
-    );
-  }
-}
-
-// FIT-720: Grid wrapper that chooses virtualized or original based on FF and annotation count
 export default function Grid(props) {
-  // FIT-720: Use VirtualizedGrid when FF is on so stub hydration runs (fixes compare-all with
-  // 2 annotations where the second panel would never load in GridClassComponent).
-  // Virtualization (react-window) is still only a win when we have many annotations.
-  const shouldVirtualize = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
-
-  if (shouldVirtualize) {
-    return <VirtualizedGrid {...props} />;
-  }
-
-  return <GridClassComponent {...props} />;
+  return <VirtualizedGrid {...props} />;
 }

@@ -79,6 +79,10 @@
   }
 }
 
+.host-panel {
+  height: 100%;
+}
+
 .history,
 .info {
   &__section-tab {

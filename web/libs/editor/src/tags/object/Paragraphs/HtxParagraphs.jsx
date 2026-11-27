@@ -2,23 +2,20 @@ import React, { Component, useCallback } from "react";
 import { inject, observer } from "mobx-react";
 
 import ObjectTag from "../../../components/Tags/Object";
-import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2918, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
 import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/html";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { isSelectionContainsSpan } from "../../../utils/selection-tools";
-import { useUpdateBuffering } from "../../../hooks/useUpdateBuffering";
 import styles from "./Paragraphs.module.css";
 import { AuthorFilter } from "./AuthorFilter";
 import { Phrases } from "./Phrases";
 import { IconHelp } from "@humansignal/icons";
 import { Toggle, Tooltip } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
-import { cnm } from "@humansignal/shad/utils";
-import { ff } from "@humansignal/core";
+import { cnm } from "@humansignal/ui";
 import { useHotkey } from "../../../hooks/useHotkey";
 
 const audioDefaultProps = { crossOrigin: "anonymous" };
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 // Separate functional component to handle hotkeys
 const ParagraphHotkeys = ({ item }) => {
@@ -44,10 +41,6 @@ const ParagraphHotkeys = ({ item }) => {
 };
 
 const ParagraphAudio = observer(({ item }) => {
-  const isBuffering = isSyncedBuffering && item.isBuffering;
-
-  const updateBuffering = useUpdateBuffering(item.audioRef, item.handleBuffering);
-
   const attachRef = useCallback(
     (audio) => {
       if (audio) {
@@ -63,25 +56,16 @@ const ParagraphAudio = observer(({ item }) => {
   );
 
   return (
-    <>
-      {isBuffering && <div className="lsf-timeline-controls__buffering" aria-label="Buffering Media Source" />}
-      <audio
-        {...audioDefaultProps}
-        controls={item.showplayer && !item.syncedAudio}
-        className={styles.audio}
-        src={item.audio}
-        ref={attachRef}
-        onLoadedMetadata={item.handleAudioLoaded}
-        onEnded={item.reset}
-        onError={item.handleError}
-        {...(isSyncedBuffering
-          ? {
-              onCanPlay: updateBuffering,
-              onWaiting: updateBuffering,
-            }
-          : {})}
-      />
-    </>
+    <audio
+      {...audioDefaultProps}
+      controls={item.showplayer && !item.syncedAudio}
+      className={styles.audio}
+      src={item.audio}
+      ref={attachRef}
+      onLoadedMetadata={item.handleAudioLoaded}
+      onEnded={item.reset}
+      onError={item.handleError}
+    />
   );
 });
 
@@ -122,7 +106,6 @@ class HtxParagraphsView extends Component {
   // Helper method to check if scrolling should happen
   shouldScroll() {
     return (
-      isFF(FF_LSDV_E_278) &&
       this.props.item.contextscroll &&
       this.props.item.playingId >= 0 &&
       this.lastPlayingId !== this.props.item.playingId &&
@@ -470,7 +453,7 @@ class HtxParagraphsView extends Component {
    * Only checks when FF_NER_SELECT_ALL is enabled
    * Prevents exact same position + exact same labels + exact same offsets
    */
-  isDuplicateRegion(range, selectedLabels, control) {
+  isDuplicateRegion(range, selectedLabels, _control) {
     if (!isFF(FF_NER_SELECT_ALL)) {
       return false; // No duplicate detection when feature flag is off
     }
@@ -773,8 +756,7 @@ class HtxParagraphsView extends Component {
   }
 
   componentDidMount() {
-    if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(this.mainContentSelector));
+    if (this.props.item.contextscroll) this._resizeObserver.observe(document.querySelector(this.mainContentSelector));
     this._handleUpdate();
 
     // Set default selection to first phrase when there's no audio
@@ -957,16 +939,14 @@ class HtxParagraphsView extends Component {
 
     return (
       <div className={styles.wrapper_header}>
-        {isFF(FF_DEV_2669) && (
-          <AuthorFilter
-            item={item}
-            onChange={() => {
-              this.setState({
-                canScroll: !this.state.canScroll,
-              });
-            }}
-          />
-        )}
+        <AuthorFilter
+          item={item}
+          onChange={() => {
+            this.setState({
+              canScroll: !this.state.canScroll,
+            });
+          }}
+        />
         {item.contextscroll && (
           <div className={styles.wrapper_header__buttons}>
             <Toggle
@@ -991,19 +971,19 @@ class HtxParagraphsView extends Component {
   render() {
     const { item } = this.props;
     const withAudio = !!item.audio;
-    const contextScroll = isFF(FF_LSDV_E_278) && this.props.item.contextscroll;
+    const contextScroll = this.props.item.contextscroll;
 
-    if (!item.playing && isFF(FF_LSDV_E_278)) this._disposeTimeout(); // dispose scroll timeout when the audio is not playing
+    if (!item.playing) this._disposeTimeout(); // dispose scroll timeout when the audio is not playing
 
     // current way to not render when we wait for data
-    if (isFF(FF_DEV_2669) && !item._value) return null;
+    if (!item._value) return null;
 
     return (
       <>
         <ParagraphHotkeys item={item} />
         <ObjectTag item={item} className={cnm(cn("paragraphs").toClassName(), styles.paragraphs)}>
           {withAudio && <ParagraphAudio item={item} />}
-          {isFF(FF_LSDV_E_278) ? this.renderWrapperHeader() : isFF(FF_DEV_2669) && <AuthorFilter item={item} />}
+          {this.renderWrapperHeader()}
           <div
             ref={this.myRef}
             data-testid="phrases-wrapper"
@@ -1017,7 +997,7 @@ class HtxParagraphsView extends Component {
               item={item}
               playingId={item.playingId}
               hasSelectedLabels={this.hasSelectedLabels}
-              {...(isFF(FF_LSDV_E_278) ? { activeRef: this.activeRef } : {})}
+              activeRef={this.activeRef}
             />
           </div>
         </ObjectTag>

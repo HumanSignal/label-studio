@@ -1,0 +1,84 @@
+.root {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 0.25rem);
+  gap: 0.1rem;
+}
+
+.pixel {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 1px;
+  background: var(--color-neutral-content);
+  opacity: 0.15;
+}
+
+.pixelRound {
+  border-radius: 999px;
+}
+
+.pixelIdle {
+  opacity: 0.07;
+}
+
+.pixelAnimated {
+  animation: ai-chat-pixel-on var(--ai-chat-pixel-duration, 650ms) ease-in-out var(--ai-chat-pixel-delay, 0ms) infinite;
+}
+
+.label {
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-neutral-content-subtle) 35%,
+    var(--color-neutral-content) 50%,
+    var(--color-neutral-content-subtle) 65%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: 500;
+  animation: ai-chat-shimmer-text 1.4s linear infinite;
+}
+
+.elapsed {
+  color: var(--color-neutral-content-subtle);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+@keyframes ai-chat-shimmer-text {
+  0% {
+    background-position: 150%;
+  }
+  100% {
+    background-position: -50%;
+  }
+}
+
+@keyframes ai-chat-pixel-on {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  18%,
+  42% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixelAnimated,
+  .label {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

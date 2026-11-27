@@ -1,49 +1,95 @@
-export * from "./lib/Card/Card";
+export type { ControlSize } from "./ds-manifest/control-sizes";
 export * from "./lib/InputFile/InputFile";
-export * from "./lib/MultiStateToggle/MultiStateToggle";
+export * from "./lib/indicator";
+export * from "./lib/input/input";
+export { Field, type FieldChromeProps, type FieldLayout, type FieldProps } from "./lib/field/field";
+export * from "./lib/number-input/number-input";
+export * from "./lib/radio-group/radio-group";
+export * from "./lib/summary-label";
+export * from "./lib/segmented-control/segmented-control";
 export * from "./lib/ThemeToggle/ThemeToggle";
 export * from "./lib/Tooltip/Tooltip";
-export * from "./lib/Userpic/Userpic";
+export * from "./lib/avatar";
 export * from "./lib/badge/badge";
-export * from "./lib/badge-group";
+export * from "./lib/card";
 export * from "./lib/button/button";
-export * from "./lib/callout/callout";
 export * from "./lib/checkbox/checkbox";
-export * from "./lib/code-block/code-block";
+export { CheckboxGroup, type CheckboxGroupProps } from "./lib/checkbox-group/checkbox-group";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
 export * from "./lib/collapsible-panel";
+export * from "./lib/column-browser";
+export * from "./lib/context-menu";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
 export * from "./lib/enterprise-badge/enterprise-badge";
 export * from "./lib/enterprise-upgrade-overlay/enterprise-upgrade-overlay";
+export * from "./lib/filter-shell";
 export * from "./lib/json-viewer";
 export * from "./lib/label/label";
 export * from "./lib/message/message";
 export * from "./lib/select/select";
+export { SelectSize, type SelectOption, type SelectOptionData } from "./lib/select/types";
+export * from "./lib/search-input/search-input";
 export * from "./lib/tag-autocomplete";
+export * from "./lib/text-area/text-area";
+// Named exports only — avoid `export *` so MultiTreeSelect's internal TreeSelect
+// does not collide with the public TreeSelect from ./lib/tree-select.
+export {
+  IdDelimiter,
+  IndexedSymbol,
+  MultiTreeSelect,
+  MultiTreeSelectDropdown,
+  MultiTreeSelectProvider,
+  RootSymbol,
+  TreeSearch,
+  TreeSearchIndex,
+  TreeSearchMatch,
+  TreeSelected,
+  TreeNode,
+  getChildrenIds,
+  useMultiTreeSelectProvider,
+  useTreeContext,
+  type Action,
+  type IndexedNode,
+  type MultiTreeSelectProps,
+  type MultiTreeSelectProviderProps,
+  type MultiTreeSelectSchema,
+  type TreeAction,
+  type TreeNodeProps,
+} from "./lib/multi-tree-select";
+export * from "./lib/taxonomy-multi-tree-select";
+export * from "./lib/taxonomy-selection-list";
 export * from "./lib/skeleton/skeleton";
 export * from "./lib/state-chip/state-chip";
+export * from "./lib/stepper";
+export * from "./lib/timeline";
 export * from "./lib/tabs";
 export * from "./lib/toast/toast";
 export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
 export * from "./lib/accordion/accordion";
 
-export * from "./assets/icons";
-export * from "./lib/simple-card";
 export * from "./lib/space/space";
 export * from "./lib/spinner/spinner";
 export * from "./lib/sparkles/sparkles";
-export * from "./lib/popover/popover";
+export * from "./lib/ai-chat";
+export { Popover, type PopoverPanelProps, type PopoverProps } from "./lib/popover/popover";
+export * from "./lib/tree-select";
 export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
-export * from "./lib/drawer";
+export { Drawer, type DrawerProps } from "./lib/drawer";
+export * from "./lib/drop-zone";
+export * from "./lib/date-range-picker";
+export * from "./lib/modal-window";
 
 export * from "./utils/utils";
+export * from "./lib/resize-handle/resize-handle";
 export * from "./utils/getTokenColor";
 export * from "./hooks/useTokenColor";
 
 // TODO: Remove when DIA-2142 and DIA-2175 are delivered
-export * from "./shadcn";
+export { cn } from "./utils/utils";
+
+export * from "./lib/property-table";

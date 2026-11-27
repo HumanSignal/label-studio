@@ -272,6 +272,7 @@ Tab represents a materialized view that can slice and order the data
 | selectedItems      | [SelectedItems](#SelectedItems)                              | List of checked samples                        |
 | columnsDisplayType | Dict<[ColumnAlias](#ColumnALias), [ColumnType](#ColumnType)> | List of display types override for data values |
 | columnsWidth       | Dict<[ColumnAlias](#ColumnAlias), int>                       | Width of each individual column                |
+| columnOrder        | Dict<[ColumnAlias](#ColumnAlias) \| "select" \| "show-source", int> | Drag order index per column (FIT-2882 shared-tab order) |
 | hiddenColumns      | Dict<"explore" \| "labeling", List<[ColumnAlias](#ColumnAlias)>> | List of hidden tabs per view                   |
 
 ### Filter

@@ -55,6 +55,21 @@ def check_avatar(files):
     return avatar
 
 
+def can_read_avatar(requester, owner):
+    """Whether `requester` may read `owner`'s uploaded avatar file.
+
+    Allowed for the owner and for requesters whose active organization counts the owner among its
+    active members. `Organization.has_user` is not enough: it also matches removed members and, in
+    LSE, pending invites and deactivated members, which lets an unrelated organization read the file.
+    """
+    if requester.pk == owner.pk:
+        return True
+    organization = requester.active_organization
+    if organization is None:
+        return False
+    return organization.active_members.filter(user=owner, deleted_at__isnull=True).exists()
+
+
 def save_user(request, next_page, user_form):
     """Save user instance to DB"""
     user = user_form.save()
@@ -94,5 +109,8 @@ def proceed_registration(request, user_form, organization_form, next_page):
 
 
 def login(request, *args, **kwargs):
+    # Stamp after auth.login: it flushes a session that still belongs to another user, which would erase
+    # last_login and make the session timeout middleware log the new user straight out.
+    result = auth.login(request, *args, **kwargs)
     request.session['last_login'] = time()
-    return auth.login(request, *args, **kwargs)
+    return result

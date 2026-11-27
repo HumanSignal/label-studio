@@ -35,7 +35,15 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
     - If the annotation is correct, click **Accept**. 
     
     - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
-    - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
+    - If the annotation is incorrect, or you don't want to attempt to correct it yourself, click **Reject** to reject the annotation. 
+    
+        Clicking **Reject** applies the project's default reject option. If the project has more than one reject option available, you can open the reject menu to choose how to handle the rejection: 
+        
+        - **No Rework** -- The annotation is rejected and is not sent back for rework. 
+        - **Return to Annotator** -- The annotation is sent back to the original annotator so that they can update it. 
+        - **Pass to Another Annotator** -- The task is sent to a different annotator for a new annotation. The original annotator can no longer update the rejected annotation. 
+        
+        Which options you see depends on the project's [**Reject Options**](project_settings_lse#reject-options) settings. 
 
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 
@@ -52,12 +60,13 @@ You can review tasks in random order, or order tasks in the project data manager
 
 #### Task ordering and limiting (Enterprise)
 
-For Label Studio Enterprise projects, you can configure the review stream ordering and limit the review slice:
+Open **Settings > Review > Task Ordering** to choose how the review stream presents tasks. **Random** and **By Annotator** require Label Studio Enterprise. See [Task Ordering](project_settings_lse#review-task-ordering) for how **By Annotator** coverage works. To decide which tasks enter the review stream, use [Review Sampling](project_settings_lse#review-sampling).
 
-- Task Ordering: Choose between By Task ID (sequential) and Random. Random preserves the order of annotations within each task but randomizes task order.
-- Task Limit (%): When Random is selected, optionally limit the percentage of project tasks available for review. The limit is applied after any filters such as “Show only finished tasks.” When reviewers start a review session from a Data Manager selection (selected items), the limit is bypassed for that session.
-
-See **Settings > Review > Task Ordering** and **Task Limit** for configuration details.
+| Ordering | What reviewers see |
+| --- | --- |
+| **By Task ID** | Tasks in ascending task ID. Annotations within a task stay in a stable order. |
+| **Random** | Tasks in a random order. Annotations within a task stay in a stable order. |
+| **By Annotator** | One annotator at a time, until a configured share of that annotator's remaining annotations has been reviewed. |
 
 ### Navigate between tasks or annotations
 
@@ -113,15 +122,15 @@ As an administrator or project manager, you can assign reviewers to tasks, or pe
 
 You can assign reviewers to multiple tasks at once, but you cannot remove reviewers from multiple tasks at once.
 
-## Review annotator activity on the project dashboard
+## Review project quality dashboards
 
-Use the project dashboard to review annotator activity. For a project, click **Dashboard** to view the dashboard.
+Use project dashboards to review annotator activity, agreement, and label distribution. For a project, click **Dashboard** to view project-level dashboards.
 
-If you don't see an annotator's activity reflected on the dashboard, make sure they have been added as a member to the project.
+If you don't see an annotator's activity reflected on a dashboard, make sure they have been added as a member to the project.
 
 ### Review label distribution
 
-For specific labels, you can see in a donut chart how many labels of each type were applied to the tasks. Use this chart to identify possible problems with your dataset distribution, if some labels are overrepresented in an annotated dataset compared with others.
+Use the [Label Distribution dashboard](dashboard_distribution) to see how labels and dimension values are distributed across annotations and predictions. Use this dashboard to identify possible problems with your dataset distribution, such as labels that are overrepresented in annotated data.
 
 For example, if you're developing a dataset of OCR images, and 90% of your tasks have **Text** labels and 10% have **Handwriting** labels, you might want to increase the number of images of handwriting in your dataset, to improve the eventual accuracy of a machine learning model trained on this dataset.
 
@@ -129,13 +138,27 @@ For example, if you're developing a dataset of OCR images, and 90% of your tasks
 
 For organizations with a large number of annotators, it might prove useful to pause an annotator's progress. This might be helpful for annotators that are performing poorly or exhibiting behavior that might indicate they have automated their work (bot behavior). 
 
+### Full and flexible pauses
+
+How much access a paused user keeps depends on why they were paused: 
+
+| Pause type          | Description    |
+| ------------- | ------------ |
+| **Full pause** | Applies when a user is [paused manually](#Manually-pause-an-annotator) or by a [behavior-based trigger](#Behavior-based-triggers). <br><br />The user loses access to the project entirely. They cannot annotate, review, comment, or make changes to their own existing annotations. |
+| **Flexible pause** | Applies when a user is paused by the [Tasks Per Annotator Limit](project_settings_lse#annotation-limit) or by [Annotator Evaluation](project_settings_lse#annotator-eval). <br><br />The user keeps access to the project so that they can work through the rejected annotations that are returned to them. They cannot begin any new annotation work. For more information, see [Recover from a flexible pause](#Recover-from-a-flexible-pause). |
+
+A pause only restricts the type of work that triggered it. Annotation limits and annotator evaluation both measure annotation work, so a flexible pause stops new annotation work only. If a paused user is also a reviewer, they can continue reviewing. Only a full pause stops a user from reviewing. 
+
+!!! note
+    A flexible pause acts as a full pause when the project's [**Reject Options**](project_settings_lse#reject-options) do not include **Reject and return to annotator**. In this case, rejected annotations are never returned to the annotator, so there is nothing for them to recover. 
+
 ### Manually pause an annotator
 
 You can manually pause annotators from the Members dashboard in a project. This action is only available next to users in the Annotator and Reviewer roles:
 
 ![Screenshot of pause](/images/review/pause.png)
 
-When a user is paused, the following occurs:
+Manually pausing a user is always a full pause. When a user is paused, the following occurs:
 
 * They immediately see a message informing them that they have been paused. 
 
@@ -155,39 +178,61 @@ When a user is paused, the following occurs:
 
 You can use **Settings > Quality > Annotation Limit** to set limits on how many tasks an annotator is able to complete before they are paused. For more information, see [Annotation Limit](project_settings_lse#annotation-limit). 
 
+#### Annotator Evaluation settings
+
+You can use **Settings > Quality > Annotator Evaluation** to automatically pause annotators who do not meet a ground truth agreement or acceptance score threshold. For more information, see [Annotator Evaluation](project_settings_lse#annotator-eval).
+
 #### Behavior-based triggers
 
 If you have [plugins](plugins) enabled, you can automatically pause an annotator based on certain behaviors and then customize the message that appears on their screen. 
 
 For more information, see [Plugins - Spam and Bot Detection](/plugins/pause_annotator).
 
+### Recover from a flexible pause
+
+When a user is under a flexible pause, they keep access to the project so that they can correct the annotations that reviewers have rejected. Getting those annotations accepted is how they work their way out of the pause. 
+
+Users under a flexible pause can do the following:
+
+* Re-enter the project. If the project has **Show Data Manager to annotators** enabled, they can use the Data Manager. Otherwise, they can only use the labeling stream. For more information, see [Annotation Options](project_settings_lse#annotating-options).
+* Update their own rejected annotations. In the labeling stream, they are only served their rejected annotations, and they cannot skip them. 
+* Add comments, so that they can respond to reviewer feedback. 
+
+They cannot begin any new annotation work, and they cannot update annotations that have not been rejected. 
+
+Once they have updated all of their rejected annotations, they see a message telling them that no further tasks are available until more of their work has been reviewed. 
+
+!!! note
+    Updating a rejected annotation does not lift the pause by itself. The pause remains in place until the user meets the project requirements again. For how each pause is lifted, see [Tasks Per Annotator Limit](project_settings_lse#annotation-limit) and [Annotator Evaluation](project_settings_lse#annotator-eval).
+
 
 ## Verify model and annotator performance
 
-To verify the performance of specific annotators, review the **Members** section for a specific project. If you don't see an annotator's activity reflected, make sure they have been added as a member to the project.
+To verify the performance of specific annotators, review the [Members dashboard](dashboard_members) for a specific project. If you don't see an annotator's activity reflected, make sure they have been added as a member to the project.
 
 ### Review annotator performance
 
-For each project, you can review the project dashboard and review the Annotator Performance section to learn more about the annotators and their annotations, as well as overall annotator consensus.
+For each project, use the [Members dashboard](dashboard_members) to learn more about annotators, reviewers, models, review outcomes, and overall agreement.
 
-Discover how many annotators have worked on the project, and how many hours they cumulatively spent labeling. You can also see the total number of annotations produced by the annotators, separate from the total number of tasks in the project.
+Discover who has worked on the project, how many annotations and reviews they have completed, how much time they spent, and how their work compares against other annotators, ground truth annotations, or model predictions.
 
 Review a table to see the following for each annotator:
 
-- The total agreement for one annotator with all other annotators. See more about [how annotator agreement is calculated](stats.html).
-- The number of tasks that they finished annotating.
+- The total agreement for one annotator with other annotators. See more about [how annotator agreement is calculated](stats.html).
+- The number of tasks assigned, pending, submitted, or skipped.
 - The number of tasks that they skipped.
 - The outcome of reviews for the annotations they performed.
-- The total annotation progress across all tasks in the project.
-- The mean time to annotate the tasks. Select this header to view the `median time` instead. Mean time and median time are calculated using the total time spent on each task by an annotator, including idle time.
+- Their performance score and acceptance score.
+- Their annotator evaluation status, if [Annotator Evaluation](project_settings_lse#annotator-eval) is enabled.
+- Their average, median, and total time spent.
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
 
 ### Review annotator agreement matrix
 
-You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
+You can also review overall annotator agreement on a more individual basis with the [Members dashboard](dashboard_members) agreement matrix.
 
-Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats).
+Review the agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can filter the matrix by dimension and label, or include model versions when predictions are available. See more about [how annotator agreement is calculated](stats).
 
 To see the specific annotations contributing to the agreement, do the following:
 
@@ -198,7 +243,7 @@ To see the specific annotations contributing to the agreement, do the following:
 
 ### Review agreement distribution across tasks
 
-You can also review the distribution of agreement percentages across project tasks. A bar chart depicts the number of tasks with a specific agreement percentage. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently.
+Use the [Data quality dashboard](dashboard_data_quality) to review the distribution of agreement percentages across project tasks. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of lower agreement scores might mean that some tasks are confusing, difficult to label consistently, or need clearer instructions.
 
 ## Review annotations against ground truth annotations
 

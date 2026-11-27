@@ -5,7 +5,7 @@
 import { render } from "@testing-library/react";
 import { getParent, hasParent, types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Image", () => {
+mockModule("../../tags/object/Image", () => {
   const { types } = require("mobx-state-tree");
   return {
     ImageModel: types
@@ -24,8 +24,8 @@ jest.mock("../../tags/object/Image", () => {
           return 100;
         },
       }))
-      .actions((self) => ({
-        createSerializedResult(region, value) {
+      .actions((_self) => ({
+        createSerializedResult(_region, value) {
           return {
             value: { ...value },
             original_width: 100,
@@ -41,7 +41,7 @@ import { PolygonPointView } from "../PolygonPoint";
 import { PolygonRegionModel } from "../PolygonRegion";
 import { ImageModel } from "../../tags/object/Image";
 
-jest.mock("../../hooks/useRegionColor", () => ({
+mockModule("../../hooks/useRegionColor", () => ({
   useRegionStyles: () => ({ strokeColor: "#000" }),
 }));
 
@@ -65,7 +65,7 @@ const TestPolygonRegionModel = types.compose(
 
 const mockAnnotation = {
   isReadOnly: () => false,
-  history: { freeze: jest.fn(), unfreeze: jest.fn() },
+  history: { freeze: mock(), unfreeze: mock() },
 };
 
 const WrapperModel = types
@@ -146,7 +146,7 @@ const TestRoot = types
     wrapper: types.optional(WrapperModel, {}),
     image: types.optional(ImageModel, { id: "img1" }),
   })
-  .views((self) => ({
+  .views((_self) => ({
     get canvasToInternalX() {
       return (x) => x;
     },
@@ -296,13 +296,13 @@ describe("PolygonPoint", () => {
       const ev = {
         cancelBubble: false,
         target: {
-          setX: jest.fn(),
-          setY: jest.fn(),
+          setX: mock(),
+          setY: mock(),
           x: () => 0,
           y: () => 0,
           width: () => 0,
           height: () => 0,
-          scale: jest.fn(),
+          scale: mock(),
         },
       };
       point.handleMouseOverStartPoint(ev);
@@ -314,7 +314,7 @@ describe("PolygonPoint", () => {
       region.setMouseOverStartPoint(true);
       expect(region.mouseOverStartPoint).toBe(true);
       const ev = {
-        target: { setX: jest.fn(), setY: jest.fn(), x: () => 0, y: () => 0, scale: jest.fn() },
+        target: { setX: mock(), setY: mock(), x: () => 0, y: () => 0, scale: mock() },
       };
       point.handleMouseOutStartPoint(ev);
       expect(region.mouseOverStartPoint).toBe(false);

@@ -5,9 +5,36 @@ import { cn } from "../../../utils/bem";
 export type RegionLabelProps = {
   item: any;
 };
+
+const ClassificationLabel = observer(({ item }: { item: any }) => {
+  const results = item.results ?? [];
+
+  if (!results.length) return "Classification";
+
+  return (
+    <div className={cn("labels-list").toClassName()}>
+      {results.map((result: any, rIdx: number) => {
+        const values = result.mainValue;
+
+        if (!values || !Array.isArray(values) || values.length === 0) {
+          return <span key={result.id}>{result.from_name?.name ?? "Classification"}</span>;
+        }
+        return values.map((val: any, vIdx: number) => {
+          const display = Array.isArray(val) ? val.join(" > ") : String(val);
+
+          return [rIdx > 0 || vIdx > 0 ? ", " : null, <span key={`${result.id}-${vIdx}`}>{display}</span>];
+        });
+      })}
+    </div>
+  );
+});
+
 export const RegionLabel = memo(
   observer(({ item }: RegionLabelProps) => {
     const { type } = item ?? {};
+    if (item?.classification) {
+      return <ClassificationLabel item={item} />;
+    }
     if (!type) {
       return "No Label";
     }

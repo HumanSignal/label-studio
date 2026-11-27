@@ -6,8 +6,6 @@ import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
 import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
-import { FF_FIT_720_LAZY_LOAD_ANNOTATIONS } from "@humansignal/core/lib/utils/feature-flags";
 
 import "./Comments.prefix.css";
 
@@ -24,15 +22,14 @@ const CommentsLoadingSkeleton: FC = () => (
 export const Comments: FC<{
   annotationStore: any;
   commentStore: any;
-  cacheKey?: string;
   isActive?: boolean; // FIT-720: Only fetch comments when tab is active (when FF enabled)
-}> = observer(({ annotationStore, commentStore, cacheKey, isActive = true }) => {
+}> = observer(({ annotationStore, commentStore, isActive = true }) => {
   const mounted = useMounted();
+  const taskId = commentStore.task?.id;
+  const annotationId = commentStore.annotation?.id;
   // Track the annotation ID we last loaded comments for (FIT-720)
   const lastLoadedAnnotationId = useRef<string | null>(null);
-
-  // FIT-720: Check if lazy loading is enabled
-  const lazyLoadEnabled = isFF(FF_FIT_720_LAZY_LOAD_ANNOTATIONS);
+  const prevTaskId = useRef<typeof taskId>(undefined);
 
   const loadComments = async () => {
     // Capture the current annotation id before the async call.
@@ -46,35 +43,29 @@ export const Comments: FC<{
 
     if (!mounted.current) return;
 
-    if (!isFF(FF_DEV_3034)) {
-      commentStore.restoreCommentsFromCache(cacheKey);
-    }
     // Track that we loaded comments for this annotation (FIT-720)
     lastLoadedAnnotationId.current = annotationId ?? null;
   };
 
+  // Single effect: reset lazy-load cursor when the task changes (e.g. DM refresh), then fetch if needed.
   useEffect(() => {
-    const annotationId = commentStore.annotation?.id;
+    if (taskId !== prevTaskId.current) {
+      lastLoadedAnnotationId.current = null;
+      prevTaskId.current = taskId;
+    }
 
-    if (lazyLoadEnabled) {
-      // FIT-720: Only load comments when active AND we haven't already loaded for this annotation
-      const needsLoad = annotationId && lastLoadedAnnotationId.current !== annotationId;
+    // Only load comments when active AND we haven't already loaded for this annotation
+    const needsLoad = annotationId && lastLoadedAnnotationId.current !== annotationId;
 
-      if (isActive && needsLoad) {
-        loadComments();
-      }
-    } else {
-      // Original behavior: Load comments whenever annotation changes
-      if (annotationId) {
-        loadComments();
-      }
+    if (isActive && needsLoad) {
+      loadComments();
     }
     // id is internal id,
     // always different for different annotations, even empty ones;
     // remain the same when user submit draft, so no unneeded calls.
-  }, [commentStore.annotation?.id, isActive, lazyLoadEnabled]);
+  }, [annotationId, isActive, taskId]);
 
-  const isLoading = lazyLoadEnabled && commentStore.isListLoading && !!commentStore.annotation;
+  const isLoading = commentStore.isListLoading && !!commentStore.annotation;
 
   useEffect(() => {
     const confirmCommentsLoss = (e: any) => {

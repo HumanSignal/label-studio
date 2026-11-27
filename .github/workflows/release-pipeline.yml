@@ -54,7 +54,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub
@@ -167,7 +167,7 @@ jobs:
     steps:
       - name: Send Notification to Slack
         id: slack_notify_ops_release
-        uses: slackapi/slack-github-action@v3.0
+        uses: slackapi/slack-github-action@v4.0
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

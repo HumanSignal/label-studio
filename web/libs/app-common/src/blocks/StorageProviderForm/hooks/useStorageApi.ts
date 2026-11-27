@@ -2,6 +2,8 @@ import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { isDefined, useAPI } from "@humansignal/core";
 import { getProviderConfig } from "../providers";
+import { omitHiddenProviderFields } from "../types/provider";
+import { emitAppCommonEvent } from "../../../utils/appCommonTelemetry";
 
 interface UseStorageApiProps {
   target?: "import" | "export";
@@ -55,12 +57,10 @@ export const useStorageApi = ({
   // Clean form data for submission
   const cleanFormDataForSubmission = useCallback(
     (data: any) => {
-      if (!isEditMode) return data;
-
-      const cleanedData = { ...data };
-
-      // Get the current provider config to identify access key fields
       const providerConfig = getProviderConfig(data.provider);
+      const cleanedData = omitHiddenProviderFields({ ...data }, providerConfig?.fields);
+
+      if (!isEditMode) return cleanedData;
 
       // Get all field names from the current provider schema
       const validFieldNames = new Set([
@@ -189,11 +189,20 @@ export const useStorageApi = ({
 
       return result;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, storageData) => {
       if (response?.$meta?.ok) {
         onSubmit();
         onClose();
       }
+      emitAppCommonEvent("storage_saved", {
+        surface: "project_setup",
+        provider: storageData?.provider ?? null,
+        target,
+        project_id: project ?? null,
+        edit: isDefined(storage?.id),
+        sync: target !== "export",
+        success: Boolean(response?.$meta?.ok),
+      });
     },
   });
 
@@ -226,11 +235,20 @@ export const useStorageApi = ({
 
       return result;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, storageData) => {
       if (response?.$meta?.ok) {
         onSubmit();
         onClose();
       }
+      emitAppCommonEvent("storage_saved", {
+        surface: "project_setup",
+        provider: storageData?.provider ?? null,
+        target,
+        project_id: project ?? null,
+        edit: isDefined(storage?.id),
+        sync: false,
+        success: Boolean(response?.$meta?.ok),
+      });
     },
   });
 

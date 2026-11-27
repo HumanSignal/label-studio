@@ -8,6 +8,7 @@ import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels/Labels";
 import ControlBase from "./Base";
 import { BitmaskModel } from "./Bitmask";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 
 /**
  * The `BitmaskLabels` tag for pixel-wise image segmentation tasks is used in the area where you want to apply a mask or use a brush to draw a region on the image.
@@ -61,6 +62,7 @@ const BitmaskLabelsModel = types.compose(
   Validation,
   LabelMixin,
   SelectedModelMixin.props({ _child: "LabelModel" }),
+  InteractivePromptMixin,
 );
 
 const HtxBitmaskLabels = observer(({ item }) => {

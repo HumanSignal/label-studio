@@ -1,0 +1,117 @@
+/*
+ * Sizes mirror Input, Button and Select (40, 32, 24px). The magnifier and the clear button follow the
+ * control icon rule: the icon size of the control, a padding from the edge, and the icon-to-text gap.
+ */
+.container {
+  --search-height: var(--spacing-1000);
+  --search-icon-size: 20px;
+  --search-font-size: var(--font-size-body-medium);
+  --search-line-height: var(--line-height-body-medium);
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  height: var(--search-height);
+  min-width: 0;
+  padding: 0 var(--spacing-tight);
+  box-sizing: border-box;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-small);
+  background: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  font-family: var(--font-family-base);
+}
+
+.container:hover:not(:has(:disabled)),
+.container:focus-within {
+  border-color: var(--color-neutral-border-bold);
+}
+
+/* Outline only after keyboard focus, as in Input; a click only darkens the border. */
+.container[data-focus-visible] {
+  outline: 2px solid var(--color-primary-focus-outline);
+  outline-offset: 1px;
+}
+
+.container[data-size="small"] {
+  --search-height: var(--spacing-800);
+  --search-icon-size: 16px;
+  --search-font-size: var(--font-size-body-small);
+  --search-line-height: var(--line-height-body-small);
+}
+
+.container[data-size="smaller"] {
+  --search-height: var(--spacing-600);
+  --search-icon-size: 12px;
+  --search-font-size: var(--font-size-label-smaller);
+  --search-line-height: var(--line-height-label-smaller);
+
+  gap: var(--spacing-tighter);
+}
+
+.icon {
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+  flex: none;
+  color: var(--color-neutral-content-subtlest);
+}
+
+.container .input {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+
+  /* one line of text, padded to the frame: the same text position as Input, Button and Select */
+  height: var(--search-line-height);
+  box-sizing: content-box;
+  padding: calc((var(--search-height) - 2px - var(--search-line-height)) / 2) 0;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--search-font-size);
+  line-height: var(--search-line-height);
+}
+
+/* The component draws its own clear button, the same in every browser. */
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/*
+ * A ghost Button: the icon plus a hairline of hover area, pulled into the padding by that hairline so
+ * the X lands where an icon would.
+ */
+.container:has(> .clear) {
+  padding-right: calc(var(--spacing-tight) - var(--spacing-tightest));
+}
+
+.container .clear {
+  flex: none;
+  width: calc(var(--search-icon-size) + 2 * var(--spacing-tightest));
+  height: calc(var(--search-icon-size) + 2 * var(--spacing-tightest));
+  min-width: 0;
+  padding: 0;
+}
+
+.container .clear svg {
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+}
+
+.input::placeholder {
+  color: var(--color-neutral-content-subtle);
+}
+
+.container:has(:disabled) {
+  cursor: not-allowed;
+  background: var(--color-neutral-surface);
+}
+
+.container .input:disabled {
+  cursor: not-allowed;
+  color: var(--color-neutral-content-subtlest);
+}

@@ -1,0 +1,13 @@
+steps:
+  - target: '[data-testid="project-publish-state-chip"]'
+    placement: bottom
+    offset: 8
+    floaterProps:
+      disableFlip: true
+    title: "Publish and unpublish from here"
+    content: >
+      Click the status bage to view the publishing checklist, publish when you are ready, or unpublish later.<br><br>You can also manage publishing from the project Settings.
+    disableBeacon: true
+    locale:
+      last: "Got it"
+      skip: "Don't show this again"

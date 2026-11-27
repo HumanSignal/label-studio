@@ -47,9 +47,6 @@ export const configureStore = async (params, events) => {
 
   store.initializeStore({
     ...(params.task ?? {}),
-    // allow external integrations to control when the app is fully hydrated
-    // default behaviour is to consider this point as hydrated
-    hydrated: params?.hydrated ?? true,
     users: params.users ?? [],
     annotationHistory: params.history ?? [],
   });

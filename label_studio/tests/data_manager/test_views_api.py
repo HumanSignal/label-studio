@@ -1,8 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import json
+from unittest.mock import patch
 
 import pytest
+from data_manager.models import View
+from projects.tests.factories import ProjectFactory
 from rest_framework import status
 
 from ..utils import project_id  # noqa
@@ -122,12 +125,14 @@ def test_views_api_filters(business_client, project_id):
                         'operator': 'contains',
                         'type': 'Image',
                         'value': {},
+                        'child_filters': [],
                     },
                     {
                         'filter': 'filter:tasks:data.image',
                         'operator': 'equal',
                         'type': 'Image',
                         'value': {},
+                        'child_filters': [],
                     },
                 ],
             }
@@ -162,12 +167,14 @@ def test_views_api_filters(business_client, project_id):
                         'operator': 'equal',
                         'type': 'Text',
                         'value': {},
+                        'child_filters': [],
                     },
                     {
                         'filter': 'filter:tasks:data.text',
                         'operator': 'contains',
                         'type': 'Text',
                         'value': {},
+                        'child_filters': [],
                     },
                 ],
             }
@@ -188,6 +195,158 @@ def test_views_api_filters(business_client, project_id):
 
     assert response.status_code == 200, response.content
     assert response.json()['data'] == updated_payload['data']
+
+
+def _wire_filter(name):
+    return {
+        'filter': f'filter:tasks:data.{name}',
+        'operator': 'equal',
+        'type': 'String',
+        'value': name,
+    }
+
+
+def test_views_api_accepts_legacy_singular_child_filter(business_client, project_id):
+    """Legacy singular input is accepted but read responses use the canonical plural field."""
+    child = _wire_filter('legacy-child')
+    parent = {**_wire_filter('parent'), 'child_filter': child}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    response = business_client.get(f'/api/dm/views/{response.json()["id"]}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == [child]
+
+
+def test_views_api_persists_ordered_child_filters(business_client, project_id):
+    """Plural child filters persist as siblings and preserve wire order through read and runtime paths."""
+    children = [_wire_filter('first-child'), _wire_filter('second-child')]
+    parent = {**_wire_filter('parent'), 'child_filters': children}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+    persisted_parent = view.filter_group.filters.get(parent__isnull=True)
+    assert persisted_parent.children.count() == 2
+    assert set(persisted_parent.children.values_list('column', flat=True)) == {child['filter'] for child in children}
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == children
+
+    runtime_parent = view.get_prepare_tasks_params().filters.items[0]
+    assert [child.filter for child in runtime_parent.child_filters] == [child['filter'] for child in children]
+
+
+def test_views_api_emits_explicit_empty_child_filters(business_client, project_id):
+    """An empty plural list must survive a round trip so legacy defaults are not resurrected."""
+    parent = {**_wire_filter('parent'), 'child_filters': []}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    response = business_client.get(f'/api/dm/views/{response.json()["id"]}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert 'child_filter' not in serialized_parent
+    assert serialized_parent['child_filters'] == []
+
+
+def test_persisted_invalid_user_filter_is_recovered_without_weakening_new_writes(business_client, project_id):
+    """Historical ORM rows recover safely, while equivalent new API writes remain strict."""
+    valid_filter = {
+        'filter': 'filter:tasks:annotators',
+        'operator': 'contains',
+        'type': 'List',
+        'value': [business_client.user.id],
+        'child_filters': [],
+    }
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [valid_filter]}},
+    }
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+
+    persisted_filter = view.filter_group.filters.get(parent__isnull=True)
+    persisted_filter.value = ['yes']
+    persisted_filter.save(update_fields=['value'])
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['data']['filters']['items'][0]['value'] == []
+
+    response = business_client.get(f'/api/tasks?view={view.id}')
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    invalid_payload = {
+        'project': project_id,
+        'data': {
+            'filters': {
+                'conjunction': 'and',
+                'items': [{**valid_filter, 'value': ['yes']}],
+            }
+        },
+    }
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(invalid_payload),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.content
+
+
+def test_persisted_invalid_child_user_filter_is_recovered_recursively(business_client, project_id):
+    """The same compatibility normalization applies to child rows without dropping the parent."""
+    child = {
+        'filter': 'filter:tasks:annotators',
+        'operator': 'contains',
+        'type': 'List',
+        'value': [business_client.user.id],
+    }
+    parent = {**_wire_filter('parent'), 'child_filters': [child]}
+    payload = {
+        'project': project_id,
+        'data': {'filters': {'conjunction': 'and', 'items': [parent]}},
+    }
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    view = View.objects.get(pk=response.json()['id'])
+
+    persisted_child = view.filter_group.filters.get(parent__isnull=False)
+    persisted_child.value = {
+        'items': [{'value': str(business_client.user.id), 'title': 'Current user'}],
+        'multiple': True,
+    }
+    persisted_child.save(update_fields=['value'])
+
+    response = business_client.get(f'/api/dm/views/{view.id}/')
+    assert response.status_code == status.HTTP_200_OK, response.content
+    serialized_parent = response.json()['data']['filters']['items'][0]
+    assert serialized_parent['value'] == 'parent'
+    assert serialized_parent['child_filters'][0]['value'] == [business_client.user.id]
+
+    response = business_client.get(f'/api/tasks?view={view.id}')
+    assert response.status_code == status.HTTP_200_OK, response.content
 
 
 def test_views_api_nested_filters(business_client, project_id):
@@ -303,9 +462,10 @@ def test_views_api_nested_filters(business_client, project_id):
     assert root_filter['type'] == 'String'
     assert root_filter['value'] == 'A'
 
-    # Verify child filter structure
-    assert 'child_filter' in root_filter
-    child_filter = root_filter['child_filter']
+    # Legacy singular input is emitted in the canonical plural shape.
+    assert 'child_filter' not in root_filter
+    assert len(root_filter['child_filters']) == 1
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['filter'] == 'filter:tasks:data.text'
     assert child_filter['operator'] == 'contains'
     assert child_filter['type'] == 'String'
@@ -546,9 +706,10 @@ def test_views_api_patch_add_child_filter(business_client, project_id):
     assert root_filter['type'] == 'String'
     assert root_filter['value'] == 'A'
 
-    # Verify child filter was added
-    assert 'child_filter' in root_filter
-    child_filter = root_filter['child_filter']
+    # Verify child filter was added using the canonical plural response shape.
+    assert 'child_filter' not in root_filter
+    assert len(root_filter['child_filters']) == 1
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['filter'] == 'filter:tasks:data.text'
     assert child_filter['operator'] == 'contains'
     assert child_filter['type'] == 'String'
@@ -602,7 +763,7 @@ def test_views_api_patch_add_child_filter(business_client, project_id):
     filter_data = view_data['filters']
 
     root_filter = filter_data['items'][0]
-    child_filter = root_filter['child_filter']
+    child_filter = root_filter['child_filters'][0]
     assert child_filter['value'] == 'task'  # Updated value
 
     # Test that the updated view filters tasks correctly
@@ -660,7 +821,7 @@ def test_update_views_order(business_client, project_id):
         data=json.dumps(new_order),
         content_type='application/json',
     )
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify the new order
     response = business_client.get('/api/dm/views/')
@@ -669,3 +830,354 @@ def test_update_views_order(business_client, project_id):
 
     returned_ids = [view['id'] for view in data]
     assert returned_ids == new_order['ids']
+
+
+def test_manager_can_lock_and_unlock_view(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['is_locked'] is True
+    assert response.json()['locked_by'] == {
+        'id': business_client.user.id,
+        'name': business_client.user.email,
+        'email': business_client.user.email,
+    }
+    assert response.json()['locked_at'] is not None
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': False}),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['is_locked'] is False
+    assert response.json()['locked_by'] is None
+    assert response.json()['locked_at'] is None
+
+
+def test_non_manager_cannot_lock_view(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    with patch('data_manager.serializers.user_can_manage_view_lock', return_value=False):
+        response = business_client.patch(
+            f'/api/dm/views/{view_id}/',
+            data=json.dumps({'is_locked': True}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()['detail'] == 'Only managers can lock or unlock tabs.'
+
+
+def test_locked_view_ignores_configuration_update(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'type': 'grid'}}),
+        content_type='application/json',
+    )
+
+    # Locked views silently ignore non-allowed configuration changes and return 200.
+    # The frontend always sends full snapshots, so silent-ignore avoids false 409s
+    # when stale snapshot fields happen to differ from current DB state.
+    assert response.status_code == status.HTTP_200_OK
+    view = business_client.get(f'/api/dm/views/{view_id}/').json()
+    assert view['data'].get('type') != 'grid'
+
+
+def test_locked_view_can_still_be_reordered(business_client, project_id):
+    view_ids = []
+    for index in range(3):
+        response = business_client.post(
+            '/api/dm/views/',
+            data=json.dumps(dict(project=project_id, data={'title': f'View {index}'})),
+            content_type='application/json',
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        view_ids.append(response.json()['id'])
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_ids[0]}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    new_order = {'project': project_id, 'ids': [view_ids[2], view_ids[0], view_ids[1]]}
+    response = business_client.post(
+        '/api/dm/views/order/',
+        data=json.dumps(new_order),
+        content_type='application/json',
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    response = business_client.get('/api/dm/views/')
+    assert [view['id'] for view in response.json()] == new_order['ids']
+
+
+def test_locked_view_allows_column_width_update(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'columnsWidth': {'tasks:id': 120}}}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+    assert response.json()['data']['columnsWidth'] == {'tasks:id': 120}
+
+
+def test_locked_view_ignores_non_width_data_changes(business_client, project_id):
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Review queue'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    view_id = response.json()['id']
+
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'is_locked': True}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+
+    # Locked tab: columnsWidth is applied, non-allowlisted fields (type) are silently ignored
+    response = business_client.patch(
+        f'/api/dm/views/{view_id}/',
+        data=json.dumps({'data': {'title': 'Review queue', 'columnsWidth': {'tasks:id': 120}, 'type': 'grid'}}),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK, response.content
+    view_data = response.json().get('data', {})
+    assert view_data.get('columnsWidth') == {'tasks:id': 120}, 'columnsWidth should be updated'
+    assert 'type' not in view_data, 'non-allowlisted field should not be persisted'
+
+
+def test_create_view_with_filters_uses_max_order_not_count(business_client, project_id):
+    """Creating a filtered view must use Max(order)+1, not count(), when orders have gaps."""
+    from data_manager.models import View
+
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'First'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    first_id = response.json()['id']
+
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'Second'})),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    second_id = response.json()['id']
+
+    # Create a gap: two views remain but max order is 5 (count would be 2).
+    View.objects.filter(id=first_id).update(order=0)
+    View.objects.filter(id=second_id).update(order=5)
+
+    payload = {
+        'project': project_id,
+        'data': {
+            'title': 'Filtered',
+            'filters': {
+                'conjunction': 'and',
+                'items': [
+                    {
+                        'filter': 'filter:tasks:id',
+                        'operator': 'equal',
+                        'type': 'Number',
+                        'value': 1,
+                    }
+                ],
+            },
+        },
+    }
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    assert response.json()['order'] == 6, 'order must be Max+1 (6), not count() (2)'
+
+
+def _create_view_with_filters(business_client, project_id, items):
+    payload = {'project': project_id, 'data': {'filters': {'conjunction': 'or', 'items': items}}}
+    response = business_client.post('/api/dm/views/', data=json.dumps(payload), content_type='application/json')
+    assert response.status_code == status.HTTP_201_CREATED, response.content
+    return response.json()['id']
+
+
+def _patch_view_filters(business_client, view_id, project_id, conjunction, items):
+    payload = {'project': project_id, 'data': {'filters': {'conjunction': conjunction, 'items': items}}}
+    return business_client.patch(
+        f'/api/dm/views/{view_id}/', data=json.dumps(payload), content_type='application/json'
+    )
+
+
+def _filters_with_children(count):
+    items = []
+    for i in range(count):
+        item = {'filter': 'filter:tasks:id', 'operator': 'equal', 'type': 'Number', 'value': i}
+        if i % 3 == 0:
+            item['child_filters'] = [_wire_filter(f'child-{i}-a'), _wire_filter(f'child-{i}-b')]
+        items.append(item)
+    return items
+
+
+def test_view_update_query_count_does_not_grow_with_filters(business_client, project_id):
+    """Saving a tab with 1,200 filters runs a bounded number of queries and round-trips them unchanged."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    view_id = _create_view_with_filters(business_client, project_id, [_wire_filter('initial')])
+
+    query_counts = {}
+    for count in (3, 1200):
+        items = _filters_with_children(count)
+        with CaptureQueriesContext(connection) as ctx:
+            response = _patch_view_filters(business_client, view_id, project_id, 'and', items)
+        assert response.status_code == status.HTTP_200_OK, response.content
+        query_counts[count] = len(ctx.captured_queries)
+
+        response = business_client.get(f'/api/dm/views/{view_id}/')
+        assert response.status_code == status.HTTP_200_OK, response.content
+        filters = response.json()['data']['filters']
+        assert filters['conjunction'] == 'and'
+        assert filters['items'] == [{**item, 'child_filters': item.get('child_filters', [])} for item in items]
+
+    # Two queries per filter would be ~4,000 here; SQLite may still split bulk statements into a few batches.
+    assert query_counts[1200] - query_counts[3] < 30, query_counts
+    view = View.objects.get(pk=view_id)
+    assert view.filter_group.filters.count() == 1200 + 2 * 400
+
+
+def test_view_update_returns_409_when_the_row_lock_wait_times_out(business_client, project_id):
+    """A save that times out waiting for another save of the same tab gets 409 and leaves the stored filters untouched."""
+    from django.db import OperationalError
+    from django.db.models.query import QuerySet
+    from psycopg import errors as pg_errors
+
+    items = [_wire_filter('kept')]
+    view_id = _create_view_with_filters(business_client, project_id, items)
+
+    original_select_for_update = QuerySet.select_for_update
+
+    def locked_select_for_update(self, *args, **kwargs):
+        if self.model is View:
+            error = OperationalError('could not obtain lock on row in relation "data_manager_view"')
+            error.__cause__ = pg_errors.LockNotAvailable()
+            raise error
+        return original_select_for_update(self, *args, **kwargs)
+
+    with patch.object(QuerySet, 'select_for_update', locked_select_for_update):
+        response = _patch_view_filters(business_client, view_id, project_id, 'and', [_wire_filter('lost')])
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.content
+    assert response.json()['detail'] == 'This tab is being saved by another request. Please try again.'
+
+    response = business_client.get(f'/api/dm/views/{view_id}/')
+    filters = response.json()['data']['filters']
+    assert filters['conjunction'] == 'or'
+    assert [item['value'] for item in filters['items']] == ['kept']
+
+
+def test_view_update_reraises_other_operational_errors(business_client, project_id):
+    """Only a lock conflict maps to 409; other database errors still surface as server errors."""
+    from django.db import OperationalError
+    from django.db.models.query import QuerySet
+
+    view_id = _create_view_with_filters(business_client, project_id, [_wire_filter('kept')])
+    original_select_for_update = QuerySet.select_for_update
+
+    def failing_select_for_update(self, *args, **kwargs):
+        if self.model is View:
+            raise OperationalError('canceling statement due to statement timeout')
+        return original_select_for_update(self, *args, **kwargs)
+
+    with patch.object(QuerySet, 'select_for_update', failing_select_for_update):
+        response = _patch_view_filters(business_client, view_id, project_id, 'and', [_wire_filter('lost')])
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, response.content
+
+
+def test_views_api_rejects_project_of_other_organization(business_client, project_id):
+    other_project = ProjectFactory()
+
+    # create a view in another organization's project
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=other_project.id, data={'title': 'x'})),
+        content_type='application/json',
+    )
+    assert response.status_code == 400, response.content
+    assert 'object does not exist' in str(response.json())
+    assert not View.objects.filter(project=other_project).exists()
+
+    # move an own view into another organization's project
+    response = business_client.post(
+        '/api/dm/views/',
+        data=json.dumps(dict(project=project_id, data={'title': 'own'})),
+        content_type='application/json',
+    )
+    assert response.status_code == 201, response.content
+    view_id = response.json()['id']
+
+    for method in ('patch', 'put'):
+        response = getattr(business_client, method)(
+            f'/api/dm/views/{view_id}/',
+            data=json.dumps(dict(project=other_project.id, data={'title': 'moved'})),
+            content_type='application/json',
+        )
+        assert response.status_code == 400, (method, response.content)
+    assert View.objects.get(id=view_id).project_id == project_id

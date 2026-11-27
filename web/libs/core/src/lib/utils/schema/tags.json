@@ -316,6 +316,13 @@
         "description": "Control region selection granularity",
         "type": ["symbol", "word", "sentence", "paragraph"],
         "required": false
+      },
+      "resolveUrls": {
+        "name": "resolveUrls",
+        "description": "Whether to resolve cloud storage URIs in the loaded content when valueType is url",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
       }
     }
   },

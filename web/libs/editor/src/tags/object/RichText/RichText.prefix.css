@@ -7,6 +7,15 @@
     line-height: 20px;
   }
 
+  /* HyperText task HTML keeps inline style: keep position:fixed / z-index overlays inside the text pane (INT-30729).
+     contain: paint clips to this box, so the box scrolls its own overflow to keep wide content reachable.
+     Not on <Text>: its data is escaped, and its resize handles sit 7px outside the line box. */
+  &__container_hypertext {
+    overflow: auto;
+    contain: paint;
+    isolation: isolate;
+  }
+
   &__orig-container {
     display: none !important;
   }
@@ -87,7 +96,9 @@
   :global(.htx-highlight) {
     /* resize handles around selected region, */
     /* they look like popsicles, normal one at the beginning, upside down one at the end */
-    area {
+    lsf-resize-handle {
+      /* must stay inline: with no top/left, the inline static position keeps the handle at the span's edge */
+      display: inline;
       position: absolute;
       width: 1px;
       height: 1.25em;

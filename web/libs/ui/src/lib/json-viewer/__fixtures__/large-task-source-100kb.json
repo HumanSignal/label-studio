@@ -1,0 +1,7955 @@
+{
+  "id": 9001,
+  "inner_id": 42,
+  "data": {
+    "text": "Sample task text for labeling interface preview and data manager inspection.",
+    "image": "s3://bucket/path/to/image.jpg",
+    "audio": "s3://bucket/path/to/audio.wav"
+  },
+  "meta": {
+    "source": "import",
+    "batch_id": "batch-001"
+  },
+  "annotations": [
+    {
+      "id": 1,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-1",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 2,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-2",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 3,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-3",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 4,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-4",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 5,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-5",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 6,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-6",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 7,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-7",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 8,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-8",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 9,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-9",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 10,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-10",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 11,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-11",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 12,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-12",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 13,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-13",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 14,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-14",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 15,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-15",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 16,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-16",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 17,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-17",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 18,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-18",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 19,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-19",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 20,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-20",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 21,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-21",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 22,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-22",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 23,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-23",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 24,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-24",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 25,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-25",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 26,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-26",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 27,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-27",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 28,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-28",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 29,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-29",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 30,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-30",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 31,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-31",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 32,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-32",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 33,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-33",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 34,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-34",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 35,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-35",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 36,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-36",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 37,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-37",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 38,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-38",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 39,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-39",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 40,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-40",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 41,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-41",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 42,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-42",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 43,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-43",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 44,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-44",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 45,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-45",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 46,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-46",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 47,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-47",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 48,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-48",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 49,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-49",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 50,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-50",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 51,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-51",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 52,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-52",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 53,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-53",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 54,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-54",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 55,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-55",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 56,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-56",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 57,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-57",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 58,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-58",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 59,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-59",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 60,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-60",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 61,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-61",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 62,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-62",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 63,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-63",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 64,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-64",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 65,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-65",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 66,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-66",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 67,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-67",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 68,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-68",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 69,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-69",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 70,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-70",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 71,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-71",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 72,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-72",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 73,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-73",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 74,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-74",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 75,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-75",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 76,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-76",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 77,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-77",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 78,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-78",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 79,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-79",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 80,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-80",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 81,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-81",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 82,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-82",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 83,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-83",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 84,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-84",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 85,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-85",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 86,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-86",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 87,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-87",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 88,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-88",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 89,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-89",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 90,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-90",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 91,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-91",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 92,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-92",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 93,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-93",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 94,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-94",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 95,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-95",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 96,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-96",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 97,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-97",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 98,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-98",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 99,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-99",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 100,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-100",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 101,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-101",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 102,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-102",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 103,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-103",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 104,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-104",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 105,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-105",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 106,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-106",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 107,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-107",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 108,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-108",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 109,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-109",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 110,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-110",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 111,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-111",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 112,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-112",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 113,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-113",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 114,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-114",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 115,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-115",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 116,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-116",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 117,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-117",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 118,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-118",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 119,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-119",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 120,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-120",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 121,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-121",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 122,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-122",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 123,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-123",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 124,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-124",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 125,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-125",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 126,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-126",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 127,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-127",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 128,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-128",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 129,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-129",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 130,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-130",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 131,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-131",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 132,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-132",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 133,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-133",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 134,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-134",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 135,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-135",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 136,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-136",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 137,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-137",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 138,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-138",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 139,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-139",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 140,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-140",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 141,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-141",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 142,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-142",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 143,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-143",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 144,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-144",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 145,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-145",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 146,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-146",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 147,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-147",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 148,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-148",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 149,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-149",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 150,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-150",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 151,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-151",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 152,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-152",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 153,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-153",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 154,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-154",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 155,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-155",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 156,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-156",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 157,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-157",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 158,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-158",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 159,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-159",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 160,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-160",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 161,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-161",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 162,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-162",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 163,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-163",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 164,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-164",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 165,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-165",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 166,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-166",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 167,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-167",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 168,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-168",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 169,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-169",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 170,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-170",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 171,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-171",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 172,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-172",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 173,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-173",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 174,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-174",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 175,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-175",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 176,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-176",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 177,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-177",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 178,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-178",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 179,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-179",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 180,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-180",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 181,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-181",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 182,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-182",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 183,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-183",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 184,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-184",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 185,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-185",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 186,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-186",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 187,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-187",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 188,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-188",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 189,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-189",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 190,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-190",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 191,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-191",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 192,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-192",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 193,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-193",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 194,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-194",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 195,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-195",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 196,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-196",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 197,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-197",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 198,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-198",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 199,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-199",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 200,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-200",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 201,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-201",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 202,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-202",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 203,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-203",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 204,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-204",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 205,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-205",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 206,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-206",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 207,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-207",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 208,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-208",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 209,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-209",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 210,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-210",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 211,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-211",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 212,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-212",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 213,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-213",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 214,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-214",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 215,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-215",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 216,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-216",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 217,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-217",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 218,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-218",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 219,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-219",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 220,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-220",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 221,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-221",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 222,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-222",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 223,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-223",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 224,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-224",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 225,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-225",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 226,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-226",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 227,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-227",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 228,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-228",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 229,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-229",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 230,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-230",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 231,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-231",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 232,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-232",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 233,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-233",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 234,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-234",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 235,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-235",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 236,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-236",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 237,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-237",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 238,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-238",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 239,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-239",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 240,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-240",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 241,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-241",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 242,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-242",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 243,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-243",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 244,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-244",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 245,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-245",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 246,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-246",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 247,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-247",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 248,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-248",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 249,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-249",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 250,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-250",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 251,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-251",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 252,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-252",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 253,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-253",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 254,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-254",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 255,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-255",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 256,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-256",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 257,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-257",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 258,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-258",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 259,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-259",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 260,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-260",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 261,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-261",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 262,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-262",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 263,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-263",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 264,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-264",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 265,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-265",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 266,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-266",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 267,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-267",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 268,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-268",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 269,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-269",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 270,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-270",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 271,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-271",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 272,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-272",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 273,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-273",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 274,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-274",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 275,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-275",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 276,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-276",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 277,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-277",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 278,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-278",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 279,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-279",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 280,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-280",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 281,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-281",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 282,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-282",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 283,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-283",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 284,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-284",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 285,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-285",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 286,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-286",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 287,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-287",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 288,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-288",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 289,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-289",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 290,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-290",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 291,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-291",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 292,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-292",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 293,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-293",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 294,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-294",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 295,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-295",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 296,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-296",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 297,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-297",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 298,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-298",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 299,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-299",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 300,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-300",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 301,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-301",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 302,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-302",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 303,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-303",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 304,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-304",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 305,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-305",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 306,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-306",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 307,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-307",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 308,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-308",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 309,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-309",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 310,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-310",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 311,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-311",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 312,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-312",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 313,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-313",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 314,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-314",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 315,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-315",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 316,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-316",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 317,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-317",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 318,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-318",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 319,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-319",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 320,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-320",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 321,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-321",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 322,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-322",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 323,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-323",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 324,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-324",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 325,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-325",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 326,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-326",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 327,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-327",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 328,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-328",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 329,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-329",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 330,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-330",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 331,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-331",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 332,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-332",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 333,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-333",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 334,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-334",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 335,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-335",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 336,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-336",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 337,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-337",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 338,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-338",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 339,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-339",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 340,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-340",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 341,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-341",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 342,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-342",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 343,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-343",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 344,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-344",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 345,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-345",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 346,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-346",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 347,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-347",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 348,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-348",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 349,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-349",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 350,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-350",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 351,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-351",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 352,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-352",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 353,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-353",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 354,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-354",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 355,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-355",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 356,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-356",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 357,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-357",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 358,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-358",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 359,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-359",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 360,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-360",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 361,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-361",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 362,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-362",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 363,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-363",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 364,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-364",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 365,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-365",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 366,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-366",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 367,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-367",
+          "type": "choices",
+          "value": {
+            "choices": ["label_7"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 368,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-368",
+          "type": "choices",
+          "value": {
+            "choices": ["label_8"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    },
+    {
+      "id": 369,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-369",
+          "type": "choices",
+          "value": {
+            "choices": ["label_9"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 51.5
+    },
+    {
+      "id": 370,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-370",
+          "type": "choices",
+          "value": {
+            "choices": ["label_10"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 42.5
+    },
+    {
+      "id": 371,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-371",
+          "type": "choices",
+          "value": {
+            "choices": ["label_11"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 43.5
+    },
+    {
+      "id": 372,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-372",
+          "type": "choices",
+          "value": {
+            "choices": ["label_0"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 44.5
+    },
+    {
+      "id": 373,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-373",
+          "type": "choices",
+          "value": {
+            "choices": ["label_1"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 45.5
+    },
+    {
+      "id": 374,
+      "completed_by": {
+        "id": 4,
+        "email": "annotator4@example.com"
+      },
+      "result": [
+        {
+          "id": "result-374",
+          "type": "choices",
+          "value": {
+            "choices": ["label_2"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 46.5
+    },
+    {
+      "id": 375,
+      "completed_by": {
+        "id": 0,
+        "email": "annotator0@example.com"
+      },
+      "result": [
+        {
+          "id": "result-375",
+          "type": "choices",
+          "value": {
+            "choices": ["label_3"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 47.5
+    },
+    {
+      "id": 376,
+      "completed_by": {
+        "id": 1,
+        "email": "annotator1@example.com"
+      },
+      "result": [
+        {
+          "id": "result-376",
+          "type": "choices",
+          "value": {
+            "choices": ["label_4"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 48.5
+    },
+    {
+      "id": 377,
+      "completed_by": {
+        "id": 2,
+        "email": "annotator2@example.com"
+      },
+      "result": [
+        {
+          "id": "result-377",
+          "type": "choices",
+          "value": {
+            "choices": ["label_5"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 49.5
+    },
+    {
+      "id": 378,
+      "completed_by": {
+        "id": 3,
+        "email": "annotator3@example.com"
+      },
+      "result": [
+        {
+          "id": "result-378",
+          "type": "choices",
+          "value": {
+            "choices": ["label_6"]
+          },
+          "from_name": "choice",
+          "to_name": "text"
+        }
+      ],
+      "created_at": "2024-01-15T12:00:00.000Z",
+      "updated_at": "2024-01-15T12:05:00.000Z",
+      "lead_time": 50.5
+    }
+  ],
+  "predictions": [],
+  "drafts": []
+}

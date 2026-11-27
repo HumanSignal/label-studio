@@ -17,5 +17,6 @@
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
 | [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object |
 | [labeling] | <code>boolean</code> |  | Use taxonomy to label regions in text. Only supported with `<Text>` and `<HyperText>` object tags. |
-| [legacy] | <code>boolean</code> |  | Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable. |
+| [legacy] | <code>boolean</code> |  | **Deprecated.** Enables the legacy Taxonomy UI (annotators can add labels as needed). When true, the `apiUrl` parameter is not usable. Prefer the default Taxonomy UI. |
+| [allowAddLabels] | <code>boolean</code> | <code>false</code> | **New taxonomy UI only.** When `true`, annotators can add and remove user-defined labels where the project supports it. Defaults to `false` so choices stay limited to the configured taxonomy unless you opt in. If you omit this attribute but set `legacy`, `allowAddLabels` defaults to the same value as `legacy`. Ignored when `legacy` is `true` and when `apiUrl` is set (external taxonomies are expected to be managed at their source). |
 

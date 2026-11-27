@@ -1,61 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom";
 import { EmptyState } from "./EmptyState";
-
-// Mock the external dependencies
-jest.mock("@humansignal/ui", () => ({
-  Button: ({ children, onClick, disabled, "data-testid": testId, ...props }: any) => (
-    <button onClick={onClick} disabled={disabled} data-testid={testId} {...props}>
-      {children}
-    </button>
-  ),
-  Typography: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  IconExternal: ({ width, height }: any) => <span data-testid="icon-external" width={width} height={height} />,
-  Tooltip: ({ children, title }: any) => <div data-tooltip={title}>{children}</div>,
-}));
-
-jest.mock("@humansignal/icons", () => ({
-  IconUpload: () => <span data-testid="icon-upload" />,
-  IconLsLabeling: ({ width, height }: any) => <span data-testid="icon-ls-labeling" width={width} height={height} />,
-  IconCheck: ({ width, height }: any) => <span data-testid="icon-check" width={width} height={height} />,
-  IconSearch: ({ width, height }: any) => <span data-testid="icon-search" width={width} height={height} />,
-  IconInbox: ({ width, height }: any) => <span data-testid="icon-inbox" width={width} height={height} />,
-  IconCloudProviderS3: ({ width, height, className }: any) => (
-    <span data-testid="icon-cloud-provider-s3" width={width} height={height} className={className} />
-  ),
-  IconCloudProviderGCS: ({ width, height, className }: any) => (
-    <span data-testid="icon-cloud-provider-gcs" width={width} height={height} className={className} />
-  ),
-  IconCloudProviderAzure: ({ width, height, className }: any) => (
-    <span data-testid="icon-cloud-provider-azure" width={width} height={height} className={className} />
-  ),
-  IconCloudProviderRedis: ({ width, height, className }: any) => (
-    <span data-testid="icon-cloud-provider-redis" width={width} height={height} className={className} />
-  ),
-}));
-
-jest.mock("../../../../../../editor/src/utils/docs", () => ({
-  getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
-}));
-
-// Mock AuthProvider/useAuth
-jest.mock("@humansignal/core/providers/AuthProvider", () => ({
-  useAuth: () => ({
-    user: { id: 1, username: "testuser" },
-    permissions: {
-      can: (ability: string) => ability === "can_manage_storage", // Grant storage management permission by default
-    },
-    isLoading: false,
-  }),
-  ABILITY: {
-    can_manage_storage: "can_manage_storage",
-  },
-}));
+import * as uiModule from "@humansignal/ui";
+import * as iconsModule from "@humansignal/icons";
+import * as docsModule from "../../../../../../editor/src/utils/docs";
+import * as authProviderModule from "@humansignal/core/providers/AuthProvider";
 
 // Mock global window.APP_SETTINGS
 Object.defineProperty(window, "APP_SETTINGS", {
@@ -66,12 +15,67 @@ Object.defineProperty(window, "APP_SETTINGS", {
 describe("EmptyState Component", () => {
   const defaultProps = {
     canImport: true,
-    onOpenSourceStorageModal: jest.fn(),
-    onOpenImportModal: jest.fn(),
+    onOpenSourceStorageModal: mock(),
+    onOpenImportModal: mock(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mock.clearAllMocks();
+
+    spyOn(uiModule, "Button").mockImplementation(
+      ({ children, onClick, disabled, "data-testid": testId, ...props }: any) => (
+        <button onClick={onClick} disabled={disabled} data-testid={testId} {...props}>
+          {children}
+        </button>
+      ),
+    );
+    spyOn(uiModule, "Typography").mockImplementation(({ children, className, ...props }: any) => (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    ));
+    spyOn(uiModule, "IconExternal").mockImplementation(({ width, height }: any) => (
+      <span data-testid="icon-external" width={width} height={height} />
+    ));
+    spyOn(uiModule, "Tooltip").mockImplementation(({ children, title }: any) => (
+      <div data-tooltip={title}>{children}</div>
+    ));
+
+    spyOn(iconsModule, "IconUpload").mockImplementation(() => <span data-testid="icon-upload" />);
+    spyOn(iconsModule, "IconLsLabeling").mockImplementation(({ width, height }: any) => (
+      <span data-testid="icon-ls-labeling" width={width} height={height} />
+    ));
+    spyOn(iconsModule, "IconCheck").mockImplementation(({ width, height }: any) => (
+      <span data-testid="icon-check" width={width} height={height} />
+    ));
+    spyOn(iconsModule, "IconSearch").mockImplementation(({ width, height }: any) => (
+      <span data-testid="icon-search" width={width} height={height} />
+    ));
+    spyOn(iconsModule, "IconInbox").mockImplementation(({ width, height }: any) => (
+      <span data-testid="icon-inbox" width={width} height={height} />
+    ));
+    spyOn(iconsModule, "IconCloudProviderS3").mockImplementation(({ width, height, className }: any) => (
+      <span data-testid="icon-cloud-provider-s3" width={width} height={height} className={className} />
+    ));
+    spyOn(iconsModule, "IconCloudProviderGCS").mockImplementation(({ width, height, className }: any) => (
+      <span data-testid="icon-cloud-provider-gcs" width={width} height={height} className={className} />
+    ));
+    spyOn(iconsModule, "IconCloudProviderAzure").mockImplementation(({ width, height, className }: any) => (
+      <span data-testid="icon-cloud-provider-azure" width={width} height={height} className={className} />
+    ));
+    spyOn(iconsModule, "IconCloudProviderRedis").mockImplementation(({ width, height, className }: any) => (
+      <span data-testid="icon-cloud-provider-redis" width={width} height={height} className={className} />
+    ));
+
+    spyOn(docsModule, "getDocsUrl").mockImplementation((path: string) => `https://docs.example.com/${path}`);
+
+    spyOn(authProviderModule, "useAuth").mockReturnValue({
+      user: { id: 1, username: "testuser" },
+      permissions: {
+        can: (ability: string) => ability === "storages.change",
+      },
+      isLoading: false,
+    } as any);
   });
 
   describe("Basic Import Functionality", () => {
@@ -123,7 +127,7 @@ describe("EmptyState Component", () => {
   describe("Button Interactions", () => {
     it("should call onOpenSourceStorageModal when Connect Storage button is clicked", async () => {
       const user = userEvent.setup();
-      const mockOpenStorage = jest.fn();
+      const mockOpenStorage = mock();
 
       render(<EmptyState {...defaultProps} onOpenSourceStorageModal={mockOpenStorage} />);
 
@@ -135,7 +139,7 @@ describe("EmptyState Component", () => {
 
     it("should call onOpenImportModal when Import button is clicked", async () => {
       const user = userEvent.setup();
-      const mockOpenImport = jest.fn();
+      const mockOpenImport = mock();
 
       render(<EmptyState {...defaultProps} onOpenImportModal={mockOpenImport} />);
 
@@ -149,7 +153,7 @@ describe("EmptyState Component", () => {
   describe("Role-Based Empty States", () => {
     describe("Filter-based Empty State", () => {
       it("should render filter empty state when hasFilters is true", () => {
-        render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
+        render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={mock()} />);
 
         expect(screen.getByText("No tasks found")).toBeInTheDocument();
         expect(screen.getByText("Try adjusting or clearing the filters to see more results")).toBeInTheDocument();
@@ -159,7 +163,7 @@ describe("EmptyState Component", () => {
 
       it("should call onClearFilters when Clear Filters button is clicked", async () => {
         const user = userEvent.setup();
-        const mockClearFilters = jest.fn();
+        const mockClearFilters = mock();
 
         render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={mockClearFilters} />);
 
@@ -182,7 +186,7 @@ describe("EmptyState Component", () => {
 
     describe("Annotator Role", () => {
       it("should render annotator auto-distribution state with Label All Tasks button", () => {
-        const mockLabelAllTasks = jest.fn();
+        const mockLabelAllTasks = mock();
         const project = {
           assignment_settings: {
             label_stream_task_distribution: "auto_distribution",
@@ -201,7 +205,7 @@ describe("EmptyState Component", () => {
 
       it("should call onLabelAllTasks when Label All Tasks button is clicked", async () => {
         const user = userEvent.setup();
-        const mockLabelAllTasks = jest.fn();
+        const mockLabelAllTasks = mock();
         const project = {
           assignment_settings: {
             label_stream_task_distribution: "auto_distribution",
@@ -344,7 +348,7 @@ describe("EmptyState Component", () => {
     });
 
     it("should render Clear Filters button with correct text", () => {
-      render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={jest.fn()} />);
+      render(<EmptyState {...defaultProps} hasFilters={true} onClearFilters={mock()} />);
 
       expect(screen.getByTestId("dm-clear-filters-button")).toHaveTextContent("Clear Filters");
     });
@@ -356,7 +360,7 @@ describe("EmptyState Component", () => {
         },
       };
 
-      render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} onLabelAllTasks={jest.fn()} />);
+      render(<EmptyState {...defaultProps} userRole="ANNOTATOR" project={project} onLabelAllTasks={mock()} />);
 
       const labelButton = screen.getByTestId("dm-label-all-tasks-button");
       expect(labelButton).toHaveTextContent("Label All Tasks");

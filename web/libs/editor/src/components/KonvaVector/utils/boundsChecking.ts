@@ -211,8 +211,8 @@ export function constrainAnchorPointsToBounds(
 export function calculateTransformerConstraints(
   transformer: any,
   bounds: { x: number; y: number; width: number; height: number },
-  scaleX = 1,
-  scaleY = 1,
+  _scaleX = 1,
+  _scaleY = 1,
   transform: { zoom: number; offsetX: number; offsetY: number } = { zoom: 1, offsetX: 0, offsetY: 0 },
   fitScale = 1,
 ): { x: number; y: number } | null {
@@ -220,7 +220,7 @@ export function calculateTransformerConstraints(
 
   // Get the transformer's current position and size
   const transformerPos = { x: transformer.x(), y: transformer.y() };
-  const transformerSize = { width: transformer.width(), height: transformer.height() };
+  const _transformerSize = { width: transformer.width(), height: transformer.height() };
 
   // Get the transformer's bounding box
   const transformerBox = transformer.getClientRect();

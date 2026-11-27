@@ -122,6 +122,20 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
 
 
 @pytest.mark.django_db
+def test_oss_user_can_set_ground_truth(business_client, configured_project_min_annotations_1):
+    """PLT-2396 keeps OSS behavior: tasks_change is granted to every signed-in user, so ground truth is stored."""
+    task = Task.objects.first()
+    result = [{'from_name': 'text_class', 'to_name': 'text', 'value': {'labels': ['class_A'], 'start': 0, 'end': 1}}]
+    r = business_client.post(
+        f'/api/tasks/{task.id}/annotations/',
+        data=json.dumps({'result': result, 'ground_truth': True}),
+        content_type='application/json',
+    )
+    assert r.status_code == 201
+    assert Annotation.objects.get(id=r.json()['id']).ground_truth is True
+
+
+@pytest.mark.django_db
 def test_delete_annotation(business_client, configured_project):
     task = Task.objects.first()
     annotation = Annotation.objects.create(task=task, project=configured_project, result=[])
@@ -166,10 +180,11 @@ def annotations():
 
 
 @pytest.fixture
-def project_with_max_annotations_2(configured_project):
+def project_with_max_annotations_2(configured_project, django_capture_on_commit_callbacks):
     configured_project.maximum_annotations = 2
     # configured_project.agreement_method = Project.SINGLE
-    configured_project.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        configured_project.save()
 
 
 @pytest.mark.parametrize(

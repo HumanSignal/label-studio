@@ -1,11 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 import calendar
+import gzip
 import io
 import json
 import logging
 import os
 import platform
+import queue
 import sys
 import threading
 from datetime import datetime
@@ -13,11 +15,95 @@ from uuid import uuid4
 
 import requests
 from django.conf import settings
+from requests.adapters import HTTPAdapter
 
 from .common import get_app_version, get_client_ip
 from .io import find_file, get_config_dir
 
 logger = logging.getLogger(__name__)
+
+CONTEXTLOG_URL = 'https://tele.labelstud.io'
+# Bodies above this size are sent gzip-compressed; small ones are not worth the CPU.
+GZIP_MIN_BYTES = 1024
+# Payloads above this size lose their 'json' and 'response' fields (marked with 'truncated').
+MAX_PAYLOAD_BYTES = 1024 * 1024
+# Events waiting to be sent; new events are dropped while the queue is full.
+QUEUE_MAXSIZE = 256
+SEND_TIMEOUT = 3.0
+
+
+def encode_payload(payload):
+    """Serialize a payload to (body, headers), trimming oversized fields and gzipping large bodies."""
+    body = json.dumps(payload, default=str).encode('utf-8')
+    if len(body) > MAX_PAYLOAD_BYTES:
+        payload = {**payload, 'json': None, 'response': None, 'truncated': True}
+        body = json.dumps(payload, default=str).encode('utf-8')
+    headers = {'Content-Type': 'application/json'}
+    if len(body) > GZIP_MIN_BYTES:
+        body = gzip.compress(body, compresslevel=6)
+        headers['Content-Encoding'] = 'gzip'
+    return body, headers
+
+
+class _Sender:
+    """Sends events from a bounded queue on one background thread over a keep-alive session.
+
+    Replaces one thread and one new TCP+TLS connection per event. The queue, thread and
+    session belong to the process that created them, so a forked worker gets its own.
+    """
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._pid = None
+        self._queue = None
+        self._session = None
+
+    def _new_session(self):
+        session = requests.Session()
+        adapter = HTTPAdapter(pool_connections=1, pool_maxsize=1, max_retries=0)
+        session.mount('https://', adapter)
+        session.mount('http://', adapter)
+        return session
+
+    def _ensure_started(self):
+        if self._pid == os.getpid():
+            return
+        with self._lock:
+            if self._pid == os.getpid():
+                return
+            self._queue = queue.Queue(maxsize=QUEUE_MAXSIZE)
+            self._session = self._new_session()
+            threading.Thread(target=self._run, name='contextlog-sender', daemon=True).start()
+            self._pid = os.getpid()
+
+    def submit(self, job):
+        """Queue a callable that returns a payload dict (or None to skip)."""
+        self._ensure_started()
+        try:
+            self._queue.put_nowait(job)
+        except queue.Full:
+            logger.debug('contextlog queue is full, event dropped')
+
+    def _run(self):
+        while True:
+            job = self._queue.get()
+            try:
+                payload = job()
+                if payload is not None:
+                    self.post(payload)
+            except Exception as exc:
+                logger.debug(exc, exc_info=True)
+            finally:
+                self._queue.task_done()
+
+    def post(self, payload):
+        if self._session is None or self._pid != os.getpid():
+            self._ensure_started()
+        body, headers = encode_payload(payload)
+        self._session.post(CONTEXTLOG_URL, data=body, headers=headers, timeout=SEND_TIMEOUT)
+
+
+_sender = _Sender()
 
 
 def _load_log_payloads():
@@ -95,7 +181,10 @@ class ContextLog(object):
     def _secure_data(self, payload, request):
         view_name = payload['view_name']
 
-        if view_name in ('user-signup', 'user-login') and payload['method'] == 'POST':
+        # Downstream apps (e.g. enterprise features) contribute extra secured view names via settings,
+        # so this OSS redaction list carries no feature-specific views.
+        secured_views = ('user-signup', 'user-login', *getattr(settings, 'ADDITIONAL_CONTEXTLOG_SECURED_VIEWS', ()))
+        if view_name in secured_views and payload['method'] == 'POST':
             payload['json'] = None
 
         if payload['status_code'] < 200 or payload['status_code'] > 299:
@@ -220,8 +309,7 @@ class ContextLog(object):
             elif settings.CONTEXTLOG_SYNC:
                 self.send_job(request, response, body)
             else:
-                thread = threading.Thread(target=self.send_job, args=(request, response, body))
-                thread.start()
+                _sender.submit(lambda: self._create_payload_or_none(request, response, body))
 
     @staticmethod
     def browser_exists(request):
@@ -320,14 +408,18 @@ class ContextLog(object):
             payload[key] = payload[key] or None
         return payload
 
-    def send_job(self, request, response, body):
+    def _create_payload_or_none(self, request, response, body):
         try:
-            payload = self.create_payload(request, response, body)
-        except:  # noqa: E722
-            pass
-        else:
-            try:
-                url = 'https://tele.labelstud.io'
-                requests.post(url=url, json=payload, timeout=3.0)
-            except:  # noqa: E722
-                pass
+            return self.create_payload(request, response, body)
+        except Exception as exc:
+            logger.debug(exc, exc_info=True)
+            return None
+
+    def send_job(self, request, response, body):
+        payload = self._create_payload_or_none(request, response, body)
+        if payload is None:
+            return
+        try:
+            _sender.post(payload)
+        except Exception as exc:
+            logger.debug(exc, exc_info=True)

@@ -21,6 +21,32 @@ Model for tracking async migration status (`label_studio/core/models.py:12`).
 
 The main tool for creating new async migrations is located in `label_studio/core/migration_helpers.py:55`.
 
+### Deploy-safe job start
+
+Migration jobs are delayed ~15 min via `start_migration_job` (`MIGRATION_JOB_START_DELAY_SECONDS`) so they run **after** a rolling deploy completes — on new workers, not stale ones still alive during the deploy. `make_sql_migration` uses it automatically; **hand-written migrations must call `start_migration_job` instead of `start_job_async_or_sync`** whenever they schedule an async job.
+
+#### Scheduling a function defined inside the migration module
+
+If the job function is defined **inside the migration module itself** (the common case for
+hand-written backfills), pass it as a **dotted-path string**, not a direct reference:
+
+```python
+def forwards(apps, schema_editor):
+    start_migration_job(
+        f'{__name__}.run_backfill',
+        migration_name=migration_name,
+        queue_name=settings.SERVICE_QUEUE_NAME,
+    )
+```
+
+`start_migration_job` routes string targets through `run_migration_job`, which imports them
+on the worker via `import_string`. This is required because Python does not bind submodules
+whose name starts with a digit (e.g. `0005_...`) as attributes on their parent package, so RQ
+cannot deserialize a direct function reference from such a module — it raises
+`AttributeError`/`ValueError` on the worker. `run_migration_job` also reschedules itself
+(after `MIGRATION_JOB_RESCHEDULE_DELAY_SECONDS`, default 30s) if the import fails because the
+worker hasn't been upgraded yet during a rolling deploy.
+
 ## How to Create a New Async Migration
 
 ### Using the make_sql_migration Helper

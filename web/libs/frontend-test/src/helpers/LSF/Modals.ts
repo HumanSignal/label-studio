@@ -1,14 +1,21 @@
+const WARNING = '[data-testid="editor-info-modal"]';
+
 export const Modals = {
   get warning() {
-    return cy.get(".ant-modal.ant-modal-confirm-warning");
+    return cy.get(WARNING);
   },
   hasWarning(text) {
-    this.warning.should("be.visible");
-    this.warning.contains("Warning").should("be.visible");
-    this.warning.contains(text).should("be.visible");
-    this.warning.contains("OK").should("be.visible");
+    // One retried assertion on a fresh query: the dialog re-renders while it opens.
+    cy.get(WARNING)
+      .should("be.visible")
+      .and("contain.text", "Warning")
+      .and("contain.text", text)
+      .and("contain.text", "OK");
+  },
+  closeWarning() {
+    cy.get('[data-testid="editor-info-modal-ok"]').click();
   },
   hasNoWarnings() {
-    this.warning.should("not.exist");
+    cy.get(WARNING).should("not.exist");
   },
 };

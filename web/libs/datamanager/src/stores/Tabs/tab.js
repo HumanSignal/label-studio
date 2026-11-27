@@ -1,19 +1,25 @@
 import deepEqual from "deep-equal";
-import { clone, destroy, flow, getParent, getRoot, getSnapshot, types } from "mobx-state-tree";
+import { clone, destroy, flow, getParent, getRoot, getSnapshot, isAlive, types } from "mobx-state-tree";
 import { guidGenerator } from "../../utils/random";
 import { normalizeFilterValue } from "./filter_utils";
 import { TabFilter } from "./tab_filter";
 import { TabHiddenColumns } from "./tab_hidden_columns";
 import { TabSelectedItems } from "./tab_selected_items";
 import { History } from "../../utils/history";
-import { CustomJSON, StringOrNumberID, ThresholdType } from "../types";
-import { clamp } from "../../utils/helpers";
-import { FF_ANNOTATION_RESULTS_FILTERING, isFF } from "../../utils/feature-flags";
+import { CustomJSON, StringOrNumberID } from "../types";
+import { emitDatamanagerTabEvent } from "../../utils/datamanagerTelemetry";
+const LOCKED_TAB_UPDATE_MESSAGE = "This tab is locked. Unlock it to update.";
+const LOCKED_TAB_READONLY_MESSAGE = "This tab is locked. Changes are not allowed.";
+const LOCKED_TAB_FILTERS_UPDATE_MESSAGE = "This tab is locked. Unlock it to change filters.";
+const LOCKED_TAB_FILTERS_READONLY_MESSAGE = "This tab is locked. Filters cannot be changed.";
+// Encoded virtual-tab query length above which hiddenColumns is sent as a compact list.
+// Matches common proxy request-line buffers (e.g. nginx's 8k default).
+export const VIRTUAL_QUERY_COMPACT_THRESHOLD = 8 * 1024;
 
-const THRESHOLD_MIN = 0;
-const THRESHOLD_MIN_DIFF = 0.001;
-
+import { preferSiblingFilterType } from "./child_filter_types";
 import { validateFilterSnapshot } from "./filter_snapshot_utils";
+import { clearPersonalColumnOrder } from "../../components/Common/Table/columnOrderStorage";
+import { clearUnavailableVirtualFilters } from "./unavailable_filters";
 
 export const Tab = types
   .model("View", {
@@ -36,6 +42,8 @@ export const Tab = types
     opener: types.optional(types.maybeNull(types.late(() => Tab)), null),
     columnsWidth: types.map(types.maybeNull(types.number)),
     columnsDisplayType: types.map(types.maybeNull(types.string)),
+    /** Drag order map `{ [columnId]: index }` — shared on the tab when FF_DM_SHARED_COLUMN_ORDER is on (FIT-2882). */
+    columnOrder: types.map(types.number),
     gridWidth: 4,
     gridFitImagesToWidth: false,
 
@@ -44,10 +52,11 @@ export const Tab = types
     saved: false,
     virtual: false,
     locked: false,
+    is_locked: types.optional(types.maybeNull(types.boolean), false),
+    locked_by: types.optional(types.maybeNull(CustomJSON), null),
+    locked_at: types.optional(types.maybeNull(types.string), null),
     editable: true,
     deletable: true,
-    semantic_search: types.optional(types.array(CustomJSON), []),
-    threshold: types.optional(types.maybeNull(ThresholdType), null),
     agreement_selected: types.optional(CustomJSON, {}),
   })
   .volatile(() => {
@@ -77,8 +86,10 @@ export const Tab = types
     },
 
     get targetColumns() {
+      // `hidden` columns are filter-only (or otherwise non-toggleable) and must not
+      // appear in the Columns / Order By pickers (FIT-2435).
       return self.columns.filter((c) => {
-        return c.target === self.target && !c.isAnnotationResultsFilterColumn;
+        return c.target === self.target && !c.hidden;
       });
     },
 
@@ -97,7 +108,9 @@ export const Tab = types
     },
 
     get availableFilters() {
-      return self.parent.availableFilters;
+      return self.parent.availableFilters.filter(
+        (filter) => isAlive(filter) && filter.field.available_for_new_filters && !filter.field.child_only,
+      );
     },
 
     get dataStore() {
@@ -114,16 +127,18 @@ export const Tab = types
 
     get currentFilters() {
       return self.filters.filter((f) => {
-        const targetMatches = f.target === self.target;
-        const annotationResultsOK = isFF(FF_ANNOTATION_RESULTS_FILTERING) || !f.field.isAnnotationResultsFilterColumn;
-
-        return targetMatches && annotationResultsOK;
+        return f.target === self.target;
       });
     },
 
     get currentOrder() {
-      return self.ordering.length
-        ? self.ordering.reduce((res, field) => {
+      const columns = self.columns ?? [];
+      const ordering = columns.length
+        ? self.ordering.filter((field) => columns.some((column) => column.id === field.replace(/^-/, "")))
+        : self.ordering;
+
+      return ordering.length
+        ? ordering.reduce((res, field) => {
             const fieldName = field.replace(/^-/, "");
             const desc = field[0] === "-";
 
@@ -132,7 +147,7 @@ export const Tab = types
               [fieldName]: desc,
               desc,
               field: fieldName,
-              column: self.columns.find((c) => c.id === fieldName),
+              column: columns.find((c) => c.id === fieldName),
             };
           }, {})
         : null;
@@ -142,25 +157,45 @@ export const Tab = types
       return self.validFilters.length;
     },
 
+    get isLockedByManager() {
+      return self.is_locked === true;
+    },
+
+    get lockedByName() {
+      return self.locked_by?.name || self.locked_by?.email || null;
+    },
+
+    get canManageLock() {
+      return self.root.SDK?.tabControls?.lock !== false;
+    },
+
+    get lockedIconTooltip() {
+      if (!self.canManageLock) return "Tab locked";
+      return self.lockedByName ? `Locked by ${self.lockedByName}` : "Locked";
+    },
+
+    get lockedUpdateMessage() {
+      return self.canManageLock ? LOCKED_TAB_UPDATE_MESSAGE : LOCKED_TAB_READONLY_MESSAGE;
+    },
+
+    get lockedFiltersMessage() {
+      return self.canManageLock ? LOCKED_TAB_FILTERS_UPDATE_MESSAGE : LOCKED_TAB_FILTERS_READONLY_MESSAGE;
+    },
+
     get validFilters() {
       return self.filters.filter((f) => !!f.isValidFilter);
     },
 
     get serializedFilters() {
       const serialize = (filterModel) => {
+        const snapshot = getSnapshot(filterModel);
         const item = {
-          ...getSnapshot(filterModel),
+          ...snapshot,
           type: filterModel.filter.currentType,
+          child_filters: filterModel.child_filters
+            .filter((childFilter) => childFilter.isValidFilter)
+            .map((childFilter) => serialize(childFilter)),
         };
-
-        // cleanup or recurse on child_filter
-        if (item.child_filter) {
-          if (!filterModel.child_filter?.isValidFilter) {
-            item.child_filter = null;
-          } else {
-            item.child_filter = serialize(filterModel.child_filter);
-          }
-        }
 
         item.value = normalizeFilterValue(item.type, item.operator, item.value);
         return item;
@@ -198,10 +233,8 @@ export const Tab = types
         const item = {
           ...getSnapshot(filterModel),
           type: filterModel.filter.currentType,
+          child_filters: filterModel.child_filters.map((childFilter) => serialize(childFilter)),
         };
-        if (item.child_filter) {
-          item.child_filter = filterModel.child_filter ? serialize(filterModel.child_filter) : null;
-        }
         return item;
       };
       return {
@@ -219,13 +252,32 @@ export const Tab = types
       return getSnapshot(self.hiddenColumns);
     },
 
+    get columnOrderSnapshot() {
+      return self.columnOrder.toPOJO();
+    },
+
+    // Columns hidden in both modes, the only ones the tasks API uses.
+    get hiddenColumnsInAllModes() {
+      const { explore, labeling } = self.hiddenColumnsSnapshot;
+      const hiddenInLabeling = new Set(labeling);
+
+      return [...new Set(explore)].filter((id) => hiddenInLabeling.has(id));
+    },
+
     get query() {
-      return JSON.stringify({
-        filters: self.filterSnapshot,
-        ordering: self.ordering.toJSON(),
-        hiddenColumns: self.hiddenColumnsSnapshot,
-        agreement_selected: self.agreement_selected,
-      });
+      const build = (hiddenColumns) =>
+        JSON.stringify({
+          filters: self.filterSnapshot,
+          ordering: self.ordering.toJSON(),
+          hiddenColumns,
+          agreement_selected: self.agreement_selected,
+        });
+      const query = build(self.hiddenColumnsSnapshot);
+
+      // Large configs push the virtual-tab GET URL past load balancer limits (FIT-3167). Only then
+      // send the compact flat list, so smaller queries stay readable by backends without list support.
+      if (encodeURIComponent(query).length <= VIRTUAL_QUERY_COMPACT_THRESHOLD) return query;
+      return build(self.hiddenColumnsInAllModes);
     },
 
     serialize() {
@@ -234,6 +286,12 @@ export const Tab = types
           title: self.title,
           filters: self.filterSnapshot,
           ordering: self.ordering.toJSON(),
+          hiddenColumns: self.hiddenColumnsSnapshot,
+          columnsWidth: self.columnsWidth.toPOJO(),
+          columnsDisplayType: self.columnsDisplayType.toPOJO(),
+          columnOrder: self.columnOrderSnapshot,
+          gridWidth: self.gridWidth,
+          gridFitImagesToWidth: self.gridFitImagesToWidth,
           agreement_selected: self.agreement_selected,
         };
       }
@@ -250,10 +308,9 @@ export const Tab = types
         hiddenColumns: getSnapshot(self.hiddenColumns),
         columnsWidth: self.columnsWidth.toPOJO(),
         columnsDisplayType: self.columnsDisplayType.toPOJO(),
+        columnOrder: self.columnOrderSnapshot,
         gridWidth: self.gridWidth,
         gridFitImagesToWidth: self.gridFitImagesToWidth,
-        semantic_search: self.semantic_search?.toJSON() ?? [],
-        threshold: self.threshold?.toJSON(),
         agreement_selected: self.agreement_selected,
       };
 
@@ -284,10 +341,30 @@ export const Tab = types
       self.locked = false;
     },
 
+    notifyLocked() {
+      self.root.SDK.invoke("toast", {
+        message: self.lockedUpdateMessage,
+        type: "error",
+      });
+      return false;
+    },
+
+    setLockState(isLocked, lockedBy = null, lockedAt = null) {
+      self.is_locked = isLocked;
+      self.locked_by = lockedBy;
+      self.locked_at = lockedAt;
+    },
+
+    toggleLock: flow(function* () {
+      yield self.parent.updateViewLock(self, !self.isLockedByManager);
+    }),
+
     setType(type) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.type = type;
       self.root.SDK.invoke("tabTypeChanged", { tab: self.id, type });
       self.save({ reload: false });
+      emitDatamanagerTabEvent(self, "dm_view_type_changed", { view_type: type });
     },
 
     setTarget(target) {
@@ -309,11 +386,17 @@ export const Tab = types
     },
 
     setConjunction(value) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.conjunction = value;
       self.save();
+      emitDatamanagerTabEvent(self, "dm_filter_conjunction_changed", {
+        conjunction: value,
+        filter_count: self.filters.length,
+      });
     },
 
     setOrdering(value) {
+      if (self.isLockedByManager) return self.notifyLocked();
       if (value === null) {
         self.ordering = [];
       } else {
@@ -329,6 +412,7 @@ export const Tab = types
 
       self.clearSelection();
       self.save({ interaction: "ordering" });
+      emitDatamanagerTabEvent(self, "dm_sort_changed", { column: value, ordering: self.ordering[0] ?? null });
     },
 
     setLabelingTableWidth(width) {
@@ -337,43 +421,19 @@ export const Tab = types
     },
 
     setGridWidth(width) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.gridWidth = width;
       self.save();
     },
 
     setFitImagesToWidth(responsive) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.gridFitImagesToWidth = responsive;
       self.save();
     },
 
     setSelected(ids) {
       self.selected = ids;
-    },
-
-    setSemanticSearch(semanticSearchList, min, max) {
-      self.semantic_search = semanticSearchList ?? [];
-      /* if no semantic search we have to clean up threshold */
-      if (self.semantic_search.length === 0) {
-        self.threshold = null;
-        return self.save();
-      }
-      /* if we have a min and max we need to make sure we save that too.
-      this prevents firing 2 view save requests to accomplish the same thing */
-      return !isNaN(min) && !isNaN(max) ? self.setSemanticSearchThreshold(min, max) : self.save();
-    },
-
-    setSemanticSearchThreshold(_min, max) {
-      const min = clamp(_min ?? THRESHOLD_MIN, THRESHOLD_MIN, max - THRESHOLD_MIN_DIFF);
-
-      if (self.semantic_search?.length && !isNaN(min) && !isNaN(max)) {
-        self.threshold = { min, max };
-        return self.save();
-      }
-    },
-
-    clearSemanticSearchThreshold(save = true) {
-      self.threshold = null;
-      return save && self.save();
     },
 
     selectAll() {
@@ -406,6 +466,7 @@ export const Tab = types
     },
 
     setColumnDisplayType(columnID, type) {
+      if (self.isLockedByManager) return self.notifyLocked();
       if (type !== null) {
         const filters = self.filters.filter(({ filter }) => {
           return columnID === filter.field.id;
@@ -427,8 +488,9 @@ export const Tab = types
      * repetitive re-selection when the user adds multiple filters for the same column.
      */
     createFilter() {
+      if (self.isLockedByManager) return self.notifyLocked();
       const lastFilter = self.filters.length > 0 ? self.filters[self.filters.length - 1] : null;
-      const filterType = lastFilter?.filter ?? self.availableFilters[0];
+      const filterType = lastFilter?.field.available_for_new_filters ? lastFilter.filter : self.availableFilters[0];
       const filter = TabFilter.create({
         filter: filterType,
         view: self.id,
@@ -445,6 +507,10 @@ export const Tab = types
       }
 
       if (filter.isValidFilter) self.save();
+      emitDatamanagerTabEvent(self, "dm_filter_added", {
+        column: filter.filter?.id ?? null,
+        filter_count: self.filters.length,
+      });
     },
 
     /**
@@ -456,19 +522,126 @@ export const Tab = types
         view: self.id,
       });
 
-      // Don't add to main filters array - child is owned by parent
-      parentFilter.child_filter = filter;
+      // Child rows are ordered siblings owned by their root filter.
+      parentFilter.child_filters.push(filter);
 
       return filter;
     },
 
+    /**
+     * Add one child row using an allowed column. Repeated aliases are valid because
+     * each row represents an independent condition.
+     */
+    addChildFilter(rootFilter, filterTypeOrAlias) {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const allowedAliases = rootFilter?.field?.allowed_child_filters ?? [];
+      if (allowedAliases.length === 0) return null;
+
+      const filterType =
+        typeof filterTypeOrAlias === "object"
+          ? filterTypeOrAlias
+          : (self.parent.availableFilters.find((candidate) => candidate.id === filterTypeOrAlias) ??
+            preferSiblingFilterType(
+              self.parent.availableFilters.filter((candidate) =>
+                filterTypeOrAlias
+                  ? candidate.field.alias === filterTypeOrAlias
+                  : allowedAliases.includes(candidate.field.alias),
+              ),
+              rootFilter.field,
+            ));
+
+      if (
+        !filterType ||
+        !allowedAliases.includes(filterType.field.alias) ||
+        filterType.field.disabled ||
+        !filterType.field.available_for_new_filters ||
+        filterType.field.filter_available === false
+      ) {
+        return null;
+      }
+
+      return self.createChildFilterForType(filterType, rootFilter);
+    },
+
+    /** Remove exactly one child row and preserve its root and siblings. */
+    removeChildFilter(rootFilterOrChild, maybeChildFilter) {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const childFilter = maybeChildFilter ?? rootFilterOrChild;
+      const parentFilter = maybeChildFilter
+        ? rootFilterOrChild
+        : self.filters.find((candidate) => candidate.child_filters.some((child) => child === childFilter));
+      const index = parentFilter?.child_filters.indexOf(childFilter) ?? -1;
+
+      if (index === -1) return false;
+
+      destroy(childFilter);
+      self.save();
+      return true;
+    },
+
     toggleColumn(column) {
-      if (self.hiddenColumns.hasColumn(column)) {
+      if (self.isLockedByManager) return self.notifyLocked();
+      const wasHidden = self.hiddenColumns.hasColumn(column);
+      if (wasHidden) {
         self.hiddenColumns.remove(column);
       } else {
         self.hiddenColumns.add(column);
       }
       self.save();
+      emitDatamanagerTabEvent(self, "dm_column_toggled", { column: column?.id ?? null, visible: wasHidden });
+    },
+
+    /**
+     * Replace the tab's shared column drag-order map and persist (FIT-2882).
+     * Same lock guard as visibility toggles — locked tabs cannot reorder.
+     * @param {Record<string, number>} orderMap
+     */
+    setColumnOrder(orderMap) {
+      if (self.isLockedByManager) return self.notifyLocked();
+      self.columnOrder.clear();
+      for (const [columnId, index] of Object.entries(orderMap ?? {})) {
+        if (typeof index === "number" && !Number.isNaN(index)) {
+          self.columnOrder.set(columnId, index);
+        }
+      }
+      self.save();
+      emitDatamanagerTabEvent(self, "dm_columns_reordered", { column_count: self.columnOrder.size });
+    },
+
+    /**
+     * Restore this tab's column visibility + order from project soft defaults (FIT-2846).
+     * Explicit user action — does not affect other tabs. Locked tabs are a no-op.
+     * Also removes this view's column ids from personal localStorage order so Reset is
+     * visible when shared column-order is off (Table otherwise prefers browser prefs
+     * over tab columnOrder). Unrelated personal prefs for other column sets are kept.
+     */
+    resetColumnsToProjectDefaults() {
+      if (self.isLockedByManager) return self.notifyLocked();
+
+      const defaults = self.parent.projectDefaultsSnapshot(false);
+      const hidden =
+        defaults.hiddenColumns ??
+        (self.parent.defaultHidden ? getSnapshot(self.parent.defaultHidden) : { explore: [], labeling: [] });
+
+      self.hiddenColumns = TabHiddenColumns.create(hidden);
+
+      self.columnOrder.clear();
+      if (defaults.columnOrder) {
+        for (const [columnId, index] of Object.entries(defaults.columnOrder)) {
+          if (typeof index === "number" && !Number.isNaN(index)) {
+            self.columnOrder.set(columnId, index);
+          }
+        }
+      }
+
+      const columnIds = self.columns.map((c) => c.id).filter(Boolean);
+      clearPersonalColumnOrder(columnIds);
+
+      self.save();
+      emitDatamanagerTabEvent(self, "dm_columns_reset");
+      return true;
     },
 
     setAgreementFilters({
@@ -476,6 +649,7 @@ export const Tab = types
       annotators = { all: true, ids: [] },
       models = { all: true, ids: [] },
     }) {
+      if (self.isLockedByManager) return self.notifyLocked();
       self.agreement_selected = {
         ground_truth,
         annotators: {
@@ -490,6 +664,13 @@ export const Tab = types
     },
 
     reload: flow(function* ({ interaction } = {}) {
+      // Annotator virtual tabs: strip denied-column filters before the tasks
+      // request so Refresh / tab apply match the initial-load graceful path
+      // and do not 403 on GET /api/tasks (FIT-2850).
+      if (self.virtual && clearUnavailableVirtualFilters(self)) {
+        self.persistVirtual();
+      }
+
       if (self.saved) {
         yield self.dataStore.reload({ id: self.id, interaction });
       }
@@ -501,17 +682,19 @@ export const Tab = types
     }),
 
     deleteFilter(filter) {
-      // Recursively delete child filter first
-      if (filter.child_filter) {
-        self.deleteFilter(filter.child_filter);
-      }
+      if (self.isLockedByManager) return self.notifyLocked();
 
       const index = self.filters.indexOf(filter);
       if (index > -1) {
+        const column = filter.filter?.id ?? null;
         self.filters.splice(index, 1);
         destroy(filter);
         self.save();
+        emitDatamanagerTabEvent(self, "dm_filter_removed", { column, filter_count: self.filters.length });
+        return;
       }
+
+      self.removeChildFilter(filter);
     },
 
     /**
@@ -522,10 +705,34 @@ export const Tab = types
      * @returns {boolean} false if no valid filters could be imported
      */
     importFilters(snapshot) {
-      const validItems = validateFilterSnapshot(snapshot, self.availableFilters);
+      if (self.isLockedByManager) return self.notifyLocked();
+      // Check against every column type, not the picker list: a saved read-only line must survive paste and undo.
+      // Child-only columns stay valid as children but not as top-level lines.
+      const validItems = validateFilterSnapshot(
+        snapshot,
+        self.parent.availableFilters.filter((filterType) => !filterType.field.child_only),
+      );
       if (!validItems) return false;
 
       const { conjunction } = snapshot;
+      const availableFilterIds = new Set(self.parent.availableFilters.map((filterType) => filterType.id));
+      const toModelSnapshot = (item) => {
+        if (!item?.filter || !availableFilterIds.has(item.filter)) return null;
+
+        const hasChildCollection = Object.hasOwn(item, "child_filters") || Object.hasOwn(item, "child_filter");
+        const childItems = Array.isArray(item.child_filters)
+          ? item.child_filters
+          : item.child_filter
+            ? [item.child_filter]
+            : [];
+
+        return {
+          filter: item.filter,
+          operator: item.operator ?? null,
+          value: item.value ?? null,
+          ...(hasChildCollection && { child_filters: childItems.map(toModelSnapshot).filter(Boolean) }),
+        };
+      };
 
       // Destroy existing filters before importing
       while (self.filters.length > 0) {
@@ -540,13 +747,11 @@ export const Tab = types
 
       for (const item of validItems) {
         try {
-          const filter = TabFilter.create({
-            filter: item.filter,
-            operator: item.operator ?? null,
-            value: item.value ?? null,
-          });
+          const modelSnapshot = toModelSnapshot(item);
+          if (!modelSnapshot) continue;
+
+          const filter = TabFilter.create(modelSnapshot);
           self.filters.push(filter);
-          self.applyChildFilter(filter);
         } catch (e) {
           console.warn("importFilters: failed to create filter for", item.filter, e);
         }
@@ -564,24 +769,33 @@ export const Tab = types
       self.snapshot = self.serialize();
     },
 
+    /**
+     * Write the virtual tab to localStorage and the URL tab key.
+     * Same persistence a normal virtual-tab edit uses, without reloading tasks.
+     */
+    persistVirtual() {
+      if (self.virtual !== true) return;
+      const snapshot = self.serialize();
+
+      self.snapshot = snapshot;
+      self.key = self.parent.snapshotToUrl(snapshot);
+
+      const projectId = self.root.SDK?.projectId;
+
+      if (projectId) {
+        localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
+      }
+
+      History.navigate({ tab: self.key }, true);
+    },
+
     save: flow(function* ({ reload, interaction } = {}) {
       const serialized = self.serialize();
 
       if (!self.saved || !deepEqual(self.snapshot, serialized)) {
         self.snapshot = serialized;
         if (self.virtual === true) {
-          const snapshot = self.serialize();
-
-          self.key = self.parent.snapshotToUrl(snapshot);
-
-          const projectId = self.root.SDK.projectId;
-
-          // Save the virtual tab of the project to local storage to persist between page navigations
-          if (projectId) {
-            localStorage.setItem(`virtual-tab-${projectId}`, JSON.stringify(snapshot));
-          }
-
-          History.navigate({ tab: self.key }, true);
+          self.persistVirtual();
           self.reload({ interaction });
         } else {
           yield self.parent.saveView(self, { reload, interaction });
@@ -613,35 +827,36 @@ export const Tab = types
       self.saved = true;
     },
 
-    /**
-     * Create child filters for a given root filter according to its column's `child_filter` metadata.
-     */
+    /** Create the compatibility child declared by legacy singular column metadata. */
     applyChildFilter(rootFilter) {
       if (!rootFilter || !rootFilter.filter || !rootFilter.filter.field) return;
 
       const column = rootFilter.field;
-      const childFilter = column?.child_filter;
+      const childFilterAlias = column?.child_filter;
 
-      if (!childFilter) return;
+      if (!childFilterAlias || rootFilter.child_filters.length > 0) return;
 
-      // NOTE: using targetColumns instead of columns means that annotation results columns cannot be used in child_filters, but seems fine for now
-      const firstChildColumn = self.targetColumns.find((c) => c.alias === childFilter);
+      const firstChildColumn = self.targetColumns.find((candidate) => candidate.alias === childFilterAlias);
 
-      if (firstChildColumn && !rootFilter.child_filter) {
+      if (firstChildColumn) {
         const filterType = self.availableFilters.find((ft) => ft.field.id === firstChildColumn.id);
 
         if (filterType) {
-          const childFilter = self.createChildFilterForType(filterType, rootFilter);
+          self.createChildFilterForType(filterType, rootFilter);
         }
       }
     },
 
-    /** Remove any child filters previously created */
-    clearChildFilter(rootFilter) {
-      if (rootFilter.child_filter) {
-        self.deleteFilter(rootFilter.child_filter);
-        rootFilter.child_filter = null;
+    /** Remove all children without saving; the root transition performs the write. */
+    clearChildFilters(rootFilter) {
+      while (rootFilter?.child_filters.length > 0) {
+        destroy(rootFilter.child_filters[0]);
       }
+    },
+
+    // Compatibility action for integrations that still call the singular method name.
+    clearChildFilter(rootFilter) {
+      self.clearChildFilters(rootFilter);
     },
   }))
   .preProcessSnapshot((snapshot) => {

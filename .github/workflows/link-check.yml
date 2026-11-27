@@ -17,7 +17,7 @@ jobs:
       DEPLOY_PREVIEW_HS: https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install linkchecker
         run: pip install linkchecker

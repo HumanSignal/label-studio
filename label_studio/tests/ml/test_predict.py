@@ -6,7 +6,7 @@ from label_studio.tests.utils import make_project, make_task
 
 
 @pytest.mark.django_db
-def test_get_single_prediction_on_task(business_client, ml_backend_for_test_predict):
+def test_get_single_prediction_on_task(business_client, ml_backend_for_test_predict, mock_gethostbyname):
     project = make_project(
         config=dict(
             is_published=True,
@@ -48,7 +48,7 @@ def test_get_single_prediction_on_task(business_client, ml_backend_for_test_pred
 
 
 @pytest.mark.django_db
-def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_predict):
+def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_predict, mock_gethostbyname):
     project = make_project(
         config=dict(
             is_published=True,

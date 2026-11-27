@@ -3,13 +3,14 @@ from datetime import datetime
 
 from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from jwt_auth.auth import TokenAuthenticationPhaseout
 from jwt_auth.models import LSAPIToken, TruncatedLSAPIToken
 from jwt_auth.serializers import (
     JWTSettingsSerializer,
     LSAPITokenCreateSerializer,
     LSAPITokenListSerializer,
+    TokenDetailErrorSerializer,
     TokenRefreshResponseSerializer,
     TokenRotateResponseSerializer,
 )
@@ -23,6 +24,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenBackendError, TokenError
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.views import TokenRefreshView, TokenViewBase
+from users.step_up import require_step_up
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +78,7 @@ class JWTSettingsAPI(CreateAPIView):
         return Response(self.get_serializer(jwt_settings).data)
 
     def post(self, request, *args, **kwargs):
+        require_step_up(request)
         jwt_settings = self.get_object()
         serializer = self.get_serializer(data=request.data, instance=jwt_settings)
         serializer.is_valid(raise_exception=True)
@@ -179,6 +182,10 @@ class LSAPITokenView(generics.ListCreateAPIView):
             return LSAPITokenCreateSerializer
         return LSAPITokenListSerializer
 
+    def create(self, request, *args, **kwargs):
+        require_step_up(request)
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         # Check for existing valid tokens
         existing_tokens = self.get_queryset()
@@ -190,6 +197,10 @@ class LSAPITokenView(generics.ListCreateAPIView):
 
 
 class LSTokenBlacklistView(TokenViewBase):
+    # TokenViewBase disables auth; set it explicitly so only the token owner can revoke it
+    authentication_classes = [JWTAuthentication, TokenAuthenticationPhaseout, SessionAuthentication]
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES
+    permission_required = all_permissions.users_token_any
     _serializer_class = 'jwt_auth.serializers.LSAPITokenBlacklistSerializer'
 
     @extend_schema(
@@ -197,8 +208,11 @@ class LSTokenBlacklistView(TokenViewBase):
         summary='Blacklist a JWT refresh token',
         description='Adds a JWT refresh token to the blacklist, preventing it from being used to obtain new access tokens.',
         responses={
-            status.HTTP_204_NO_CONTENT: 'Token was successfully blacklisted',
-            status.HTTP_404_NOT_FOUND: 'Token is already blacklisted',
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(description='Token was successfully blacklisted'),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                response=TokenDetailErrorSerializer,
+                description='Token is already blacklisted',
+            ),
         },
         extensions={
             'x-fern-sdk-group-name': 'tokens',
@@ -234,7 +248,10 @@ class LSAPITokenRotateView(TokenViewBase):
         description='Creates a new JWT refresh token and blacklists the current one.',
         responses={
             status.HTTP_200_OK: TokenRotateResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: 'Invalid token or token already blacklisted',
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                response=TokenDetailErrorSerializer,
+                description='Invalid token or token already blacklisted',
+            ),
         },
         extensions={
             'x-fern-sdk-group-name': 'tokens',

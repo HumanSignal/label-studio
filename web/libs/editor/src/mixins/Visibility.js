@@ -1,4 +1,23 @@
-import { getParent, types } from "mobx-state-tree";
+import { getParent, hasParent, types } from "mobx-state-tree";
+import { isDefined } from "../utils/utilities";
+
+/**
+ * Visibility of a node on a given item of a multi-item object (perItem, Multi Items Segmentation).
+ * Tags without VisibilityMixin (Number, DateTime, Rating) inherit visibility from their parent View,
+ * the same way `isVisible` is checked for them in RequiredMixin.
+ * @param {Object} node Tag
+ * @param {number} itemIndex
+ * @returns {boolean}
+ */
+export function isNodeVisibleForItem(node, itemIndex) {
+  if (node.isVisibleForItem) return node.isVisibleForItem(itemIndex);
+  if (node.isVisible === false) return false;
+  if (!hasParent(node, 2)) return true;
+
+  const parent = getParent(node, 2);
+
+  return parent.isVisibleForItem ? parent.isVisibleForItem(itemIndex) : parent.isVisible !== false;
+}
 
 /**
  * Controls visibility of the element depending on other tags.
@@ -23,6 +42,33 @@ const VisibilityMixin = types
         return false;
       }
 
+      return self.isOwnConditionMet();
+    },
+
+    /**
+     * Same as `isVisible`, but choice conditions on perItem tags are checked on the given item
+     * instead of the current one, so hidden items can be told apart from visible ones on submit.
+     * @param {number} itemIndex
+     * @returns {boolean}
+     */
+    isVisibleForItem(itemIndex) {
+      const parent = getParent(self, 2);
+      const isParentVisible = parent?.isVisibleForItem
+        ? parent.isVisibleForItem(itemIndex)
+        : parent?.isVisible !== false;
+
+      return isParentVisible && self.isOwnConditionMet(itemIndex);
+    },
+
+    /**
+     * Checks visibility params of this tag only, ignoring parents.
+     * @param {number} [itemIndex] item to check perItem choices on; current item if not set
+     * @returns {boolean}
+     */
+    isOwnConditionMet(itemIndex) {
+      const isPerItem = (tag) => isDefined(itemIndex) && tag.peritem && !!tag.selectedValuesForItem;
+      const selectedValues = (tag) => (isPerItem(tag) ? tag.selectedValuesForItem(itemIndex) : tag.selectedValues?.());
+
       if (self.visiblewhen) {
         const fns = {
           "region-selected": ({ tagName, labelValue, roleValue }) => {
@@ -42,7 +88,7 @@ const VisibilityMixin = types
           "choice-selected": ({ tagName, choiceValue }) => {
             if (!tagName) {
               for (const choices of self.annotation.names.values()) {
-                if (choices.type === "choices" && choices.selectedValues && choices.selectedValues().length) {
+                if (choices.type === "choices" && choices.selectedValues && selectedValues(choices).length) {
                   return true;
                 }
               }
@@ -50,6 +96,16 @@ const VisibilityMixin = types
             }
 
             const tag = self.annotation.names.get(tagName);
+
+            if (tag && isPerItem(tag)) {
+              if (!isNodeVisibleForItem(tag, itemIndex)) return false;
+
+              // for Taxonomy the value is a path, the selected choice is the last item in it
+              const values = selectedValues(tag).map((v) => (Array.isArray(v) ? v.at(-1) : v));
+
+              if (!choiceValue?.length) return values.length > 0;
+              return choiceValue.split(",").some((v) => values.some((vv) => tag.selectedChoicesMatch(v, vv)));
+            }
 
             if (!tag?.hasChoiceSelection && !choiceValue?.length) return false;
             if (tag.isVisible === false) return false;
@@ -73,7 +129,7 @@ const VisibilityMixin = types
         }
       } else if (self.whenchoicevalue) {
         for (const choices of self.annotation.names.values()) {
-          const choicesList = choices?.selectedValues?.();
+          const choicesList = choices && selectedValues(choices);
 
           if (choicesList?.length) {
             for (const obj of choicesList) {

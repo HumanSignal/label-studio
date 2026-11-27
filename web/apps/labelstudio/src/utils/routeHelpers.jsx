@@ -33,6 +33,7 @@ export const pageSetToRoutes = (pages, config) => {
 
     if (page.title) route.title = page.title;
     if (page.render) route.render = page.render;
+    if (page.extra) route.extra = page.extra;
 
     if (page instanceof React.Component || page instanceof Function) {
       if (name && /Layout/.test(name)) route.layout = page;

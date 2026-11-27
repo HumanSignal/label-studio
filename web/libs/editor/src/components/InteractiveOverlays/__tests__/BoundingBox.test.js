@@ -1,20 +1,27 @@
 /**
  * Unit tests for BoundingBox (components/InteractiveOverlays/BoundingBox.js)
  */
-import { BoundingBox } from "../BoundingBox";
 import { Geometry } from "../Geometry";
+let BoundingBox;
 
-jest.mock("../Geometry", () => ({
+mockModule("../Geometry", () => ({
   Geometry: {
-    getDOMBBox: jest.fn(),
-    clampBBox: jest.fn((bbox) => ({ ...bbox })),
-    modifyBBoxCoords: jest.fn((bbox) => ({ ...bbox })),
+    getDOMBBox: mock(),
+    clampBBox: mock((bbox) => ({ ...bbox })),
+    modifyBBoxCoords: mock((bbox) => ({ ...bbox })),
   },
 }));
 
 describe("BoundingBox", () => {
+  beforeAll(async () => {
+    const boundingBoxAbs = require.resolve("../BoundingBox");
+    const boundingBoxUrl = require("node:url").pathToFileURL(boundingBoxAbs).href;
+    const boundingBoxModule = await import(`${boundingBoxUrl}?bun_reload=${Date.now()}`);
+    BoundingBox = boundingBoxModule.BoundingBox;
+  });
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
   });
 
   describe("class", () => {
@@ -23,8 +30,8 @@ describe("BoundingBox", () => {
         source: { left: 10, top: 20 },
         getX: (s) => s.left,
         getY: (s) => s.top,
-        getWidth: (s) => 100,
-        getHeight: (s) => 50,
+        getWidth: (_s) => 100,
+        getHeight: (_s) => 50,
       };
       const box = new BoundingBox(options);
       expect(box._source).toBe(options.source);
@@ -52,7 +59,7 @@ describe("BoundingBox", () => {
   describe("bbox (static)", () => {
     it("returns array of default bbox for unknown region type", () => {
       const region = { type: "unknown" };
-      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      const warnSpy = spyOn(console, "warn").mockImplementation(() => {});
       const result = BoundingBox.bbox(region);
       expect(result).toEqual([{ x: 0, y: 0, width: 0, height: 0 }]);
       expect(warnSpy).toHaveBeenCalledWith("Unknown region type: unknown");
@@ -156,6 +163,28 @@ describe("BoundingBox", () => {
       Object.defineProperty(iframeEl, "tagName", { value: "IFRAME" });
       const result = BoundingBox.bbox(region);
       expect(result).toEqual([{ x: 205, y: 110, width: 20, height: 8 }]);
+    });
+
+    it("returns video bbox for videorectangleregion (BROS-1393)", () => {
+      const stageEl = document.createElement("div");
+      Geometry.getDOMBBox.mockReturnValue({ x: 100, y: 50, width: 800, height: 600 });
+
+      const region = {
+        type: "videorectangleregion",
+        parent: {
+          currentFrame: 0,
+          workingArea: { x: 10, y: 20, scale: 2, realWidth: 400, realHeight: 300 },
+          stageRef: { content: stageEl },
+        },
+        getShape: () => ({ x: 10, y: 20, width: 30, height: 40 }),
+      };
+
+      const result = BoundingBox.bbox(region);
+      expect(result).toHaveLength(1);
+      expect(result[0].x).toBe(190);
+      expect(result[0].y).toBe(190);
+      expect(result[0].width).toBe(240);
+      expect(result[0].height).toBe(240);
     });
 
     it("returns default bbox for brushregion without parent stageRef", () => {

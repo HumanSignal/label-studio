@@ -85,8 +85,12 @@ export const Labeling = injector(
 
     useEffect(() => {
       return () => {
-        SDK.destroyLSF();
         delete document.body.dataset.lsfLabeling;
+        // Always run destroyLSF so beforeLsfDestroy fires even when lsf was never init'd.
+        // Deduped with closeLabeling (which awaits this before unsetTask/setMode).
+        SDK.destroyLSF().catch((err) => {
+          console.warn("[Labeling] destroyLSF on unmount failed:", err);
+        });
       };
     }, []);
 

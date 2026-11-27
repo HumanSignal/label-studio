@@ -24,7 +24,7 @@ env:
 jobs:
   commit-feature-flags:
     name: "Commit Feature Flags"
-
+    if: github.repository_owner == 'HumanSignal'
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v3.0.0
@@ -47,7 +47,7 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1

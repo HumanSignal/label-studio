@@ -1,0 +1,4 @@
+(^|/)uv\.lock$
+(^|/)bun\.lock$
+(^|/)yarn\.lock$
+^docs/

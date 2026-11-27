@@ -57,7 +57,7 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 - **Kubernetes** — version 1.17 or higher
 - **Helm** — version 3.6.3 or higher
 - **Redis** — version 6.0.5 or higher
-- **PostgreSQL** — version 13.0 or higher
+- **PostgreSQL** — version 14.0 or higher
 - **Persistent storage** — PVC with ReadWriteMany access mode or S3-compatible object storage
 
 Redis and PostgreSQL are mandatory components of Label Studio Enterprise and are required for it to be fully functional. This chart does not include or install Redis or PostgreSQL; you must have them preconfigured (for example, according to your company’s standards) and provide connection details in your Helm values.

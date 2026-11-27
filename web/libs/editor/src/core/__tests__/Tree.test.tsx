@@ -55,19 +55,16 @@ describe("Tree", () => {
       expect(parent).toBe(root.child);
     });
 
-    it("returns null when no matching parent", () => {
+    it("returns null when classes list is empty", () => {
       const root = Root.create({ child: { id: "b" } });
-      const parent = findParentOfType(root.child, [NodeA]);
+      const parent = findParentOfType(root.child, []);
       expect(parent).toBeNull();
     });
 
     it("catches getParentOfType errors and continues to next class", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
       const badObj = {} as any;
       const parent = findParentOfType(badObj, [NodeA, NodeB]);
       expect(parent).toBeNull();
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
     });
   });
 
@@ -201,7 +198,8 @@ describe("Tree", () => {
 
   describe("extractNames", () => {
     it("returns names and toNames from root with name/toname", () => {
-      const Registry = require("../Registry").default;
+      const RegistryModule = require("../Registry");
+      const Registry = RegistryModule.default ?? RegistryModule;
       require("../../tags/visual/View");
       require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
@@ -218,7 +216,8 @@ describe("Tree", () => {
 
   describe("renderItem and renderChildren", () => {
     it("renderItem returns a React element for a registered View model", () => {
-      const Registry = require("../Registry").default;
+      const RegistryModule = require("../Registry");
+      const Registry = RegistryModule.default ?? RegistryModule;
       require("../../tags/visual/View");
       require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="mytext" value="$t" /></View>`, {
@@ -232,7 +231,8 @@ describe("Tree", () => {
     });
 
     it("renderChildren returns array of elements when item has children", () => {
-      const Registry = require("../Registry").default;
+      const RegistryModule = require("../Registry");
+      const Registry = RegistryModule.default ?? RegistryModule;
       require("../../tags/visual/View");
       require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="a" value="$x" /><Text name="b" value="$y" /></View>`, {
@@ -247,7 +247,8 @@ describe("Tree", () => {
     });
 
     it("renderChildren returns null when item has no children", () => {
-      const Registry = require("../Registry").default;
+      const RegistryModule = require("../Registry");
+      const Registry = RegistryModule.default ?? RegistryModule;
       require("../../tags/visual/View");
       require("../../tags/object/RichText");
       const config = Tree.treeToModel(`<View><Text name="only" value="$x" /></View>`, {

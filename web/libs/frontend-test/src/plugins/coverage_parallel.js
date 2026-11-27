@@ -20,7 +20,7 @@ async function beginSyncedPart(key) {
   while (!release) {
     try {
       release = await lockfile.lock(path.resolve(LOCK_PATH, key), { realpath: false });
-    } catch (err) {
+    } catch (_err) {
       await waitTime(LOCK_WAITING_TIMEOUT);
     }
   }

@@ -7,6 +7,7 @@ import { Interface } from "../../Common/Interface";
 import { ExportButton, ImportButton } from "../../Common/SDKButtons";
 import { Tooltip } from "@humansignal/ui";
 import { ActionsButton } from "./ActionsButton";
+import { GridSelectAll } from "./GridSelectAll";
 import { DensityToggle } from "./DensityToggle";
 import { GridWidthButton } from "./GridWidthButton";
 import { LabelButton } from "./LabelButton";
@@ -66,14 +67,21 @@ const ImportButtonWithChecks = ({ size }) => {
 
 export const instruments = {
   "view-toggle": ({ size }) => {
-    return <ViewToggle size={size} style={style} />;
+    return <ViewToggle size={size} />;
   },
   "density-toggle": ({ size }) => {
     return <DensityToggle size={size} />;
   },
   columns: ({ size }) => {
     return (
-      <FieldsButton multiSelect={true} title={"Columns"} size={size} style={style} openUpwardForShortViewport={false} />
+      <FieldsButton
+        multiSelect={true}
+        title={"Columns"}
+        size={size}
+        style={style}
+        openUpwardForShortViewport={false}
+        showProjectDefaultsFooter
+      />
     );
   },
   filters: ({ size }) => {
@@ -93,6 +101,9 @@ export const instruments = {
   },
   "label-button": ({ size }) => {
     return <LabelButton size={size} />;
+  },
+  "grid-select-all": () => {
+    return <GridSelectAll />;
   },
   actions: ({ size }) => {
     return <ActionsButton size={size} style={style} />;

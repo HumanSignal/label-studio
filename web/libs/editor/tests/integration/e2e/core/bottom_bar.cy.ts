@@ -1,14 +1,6 @@
 import { Choices, ToolBar, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import type { CustomButtonType } from "../../../../src/stores/CustomButton";
-import { FF_BULK_ANNOTATION, FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 import { choicesConfig, simpleData } from "../../data/control_tags/choice";
-
-beforeEach(() => {
-  LabelStudio.addFeatureFlagsOnPageLoad({
-    [FF_BULK_ANNOTATION]: true,
-    [FF_DEV_3873]: true,
-  });
-});
 
 describe("Bottom bar", () => {
   it("should display custom buttons", () => {

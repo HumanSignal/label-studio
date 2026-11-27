@@ -11,7 +11,7 @@ stages:
       url: "{django_live_url}/user/signup"
       data:
         email: test_suites_user@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302
@@ -21,15 +21,30 @@ stages:
       url: "{django_live_url}/user/login"
       data:
         email: test_suites_user@heartex.com
-        password: 12345678
+        password: StrongPassw0rd
       method: POST
     response:
       status_code: 302
+  # GET /logout only renders the confirmation form; the session ends on POST with its CSRF token
+  - id: logout_page
+    name: logout page
+    request:
+      url: "{django_live_url}/logout"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        $ext:
+          function: tavern.helpers:validate_regex
+          extra_kwargs:
+            expression: 'name="csrfmiddlewaretoken" value="(?P<logout_csrf_token>[^"]+)"'
   - id: logout
     name: logout
     request:
       url: "{django_live_url}/logout"
-      method: GET
+      method: POST
+      data:
+        csrfmiddlewaretoken: "{regex.logout_csrf_token}"
     response:
       status_code: 302
   - id: create_project

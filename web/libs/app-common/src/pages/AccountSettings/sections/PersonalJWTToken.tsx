@@ -1,5 +1,3 @@
-import { Callout, CalloutContent, CalloutHeader, CalloutIcon, CalloutTitle } from "@humansignal/ui/lib/callout/callout";
-import { IconWarning } from "@humansignal/icons";
 import { atomWithMutation, atomWithQuery, queryClientAtom } from "jotai-tanstack-query";
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
@@ -7,13 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { getApiInstance, useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.css";
-import { Button } from "@humansignal/ui";
+import { useStepUp, type WithStepUp } from "../../../components/step-up/step-up-provider";
+import { ConfirmDialog, type ConfirmDialogContent, Button, Message, ModalWindow } from "@humansignal/ui";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { modal, confirm } from "@humansignal/ui/lib/modal";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
@@ -44,9 +42,9 @@ const refreshTokenAtom = atomWithMutation((get) => {
   const queryClient = get(queryClientAtom);
   return {
     mutationKey: ["refresh-token"],
-    async mutationFn() {
+    async mutationFn(withStepUp: WithStepUp) {
       const api = getApiInstance();
-      const token = await api.invoke("accessTokenGetRefreshToken");
+      const token = await withStepUp("Create an access token", () => api.invoke("accessTokenGetRefreshToken"));
       if (!token.$meta.ok) {
         console.error(token.error);
         return "";
@@ -81,10 +79,10 @@ const revokeTokenAtom = atomWithMutation((get) => {
       // We need to keep everything but one token that we just deleted
       const filtered = previousTokens.filter((t) => t.token !== token);
       // We now optimistically override data inside the query
-      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (old: Token[]) => filtered as Token[]);
+      queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, (_old: Token[]) => filtered as Token[]);
       return { previousTokens };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       // If error, reset query to its previous state (without changes from `onMutate`)
       queryClient.setQueryData(ACCESS_TOKENS_QUERY_KEY, context?.previousTokens);
     },
@@ -98,6 +96,7 @@ const revokeTokenAtom = atomWithMutation((get) => {
 });
 
 export function PersonalJWTToken() {
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogContent | null>(null);
   const [dialogOpened, setDialogOpened] = useState(false);
   const tokens = useAtomValue(tokensListAtom);
   const revokeToken = useAtomValue(revokeTokenAtom);
@@ -110,9 +109,9 @@ export function PersonalJWTToken() {
 
   const revoke = useCallback(
     async (token: string) => {
-      confirm({
+      setPendingConfirm({
         title: "Revoke Token",
-        body: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
+        children: `Are you sure you want to delete this access token? Any application using this token will need a new token to be able to access ${
           window?.APP_SETTINGS?.app_name || "Label Studio"
         }`,
         okText: "Revoke",
@@ -132,17 +131,11 @@ export function PersonalJWTToken() {
   function openDialog() {
     if (dialogOpened) return;
     setDialogOpened(true);
-    modal({
-      visible: true,
-      title: "New Auth Token",
-      style: { width: 680 },
-      body: CreateTokenForm,
-      closeOnClickOutside: false,
-      onHidden: () => {
-        setDialogOpened(false);
-        queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
-      },
-    });
+  }
+
+  function closeDialog() {
+    setDialogOpened(false);
+    queryClient.invalidateQueries({ queryKey: ACCESS_TOKENS_QUERY_KEY });
   }
 
   return (
@@ -184,16 +177,34 @@ export function PersonalJWTToken() {
           </Button>
         </div>
       </Tooltip>
+      <ConfirmDialog
+        {...pendingConfirm}
+        open={pendingConfirm !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingConfirm(null);
+        }}
+      />
+      <ModalWindow
+        open={dialogOpened}
+        onOpenChange={(open) => !open && closeDialog()}
+        title="New Auth Token"
+        size="medium"
+        closeOnScrimClick={false}
+        dataTestId="new-auth-token-modal"
+      >
+        {dialogOpened && <CreateTokenForm />}
+      </ModalWindow>
     </div>
   );
 }
 
 function CreateTokenForm() {
   const { data, mutate: createToken } = useAtomValue(refreshTokenAtom);
+  const withStepUp = useStepUp();
   const [copy, copied] = useCopyText({ defaultText: data ?? "" });
 
   useEffect(() => {
-    createToken();
+    createToken(withStepUp);
   }, []);
 
   return (
@@ -220,18 +231,10 @@ function CreateTokenForm() {
         </div>
       )}
 
-      <Callout variant="warning">
-        <CalloutHeader>
-          <CalloutIcon>
-            <IconWarning />
-          </CalloutIcon>
-          <CalloutTitle>Manage your access tokens securely</CalloutTitle>
-        </CalloutHeader>
-        <CalloutContent>
-          Do not share this key with anyone. If you suspect any keys have been compromised, you should revoke them and
-          create new ones.
-        </CalloutContent>
-      </Callout>
+      <Message variant="warning" title="Manage your access tokens securely">
+        Do not share this key with anyone. If you suspect any keys have been compromised, you should revoke them and
+        create new ones.
+      </Message>
     </div>
   );
 }

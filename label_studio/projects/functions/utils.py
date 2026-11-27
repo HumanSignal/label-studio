@@ -100,12 +100,15 @@ def recalculate_created_annotations_and_labels_from_scratch(
     summary.update_data_columns(project.tasks.only('data'))
 
     summary.created_labels, summary.created_annotations = {}, {}
+    summary.created_labels_drafts = {}
+    summary.save(update_fields=['created_annotations', 'created_labels', 'created_labels_drafts'])
+
     summary.update_created_annotations_and_labels(project.annotations.all())
 
-    summary.created_labels_drafts = {}
     drafts = AnnotationDraft.objects.filter(task__project=project)
     summary.update_created_labels_drafts(drafts)
 
+    summary.refresh_from_db(fields=['created_annotations', 'created_labels', 'created_labels_drafts'])
     logger.info(
         f'Reset cache finished for project {project.id} and organization {organization_id}:\n'
         f'created_annotations = {summary.created_annotations}\n'

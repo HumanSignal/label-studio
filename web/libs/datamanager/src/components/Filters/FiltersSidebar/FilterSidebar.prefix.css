@@ -28,31 +28,13 @@
     z-index: 100;
     background: var(--color-neutral-background);
     top: 0;
-    padding: 0 var(--spacing-tight);
+    padding-inline: var(--spacing-tight);
     align-items: center;
+    justify-content: space-between;
     gap: var(--spacing-tight);
   }
 
   &__title {
-    font-size: 18px;
-    font-weight: 500;
-  }
-
-  &__extra {
-    display: flex;
-    align-items: center;
-
-    .button-dm {
-      --button-width: 24px;
-
-      width: var(--button-width);
-      height: var(--button-width);
-      padding: 0;
-      border: 1px solid var(--color-neutral-border);
-
-      &:hover {
-        border: 1px solid var(--color-neutral-border);
-      }
-    }
+    min-width: 0;
   }
 }

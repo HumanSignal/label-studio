@@ -6,7 +6,20 @@ import { MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
 export const Menu = forwardRef(
-  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, allowClickSelected }, ref) => {
+  (
+    {
+      children,
+      className,
+      style,
+      size,
+      selectedKeys,
+      closeDropdownOnItemClick,
+      allowClickSelected,
+      contextual,
+      ...rest
+    },
+    ref,
+  ) => {
     const dropdown = useDropdown();
 
     const selected = useMemo(() => {
@@ -36,9 +49,10 @@ export const Menu = forwardRef(
       <MenuContext.Provider value={contextValue}>
         <ul
           ref={ref}
-          className={cn("menu").mod({ size, collapsed }).mix(className).toClassName()}
+          className={cn("menu").mod({ size, collapsed, contextual }).mix(className).toClassName()}
           style={style}
           onClick={clickHandler}
+          {...rest}
         >
           {children}
         </ul>

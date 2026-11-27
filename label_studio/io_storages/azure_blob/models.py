@@ -8,12 +8,12 @@ from typing import Union
 from urllib.parse import urlparse
 
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
+from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -31,7 +31,7 @@ from io_storages.utils import (
 )
 from tasks.models import Annotation
 
-from label_studio.io_storages.azure_blob.utils import AZURE
+from label_studio.io_storages.azure_blob.utils import AZURE, get_blob_service_client
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
@@ -64,14 +64,7 @@ class AzureBlobStorageMixin(models.Model):
                 'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
                 'or account_name and account_key fields.'
             )
-        connection_string = (
-            'DefaultEndpointsProtocol=https;AccountName='
-            + account_name
-            + ';AccountKey='
-            + account_key
-            + ';EndpointSuffix=core.windows.net'
-        )
-        client = BlobServiceClient.from_connection_string(conn_str=connection_string)
+        client = get_blob_service_client(account_name, account_key)
         container = client.get_container_client(str(self.container))
         return client, container
 
@@ -277,7 +270,19 @@ class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: ord
         blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
 
         # create link if everything ok
-        AzureBlobExportStorageLink.create(annotation, self)
+        AzureBlobExportStorageLink.create_or_skip_missing_annotation(annotation, self)
+
+    def delete_annotation(self, annotation):
+        container = self.get_container()
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+
+        key = AzureBlobExportStorageLink.get_key(annotation)
+        key = str(self.prefix) + '/' + key if self.prefix else key
+
+        blob = container.get_blob_client(key)
+        blob.delete_blob()
+
+        AzureBlobExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
 
 
 def async_export_annotation_to_azure_storages(annotation: 'Annotation | int'):
@@ -300,6 +305,16 @@ def export_annotation_to_azure_storages(sender, instance, **kwargs):
     storages = getattr(instance.project, 'io_storages_azureblobexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         transaction.on_commit(lambda: start_job_async_or_sync(async_export_annotation_to_azure_storages, instance.pk))
+
+
+@receiver(pre_delete, sender=Annotation)
+def delete_annotation_from_azure_storages(sender, instance, **kwargs):
+    links = AzureBlobExportStorageLink.objects.filter(annotation=instance)
+    for link in links:
+        storage = link.storage
+        if storage.can_delete_objects:
+            logger.debug(f'Delete {instance} from Azure Blob storage {storage}')
+            storage.delete_annotation(instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):

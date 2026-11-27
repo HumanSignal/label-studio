@@ -8,9 +8,11 @@ type SidebarProps = {
   setDates: (range: DateOrDateTimeRange, key: string) => void;
   selectedDates: Selected;
   floatingRangeKey?: string;
+  /** Optional entry under the presets for the answer the calendar cannot express (e.g. Never). */
+  nullMode?: { label: string; selected: boolean; onSelect: (selected: boolean) => void };
 };
 
-export const Sidebar = ({ creationDate, setDates, selectedDates, floatingRangeKey }: SidebarProps) => {
+export const Sidebar = ({ creationDate, setDates, selectedDates, floatingRangeKey, nullMode }: SidebarProps) => {
   const [selectedButton, setSelectedButton] = useState<string | undefined>(floatingRangeKey);
   const [pushedDates, setPushedDates] = useState<DateOrDateTimeRange>();
 
@@ -36,13 +38,27 @@ export const Sidebar = ({ creationDate, setDates, selectedDates, floatingRangeKe
           id={buttons[button].id}
           align="left"
           className="border-0 m-[4px_8px] shadow-none text-body-medium font-medium"
-          look={selectedButton === button ? "filled" : "string"}
+          look={selectedButton === button ? "filled" : "ghost"}
           onClick={(event: any) => handleButtonClick(event, buttons[button], button)}
           data-testid={`datetime-sidebar-button-${buttons[button].id}`}
         >
           {buttons[button].name}
         </Button>
       ))}
+      {nullMode && (
+        <div className="flex flex-col mt-tight pt-tight border-t border-neutral-border">
+          <Button
+            align="left"
+            className="border-0 m-[4px_8px] shadow-none text-body-medium font-medium"
+            look={nullMode.selected ? "filled" : "ghost"}
+            // Re-picking it hands the answer back to the calendar range.
+            onClick={() => nullMode.onSelect(!nullMode.selected)}
+            data-testid="datetime-sidebar-button-null"
+          >
+            {nullMode.label}
+          </Button>
+        </div>
+      )}
     </>
   );
 };

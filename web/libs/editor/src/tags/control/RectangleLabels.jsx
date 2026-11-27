@@ -9,6 +9,7 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
 import { RectangleModel } from "./Rectangle";
 import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 
 /**
  * The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bounding box semantic segmentation tasks.
@@ -60,6 +61,7 @@ const Composition = types.compose(
   Validation,
   LabelMixin,
   SelectedModelMixin.props({ _child: "LabelModel" }),
+  InteractivePromptMixin,
 );
 
 const RectangleLabelsModel = types.compose("RectangleLabelsModel", Composition);

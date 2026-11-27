@@ -3,32 +3,28 @@ import userEvent from "@testing-library/user-event";
 import { Provider } from "mobx-react";
 import { DynamicPreannotationsToggle } from "../DynamicPreannotationsToggle";
 
-const mockSelectDefault = jest.fn();
-jest.mock("../../../tools/Manager", () => ({
-  __esModule: true,
-  default: {
-    allInstances: () => [{ selectDefault: mockSelectDefault }],
-  },
-}));
+import ToolsManager from "../../../tools/Manager";
+const mockSelectDefault = mock();
 
 function createStore(overrides = {}) {
   return {
-    hasInterface: jest.fn((name) => name === "auto-annotation"),
+    hasInterface: mock((name) => name === "auto-annotation"),
     forceAutoAnnotation: false,
     autoAnnotation: false,
-    setAutoAnnotation: jest.fn(),
+    setAutoAnnotation: mock(),
     ...overrides,
   };
 }
 
 describe("DynamicPreannotationsToggle", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    clearAllMocks();
+    spyOn(ToolsManager, "allInstances").mockReturnValue([{ selectDefault: mockSelectDefault }]);
   });
 
   it("returns null when store has no auto-annotation interface", () => {
     const store = createStore({
-      hasInterface: jest.fn(() => false),
+      hasInterface: mock(() => false),
     });
     const { container } = render(
       <Provider store={store}>
@@ -49,9 +45,9 @@ describe("DynamicPreannotationsToggle", () => {
   });
 
   it("calls setAutoAnnotation(false) when enabled becomes false", () => {
-    const setAutoAnnotation = jest.fn();
+    const setAutoAnnotation = mock();
     const store = createStore({
-      hasInterface: jest.fn(() => false),
+      hasInterface: mock(() => false),
       setAutoAnnotation,
     });
     render(
@@ -76,7 +72,7 @@ describe("DynamicPreannotationsToggle", () => {
 
   it("calls setAutoAnnotation when toggle is changed", async () => {
     const user = userEvent.setup();
-    const setAutoAnnotation = jest.fn();
+    const setAutoAnnotation = mock();
     const store = createStore({ setAutoAnnotation });
     render(
       <Provider store={store}>
@@ -90,7 +86,7 @@ describe("DynamicPreannotationsToggle", () => {
 
   it("calls selectDefault on all tool instances when toggle is unchecked", async () => {
     const user = userEvent.setup();
-    const setAutoAnnotation = jest.fn();
+    const setAutoAnnotation = mock();
     const store = createStore({ autoAnnotation: true, setAutoAnnotation });
     render(
       <Provider store={store}>

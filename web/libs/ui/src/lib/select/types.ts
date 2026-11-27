@@ -1,19 +1,25 @@
-import type { FC, ReactNode } from "react";
+import type { ControlSize } from "../../ds-manifest/control-sizes";
+import type { FC, ReactNode, HTMLAttributes } from "react";
 
 export type SelectOptionData<T = any> = {
   value: T;
-  label?: string;
+  label?: ReactNode;
   hidden?: boolean;
   disabled?: boolean;
   children?: SelectOptionData<T>[];
+  /** Optional badge shown next to the option label. */
+  badge?: string;
+  /** Optional explanation shown in an info tooltip next to the option label. */
+  description?: string;
   /** Custom row height (px) for virtual-list mode; defaults to VARIABLE_LIST_ITEM_HEIGHT (40). */
   height?: number;
 };
 
+/** Heights match the Button of the same name: smaller 24px, small 32px, medium 40px (default). */
 export enum SelectSize {
+  SMALLER = "smaller",
   SMALL = "small",
   MEDIUM = "medium",
-  LARGE = "large",
 }
 
 export type SelectOption<T> = string | number | SelectOptionData<T>;
@@ -25,6 +31,8 @@ export type OptionProps = {
   disabled?: boolean;
   style?: any;
   multiple?: boolean;
+  /** Draws the row's checkbox in multiple mode. Off when a custom row carries its own controls. */
+  optionCheckbox?: boolean;
   onSelect?: () => void;
   isIndeterminate?: boolean;
   className?: string;
@@ -34,6 +42,10 @@ export type OptionProps = {
   option?: any;
   /** Index passed to optionRenderer */
   optionIndex?: number;
+  /** Optional icon rendered before the option label. */
+  leadingIcon?: ReactNode;
+  /** Applies a persistent emphasis treatment to the option. */
+  highlighted?: boolean;
 };
 
 type ExtractStructOption<T> = T extends SelectOptionData ? T["value"] : never;
@@ -63,14 +75,30 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   placeholder?: ReactNode;
   triggerClassName?: string;
   contentClassName?: string;
+  /** Attributes on the portaled option panel, including explicit viewer theme propagation. */
+  contentProps?: Omit<HTMLAttributes<HTMLDivElement>, "children" | "className"> & {
+    "data-theme"?: "light" | "dark";
+    "data-color-scheme"?: "light" | "dark";
+  };
   ghost?: boolean;
   width?: string;
   icon?: any;
   fieldProps?: any;
+  /** @deprecated Use `invalid`. */
   error?: boolean;
+  /** Draws the error state and sets `aria-invalid` on the trigger. */
+  invalid?: boolean;
+  /** Fires when the trigger loses focus, for form libraries that validate on blur. */
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   autoSelectFirst?: boolean;
   searchable?: boolean;
+  /** Allow a search value that does not match an option to be selected as a new option. */
+  creatable?: boolean;
+  /** Label template for the create option; `{value}` is replaced with the search value. */
+  createOptionLabel?: string;
   searchPlaceholder?: string;
+  /** Margin of the search field, replacing its default `m-1`; match it to the header's inset when there is one. */
+  searchClassName?: string;
   /** Initial value for the search input field. Useful for restoring a previous search state. */
   defaultSearchValue?: string;
   ref?: React.Ref<HTMLSelectElement>;
@@ -82,19 +110,44 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   onChange?: (value: any) => void | false;
   setValue?: (value: ExtractOption<A>) => void;
   header?: string | FC | JSX.Element;
+  /** Pinned between the search field and the options, e.g. column headings for a custom `optionRenderer`. */
+  listHeader?: ReactNode;
   footer?: ReactNode;
   multiple?: boolean;
+  /**
+   * With `multiple`, picks stay pending until the Apply button in the footer is clicked: `onChange` fires once,
+   * with the full list, on Apply. Closing without Apply discards the pending picks. Ignored without `multiple`.
+   * The Apply button's test id is `${dataTestid}-apply`, or `select-apply` without `dataTestid`.
+   */
+  requireApply?: boolean;
+  /**
+   * In multiple mode, hide the checkbox at the start of every row. The row still toggles on click and a picked
+   * row keeps the selected background and `aria-selected`, so a custom row only has to render its own controls.
+   */
+  optionCheckbox?: boolean;
   disabled?: boolean;
+  /**
+   * When true, the trigger stays enabled so the dropdown can open for inspection,
+   * but option selection and bulk actions (Select all / group All/None) are blocked.
+   * Distinct from `disabled`, which greys out the trigger and prevents opening.
+   * Search remains available when `searchable` is set.
+   */
+  readOnly?: boolean;
   triggerProps?: any;
   isInline?: boolean;
   isLoading?: boolean;
   dataTestid?: string;
-  size?: SelectSize | undefined;
+  size?: ControlSize | SelectSize | undefined;
   onSearch?: (value: string) => void;
   selectFirstIfEmpty?: boolean;
   renderSelected?: (selectedOptions?: A[number][], placeholder?: string) => React.ReactNode | string;
   isVirtualList?: boolean;
-  /** Max visible items in the virtual list before scrolling (default: 5) */
+  /**
+   * When true with `isVirtualList`, size the dropdown from a sample of the first
+   * option labels (not a full longest-label scan). No-op without `isVirtualList`.
+   */
+  withDynamicWidth?: boolean;
+  /** Max visible items in the virtual list before scrolling (default: ~7.5 / 300px). */
   virtualListMaxVisible?: number;
   loadMore?: () => void;
   pageSize?: number;
@@ -106,8 +159,19 @@ export type SelectProps<T, A extends SelectOption<T>[]> = {
   open?: boolean;
   alwaysShowSelectedGroup?: boolean;
   onSelectAllClick?: () => void;
+  /** Accessible name for the "Select All" button, for consumers whose select-all reaches past the rendered items. */
+  selectAllLabel?: string;
+  /** When true (requires `multiple` + `groupBy`), shows "All" / "None" bulk-toggle buttons on group header hover. Fires a single `onChange` with the full updated array. */
+  showGroupActions?: boolean;
+  /**
+   * Which trigger edge the dropdown is anchored to. Defaults to `"start"` (panel's leading edge on
+   * the trigger's leading edge). Pass `"end"` to anchor the trailing edges instead — useful for a
+   * panel wider than its trigger that would otherwise overflow the viewport, since Radix's `flip`
+   * only flips the *side* (bottom↔top) and never the alignment.
+   */
+  align?: "start" | "center" | "end";
 } & SelectVirtualizedProps &
-  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder">;
+  Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "placeholder" | "onChange" | "size">;
 
 type ToNever<T> = {
   [key in keyof T]?: never;

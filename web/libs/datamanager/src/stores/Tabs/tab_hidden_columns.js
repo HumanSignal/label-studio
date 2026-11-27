@@ -1,7 +1,7 @@
 import { getRoot, types } from "mobx-state-tree";
-import { TabColumn } from "./tab_column";
+import { StringOrNumber } from "../types";
 
-const ColumnsList = types.maybeNull(types.array(types.late(() => types.reference(TabColumn))));
+const ColumnsList = types.maybeNull(types.array(StringOrNumber));
 
 export const TabHiddenColumns = types
   .model("TabHiddenColumns", {
@@ -27,21 +27,21 @@ export const TabHiddenColumns = types
     },
 
     hasColumn(column) {
-      return self.activeList.indexOf(column) >= 0;
+      return self.activeList.includes(column.id);
     },
   }))
   .actions((self) => ({
     add(column) {
       const set = new Set(self.activeList);
 
-      set.add(column);
+      set.add(column.id);
       self.activeList = Array.from(set);
     },
 
     remove(column) {
       const set = new Set(self.activeList);
 
-      set.delete(column);
+      set.delete(column.id);
       self.activeList = Array.from(set);
     },
   }))

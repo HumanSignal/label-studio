@@ -1,0 +1,428 @@
+import { mock, describe, it, expect, beforeEach, afterEach, spyOn } from "bun:test";
+import { destroy, types } from "mobx-state-tree";
+import { AppStore } from "./AppStore";
+import { History } from "../utils/history";
+import * as datamanagerTelemetry from "../utils/datamanagerTelemetry";
+
+describe("AppStore setTask annotation matching (FIT-1949)", () => {
+  let store;
+  let mockLsf;
+
+  beforeEach(() => {
+    mockLsf = {
+      setLSFTask: mock(() => {}),
+      currentAnnotation: { pk: 123 },
+      lsf: {
+        annotationStore: {
+          annotations: [
+            { pk: 97375393, id: 1, type: "annotation" },
+            { pk: null, id: "alphanumeric-id-abc", type: "annotation" },
+          ],
+          predictions: [],
+        },
+      },
+    };
+
+    const DummyTaskStore = types
+      .model({
+        selected: types.maybeNull(types.frozen()),
+      })
+      .actions((self) => ({
+        setSelected(_id) {},
+        loadTask(id) {
+          self.selected = {
+            id,
+            annotations: [
+              { id: 97375393, type: "annotation" },
+              { id: "alphanumeric-id-abc", type: "annotation" },
+            ],
+            predictions: [],
+          };
+          return Promise.resolve(self.selected);
+        },
+      }));
+
+    const DummyAnnotationStore = types.model({}).actions((_self) => ({
+      setSelected(_id) {},
+    }));
+
+    const TestStore = types.compose(
+      AppStore,
+      types.model({
+        taskStore: types.optional(DummyTaskStore, {}),
+        annotationStore: types.optional(DummyAnnotationStore, {}),
+      }),
+    );
+
+    store = TestStore.create({
+      toolbar: "",
+    });
+
+    store._sdk = {
+      lsf: mockLsf,
+      api: {
+        columns: () => Promise.resolve([]),
+      },
+    };
+  });
+
+  it("should match annotation when ID is a number and URL parameter is a string", async () => {
+    // Mock History.getParams to return string annotation id
+    const getParamsSpy = spyOn(History, "getParams").mockReturnValue({
+      annotation: "97375393",
+    });
+
+    const navigateSpy = spyOn(History, "navigate").mockImplementation(() => {});
+
+    // Run setTask flow
+    await store.setTask({ taskID: 1, annotationID: 97375393, pushState: false });
+
+    // Expect setLSFTask to be called once directly with the target annotation
+    expect(mockLsf.setLSFTask).toHaveBeenCalledTimes(1);
+    expect(mockLsf.setLSFTask).toHaveBeenLastCalledWith(store.taskStore.selected, 97375393, undefined, false);
+
+    getParamsSpy.mockRestore();
+    navigateSpy.mockRestore();
+  });
+
+  it("should match annotation when ID is a string and URL parameter is a string", async () => {
+    // Mock History.getParams to return string annotation id
+    const getParamsSpy = spyOn(History, "getParams").mockReturnValue({
+      annotation: "alphanumeric-id-abc",
+    });
+
+    const navigateSpy = spyOn(History, "navigate").mockImplementation(() => {});
+
+    // Run setTask flow
+    await store.setTask({ taskID: 1, annotationID: "alphanumeric-id-abc", pushState: false });
+
+    // Expect setLSFTask to be called once directly with the target annotation
+    expect(mockLsf.setLSFTask).toHaveBeenCalledTimes(1);
+    expect(mockLsf.setLSFTask).toHaveBeenLastCalledWith(
+      store.taskStore.selected,
+      "alphanumeric-id-abc",
+      undefined,
+      false,
+    );
+
+    getParamsSpy.mockRestore();
+    navigateSpy.mockRestore();
+  });
+
+  it("should select region if region URL parameter is present", async () => {
+    const setRegionVisibleMock = mock(() => {});
+    const selectRegionByIDMock = mock(() => {});
+
+    mockLsf.currentAnnotation = {
+      pk: 97375393,
+      id: "abcde",
+      regionStore: {
+        setRegionVisible: setRegionVisibleMock,
+        selectRegionByID: selectRegionByIDMock,
+      },
+    };
+
+    const getParamsSpy = spyOn(History, "getParams").mockReturnValue({
+      annotation: "97375393",
+      region: "r1",
+    });
+
+    const navigateSpy = spyOn(History, "navigate").mockImplementation(() => {});
+
+    await store.setTask({ taskID: 1, annotationID: 97375393, pushState: false });
+
+    // Wait for the next tick for setTimeout(..., 0) to execute
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(setRegionVisibleMock).toHaveBeenCalledWith("r1");
+    expect(selectRegionByIDMock).toHaveBeenCalledWith("r1");
+
+    getParamsSpy.mockRestore();
+    navigateSpy.mockRestore();
+  });
+});
+
+describe("AppStore invokeAction reload handling (UTC-1043)", () => {
+  let store;
+  let mockView;
+
+  // `currentView` normally resolves through `viewsStore` (a real TabStore); overriding it here keeps
+  // the test focused on invokeAction's reload decision without building a full Tab fixture.
+  const TestAppStore = AppStore.views(() => ({
+    get currentView() {
+      return mockView;
+    },
+  }));
+
+  beforeEach(() => {
+    mockView = {
+      ordering: null,
+      serializedFilters: [],
+      conjunction: "and",
+      selected: { snapshot: { all: false, included: [] } },
+      reload: mock(() => Promise.resolve()),
+      clearSelection: mock(() => {}),
+      unlock: mock(() => {}),
+      lock: mock(() => {}),
+    };
+
+    store = TestAppStore.create({ toolbar: "" });
+
+    store._sdk = {
+      getAction: () => undefined,
+      invoke: mock(() => {}),
+      api: {
+        invokeAction: mock(() => Promise.resolve({ reload: false })),
+        project: mock(() => Promise.resolve({})),
+      },
+    };
+  });
+
+  it("reloads the view for a synchronous action that returns reload: false (e.g. delete_tasks)", async () => {
+    await store.invokeAction("delete_task");
+
+    expect(mockView.reload).toHaveBeenCalledTimes(1);
+    expect(store._sdk.api.project).toHaveBeenCalledTimes(1);
+    expect(mockView.clearSelection).toHaveBeenCalled();
+  });
+
+  it("sends the active page task IDs for Add or Update Columns", async () => {
+    mockView.dataStore = { list: [{ id: 101 }, { id: 102 }] };
+
+    await store.invokeAction("add_data_field");
+
+    const [, request] = store._sdk.api.invokeAction.mock.calls[0];
+    expect(request.body.visibleTaskIds).toEqual([101, 102]);
+  });
+
+  it("asks the user to refresh the page after adding a column", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({ column_operation: "add", manual_refresh_required: true }),
+    );
+
+    await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(store._sdk.api.project).not.toHaveBeenCalled();
+    expect(store._sdk.invoke).toHaveBeenCalledWith("toast", {
+      message: "Column added. Refresh the page to see the new column.",
+      type: "success",
+    });
+  });
+
+  it("asks the user to use Refresh after updating a column", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({ column_operation: "update", manual_refresh_required: true }),
+    );
+
+    await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(store.backgroundActionPending).toBe(true);
+    expect(store._sdk.invoke).toHaveBeenCalledWith("toast", {
+      message: "Column updated. Use the Refresh button to see the latest data.",
+      type: "success",
+    });
+  });
+
+  it("returns the specific error for a failed column action without reloading or toasting", async () => {
+    store._sdk.api.invokeAction = mock(() =>
+      Promise.resolve({
+        error: "Bad request",
+        response: { detail: "Validation error", validation_errors: { value: "Enter a valid number value." } },
+      }),
+    );
+
+    const result = await store.invokeAction("add_data_field");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(mockView.unlock).toHaveBeenCalled();
+    expect(result.error).toBe(true);
+    // Surfaces the field-level message, not the generic "Validation error" label.
+    // Message extraction itself is covered in utils/__tests__/column-action-errors.test.ts.
+    expect(result.errorMessages).toEqual([{ label: "column-error-0", messages: ["Enter a valid number value."] }]);
+    expect(store._sdk.invoke).not.toHaveBeenCalled();
+  });
+
+  it("skips the reload for an async action that returns reload: false (e.g. bulk Review)", async () => {
+    store._sdk.api.invokeAction = mock(() => Promise.resolve({ async: true, reload: false }));
+
+    await store.invokeAction("bulk_review");
+
+    expect(mockView.reload).not.toHaveBeenCalled();
+    expect(store._sdk.api.project).not.toHaveBeenCalled();
+    expect(store.backgroundActionPending).toBe(true);
+  });
+
+  it("does not flag the Refresh button as stale after a synchronous action changed counts (UTC-1043)", async () => {
+    // Pre-action loaded counts.
+    store = TestAppStore.create({
+      toolbar: "",
+      project: { id: 1, task_count: 10, task_number: 10, annotation_count: 5, num_tasks_with_annotations: 5 },
+    });
+    store._sdk = {
+      getAction: () => undefined,
+      invoke: mock(() => {}),
+      api: {
+        invokeAction: mock(() => Promise.resolve({ reload: false })),
+        // The fresh project fetch reports fewer tasks because we just deleted some.
+        project: mock(() =>
+          Promise.resolve({ id: 1, task_count: 8, task_number: 8, annotation_count: 5, num_tasks_with_annotations: 5 }),
+        ),
+      },
+    };
+
+    await store.invokeAction("delete_task");
+
+    // The grid is reloaded (the UTC-1043 fix) ...
+    expect(mockView.reload).toHaveBeenCalledTimes(1);
+    // ... but the Refresh button must NOT be highlighted just because our own action changed the counts.
+    expect(store.needsDataFetch).toBe(false);
+    expect(store.backgroundActionPending).toBe(false);
+  });
+
+  it("still detects drift for an async action whose background job is not done yet", async () => {
+    // delete_tasks_annotations returns async:true without a reload flag: it falls through to the reload
+    // path, but its non-forced project fetch must keep the count-drift check so the button can highlight.
+    store = TestAppStore.create({
+      toolbar: "",
+      project: { id: 1, task_count: 10, task_number: 10, annotation_count: 5, num_tasks_with_annotations: 5 },
+    });
+    store._sdk = {
+      getAction: () => undefined,
+      invoke: mock(() => {}),
+      api: {
+        invokeAction: mock(() => Promise.resolve({ async: true })),
+        project: mock(() =>
+          Promise.resolve({
+            id: 1,
+            task_count: 10,
+            task_number: 10,
+            annotation_count: 2,
+            num_tasks_with_annotations: 2,
+          }),
+        ),
+      },
+    };
+
+    await store.invokeAction("delete_tasks_annotations");
+
+    expect(mockView.reload).toHaveBeenCalledTimes(1);
+    expect(store.needsDataFetch).toBe(true);
+  });
+});
+
+describe("AppStore refreshColumns (FIT-2850)", () => {
+  let store;
+
+  afterEach(() => {
+    if (store) destroy(store);
+    store = null;
+  });
+
+  it("rebuilds the filter catalog from /columns without reloading tasks", async () => {
+    store = AppStore.create({ toolbar: "" });
+    const fetchColumns = mock(() => {});
+    store.viewsStore.fetchColumns = fetchColumns;
+    store.apiCall = mock(async (method) => {
+      if (method === "columns") {
+        return {
+          columns: [{ id: "id", title: "ID", type: "Number", target: "tasks" }],
+        };
+      }
+      return {};
+    });
+
+    const ok = await store.refreshColumns();
+
+    expect(ok).toBe(true);
+    expect(store.apiCall).toHaveBeenCalledWith("columns");
+    expect(store.viewsStore.columnsRaw).toEqual([{ id: "id", title: "ID", type: "Number", target: "tasks" }]);
+    expect(fetchColumns).toHaveBeenCalledWith({ deferSelectedReload: true });
+  });
+});
+
+describe("AppStore project timer poll (FIT-2914)", () => {
+  let store;
+
+  afterEach(() => {
+    if (store?._poll) clearTimeout(store._poll);
+    if (store) destroy(store);
+    store = null;
+  });
+
+  it("does not refetch the project in the same turn polling starts", async () => {
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+    Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
+
+    store = AppStore.create({ toolbar: "" });
+    document.dispatchEvent(new Event("visibilitychange"));
+    const project = mock(() => Promise.resolve({ id: 1 }));
+    store._sdk = { polling: true, type: "dm", invoke() {}, api: { project } };
+
+    store.startPolling();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(project).not.toHaveBeenCalled();
+  });
+});
+
+describe("AppStore invokeAction telemetry (FIT-3264)", () => {
+  let store;
+  let mockView;
+  let emitSpy;
+
+  const TestAppStore = AppStore.views(() => ({
+    get currentView() {
+      return mockView;
+    },
+  }));
+
+  beforeEach(() => {
+    mockView = {
+      id: 7,
+      virtual: false,
+      selectedCount: 3,
+      ordering: null,
+      serializedFilters: [],
+      conjunction: "and",
+      selected: { snapshot: { all: false, included: [1, 2, 3] } },
+      reload: mock(() => Promise.resolve()),
+      clearSelection: mock(() => {}),
+      unlock: mock(() => {}),
+      lock: mock(() => {}),
+    };
+
+    store = TestAppStore.create({ toolbar: "" });
+
+    store._sdk = {
+      getAction: () => undefined,
+      invoke: mock(() => {}),
+      api: {
+        invokeAction: mock(() => Promise.resolve({ reload: false })),
+        project: mock(() => Promise.resolve({})),
+      },
+    };
+    emitSpy = spyOn(datamanagerTelemetry, "emitDatamanagerTabEvent").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    emitSpy.mockRestore();
+  });
+
+  it("records a bulk action with its outcome and selection size", async () => {
+    await store.invokeAction("delete_tasks");
+
+    expect(emitSpy).toHaveBeenCalledWith(
+      mockView,
+      "dm_action_invoked",
+      expect.objectContaining({ action_id: "delete_tasks", select_all: false, selected_count: 3, success: true }),
+    );
+  });
+
+  it("does not count next_task, which the label stream calls for every task", async () => {
+    await store.invokeAction("next_task", { reload: false });
+
+    expect(emitSpy).not.toHaveBeenCalledWith(mockView, "dm_action_invoked", expect.anything());
+  });
+});

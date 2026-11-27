@@ -1,9 +1,7 @@
 import { observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../../../utils/bem";
-import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 import { normalizeCellAlias } from "../../../CellViews";
-import { SkeletonLoader } from "../../SkeletonLoader";
 import "./TableRow.prefix.css";
 import { TableContext, tableCN } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
@@ -29,7 +27,6 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
   const renderProps = { column: col, original: data, value };
   const Decoration = decoration?.get?.(col);
   const style = getStyle(cellViews, col, Decoration);
-  const cellIsLoading = isFF(FF_LOPS_E_3) && data.loading === colInput.alias;
 
   return (
     <div className={tableCN.elem("cell").toClassName()}>
@@ -38,17 +35,17 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
           ...(style ?? {}),
           display: "flex",
           height: "100%",
-          alignItems: cellIsLoading ? "" : "center",
+          alignItems: "center",
         }}
       >
-        {cellIsLoading ? <SkeletonLoader /> : Renderer ? <Renderer {...renderProps} /> : value}
+        {Renderer ? <Renderer {...renderProps} /> : value}
       </div>
     </div>
   );
 });
 
 export const TableRow = observer(
-  ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, onContextMenu }) => {
+  ({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration, contextMenuTriggerProps }) => {
     const { columns, cellViews, contextMenuRowId } = React.useContext(TableContext);
     const rowWrapperCN = tableCN.elem("row-wrapper");
     const tableRowCN = cn("table-row");
@@ -67,7 +64,7 @@ export const TableRow = observer(
         className={rowWrapperCN.mod(mods).toClassName()}
         style={wrapperStyle}
         onClick={(e) => onClick?.(data, e)}
-        onContextMenu={(e) => onContextMenu?.(e, data)}
+        {...contextMenuTriggerProps}
         data-testid="table-row-wrapper"
       >
         <div className={tableRowCN.toClassName()} style={style} data-leave={true} data-testid="table-row">

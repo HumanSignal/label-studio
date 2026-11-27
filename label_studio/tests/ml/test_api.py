@@ -1,8 +1,11 @@
 import json
 
 import pytest
+from data_manager.managers import annotate_predictions_score
+from ml.models import MLBackend, MLBackendState
 from projects.models import Task
 from rest_framework import status
+from tasks.models import Prediction
 
 from label_studio.tests.utils import make_project, register_ml_backend_mock
 
@@ -19,11 +22,6 @@ def ml_backend_for_test_api(ml_backend):
         setup_model_version='1.0.0',
     )
     yield ml_backend
-
-
-@pytest.fixture
-def mock_gethostbyname(mocker):
-    mocker.patch('socket.gethostbyname', return_value='321.21.21.21')
 
 
 @pytest.mark.django_db
@@ -190,6 +188,143 @@ def test_model_version_on_delete(business_client, ml_backend_for_test_api, mock_
     assert business_client.delete(f'/api/ml/{ml_backend_id}').status_code == 204
     project.refresh_from_db()
     assert project.model_version == ''
+
+
+@pytest.mark.django_db
+def test_predictions_score_uses_backend_model_version_when_project_model_version_is_backend_title(business_client):
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_predictions_score_model_version_title_mapping',
+            model_version='My ML Backend',
+        ),
+        user=business_client.user,
+    )
+    MLBackend.objects.create(
+        project=project,
+        title='My ML Backend',
+        model_version='v1',
+        url='http://127.0.0.1:9090',
+    )
+    task = Task.objects.create(project=project, data={'image_url': 'http://example.com/image.jpg'})
+    Prediction.objects.create(
+        task=task,
+        project=project,
+        result=[{}],
+        score=0.87,
+        model_version='v1',
+    )
+
+    annotated_task = annotate_predictions_score(Task.objects.filter(id=task.id)).values('predictions_score').first()
+
+    assert annotated_task['predictions_score'] == pytest.approx(0.87)
+
+
+@pytest.mark.django_db
+def test_predictions_score_uses_project_model_version_from_imported_predictions_without_backend_mapping(
+    business_client,
+):
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_preds_score_imported_no_backend_mapping',
+            model_version='',
+        ),
+        user=business_client.user,
+    )
+    task = Task.objects.create(project=project, data={'image_url': 'http://example.com/image.jpg'})
+
+    response = business_client.post(
+        f'/api/projects/{project.id}/import/predictions',
+        data=[
+            {
+                'task': task.id,
+                'result': [
+                    {
+                        'from_name': 'label',
+                        'to_name': 'image',
+                        'type': 'choices',
+                        'value': {'choices': ['pos']},
+                    }
+                ],
+                'score': 0.11,
+                'model_version': 'imported-v1',
+            },
+            {
+                'task': task.id,
+                'result': [
+                    {
+                        'from_name': 'label',
+                        'to_name': 'image',
+                        'type': 'choices',
+                        'value': {'choices': ['neg']},
+                    }
+                ],
+                'score': 0.89,
+                'model_version': 'imported-v2',
+            },
+        ],
+        content_type='application/json',
+    )
+    assert response.status_code == 201
+    assert response.json()['created'] == 2
+
+    # Empty string means "no selected model version", so score should be null (not averaged across all predictions).
+    annotated_task = annotate_predictions_score(Task.objects.filter(id=task.id)).values('predictions_score').first()
+    assert annotated_task['predictions_score'] is None
+
+    project.model_version = 'imported-v2'
+    project.save(update_fields=['model_version'])
+
+    annotated_task = annotate_predictions_score(Task.objects.filter(id=task.id)).values('predictions_score').first()
+
+    assert annotated_task['predictions_score'] == pytest.approx(0.89)
+
+
+@pytest.mark.django_db
+def test_ml_backend_local_url_blocked_by_default(business_client, ml_backend_for_test_api):
+    """ML_BLOCK_LOCAL_IP defaults to on, so a backend on a loopback address is rejected."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_local_url',
+        ),
+        user=business_client.user,
+    )
+
+    response = business_client.post(
+        '/api/ml/',
+        data={
+            'project': project.id,
+            'title': 'local_ml_backend',
+            'url': 'http://127.0.0.1:9090',
+        },
+    )
+    assert response.status_code == 403
+    assert 'reserved network address' in response.json()['detail']
+
+
+@pytest.mark.django_db
+def test_ml_backend_detail_reports_blocked_url_as_disconnected(business_client):
+    """A backend whose URL is blocked must degrade to DISCONNECTED, not fail the read with 403."""
+    project = make_project(
+        config=dict(
+            is_published=True,
+            label_config=PROJECT_CONFIG,
+            title='test_ml_backend_blocked_detail',
+        ),
+        user=business_client.user,
+    )
+    ml_backend = MLBackend.objects.create(project=project, url='http://127.0.0.1:9090')
+
+    response = business_client.get(f'/api/ml/{ml_backend.id}')
+
+    assert response.status_code == 200
+    ml_backend.refresh_from_db()
+    assert ml_backend.state == MLBackendState.DISCONNECTED
 
 
 @pytest.mark.django_db

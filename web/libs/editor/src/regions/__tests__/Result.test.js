@@ -7,79 +7,100 @@
  */
 import { types } from "mobx-state-tree";
 
-const mockIsFF = jest.fn(() => false);
-jest.mock("../../utils/feature-flags", () => ({
-  isFF: (...args) => mockIsFF(...args),
-  FF_LSDV_4583: "ff_lsdv_4583",
-}));
-
-jest.mock("@humansignal/core", () => ({
-  ff: {
-    isActive: () => false,
-  },
-}));
-
-jest.mock("../../core/Registry", () => {
-  const { types: t } = require("mobx-state-tree");
-  const MinimalControl = t
-    .model("MinimalControl", {
-      id: t.identifier,
-      name: t.optional(t.string, "labels"),
-      valueType: t.optional(t.string, "labels"),
-      allowempty: t.optional(t.boolean, false),
-      perregion: t.optional(t.boolean, false),
-      visiblewhen: t.optional(t.string, ""),
-      whenlabelvalue: t.optional(t.string, ""),
-      whenchoicevalue: t.optional(t.string, ""),
-      whentagname: t.optional(t.string, ""),
-      mergeLabelsAndResults: t.optional(t.boolean, false),
-      fillcolor: t.maybeNull(t.string),
-      strokecolor: t.maybeNull(t.string),
-      strokewidth: t.maybeNull(t.number),
-      fillopacity: t.maybeNull(t.number),
-      opacity: t.maybeNull(t.number),
-      emptyLabel: t.optional(t.frozen(), () => null),
-    })
-    .views((self) => ({
-      get findLabel() {
-        return (val) => (val === null ? { background: "#ccc", parent: self } : { background: "#f00", parent: self });
-      },
-      selectedChoicesMatch() {
-        return () => false;
-      },
-      get isVisible() {
-        return true;
-      },
-      getRegionElement() {
-        return undefined;
-      },
-    }));
-
-  const MinimalObject = t.model("MinimalObject", {
-    id: t.identifier,
-    mergeLabelsAndResults: t.optional(t.boolean, false),
-  });
-
-  return {
-    __esModule: true,
-    default: {
-      modelsArr: () => [MinimalControl],
-      objectTypes: () => [MinimalObject],
-      customTags: [],
-    },
-  };
+mockModule("@humansignal/core", () => {
+  const actual = requireActual("@humansignal/core");
+  return { ...actual, ff: { ...actual.ff, isActive: () => false } };
 });
 
-import Result from "../Result";
-import Registry from "../../core/Registry";
+const { types: t } = require("mobx-state-tree");
 
-const MinimalControl = Registry.modelsArr()[0];
-const MinimalObject = Registry.objectTypes()[0];
+let resultModelCache;
+
+const createBunActualStamp = () => `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+const loadRealResultModel = async () => {
+  const resultModule = await import(`../Result?bun_actual=${createBunActualStamp()}`);
+  resultModelCache = resultModule.default ?? resultModule;
+};
+
+const getResultModel = () => {
+  if (resultModelCache) return resultModelCache;
+  const resultModule = requireActual("../Result");
+  return resultModule.default ?? resultModule;
+};
+
+const getRegistry = () => {
+  const registryModule = requireActual("../../core/Registry");
+  return registryModule.default ?? registryModule;
+};
+
+const MinimalControl = t
+  .model("MinimalControl", {
+    id: t.identifier,
+    name: t.optional(t.string, "labels"),
+    valueType: t.optional(t.string, "labels"),
+    allowempty: t.optional(t.boolean, false),
+    perregion: t.optional(t.boolean, false),
+    peritem: t.optional(t.boolean, false),
+    // visibility on the current item vs per item (see isVisibleForItem)
+    visible: t.optional(t.boolean, true),
+    hiddenItems: t.optional(t.array(t.number), []),
+    visiblewhen: t.optional(t.string, ""),
+    whenlabelvalue: t.optional(t.string, ""),
+    whenchoicevalue: t.optional(t.string, ""),
+    whentagname: t.optional(t.string, ""),
+    mergeLabelsAndResults: t.optional(t.boolean, false),
+    fillcolor: t.maybeNull(t.string),
+    strokecolor: t.maybeNull(t.string),
+    strokewidth: t.maybeNull(t.number),
+    fillopacity: t.maybeNull(t.number),
+    opacity: t.maybeNull(t.number),
+    emptyLabel: t.optional(t.frozen(), () => null),
+  })
+  .views((self) => ({
+    get findLabel() {
+      return (val) => (val === null ? { background: "#ccc", parent: self } : { background: "#f00", parent: self });
+    },
+    selectedChoicesMatch() {
+      return () => false;
+    },
+    get isVisible() {
+      return self.visible;
+    },
+    isVisibleForItem(idx) {
+      return !self.hiddenItems.includes(idx);
+    },
+    getRegionElement() {
+      return undefined;
+    },
+  }));
+
+const MinimalObject = t.model("MinimalObject", {
+  id: t.identifier,
+  mergeLabelsAndResults: t.optional(t.boolean, false),
+});
+
+let registryModelsSpy;
+let registryObjectTypesSpy;
+
+beforeAll(async () => {
+  await loadRealResultModel();
+
+  const Registry = getRegistry();
+  const originalModels = Registry.modelsArr.bind(Registry);
+  const originalObjectTypes = Registry.objectTypes.bind(Registry);
+
+  registryModelsSpy = spyOn(Registry, "modelsArr").mockImplementation(() => [...originalModels(), MinimalControl]);
+  registryObjectTypesSpy = spyOn(Registry, "objectTypes").mockImplementation(() => [
+    ...originalObjectTypes(),
+    MinimalObject,
+  ]);
+});
 
 const MinimalArea = types
   .model("MinimalArea", {
     id: types.identifier,
-    results: types.array(Result),
+    results: types.array(types.late(() => getResultModel())),
     parentID: types.maybeNull(types.string),
     item_index: types.optional(types.maybeNull(types.number), null),
   })
@@ -100,7 +121,7 @@ const MinimalArea = types
       return false;
     },
   }))
-  .actions((self) => ({
+  .actions((_self) => ({
     isReadOnly() {
       return false;
     },
@@ -124,7 +145,10 @@ const AnnotationStore = types.model("AnnotationStore", {
 });
 
 const Root = types.model("Root", {
+  // stands in for a wrapping <View visibleWhen> of the control
+  visiblewhen: types.optional(types.string, ""),
   control: MinimalControl,
+  gate: types.maybeNull(MinimalControl),
   object: MinimalObject,
   annotationStore: types.optional(AnnotationStore, { selected: null }),
 });
@@ -148,8 +172,8 @@ function createTree(resultSnapshot = {}, controlSnapshot = {}, areaSnapshot = {}
     areas: [area],
   };
   return Root.create({
-    control: { id: "c1", ...controlSnapshot },
-    object: { id: "o1", ...objectSnapshot },
+    control: { id: "c1", name: "c1", ...controlSnapshot },
+    object: { id: "o1", name: "o1", ...objectSnapshot },
     annotationStore: { selected: annotation },
   });
 }
@@ -321,6 +345,68 @@ describe("Result", () => {
     });
   });
 
+  describe("canBeSubmitted (perItem)", () => {
+    // perItem control gated by perItem choices "gate"; `gateItems` are the items where the gate choice is set
+    function createPerItemTree({ gateItems, resultItem, control = {}, root = {} }) {
+      const gateAreas = gateItems.map((idx) => ({
+        id: `gate_${idx}`,
+        item_index: idx,
+        results: [{ from_name: "gate", to_name: "o1", type: "choices", value: { choices: ["Yes"] }, meta: {} }],
+      }));
+      const tree = Root.create({
+        ...root,
+        control: {
+          id: "c1",
+          name: "c1",
+          valueType: "text",
+          peritem: true,
+          visiblewhen: "choice-selected",
+          whentagname: "gate",
+          ...control,
+        },
+        gate: { id: "gate", name: "gate", valueType: "choices", peritem: true },
+        object: { id: "o1" },
+        annotationStore: {
+          selected: {
+            areas: [
+              ...gateAreas,
+              {
+                id: "comment",
+                item_index: resultItem,
+                results: [{ from_name: "c1", to_name: "o1", type: "textarea", value: { text: ["why"] }, meta: {} }],
+              },
+            ],
+          },
+        },
+      });
+      return tree.annotationStore.selected.areas.at(-1).results[0];
+    }
+
+    it("matches the gating choice on the same item_index as the result", () => {
+      expect(createPerItemTree({ gateItems: [0], resultItem: 1 }).canBeSubmitted).toBe(false);
+      expect(createPerItemTree({ gateItems: [0, 1], resultItem: 1 }).canBeSubmitted).toBe(true);
+    });
+
+    it("keeps a result whose item is visible even when the current item hides the control", () => {
+      const result = createPerItemTree({ gateItems: [0], resultItem: 0, control: { visible: false } });
+      expect(result.canBeSubmitted).toBe(true);
+    });
+
+    it("drops a result whose item hides the control through a choice-unselected ancestor", () => {
+      const params = { gateItems: [], resultItem: 0, root: { visiblewhen: "choice-unselected" } };
+
+      expect(createPerItemTree({ ...params, control: { visiblewhen: "", hiddenItems: [0] } }).canBeSubmitted).toBe(
+        false,
+      );
+      expect(createPerItemTree({ ...params, control: { visiblewhen: "" } }).canBeSubmitted).toBe(true);
+    });
+
+    it("drops a result whose own item hides the control", () => {
+      const result = createPerItemTree({ gateItems: [0], resultItem: 0, control: { hiddenItems: [0] } });
+      expect(result.canBeSubmitted).toBe(false);
+    });
+  });
+
   describe("tag", () => {
     it("returns null when mainValue empty", () => {
       const root = createTree({ value: { labels: [] } });
@@ -463,7 +549,7 @@ describe("Result", () => {
       const AreaNullSerialize = types
         .model("AreaNullSerialize", {
           id: types.identifier,
-          results: types.array(Result),
+          results: types.array(types.late(() => getResultModel())),
           parentID: types.maybeNull(types.string),
         })
         .views((self) => ({
@@ -563,7 +649,7 @@ describe("Result", () => {
       const MinimalAreaWithMeta = types
         .model("MinimalAreaWithMeta", {
           id: types.identifier,
-          results: types.array(Result),
+          results: types.array(types.late(() => getResultModel())),
           parentID: types.maybeNull(types.string),
           meta: types.optional(types.frozen(), () => ({ areaMeta: 1 })),
         })
@@ -578,7 +664,7 @@ describe("Result", () => {
             return "manual";
           },
         }))
-        .actions((self) => ({
+        .actions((_self) => ({
           isReadOnly() {
             return false;
           },
@@ -634,7 +720,7 @@ describe("Result", () => {
       const AreaWithLabels = types
         .model("AreaWithLabels", {
           id: types.identifier,
-          results: types.array(Result),
+          results: types.array(types.late(() => getResultModel())),
           parentID: types.maybeNull(types.string),
           labels: types.optional(types.array(types.string), []),
         })
@@ -704,20 +790,18 @@ describe("Result", () => {
       expect(data.parentID).toBe("pid-123");
     });
 
-    it("includes item_index when isFF(FF_LSDV_4583) and area.item_index is set", () => {
-      mockIsFF.mockImplementation((flag) => flag === "ff_lsdv_4583");
+    it("includes item_index when area.item_index is set", () => {
       const root = createTree({}, {}, { item_index: 2 });
       const result = root.annotationStore.selected.areas[0].results[0];
       const data = result.serialize();
       expect(data.item_index).toBe(2);
-      mockIsFF.mockReturnValue(false);
     });
 
     it("initializes data.value when area.serialize returns object without value", () => {
       const AreaNoValue = types
         .model("AreaNoValue", {
           id: types.identifier,
-          results: types.array(Result),
+          results: types.array(types.late(() => getResultModel())),
           parentID: types.maybeNull(types.string),
         })
         .views((self) => ({
@@ -776,4 +860,9 @@ describe("Result", () => {
       expect(data.value).toEqual({ labels: ["L1"] });
     });
   });
+});
+
+afterAll(() => {
+  registryModelsSpy?.mockRestore?.();
+  registryObjectTypesSpy?.mockRestore?.();
 });

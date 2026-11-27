@@ -13,9 +13,14 @@ from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
-from fsm.serializer_fields import FSMStateField
+from fsm.serializer_fields import FSMStateField, fsm_state_fields_enabled
 from fsm.state_inference import get_or_infer_state
-from fsm.utils import get_or_initialize_state, is_fsm_enabled
+from fsm.utils import (
+    FF_IMPORT_BULK_TASK_STATES,
+    bulk_initialize_created_task_states,
+    get_or_initialize_state,
+    is_fsm_enabled,
+)
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -26,9 +31,16 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.settings import api_settings
 from tasks.exceptions import AnnotationDuplicateError
 from tasks.models import Annotation, AnnotationDraft, Prediction, PredictionMeta, Task
+from tasks.ordering import apply_annotation_ordering, apply_prediction_ordering
+from tasks.result_utils import dedupe_annotation_result_list, sanitize_null_bytes
 from tasks.validation import TaskValidator
 from users.models import User
-from users.serializers import UserSerializer
+from users.serializers import (
+    AnnotatorReviewerFirewall,
+    AnonymizedUserPrimaryKeyRelatedField,
+    UserSerializer,
+    is_user_deleted,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +90,23 @@ class AnnotationResultField(serializers.JSONField):
     pass
 
 
-class PredictionSerializer(ModelSerializer):
+class ImmutableOnUpdateMixin:
+    # not a docstring: serializers without their own would inherit it as their OpenAPI description
+    # fields listed in `immutable_on_update` are ignored in the request body once the object exists
+    immutable_on_update = ()
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.instance is not None:
+            for name in self.immutable_on_update:
+                if name in fields:
+                    fields[name].read_only = True
+        return fields
+
+
+class PredictionSerializer(ImmutableOnUpdateMixin, ModelSerializer):
+    immutable_on_update = ('task', 'project')
+
     result = PredictionResultField()
     model_version = serializers.CharField(
         allow_blank=True,
@@ -97,17 +125,28 @@ class PredictionSerializer(ModelSerializer):
             project = data['project']
         ff_user = project.organization.created_by if project else 'auto'
 
-        if not flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=ff_user):
-            # Skip validation if feature flag is not set
-            logger.info(f'Skipping prediction validation in PredictionSerializer for user {ff_user}')
-            return super().validate(data)
-
         # Only validate if we're updating the result field
         if 'result' not in data:
             return data
 
         if not project:
             raise ValidationError('Project is required for prediction validation')
+
+        custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_PREDICTION_VALIDATOR', None))
+        if custom_interface_validator:
+            validation_errors = custom_interface_validator(project, data.get('result', []))
+            if validation_errors:
+                raise ValidationError(f'Error validating prediction: {validation_errors}')
+
+        if not flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=ff_user):
+            # Skip validation if feature flag is not set
+            logger.info(f'Skipping prediction validation in PredictionSerializer for user {ff_user}')
+            return super().validate(data)
+
+        # Custom Interface projects normally keep the default <View></View>
+        # label_config and are validated above against output_schema instead.
+        if not project.label_config_is_not_default:
+            return super().validate(data)
 
         # Validate prediction using LabelInterface
         li = LabelInterface(project.label_config)
@@ -128,12 +167,14 @@ class ListAnnotationSerializer(serializers.ListSerializer):
 
 
 class CompletedByDMSerializer(UserSerializer):
+    """DM column user snippet: fields must satisfy Data Manager MST `User` after camelCase."""
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
+        fields = ['id', 'first_name', 'last_name', 'username', 'last_activity', 'avatar', 'email', 'initials']
 
 
-class AnnotationSerializer(FlexFieldsModelSerializer):
+class AnnotationSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
     """
     Annotation Serializer with FSM state support.
 
@@ -141,13 +182,21 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
     if present, preventing N+1 queries. Use .with_state() on your queryset.
     """
 
+    immutable_on_update = ('task', 'project', 'parent_annotation', 'parent_prediction')
+
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     """"""
 
     result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    completed_by = AnonymizedUserPrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    updated_by = AnonymizedUserPrimaryKeyRelatedField(
+        required=False,
+        allow_null=True,
+        queryset=User.objects.all(),
+        help_text='Last user who updated this annotation',
+    )
     unique_id = serializers.CharField(required=False, write_only=True)
 
     def create(self, *args, **kwargs):
@@ -175,12 +224,55 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         if not isinstance(data, list):
             raise ValidationError('annotation "result" field in annotation must be list')
 
-        return data
+        # FIT-1669: collapse `(id, from_name, type)` collisions at the write boundary
+        # so the annotation record never persists duplicate-id rows.
+        return dedupe_annotation_result_list(data)
+
+    def _resolve_project_for_validation(self, data):
+        if 'task' in data:
+            return data['task'].project
+        if self.instance is not None:
+            return self.instance.project
+        task = self.context.get('task')
+        if task is not None:
+            return task.project
+        return None
+
+    def validate(self, data):
+        """Validate annotation result against project config and custom interface output_schema."""
+        if 'result' not in data or data.get('was_cancelled') is True:
+            return super().validate(data)
+
+        project = self._resolve_project_for_validation(data)
+        custom_interface_validator = load_func(getattr(settings, 'CUSTOM_INTERFACE_ANNOTATION_VALIDATOR', None))
+        if custom_interface_validator and project:
+            task = data.get('task') or self.context.get('task') or getattr(self.instance, 'task', None)
+            request = self.context.get('request')
+            user = getattr(request, 'user', None) if request is not None else None
+            # Integrity binds to the annotation author, not the acting user:
+            # a reviewer editing a contributor's annotation must validate
+            # against the contributor's uploads.
+            if self.instance is not None:
+                user = getattr(self.instance, 'completed_by', None) or user
+            validation_errors = custom_interface_validator(project, data.get('result', []), task=task, user=user)
+            if validation_errors:
+                raise ValidationError(f'Error validating annotation: {validation_errors}')
+
+        return super().validate(data)
 
     def get_created_username(self, annotation) -> str:
         user = annotation.completed_by
         if not user:
             return ''
+
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+        project = self.context.get('project') or getattr(annotation, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
 
         name = user.first_name
         if len(user.last_name):
@@ -190,13 +282,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         return name
 
     def to_representation(self, obj):
-        """Remove state field if feature flags are disabled"""
+        """Remove state field if FSM state fields are disabled"""
         ret = super().to_representation(obj)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
         return ret
 
@@ -211,7 +299,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     Lightweight Annotation Serializer for lazy loading.
 
     Returns only minimal metadata needed for annotation list display.
-    Used when fflag_fix_all_fit_720_lazy_load_annotations is enabled
+    Used when the client requests annotation stubs
     to improve performance for tasks with many annotations.
 
     Fields included:
@@ -219,6 +307,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     - created_username: for display in annotation list
     - created_ago: for display in annotation list (relative time string)
     - created_at: for TimeAgo component (actual timestamp)
+    - updated_at: for Updated-at sorting in the annotations list
     - completed_by: user id for avatar lookup
     - ground_truth: for showing star indicator
     - was_cancelled: for skip queue / cancel-skip button display
@@ -227,7 +316,7 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
 
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    completed_by = AnonymizedUserPrimaryKeyRelatedField(required=False, queryset=User.objects.all())
     # Mark this as a stub so frontend knows to fetch full data on selection
     is_stub = serializers.SerializerMethodField(read_only=True)
 
@@ -235,6 +324,15 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         user = annotation.completed_by
         if not user:
             return ''
+
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+        project = self.context.get('project') or getattr(annotation, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
 
         name = user.first_name
         if len(user.last_name):
@@ -249,12 +347,13 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Annotation
         # Minimal fields for annotation list display only
-        # ground_truth, created_at, and was_cancelled are simple model fields (no extra query)
+        # ground_truth, created_at, updated_at, and was_cancelled are simple model fields (no extra query)
         fields = [
             'id',
             'created_username',
             'created_ago',
             'created_at',
+            'updated_at',
             'completed_by',
             'ground_truth',
             'was_cancelled',
@@ -262,7 +361,9 @@ class AnnotationStubSerializer(FlexFieldsModelSerializer):
         ]
 
 
-class TaskSimpleSerializer(FlexFieldsModelSerializer):
+class TaskSimpleSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
+    immutable_on_update = ('project',)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
@@ -282,8 +383,10 @@ class TaskSimpleSerializer(FlexFieldsModelSerializer):
         exclude = ('precomputed_agreement', 'allow_skip')
 
 
-class BaseTaskSerializer(FlexFieldsModelSerializer):
+class BaseTaskSerializer(ImmutableOnUpdateMixin, FlexFieldsModelSerializer):
     """Task Serializer with project scheme configs validation"""
+
+    immutable_on_update = ('project',)
 
     def project(self, task=None):
         """Take the project from context"""
@@ -321,15 +424,22 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
         )
         return validator.validate(task)
 
+    def create(self, validated_data):
+        # Full-overlap projects skip rearrangement on task add (`_update_tasks_states`
+        # only rearranges when cohort < 100%). Seed overlap like bulk import / storage
+        # sync so is_labeled uses maximum_annotations instead of the model default of 1.
+        # Own this here so both POST /api/tasks/ and POST /api/projects/{id}/tasks/ agree.
+        project = validated_data.get('project') or self.project()
+        if 'overlap' not in validated_data and project is not None and project.overlap_cohort_percentage >= 100:
+            validated_data['overlap'] = project.maximum_annotations
+        return super().create(validated_data)
+
     def to_representation(self, instance):
         project = self.project(instance)
         if project:
             # resolve uri for storage (s3/gcs/etc)
             if self.context.get('resolve_uri', False):
-                if flag_set('fflag_fix_fit_1511_resolve_multiple_cloud_uris', user='auto'):
-                    instance.data = instance.resolve_uris(instance.data, project)
-                else:
-                    instance.data = instance.resolve_uri(instance.data, project)
+                instance.data = instance.resolve_uris(instance.data, project)
 
             # resolve $undefined$ key in task data
             data = instance.data
@@ -340,6 +450,92 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Task
         exclude = ('precomputed_agreement', 'allow_skip')
+
+
+FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY = 'fflag_fix_back_bros_1092_import_unknown_completed_by_short'
+
+# Task.import_id is a BigIntegerField (Postgres bigint)
+_BIGINT_MIN, _BIGINT_MAX = -(2**63), 2**63 - 1
+
+
+def get_task_import_id(task: dict) -> int | None:
+    """Source task id to keep as ``Task.import_id``: the root ``id`` of an imported task.
+
+    Only a real integer that fits the column is kept. Imported JSON is often not ours: ``id`` can be a
+    string, a UUID, a float or a 64-bit unsigned number from another tool. Label Studio always ignored
+    a task ``id`` on import, so anything unusable is ignored again instead of failing the import.
+    """
+    value = task.get('id')
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value if _BIGINT_MIN <= value <= _BIGINT_MAX else None
+
+
+def resolve_completed_by_id(
+    completed_by_value,
+    members_email_to_id: dict,
+    members_ids: set,
+    default_user_id: int | None,
+) -> int | None:
+    """Resolve imported annotation's ``completed_by`` to a valid org-member user id.
+
+    Used by both file imports (``BaseTaskSerializerBulk``) and storage syncs
+    (``ImportStorage.add_task``) when
+    ``fflag_fix_back_bros_1092_import_unknown_completed_by_short`` is enabled.
+    Goal: never reject an import just because the original annotator is not a member
+    of the receiving organization. Re-attribute to a sane fallback (importer for file
+    imports, ``project.created_by`` for storage sync) so re-imports of cross-org
+    snapshots work without manual cleanup.
+
+    Supported input shapes (mirror what Export API can produce):
+      - ``None``    -> ``default_user_id`` (annotation had no annotator).
+      - ``int``     -> that id if it belongs to the org, otherwise ``default_user_id``.
+      - ``dict``    -> try ``email`` first, then ``id``, otherwise ``default_user_id``.
+      - any other shape -> ``default_user_id`` with a warning (we never raise here;
+        the FF-off path retains strict legacy validation in
+        ``_insert_valid_completed_by``).
+
+    Args:
+        completed_by_value: raw value from the imported annotation payload.
+        members_email_to_id: mapping ``email -> user.id`` for the project organization.
+        members_ids: set of ``user.id`` for the project organization.
+        default_user_id: fallback id used when the value cannot be resolved.
+
+    Returns:
+        Resolved user id, or ``None`` when ``default_user_id`` is also ``None`` —
+        caller is expected to drop the ``completed_by`` field so the underlying
+        serializer treats it as missing.
+    """
+    # bool is a subclass of int in Python; reject up-front so True/False don't
+    # accidentally match user id 1 / 0 via membership checks below.
+    if isinstance(completed_by_value, bool):
+        logger.warning('Unknown completed_by shape: %r, falling back to %s', completed_by_value, default_user_id)
+        return default_user_id
+
+    if completed_by_value is None:
+        return default_user_id
+
+    if isinstance(completed_by_value, int):
+        if completed_by_value in members_ids:
+            return completed_by_value
+        return default_user_id
+
+    if isinstance(completed_by_value, dict):
+        email = completed_by_value.get('email')
+        if isinstance(email, str) and email in members_email_to_id:
+            return members_email_to_id[email]
+
+        candidate_id = completed_by_value.get('id')
+        # Same bool guard as above for the nested id field.
+        if isinstance(candidate_id, bool):
+            candidate_id = None
+        if isinstance(candidate_id, int) and candidate_id in members_ids:
+            return candidate_id
+
+        return default_user_id
+
+    logger.warning('Unknown completed_by shape: %r, falling back to %s', completed_by_value, default_user_id)
+    return default_user_id
 
 
 class BaseTaskSerializerBulk(serializers.ListSerializer):
@@ -403,10 +599,34 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         return ret
 
     @staticmethod
-    def _insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user):
-        """Insert the correct id for completed_by by email in annotations"""
+    def _insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user, ff_user=None):
+        """Insert the correct id for completed_by by email/id in annotations.
+
+        Two modes of operation, gated on
+        ``fflag_fix_back_bros_1092_import_unknown_completed_by_short``:
+
+        - FF on (BROS-1092 default): unknown annotators are silently re-attributed
+          to ``default_user`` via :func:`resolve_completed_by_id` so cross-org
+          re-imports do not 400. ``default_user`` here is the importer (when
+          available in serializer context) or ``project.created_by`` as set by
+          :meth:`BaseTaskSerializerBulk.create`.
+        - FF off: keeps the historical strict validation that raises
+          ``ValidationError`` for any value that doesn't resolve to an org member,
+          preserving the legacy behavior for rollback.
+        """
+        use_fallback = flag_set(FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=ff_user)
+
         for annotation in annotations:
             completed_by = annotation.get('completed_by')
+
+            if use_fallback:
+                resolved_id = resolve_completed_by_id(completed_by, members_email_to_id, members_ids, default_user.id)
+                if resolved_id is not None:
+                    annotation['completed_by_id'] = resolved_id
+                annotation.pop('completed_by', None)
+                continue
+
+            # --- legacy FF-off branches -------------------------------------------------
             # no completed_by info found - just skip it, will be assigned to the user who imports
             if completed_by is None:
                 annotation['completed_by_id'] = default_user.id
@@ -428,8 +648,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
             # old style annotators specification - try to find them by ID
             elif isinstance(completed_by, int) and completed_by in members_ids:
-                if completed_by not in members_ids:
-                    raise ValidationError(f"Unknown annotator's ID {completed_by}")
                 annotation['completed_by_id'] = completed_by
 
             # in any other cases - import validation error
@@ -511,7 +729,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             for task in validated_tasks:
                 # extract annotations from snapshot
                 annotations = task.pop('annotations', [])
-                self._insert_valid_completed_by(annotations, members_email_to_id, members_ids, default_user)
+                self._insert_valid_completed_by(
+                    annotations, members_email_to_id, members_ids, default_user, ff_user=ff_user
+                )
                 task_annotations.append(annotations)
 
                 # extract predictions from snapshot
@@ -542,9 +762,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             if prediction_errors and raise_prediction_errors:
                 raise ValidationError({'predictions': prediction_errors})
 
+            if db_annotations:
+                # Keep ProjectSummary counters in sync for imported annotations so
+                # label-distribution statistics don't require a manual summary reset.
+                self.project.summary.update_created_annotations_and_labels(db_annotations)
+
         self.post_process_annotations(user, db_annotations, 'imported')
         self.post_process_tasks(self.project.id, [t.id for t in self.db_tasks])
-        self.post_process_custom_callback(self.project.id, user)
+        if not self.context.get('defer_post_process_custom_callback'):
+            self.post_process_custom_callback(self.project.id, user)
 
         if flag_set('fflag_feat_back_lsdv_5307_import_reviews_drafts_29062023_short', user=ff_user):
             with transaction.atomic():
@@ -553,13 +779,15 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 annotation_mapping = {v.import_id: v.id for v in db_annotations}
                 annotation_mapping[None] = None
                 # the sequence of add_ functions is very important because of references to ids
-                self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
+                db_drafts = self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
+                if db_drafts:
+                    self.project.summary.update_created_labels_drafts(db_drafts)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
         # Backfill FSM states for bulk-created tasks
         # bulk_create() bypasses save() so FSM transitions don't fire automatically
         # Do this after all child entities states(annotations, drafts, reviews) have been backfilled
-        self._backfill_fsm_states(self.db_tasks)
+        self._backfill_task_fsm_states_skipping_inference(self.db_tasks, task_annotations)
 
         return db_tasks
 
@@ -582,10 +810,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
                 # Strip FSM state field from predictions before validation
                 # Exported data may include 'state' which is not a valid prediction field
-                ff_user = self.project.organization.created_by
-                if flag_set('fflag_feat_fit_568_finite_state_management', user=ff_user) and flag_set(
-                    'fflag_feat_fit_710_fsm_state_fields', user=ff_user
-                ):
+                if fsm_state_fields_enabled(self.context):
                     prediction.pop('state', None)
 
                 # Validate prediction only when project label config is not default
@@ -668,16 +893,33 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 draft.update(
                     {
                         'task_id': db_tasks[i].id,
-                        'annotation_id': annotation_mapping[draft.get('annotation')],
+                        # Use .get() so a draft that references an annotation not present in this
+                        # import batch (e.g. its parent annotation was dropped/never imported)
+                        # degrades to an unlinked draft (annotation_id=None) instead of raising
+                        # KeyError. See ENTERPRISE-V2-BACKEND-6G5.
+                        'annotation_id': annotation_mapping.get(draft.get('annotation')),
                         'project': self.project,
                         'import_id': draft.get('id'),
                     }
                 )
-                # remove redundant fields
+                # remove redundant/export-only fields
                 [
                     draft.pop(field, None)
-                    for field in ['id', 'task', 'annotation', 'project', 'created_username', 'created_ago']
+                    for field in [
+                        'id',
+                        'task',
+                        'annotation',
+                        'project',
+                        'created_username',
+                        'created_ago',
+                        'state',
+                        'created_by',
+                    ]
                 ]
+                # bulk_create bypasses AnnotationDraft.save(), so strip NUL bytes here too
+                # (Postgres JSONB rejects \u0000). See FIT-2353.
+                if 'result' in draft:
+                    draft['result'] = sanitize_null_bytes(draft['result'])
                 db_drafts.append(AnnotationDraft(**draft))
 
         self.db_drafts = AnnotationDraft.objects.bulk_create(db_drafts, batch_size=settings.BATCH_SIZE)
@@ -766,6 +1008,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
                 allow_skip=task.get('allow_skip', True),
+                import_id=get_task_import_id(task),
             )
             db_tasks.append(t)
 
@@ -788,6 +1031,24 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
 
         return db_tasks
+
+    def _backfill_task_fsm_states_skipping_inference(self, db_tasks: list, task_annotations: list):
+        """
+        Backfill FSM states for bulk-created tasks.
+
+        A just-created task without imported annotations is always CREATED, so its state is
+        inserted in bulk instead of being inferred and initialized one task at a time.
+        """
+        if not flag_set(FF_IMPORT_BULK_TASK_STATES, organization=self.project.organization):
+            self._backfill_fsm_states(db_tasks)
+            return
+
+        unannotated, annotated = [], []
+        for task, annotations in zip(db_tasks, task_annotations):
+            (annotated if annotations else unannotated).append(task)
+
+        bulk_initialize_created_task_states(unannotated, user=CurrentContext.get_user())
+        self._backfill_fsm_states(annotated)
 
     def _backfill_fsm_states(self, entities: list, overwrite_state=False):
         """
@@ -842,7 +1103,7 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
         exclude = ()
 
 
-class AnnotationDraftSerializer(ModelSerializer):
+class AnnotationDraftSerializer(ImmutableOnUpdateMixin, ModelSerializer):
     """
     AnnotationDraft Serializer with FSM state support.
 
@@ -850,8 +1111,11 @@ class AnnotationDraftSerializer(ModelSerializer):
     if present, preventing N+1 queries. Use .with_state() on your queryset.
     """
 
+    immutable_on_update = ('task', 'annotation')
+
     state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     user = serializers.CharField(default=serializers.CurrentUserDefault())
+    created_by = CompletedByDMSerializer(source='user', read_only=True, allow_null=True)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
@@ -859,6 +1123,17 @@ class AnnotationDraftSerializer(ModelSerializer):
         user = draft.user
         if not user:
             return ''
+
+        request = self.context.get('request')
+        requester = getattr(request, 'user', None) if request is not None else None
+        if AnnotatorReviewerFirewall.should_anonymize(user=user, requester=requester):
+            return AnnotatorReviewerFirewall.role_label(user=user, requester=requester)
+
+        project = self.context.get('project')
+        if not project and getattr(draft, 'task', None):
+            project = getattr(draft.task, 'project', None)
+        if is_user_deleted(user, context=self.context, project=project):
+            return f'Deleted User {user.id} deleted-{user.id}-user@example.com, {user.id}'
 
         name = user.first_name
         last_name = user.last_name
@@ -870,12 +1145,15 @@ class AnnotationDraftSerializer(ModelSerializer):
     def to_representation(self, obj):
         """Remove state field if feature flags are disabled"""
         ret = super().to_representation(obj)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not fsm_state_fields_enabled(self.context):
             ret.pop('state', None)
+        # Firewall: the `user` field serializes to str(user) (username/email); hide it for others.
+        draft_user = getattr(obj, 'user', None)
+        if draft_user is not None and 'user' in ret:
+            request = self.context.get('request')
+            requester = getattr(request, 'user', None) if request is not None else None
+            if AnnotatorReviewerFirewall.should_anonymize(user=draft_user, requester=requester):
+                ret['user'] = AnnotatorReviewerFirewall.role_label(user=draft_user, requester=requester)
         return ret
 
     class Meta:
@@ -898,14 +1176,9 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
     def get_predictions(self, task):
         predictions = task.predictions
-        user = self._get_user()
-        if flag_set('ff_front_dev_1682_model_version_dropdown_070622_short', user=user or 'auto'):
-            active_ml_backends = task.project.get_active_ml_backends()
-            model_versions = active_ml_backends.values_list('model_version', flat=True)
-            logger.debug(f'Selecting predictions from active ML backend model versions: {model_versions}')
-            predictions = predictions.filter(model_version__in=model_versions)
-        elif task.project.model_version:
+        if task.project.model_version:
             predictions = predictions.filter(model_version=task.project.model_version)
+        predictions = apply_prediction_ordering(predictions, self.context.get('annotations_ordering'))
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
     def get_annotations(self, task):
@@ -916,6 +1189,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         if user and user.is_annotator:
             annotations = annotations.filter(completed_by=user)
 
+        annotations = apply_annotation_ordering(annotations, self.context.get('annotations_ordering'))
         return AnnotationSerializer(annotations, many=True, read_only=True, default=[], context=self.context).data
 
     def get_drafts(self, task):
@@ -943,6 +1217,7 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
 
     def get_predictions(self, task):
         predictions = task.get_predictions_for_prelabeling()
+        predictions = apply_prediction_ordering(predictions, self.context.get('annotations_ordering'))
         return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
     def get_annotations(self, task):
@@ -960,6 +1235,7 @@ class NextTaskSerializer(TaskWithAnnotationsAndPredictionsAndDraftsSerializer):
                     annotations = annotations.filter(completed_by=user)
                 else:
                     annotations = annotations.filter(completed_by=user)
+                annotations = apply_annotation_ordering(annotations, self.context.get('annotations_ordering'))
                 return AnnotationStubSerializer(annotations, many=True, read_only=True, context=self.context).data
             else:
                 annotations = super().get_annotations(task)

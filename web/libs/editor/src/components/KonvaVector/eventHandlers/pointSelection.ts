@@ -58,7 +58,19 @@ export function shouldClosePathOnPointClick(
 }
 
 // Helper function to check if the active point is eligible for path closing
-export function isActivePointEligibleForClosing(props: EventHandlerProps): boolean {
+export function isActivePointEligibleForClosing(props: EventHandlerProps, clickedPointIndex?: number): boolean {
+  // BROS-911: When the user explicitly clicks an endpoint (first/last) to close the path,
+  // closing must be allowed regardless of which point is currently active. In skeleton mode,
+  // selecting an intermediate point mid-drawing makes it the active point; without this branch
+  // the active-point check below would reject the close and the region could never be closed.
+  // The structural validity of the close is still enforced by closePathBetweenFirstAndLast.
+  if (clickedPointIndex !== undefined) {
+    const lastPointIndex = props.initialPoints.length - 1;
+    if (clickedPointIndex === 0 || clickedPointIndex === lastPointIndex) {
+      return true;
+    }
+  }
+
   const activePoint =
     props.skeletonEnabled && props.activePointId
       ? props.initialPoints.find((p) => p.id === props.activePointId)
@@ -155,7 +167,7 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
       // But only if the active point is also the first or last point
       // But don't close if Shift is held (to allow Shift+click functionality)
       // This should take priority over normal point selection
-      if (shouldClosePathOnPointClick(i, props, e) && isActivePointEligibleForClosing(props)) {
+      if (shouldClosePathOnPointClick(i, props, e) && isActivePointEligibleForClosing(props, i)) {
         // Determine which point to close to
         const fromPointIndex = i;
         const toPointIndex = i === 0 ? props.initialPoints.length - 1 : 0;

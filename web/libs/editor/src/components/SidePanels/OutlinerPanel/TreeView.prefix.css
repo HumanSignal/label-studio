@@ -108,6 +108,13 @@
       }
     }
 
+    &_type_classification {
+      .tree-iconEle,
+      .outliner-item__title {
+        color: var(--color-neutral-content-subtle);
+      }
+    }
+
     &_hidden {
       opacity: 0.4;
     }

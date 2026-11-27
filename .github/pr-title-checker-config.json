@@ -5,25 +5,32 @@
   },
   "CHECKS": {
     "prefixes": [
+      "build: ",
       "fix: ",
       "feat: ",
       "docs: ",
       "chore: ",
       "chore(deps): ",
+      "chore(deps-dev): ",
+      "build(deps): ",
+      "build(deps-dev): ",
       "ci: ",
       "perf: ",
       "refactor: ",
+      "revert: ",
       "style: ",
       "test: "
     ],
     "ignoreLabels": [
       "skip-changelog",
       "skip-ci"
-    ]
+    ],
+    "regexp": ".*:\\s[A-Z0-9]+-[0-9]+:\\s.*",
+    "regexpFlags": "i"
   },
   "MESSAGES": {
     "success": "PR title is valid",
     "failure": "PR title is invalid",
-    "notice": "Valid prefixes are: fix, feat, docs, chore, ci, perf, refactor, style, test."
+    "notice": "For more information, see [Conventional Commits specification](https://conventionalcommits.org)"
   }
 }

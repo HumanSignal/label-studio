@@ -8,6 +8,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Badge, Tooltip, Popover } from "@humansignal/ui";
+import type { BadgeVariant } from "../badge/badge";
 
 export interface StateChipProps {
   /**
@@ -24,7 +25,7 @@ export interface StateChipProps {
    * Badge variant for styling (e.g. "sand", "grape", "canteloupe", "kale", "plum").
    * Use getStateVariant(state) from @humansignal/app-common to map state to variant.
    */
-  variant: string;
+  variant: BadgeVariant;
 
   /**
    * Whether the chip should be interactive (clickable with popover)

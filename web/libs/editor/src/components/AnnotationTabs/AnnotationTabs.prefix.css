@@ -102,9 +102,6 @@
   }
 
   &__userpic {
-    width: 24px;
-    height: 24px;
-
     &_prediction {
       color: var(--color-accent-plum-bold);
       background-color: var(--color-accent-plum-subtle);

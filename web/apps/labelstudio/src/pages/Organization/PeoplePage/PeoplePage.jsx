@@ -1,8 +1,7 @@
-import { Button } from "@humansignal/ui";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Button, ModalWindow } from "@humansignal/ui";
+import { useCallback, useMemo, useState } from "react";
 import { useUpdatePageTitle } from "@humansignal/core";
 import { HeidiTips } from "../../../components/HeidiTips/HeidiTips";
-import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
 import { cn } from "../../../utils/bem";
 import { FF_AUTH_TOKENS, FF_LSDV_E_297, isFF } from "../../../utils/feature-flags";
@@ -16,7 +15,7 @@ import { InviteLink } from "./InviteLink";
 import { SelectedUser } from "./SelectedUser";
 
 export const PeoplePage = () => {
-  const apiSettingsModal = useRef();
+  const [tokenSettingsOpen, setTokenSettingsOpen] = useState(false);
   const toast = useToast();
   const [selectedUser, setSelectedUser] = useState(null);
   const [invitationOpen, setInvitationOpen] = useState(false);
@@ -32,26 +31,10 @@ export const PeoplePage = () => {
     [setSelectedUser],
   );
 
-  const apiTokensSettingsModalProps = useMemo(
-    () => ({
-      title: "API Token Settings",
-      style: { width: 480 },
-      body: () => (
-        <TokenSettingsModal
-          onSaved={() => {
-            toast.show({ message: "API Token settings saved" });
-            apiSettingsModal.current?.close();
-          }}
-        />
-      ),
-    }),
-    [],
-  );
-
   const showApiTokenSettingsModal = useCallback(() => {
-    apiSettingsModal.current = modal(apiTokensSettingsModalProps);
+    setTokenSettingsOpen(true);
     __lsa("organization.token_settings");
-  }, [apiTokensSettingsModalProps]);
+  }, []);
 
   const defaultSelected = useMemo(() => {
     return localStorage.getItem("selectedUser");
@@ -99,6 +82,22 @@ export const PeoplePage = () => {
           setInvitationOpen(false);
         }}
       />
+      <ModalWindow
+        open={tokenSettingsOpen}
+        onOpenChange={setTokenSettingsOpen}
+        title="API Token Settings"
+        size="small"
+        dataTestId="api-token-settings-modal"
+      >
+        {tokenSettingsOpen && (
+          <TokenSettingsModal
+            onSaved={() => {
+              toast.show({ message: "API Token settings saved" });
+              setTokenSettingsOpen(false);
+            }}
+          />
+        )}
+      </ModalWindow>
     </div>
   );
 };

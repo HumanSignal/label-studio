@@ -1,50 +1,44 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { JsonViewer } from "./json-viewer";
+import * as jsonEditReactModule from "json-edit-react";
+import * as iconsModule from "@humansignal/icons";
+import * as buttonModule from "../button/button";
+import * as tooltipModule from "../Tooltip/Tooltip";
+import * as readerViewButtonModule from "./reader-view-button";
 
 declare global {
   // eslint-disable-next-line no-var
   var __jsonEditorProps: any;
 }
 
-jest.mock("json-edit-react", () => ({
-  JsonEditor: (props: any) => {
-    global.__jsonEditorProps = props;
-    return <div data-testid="json-editor" />;
-  },
-  defaultTheme: { styles: {} },
-  matchNode: jest.fn(() => false),
-}));
-
-jest.mock("@humansignal/icons", () => ({
-  IconSearch: () => null,
-  IconReset: () => null,
-  IconClose: () => null,
-  IconCopyOutline: () => null,
-}));
-
-jest.mock("../button/button", () => ({
-  Button: ({ children, onClick, ...rest }: any) => (
-    <button type="button" onClick={onClick} {...rest}>
-      {children}
-    </button>
-  ),
-}));
-
-jest.mock("../Tooltip/Tooltip", () => ({
-  Tooltip: ({ children }: any) => <>{children}</>,
-}));
-
-jest.mock("./reader-view-button", () => ({
-  ReaderViewButton: () => null,
-}));
-
-jest.mock("./json-viewer.module.css", () => ({}));
+const mockMatchNode = mock(() => false);
 
 describe("JsonViewer filtered search", () => {
   beforeEach(() => {
     global.__jsonEditorProps = undefined;
-    jest.clearAllMocks();
+    mock.clearAllMocks();
+    mockMatchNode.mockClear();
+
+    spyOn(jsonEditReactModule, "JsonEditor").mockImplementation((props: any) => {
+      global.__jsonEditorProps = props;
+      return <div data-testid="json-editor" />;
+    });
+    spyOn(jsonEditReactModule, "matchNode").mockImplementation((...args: any[]) => mockMatchNode(...args));
+
+    spyOn(iconsModule, "IconSearch").mockReturnValue(null);
+    spyOn(iconsModule, "IconReset").mockReturnValue(null);
+    spyOn(iconsModule, "IconClose").mockReturnValue(null);
+    spyOn(iconsModule, "IconCopyOutline").mockReturnValue(null);
+
+    spyOn(buttonModule, "Button").mockImplementation(({ children, onClick, ...rest }: any) => (
+      <button type="button" onClick={onClick} {...rest}>
+        {children}
+      </button>
+    ));
+
+    spyOn(tooltipModule, "Tooltip").mockImplementation(({ children }: any) => <>{children}</>);
+
+    spyOn(readerViewButtonModule, "ReaderViewButton").mockReturnValue(null);
   });
 
   it("finds key names when All filter is explicitly selected", () => {
@@ -53,12 +47,11 @@ describe("JsonViewer filtered search", () => {
     fireEvent.click(screen.getByRole("button", { name: "All" }));
     fireEvent.change(screen.getByLabelText("Search JSON"), { target: { value: "id" } });
 
-    const { matchNode } = require("json-edit-react");
     const searchFilter = global.__jsonEditorProps.searchFilter;
 
     expect(typeof searchFilter).toBe("function");
     expect(searchFilter({ key: "id", value: 123, path: ["id"] }, "id")).toBe(true);
-    expect(matchNode).toHaveBeenCalled();
+    expect(mockMatchNode).toHaveBeenCalled();
   });
 
   it("keeps custom filter scope while matching keys in filtered nodes", () => {

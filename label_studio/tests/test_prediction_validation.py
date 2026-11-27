@@ -23,7 +23,7 @@ from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory, force_authenticate
-from tasks.models import Annotation, Prediction, Task
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.tests.factories import TaskFactory
 from users.tests.factories import UserFactory
 
@@ -135,6 +135,40 @@ class TestPredictionValidation:
         assert serializer.is_valid(), serializer.errors
         created_tasks = serializer.save(project_id=self.project.id)
         assert len(created_tasks) == 1
+
+    @patch('tasks.serializers.flag_set', return_value=True)
+    def test_import_tasks_sanitizes_draft_state_from_snapshot(self, _mock_flag_set):
+        """ImportApiSerializer must ignore export-only draft state fields from JSON snapshots."""
+        tasks = [
+            {
+                'data': {'text': 'Draft state should be ignored'},
+                'drafts': [
+                    {
+                        'id': 222,
+                        'state': 'CREATED',
+                        'result': [
+                            {
+                                'from_name': 'sentiment',
+                                'to_name': 'text',
+                                'type': 'choices',
+                                'value': {'choices': ['positive']},
+                            }
+                        ],
+                        'lead_time': 1.25,
+                        'was_postponed': False,
+                        'user': self.user.email,
+                    }
+                ],
+            }
+        ]
+
+        serializer = ImportApiSerializer(data=tasks, many=True, context={'project': self.project, 'user': self.user})
+        assert serializer.is_valid(), serializer.errors
+        created_tasks = serializer.save(project_id=self.project.id)
+
+        draft = AnnotationDraft.objects.get(task=created_tasks[0])
+        assert draft.import_id == 222
+        assert draft.result[0]['value'] == {'choices': ['positive']}
 
     @patch(
         'data_import.api.flag_set',
@@ -630,6 +664,20 @@ class TestPredictionValidation:
         assert 'data' in reformatted_tasks[0]
         assert 'predictions' in reformatted_tasks[0]
         assert len(reformatted_tasks[0]['predictions']) == 1
+
+    def test_preannotated_fields_keep_source_task_id(self):
+        """Converting fields to predictions keeps the root id of a task-format item (stored as Task.import_id)."""
+        tasks = [
+            {'id': 17, 'data': {'text': 'Test text 1', 'sentiment': 'positive'}},
+            {'id': 8, 'text': 'Test text 2', 'sentiment': 'negative'},
+        ]
+
+        reformatted_tasks = reformat_predictions(tasks, ['sentiment'])
+
+        assert reformatted_tasks[0]['id'] == 17
+        # a data-only item has no task id: its "id" stays a data field
+        assert 'id' not in reformatted_tasks[1]
+        assert reformatted_tasks[1]['data']['id'] == 8
 
     def test_preannotated_fields_missing_field(self):
         """Test validation fails when preannotated field is missing."""

@@ -4,7 +4,7 @@ import {
   simpleRectangleConfig,
   simpleRectangleResult,
 } from "../../data/image_segmentation/tools/selection-tool";
-import { FF_DEV_2671, FF_ZOOM_OPTIM } from "../../../../src/utils/feature-flags";
+import { FF_DEV_2671 } from "../../../../src/utils/feature-flags";
 
 describe("Image Segmentation - Transformer interactions", () => {
   it("keeps rectangle coordinates within image bounds when dragging near edges", () => {
@@ -95,11 +95,7 @@ describe("Image Segmentation - Transformer interactions", () => {
     Sidebar.hasSelectedRegions(1);
   });
 
-  it("keeps transformed rectangle bounded with zoom optimization enabled", () => {
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_ZOOM_OPTIM]: true,
-    });
-
+  it("keeps transformed rectangle bounded when zoomed", () => {
     LabelStudio.params().config(simpleRectangleConfig).data(simpleImageData).withResult(simpleRectangleResult).init();
     ImageView.waitForImage();
 

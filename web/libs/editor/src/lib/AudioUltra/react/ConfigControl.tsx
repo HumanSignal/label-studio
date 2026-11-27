@@ -2,7 +2,7 @@ import type React from "react";
 import { type FC, type MouseEvent, useContext, useEffect, useState } from "react";
 import { Toggle } from "@humansignal/ui";
 import { cn } from "../../../utils/bem";
-import { IconConfig } from "@humansignal/ui";
+import { IconConfig } from "@humansignal/icons";
 import { TimelineContext } from "../../../components/Timeline/Context";
 import { ControlButton } from "../../../components/Timeline/Controls";
 import { Slider } from "../../../components/Timeline/Controls/Slider";

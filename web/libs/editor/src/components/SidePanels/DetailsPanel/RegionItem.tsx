@@ -9,6 +9,11 @@ import { cn } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionLabels } from "./RegionLabels";
+import {
+  emitRegionLockToggled,
+  emitRegionVisibilityToggled,
+  emitRegionDeleted,
+} from "../../../utils/labelingTelemetry";
 
 interface RegionItemProps {
   region: any;
@@ -106,7 +111,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
       <RegionActionButton
         key="relation"
         variant={annotation.isLinkingMode ? "primary" : "neutral"}
-        look={annotation.isLinkingMode ? "filled" : "string"}
+        look={annotation.isLinkingMode ? "filled" : "ghost"}
         onClick={(_e: any, hotkey?: any) => {
           // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
           if (hotkey) return;
@@ -127,7 +132,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
     <WithHotkey binging="region:meta">
       <RegionActionButton
         key="meta"
-        look={editMode ? "filled" : "string"}
+        look={editMode ? "filled" : "ghost"}
         variant={editMode ? "primary" : "neutral"}
         onClick={() => onEditModeChange(!editMode)}
         aria-label="Edit region's meta"
@@ -149,10 +154,17 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
             annotation={region?.annotation}
             hovered={true}
             locked={region?.locked}
-            onClick={() => region.setLocked(!region.locked)}
+            onClick={() => {
+              const nextLocked = !region.locked;
+              emitRegionLockToggled(region.annotation?.store, region.annotation, {
+                region_id: region.id,
+                locked: nextLocked,
+              });
+              region.setLocked(nextLocked);
+            }}
             displayedHotkey="region:lock"
             variant="neutral"
-            look="string"
+            look="ghost"
             aria-label="Unlock Region"
             tooltip="Unlock Region"
           />
@@ -161,8 +173,16 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
           <RegionActionButton
             aria-label={`${region.hidden ? "Show" : "Hide"} selected region`}
             variant="neutral"
-            look="string"
-            onClick={region.toggleHidden}
+            look="ghost"
+            onClick={() => {
+              const nextVisible = region.hidden;
+              emitRegionVisibilityToggled(region.annotation?.store, region.annotation, {
+                region_id: region.id,
+                visible: nextVisible,
+                scope: "region",
+              });
+              region.toggleHidden();
+            }}
             tooltip={`${region.hidden ? "Show" : "Hide"} selected region`}
           >
             {region.hidden ? <IconEyeClosed /> : <IconEyeOpened />}
@@ -170,11 +190,17 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         )}
         <RegionActionButton
           variant="negative"
-          look="string"
+          look="ghost"
           aria-label="Delete selected region"
           disabled={region.isReadOnly()}
           tooltip="Delete selected region"
-          onClick={() => annotation.deleteRegion(region)}
+          onClick={() => {
+            emitRegionDeleted(annotation.store, annotation, {
+              region_id: region.id,
+              region_type: region.type ?? null,
+            });
+            annotation.deleteRegion(region);
+          }}
         >
           <IconTrash />
         </RegionActionButton>
@@ -185,7 +211,7 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
 
 const RegionActionButton: FC<ButtonProps> = forwardRef(({ children, ...props }, ref) => {
   return (
-    <Button ref={ref} variant="neutral" look="string" size="small" {...props}>
+    <Button ref={ref} variant="neutral" look="ghost" size="small" {...props}>
       {children}
     </Button>
   );

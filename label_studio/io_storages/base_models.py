@@ -24,17 +24,30 @@ from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.db import models, transaction
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from fsm.functions import backfill_fsm_states_for_tasks
-from io_storages.utils import StorageObject, get_all_uris_via_regex, get_uri_via_regex, parse_bucket_uri
+from fsm.utils import FF_IMPORT_BULK_TASK_STATES
+from io_storages.utils import (
+    StorageObject,
+    get_all_uris_via_regex,
+    get_uri_via_regex,
+    key_is_under_prefix,
+    parse_bucket_uri,
+)
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
 from tasks.models import Annotation, Task
-from tasks.serializers import AnnotationSerializer, PredictionSerializer
+from tasks.serializers import (
+    FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY,
+    AnnotationSerializer,
+    PredictionSerializer,
+    get_task_import_id,
+    resolve_completed_by_id,
+)
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
@@ -140,13 +153,14 @@ class StorageInfo(models.Model):
         self.status = self.Status.COMPLETED
         self.last_sync = timezone.now()
         self.last_sync_count = last_sync_count
+        self.traceback = None
 
         time_completed = timezone.now()
 
         self.meta['time_completed'] = str(time_completed)
         self.meta['duration'] = (time_completed - self.time_in_progress).total_seconds()
         self.meta.update(kwargs)
-        self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count'])
+        self.save(update_fields=['status', 'meta', 'last_sync', 'last_sync_count', 'traceback'])
 
     def info_set_completed_with_errors(self, last_sync_count, validation_errors, **kwargs):
         self.status = self.Status.COMPLETED_WITH_ERRORS
@@ -227,12 +241,19 @@ class StorageInfo(models.Model):
         # iterate over all storages
         storages = storages.only('id', 'last_sync_job', 'status', 'meta')
         for storage in storages:
-            storage.health_check()
+            try:
+                storage.health_check()
+            except Exception:
+                logger.warning(f'Health check failed for storage {storage.id}', exc_info=True)
 
     def health_check(self):
         # get duration between last ping time and now
         now = timezone.now()
-        last_ping = datetime.fromisoformat(self.meta.get('time_last_ping', str(now)))
+        meta = self.meta if self.meta is not None else {}
+        try:
+            last_ping = datetime.fromisoformat(meta.get('time_last_ping', str(now)))
+        except (ValueError, TypeError):
+            last_ping = now
         delta = (now - last_ping).total_seconds()
 
         # check redis connection
@@ -258,12 +279,15 @@ class StorageInfo(models.Model):
         if self.status not in [Status.IN_PROGRESS, Status.QUEUED]:
             return
 
-        queue = django_rq.get_queue('low')
-        try:
-            sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
-            job_status = sync_job.get_status()
-        except rq.exceptions.NoSuchJobError:
+        if not self.last_sync_job:
             job_status = 'not found'
+        else:
+            queue = django_rq.get_queue('low')
+            try:
+                sync_job = Job.fetch(self.last_sync_job, connection=queue.connection)
+                job_status = sync_job.get_status()
+            except (rq.exceptions.NoSuchJobError, TypeError):
+                job_status = 'not found'
 
         # broken synchronization between storage and job
         # this might happen when job was stopped because of OOM and on_failure wasn't called
@@ -302,6 +326,33 @@ class Storage(StorageInfo):
     def validate_connection(self, client=None):
         raise NotImplementedError('validate_connection is not implemented')
 
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
+        return self.can_resolve_scheme(url)
+
+    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
+        # Lives on Storage, not ImportStorage: export targets also resolve URIs
+        # (Data Collection read-back). A storage class that never declares a
+        # url_scheme resolves nothing.
+        if not url or not self.url_scheme:
+            return False
+        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
+        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
+        bucket_uri = parse_bucket_uri(url, self)
+
+        # If there is a prefix and the bucket matches the storage's bucket/container/path
+        if prefix == self.url_scheme and bucket_uri:
+            # bucket is used for s3 and gcs
+            if hasattr(self, 'bucket') and bucket_uri.bucket == self.bucket:
+                return True
+            # container is used for azure blob
+            if hasattr(self, 'container') and bucket_uri.bucket == self.container:
+                return True
+            # path is used for redis
+            if hasattr(self, 'path') and bucket_uri.bucket == self.path:
+                return True
+        # if not found any occurrences - this Storage can't resolve url
+        return False
+
     class Meta:
         abstract = True
 
@@ -337,6 +388,18 @@ class ImportStorage(Storage):
     def generate_http_url(self, url):
         raise NotImplementedError
 
+    def get_resolve_key(self, url: str) -> Union[str, None]:
+        """The object key a resolvable URL points at, relative to the bucket/container."""
+        uri = parse_bucket_uri(url, self)
+        return uri.path if uri else None
+
+    def prefix_allows_url(self, url: str) -> bool:
+        """True when the URL's object key is under this storage's prefix (or no prefix is set)."""
+        prefix = getattr(self, 'prefix', None)
+        if not prefix:
+            return True
+        return key_is_under_prefix(self.get_resolve_key(url), prefix)
+
     def get_bytes_stream(self, uri):
         """Get file bytes from storage as a stream and content type.
 
@@ -347,30 +410,6 @@ class ImportStorage(Storage):
             Tuple of (BytesIO stream, content_type)
         """
         raise NotImplementedError
-
-    def can_resolve_url(self, url: Union[str, None]) -> bool:
-        return self.can_resolve_scheme(url)
-
-    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
-        if not url:
-            return False
-        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
-        _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
-        bucket_uri = parse_bucket_uri(url, self)
-
-        # If there is a prefix and the bucket matches the storage's bucket/container/path
-        if prefix == self.url_scheme and bucket_uri:
-            # bucket is used for s3 and gcs
-            if hasattr(self, 'bucket') and bucket_uri.bucket == self.bucket:
-                return True
-            # container is used for azure blob
-            if hasattr(self, 'container') and bucket_uri.bucket == self.container:
-                return True
-            # path is used for redis
-            if hasattr(self, 'path') and bucket_uri.bucket == self.path:
-                return True
-        # if not found any occurrences - this Storage can't resolve url
-        return False
 
     def resolve_uri(self, uri, task=None):
         # DEPRECATED: use resolve_uris instead.
@@ -461,20 +500,17 @@ class ImportStorage(Storage):
             logger.info(f"Can't resolve URIs in data={data}", exc_info=True)
             return None
 
-    def _scan_and_create_links_v2(self):
-        # Async job execution for batch of objects:
-        # e.g. GCS example
-        # | "GetKey" >>  --> read file content into label_studio_semantic_search.indexer.RawDataObject repr
-        # | "AggregateBatch" >> beam.Combine      --> combine read objects into a batch
-        # | "AddObjects" >> label_studio_semantic_search.indexer.add_objects_from_bucket
-        # --> add objects from batch to Vector DB
-        # or for project task creation last step would be
-        # | "AddObject" >> ImportStorage.add_task
-
-        raise NotImplementedError
+    @staticmethod
+    def is_bare_task_data(task_data) -> bool:
+        """True when a storage object carries no annotations or predictions, so its task can be bulk-created."""
+        return isinstance(task_data, dict) and not (task_data.get('annotations') or task_data.get('predictions'))
 
     @classmethod
-    def add_task(cls, project, maximum_annotations, max_inner_id, storage, link_object: StorageObject, link_class):
+    def _build_task(cls, project, maximum_annotations, max_inner_id, link_object: StorageObject):
+        """Validate a storage object and build its unsaved task.
+
+        Returns (task, link_kwargs, annotations, predictions).
+        """
         link_kwargs = asdict(link_object)
         data = link_kwargs.pop('task_data', None)
 
@@ -498,29 +534,68 @@ class ImportStorage(Storage):
                 )
             cancelled_annotations = len([a for a in annotations if a.get('was_cancelled', False)])
 
+        storage_task_data_validator = load_func(getattr(settings, 'STORAGE_TASK_DATA_VALIDATOR', None))
+        if storage_task_data_validator:
+            storage_task_data_validator(project, data)
+
+        # Only a task-format object ({"id": ..., "data": {...}}) has a task id; in a data-only object
+        # an "id" key is a data field and stays in task.data.
+        import_id = None
         if 'data' in data and isinstance(data['data'], dict):
+            import_id = get_task_import_id(data)
             if data['data'] is not None:
                 data = data['data']
             else:
                 data.pop('data')
 
+        task = Task(
+            data=data,
+            project=project,
+            overlap=maximum_annotations,
+            is_labeled=len(annotations) >= maximum_annotations,
+            total_predictions=len(predictions),
+            total_annotations=len(annotations) - cancelled_annotations,
+            cancelled_annotations=cancelled_annotations,
+            inner_id=max_inner_id,
+            allow_skip=allow_skip,
+            import_id=import_id,
+        )
+        return task, link_kwargs, annotations, predictions
+
+    @classmethod
+    def add_tasks_bulk(cls, project, storage, pending: list, link_class) -> list:
+        """Insert bare tasks (no annotations or predictions) and their links in one transaction.
+
+        pending is a list of (unsaved task, link_kwargs) pairs from _build_task. bulk_create() skips Task.save()
+        and the Task pre_save/post_save receivers; for a new bare task their only effect is the project summary
+        data-columns update, which is applied here once for the whole batch (and whose own post_save handles
+        the per-project cache invalidation). If a Task or link save hook is ever added, it must be replicated
+        here; lse_data_import/tests/test_bulk_import_hooks.py fails until it is reviewed.
+        """
         with transaction.atomic():
-            # Create task without skip_fsm (it's not a model field)
-            task = Task(
-                data=data,
-                project=project,
-                overlap=maximum_annotations,
-                is_labeled=len(annotations) >= maximum_annotations,
-                total_predictions=len(predictions),
-                total_annotations=len(annotations) - cancelled_annotations,
-                cancelled_annotations=cancelled_annotations,
-                inner_id=max_inner_id,
-                allow_skip=allow_skip,
+            tasks = Task.objects.bulk_create([task for task, _ in pending], batch_size=settings.BATCH_SIZE)
+            link_class.objects.bulk_create(
+                [
+                    link_class(task=task, storage=storage, object_exists=True, **link_kwargs)
+                    for task, (_, link_kwargs) in zip(tasks, pending)
+                ],
+                batch_size=settings.BATCH_SIZE,
             )
+            project.summary.update_data_columns(tasks)
+        return tasks
+
+    @classmethod
+    def add_task(cls, project, maximum_annotations, max_inner_id, storage, link_object: StorageObject, link_class):
+        task, link_kwargs, annotations, predictions = cls._build_task(
+            project, maximum_annotations, max_inner_id, link_object
+        )
+
+        with transaction.atomic():
             # Save with skip_fsm flag to bypass FSM during bulk import
             task.save(skip_fsm=True)
 
-            link_class.create(task, storage=storage, **link_kwargs)
+            # The task is new, so its link cannot exist yet; a plain insert avoids get_or_create's lookup.
+            link_class.objects.create(task=task, storage=storage, object_exists=True, **link_kwargs)
             logger.debug(f'Create {storage.__class__.__name__} link with {link_kwargs} for {task=}')
 
             raise_exception = not flag_set(
@@ -539,32 +614,106 @@ class ImportStorage(Storage):
                 flag_set('fflag_feat_utc_210_prediction_validation_15082025', user=project.organization.created_by)
                 or raise_exception
             )
+            created_predictions = []
             if prediction_ser.is_valid(raise_exception=raise_prediction_exception):
-                prediction_ser.save()
+                created_predictions = prediction_ser.save()
 
             # add annotations
             logger.debug(f'Create {len(annotations)} annotations for task={task}')
+
+            # Storage sync must accept JSON exported by Label Studio. Exports can
+            # include ``completed_by`` as a full user object, while
+            # AnnotationSerializer expects a primary key. Keep BROS-1092's broader
+            # unknown/cross-org fallback behind its flag, but always normalize
+            # dict-shaped export values that resolve to an organization member.
+            normalize_completed_by = any(
+                isinstance(annotation.get('completed_by'), dict) for annotation in annotations
+            )
+            fallback_unknown_completed_by = flag_set(
+                FF_BROS_1092_IMPORT_UNKNOWN_COMPLETED_BY, user=project.organization.created_by
+            )
+            if annotations and (normalize_completed_by or fallback_unknown_completed_by):
+                members_email_to_id = dict(project.organization.members.values_list('user__email', 'user__id'))
+                members_ids = set(members_email_to_id.values())
+                default_user_id = project.created_by_id or project.organization.created_by_id
+                if default_user_id is None:
+                    logger.warning(
+                        f'Cannot resolve default user for project {project.id} during storage sync; '
+                        f'annotations with unknown completed_by will be created without an annotator'
+                    )
+                for annotation in annotations:
+                    if 'completed_by' not in annotation:
+                        continue
+                    completed_by = annotation['completed_by']
+                    if not fallback_unknown_completed_by and not isinstance(completed_by, dict):
+                        continue
+                    default_completed_by_id = default_user_id if fallback_unknown_completed_by else None
+                    resolved = resolve_completed_by_id(
+                        completed_by,
+                        members_email_to_id,
+                        members_ids,
+                        default_completed_by_id,
+                    )
+                    if resolved is not None:
+                        annotation['completed_by'] = resolved
+                    elif fallback_unknown_completed_by:
+                        annotation.pop('completed_by', None)
+
             for annotation in annotations:
+                # Storage sync must accept JSON exported by Label Studio. Manual import
+                # ignores export identity fields; reusing exported unique_id violates the
+                # DB unique constraint. Map export id -> import_id for parity with bulk import.
+                annotation.pop('unique_id', None)
+                export_id = annotation.pop('id', None)
+                if export_id is not None and annotation.get('import_id') is None:
+                    annotation['import_id'] = export_id
                 annotation['task'] = task.id
                 annotation['project'] = project.id
             annotation_ser = AnnotationSerializer(data=annotations, many=True)
 
             # Always validate annotations, but control error handling based on FF
+            created_annotations = []
             if annotation_ser.is_valid():
-                annotation_ser.save()
+                created_annotations = annotation_ser.save()
             else:
                 # Log validation errors but don't save invalid annotations
                 logger.error(f'Invalid annotations for task {task.id}: {annotation_ser.errors}')
                 if raise_exception:
                     raise ValidationError(annotation_ser.errors)
+
+            # Reconcile the denormalized task counters with what actually persisted. The task
+            # above is seeded with counts taken from the *payload* annotations/predictions, but
+            # rows can be silently skipped when invalid (under
+            # ff_fix_back_dev_3342_storage_scan_with_invalid_annotations, is_valid() fails and we
+            # don't raise). Without this, a task whose only annotation was skipped keeps
+            # total_annotations=1 while having zero annotation rows — a stale counter the Data
+            # Manager reads directly (per-task column and tab totals). Recompute from the rows we
+            # actually created so the cached counters can't drift above reality.
+            actual_total_annotations = sum(1 for a in created_annotations if not a.was_cancelled)
+            actual_cancelled_annotations = sum(1 for a in created_annotations if a.was_cancelled)
+            actual_total_predictions = len(created_predictions)
+            if (
+                task.total_annotations != actual_total_annotations
+                or task.cancelled_annotations != actual_cancelled_annotations
+                or task.total_predictions != actual_total_predictions
+            ):
+                task.total_annotations = actual_total_annotations
+                task.cancelled_annotations = actual_cancelled_annotations
+                task.total_predictions = actual_total_predictions
+                task.update_is_labeled()
+                task.save(
+                    update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions', 'is_labeled'],
+                    skip_fsm=True,
+                )
+
+            if created_annotations:
+                post_process_user = project.created_by or project.organization.created_by
+                post_process = load_func(settings.TASK_SERIALIZER_BULK).post_process_annotations
+                post_process(post_process_user, created_annotations, 'imported')
+
         return task
-        # FIXME: add_annotation_history / post_process_annotations should be here
 
     def _scan_and_create_links(self, link_class):
-        """
-        TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2,
-        TODO: it must be compatible with opensource, so old version is needed as well
-        """
         # set in progress status for storage info
         self.info_set_in_progress()
 
@@ -574,18 +723,37 @@ class ImportStorage(Storage):
         max_inner_id = (task.inner_id + 1) if task else 1
         validation_errors = []
 
-        # Check feature flags once for the entire sync process
-        check_file_extension = flag_set(
-            'fflag_fix_back_plt_804_check_file_extension_11072025_short', organization=self.project.organization
-        )
-        existed_count_flag_set = flag_set(
-            'fflag_root_212_reduce_importstoragelink_counts', organization=self.project.organization
-        )
-
         tasks_for_webhook = []
-        for keys_batch in _batched(
-            self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
-        ):
+        bulk_tasks = connection.features.can_return_rows_from_bulk_insert and flag_set(
+            FF_IMPORT_BULK_TASK_STATES, organization=self.project.organization
+        )
+        pending_bulk = []
+
+        def emit_webhooks_if_full():
+            nonlocal tasks_for_webhook
+            # settings.WEBHOOK_BATCH_SIZE
+            # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
+            # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
+            # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
+            # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
+            # call to ensure all tasks are processed and no task is left unreported in the webhook.
+            if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
+                emit_webhooks_for_instance(
+                    self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+                )
+                tasks_for_webhook = []
+
+        def flush_bulk():
+            nonlocal tasks_created
+            if not pending_bulk:
+                return
+            created = self.add_tasks_bulk(self.project, self, pending_bulk, link_class)
+            pending_bulk.clear()
+            tasks_created += len(created)
+            tasks_for_webhook.extend(task.id for task in created)
+            emit_webhooks_if_full()
+
+        for keys_batch in _batched(self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE):
             deduplicated_keys = list(dict.fromkeys(keys_batch))  # preserve order
             for key in deduplicated_keys:
                 logger.debug(f'Scanning key {key}')
@@ -608,7 +776,7 @@ class ImportStorage(Storage):
 
                 # Check if file should be processed as JSON based on extension
                 # Skip non-JSON files if use_blob_urls is False
-                if check_file_extension and not self.use_blob_urls:
+                if not self.use_blob_urls:
                     _, ext = os.path.splitext(key.lower())
                     # Only process files with JSON/JSONL/PARQUET extensions
                     json_extensions = {'.json', '.jsonl', '.parquet'}
@@ -631,8 +799,22 @@ class ImportStorage(Storage):
                     )
 
                 for link_object in link_objects:
-                    # TODO: batch this loop body with add_task -> add_tasks in a single bulk write.
-                    # See DIA-2062 for prerequisites
+                    if bulk_tasks and self.is_bare_task_data(link_object.task_data):
+                        try:
+                            task, link_kwargs, _, _ = self._build_task(
+                                self.project, maximum_annotations, max_inner_id, link_object
+                            )
+                        except ValidationError as e:
+                            error_message = f'Validation error for task from {link_object.key}: {e}'
+                            logger.error(error_message)
+                            validation_errors.append(error_message)
+                            continue
+                        max_inner_id += 1
+                        pending_bulk.append((task, link_kwargs))
+                        if len(pending_bulk) >= settings.BATCH_SIZE:
+                            flush_bulk()
+                        continue
+
                     try:
                         task = self.add_task(
                             self.project,
@@ -656,27 +838,29 @@ class ImportStorage(Storage):
                         validation_errors.append(error_message)
                         continue
 
-                    # settings.WEBHOOK_BATCH_SIZE
-                    # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
-                    # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
-                    # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
-                    # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
-                    # call to ensure all tasks are processed and no task is left unreported in the webhook.
-                    if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
-                        emit_webhooks_for_instance(
-                            self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
-                        )
-                        tasks_for_webhook = []
+                    emit_webhooks_if_full()
 
                 self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+
+            flush_bulk()
 
         if tasks_for_webhook:
             emit_webhooks_for_instance(
                 self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
             )
 
+        def report_progress():
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+
         # Create initial FSM states for all tasks created during storage sync
-        backfill_fsm_states_for_tasks(self.id, tasks_created, link_class)
+        report_progress()
+        bulk_state_task_ids = backfill_fsm_states_for_tasks(
+            self.id, tasks_created, link_class, project=self.project, on_progress=report_progress
+        )
+        if bulk_state_task_ids:
+            # Bulk-created states skip the per-task post-transition hooks, so run the bulk-import task
+            # post-processing once, as a serializer import does (e.g. LSE review limit recalculation).
+            load_func(settings.TASK_SERIALIZER_BULK).post_process_tasks(self.project.id, list(bulk_state_task_ids))
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
@@ -828,10 +1012,19 @@ class ExportStorage(Storage, ProjectStorageMixin):
     def save_annotation(self, annotation):
         raise NotImplementedError
 
-    def save_annotations(self, annotations: models.QuerySet[Annotation]):
+    def save_annotations(self, annotations: models.QuerySet[Annotation], update_status: bool = True):
+        """Export a queryset of annotations to this storage.
+
+        :param update_status: when True (the default, used by full syncs) the storage's sync status
+            (QUEUED -> IN_PROGRESS -> COMPLETED) and last_sync_count are updated. Pass False for
+            partial exports (e.g. bulk review) that should not touch the storage sync status, which
+            also avoids the QUEUED precondition required by ``info_set_in_progress``.
+        """
         annotation_exported = 0
+        failed = 0
         total_annotations = annotations.count()
-        self.info_set_in_progress()
+        if update_status:
+            self.info_set_in_progress()
         self.cached_user = self.project.organization.created_by
 
         # Calculate optimal batch size based on project data and worker count
@@ -856,10 +1049,28 @@ class ExportStorage(Storage, ProjectStorageMixin):
                     futures.append(executor.submit(self.save_annotation, annotation))
 
                 for future in concurrent.futures.as_completed(futures):
+                    # Resolve the future so exceptions raised inside save_annotation worker threads
+                    # are not silently swallowed. Best-effort: keep exporting the rest of the batch.
+                    try:
+                        future.result()
+                    except Exception:
+                        failed += 1
+                        logger.error(f'Export storage {self.id}: failed to export annotation', exc_info=True)
+                        continue
                     annotation_exported += 1
-                    self.info_update_progress(last_sync_count=annotation_exported, total_annotations=total_annotations)
+                    if update_status:
+                        self.info_update_progress(
+                            last_sync_count=annotation_exported, total_annotations=total_annotations
+                        )
 
-        self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
+        # Surface worker-thread failures by re-raising so the RQ job is marked failed. Full syncs set the
+        # storage FAILED via on_failure=storage_background_failure; partial exports (update_status=False)
+        # leave the shared storage status untouched, which is the intended contract.
+        if failed:
+            raise RuntimeError(f'Export storage {self.id}: {failed} annotation(s) failed to export')
+
+        if update_status:
+            self.info_set_completed(last_sync_count=annotation_exported, total_annotations=total_annotations)
 
     def save_all_annotations(self):
         self.save_annotations(Annotation.objects.filter(project=self.project))
@@ -978,6 +1189,25 @@ class ExportStorageLink(models.Model):
             # update updated_at field
             link.save()
         return link
+
+    @classmethod
+    def create_or_skip_missing_annotation(cls, annotation, storage):
+        """Create export link unless annotation disappeared during async export."""
+        try:
+            return cls.create(annotation, storage)
+        except Exception as exc:
+            if not isinstance(exc, IntegrityError):
+                raise
+            annotation_id = getattr(annotation, 'pk', annotation)
+            if annotation_id and not Annotation.objects.filter(pk=annotation_id).exists():
+                logger.info(
+                    'Skipping export link creation because annotation %s was deleted during export for %s storage %s',
+                    annotation_id,
+                    cls.__name__,
+                    getattr(storage, 'pk', None),
+                )
+                return None
+            raise
 
     def has_permission(self, user):
         user.project = self.annotation.project  # link for activity log

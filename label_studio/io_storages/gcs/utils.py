@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 
 Base64 = bytes
 
+GOOGLE_TOKEN_URI = 'https://oauth2.googleapis.com/token'
+GOOGLE_UNIVERSE_DOMAIN = 'googleapis.com'
+
 
 class GCS(object):
     _client_cache = {}
@@ -69,7 +72,14 @@ class GCS(object):
                     except JSONDecodeError as e:
                         # change JSON error to human-readable format
                         raise ValueError(f'Google Application Credentials must be valid JSON string. {e}')
-                credentials = service_account.Credentials.from_service_account_info(google_application_credentials)
+                # google-auth sends the signed JWT to token_uri and API calls to the universe domain
+                credentials = service_account.Credentials.from_service_account_info(
+                    {
+                        **google_application_credentials,
+                        'token_uri': GOOGLE_TOKEN_URI,
+                        'universe_domain': GOOGLE_UNIVERSE_DOMAIN,
+                    }
+                )
                 GCS._client_cache[cache_key] = gcs.Client(project=google_project_id, credentials=credentials)
 
             # use Google Application Default Credentials (ADC)

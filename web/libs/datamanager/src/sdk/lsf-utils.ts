@@ -1,5 +1,23 @@
 import type { APIAnnotation, APIPrediction, APITask, LSFAnnotation, LSFTaskData } from "../types/Task";
 
+/** Same string as `AnnotationDraftSerializer.get_created_username` (snake or camel user fields). */
+export function formatDraftCreatedUsernameFromUser(user: {
+  id: number;
+  first_name?: string | null;
+  last_name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+}): string {
+  let name = (user.first_name ?? user.firstName ?? "").trim();
+  const lastName = (user.last_name ?? user.lastName ?? "").trim();
+  if (lastName.length) {
+    name = name ? `${name} ${lastName}` : lastName;
+  }
+  const email = (user.email ?? "").trim();
+  return `${name}${name ? " " : ""}${email}, ${user.id}`;
+}
+
 /**
  * Converts the task from the server format to the
  * format supported by the LS frontend

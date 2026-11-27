@@ -1,20 +1,21 @@
 import React, { useMemo } from "react";
-import { Modal, Table, Tabs } from "antd";
+import { Table, Tabs } from "antd";
 import { observer } from "mobx-react";
 
 import { Hotkey } from "../../core/Hotkey";
 
 import "./Settings.prefix.css";
 import { cn } from "../../utils/bem";
-import { triggerResizeEvent } from "../../utils/utilities";
 
 import EditorSettings from "../../core/settings/editorsettings";
 import * as TagSettings from "./TagSettings";
-import { IconClose } from "@humansignal/icons";
-import { Checkbox, Toggle } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
+import { ModalWindow, Toggle, Typography } from "@humansignal/ui";
+import { ff, isAnnotatorRole } from "@humansignal/core";
+import { getProjectHotkeysSettingsPath, getProjectIdFromPathname } from "@humansignal/core/lib/utils/hotkeysProject";
 
 const HotkeysDescription = () => {
+  const projectId = getProjectIdFromPathname(window.location.pathname);
+  const customizationPath = projectId ? getProjectHotkeysSettingsPath(projectId) : "/user/account/hotkeys";
   const columns = [
     { title: "Shortcut", dataIndex: "combo", key: "combo" },
     { title: "Description", dataIndex: "descr", key: "descr" },
@@ -58,6 +59,15 @@ const HotkeysDescription = () => {
           );
         })}
       </Tabs>
+      <Typography
+        as="a"
+        variant="body"
+        size="small"
+        href={customizationPath}
+        className="text-primary-content hover:underline hover:text-primary-content-hover"
+      >
+        {projectId ? "Customize for this project" : "Customize hotkeys"}
+      </Typography>
     </div>
   );
 };
@@ -83,6 +93,10 @@ const SettingsTag = ({ children }) => {
 };
 
 const GeneralSettings = observer(({ store }) => {
+  const showVerticalLayoutToggle =
+    ff.isActive(ff.FF_FIT_ANNOTATIONS_VERTICAL_LAYOUT) && store.hasInterface("annotations:tabs") && !isAnnotatorRole();
+  const isVerticalLayout = store.settings.annotationsListLayout === "vertical";
+
   return (
     <div className={cn("settings").mod(newUI).toClassName()}>
       {editorSettingsKeys.map((obj, index) => {
@@ -110,67 +124,27 @@ const GeneralSettings = observer(({ store }) => {
           </label>
         );
       })}
-    </div>
-  );
-});
-
-const LayoutSettings = observer(({ store }) => {
-  return (
-    <div className={cn("settings").mod(newUI).toClassName()}>
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          checked={store.settings.bottomSidePanel}
-          onChange={() => {
-            store.settings.toggleBottomSP();
-            setTimeout(triggerResizeEvent);
-          }}
-        >
-          Move sidepanel to the bottom
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox checked={store.settings.displayLabelsByDefault} onChange={store.settings.toggleSidepanelModel}>
-          Display Labels by default in Results panel
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show Annotations panel"
-          defaultChecked={store.settings.showAnnotationsPanel}
-          onChange={() => {
-            store.settings.toggleAnnotationsPanel();
-          }}
-        >
-          Show Annotations panel
-        </Checkbox>
-      </div>
-
-      <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show Predictions panel"
-          defaultChecked={store.settings.showPredictionsPanel}
-          onChange={() => {
-            store.settings.togglePredictionsPanel();
-          }}
-        >
-          Show Predictions panel
-        </Checkbox>
-      </div>
-
-      {/* Saved for future use */}
-      {/* <div className={cn("settings").elem("field").toClassName()}>
-        <Checkbox
-          value="Show image in fullsize"
-          defaultChecked={store.settings.imageFullSize}
-          onChange={() => {
-            store.settings.toggleImageFS();
-          }}
-        >
-          Show image in fullsize
-        </Checkbox>
-      </div> */}
+      {showVerticalLayoutToggle && (
+        <label className={cn("settings").elem("field").toClassName()}>
+          <div className={cn("settings__label").toClassName()}>
+            <div className={cn("settings__label").elem("title").toClassName()}>
+              Display annotations in vertical panel
+            </div>
+            <div className={cn("settings__label").elem("description").toClassName()}>
+              Shows annotations as a vertical list on the left side of the labeling UI
+            </div>
+          </div>
+          <Toggle
+            checked={isVerticalLayout}
+            onChange={(event) =>
+              store.settings.setAnnotationsListLayout(event.target.checked ? "vertical" : "horizontal")
+            }
+            description="Display annotations in vertical panel"
+            aria-label="Display annotations in vertical panel"
+            data-testid="annotations-list-layout-toggle"
+          />
+        </label>
+      )}
     </div>
   );
 });
@@ -185,7 +159,6 @@ const DEFAULT_ACTIVE = Object.keys(Settings)[0];
 const DEFAULT_MODAL_SETTINGS = {
   name: "settings-modal",
   title: "Labeling Interface Settings",
-  closeIcon: <IconClose />,
 };
 
 export default observer(({ store }) => {
@@ -203,28 +176,40 @@ export default observer(({ store }) => {
     }, []);
   }, []);
 
+  // ModalWindow's body is p-0 so the tab bar runs edge to edge; each pane adds its own padding.
+  const paneProps = (key) => ({ className: "px-wide pb-wide", "data-testid": `editor-settings-tab-pane-${key}` });
+
+  const settingsTabs = (
+    <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
+      {Object.entries(Settings).map(([key, { name, component }]) => (
+        <Tabs.TabPane tab={name} key={key}>
+          <div {...paneProps(key)}>{React.createElement(component, { store })}</div>
+        </Tabs.TabPane>
+      ))}
+      {availableSettings.map((Page) => (
+        <Tabs.TabPane tab={Page.title} key={Page.tagName}>
+          <div {...paneProps(Page.tagName)}>
+            <Page store={store} />
+          </div>
+        </Tabs.TabPane>
+      ))}
+    </Tabs>
+  );
+
   return (
-    <Modal
+    <ModalWindow
       className={cn(DEFAULT_MODAL_SETTINGS.name).toClassName()}
       open={store.showingSettings}
-      onCancel={store.toggleSettings}
-      footer=""
+      onOpenChange={(open) => {
+        if (!open && store.showingSettings) store.toggleSettings();
+      }}
       title={DEFAULT_MODAL_SETTINGS.title}
-      closeIcon={DEFAULT_MODAL_SETTINGS.closeIcon}
-      bodyStyle={DEFAULT_MODAL_SETTINGS.bodyStyle}
+      size="large"
+      contentClassName="max-w-[568px]"
+      bodyClassName="min-h-0 p-0"
+      dataTestId="editor-settings-modal"
     >
-      <Tabs defaultActiveKey={DEFAULT_ACTIVE}>
-        {Object.entries(Settings).map(([key, { name, component }]) => (
-          <Tabs.TabPane tab={name} key={key}>
-            {React.createElement(component, { store })}
-          </Tabs.TabPane>
-        ))}
-        {availableSettings.map((Page) => (
-          <Tabs.TabPane tab={Page.title} key={Page.tagName}>
-            <Page store={store} />
-          </Tabs.TabPane>
-        ))}
-      </Tabs>
-    </Modal>
+      {settingsTabs}
+    </ModalWindow>
   );
 });

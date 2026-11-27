@@ -29,7 +29,6 @@ import { Hotkey } from "../../core/Hotkey";
 import "./TimeSeries/MultiChannel";
 import "./TimeSeries/Channel";
 import { getChannelColor } from "./TimeSeries/palette";
-import { ff } from "@humansignal/core";
 /**
  * The `TimeSeries` tag can be used to label time series data. Read more about Time Series Labeling on [the time series template page](../templates/time_series.html).
  *
@@ -469,6 +468,10 @@ const Model = types
       return [keys[0], keys[keys.length - 1]];
     },
 
+    get persistentValuesKey() {
+      return `labelStudio:storedValues:timeseries:${self.name}`;
+    },
+
     get persistentValues() {
       return {
         brushRange: self.brushRange,
@@ -697,9 +700,14 @@ const Model = types
       const [control, ...rest] = states;
       const labels = { [control.valueType]: control.selectedValues() };
 
-      const r = ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)
-        ? self.annotation.createResult({ start, end, instant: start === end }, labels, control, self, false, rest)
-        : self.annotation.createResult({ start, end, instant: start === end }, labels, control, self, false);
+      const r = self.annotation.createResult(
+        { start, end, instant: start === end },
+        labels,
+        control,
+        self,
+        false,
+        rest,
+      );
 
       return r;
     },

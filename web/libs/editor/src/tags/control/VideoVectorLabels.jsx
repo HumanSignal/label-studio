@@ -8,6 +8,7 @@ import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels/Labels";
 import { VideoVectorModel } from "./VideoVector";
 import ControlBase from "./Base";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 
 /**
  * The `VideoVectorLabels` tag creates labeled vectors on video frames.
@@ -54,6 +55,7 @@ const VideoVectorLabelsModel = types.compose(
   VideoVectorModel,
   LabelMixin,
   SelectedModelMixin.props({ _child: "LabelModel" }),
+  InteractivePromptMixin,
 );
 
 const HtxVideoVectorLabels = observer(({ item }) => {

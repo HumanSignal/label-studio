@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { format } from "date-fns/esm";
-import { Button, CodeBlock, IconFileCopy, Space, Tooltip } from "@humansignal/ui";
+import { Button, CodeBlock, Space, Tooltip, ModalWindow } from "@humansignal/ui";
+import { IconFileCopy } from "@humansignal/icons";
 import { DescriptionList } from "../../../components/DescriptionList/DescriptionList";
-import { modal } from "../../../components/Modal/Modal";
 import { Oneof } from "../../../components/Oneof/Oneof";
 import { getLastTraceback } from "../../../utils/helpers";
 import { useCopyText } from "@humansignal/core";
@@ -42,6 +43,8 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
       ? `${storage.meta.total_annotations} total annotations seen in the project at the sync moment.`
       : "";
 
+  const [errorLog, setErrorLog] = useState(null);
+
   const handleButtonClick = () => {
     const msg =
       `Error logs for ${target === "export" ? "export " : ""}${storage.type} ` +
@@ -49,38 +52,7 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
       `${getLastTraceback(storage.traceback)}\n\n` +
       `meta = ${JSON.stringify(storage.meta)}\n`;
 
-    const currentModal = modal({
-      title: "Storage Sync Error Log",
-      body: <CodeBlock code={msg} variant="negative" className="max-h-[50vh] overflow-y-auto" />,
-      footer: (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {!window.APP_SETTINGS?.whitelabel_is_active && (
-            <div>
-              <>
-                <a
-                  href="https://labelstud.io/guide/storage.html#Troubleshooting"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label="Learn more about cloud storage troubleshooting"
-                >
-                  See docs
-                </a>{" "}
-                for troubleshooting tips on cloud storage connections.
-              </>
-            </div>
-          )}
-          <Space>
-            <CopyButton msg={msg} />
-            <Button variant="primary" className="w-[7rem]" onClick={() => currentModal.close()}>
-              Close
-            </Button>
-          </Space>
-        </div>
-      ),
-      style: { width: "700px" },
-      optimize: false,
-      allowClose: true,
-    });
+    setErrorLog(msg);
   };
 
   return (
@@ -145,6 +117,38 @@ export const StorageSummary = ({ target, storage, className, storageTypes = [] }
           {storage.last_sync ? format(new Date(storage.last_sync), "MMMM dd, yyyy ∙ HH:mm:ss") : "Not synced yet"}
         </DescriptionList.Item>
       </DescriptionList>
+      <ModalWindow
+        open={errorLog !== null}
+        onOpenChange={(open) => !open && setErrorLog(null)}
+        title="Storage Sync Error Log"
+        size="medium"
+        dataTestId="storage-sync-error-log-modal"
+        footer={
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+            {!window.APP_SETTINGS?.whitelabel_is_active && (
+              <div>
+                <a
+                  href="https://labelstud.io/guide/storage.html#Troubleshooting"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label="Learn more about cloud storage troubleshooting"
+                >
+                  See docs
+                </a>{" "}
+                for troubleshooting tips on cloud storage connections.
+              </div>
+            )}
+            <Space>
+              <CopyButton msg={errorLog ?? ""} />
+              <Button variant="primary" className="w-[7rem]" onClick={() => setErrorLog(null)}>
+                Close
+              </Button>
+            </Space>
+          </div>
+        }
+      >
+        <CodeBlock code={errorLog ?? ""} variant="negative" className="max-h-[50vh] overflow-y-auto" />
+      </ModalWindow>
     </div>
   );
 };

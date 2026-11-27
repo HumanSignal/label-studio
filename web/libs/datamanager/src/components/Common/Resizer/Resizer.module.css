@@ -1,7 +1,8 @@
 .root {
-  --handle-size: 2px;
-  --handle-size-hover: 4px;
-  --handle-interactive-size: 8px;
+  /* Shared with the column drop placeholder, see columnSeparator.prefix.css. */
+  --handle-size: var(--dm-column-separator-line-width);
+  --handle-size-hover: var(--dm-column-separator-line-width-active);
+  --handle-interactive-size: var(--dm-column-separator-hit-size);
 
   & button {
     &:focus {
@@ -11,8 +12,8 @@
   }
 
   .handle {
-    top: var(--spacing-tight);
-    bottom: var(--spacing-tight);
+    top: var(--dm-column-separator-inset-y);
+    bottom: var(--dm-column-separator-inset-y);
     position: absolute;
     right: 0;
     cursor: ew-resize;

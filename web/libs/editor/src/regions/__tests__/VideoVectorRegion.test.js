@@ -3,7 +3,7 @@
  */
 import { types } from "mobx-state-tree";
 
-jest.mock("../../tags/object/Video", () => {
+mockModule("../../tags/object/Video", () => {
   const { types } = require("mobx-state-tree");
   return {
     VideoModel: types
@@ -14,46 +14,57 @@ jest.mock("../../tags/object/Video", () => {
       })
       .volatile(() => ({
         ref: { current: { duration: 10.5 } },
+        // Default drawing control so incomplete/minPoints views are exercised
+        // even when another suite's Video mockModule pollutes this path (CI
+        // ordered runner). Tests that need "no closable control" clear it.
+        videoVectorControl: {
+          type: "videovectorlabels",
+          closable: true,
+          minpoints: "2",
+          maxpoints: "15",
+          tools: { VideoVector: {} },
+        },
       }))
       .actions((self) => ({
         setFrame(frame) {
           self._lastSetFrame = frame;
         },
+        setVideoVectorControl(control) {
+          self.videoVectorControl = control;
+        },
       })),
   };
 });
 
-import { VideoVectorRegionModel } from "../VideoVectorRegion";
-import { VideoModel } from "../../tags/object/Video";
-
-const TestRoot = types
-  .model("TestRoot", {
-    video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
-    region: types.optional(VideoVectorRegionModel, {
-      id: "vvr1",
-      pid: "p1",
-      object: "vid1",
-      sequence: [],
-    }),
-  })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
-      return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
-    },
-  }));
-
 const mkVertices = (pts) => pts.map(([x, y], i) => ({ id: `v${i}`, x, y }));
 
-const mkBezierVertices = (pts) =>
-  pts.map(([x, y, cp1x, cp1y, cp2x, cp2y], i) => ({
-    id: `v${i}`,
-    x,
-    y,
-    controlPoint1: { x: cp1x, y: cp1y },
-    controlPoint2: { x: cp2x, y: cp2y },
-  }));
-
 describe("VideoVectorRegion", () => {
+  let VideoVectorRegionModel;
+  let resolveVideoVectorRegionControl;
+  let VideoModel;
+  let TestRoot;
+
+  beforeAll(() => {
+    ({ VideoVectorRegionModel, resolveVideoVectorRegionControl } = require("../VideoVectorRegion"));
+    VideoModel = require("../../tags/object/Video").VideoModel;
+
+    TestRoot = types
+      .model("TestRoot", {
+        video: types.optional(VideoModel, { id: "vid1", framerate: "24", length: 100 }),
+        region: types.optional(VideoVectorRegionModel, {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [],
+        }),
+      })
+      .actions((_self) => ({
+        createSerializedResult(_region, value) {
+          return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
+        },
+      }));
+  });
+
   describe("getShape — exact keyframe retrieval", () => {
     it("returns exact keyframe data when frame matches", () => {
       const vertices = mkVertices([
@@ -89,6 +100,94 @@ describe("VideoVectorRegion", () => {
       const shape24 = root.region.getShape(24);
       expect(shape24.vertices[0].x).toBe(50);
       expect(shape24.closed).toBe(true);
+    });
+  });
+
+  describe("getShape — lifespan terminators (BROS-1513)", () => {
+    it("resolves an empty right terminator from the preceding vector geometry", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 5, enabled: true, vertices, closed: true },
+            { frame: 6, enabled: false },
+          ],
+        },
+      });
+
+      expect(root.region.getShape(6)).toEqual({ vertices, closed: true });
+    });
+
+    it("preserves geometry on an exact disabled boundary keyframe", () => {
+      const vertices = mkVertices([[10, 20]]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [{ frame: 5, enabled: false, vertices, closed: false }],
+        },
+      });
+
+      expect(root.region.getShape(5)).toEqual({ vertices, closed: false });
+    });
+
+    it("resolves an empty left terminator from the following vector geometry", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 4, enabled: false },
+            { frame: 5, enabled: true, vertices, closed: true },
+          ],
+        },
+      });
+
+      // Left lifespan caps sit before the first tracked keyframe, so there is no
+      // preceding geometry — fall back to the next shape-bearing keyframe so the
+      // canvas matches the timeline endpoint (BROS-1513 follow-up).
+      expect(root.region.getShape(4)).toEqual({ vertices, closed: true });
+    });
+
+    it("resolves empty left and right terminators after Track Both-style caps", () => {
+      const vertices = mkVertices([
+        [10, 20],
+        [30, 40],
+      ]);
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 14, enabled: false },
+            { frame: 15, enabled: true, vertices, closed: true },
+            { frame: 25, enabled: true, vertices, closed: true },
+            { frame: 26, enabled: false },
+          ],
+        },
+      });
+
+      expect(root.region.getShape(14)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(15)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(25)).toEqual({ vertices, closed: true });
+      expect(root.region.getShape(26)).toEqual({ vertices, closed: true });
     });
   });
 
@@ -182,7 +281,7 @@ describe("VideoVectorRegion", () => {
       expect(shape.vertices[0].y).toBeCloseTo(25);
     });
 
-    it("interpolates bezier control points", () => {
+    it("interpolates at quarter ratio", () => {
       const root = TestRoot.create({
         video: { id: "vid1" },
         region: {
@@ -190,18 +289,14 @@ describe("VideoVectorRegion", () => {
           pid: "p1",
           object: "vid1",
           sequence: [
-            { frame: 0, enabled: true, vertices: mkBezierVertices([[0, 0, 10, 10, 20, 20]]), closed: false },
-            { frame: 10, enabled: true, vertices: mkBezierVertices([[100, 100, 50, 50, 80, 80]]), closed: false },
+            { frame: 0, enabled: true, vertices: mkVertices([[0, 0]]), closed: false },
+            { frame: 20, enabled: true, vertices: mkVertices([[100, 100]]), closed: false },
           ],
         },
       });
-      const shape = root.region.getShape(5);
-      expect(shape.vertices[0].x).toBeCloseTo(50);
-      expect(shape.vertices[0].y).toBeCloseTo(50);
-      expect(shape.vertices[0].controlPoint1.x).toBeCloseTo(30);
-      expect(shape.vertices[0].controlPoint1.y).toBeCloseTo(30);
-      expect(shape.vertices[0].controlPoint2.x).toBeCloseTo(50);
-      expect(shape.vertices[0].controlPoint2.y).toBeCloseTo(50);
+      const shape = root.region.getShape(15);
+      expect(shape.vertices[0].x).toBeCloseTo(75);
+      expect(shape.vertices[0].y).toBeCloseTo(75);
     });
   });
 
@@ -234,6 +329,285 @@ describe("VideoVectorRegion", () => {
       });
       expect(root.region.getShape(0)).toBeNull();
       expect(root.region.getShape(10)).toBeNull();
+    });
+  });
+
+  describe("control fallback", () => {
+    it("uses the video object's VideoVector control when label results no longer include it", () => {
+      const labelsControl = { type: "labels", closable: false };
+      const videoVectorControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+
+      // BROS-1485: removing the VideoVectorLabels label can leave only generic
+      // Labels results attached to the region. Drawing mechanics still belong
+      // to the configured VideoVectorLabels control on the video object.
+      expect(resolveVideoVectorRegionControl([{ from_name: labelsControl }], { videoVectorControl })).toBe(
+        videoVectorControl,
+      );
+    });
+
+    it("prefers the region's tool-owning result when it is still attached", () => {
+      const labelsControl = { type: "labels", closable: false };
+      const videoVectorControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+      const fallbackControl = { type: "videovectorlabels", tools: { VideoVector: {} }, closable: true };
+
+      expect(
+        resolveVideoVectorRegionControl([{ from_name: labelsControl }, { from_name: videoVectorControl }], {
+          videoVectorControl: fallbackControl,
+        }),
+      ).toBe(videoVectorControl);
+    });
+  });
+
+  describe("registry detector", () => {
+    it("detects persisted Track Both VideoVector when the first keyframe is a lifespan terminator", () => {
+      const value = {
+        sequence: [
+          // Track Both left-cap after submit/reload: first keyframe has no geometry.
+          { frame: 4, enabled: false },
+          {
+            frame: 5,
+            enabled: true,
+            vertices: mkVertices([
+              [10, 10],
+              [20, 20],
+              [30, 10],
+            ]),
+            closed: true,
+          },
+        ],
+      };
+
+      expect(VideoVectorRegionModel.detectByValue(value)).toBe(true);
+      expect(VideoVectorRegionModel.detectByValue({ value })).toBe(true);
+    });
+
+    it("does not detect VideoRectangle-style sequences as VideoVector", () => {
+      expect(
+        VideoVectorRegionModel.detectByValue({
+          sequence: [{ frame: 1, enabled: true, x: 10, y: 10, width: 20, height: 20 }],
+        }),
+      ).toBe(false);
+    });
+  });
+
+  describe("closable — a closed contour is always closable (BROS-1422)", () => {
+    it("reports closable=true for a closed keyframe even without a closable control", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            {
+              frame: 0,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+      // SAM2 produces closed polygons regardless of `closable=false`; the region
+      // must treat such a shape as closable so finished/incomplete are correct.
+      expect(root.region.closable).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+      expect(root.region.finished).toBe(true);
+    });
+
+    it("reports closable=false for an open contour with no closable control", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [{ frame: 0, enabled: true, vertices: mkVertices([[1, 2]]), closed: false }],
+        },
+      });
+      root.video.setVideoVectorControl(undefined);
+      expect(root.region.closable).toBe(false);
+    });
+  });
+
+  describe("incomplete vs lifespan terminators (BROS-1511)", () => {
+    // Uses the Video mock's default closable videoVectorControl (see mockModule above).
+
+    it("does not mark incomplete when sequence[0] is a lifespan terminator and a later keyframe is valid", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            // Track Both left-cap: { frame, enabled: false } with no geometry
+            { frame: 4, enabled: false },
+            {
+              frame: 5,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+
+      expect(root.region.closed).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+      expect(root.region.vertices).toHaveLength(3);
+    });
+
+    it("still selects the earliest geometric keyframe when it is malformed", () => {
+      const root = TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            { frame: 4, enabled: false },
+            { frame: 5, enabled: true, vertices: mkVertices([[1, 2]]), closed: false },
+            {
+              frame: 50,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: true,
+            },
+          ],
+        },
+      });
+
+      expect(root.region.shapeKeyframe.frame).toBe(5);
+      expect(root.region.closed).toBe(false);
+      expect(root.region.vertices).toHaveLength(1);
+    });
+  });
+
+  describe("closed state across keyframes (BROS-1497)", () => {
+    const createRegionWithOpenKeyframes = () =>
+      TestRoot.create({
+        video: { id: "vid1" },
+        region: {
+          id: "vvr1",
+          pid: "p1",
+          object: "vid1",
+          sequence: [
+            {
+              frame: 1,
+              enabled: true,
+              vertices: mkVertices([
+                [10, 10],
+                [20, 20],
+                [30, 10],
+              ]),
+              closed: false,
+            },
+            {
+              frame: 5,
+              enabled: true,
+              vertices: mkVertices([
+                [15, 10],
+                [25, 20],
+                [35, 10],
+              ]),
+              closed: false,
+            },
+          ],
+        },
+      });
+
+    it("closes every keyframe when the path is closed on a later frame", () => {
+      const root = createRegionWithOpenKeyframes();
+
+      root.region.setClosed(true);
+
+      expect(root.region.sequence.map(({ closed }) => closed)).toEqual([true, true]);
+      expect(root.region.closed).toBe(true);
+      expect(root.region.incomplete).toBeFalsy();
+    });
+
+    it("reopens every keyframe when a closed path is broken", () => {
+      const root = createRegionWithOpenKeyframes();
+      root.region.setClosed(true);
+
+      root.region.setClosed(false);
+
+      expect(root.region.sequence.map(({ closed }) => closed)).toEqual([false, false]);
+      expect(root.region.closed).toBe(false);
+    });
+  });
+
+  describe("addVertexAtCanvasPoint — rapid clicks accumulate (BROS-1206)", () => {
+    const makeRoot = () =>
+      TestRoot.create({
+        video: { id: "vid1" },
+        region: { id: "vvr1", pid: "p1", object: "vid1", sequence: [] },
+      });
+
+    // Mirrors the production handler registered by the view: it reads the LIVE
+    // store on every call (never a captured snapshot), so consecutive clicks
+    // that arrive before a re-render still each produce a vertex.
+    const registerFreshAppender = (region) =>
+      region.setAppendVertexFn((x, y) => {
+        const shape = region.getShape(0) ?? { vertices: [], closed: false };
+        const current = shape.vertices;
+        const last = current[current.length - 1];
+        region.updateShape(
+          {
+            vertices: [...current, { id: `v${current.length}`, x, y, prevPointId: last?.id }],
+            closed: shape.closed,
+          },
+          0,
+        );
+      });
+
+    it("returns false when no append handler is registered", () => {
+      const root = makeRoot();
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(false);
+      expect(root.region.getShape(0)).toBeNull();
+    });
+
+    it("adds one vertex per call without dropping earlier ones", () => {
+      const root = makeRoot();
+      registerFreshAppender(root.region);
+
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(true);
+      expect(root.region.addVertexAtCanvasPoint(20, 20)).toBe(true);
+      expect(root.region.addVertexAtCanvasPoint(30, 30)).toBe(true);
+
+      const shape = root.region.getShape(0);
+      expect(shape.vertices).toHaveLength(3);
+      expect(shape.vertices.map((v) => [v.x, v.y])).toEqual([
+        [10, 10],
+        [20, 20],
+        [30, 30],
+      ]);
+      // each new vertex links back to the previous one
+      expect(shape.vertices[1].prevPointId).toBe(shape.vertices[0].id);
+      expect(shape.vertices[2].prevPointId).toBe(shape.vertices[1].id);
+    });
+
+    it("clears the handler when set to null", () => {
+      const root = makeRoot();
+      registerFreshAppender(root.region);
+      expect(root.region.addVertexAtCanvasPoint(10, 10)).toBe(true);
+
+      root.region.setAppendVertexFn(null);
+      expect(root.region.addVertexAtCanvasPoint(20, 20)).toBe(false);
+      expect(root.region.getShape(0).vertices).toHaveLength(1);
     });
   });
 });

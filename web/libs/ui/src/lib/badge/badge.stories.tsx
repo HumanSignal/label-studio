@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { IconChevronRight, IconWarning } from "@humansignal/icons";
 import { Badge } from "./badge";
 import { EnterpriseBadge } from "../enterprise-badge/enterprise-badge";
 import { DataTable } from "../data-table";
@@ -8,7 +9,7 @@ import { Typography } from "../typography/typography";
 
 const meta: Meta<typeof Badge> = {
   component: Badge,
-  title: "UI/Badge",
+  title: "Data display/Badge",
   argTypes: {
     variant: {
       control: "select",
@@ -30,22 +31,18 @@ const meta: Meta<typeof Badge> = {
         "fig",
         "sand",
       ],
-      // Note: Other variants (default, secondary, destructive, error, info, success, caution, beta, enterprise)
-      // are still supported as hidden fallbacks for backwards compatibility
     },
-    style: {
+    look: {
       control: "select",
-      options: ["filled", "outline", "ghost", "solid"],
+      options: ["filled", "ghost", "solid"],
     },
     shape: {
       control: "select",
       options: ["rounded", "square"],
-      // Note: "squared" is still supported as a hidden fallback for backwards compatibility
     },
     size: {
       control: "select",
-      options: ["medium", "small"],
-      // Note: "default" and "compact" are still supported as hidden fallbacks for backwards compatibility
+      options: ["large", "medium", "small"],
     },
   },
 };
@@ -61,6 +58,20 @@ export const Default: Story = {
   args: {
     children: "Default",
   },
+};
+
+export const LargeSize: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge variant="neutral" shape="rounded" size="large">
+        English
+      </Badge>
+      <Badge variant="neutral" shape="rounded" size="large">
+        <span>English</span>
+        <span className="text-neutral-content-subtler">· Native</span>
+      </Badge>
+    </div>
+  ),
 };
 
 /**
@@ -115,7 +126,6 @@ export const SemanticVariants: Story = {
           <p className="text-xs text-neutral-content-subtler mb-2">Use to highlight number of warnings.</p>
           <div className="flex flex-wrap gap-3">
             <Badge variant="warning">Warning</Badge>
-            <Badge variant="caution">Caution</Badge>
           </div>
         </div>
         <div>
@@ -159,7 +169,8 @@ export const AccentColors: Story = {
 
 /**
  *
- * Badges support four styles: filled (default), outline, ghost, and solid.
+ * Badges support three styles: filled (default), ghost, and solid. A selection control shows not selected as
+ * the neutral filled Badge.
  */
 export const StyleVariants: Story = {
   render: () => {
@@ -168,33 +179,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Filled (default):</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="filled">
+            <Badge variant="grape" look="filled">
               Grape
             </Badge>
-            <Badge variant="kale" style="filled">
+            <Badge variant="kale" look="filled">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="filled">
+            <Badge variant="persimmon" look="filled">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="filled">
-              Canteloupe
-            </Badge>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm text-neutral-content-subtle mb-2">Outline:</p>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="outline">
-              Grape
-            </Badge>
-            <Badge variant="kale" style="outline">
-              Kale
-            </Badge>
-            <Badge variant="persimmon" style="outline">
-              Persimmon
-            </Badge>
-            <Badge variant="canteloupe" style="outline">
+            <Badge variant="canteloupe" look="filled">
               Canteloupe
             </Badge>
           </div>
@@ -202,16 +196,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Ghost:</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="ghost">
+            <Badge variant="grape" look="ghost">
               Grape
             </Badge>
-            <Badge variant="kale" style="ghost">
+            <Badge variant="kale" look="ghost">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="ghost">
+            <Badge variant="persimmon" look="ghost">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="ghost">
+            <Badge variant="canteloupe" look="ghost">
               Canteloupe
             </Badge>
           </div>
@@ -219,16 +213,16 @@ export const StyleVariants: Story = {
         <div>
           <p className="text-sm text-neutral-content-subtle mb-2">Solid:</p>
           <div className="flex flex-wrap gap-3">
-            <Badge variant="grape" style="solid">
+            <Badge variant="grape" look="solid">
               Grape
             </Badge>
-            <Badge variant="kale" style="solid">
+            <Badge variant="kale" look="solid">
               Kale
             </Badge>
-            <Badge variant="persimmon" style="solid">
+            <Badge variant="persimmon" look="solid">
               Persimmon
             </Badge>
-            <Badge variant="canteloupe" style="solid">
+            <Badge variant="canteloupe" look="solid">
               Canteloupe
             </Badge>
           </div>
@@ -288,6 +282,48 @@ export const ShapeVariants: Story = {
  *
  * Badges support two sizes: medium (default) and small. Small should be used sparingly, only when real estate is minimal—e.g. inside input fields, dropdowns, or beside field labels.
  */
+/**
+ * Badges accept both a leading `icon` (rendered before the label, e.g. a warning for a status
+ * badge) and a `trailingIcon` (rendered after the label, e.g. a chevron on interactive chips).
+ * Either can be used on its own or both together, and both work at every size.
+ */
+export const WithIcons: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {/* Placement: leading, trailing, and both. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge variant="negative" icon={<IconWarning aria-hidden />}>
+          Needs attention
+        </Badge>
+        <Badge variant="grape" shape="rounded" look="filled" trailingIcon={<IconChevronRight aria-hidden />}>
+          Annotation in progress
+        </Badge>
+        <Badge
+          variant="grape"
+          shape="rounded"
+          look="solid"
+          icon={<IconWarning aria-hidden />}
+          trailingIcon={<IconChevronRight aria-hidden />}
+        >
+          Leading and trailing
+        </Badge>
+      </div>
+      {/* Sizes: the leading icon scales with the badge size. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge variant="negative" size="large" icon={<IconWarning aria-hidden />}>
+          Large
+        </Badge>
+        <Badge variant="negative" size="medium" icon={<IconWarning aria-hidden />}>
+          Medium
+        </Badge>
+        <Badge variant="negative" size="small" icon={<IconWarning aria-hidden />}>
+          Small
+        </Badge>
+      </div>
+    </div>
+  ),
+};
+
 export const SizeVariants: Story = {
   render: () => {
     return (
@@ -339,25 +375,25 @@ export const GradientVariant: Story = {
         <p className="text-sm text-neutral-content-subtle mb-2">With icon and label (default):</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge />
-          <EnterpriseBadge style="filled" />
-          <EnterpriseBadge style="ghost" />
-          <EnterpriseBadge style="solid" />
+          <EnterpriseBadge look="filled" />
+          <EnterpriseBadge look="ghost" />
+          <EnterpriseBadge look="solid" />
         </div>
       </div>
       <div>
         <p className="text-sm text-neutral-content-subtle mb-2">Text only (no icon):</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge icon={null} />
-          <EnterpriseBadge icon={null} style="filled" />
+          <EnterpriseBadge icon={null} look="filled" />
         </div>
       </div>
       <div>
         <p className="text-sm text-neutral-content-subtle mb-2">Icon-only:</p>
         <div className="flex flex-wrap gap-3">
           <EnterpriseBadge children="" />
-          <EnterpriseBadge style="filled" children="" />
-          <EnterpriseBadge style="ghost" children="" />
-          <EnterpriseBadge style="solid" children="" />
+          <EnterpriseBadge look="filled" children="" />
+          <EnterpriseBadge look="ghost" children="" />
+          <EnterpriseBadge look="solid" children="" />
         </div>
       </div>
       <div>

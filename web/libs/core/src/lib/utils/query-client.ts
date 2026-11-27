@@ -1,9 +1,11 @@
 import { QueryClient as QC } from "@tanstack/react-query";
 
 /**
- * Allows for e2e testing without cache if user is from e2e domain
+ * Allows for e2e testing without cache if user is from an e2e domain.
+ * Both `.e2e` and `.test` are used by the automated suites (Selenium drives
+ * `heartex.test`, Cypress specs are split across both), so match either.
  */
-export const shouldBypassCache = window?.APP_SETTINGS?.user?.email?.endsWith(".e2e") ?? false;
+export const shouldBypassCache = /\.(e2e|test)$/.test(window?.APP_SETTINGS?.user?.email ?? "");
 
 /**
  * How long to keep queries in cache before garbage collecting them

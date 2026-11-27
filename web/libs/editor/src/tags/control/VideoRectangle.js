@@ -4,6 +4,8 @@ import { types } from "mobx-state-tree";
 import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { InteractivePromptMixin } from "../../mixins/InteractivePromptMixin";
 
 /**
  * VideoRectangle tag brings Object Tracking capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags.
@@ -36,7 +38,14 @@ const ModelAttrs = types.model("VideoRectangleModel", {
   type: "videorectangle",
 });
 
-const VideoRectangleModel = types.compose("VideoRectangleModel", ControlBase, ModelAttrs, TagAttrs);
+const VideoRectangleModel = types.compose(
+  "VideoRectangleModel",
+  ControlBase,
+  AnnotationMixin,
+  ModelAttrs,
+  TagAttrs,
+  InteractivePromptMixin,
+);
 
 const HtxVideoRectangle = observer(() => {
   return null;

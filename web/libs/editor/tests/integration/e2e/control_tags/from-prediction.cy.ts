@@ -9,7 +9,6 @@ import {
   useTextarea,
 } from "@humansignal/frontend-test/helpers/LSF";
 import { Hotkeys } from "@humansignal/frontend-test/helpers/LSF/Hotkeys";
-import { FF_DEV_3873 } from "../../../../src/utils/feature-flags";
 import { allClassificationsConfig, prediction, textData } from "../../data/control_tags/from-prediction";
 
 describe("Classification from prediction", () => {
@@ -25,9 +24,6 @@ describe("Classification from prediction", () => {
 
   it('should have origin "prediction-changed" after changing prediction', () => {
     const SecondTextarea = useTextarea("&:eq(1)");
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
     LabelStudio.params().config(allClassificationsConfig).data(textData).withPrediction(prediction).init();
     LabelStudio.waitForObjectsReady();
     ToolBar.clickCopyAnnotationBtn();
@@ -52,9 +48,6 @@ describe("Classification from prediction", () => {
 
   it("should work correctly with undo", () => {
     const SecondTextarea = useTextarea("&:eq(1)");
-    LabelStudio.addFeatureFlagsOnPageLoad({
-      [FF_DEV_3873]: true,
-    });
     LabelStudio.params().config(allClassificationsConfig).data(textData).withPrediction(prediction).init();
     LabelStudio.waitForObjectsReady();
     ToolBar.clickCopyAnnotationBtn();

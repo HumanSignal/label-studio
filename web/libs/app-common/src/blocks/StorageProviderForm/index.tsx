@@ -1,14 +1,14 @@
-import { forwardRef, useCallback, useEffect, useState } from "react";
-import { useModalControls } from "@humansignal/ui/lib/modal";
-import { Stepper, ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
-import { FormHeader } from "./components/form-header";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import { ModalWindow, Stepper, type StepperStep } from "@humansignal/ui";
+import { ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
+import { FormError } from "./components/form-error";
 import { FormFooter } from "./components/form-footer";
 import { useStorageForm } from "./hooks/useStorageForm";
 import { useStorageApi } from "./hooks/useStorageApi";
 import { step1Schema, getProviderSchema } from "./schemas";
 import { addProvider } from "./providers";
+import { emitAppCommonEvent } from "../../utils/appCommonTelemetry";
 import type { ProviderConfig } from "./types/provider";
-import { InlineError } from "apps/labelstudio/src/components/Error/InlineError";
 
 interface StorageProviderFormProps {
   onSubmit: () => void;
@@ -24,14 +24,28 @@ interface StorageProviderFormProps {
   defaultValues?: Record<string, Record<string, any>>;
   onClose?: () => void;
   onHide?: () => void;
+  open?: boolean;
+  dataTestId?: string;
 }
 
 export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>(
   (
-    { onSubmit, target, project, storage, title, storageTypes, providers, defaultValues, onClose = () => {}, onHide },
+    {
+      onSubmit,
+      target,
+      project,
+      storage,
+      title,
+      storageTypes,
+      providers,
+      defaultValues,
+      onClose = () => {},
+      onHide,
+      open = true,
+      dataTestId,
+    },
     ref,
   ) => {
-    const modal = useModalControls();
     const [type, setType] = useState<string | undefined>(storage?.type || storage?.provider || "s3");
     const [filesPreview, setFilesPreview] = useState<any[] | null>(null);
     const [connectionChecked, setConnectionChecked] = useState(false);
@@ -42,7 +56,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       setConnectionChecked(false);
       setType("s3");
       onClose();
-      modal?.hide();
     };
 
     // Initialize providers first
@@ -104,6 +117,15 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
 
     const { currentStep, formData } = formState;
 
+    const stepperSteps = useMemo((): StepperStep[] => {
+      return currentSteps.map((step, index) => ({
+        id: `storage-step-${index}`,
+        label: step.title,
+        completed: index < currentStep,
+        canNavigate: isEditMode || index < currentStep,
+      }));
+    }, [currentSteps, currentStep, isEditMode]);
+
     // Update type when formData.provider changes in edit mode
     useEffect(() => {
       if (isEditMode && formData.provider && formData.provider !== type) {
@@ -141,7 +163,7 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     // Handle modal hide (including Escape key)
     useEffect(() => {
       if (onHide) {
-        const handleModalHide = () => {
+        const _handleModalHide = () => {
           resetForm();
           setFilesPreview(null);
           setConnectionChecked(false);
@@ -182,7 +204,6 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
           setConnectionChecked(false);
           setType("s3");
           onClose();
-          modal?.hide();
         },
       });
 
@@ -192,6 +213,12 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       handleProviderFieldChange(name, value, () => {
         setFilesPreview(null);
         setConnectionChecked(false);
+      });
+      emitAppCommonEvent("storage_provider_selected", {
+        surface: "project_setup",
+        provider: value,
+        target,
+        project_id: project ?? null,
       });
     };
 
@@ -204,7 +231,7 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
 
     const nextStep = () => {
       if (validateEntireForm()) {
-        if (currentStep < steps.length - 1) {
+        if (currentStep < currentSteps.length - 1) {
           setCurrentStep(currentStep + 1);
         } else {
           createStorageMutation.mutate(formData);
@@ -231,9 +258,25 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         onSuccess: (response) => {
           const isSuccess = response?.$meta?.ok || response?.$meta?.status === 200;
           setConnectionChecked(isSuccess);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: Boolean(isSuccess),
+            status: response?.$meta?.status ?? null,
+          });
         },
         onError: () => {
           setConnectionChecked(false);
+          emitAppCommonEvent("storage_connection_tested", {
+            surface: "project_setup",
+            provider: formData.provider,
+            target,
+            project_id: project ?? null,
+            success: false,
+            status: null,
+          });
         },
       });
     };
@@ -264,12 +307,55 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     };
 
     return (
-      <div className="flex flex-col h-full w-full">
-        <FormHeader title={title} onClose={handleClose} />
+      <ModalWindow
+        open={open}
+        onOpenChange={(isOpen) => !isOpen && handleClose()}
+        title={title}
+        description="Import your data from cloud storage providers"
+        size="large"
+        closeOnScrimClick={false}
+        dataTestId={dataTestId}
+        footer={
+          <FormFooter
+            currentStep={currentStep}
+            totalSteps={currentSteps.length}
+            onPrevious={prevStep}
+            onNext={nextStep}
+            onSave={saveOnly}
+            isEditMode={isEditMode}
+            connectionChecked={connectionChecked}
+            filesPreview={filesPreview}
+            testConnection={{
+              isLoading: testConnectionMutation.isLoading,
+              mutate: testStorageConnection,
+            }}
+            loadPreview={{
+              isLoading: loadFilesPreviewMutation.isLoading,
+              mutate: loadFilesPreview,
+            }}
+            createStorage={{
+              isLoading: createStorageMutation.isLoading,
+            }}
+            saveStorage={{
+              isLoading: saveStorageMutation.isLoading,
+            }}
+            target={effectiveTarget}
+            isProviderDisabled={providers[formData.provider]?.disabled || false}
+          />
+        }
+      >
+        <div className="flex justify-center">
+          <Stepper
+            aria-label="Storage setup progress"
+            className="w-auto"
+            steps={stepperSteps}
+            currentStepIndex={currentStep}
+            onStepSelect={handleStepClick}
+            data-testid="storage-provider-form-stepper"
+          />
+        </div>
 
-        <Stepper steps={steps} currentStep={currentStep} onStepClick={handleStepClick} isEditMode={isEditMode} />
-
-        <div className="px-wide py-base">
+        <div className="pt-base">
           {(() => {
             const actualStep = isEditMode ? currentStep + 1 : currentStep;
 
@@ -338,37 +424,8 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
           })()}
         </div>
 
-        <div className="p-tight">
-          <InlineError includeValidation minimal />
-        </div>
-
-        <FormFooter
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          onPrevious={prevStep}
-          onNext={nextStep}
-          onSave={saveOnly}
-          isEditMode={isEditMode}
-          connectionChecked={connectionChecked}
-          filesPreview={filesPreview}
-          testConnection={{
-            isLoading: testConnectionMutation.isLoading,
-            mutate: testStorageConnection,
-          }}
-          loadPreview={{
-            isLoading: loadFilesPreviewMutation.isLoading,
-            mutate: loadFilesPreview,
-          }}
-          createStorage={{
-            isLoading: createStorageMutation.isLoading,
-          }}
-          saveStorage={{
-            isLoading: saveStorageMutation.isLoading,
-          }}
-          target={effectiveTarget}
-          isProviderDisabled={providers[formData.provider]?.disabled || false}
-        />
-      </div>
+        <FormError />
+      </ModalWindow>
     );
   },
 );

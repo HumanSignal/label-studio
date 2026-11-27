@@ -44,8 +44,10 @@
     &:not(.breadcrumbs__item_last) {
       cursor: pointer;
 
-      & > span,
-      & > a {
+      & > .breadcrumbs__link span,
+      & > .breadcrumbs__link a,
+      & > .breadcrumbs__trigger-row > .breadcrumbs__link span,
+      & > .breadcrumbs__trigger-row > .breadcrumbs__link a {
         color: var(--color-neutral-content-subtler);
 
         &:hover {
@@ -58,10 +60,11 @@
       flex-shrink: 0;
     }
 
-    &:nth-child(2) span {
+    &:nth-child(2) .breadcrumbs__label {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
 
     &:only-child {
@@ -69,8 +72,43 @@
     }
   }
 
-  &__item > span,
-  &__item > a {
+  &__link {
+    display: block;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__extra {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: var(--spacing-tight);
+    gap: var(--spacing-tighter);
+  }
+
+  /*
+   * Menubar sets `.menu-header__context * { min-width: 0 }` so flex children can shrink.
+   * That collapses the breadcrumb extra slot (and chips inside it) to zero width — restore
+   * intrinsic sizing for the slot and its contents.
+   */
+  &__item > &__extra {
+    min-width: max-content;
+  }
+
+  &__item > &__extra * {
+    min-width: auto;
+  }
+
+  &__trigger-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
+    gap: var(--spacing-tighter);
+  }
+
+  &__item > .breadcrumbs__link,
+  &__item > .breadcrumbs__trigger-row > .breadcrumbs__link {
     text-decoration: none;
     color: var(--color-neutral-content);
 

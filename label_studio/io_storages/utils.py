@@ -1,11 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import base64
+import binascii
 import io
 import json
 import logging
 import re
 from dataclasses import dataclass
 from typing import Iterator, Optional, Union
+from urllib.parse import parse_qs, unquote, urlsplit
 
 import ijson
 from core.utils.common import load_func
@@ -16,12 +19,126 @@ logger = logging.getLogger(__name__)
 # Put storage prefixes here
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
+# Upload proxy spelling used when CLOUD_FILE_STORAGE_ENABLED stores a rooted proxy URL in task
+# data (``StorageProxyMixin.url``). Automax re-exports this as ``UPLOAD_PROXY_ROUTE``.
+UPLOAD_PROXY_FILEPATH_ROUTE = '/storage-data/uploaded/?filepath='
+
+
+def decode_resolve_fileuri(url: str) -> Optional[str]:
+    """Decode the storage URI embedded in a resolve/proxy ``fileuri`` query param.
+
+    Same approach as Automax's resolve-link helpers (``parse_qs`` + ``urlsafe_b64decode``)
+    and the payload ``ResolveStorageUriAPIMixin`` expects after routing extracts ``fileuri``.
+    Returns ``None`` when the URL has no ``fileuri`` or the value is not valid base64 text.
+    """
+    if not isinstance(url, str) or not url or 'fileuri=' not in url.lower():
+        return None
+    try:
+        raw_list = parse_qs(urlsplit(url).query).get('fileuri')
+    except ValueError:
+        return None
+    if not raw_list:
+        return None
+    raw = raw_list[0]
+    try:
+        padding = '=' * (-len(raw) % 4)
+        return base64.urlsafe_b64decode(raw + padding).decode('utf-8')
+    except (binascii.Error, ValueError, UnicodeDecodeError):
+        return None
+
+
+def unwrap_storage_media_path(value: str) -> str:
+    """Normalize a task-data media reference to a path-like string for extension checks.
+
+    Peels wrappers without fetching or presigning:
+
+    - ``...?fileuri=<urlsafe-b64>`` resolve/proxy links (see ``decode_resolve_fileuri``)
+    - ``/storage-data/uploaded/?filepath=...`` upload proxy URLs
+    - ``http(s)://``, ``s3://``, ``gs://``, ``azure://`` URLs → path component
+    - rooted absolute paths → path component
+
+    Product resolve builders encode a storage URI (or path) in ``fileuri``, never another
+    resolve link — peel at most one ``fileuri`` layer.
+    """
+    if not isinstance(value, str) or not value:
+        return ''
+
+    decoded = decode_resolve_fileuri(value)
+    if decoded:
+        value = decoded
+
+    try:
+        parts = urlsplit(value)
+        filepath = parse_qs(parts.query).get('filepath')
+        if filepath and filepath[0]:
+            return unquote(filepath[0])
+        if parts.scheme in ('http', 'https', 's3', 'gs', 'azure'):
+            return unquote(parts.path or value)
+        if parts.path and value.startswith('/'):
+            return unquote(parts.path)
+    except ValueError:
+        pass
+
+    return value
+
 
 @dataclass
 class BucketURI:
     bucket: str
     path: str
     scheme: str
+
+
+# Objects written by the collection-submission upload path live under a fully
+# server-derived reserved key layout. Import sync must never turn them into
+# tasks (each uploaded file would become a phantom task), so key iteration
+# skips them regardless of the connection's own prefix/regex settings.
+# Reserved are the raw submissions and the legacy flat layout that preceded
+# them — NOT the sibling `approved/` folder, which exists precisely to be
+# imported: a downstream annotation project points its source storage there to
+# consume accepted media, and reserving it would skip every object.
+COLLECTION_SUBMISSION_KEY_REGEX = re.compile(
+    r'(^|/)collection/org-\d+/project-\d+/(submissions/|task-\d+-[0-9a-f]{12}\.[a-z0-9]{1,8}$)'
+)
+
+
+def is_collection_submission_key(key: str) -> bool:
+    return bool(COLLECTION_SUBMISSION_KEY_REGEX.search(key or ''))
+
+
+def is_own_collection_key(key: str, organization_id, project_id) -> bool:
+    """True only for keys under THIS project's own collection folder.
+
+    Storage matching is bucket-wide, so a client-supplied URI that merely names
+    an export bucket must not be enough to read from it: export targets are
+    routinely shared across an organization. Resolution through an export
+    connection is therefore narrowed to the project's own reserved folder.
+    """
+    if organization_id is None or project_id is None:
+        return False
+    pattern = rf'(^|/)collection/org-{int(organization_id)}/project-{int(project_id)}/'
+    return bool(re.search(pattern, key or ''))
+
+
+def key_is_under_prefix(key: Union[str, None], prefix: Union[str, None]) -> bool:
+    """True when an object key sits under an import storage prefix.
+
+    Uses the directory semantics listing uses (``prefix.rstrip('/') + '/'``), so
+    ``team-a`` does not cover ``team-ab/``. Dot segments are refused: some HTTP
+    clients normalize them, which could step out of the prefix. Control characters
+    are refused too: ``urlparse`` (used by the fetch and presign paths) drops tabs
+    and newlines, so ``.\t.`` would be fetched as ``..``.
+    """
+    normalized = str(prefix or '').rstrip('/')
+    if not normalized:
+        return True
+    if not key:
+        return False
+    if any(ord(char) < 0x20 or ord(char) == 0x7F for char in key):
+        return False
+    if any(part in ('.', '..') for part in key.split('/')):
+        return False
+    return key.startswith(normalized + '/')
 
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:

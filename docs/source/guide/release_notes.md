@@ -12,11 +12,13 @@ meta_title: On-premises release notes for Label Studio Enterprise
 meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---
 
-!!! note 
-    The release notes for Label Studio Community Edition are available from the <a href="https://github.com/HumanSignal/label-studio/releases">Label Studio GitHub repository</a>.
+Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
+
+!!! attention "Release support lifecycle"
+    All releases from the last 12 months are supported: you can report bugs against them, and we fix those bugs in the current or an upcoming release, so you might need to upgrade to get a fix. Security patches are released only for the current minor release and the previous minor release. To keep receiving security fixes, stay on one of the two most recent minor releases. For help planning an upgrade, contact your HumanSignal representative.
 
 !!! note 
-    Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
+    The release notes for Label Studio Community Edition are available from the <a href="https://github.com/HumanSignal/label-studio/releases">Label Studio GitHub repository</a>.
 
 <div class="release-note"><button class="release-note-toggle"></button>
 <a name="2331md"></a>

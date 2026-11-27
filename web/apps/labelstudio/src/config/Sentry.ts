@@ -20,6 +20,39 @@ const tracePropagationTargets = [
   /^\/(?!tasks\/\d+\/(?:resolve|presign)|projects\/\d+\/(?:resolve|presign))/,
 ];
 
+/**
+ * Detects RangeError: Maximum call stack size exceeded events originating from
+ * browser-injected scripts (e.g. Chrome Mobile iOS / CriOS history wrapper recursion).
+ *
+ * NOTE: @sentry/browser marks all browser frames with in_app: true by default
+ * (stack-parsers.js:20), so frame.in_app can't distinguish first-party code. An
+ * allowlist of first-party bundle paths is also unsafe here: it misses frames with
+ * no filename, blob: URLs, anonymous/eval frames, or any bundle path not on the list,
+ * silently dropping genuine first-party crashes. Instead, only drop the error when
+ * EVERY frame reports the exact injected document URL (location.origin +
+ * location.pathname) — which is what the CriOS/GSA proxy frames in the reported
+ * Sentry events look like. Any other, unrecognized frame keeps the error.
+ */
+export const isBrowserInjectedRangeError = (event: Sentry.Event, hint?: Sentry.EventHint): boolean => {
+  const error = hint?.originalException;
+  const errorMessage =
+    (typeof error === "object" && error !== null && "message" in error ? String((error as any).message) : "") ||
+    event.exception?.values?.[0]?.value ||
+    "";
+
+  if (!errorMessage.includes("Maximum call stack size exceeded")) {
+    return false;
+  }
+
+  const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? [];
+  if (frames.length === 0) {
+    return false;
+  }
+
+  const documentUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
+  return frames.every((frame) => frame.filename === documentUrl);
+};
+
 export const initSentry = (history: RouterHistory) => {
   if (SENTRY_ENABLED) {
     setTags();
@@ -37,6 +70,12 @@ export const initSentry = (history: RouterHistory) => {
       // We recommend adjusting this value in production
       tracesSampleRate: SENTRY_RATE,
       release: getVersion(),
+      beforeSend(event, hint) {
+        if (isBrowserInjectedRangeError(event, hint)) {
+          return null;
+        }
+        return event;
+      },
     });
   }
 };

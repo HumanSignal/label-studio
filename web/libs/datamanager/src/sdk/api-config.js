@@ -8,6 +8,9 @@ export const APIConfig = {
     /** users list */
     users: "/../users",
 
+    /** Project-scoped users for Data Manager filter options */
+    projectUsers: "/projects/:project/user-options",
+
     /** user info */
     user: "/../users/:pk",
 
@@ -91,6 +94,12 @@ export const APIConfig = {
     /** Delete annotation */
     deleteAnnotation: {
       path: "/../annotations/:annotationID",
+      method: "delete",
+    },
+
+    /** Delete prediction */
+    deletePrediction: {
+      path: "/../predictions/:predictionID",
       method: "delete",
     },
 

@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-06-19T17:10:22.243Z",
+  "fixtures": [
+    {
+      "file": "large-task-source-10kb.json",
+      "targetBytes": 10240,
+      "actualBytes": 11523,
+      "annotations": 40,
+      "extraDataKeys": 0
+    },
+    {
+      "file": "large-task-source-100kb.json",
+      "targetBytes": 102400,
+      "actualBytes": 107115,
+      "annotations": 378,
+      "extraDataKeys": 0
+    },
+    {
+      "file": "large-task-source-1mb.json",
+      "targetBytes": 1048576,
+      "actualBytes": 1102245,
+      "annotations": 3872,
+      "extraDataKeys": 0
+    }
+  ]
+}

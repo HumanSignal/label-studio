@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Select } from "./select";
 import { Badge } from "../badge/badge";
-import { BadgeGroup } from "../badge-group";
+import { SummaryLabel } from "../summary-label";
 import { Button } from "../button/button";
 
 const thousandOptions = (() => {
@@ -10,10 +10,31 @@ const thousandOptions = (() => {
 })();
 
 const meta = {
-  title: "UI/Select",
+  title: "Inputs/Select",
   component: Select,
   parameters: {
     layout: "centered",
+    // Keep declaration order: without this, Storybook alphabetizes and buries `size`.
+    controls: { sort: "none" },
+  },
+  args: {
+    size: "medium",
+  },
+  // Select's generic forwardRef signature defeats docgen, so controls must be declared by hand.
+  // `size` is first so it stays at the top of the Controls panel.
+  argTypes: {
+    size: {
+      control: "select",
+      options: ["smaller", "small", "medium"],
+      description: "Heights match the Button of the same name: smaller 24px, small 32px, medium 40px.",
+      table: { defaultValue: { summary: "medium" } },
+    },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    searchable: { control: "boolean" },
+    multiple: { control: "boolean" },
+    isInline: { control: "boolean" },
+    isLoading: { control: "boolean" },
   },
 } satisfies Meta<typeof Select>;
 
@@ -22,6 +43,7 @@ type Story = StoryObj<typeof Select>;
 
 export const Default: Story = {
   args: {
+    size: "medium",
     placeholder: "Select a fruit",
     options: ["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"] as any[],
     label: "default",
@@ -59,6 +81,31 @@ export const Disabled: Story = {
     options: ["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"] as any[],
     label: "disabled select",
     disabled: true,
+  },
+};
+
+/**
+ * Read-only: trigger stays clickable so the dropdown can open for inspection,
+ * but options and bulk actions cannot change the value. Search remains available.
+ * Contrast with `Disabled`, which greys out the trigger and blocks opening.
+ */
+export const ReadOnly: Story = {
+  args: {
+    placeholder: "Select columns",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+    ] as any[],
+    value: ["id", "agreement"],
+    multiple: true,
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    groupBy: "group",
+    showGroupActions: true,
+    readOnly: true,
+    label: "read-only select (openable, non-editable)",
   },
 };
 
@@ -216,7 +263,8 @@ export const MultipleWithBadges: Story = {
           renderSelected={(selectedOptions) => {
             if (!selectedOptions || selectedOptions?.length === 0) return null;
             return (
-              <BadgeGroup
+              <SummaryLabel
+                badges
                 items={
                   selectedOptions?.map((opt: any) => ({
                     id: opt?.value ?? opt,
@@ -300,6 +348,42 @@ export const WithGroupByMultiple: Story = {
 };
 
 /**
+ * Multi-select with groupBy and showGroupActions enabled.
+ * Hovering a group header or any of its items reveals "All" / "None" buttons
+ * that bulk-select or deselect the entire group in a single onChange call.
+ * Disabled items are skipped by the bulk actions.
+ */
+export const WithGroupByMultipleAndGroupActions: Story = {
+  args: {
+    ...WithGroupBy.args,
+    multiple: true,
+    value: ["id", "task_state"],
+    showGroupActions: true,
+    label: "With groupBy + group actions (All / None)",
+    options: [
+      { key: "id", title: "ID", value: "id" },
+      { key: "inner_id", title: "Inner ID", value: "inner_id" },
+      { key: "task_state", title: "Task State", value: "task_state" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+      {
+        key: "dim_2",
+        title: "Dimension 2 (disabled)",
+        value: "dim_2",
+        group: "Agreement",
+        disabled: true,
+      },
+      { key: "annot_completed", title: "Annotation Completed At", value: "annot_completed", group: "Annotations" },
+      { key: "lead_time", title: "Lead Time", value: "lead_time", group: "Annotations" },
+      { key: "summary", title: "summary", value: "summary", group: "Data", readableType: "TextArea" },
+      { key: "rating", title: "rating", value: "rating", group: "Data", readableType: "Rating" },
+      { key: "heading", title: "heading", value: "heading", group: "Data", readableType: "str" },
+      { key: "author", title: "author", value: "author", group: "Data", readableType: "str" },
+    ] as any[],
+  },
+};
+
+/**
  * groupBy with custom option content via optionRenderer (e.g. type badges).
  */
 export const WithGroupByAndOptionRenderer: Story = {
@@ -318,13 +402,45 @@ export const WithGroupByAndOptionRenderer: Story = {
       <span className="flex w-full items-center justify-between gap-2">
         <span>{option?.title ?? option?.label ?? option?.value}</span>
         {option?.readableType && (
-          <Badge variant="secondary" shape="squared" className="text-[10px]">
+          <Badge variant="neutral" shape="square" className="text-[10px]">
             {option.readableType}
           </Badge>
         )}
       </span>
     ),
     label: "With groupBy and optionRenderer (type badges)",
+  },
+};
+
+/**
+ * `listHeader` sits under the search field and above the options, so column headings for a custom
+ * `optionRenderer` stay pinned while the list scrolls.
+ */
+export const WithListHeader: Story = {
+  args: {
+    placeholder: "Select a column",
+    searchable: true,
+    searchPlaceholder: "Search columns",
+    options: [
+      { value: "summary", label: "summary", readableType: "TextArea" },
+      { value: "rating", label: "rating", readableType: "Rating" },
+      { value: "author", label: "author", readableType: "str" },
+    ] as any[],
+    listHeader: (
+      <div className="flex items-center justify-between px-4 py-2 text-body-smaller text-neutral-content-subtle">
+        <span>Column</span>
+        <span>Type</span>
+      </div>
+    ),
+    optionRenderer: ({ option }) => (
+      <span className="flex w-full items-center justify-between gap-2">
+        <span>{option?.label}</span>
+        <Badge variant="neutral" shape="square" className="text-[10px]">
+          {option?.readableType}
+        </Badge>
+      </span>
+    ),
+    label: "With listHeader (pinned column headings)",
   },
 };
 
@@ -393,4 +509,122 @@ export const ControlledOpenWithFooterApply: Story = {
       </div>
     );
   },
+};
+
+/**
+ * `requireApply` on a multiple select: picks stay pending until Apply, closing without Apply discards them, and
+ * `onChange` fires once with the full list. Use it when the list is long or a change reloads data.
+ */
+export const RequireApply: Story = {
+  render: () => {
+    const options = [
+      { value: "AN", label: "Annotator" },
+      { value: "RE", label: "Reviewer" },
+      { value: "MA", label: "Manager" },
+      { value: "AD", label: "Administrator" },
+    ];
+    const [applied, setApplied] = useState<string[]>(["AN"]);
+
+    return (
+      <div className="flex flex-col gap-4 w-[350px]">
+        <Select
+          multiple
+          requireApply
+          value={applied}
+          options={options}
+          placeholder="Roles"
+          label="Enforced roles"
+          renderSelected={(picked, placeholder) =>
+            picked?.length ? (
+              <SummaryLabel items={picked.map((option: any) => ({ id: option.value, label: option.label }))} />
+            ) : (
+              placeholder
+            )
+          }
+          onChange={(values: any) => setApplied(values)}
+        />
+        <p className="text-sm text-neutral-content">Applied: {applied.length > 0 ? applied.join(", ") : "none"}</p>
+      </div>
+    );
+  },
+};
+
+/**
+ * The trigger keeps its declared height whichever axis the parent flexes along. Column-flex and
+ * grid parents used to hand the block axis to the trigger's own `flex` basis/grow, which stretched
+ * or collapsed it away from that height.
+ */
+export const TriggerHeightInFlexParents: Story = {
+  render: () => {
+    const options = ["Apple", "Banana", "Blueberry"] as any[];
+
+    return (
+      <div className="flex flex-col gap-6 w-[420px]">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Column-flex parent</span>
+          <Select placeholder="Select a fruit" options={options} />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Row-flex parent, sharing space</span>
+          <div className="flex flex-row gap-2">
+            <Select placeholder="Select a fruit" options={options} />
+            <Button look="outlined">Action</Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Grid parent</span>
+          <div className="grid grid-cols-2 gap-2">
+            <Select placeholder="Select a fruit" options={options} />
+            <Select placeholder="Select a fruit" options={options} size="small" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Each size matches the Button of the same name — medium 40px, small 32px, smaller 24px — so the
+ * two line up when they sit side by side. `triggerClassName` still wins for the rare layout that
+ * needs a height outside the scale.
+ */
+export const SizesMatchButton: Story = {
+  render: () => {
+    const options = ["Apple", "Banana", "Blueberry"] as any[];
+    const sizes = ["medium", "small", "smaller"] as const;
+
+    return (
+      <div className="flex flex-col gap-6 w-[480px]">
+        {sizes.map((size) => (
+          <div key={size} className="flex flex-col gap-2">
+            <span className="text-sm text-neutral-content-subtler">{size}</span>
+            <div className="flex flex-row items-center gap-2">
+              <Select placeholder="Select a fruit" options={options} size={size} />
+              <Button look="outlined" size={size}>
+                Action
+              </Button>
+            </div>
+          </div>
+        ))}
+
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-neutral-content-subtler">Custom height via triggerClassName</span>
+          <Select placeholder="Select a fruit" options={options} triggerClassName="!h-[36px]" />
+        </div>
+      </div>
+    );
+  },
+};
+
+/** `medium` 40px, `small` 32px, `smaller` 24px: the same heights as every other control. */
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-base" style={{ width: 240 }}>
+      {(["medium", "small", "smaller"] as const).map((size) => (
+        <Select key={size} size={size} placeholder={size} options={["Apple", "Banana", "Blueberry"] as any[]} />
+      ))}
+    </div>
+  ),
 };

@@ -6,6 +6,7 @@ import pytest
 from data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.test import override_settings
 from django.utils.timezone import now
 from fsm.state_choices import TaskStateChoices
 from fsm.tests.factories import TaskStateFactory
@@ -105,6 +106,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
 
 
 @pytest.mark.django_db
+@override_settings(FSM_ENABLED=True)
 def test_views_ordering_task_state():
     """
     This test verifies that ordering by task state orders by the state progression, and not in alphabetical order.

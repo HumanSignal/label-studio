@@ -4,32 +4,24 @@
  */
 import { types } from "mobx-state-tree";
 
-const mockRemoveSpans = jest.fn();
-jest.mock("../../utils", () => ({
+const mockRemoveSpans = mock();
+mockModule("../../utils", () => ({
+  ...(requireActual("../../utils") ?? {}),
   __esModule: true,
   default: {
+    ...((requireActual("../../utils") ?? {}).default ?? {}),
     HTML: {
       removeSpans: (...args) => mockRemoveSpans(...args),
     },
   },
 }));
 
-jest.mock("../../tags/object/Paragraphs", () => {
-  const { types: t } = require("mobx-state-tree");
-  return {
-    ParagraphsModel: t.model("ParagraphsModel", {
-      name: t.identifier,
-      savetextresult: t.optional(t.enumeration(["none", "no", "yes"]), "no"),
-    }),
-  };
-});
-
 import { ParagraphsRegionModel } from "../ParagraphsRegion";
 import { ParagraphsModel } from "../../tags/object/Paragraphs";
 
 const TestRoot = types
   .model("TestRoot", {
-    paragraphs: types.optional(ParagraphsModel, { name: "para1", savetextresult: "no" }),
+    paragraphs: types.optional(ParagraphsModel, { name: "para1", value: "$text", savetextresult: "no" }),
     region: types.optional(ParagraphsRegionModel, {
       id: "r1",
       pid: "p1",
@@ -41,8 +33,8 @@ const TestRoot = types
       results: [],
     }),
   })
-  .actions((self) => ({
-    createSerializedResult(region, value) {
+  .actions((_self) => ({
+    createSerializedResult(_region, value) {
       return { value: { ...value }, original_width: 100, original_height: 100, image_rotation: 0 };
     },
   }));
@@ -54,7 +46,7 @@ describe("ParagraphsRegion", () => {
 
     beforeEach(() => {
       root = TestRoot.create({
-        paragraphs: { name: "para1", savetextresult: "no" },
+        paragraphs: { name: "para1", value: "$text", savetextresult: "no" },
         region: {
           id: "r1",
           pid: "p1",
@@ -86,7 +78,7 @@ describe("ParagraphsRegion", () => {
 
     it("serialize includes text when object.savetextresult is yes", () => {
       root = TestRoot.create({
-        paragraphs: { name: "para1", savetextresult: "yes" },
+        paragraphs: { name: "para1", value: "$text", savetextresult: "yes" },
         region: {
           id: "r1",
           pid: "p1",

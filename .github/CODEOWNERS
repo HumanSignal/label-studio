@@ -2,10 +2,10 @@
 deploy/                                     @HumanSignal/devops
 Dockerfile*                                 @HumanSignal/devops
 docker-compose*                             @HumanSignal/devops
-docs/.npmignore                             @hlomzik @nick-skriabin
-docs/package.json                           @hlomzik @nick-skriabin
-docs/yarn.lock                              @hlomzik @nick-skriabin
-web/libs/editor                             @hlomzik @nick-skriabin
+docs/.npmignore                             @hlomzik
+docs/package.json                           @hlomzik
+docs/yarn.lock                              @hlomzik
+web/libs/editor                             @hlomzik
 web/tools                                   @HumanSignal/team-fit
 web/libs/datamanager                        @HumanSignal/team-fit
 web/design-tokens.json                      @HumanSignal/team-fit

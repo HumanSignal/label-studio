@@ -1,11 +1,11 @@
-import { destroy, detach, getEnv, getParent, onPatch, types } from "mobx-state-tree";
+import { destroy, detach, getEnv, getParent, getRoot, onPatch, types } from "mobx-state-tree";
 
+import { ff } from "@humansignal/core";
+import { debounce } from "@humansignal/core/lib/utils/debounce";
 import { Hotkey } from "../core/Hotkey";
 import { isDefined } from "../utils/utilities";
 import { AllRegionsType } from "../regions";
-import { debounce } from "@humansignal/core/lib/utils/debounce";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
-import { FF_DEV_2755, isFF } from "../utils/feature-flags";
 
 const hotkeys = Hotkey("RegionStore");
 
@@ -64,6 +64,8 @@ const SelectionMap = types
         });
       },
       select(region) {
+        const alreadySelected = self.isSelected(region);
+
         self.selected.put(region);
         region.selectRegion && region.selectRegion();
 
@@ -216,6 +218,15 @@ export default types
         return [].concat(...textAreas);
       },
 
+      // per-item classifications are not visible globally, only in the item context,
+      // so we need a way to see them and focus the related item.
+      get classificationAreas() {
+        if (!ff.isActive(ff.FF_CLASSIFICATIONS_IN_OUTLINER)) return [];
+        return Array.from(self.annotation.areas.values()).filter(
+          (area) => area.classification && area.item_index != null,
+        );
+      },
+
       get regions() {
         return Array.from(self.annotation.areas.values()).filter((area) => !area.classification);
       },
@@ -331,6 +342,20 @@ export default types
           tree.push(el);
         });
 
+        if (ff.isActive(ff.FF_CLASSIFICATIONS_IN_OUTLINER)) {
+          self.classificationAreas.forEach((area, areaIdx) => {
+            const result = enrich(area, regions.length + areaIdx, false);
+
+            Object.assign(result, {
+              item: area,
+              children: [],
+              isArea: true,
+              isClassification: true,
+            });
+            tree.push(result);
+          });
+        }
+
         return tree;
       },
 
@@ -347,23 +372,17 @@ export default types
 
           return (groups[key] = {
             ...enrich(label, index, true),
+            key,
             id: key,
             isGroup: true,
             isNotLabel: true,
             children: [],
           });
         };
-        const getRegionLabel = (region) =>
-          region.labeling?.selectedLabels || (region.emptyLabel && [region.emptyLabel]);
         const addToLabelGroup = (key, label, region) => {
           const group = getLabelGroup(label, key);
           const groupId = group.id;
-          const labelHotKey = getRegionLabel(region)?.[0]?.hotkey;
 
-          if (isFF(FF_DEV_2755)) {
-            group.hotkey = labelHotKey;
-            group.pos = groupId.slice(0, groupId.indexOf("#"));
-          }
           group.children.push({
             ...enrich(region, index, false, null, onClick, groupId),
             item: region,
@@ -386,12 +405,35 @@ export default types
           index++;
         }
 
-        const groupsArray = Object.values(groups);
+        if (ff.isActive(ff.FF_CLASSIFICATIONS_IN_OUTLINER)) {
+          for (const area of self.classificationAreas) {
+            for (const result of area.results) {
+              const values = result.mainValue;
 
-        if (isFF(FF_DEV_2755)) {
-          groupsArray.sort((a, b) => (a.hotkey > b.hotkey ? 1 : a.hotkey < b.hotkey ? -1 : 0));
+              if (!values || !Array.isArray(values)) continue;
+              for (const val of values) {
+                // taxonomy paths are arrays, choices values are strings (or arrays for nested)
+                const displayValue = Array.isArray(val) ? val[val.length - 1] : val;
+                const pseudoLabel = {
+                  type: "label",
+                  value: displayValue,
+                  background: "#808080",
+                  id: `clf-${result.from_name.name}`,
+                };
+                const key = `${displayValue}#clf-${result.from_name.name}`;
+
+                addToLabelGroup(key, pseudoLabel, area);
+                const group = groups[key];
+
+                group.isClassification = true;
+                group.children[group.children.length - 1].isClassification = true;
+              }
+            }
+            index++;
+          }
         }
-        result.push(...groupsArray);
+
+        result.push(...Object.values(groups));
 
         return result;
       },
@@ -443,6 +485,24 @@ export default types
           index++;
         }
 
+        if (ff.isActive(ff.FF_CLASSIFICATIONS_IN_OUTLINER)) {
+          for (const area of self.classificationAreas) {
+            for (const result of area.results) {
+              const key = result.from_name.name;
+              const group = getTypeGroup(area, key);
+
+              group.isClassification = true;
+              group.children.push({
+                ...enrich(area, index, false, null, onClick),
+                item: area,
+                isArea: true,
+                isClassification: true,
+              });
+            }
+            index++;
+          }
+        }
+
         result.push(...Object.values(groups));
 
         return result;
@@ -476,9 +536,6 @@ export default types
     },
 
     setView(view) {
-      if (isFF(FF_DEV_2755)) {
-        window.localStorage.setItem(localStorageKeys.view, view);
-      }
       self.view = view;
     },
 

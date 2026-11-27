@@ -50,7 +50,7 @@ export const StorageCard = ({ rootClass, target, storage, onEditStorage, onDelet
             </Menu>
           }
         >
-          <Button look="string" className="-ml-3" aria-label="Storage options">
+          <Button look="ghost" className="-ml-3" aria-label="Storage options">
             <IconEllipsisVertical />
           </Button>
         </Dropdown.Trigger>

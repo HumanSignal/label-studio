@@ -6,8 +6,7 @@ from typing import Any, Iterable, Tuple
 from urllib.parse import unquote
 
 import ujson as json
-from core.feature_flags import flag_set
-from core.utils.common import int_from_request
+from core.utils.common import int_from_request, load_func
 from data_manager.models import View
 from data_manager.prepare_params import PrepareParams
 from django.conf import settings
@@ -20,6 +19,39 @@ logger = logging.getLogger(__name__)
 
 class DataManagerException(Exception):
     pass
+
+
+def accessible_projects(user):
+    """Projects whose Data Manager tabs this user may read or change.
+
+    ``Project.objects.for_user`` is only the active organization. Project access,
+    including enterprise role and workspace rules, is ``ACCESSIBLE_PROJECTS_FUNCTION``.
+    """
+    return load_func(settings.ACCESSIBLE_PROJECTS_FUNCTION)(user).distinct()
+
+
+def noop_validate_column_access(project, user, column_refs=None, payload=None, message=None):
+    """OSS no-op for DATA_MANAGER_VALIDATE_COLUMN_ACCESS."""
+    return None
+
+
+def run_column_access_validation(project, user, *, payload=None, column_refs=None, message=None):
+    path = getattr(settings, 'DATA_MANAGER_VALIDATE_COLUMN_ACCESS', None)
+    if not path:
+        return
+    load_func(path)(project, user, column_refs=column_refs, payload=payload, message=message)
+
+
+def noop_sanitize_column_ordering(project, user, ordering):
+    """OSS no-op for DATA_MANAGER_SANITIZE_COLUMN_ORDERING."""
+    return ordering
+
+
+def run_column_ordering_sanitize(project, user, ordering):
+    path = getattr(settings, 'DATA_MANAGER_SANITIZE_COLUMN_ORDERING', None)
+    if not path:
+        return ordering
+    return load_func(path)(project, user, ordering)
 
 
 def get_all_columns(project, *_):
@@ -43,15 +75,23 @@ def get_all_columns(project, *_):
 
     # all data types from import data
     all_data_columns = project.summary.all_data_columns
-    logger.info(f'get_all_columns: project_id={project.id} {all_data_columns=} {data_types=}')
+    # Lazy %s args: avoid formatting large column dicts when DEBUG is disabled
+    logger.debug(
+        'get_all_columns: project_id=%s all_data_columns=%s data_types=%s', project.id, all_data_columns, data_types
+    )
     if all_data_columns:
         data_types.update({key: 'Unknown' for key in all_data_columns if key not in data_types})
-    logger.info(f'get_all_columns: project_id={project.id} {data_types=}')
+    logger.debug('get_all_columns: project_id=%s data_types=%s', project.id, data_types)
 
     # remove $undefined$ if there is one type at least in labeling config, because it will be resolved automatically
     if len(project_data_types) > 0:
         data_types.pop(settings.DATA_UNDEFINED_NAME, None)
-    logger.info(f'get_all_columns: project_id={project.id} {data_types=} {project_data_types=}')
+    logger.debug(
+        'get_all_columns: project_id=%s data_types=%s project_data_types=%s',
+        project.id,
+        data_types,
+        project_data_types,
+    )
 
     for key, data_type in list(data_types.items()):  # make data types from labeling config first
         column = {
@@ -69,8 +109,6 @@ def get_all_columns(project, *_):
         result['columns'].append(column)
         task_data_children.append(column['id'])
         i += 1
-
-    remove_members_schema = flag_set('fflag_feat_fit_449_datamanager_filter_members_short', user='auto')
 
     # --- Data root ---
     data_root = {
@@ -107,18 +145,13 @@ def get_all_columns(project, *_):
         }
     ]
 
-    if remove_members_schema:
-        project_members = []
-    else:
-        project_members = project.all_members.values_list('id', flat=True)
-
     result['columns'] += [
         {
             'id': 'completed_at',
             'title': 'Completed',
             'type': 'Datetime',
             'target': 'tasks',
-            'help': 'Last annotation date',
+            'help': 'Latest annotation time, set once the task has all required annotations',
             'visibility_defaults': {'explore': True, 'labeling': False},
             'project_defined': False,
         },
@@ -155,7 +188,7 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
-            **({'schema': {'items': project_members}} if not remove_members_schema else {}),
+            'schema': {'multiple': True},
             'visibility_defaults': {'explore': True, 'labeling': False},
             'project_defined': False,
         },
@@ -247,7 +280,7 @@ def get_all_columns(project, *_):
             'type': 'List',
             'target': 'tasks',
             'help': 'User who did the last task update',
-            **({'schema': {'items': project_members}} if not remove_members_schema else {}),
+            'schema': {'multiple': True},
             'visibility_defaults': {'explore': False, 'labeling': False},
             'project_defined': False,
         },
@@ -323,6 +356,10 @@ def get_prepare_params(request, project):
         prepare_params = PrepareParams(
             project=project.id, selectedItems=selected, data=data, filters=filters, ordering=ordering, request=request
         )
+    # Denied-column filters still apply on reads (shared tabs / reviewers). View save
+    # continues to reject them via ViewSerializer. Ordering is stripped for the request only.
+    user = getattr(request, 'user', None)
+    prepare_params.ordering = run_column_ordering_sanitize(project, user, prepare_params.ordering) or []
     return prepare_params
 
 
@@ -355,6 +392,11 @@ def filters_ordering_selected_items_exist(data):
 
 def custom_filter_expressions(*args, **kwargs):
     pass
+
+
+def combined_filter_expression(*args, **kwargs):
+    """Returns (Q, consumed parent filters) to answer several filter lines at once, or None."""
+    return None
 
 
 def preprocess_filter(_filter, *_):

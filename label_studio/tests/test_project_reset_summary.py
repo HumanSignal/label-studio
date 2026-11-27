@@ -1,11 +1,35 @@
 import json
 
 import pytest
+from projects.models import ProjectSummary
 from tasks.models import Task
 from tests.conftest import project_choices
-from tests.utils import make_project
+from tests.utils import make_project, signout
 
 pytestmark = pytest.mark.django_db
+
+
+def test_get_labels_extracts_bare_array_for_labels_pass_through():
+    summary = ProjectSummary()
+    result = {
+        'type': 'labels',
+        'from_name': 'selected_images',
+        'value': ['https://example.com/a.jpg', 'https://example.com/b.jpg'],
+    }
+    assert summary._get_labels(result) == [
+        'https://example.com/a.jpg',
+        'https://example.com/b.jpg',
+    ]
+
+
+def test_get_labels_ignores_bare_array_for_non_labels_types():
+    summary = ProjectSummary()
+    result = {
+        'type': 'choices',
+        'from_name': 'sentiment',
+        'value': ['positive'],
+    }
+    assert summary._get_labels(result) == []
 
 
 def test_reset_summary_empty_project(business_client):
@@ -95,7 +119,42 @@ def test_reset_summary_project_has_annotations(business_client):
     assert s.created_labels == {'some': {'Opossum': 1}}
 
 
-def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labels(business_client):
+def test_imported_annotations_update_project_summary_without_reset(business_client):
+    project = make_project(project_choices(), business_client.user, use_ml_backend=False)
+
+    response = business_client.post(
+        f'/api/projects/{project.id}/import',
+        data=json.dumps(
+            [
+                {
+                    'data': {'image': 'kittens.jpg'},
+                    'annotations': [
+                        {
+                            'result': [
+                                {
+                                    'from_name': 'animals',
+                                    'to_name': 'xxx',
+                                    'type': 'choices',
+                                    'value': {'choices': ['Cat']},
+                                }
+                            ]
+                        }
+                    ],
+                }
+            ]
+        ),
+        content_type='application/json',
+    )
+    assert response.status_code == 201
+
+    project.summary.refresh_from_db()
+    assert project.summary.created_annotations == {'animals|xxx|choices': 1}
+    assert project.summary.created_labels == {'animals': {'Cat': 1}}
+
+
+def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labels(
+    business_client, django_capture_on_commit_callbacks
+):
     project = make_project(project_choices(), business_client.user, use_ml_backend=False)
 
     r = business_client.post(
@@ -130,7 +189,9 @@ def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labe
         setattr(s, field, {'garbled': field})
     s.save()
 
-    r = business_client.post(f'/api/dm/actions?id=delete_tasks_annotations&project={project.id}')
+    # the summary decrement runs after commit
+    with django_capture_on_commit_callbacks(execute=True):
+        r = business_client.post(f'/api/dm/actions?id=delete_tasks_annotations&project={project.id}')
     assert r.status_code == 200
 
     s.refresh_from_db()
@@ -140,7 +201,7 @@ def test_delete_tasks_and_annotations_clears_created_drafts_annotations_and_labe
 
 def test_logged_out_user_cannot_reset_summary(business_client):
     project = make_project(project_choices(), business_client.user, use_ml_backend=False)
-    r = business_client.get('/logout')
+    r = signout(business_client)
     assert r.status_code == 302
     r = business_client.post(f'/api/projects/{project.id}/summary/reset')
     assert r.status_code == 401

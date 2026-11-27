@@ -32,7 +32,7 @@ export const ToolBar = {
   },
 
   get annotationDropdownTrigger() {
-    return this.sectionOne.find(".lsf-annotation-button__trigger");
+    return this.sectionOne.find('[data-testid="annotation-button-menu-trigger"]');
   },
 
   get dropdownMenu() {
@@ -41,6 +41,6 @@ export const ToolBar = {
 
   clickCopyAnnotationBtn() {
     this.annotationDropdownTrigger.click();
-    this.dropdownMenu.find('[class*="option--"]').contains("Duplicate Annotation").click();
+    this.dropdownMenu.find('[data-testid="annotation-button-menu-duplicate"]').click();
   },
 };

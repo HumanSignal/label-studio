@@ -35,7 +35,7 @@ const Model = types
 
     fixedscale: types.maybe(types.boolean),
   })
-  .volatile((self) => ({
+  .volatile((_self) => ({
     isChannelHiddenMap: {},
     highlightedChannelId: null,
   }))

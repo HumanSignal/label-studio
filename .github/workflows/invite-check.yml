@@ -18,7 +18,7 @@ jobs:
           ! grep --only-matching --extended-regexp '(&quot;|")isSharedInviteError(&quot;|")\s*:\s*true' <(curl --silent --location --user-agent Chrome/65536.0.0.0 ${{ env.INVITE_LINK }})
       - name: Notify to Slack
         if: always() && steps.invite_link_is_active.outcome == 'failure'
-        uses: slackapi/slack-github-action@v3.0
+        uses: slackapi/slack-github-action@v4.0
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_LS_BOT_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
 #          )
 #      - name: Notify to Slack
 #        if: always() && steps.invite_link_has_teamdomains.outcome == 'failure'
-#        uses: slackapi/slack-github-action@v3.0
+#        uses: slackapi/slack-github-action@v4.0
 #        with:
 #          channel-id: '${{ secrets.SLACK_LS_MONITORING_CHANNEL }}'
 #          slack-message: "Our <${{ env.INVITE_LINK }}|public invite link> was configured to allow signups only from a list of allowed domains:\n1. Go to <https://label-studio.slack.com/admin/settings|Workspace settings>, next to `Joining This Workspace`, click `Expand`.\n2. Delete all domains from the list, select `Allow invitations` and click `Save`."

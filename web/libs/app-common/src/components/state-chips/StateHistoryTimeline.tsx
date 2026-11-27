@@ -2,7 +2,7 @@
  * StateHistoryTimeline - Reusable timeline component for displaying state history
  */
 
-import { Userpic, cn, Typography } from "@humansignal/ui";
+import { Avatar, Timeline } from "@humansignal/ui";
 import type { StateHistoryItem } from "../../hooks/useStateHistory";
 import { formatStateName, formatTimestamp, formatUserName } from "./utils";
 import { getStateVisuals } from "./state-visuals";
@@ -35,108 +35,75 @@ function getUserInitials(
   return "SY";
 }
 
+/** Separates the author (or "System") from the timestamp in the meta row. */
+function MetaDot() {
+  return <span className="size-[3px] shrink-0 rounded-full bg-neutral-content-subtler" aria-hidden="true" />;
+}
+
 export interface TimelineItemProps {
   item: StateHistoryItem;
   index: number;
-  isLast: boolean;
+  /** Injected by the parent `Timeline` when rendered through it; see `Timeline`'s own `isLast` prop. */
+  isLast?: boolean;
 }
 
 /**
- * Timeline item component for a single state history entry
+ * Timeline item component for a single state history entry. Renders through the shared `Timeline.Item` from
+ * `@humansignal/ui`; the state-to-colour mapping (`getStateVisuals`) and the current/past split stay here.
  */
-export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
+export function TimelineItem({ item, index, isLast = false }: TimelineItemProps) {
   const isCurrent = index === 0;
   const stateLabel = formatStateName(item.state);
   const visuals = getStateVisuals(stateLabel);
   const StateIcon = visuals.icon;
 
-  // Current state (index 0) gets bold/base colors, past states get subtle colors
+  // Current state (index 0) gets bold/base colors, past states get subtle colors.
   const bgColor = isCurrent ? visuals.baseBg : visuals.subtleBg;
   const iconColor = isCurrent ? visuals.baseIconColor : visuals.subtleIconColor;
 
-  // Text color: current state is dark, all past states are subtle
-  const labelClass = isCurrent ? "text-neutral-content" : "text-neutral-content-subtle";
-
   const userName = formatUserName(item.triggered_by);
   const isSystem = userName === "System";
-  const reason = item.reason;
 
   return (
-    <div className="flex gap-2 items-start relative">
-      {/* Timeline connector line - positioned behind icon, extends to next icon */}
-      {!isLast && (
-        <div className="absolute w-px bg-neutral-border" style={{ left: "16px", top: "38px", bottom: "4px" }} />
-      )}
-      {/* Icon column */}
-      <div className="flex flex-col items-center shrink-0 pt-0.5">
-        {/* State icon with circular background - 32px circle with 24px icon */}
-        <div className="rounded-full size-8 p-1 flex items-center justify-center" style={{ backgroundColor: bgColor }}>
-          <StateIcon className="w-6 h-6 shrink-0" style={{ color: iconColor }} />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className={cn("flex flex-col gap-0.5 flex-1 min-h-10 justify-center min-w-0", !isLast && "pb-6")}>
-        {/* State name and optional reason */}
-        <div className="flex flex-col gap-1">
-          <Typography variant="label" size="small" className={`${labelClass} truncate`}>
-            {stateLabel}
-          </Typography>
-          {reason && (
-            <Typography variant="body" size="smaller" className="text-neutral-content-subtler mt-0.5">
-              {reason}
-            </Typography>
+    <Timeline.Item
+      icon={<StateIcon className="h-6 w-6 shrink-0" style={{ color: iconColor }} />}
+      markerColor={{ background: bgColor, icon: iconColor }}
+      emphasis={isCurrent ? "strong" : "subtle"}
+      title={stateLabel}
+      description={item.reason}
+      meta={
+        <>
+          {isSystem ? (
+            <span className="shrink-0">System</span>
+          ) : (
+            <span className="flex min-w-0 items-center gap-tighter">
+              <Avatar
+                className="shrink-0"
+                size="small"
+                user={item.triggered_by}
+                username={getUserInitials(item.triggered_by)}
+              />
+              <span className="min-w-0 truncate">{userName}</span>
+            </span>
           )}
-        </div>
-
-        {/* Metadata row */}
-        <div className="flex items-center gap-2 text-neutral-content-subtler">
-          {/* Author section */}
-          {!isSystem && (
-            <>
-              <div className="flex items-center gap-1 shrink-0">
-                <Userpic size={20} user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
-                <Typography variant="body" size="smaller">
-                  {userName}
-                </Typography>
-              </div>
-              {/* Dot separator */}
-              <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
-            </>
-          )}
-          {isSystem && (
-            <>
-              <Typography variant="body" size="smaller">
-                System
-              </Typography>
-              {/* Dot separator */}
-              <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
-            </>
-          )}
-          {/* Timestamp */}
-          <Typography variant="body" size="smaller">
-            {formatTimestamp(item.created_at)}
-          </Typography>
-        </div>
-      </div>
-    </div>
+          <MetaDot />
+          <span className="shrink-0 whitespace-nowrap">{formatTimestamp(item.created_at)}</span>
+        </>
+      }
+      isLast={isLast}
+    />
   );
 }
 
 /**
- * Timeline component that renders a list of state history items
+ * Timeline component that renders a list of state history items through the shared `Timeline`.
  */
 export function StateHistoryTimeline({ history }: StateHistoryTimelineProps) {
   return (
-    <div className="flex flex-col">
+    <Timeline>
       {history.map((item: StateHistoryItem, index: number) => (
-        <TimelineItem
-          key={`${item.state}-${item.created_at}-${index}`}
-          item={item}
-          index={index}
-          isLast={index === history.length - 1}
-        />
+        <TimelineItem key={`${item.state}-${item.created_at}-${index}`} item={item} index={index} />
       ))}
-    </div>
+    </Timeline>
   );
 }

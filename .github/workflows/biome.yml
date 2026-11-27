@@ -20,7 +20,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -33,4 +33,4 @@ jobs:
       - name: Run biome
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
         run: |
-          yarn biome check . --diagnostic-level=error
+          bun run biome check . --diagnostic-level=error

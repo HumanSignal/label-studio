@@ -1,6 +1,6 @@
 @font-face {
   font-family: Figtree;
-  src: url("/static/fonts/Figtree-Regular.ttf") format("truetype");
+  src: url("@humansignal/ui/fonts/Figtree-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: Figtree;
-  src: url("/static/fonts/Figtree-SemiBold.ttf") format("truetype");
+  src: url("@humansignal/ui/fonts/Figtree-SemiBold.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;

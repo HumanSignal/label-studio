@@ -10,6 +10,36 @@ from io_storages.utils import parse_range
 
 logger = logging.getLogger(__name__)
 
+AZURE_ACCOUNT_URL_TEMPLATE = 'https://{account_name}.blob.core.windows.net'
+AZURE_ACCOUNT_NAME_RE = re.compile(r'[a-z0-9]{3,24}')
+AZURE_ACCOUNT_KEY_RE = re.compile(r'[A-Za-z0-9+/]+={0,2}')
+AZURE_ACCOUNT_URL_RE = re.compile(
+    r'https://[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9-]+)*'
+    r'\.blob\.core\.(windows\.net|usgovcloudapi\.net|chinacloudapi\.cn)/?'
+)
+
+
+def validate_azure_account_name(account_name):
+    # the name becomes the endpoint host, so anything but a plain account name can redirect the client
+    if not AZURE_ACCOUNT_NAME_RE.fullmatch(str(account_name)):
+        raise ValueError('Azure account name must be 3 to 24 lowercase letters and digits.')
+
+
+def validate_azure_account_url(account_url):
+    if not AZURE_ACCOUNT_URL_RE.fullmatch(str(account_url)):
+        raise ValueError('Azure account URL must be an https:// Azure Blob Storage endpoint.')
+
+
+def get_blob_service_client(account_name, account_key):
+    """Build a shared-key client for the public Azure cloud endpoint of the account."""
+    validate_azure_account_name(account_name)
+    if not AZURE_ACCOUNT_KEY_RE.fullmatch(str(account_key)):
+        raise ValueError('Azure account key must be the base64 access key, not a connection string.')
+    return BlobServiceClient(
+        account_url=AZURE_ACCOUNT_URL_TEMPLATE.format(account_name=account_name),
+        credential={'account_name': account_name, 'account_key': account_key},
+    )
+
 
 class AZURE(object):
     @staticmethod
@@ -43,11 +73,11 @@ class AZURE(object):
         if start is None and end is None:
             streaming = False
             start, end = 0, total_size
-        elif start == 0 and end == 0:
-            start, end = 0, 1
         elif start == 0 and (end == '' or end is None):
             mr = max_range_size if max_range_size is not None else settings.RESOLVER_PROXY_MAX_RANGE_SIZE
-            end = start + mr
+            # ``end`` is an inclusive byte index, so the last byte of an mr-sized
+            # window starting at ``start`` is ``start + mr - 1`` (length == mr).
+            end = start + mr - 1
 
         if start is None:
             start = 0
@@ -58,7 +88,10 @@ class AZURE(object):
             pass
 
         if end is not None and end != '':
-            length = end - start
+            # HTTP Range is inclusive on both ends, but Azure's download_blob(length=...)
+            # expects a byte count. For bytes=A-B the count is B - A + 1 (so bytes=N-N is
+            # 1 byte, not 0 -> avoids the invalid backwards range bytes=N-(N-1)).
+            length = end - start + 1
         else:
             length = None
 
@@ -117,14 +150,7 @@ class AZURE(object):
                 'Azure account name and key must be set using '
                 'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY'
             )
-        connection_string = (
-            'DefaultEndpointsProtocol=https;AccountName='
-            + account_name
-            + ';AccountKey='
-            + account_key
-            + ';EndpointSuffix=core.windows.net'
-        )
-        client = BlobServiceClient.from_connection_string(conn_str=connection_string)
+        client = get_blob_service_client(account_name, account_key)
         container = client.get_container_client(str(container))
         return client, container
 

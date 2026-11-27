@@ -45,7 +45,7 @@
         "libs/frontend-test/src/*"
       ],
       "@humansignal/icons": [
-        "libs/ui/src/assets/icons"
+        "libs/ui/src/assets/icons/index.ts"
       ],
       "@humansignal/shad/*": [
         "./libs/ui/src/shad/*"

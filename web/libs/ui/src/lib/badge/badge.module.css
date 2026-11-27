@@ -26,18 +26,40 @@
   color: var(--color-neutral-content);
 }
 
+.has-trailing-icon {
+  padding-right: var(--spacing-tighter);
+}
+
 /* Shape variants */
 .shape-rounded {
   border-radius: var(--corner-radius-large);
 }
 
-.shape-squared {
+.shape-square {
   border-radius: var(--corner-radius-smaller);
 }
 
 /* Size variants */
-.size-small,
-.size-compact {
+.size-large {
+  padding: var(--spacing-tighter) var(--spacing-tight);
+  font-size: var(--font-size-label-smaller);
+  min-height: 28px;
+  height: auto;
+  white-space: normal;
+  align-items: center;
+
+  .closeButton {
+    --badge-close-icon-size: 18px;
+  }
+
+  .icon svg,
+  .iconTrailing svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.size-small {
   padding: 0 var(--spacing-tighter);
   font-size: var(--font-size-label-smaller);
   height: 18px;
@@ -50,6 +72,19 @@
       width: 12px;
       height: 12px;
     }
+  }
+
+  .iconTrailing {
+    margin-left: var(--spacing-tightest);
+
+    & svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &.has-trailing-icon {
+    padding-right: var(--spacing-tightest);
   }
 }
 
@@ -115,73 +150,10 @@
   color: var(--color-accent-sand-bold);
 }
 
-/* Outline style */
-.style-outline {
-  &.variant-grape {
-    background: transparent;
-    border-color: var(--color-accent-grape-subtle);
-    color: var(--color-accent-grape-bold);
-  }
-
-  &.variant-blueberry {
-    background: transparent;
-    border-color: var(--color-accent-blueberry-subtle);
-    color: var(--color-accent-blueberry-bold);
-  }
-
-  &.variant-kale {
-    background: transparent;
-    border-color: var(--color-accent-kale-subtle);
-    color: var(--color-accent-kale-bold);
-  }
-
-  &.variant-kiwi {
-    background: transparent;
-    border-color: var(--color-accent-kiwi-subtle);
-    color: var(--color-accent-kiwi-bold);
-  }
-
-  &.variant-mango {
-    background: transparent;
-    border-color: var(--color-accent-mango-subtle);
-    color: var(--color-accent-mango-bold);
-  }
-
-  &.variant-canteloupe {
-    background: transparent;
-    border-color: var(--color-accent-canteloupe-subtle);
-    color: var(--color-accent-canteloupe-bold);
-  }
-
-  &.variant-persimmon {
-    background: transparent;
-    border-color: var(--color-accent-persimmon-subtle);
-    color: var(--color-accent-persimmon-bold);
-  }
-
-  &.variant-plum {
-    background: transparent;
-    border-color: var(--color-accent-plum-subtle);
-    color: var(--color-accent-plum-bold);
-  }
-
-  &.variant-fig {
-    background: transparent;
-    border-color: var(--color-accent-fig-subtle);
-    color: var(--color-accent-fig-bold);
-  }
-
-  &.variant-sand {
-    background: transparent;
-    border-color: var(--color-neutral-border);
-    color: var(--color-accent-sand-bold);
-  }
-}
-
-/* Ghost style */
-.style-ghost {
+/* Ghost look */
+.look-ghost {
   background: none !important;
-  border: none !important;
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     color: var(--color-accent-grape-bold);
@@ -224,9 +196,9 @@
   }
 }
 
-/* Solid style */
-.style-solid {
-  border: none !important;
+/* Solid look */
+.look-solid {
+  border: 1px solid transparent !important;
 
   &.variant-grape {
     background: var(--color-accent-grape-subtle);
@@ -282,7 +254,7 @@
 /* Gradient variant (special handling) */
 .variant-gradient {
   display: inline-block;
-  border-radius: var(--corner-radius-smaller); /* Default squared shape */
+  border-radius: var(--corner-radius-smaller); /* Default square shape */
   background: linear-gradient(
     135deg,
     var(--color-accent-canteloupe-base) 0%,
@@ -303,7 +275,7 @@
     }
   }
 
-  &.shape-squared {
+  &.shape-square {
     border-radius: var(--corner-radius-smaller);
 
     .badge-content {
@@ -314,7 +286,7 @@
   .badge-content {
     margin: 1px;
     background: none;
-    border-radius: calc(var(--corner-radius-smaller) - 1px); /* Default squared shape */
+    border-radius: calc(var(--corner-radius-smaller) - 1px); /* Default square shape */
     font-size: var(--font-size-label-smaller);
     padding: 0 var(--spacing-tighter) 0 var(--spacing-tighter);
     display: flex;
@@ -337,7 +309,7 @@
     -webkit-text-fill-color: transparent;
   }
 
-  &.style-filled {
+  &.look-filled {
     .badge-content {
       background: linear-gradient(
         135deg,
@@ -348,41 +320,21 @@
       height: calc(100% - 2px);
     }
 
-    /* Shape variants for filled style */
+    /* Shape variants for filled look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       .badge-content {
         border-radius: calc(var(--corner-radius-smaller) - 1px);
       }
     }
   }
 
-  &.style-outline {
-    .badge-content {
-      background: var(--color-neutral-background);
-      height: calc(100% - 2px);
-    }
-
-    /* Shape variants for outline style */
-    &.shape-rounded {
-      .badge-content {
-        border-radius: calc(var(--corner-radius-large) - 1px);
-      }
-    }
-
-    &.shape-squared {
-      .badge-content {
-        border-radius: calc(var(--corner-radius-smaller) - 1px);
-      }
-    }
-  }
-
-  &.style-solid {
+  &.look-solid {
     .badge-content {
       border: none;
       background: none;
@@ -396,27 +348,28 @@
       color: var(--color-neutral-on-dark-content);
     }
 
-    .icon {
+    .icon,
+    .iconTrailing {
       & path {
         fill: var(--color-neutral-on-dark-content);
       }
     }
 
-    /* Shape variants for solid style */
+    /* Shape variants for solid look */
     &.shape-rounded {
       .badge-content {
         border-radius: calc(var(--corner-radius-large) - 1px);
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       .badge-content {
         border-radius: calc(var(--corner-radius-smaller) - 1px);
       }
     }
   }
 
-  &.style-ghost {
+  &.look-ghost {
     background: none;
     border-radius: 0;
 
@@ -428,7 +381,7 @@
       }
     }
 
-    &.shape-squared {
+    &.shape-square {
       border-radius: var(--corner-radius-smaller);
 
       .badge-content {
@@ -445,8 +398,7 @@
     }
   }
 
-  &.size-small,
-  &.size-compact {
+  &.size-small {
     .badge-content {
       font-size: var(--font-size-label-smallest);
       padding: var(--spacing-tightest);
@@ -465,6 +417,19 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  margin-right: var(--spacing-tighter);
+
+  & svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.iconTrailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: var(--spacing-tightest);
 
   & svg {
     width: 14px;
@@ -482,6 +447,9 @@
 
 /* Close button */
 .closeButton {
+  --badge-close-icon-size: 12px;
+
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -499,8 +467,25 @@
     opacity: 1;
   }
 
+  &:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--color-primary-focus-outline);
+    outline-offset: 1px;
+  }
+
+  /* Reaches the 24px minimum target size without growing the badge or shifting its content. */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+  }
+
   & svg {
-    width: 12px;
-    height: 12px;
+    width: var(--badge-close-icon-size);
+    height: var(--badge-close-icon-size);
   }
 }

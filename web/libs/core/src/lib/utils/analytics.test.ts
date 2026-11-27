@@ -1,10 +1,11 @@
 import { registerAnalytics } from "./analytics";
+import type { Mock } from "bun:test";
 
 describe("analytics", () => {
-  const testUrl = "http://test.com/page";
+  const testPath = "/page";
   let originalRequestIdleCallback: any;
   let originalSendBeacon: any;
-  let mockSendBeacon: jest.Mock;
+  let mockSendBeacon: Mock<any>;
 
   beforeEach(() => {
     // Mock window.requestIdleCallback
@@ -13,7 +14,7 @@ describe("analytics", () => {
 
     // Mock navigator.sendBeacon
     originalSendBeacon = navigator.sendBeacon;
-    mockSendBeacon = jest.fn(() => true);
+    mockSendBeacon = mock(() => true);
     Object.defineProperty(navigator, "sendBeacon", {
       value: mockSendBeacon,
       configurable: true,
@@ -24,12 +25,8 @@ describe("analytics", () => {
       collect_analytics: true,
     };
 
-    // Mock window.location - simple pattern works with JSDOM 22 (jest-environment-jsdom v29)
-    Object.defineProperty(window, "location", {
-      value: { href: testUrl },
-      configurable: true,
-      writable: true,
-    });
+    // Keep URL deterministic across runners without redefining non-configurable location.
+    window.history.replaceState({}, "", testPath);
   });
 
   afterEach(() => {
@@ -60,7 +57,7 @@ describe("analytics", () => {
     window.__lsa("test.event", { data: "value" });
 
     expect(mockSendBeacon).toHaveBeenCalledTimes(1);
-    const [url, data] = mockSendBeacon.mock.calls[0];
+    const [url, _data] = mockSendBeacon.mock.calls[0];
 
     expect(url).toMatch(/^\/__lsa\/\?/);
     const params = new URLSearchParams(url.split("?")[1]);
@@ -69,20 +66,22 @@ describe("analytics", () => {
     expect(payload).toEqual({
       data: "value",
       event: "test.event",
-      url: testUrl,
+      url: `${window.location.origin}${testPath}`,
     });
   });
 
   it("should fallback to Image when sendBeacon is not available", () => {
     // Remove sendBeacon
     Object.defineProperty(navigator, "sendBeacon", {
-      value: undefined,
+      value: null,
       configurable: true,
     });
 
     const mockImage = { src: "" };
-    const originalImage = window.Image;
-    (window as any).Image = jest.fn(() => mockImage);
+    const originalImage = (globalThis as any).Image;
+    const imageCtor = mock(() => mockImage);
+    (window as any).Image = imageCtor;
+    (globalThis as any).Image = imageCtor;
 
     registerAnalytics();
     window.__lsa("test.event", { data: "value" });
@@ -92,6 +91,7 @@ describe("analytics", () => {
 
     // Restore Image constructor
     (window as any).Image = originalImage;
+    (globalThis as any).Image = originalImage;
   });
 
   it("should handle errors gracefully", () => {
@@ -118,7 +118,7 @@ describe("analytics", () => {
 
     expect(payload).toEqual({
       event: "test.event",
-      url: testUrl,
+      url: `${window.location.origin}${testPath}`,
     });
   });
 });

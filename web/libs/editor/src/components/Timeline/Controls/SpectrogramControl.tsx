@@ -23,7 +23,7 @@ const DEFAULT_SCALE: SpectrogramScale = "mel";
 
 // FFT Samples Setup
 const FFT_SAMPLE_VALUES = [64, 128, 256, 512, 1024, 2048];
-const FFT_MARKS = FFT_SAMPLE_VALUES.reduce(
+const _FFT_MARKS = FFT_SAMPLE_VALUES.reduce(
   (acc, val, index) => {
     acc[index] = val.toString();
     return acc;

@@ -6,10 +6,6 @@ inputs:
     description: node version
     default: "22"
     required: false
-  yarn-version:
-    description: yarn version
-    default: "1.22"
-    required: false
   directory:
     description: frontend directory
     default: "web"
@@ -23,11 +19,10 @@ runs:
       with:
         node-version: "${{ inputs.node-version }}"
 
-    - name: Upgrade Yarn
-      env:
-        VERSION: "${{ inputs.yarn-version }}"
-      shell: bash
-      run: npm install -g "yarn@${VERSION}"
+    - name: Setup bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version-file: "${{ inputs.directory }}/package.json"
 
     - name: Cache node_modules
       uses: actions/cache@v4
@@ -36,28 +31,22 @@ runs:
         path: |
           ${{ inputs.directory }}/node_modules
           !${{ inputs.directory }}/node_modules/.cache
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-v3-${{ hashFiles('web/yarn.lock') }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-v4-${{ hashFiles(format('{0}/bun.lock', inputs.directory)) }}
 
-    - name: Get yarn cache directory path
-      if: steps.node-modules-cache.outputs.cache-hit != 'true'
-      id: yarn-cache-dir-path
-      shell: bash
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-    - name: Configure yarn cache
+    - name: Configure bun cache
       if: steps.node-modules-cache.outputs.cache-hit != 'true'
       uses: actions/cache@v4
       with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-yarn-v1-${{ hashFiles('web/yarn.lock') }}
+        path: ~/.bun/install/cache
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-bun-v1-${{ hashFiles(format('{0}/bun.lock', inputs.directory)) }}
         restore-keys: |
-          ${{ runner.os }}-node-${{ inputs.node-version }}-yarn-v1-
+          ${{ runner.os }}-node-${{ inputs.node-version }}-bun-v1-
 
-    - name: Install yarn dependencies
+    - name: Install dependencies
       if: steps.node-modules-cache.outputs.cache-hit != 'true'
       working-directory: "${{ inputs.directory }}"
       shell: bash
-      run: yarn install --frozen-lockfile
+      run: bun install --frozen-lockfile
 
     - name: Print node_modules size
       shell: bash

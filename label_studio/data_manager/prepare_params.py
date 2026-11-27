@@ -3,7 +3,52 @@
 from enum import Enum
 from typing import Any, List, Optional, Union
 
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
+from django.conf import settings
+from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, field_validator, model_validator
+from rest_framework.exceptions import ValidationError as APIValidationError
+
+
+def _strip_dm_column_prefixes(column: str) -> str:
+    """Normalize the way preprocess_field_name() does, so the check sees what the ORM would."""
+    column_copy = column
+    if column_copy.startswith('-'):
+        column_copy = column_copy[1:]
+    for prefix in ('filter:', 'tasks:'):
+        if column_copy.startswith(prefix):
+            column_copy = column_copy[len(prefix) :]
+    if column_copy.startswith('-'):
+        column_copy = column_copy[1:]
+    return column_copy
+
+
+def _reject_fk_traversal(column: str, normalized: str) -> str:
+    """Shared CVE-2023-47117 policy: no `__` outside task.data and the allowlist."""
+    # task.data JSONField lookups are not relation traversals
+    if normalized.startswith('data.'):
+        return column
+    if normalized in settings.DATA_MANAGER_FILTER_ALLOWLIST:
+        return column
+    if '__' in normalized:
+        raise APIValidationError(
+            f'"__" is not generally allowed in filters. Consider asking your administrator to add '
+            f'"{normalized}" to DATA_MANAGER_FILTER_ALLOWLIST, but note that some filter expressions '
+            'may pose a security risk'
+        )
+    return column
+
+
+def validate_filter_column_no_fk_traversal(column: str) -> str:
+    """Guard inline filter columns, where FilterSerializer.validate_column never runs."""
+    # apply_filters() drops every other name before it can become an ORM lookup,
+    # so those must keep being ignored, not 400'd
+    if not column.startswith('filter:tasks:'):
+        return column
+    return _reject_fk_traversal(column, _strip_dm_column_prefixes(column))
+
+
+def validate_ordering_column_no_fk_traversal(column: str) -> str:
+    """Guard inline ordering columns: apply_ordering() feeds every one into F(), no prefix gate."""
+    return _reject_fk_traversal(column, _strip_dm_column_prefixes(column))
 
 
 class FilterIn(BaseModel):
@@ -12,12 +57,42 @@ class FilterIn(BaseModel):
 
 
 class Filter(BaseModel):
-    child_filter: Optional['Filter'] = None
+    child_filters: List['Filter'] = Field(default_factory=list)
 
     filter: str
     operator: str
     type: str
     value: Union[StrictInt, StrictFloat, StrictBool, StrictStr, FilterIn, list]
+
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_child_filters(cls, data):
+        """Normalize the legacy singular child into the canonical ordered list."""
+        if not isinstance(data, dict):
+            return data
+
+        normalized = dict(data)
+        if 'child_filters' in normalized:
+            # The canonical plural field wins deterministically when both are supplied.
+            normalized.pop('child_filter', None)
+        elif 'child_filter' in normalized:
+            child_filter = normalized.pop('child_filter')
+            normalized['child_filters'] = [] if child_filter is None else [child_filter]
+        return normalized
+
+    @field_validator('filter')
+    @classmethod
+    def check_filter_column_traversal(cls, column: str) -> str:
+        return validate_filter_column_no_fk_traversal(column)
+
+    @property
+    def child_filter(self) -> Optional['Filter']:
+        """Compatibility accessor for callers that still consume one child."""
+        return self.child_filters[0] if self.child_filters else None
+
+    @child_filter.setter
+    def child_filter(self, value: Optional['Filter']) -> None:
+        self.child_filters = [] if value is None else [value]
 
 
 class ConjunctionEnum(Enum):
@@ -28,6 +103,13 @@ class ConjunctionEnum(Enum):
 class Filters(BaseModel):
     conjunction: ConjunctionEnum
     items: List[Filter]
+
+    @model_validator(mode='after')
+    def validate_one_nesting_level(self):
+        for item in self.items:
+            if any(child.child_filters for child in item.child_filters):
+                raise ValueError('Child filters cannot contain nested child filters')
+        return self
 
 
 class SelectedItems(BaseModel):
@@ -43,6 +125,13 @@ class PrepareParams(BaseModel):
     filters: Optional[Filters] = None
     data: Optional[dict] = None
     request: Optional[Any] = None
+
+    @field_validator('ordering')
+    @classmethod
+    def check_ordering_traversal(cls, ordering: List[str]) -> List[str]:
+        for column in ordering:
+            validate_ordering_column_no_fk_traversal(column)
+        return ordering
 
     @property
     def projects(self) -> List[int]:
@@ -100,7 +189,7 @@ class Column(Enum):
         'Number of cancelled or skipped annotations for the task',
     )
     TOTAL_ANNOTATIONS = 'total_annotations', 'Number', 'Total number of annotations on a task'
-    COMPLETED_AT = 'completed_at', 'Datetime', 'Time when a task was fully annotated'
+    COMPLETED_AT = 'completed_at', 'Datetime', 'Latest annotation time, set once the task has all required annotations'
     AGREEMENT = 'agreement', 'Number', 'Agreement for annotation results for a specific task (Enterprise only)'
     REVIEWERS = (
         'reviewers',
@@ -159,6 +248,17 @@ class Operator(CustomEnum):
     NOT_BETWEEN = (
         'not_in',
         'Is not between min and max values, so the filter `value` should be e.g. `{"min": 1, "max": 7}`',
+    )
+    IS_ANY_OF = (
+        'in_list',
+        'Field value is one of the items in the supplied list. Value must be a JSON array of strings or '
+        'numbers, e.g. `[1, 2, 3]` or `["a", "b"]`. Supported only for Task ID, Inner ID, and `task.data.*` '
+        'fields.',
+    )
+    IS_NONE_OF = (
+        'not_in_list',
+        'Field value is NOT in the supplied list. Value must be a JSON array of strings or numbers. '
+        'Supported only for Task ID, Inner ID, and `task.data.*` fields.',
     )
 
 
@@ -224,7 +324,7 @@ filters_schema = {
                             'e.g. `filter:tasks:agreement`. '
                             'For `task.data` fields it may look like `filter:tasks:data.field_name`. '
                             'If you need more info about columns, check the '
-                            '[Get data manager columns](#tag/Data-Manager/operation/api_dm_columns_list) API endpoint. '
+                            '[Get data manager columns](api:GET/api/dm/columns/) API endpoint. '
                             'Possible values:<br>'
                             + '<br>'.join(
                                 [
@@ -264,7 +364,10 @@ filters_schema = {
                             {
                                 'type': 'object',
                                 'title': 'List',
-                                'description': 'List of strings or integers',
+                                'description': (
+                                    'List of strings or integers. Used by the `in_list` and `not_in_list` '
+                                    'operators, e.g. `[1, 2, 3]` or `["a", "b"]`.'
+                                ),
                             },
                         ],
                         'description': 'Value to filter by',
@@ -284,6 +387,19 @@ filters_schema = {
         'Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", '
         '"type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`'
     ),
+}
+
+# Keep the public schema canonical and explicitly limit children to one nesting level.
+_filter_item_schema = filters_schema['properties']['items']['items']
+_child_filter_item_schema = {
+    'type': 'object',
+    'properties': dict(_filter_item_schema['properties']),
+    'required': list(_filter_item_schema['required']),
+}
+_filter_item_schema['properties']['child_filters'] = {
+    'type': 'array',
+    'items': _child_filter_item_schema,
+    'description': 'Ordered child filters AND-merged with their parent. Child filters cannot be nested.',
 }
 
 selected_items_schema = {

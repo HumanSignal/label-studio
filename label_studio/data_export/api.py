@@ -7,6 +7,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from core.feature_flags import flag_set
+from core.mixins import GetParentObjectMixin
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
@@ -23,12 +24,13 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from projects.models import Project
 from ranged_fileresponse import RangedFileResponse
 from rest_framework import generics, status
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import APIException, NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tasks.models import Task
 
-from .models import ConvertedFormat, DataExport, Export
+from .functions import get_export_hostname
+from .models import ConvertedFormat, DataExport, Export, delete_file_from_storage
 from .serializers import (
     ExportConvertSerializer,
     ExportCreateSerializer,
@@ -40,6 +42,11 @@ from .serializers import (
 logger = logging.getLogger(__name__)
 
 
+class ExportFileDeleteError(APIException):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'Could not delete file from storage'
+
+
 @method_decorator(
     name='get',
     decorator=extend_schema(
@@ -47,7 +54,7 @@ logger = logging.getLogger(__name__)
         summary='[Deprecated] Get export formats',
         description="""
         This endpoint is deprecated in Enterprise. Use the async export API instead:
-        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+        POST /api/projects/{{id}}/exports/ (see [Create new export](api:POST/api/projects/{id}/exports/)).
 
         In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
 
@@ -130,7 +137,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         summary='[Deprecated] Easy export of tasks and annotations',
         description="""
         This endpoint is deprecated in Enterprise. Use the async export API instead:
-        POST /api/projects/{{id}}/exports/ (see [Create new export](/api#operation/api_projects_exports_create)).
+        POST /api/projects/{{id}}/exports/ (see [Create new export](api:POST/api/projects/{{id}}/exports/)).
 
         In Label Studio Enterprise, this endpoint will always return a 404 Not Found response with instructions to use the async export API.
 
@@ -182,19 +189,14 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get_task_queryset(self, queryset):
         # Import here to avoid circular dependencies
-        from core.feature_flags import flag_set
+        from fsm.serializer_fields import fsm_state_fields_enabled
         from tasks.models import Annotation
 
         # Create a prefetch for annotations with FSM state
         annotations_qs = Annotation.objects.all()
 
-        # Only annotate FSM state if both feature flags are enabled
-        user = getattr(self.request, 'user', None)
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(annotations_qs, 'with_state')
-        ):
+        # Only annotate FSM state if FSM state fields are enabled
+        if fsm_state_fields_enabled() and hasattr(annotations_qs, 'with_state'):
             annotations_qs = annotations_qs.with_state()
 
         qs = queryset.select_related('project').prefetch_related(
@@ -202,11 +204,7 @@ class ExportAPI(generics.RetrieveAPIView):
         )
 
         # Add FSM state annotation to tasks as well to avoid N+1 queries during export
-        if (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-            and hasattr(qs, 'with_state')
-        ):
+        if fsm_state_fields_enabled() and hasattr(qs, 'with_state'):
             qs = qs.with_state()
         return qs
 
@@ -246,7 +244,13 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Prepare export files')
 
         export_file, content_type, filename = DataExport.generate_export_file(
-            project, tasks, export_type, download_resources, request.GET, hostname=request.build_absolute_uri('/')
+            project,
+            tasks,
+            export_type,
+            download_resources,
+            request.GET,
+            hostname=get_export_hostname(request),
+            user=request.user,
         )
 
         r = FileResponse(export_file, as_attachment=True, content_type=content_type, filename=filename)
@@ -304,7 +308,8 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=pk)
+        self.check_object_permissions(request, project)
         return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)
 
 
@@ -334,7 +339,21 @@ class ProjectExportFilesAuthCheck(APIView):
     decorator=extend_schema(
         tags=['Export'],
         summary='Create new export snapshot',
-        description='Create a new export request to start a background task and generate an export file for a specific project by ID.',
+        description=(
+            'Create a new export request to start a background task and generate an export file '
+            'for a specific project by ID. Optional `since` / `until` limit the snapshot to tasks '
+            'with `updated_at` in the half-open window `[since, until)`. `since` must be in the past; an '
+            'omitted or later `until` becomes create/request time minus INCREMENTAL_EXPORT_UNTIL_LAG_SECONDS. '
+            'Set `ephemeral=true` to omit the snapshot from list endpoints. '
+            'On deployments that run the RQ cron scheduler (SaaS; on-prem with `rqcron.enabled`), '
+            'ephemeral exports older than EPHEMERAL_EXPORT_TTL_HOURS (default 24) are deleted by a '
+            'daily low-queue sweep; otherwise they remain unlisted until explicitly deleted. '
+            'Use the resolved `until` from the response as `since` on the next incremental create. '
+            'Task deletions are not represented in incremental snapshots (only surviving tasks with '
+            'bumped `updated_at`). Rows committed after the export query starts but stamped with '
+            '`updated_at` before `until` can fall outside both consecutive windows; the default '
+            '`until` lag mitigates long transactions.'
+        ),
         parameters=[
             OpenApiParameter(
                 name='id',
@@ -350,9 +369,8 @@ class ProjectExportFilesAuthCheck(APIView):
         },
     ),
 )
-class ExportListAPI(generics.ListCreateAPIView):
+class ExportListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
     queryset = Export.objects.all().order_by('-created_at')
-    project_model = Project
     serializer_class = ExportSerializer
     permission_required = all_permissions.projects_change
 
@@ -368,20 +386,16 @@ class ExportListAPI(generics.ListCreateAPIView):
         context['user'] = self.request.user
         return context
 
-    def _get_project(self):
-        project_pk = self.kwargs.get('pk')
-        project = generics.get_object_or_404(
-            self.project_model.objects.for_user(self.request.user),
-            pk=project_pk,
-        )
-        return project
+    @property
+    def parent_queryset(self):
+        return Project.objects.for_user(self.request.user)
 
     def perform_create(self, serializer):
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
 
-        project = self._get_project()
+        project = self.parent_object
         serializer.save(project=project, created_by=self.request.user)
         instance = serializer.instance
 
@@ -392,8 +406,8 @@ class ExportListAPI(generics.ListCreateAPIView):
         )
 
     def get_queryset(self):
-        project = self._get_project()
-        return super().get_queryset().filter(project=project)
+        project = self.parent_object
+        return super().get_queryset().filter(project=project).exclude(ephemeral=True)
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -463,24 +477,24 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     permission_required = all_permissions.projects_change
 
     def delete(self, *args, **kwargs):
-        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
-            try:
-                export = self.get_object()
-                export.file.delete()
-
-                for converted_format in export.converted_formats.all():
-                    if converted_format.file:
-                        converted_format.file.delete()
-            except Exception as e:
-                return Response(
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    data={
-                        'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
-                        % extract_message(e)
-                    },
-                )
-
         return super().delete(*args, **kwargs)
+
+    def perform_destroy(self, instance):
+        field_files = [instance.file] + [
+            converted_format.file for converted_format in instance.converted_formats.all()
+        ]
+        # Files go after the rows in one transaction: a storage error rolls the rows back,
+        # so they keep pointing at their files and the delete can be retried
+        with transaction.atomic():
+            instance.delete()
+            for field_file in field_files:
+                try:
+                    delete_file_from_storage(field_file)
+                except Exception as e:
+                    raise ExportFileDeleteError(
+                        'Could not delete file from storage. Check that your user has permissions to delete files: %s'
+                        % extract_message(e)
+                    ) from e
 
     def _get_project(self):
         project_pk = self.kwargs.get('pk')
@@ -505,8 +519,8 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
         parameter in the path and the ID of the export file you want to download using the `export_pk` parameter
         in the path.
 
-        Get the `export_pk` from the response of the request to [Create new export](/api#operation/api_projects_exports_create)
-        or after [listing export files](/api#operation/api_projects_exports_list).
+        Get the `export_pk` from the response of the request to [Create new export](api:POST/api/projects/{id}/exports/)
+        or after [listing export files](api:GET/api/projects/{id}/exports/).
         """,
         parameters=[
             OpenApiParameter(
@@ -583,6 +597,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             else:
                 url = file.storage.url(file.name, storage_url=True)
             protocol = urlparse(url).scheme
+            download_name = snapshot.get_download_filename(file.name)
 
             # NGINX downloads are a solid way to make uwsgi workers free
             if settings.USE_NGINX_FOR_EXPORT_DOWNLOADS:
@@ -591,16 +606,16 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 # below header tells NGINX to catch it and serve, see docker-config/nginx-app.conf
                 redirect = '/file_download/' + protocol + '/' + url.replace(protocol + '://', '')
                 response['X-Accel-Redirect'] = redirect
-                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
 
             # No NGINX: standard way for export downloads in the community edition
             else:
                 ext = file.name.split('.')[-1]
                 response = RangedFileResponse(request, file, content_type=f'application/{ext}')
-                response['Content-Disposition'] = f'attachment; filename="{file.name}"'
-                response['filename'] = os.path.basename(file.name)
+                response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+                response['filename'] = download_name
                 return response
         else:
             if export_type is None:
@@ -612,10 +627,11 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
                 return HttpResponse("Can't get file", status=404)
 
             ext = file_.name.split('.')[-1]
+            download_name = snapshot.get_download_filename(file_.name)
 
             response = RangedFileResponse(request, file_, content_type=f'application/{ext}')
-            response['Content-Disposition'] = f'attachment; filename="{file_.name}"'
-            response['filename'] = file_.name
+            response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+            response['filename'] = download_name
             return response
 
 
@@ -633,7 +649,11 @@ def async_convert(converted_format_id, export_type, project, hostname, download_
         converted_format.save(update_fields=['status'])
 
     snapshot = converted_format.export
-    converted_file = snapshot.convert_file(export_type, download_resources=download_resources, hostname=hostname)
+    # Jobs queued before conversions recorded their user fall back to the snapshot's
+    user = converted_format.created_by or snapshot.created_by
+    converted_file = snapshot.convert_file(
+        export_type, download_resources=download_resources, hostname=hostname, user=user
+    )
     if converted_file is None:
         raise ValidationError('No converted file found, probably there are no annotations in the export snapshot')
     md5 = Export.eval_md5(converted_file)
@@ -655,8 +675,7 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
     try:
         trace = ''.join(tb.format_exception(type, value, traceback_obj))
     except Exception as e:
-        if flag_set('fflag_fix_back_leap_1818_set_convert_background_failure_logging_02062025_short'):
-            logger.error(f'Failed to format traceback: {job=} {type=} {value=} {traceback_obj=} {e=}', exc_info=True)
+        logger.error(f'Failed to format traceback: {job=} {type=} {value=} {traceback_obj=} {e=}', exc_info=True)
         trace = 'Exception while processing traceback. See stderr for details'
     ConvertedFormat.objects.filter(id=convert_id).update(status=Export.Status.FAILED, traceback=trace)
 
@@ -714,7 +733,7 @@ class ExportConvertAPI(generics.CreateAPIView):
 
         converted_format, created = ConvertedFormat.objects.exclude(
             status=ConvertedFormat.Status.FAILED
-        ).get_or_create(export=snapshot, export_type=export_type)
+        ).get_or_create(export=snapshot, export_type=export_type, defaults={'created_by': request.user})
 
         if not created:
             raise ValidationError(f'Conversion to {export_type} already started')
@@ -724,7 +743,7 @@ class ExportConvertAPI(generics.CreateAPIView):
             converted_format.id,
             export_type,
             snapshot.project,
-            request.build_absolute_uri('/'),
+            get_export_hostname(request),
             download_resources=download_resources,
             on_failure=set_convert_background_failure,
         )

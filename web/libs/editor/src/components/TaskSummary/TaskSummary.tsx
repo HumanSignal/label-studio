@@ -1,9 +1,13 @@
+import { useQuery } from "@tanstack/react-query";
+import { observer } from "mobx-react";
 import type { MSTAnnotation, MSTControlTag, MSTStore } from "../../stores/types";
+import { emitAnnotationTabSelected } from "../../utils/labelingTelemetry";
+import { fetchTaskAgreementDistribution } from "./Aggregation";
 import { DataSummary } from "./DataSummary";
 import { LabelingSummary } from "./LabelingSummary";
 import { NumbersSummary } from "./NumbersSummary";
-import type { ControlTag, ObjectTagEntry, ObjectTypes } from "./types";
-import { getLabelColors, sortControls } from "./utils";
+import type { ControlTag, ObjectTypes } from "./types";
+import { buildObjectDataTypes, getLabelColors, sortControls } from "./utils";
 
 type TaskSummaryProps = {
   annotations: MSTAnnotation[];
@@ -15,17 +19,36 @@ interface Annotation {
   type: "annotation" | "prediction";
 }
 
-const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
+const TaskSummary = observer(({ annotations: all, store: annotationStore }: TaskSummaryProps) => {
   const task = annotationStore.store.task;
+  const taskId = task?.id;
+  const agreementQueryEnabled = taskId != null;
+
+  const { data: agreementPayload, isFetching: agreementQueryFetching } = useQuery({
+    queryKey: ["task-agreement", taskId],
+    queryFn: () => fetchTaskAgreementDistribution(taskId as number | string),
+    enabled: agreementQueryEnabled,
+    staleTime: 30000,
+    cacheTime: 5 * 60 * 1000,
+  });
+
+  /** First fetch for this task — show skeletons; avoid flashing stale `task.agreement` before `/agreement/` returns. */
+  const agreementHeadlineLoading = agreementQueryEnabled && agreementQueryFetching;
+
   // skip unsubmitted drafts
   const annotations = all.filter((a) => a.pk);
   const allTags = [...annotationStore.names];
 
   const onSelect = (entity: Annotation) => {
+    const previous = annotationStore.selected;
     if (entity.type === "annotation") {
       annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
     } else {
       annotationStore.selectPrediction(entity.id, { exitViewAll: true });
+    }
+    const liveEntity = all.find((a) => String(a.id) === String(entity.id));
+    if (liveEntity) {
+      emitAnnotationTabSelected(annotationStore.store, liveEntity, previous, { exitViewAll: true });
     }
   };
 
@@ -61,46 +84,59 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   // show global classifications first, then labels, then per-regions
   const controls = Object.entries(grouped).flatMap(([_, controls]) => sortControls(controls ?? []));
 
-  const objectTags: ObjectTagEntry[] = allTags.filter(
-    ([_, tag]) => tag.isObjectTag && (tag.value.includes("$") || tag.loadedData),
-  ) as ObjectTagEntry[];
-  const dataTypes: ObjectTypes = Object.fromEntries(
-    objectTags.map(([name, object]) => [
-      name,
-      // most of tags has `updateValue()` method which resolves `value` and stores it in `_value`
-      // Image tag uses `parsedValue` instead of `_value`
-      // Pdf tag uses `_url` instead of `_value`
-      // TimeSeries tag uses `dataObj` instead of `_value`, it's always an object {<channel name>: [array of values]}
-      // for other tags with complex logic (like TimeSeries) we use `value` for now, which is not ideal
-      {
-        type: object.type,
-        value:
-          // @ts-expect-error parsedValue, dataObj and _url are very specific and not added to types
-          object.loadedData ?? object.parsedValue ?? object.dataObj ?? object._url ?? object._value ?? object.value,
-      },
-    ]),
-  );
+  const dataTypes: ObjectTypes = buildObjectDataTypes(allTags);
+
+  const agreementFromQuery = agreementPayload?.agreement;
+
+  const roundAgreementDisplay = (n: number) => Math.round(n * 100) / 100;
+
+  const agreementPercent = agreementHeadlineLoading
+    ? undefined
+    : typeof agreementFromQuery === "number"
+      ? agreementFromQuery
+      : typeof task?.agreement === "number"
+        ? task.agreement
+        : undefined;
+
+  const taskAgreementNum = typeof task?.agreement === "number" ? task.agreement : undefined;
+  const endpointAgreementNum = typeof agreementFromQuery === "number" ? agreementFromQuery : undefined;
+  const agreementTaskAndEndpointDiffer =
+    agreementQueryEnabled &&
+    !agreementHeadlineLoading &&
+    taskAgreementNum !== undefined &&
+    endpointAgreementNum !== undefined &&
+    roundAgreementDisplay(taskAgreementNum) !== roundAgreementDisplay(endpointAgreementNum);
+
+  const agreementMismatchTooltip =
+    "The task API and agreement endpoint currently show different scores; they should align after background processing finishes.";
+
+  const annotationCount = annotations.filter((a) => a.type === "annotation").length;
+  const predictionCount = annotations.filter((a) => a.type === "prediction").length;
 
   const values = [
     // if agreement is unavailable for current user it's undefined
-    ...(typeof task?.agreement === "number"
+    ...(agreementHeadlineLoading || typeof agreementPercent === "number"
       ? [
           {
             title: "Agreement",
+            loading: agreementHeadlineLoading,
             // 2 decimals but without trailing zeros
-            value: `${Math.round(task.agreement * 100) / 100}%`,
+            value: agreementHeadlineLoading ? "" : `${roundAgreementDisplay(agreementPercent as number)}%`,
             info: "Overall agreement over all submitted annotations",
+            valueWarningTooltip: agreementTaskAndEndpointDiffer ? agreementMismatchTooltip : undefined,
           },
         ]
       : []),
     {
       title: "Annotations",
-      value: annotations.filter((a) => a.type === "annotation").length,
+      loading: agreementHeadlineLoading,
+      value: agreementHeadlineLoading ? 0 : annotationCount,
       info: "Number of submitted annotations. Table shows only submitted results, not current drafts.",
     },
     {
       title: "Predictions",
-      value: annotations.filter((a) => a.type === "prediction").length,
+      loading: agreementHeadlineLoading,
+      value: agreementHeadlineLoading ? 0 : predictionCount,
       info: "Number of predictions. They are not included in the agreement calculation.",
     },
   ];
@@ -126,6 +162,6 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
       </div>
     </div>
   );
-};
+});
 
 export default TaskSummary;

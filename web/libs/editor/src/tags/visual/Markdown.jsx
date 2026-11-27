@@ -7,7 +7,7 @@ import Tree from "../../core/Tree";
 import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
 import VisibilityMixin from "../../mixins/Visibility";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import { parseValue } from "../../utils/data";
+import { isDataBound, parseValue } from "../../utils/data";
 import { guidGenerator } from "../../utils/unique";
 
 /**
@@ -53,6 +53,12 @@ const Model = types
     style: types.maybeNull(types.string),
     idattr: types.optional(types.string, ""),
   })
+  .views((self) => ({
+    // Static markdown can render in bulk mode; data-bound content can't (no task data).
+    get isIndependent() {
+      return !isDataBound(self.value);
+    },
+  }))
   .actions((self) => ({
     updateValue(store) {
       const value = parseValue(self.value, store?.task?.dataObj ?? {});

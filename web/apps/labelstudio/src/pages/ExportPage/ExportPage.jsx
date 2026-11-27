@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useHistory } from "react-router";
-import { Button, Badge } from "@humansignal/ui";
+import { Button, Badge, ModalWindow } from "@humansignal/ui";
 import {
   IconWarningCircleFilled,
   IconTerminal,
@@ -10,7 +10,6 @@ import {
   IconCopyOutline,
 } from "@humansignal/icons";
 import { Form, Input } from "../../components/Form";
-import { Modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
@@ -39,7 +38,7 @@ const downloadFile = (blob, filename) => {
   link.click();
 };
 
-const wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
+const _wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
 
 const isTimeoutLikeStatus = (status) => status === 408 || status === 502 || status === 504;
 
@@ -49,7 +48,7 @@ export const ExportPage = () => {
   const pageParams = useParams();
   const api = useAPI();
 
-  const [previousExports, setPreviousExports] = useState([]);
+  const [_previousExports, setPreviousExports] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [downloadingMessage, setDownloadingMessage] = useState(false);
   const [availableFormats, setAvailableFormats] = useState([]);
@@ -154,19 +153,20 @@ export const ExportPage = () => {
   }, [pageParams.id]);
 
   return (
-    <Modal
-      onHide={() => {
+    <ModalWindow
+      open
+      onOpenChange={(open) => {
+        if (open || downloading) return;
         const path = location.pathname.replace(ExportPage.path, "");
         const search = location.search;
 
         history.replace(`${path}${search !== "?" ? search : ""}`);
       }}
       title="Export data"
-      style={{ width: 720 }}
-      closeOnClickOutside={false}
-      allowClose={!downloading}
-      // footer="Read more about supported export formats in the Documentation."
-      visible
+      size="medium"
+      showCloseButton={!downloading}
+      closeOnScrimClick={false}
+      dataTestId="export-modal"
     >
       <div className={cn("export-page").toClassName()}>
         <FormatInfo
@@ -202,7 +202,7 @@ export const ExportPage = () => {
           </Space>
         </div>
       </div>
-    </Modal>
+    </ModalWindow>
   );
 };
 

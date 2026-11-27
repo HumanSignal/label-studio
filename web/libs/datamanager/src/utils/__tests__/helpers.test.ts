@@ -57,4 +57,27 @@ describe("helpers", () => {
     const result = helpers.jsonReviverWithBigInt(key, value, context);
     expect(result).toBe(source);
   });
+
+  describe("parseDmQueryParam", () => {
+    it("returns empty object when query is missing", () => {
+      expect(helpers.parseDmQueryParam(undefined)).toEqual({});
+      expect(helpers.parseDmQueryParam("")).toEqual({});
+    });
+
+    it("parses once-encoded JSON", () => {
+      const payload = { selectedItems: { all: false, included: [1, 2] } };
+      const encoded = encodeURIComponent(JSON.stringify(payload));
+      expect(helpers.parseDmQueryParam(encoded)).toEqual(payload);
+    });
+
+    it("parses double-encoded JSON from legacy Label button URLs", () => {
+      const payload = { selectedItems: { all: false, included: [1, 2, 3] } };
+      const twice = encodeURIComponent(encodeURIComponent(JSON.stringify(payload)));
+      expect(helpers.parseDmQueryParam(twice)).toEqual(payload);
+    });
+
+    it("returns empty object for invalid JSON", () => {
+      expect(helpers.parseDmQueryParam("%7Bbroken")).toEqual({});
+    });
+  });
 });

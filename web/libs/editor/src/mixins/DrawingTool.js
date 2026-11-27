@@ -4,7 +4,6 @@ import Utils from "../utils";
 import { throttle } from "@humansignal/core/lib/utils/lodash-replacements";
 import { MIN_SIZE } from "../tools/Base";
 import { FF_DEV_3391, isFF } from "../utils/feature-flags";
-import { ff } from "@humansignal/core";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
 const DrawingTool = types
@@ -169,19 +168,14 @@ const DrawingTool = types
         // Remove the main control from additional states to avoid duplication
         const additionalStates = activeStates.filter((state) => state !== control);
 
-        if (ff.isActive(ff.FF_MULTIPLE_LABELS_REGIONS)) {
-          self.currentArea = self.annotation.createResult(
-            opts,
-            resultValue,
-            control,
-            self.obj,
-            skipAfterCreate,
-            additionalStates,
-          );
-        } else {
-          self.currentArea = self.annotation.createResult(opts, resultValue, control, self.obj, skipAfterCreate);
-          self.applyActiveStates(self.currentArea);
-        }
+        self.currentArea = self.annotation.createResult(
+          opts,
+          resultValue,
+          control,
+          self.obj,
+          skipAfterCreate,
+          additionalStates,
+        );
         return self.currentArea;
       },
       deleteRegion() {

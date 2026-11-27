@@ -1,0 +1,18 @@
+# Run after the publish-entry tour so two Joyrides are not shown at once (stagger via API + client retry).
+dependencies:
+  - lse_published_publish_entry
+
+steps:
+  - target: '[data-testid="project-dashboard-members-tab"]'
+    placement: right-start
+    offset: 12
+    floaterProps:
+      disableFlip: true
+    title: "The Members page now lives under the project Dashboard."
+    content: >
+      In the future, you can find this page under the <b>Dashboard</b> tab.
+      You can still open it from <b>Members</b> in the project menu (same view).
+    disableBeacon: true
+    locale:
+      last: "Got it"
+      skip: "Don't show this again"

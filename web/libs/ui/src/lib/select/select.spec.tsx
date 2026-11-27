@@ -1,5 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { Select } from "./select";
 
 // Mock ResizeObserver which is used by cmdk
@@ -10,17 +9,17 @@ global.ResizeObserver = class ResizeObserver {
 };
 
 // Mock scrollIntoView
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = mock();
 
 // Mock the styles
-jest.mock("./select.module.css", () => ({
+mockModule("./select.module.css", () => ({
   selectTrigger: "selectTrigger",
   isInline: "isInline",
   isOpen: "isOpen",
   isDisabled: "isDisabled",
+  sizeSmaller: "sizeSmaller",
   sizeSmall: "sizeSmall",
-  sizeMedium: "sizeMedium",
-  sizeLarge: "sizeLarge",
+  selectCaret: "selectCaret",
   selectLoading: "selectLoading",
   valueInput: "valueInput",
   selectedItemsGroup: "selectedItemsGroup",
@@ -31,8 +30,8 @@ jest.mock("./select.module.css", () => ({
 }));
 
 // Mock react-window and react-window-infinite-loader to capture props
-const mockVariableSizeList = jest.fn();
-jest.mock("react-window", () => ({
+const mockVariableSizeList = mock();
+mockModule("react-window", () => ({
   VariableSizeList: (props: any) => {
     mockVariableSizeList(props);
     // Render the items directly for testing
@@ -45,22 +44,69 @@ jest.mock("react-window", () => ({
       );
     }
     return (
-      <div data-testid="virtual-list" data-height={props.height}>
+      <div data-testid="virtual-list" data-height={props.height} data-width={props.width}>
         {items}
       </div>
     );
   },
 }));
 
-jest.mock("react-window-infinite-loader", () => ({
+mockModule("react-window-infinite-loader", () => ({
   __esModule: true,
   default: ({ children, ...props }: any) => {
     return children({
-      onItemsRendered: jest.fn(),
+      onItemsRendered: mock(),
       ref: { current: null },
     });
   },
 }));
+
+function getLastVirtualListProps() {
+  const calls = mockVariableSizeList.mock.calls;
+  for (let i = calls.length - 1; i >= 0; i--) {
+    const entry = calls[i];
+    const props = Array.isArray(entry) ? entry[0] : entry;
+    if (props && typeof props === "object" && "itemCount" in props) {
+      return props;
+    }
+  }
+  throw new Error("VariableSizeList was not called with list props");
+}
+
+function restorePrototypeDescriptor(name: "scrollWidth" | "offsetWidth", original?: PropertyDescriptor) {
+  if (original) {
+    Object.defineProperty(HTMLElement.prototype, name, original);
+  } else {
+    // @ts-expect-error - remove the test-only override
+    delete HTMLElement.prototype[name];
+  }
+}
+
+function mockElementWidths({ scrollWidth, triggerWidth }: { scrollWidth: number; triggerWidth: number }) {
+  const originalScrollWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollWidth");
+  const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth");
+
+  Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+    configurable: true,
+    get() {
+      return scrollWidth;
+    },
+  });
+  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+    configurable: true,
+    get() {
+      if ((this as HTMLElement).getAttribute("aria-expanded") != null) {
+        return triggerWidth;
+      }
+      return originalOffsetWidth?.get?.call(this) ?? 0;
+    },
+  });
+
+  return () => {
+    restorePrototypeDescriptor("scrollWidth", originalScrollWidth);
+    restorePrototypeDescriptor("offsetWidth", originalOffsetWidth);
+  };
+}
 
 describe("Select Component", () => {
   beforeEach(() => {
@@ -68,6 +114,25 @@ describe("Select Component", () => {
   });
 
   describe("Basic Rendering", () => {
+    it("names only the visible trigger and preserves hidden form submission", () => {
+      const { container } = render(
+        <form>
+          <Select name="speed" options={["One"]} value="One" triggerProps={{ "aria-label": "Playback speed" }} />
+        </form>,
+      );
+      expect(screen.getByLabelText("Playback speed")).toHaveAttribute("aria-expanded", "false");
+      const backing = container.querySelector("select")!;
+      expect(backing).toHaveAttribute("hidden");
+      expect(backing).toHaveAttribute("aria-hidden", "true");
+      expect(backing).toHaveAttribute("tabindex", "-1");
+      expect(new window.FormData(container.querySelector("form")!).get("speed")).toBe("One");
+    });
+
+    it("keeps a trigger-provided label off the backing select", () => {
+      render(<Select options={["One"]} value="One" triggerProps={{ "aria-label": "Speed" }} />);
+      expect(screen.getByLabelText("Speed")).toHaveAttribute("aria-expanded", "false");
+    });
+
     it("renders with placeholder", () => {
       render(<Select options={["Apple", "Banana"]} placeholder="Select a fruit" />);
       expect(screen.getByText("Select a fruit")).toBeInTheDocument();
@@ -107,7 +172,7 @@ describe("Select Component", () => {
 
   describe("Virtual List Height Calculation", () => {
     const ITEM_HEIGHT = 40;
-    const MAX_VISIBLE_ITEMS = 5;
+    const MAX_LIST_HEIGHT = 300;
 
     it("calculates correct height for flat options with virtual list", async () => {
       const flatOptions = ["Option 1", "Option 2", "Option 3"];
@@ -137,9 +202,9 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // With 20 options, height should be capped at 5 * 40 = 200
+      // With 20 options, height should be capped at 300px (CommandList max)
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
+      expect(lastCall.height).toBe(MAX_LIST_HEIGHT);
     });
 
     it("calculates correct height for grouped options using flatOptions count", async () => {
@@ -158,10 +223,10 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // With 6 flattened items (3 + 3), height should be capped at 5 * 40 = 200
+      // With 6 flattened items (3 + 3), height should be 6 * 40 = 240 (under the 300px cap)
       // NOT 2 * 40 = 80 (which would be wrong if using renderedOptions.length)
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(MAX_VISIBLE_ITEMS * ITEM_HEIGHT);
+      expect(lastCall.height).toBe(6 * ITEM_HEIGHT);
     });
 
     it("calculates correct height for single group with few children", async () => {
@@ -222,11 +287,86 @@ describe("Select Component", () => {
         expect(lastCall.height).toBe(2 * ITEM_HEIGHT);
       });
     });
+
+    it("passes raw option data as itemData instead of prebuilt React elements", async () => {
+      const options = Array.from({ length: 20 }, (_, i) => ({
+        value: String(i),
+        label: `Option ${i}`,
+        badge: `id=${i}`,
+      }));
+
+      render(<Select options={options as any} isVirtualList={true} searchable={true} placeholder="Select" />);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(mockVariableSizeList).toHaveBeenCalled();
+      });
+
+      const lastCall = getLastVirtualListProps();
+      expect(lastCall.itemData).toEqual(options);
+      expect(lastCall.itemData[0].$$typeof).toBeUndefined();
+      expect(lastCall.overscanCount).toBe(4);
+    });
+
+    it("renders visible virtual rows with optionRenderer and badge", async () => {
+      const optionRenderer = mock(({ option }: { option: { label: string } }) => `rendered:${option.label}`);
+      const options = Array.from({ length: 20 }, (_, i) => ({
+        value: String(i),
+        label: `Option ${i}`,
+        badge: `id=${i}`,
+      }));
+
+      render(
+        <Select
+          options={options as any}
+          isVirtualList={true}
+          searchable={true}
+          placeholder="Select"
+          optionRenderer={optionRenderer}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("rendered:Option 0")).toBeInTheDocument();
+        expect(screen.getByText("id=0")).toBeInTheDocument();
+      });
+
+      expect(optionRenderer.mock.calls.length).toBeLessThanOrEqual(5);
+      expect(screen.queryByText("rendered:Option 19")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Custom option rows", () => {
+    it("lets a custom row span the option width so trailing cells line up across rows", async () => {
+      render(
+        <Select
+          options={[{ value: "a", label: "A" }]}
+          placeholder="Select"
+          optionRenderer={({ option }: { option: { label: string } }) => <span>row:{option.label}</span>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const row = await screen.findByText("row:A");
+      expect(row.parentElement).toHaveClass("flex-1");
+    });
+
+    it("keeps plain labels sized to their text", async () => {
+      render(<Select options={[{ value: "a", label: "Plain" }]} placeholder="Select" />);
+
+      fireEvent.click(screen.getByRole("button"));
+
+      expect(await screen.findByText("Plain")).not.toHaveClass("flex-1");
+    });
   });
 
   describe("Infinite Loading Support", () => {
     it("supports loadMore callback for infinite scroll", async () => {
-      const loadMore = jest.fn();
+      const loadMore = mock();
       const options = Array.from({ length: 10 }, (_, i) => `Option ${i + 1}`);
 
       render(
@@ -251,7 +391,7 @@ describe("Select Component", () => {
     });
 
     it("maintains correct height calculation with paginated flat options", async () => {
-      const loadMore = jest.fn();
+      const loadMore = mock();
       // Simulate first page of 10 items loaded
       const options = Array.from({ length: 10 }, (_, i) => `User ${i + 1}`);
 
@@ -272,9 +412,303 @@ describe("Select Component", () => {
         expect(mockVariableSizeList).toHaveBeenCalled();
       });
 
-      // Height should be based on loaded items (10), capped at 5 visible
+      // Height should be based on loaded items (10 * 40 = 400), capped at 300
       const lastCall = mockVariableSizeList.mock.calls[mockVariableSizeList.mock.calls.length - 1][0];
-      expect(lastCall.height).toBe(5 * 40); // 5 * ITEM_HEIGHT
+      expect(lastCall.height).toBe(300);
+    });
+  });
+
+  describe("Virtual List Dynamic Width", () => {
+    it("sizes the virtual list from a sample of option labels when withDynamicWidth is set", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+
+      try {
+        render(
+          <Select
+            options={["Short", "A much longer option label"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.width).toBe(measuredWidth);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("never renders the virtual list narrower than its popover", async () => {
+      const restoreWidths = mockElementWidths({ scrollWidth: 150, triggerWidth: 160 });
+
+      try {
+        render(
+          <Select
+            options={["ada", "bob"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.width).toBe(160);
+          expect(lastCall.style).toMatchObject({ minWidth: "100%", maxWidth: "100%" });
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("does not render the width sizer while the dropdown is closed", () => {
+      render(
+        <Select
+          options={["Short", "A much longer option label"] as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      expect(screen.queryByTestId("virtual-list-width-sizer")).not.toBeInTheDocument();
+    });
+
+    it("treats withDynamicWidth as a no-op without isVirtualList", async () => {
+      render(
+        <Select
+          options={["Short", "A much longer option label"] as any}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("A much longer option label")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("virtual-list")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("virtual-list-width-sizer")).not.toBeInTheDocument();
+    });
+
+    it("keeps virtual list width at 100% when withDynamicWidth is unset", async () => {
+      render(
+        <Select options={["Short", "A much longer option label"] as any} isVirtualList={true} placeholder="Select" />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(getLastVirtualListProps().width).toBe("100%");
+      });
+    });
+
+    it("adds the scrollbar gutter only when content overflows the height cap", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+      const overflowingOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      try {
+        render(
+          <Select
+            options={overflowingOptions as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(300);
+          expect(lastCall.width).toBe(measuredWidth + 16);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("adds the scrollbar gutter when item heights land exactly on the cap but more items remain", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+      const overflowingOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      try {
+        render(
+          <Select
+            options={overflowingOptions as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            virtualListMaxVisible={3}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(3 * 40);
+          expect(lastCall.width).toBe(measuredWidth + 16);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("does not add the scrollbar gutter when items fill the cap exactly with none remaining", async () => {
+      const measuredWidth = 420;
+      const restoreWidths = mockElementWidths({ scrollWidth: measuredWidth, triggerWidth: 200 });
+
+      try {
+        render(
+          <Select
+            options={["A", "B", "C"] as any}
+            isVirtualList={true}
+            withDynamicWidth={true}
+            searchable={true}
+            virtualListMaxVisible={3}
+            placeholder="Select"
+          />,
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        await waitFor(() => {
+          const lastCall = getLastVirtualListProps();
+          expect(lastCall.height).toBe(3 * 40);
+          expect(lastCall.width).toBe(measuredWidth);
+        });
+      } finally {
+        restoreWidths();
+      }
+    });
+
+    it("lets virtualListMaxVisible override the 300px height cap", async () => {
+      const manyOptions = Array.from({ length: 20 }, (_, i) => `Option ${i + 1}`);
+
+      render(
+        <Select
+          options={manyOptions as any}
+          isVirtualList={true}
+          searchable={true}
+          virtualListMaxVisible={3}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(getLastVirtualListProps().height).toBe(3 * 40);
+      });
+    });
+
+    it("samples only the first 16 options for dynamic width and ignores the rest", async () => {
+      const options = [
+        ...Array.from({ length: 16 }, (_, i) => `Short ${i}`),
+        "This is a much longer option that a sort-by-length scan would have picked",
+      ];
+
+      render(
+        <Select
+          options={options as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const sizer = await screen.findByTestId("virtual-list-width-sizer");
+      expect(sizer.children).toHaveLength(16);
+      expect(sizer).toHaveTextContent("Short 0");
+      expect(sizer).toHaveTextContent("Short 15");
+      expect(sizer).not.toHaveTextContent("This is a much longer option");
+    });
+
+    it("mirrors multiple-option padding, checkbox, and description icon in the width sizer", async () => {
+      render(
+        <Select
+          options={[{ value: "a", label: "Alpha", description: "Help text" }] as any}
+          isVirtualList={true}
+          withDynamicWidth={true}
+          multiple={true}
+          searchable={true}
+          placeholder="Select"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const sizer = await screen.findByTestId("virtual-list-width-sizer");
+      const row = sizer.firstElementChild as HTMLElement;
+      const inner = row.firstElementChild as HTMLElement;
+      expect(row).toHaveClass("p-1");
+      expect(inner).toHaveClass("pl-2", "pr-4");
+      expect(inner).not.toHaveClass("px-4");
+      expect(inner.querySelector('input[type="checkbox"]')).toBeInTheDocument();
+      expect(sizer.querySelector("svg")).toBeInTheDocument();
+    });
+  });
+
+  describe("List header", () => {
+    it("pins the list header between the search field and the options", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          searchable
+          header={<div data-testid="custom-header">Header</div>}
+          listHeader={<div data-testid="list-header">Columns</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const listHeader = await screen.findByTestId("list-header");
+      const search = screen.getByTestId("select-search-field");
+      const list = document.querySelector("[data-slot='command-list']");
+      const follows = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(follows(screen.getByTestId("custom-header"), search)).toBe(true);
+      expect(follows(search, listHeader)).toBe(true);
+      expect(list?.contains(listHeader)).toBe(false);
+      expect(follows(listHeader, list as Node)).toBe(true);
+    });
+  });
+
+  describe("Search inset", () => {
+    it("keeps the default margin unless searchClassName replaces it", async () => {
+      const { unmount } = render(<Select options={["Apple"] as any} placeholder="Select" searchable />);
+      fireEvent.click(screen.getByRole("button"));
+      const wrapper = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(wrapper).toHaveClass("m-1");
+      unmount();
+
+      render(<Select options={["Apple"] as any} placeholder="Select" searchable searchClassName="mx-tight my-1" />);
+      fireEvent.click(screen.getByRole("button"));
+      const inset = (await screen.findByTestId("select-search-field")).closest("[data-slot='command-input-wrapper']");
+      expect(inset).toHaveClass("mx-tight");
+      expect(inset).not.toHaveClass("m-1");
     });
   });
 
@@ -295,11 +729,83 @@ describe("Select Component", () => {
         expect(screen.getByText("Custom Footer")).toBeInTheDocument();
       });
     });
+
+    it("keeps the footer outside the scrollable list so a long list cannot push it out of view", async () => {
+      const manyOptions = Array.from({ length: 50 }, (_, index) => `Option ${index}`);
+      render(
+        <Select
+          options={manyOptions as any}
+          placeholder="Select"
+          footer={<div data-testid="custom-footer">Custom Footer</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      const footer = await screen.findByTestId("custom-footer");
+      const list = document.querySelector("[data-slot='command-list']");
+      expect(list).not.toBeNull();
+      expect(list?.contains(footer)).toBe(false);
+      expect(list?.className).not.toContain("max-h-none");
+    });
+
+    it("lets the virtual list size itself instead of capping the container", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          isVirtualList={true}
+          footer={<div data-testid="custom-footer">Custom Footer</div>}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await screen.findByTestId("custom-footer");
+      expect(document.querySelector("[data-slot='command-list']")?.className).toContain("max-h-none");
+    });
+  });
+
+  describe("Select All", () => {
+    const openSelectAllDropdown = (extraProps: Record<string, unknown> = {}) => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          multiple={true}
+          searchable={true}
+          isVirtualList={true}
+          alwaysShowSelectedGroup={true}
+          onSelectAllClick={mock()}
+          {...extraProps}
+        />,
+      );
+
+      fireEvent.click(screen.getAllByRole("button")[0]);
+    };
+
+    it("describes the select all action as covering the rendered items by default", async () => {
+      openSelectAllDropdown();
+
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: "Select all rendered items" })).toBeInTheDocument();
+      });
+    });
+
+    it("lets consumers describe what select all covers", async () => {
+      openSelectAllDropdown({ selectAllLabel: "Select all members matching the current filters" });
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("button", { name: "Select all members matching the current filters" }),
+        ).toBeInTheDocument();
+      });
+    });
   });
 
   describe("Selection Behavior", () => {
     it("selects an option when clicked", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
 
       render(
         <Select options={["Apple", "Banana", "Cherry"] as any} placeholder="Select a fruit" onChange={onChange} />,
@@ -317,7 +823,7 @@ describe("Select Component", () => {
     });
 
     it("handles multiple selection", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
 
       render(
         <Select
@@ -338,6 +844,30 @@ describe("Select Component", () => {
       fireEvent.click(screen.getByText("Cherry"));
 
       expect(onChange).toHaveBeenCalledTimes(2);
+    });
+
+    it("drops the row checkbox with optionCheckbox off while rows still toggle", async () => {
+      const onChange = mock();
+
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select fruits"
+          onChange={onChange}
+          multiple={true}
+          optionCheckbox={false}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("button"));
+
+      await waitFor(() => {
+        expect(screen.getByText("Apple")).toBeInTheDocument();
+      });
+
+      expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+      fireEvent.click(screen.getByText("Apple"));
+      expect(onChange).toHaveBeenCalledWith(["Apple"]);
     });
   });
 
@@ -392,7 +922,7 @@ describe("Select Component", () => {
     });
 
     it("deselects item from selected group when clicking option", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -437,7 +967,7 @@ describe("Select Component", () => {
 
   describe("Search and callbacks", () => {
     it("calls onSearch when search input changes", async () => {
-      const onSearch = jest.fn();
+      const onSearch = mock();
       render(
         <Select options={["Apple", "Banana"] as any} placeholder="Select" searchable={true} onSearch={onSearch} />,
       );
@@ -448,7 +978,7 @@ describe("Select Component", () => {
     });
 
     it("uses custom searchFilter when provided", async () => {
-      const searchFilter = jest.fn((option: any, q: string) => {
+      const searchFilter = mock((option: any, q: string) => {
         const label = option?.label ?? option;
         return String(label).toLowerCase().startsWith(q.toLowerCase());
       });
@@ -469,19 +999,60 @@ describe("Select Component", () => {
 
   describe("Open/close callbacks", () => {
     it("calls onOpen when dropdown opens and onClose when option selected (single)", async () => {
-      const onOpen = jest.fn();
-      const onClose = jest.fn();
+      const onOpen = mock();
+      const onClose = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onOpen={onOpen} onClose={onClose} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(onOpen).toHaveBeenCalled());
       fireEvent.click(screen.getByText("Apple"));
       await waitFor(() => expect(onClose).toHaveBeenCalled());
     });
+
+    it("closes when an outside container scrolls so the panel cannot drift from its trigger", async () => {
+      const onClose = mock();
+      render(
+        <div data-testid="scroller">
+          <Select options={["Apple", "Banana"] as any} placeholder="Select" onClose={onClose} />
+        </div>,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByTestId("scroller"));
+
+      await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    it("stays open when the options list itself scrolls", async () => {
+      render(<Select options={["Apple", "Banana"] as any} placeholder="Select" />);
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByText("Apple"));
+
+      expect(screen.getByTestId("select-popup")).toBeInTheDocument();
+    });
+
+    it("stays open when an element that does not contain the trigger scrolls", async () => {
+      render(
+        <>
+          <input data-testid="search" />
+          <Select options={["Apple", "Banana"] as any} placeholder="Select" />
+        </>,
+      );
+      fireEvent.click(screen.getByRole("button"));
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+
+      fireEvent.scroll(screen.getByTestId("search"));
+
+      expect(screen.getByTestId("select-popup")).toBeInTheDocument();
+    });
   });
 
   describe("renderSelected and selectFirstIfEmpty", () => {
     it("uses renderSelected when provided", async () => {
-      const renderSelected = jest.fn((selected: any[], placeholder: string) =>
+      const renderSelected = mock((selected: any[], placeholder: string) =>
         selected.length ? selected.map((s) => s?.label ?? s).join(", ") : placeholder,
       );
       render(<Select options={["Apple", "Banana"] as any} placeholder="Pick one" renderSelected={renderSelected} />);
@@ -493,7 +1064,7 @@ describe("Select Component", () => {
     });
 
     it("selects first option when selectFirstIfEmpty and no value", () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={[{ value: "a", label: "Option A" }] as any}
@@ -521,7 +1092,7 @@ describe("Select Component", () => {
 
   describe("Option keyboard navigation", () => {
     it("selects option on Enter key", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Apple")).toBeInTheDocument());
@@ -532,7 +1103,7 @@ describe("Select Component", () => {
     });
 
     it("selects option on Space key", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Banana"] as any} placeholder="Select" onChange={onChange} />);
       fireEvent.click(screen.getByRole("button"));
       await waitFor(() => expect(screen.getByText("Banana")).toBeInTheDocument());
@@ -545,7 +1116,7 @@ describe("Select Component", () => {
 
   describe("Group option with multiple", () => {
     it("toggles all children when clicking group header in multiple mode", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       const options = [
         {
           label: "Fruits",
@@ -565,7 +1136,7 @@ describe("Select Component", () => {
 
   describe("SelectedItemsGroup disabled and deselect all", () => {
     it("does not deselect when clicking option in selected group if disabled", () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -583,7 +1154,7 @@ describe("Select Component", () => {
     });
 
     it("deselects all when clicking deselect all checkbox in selected group", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana", "Cherry"] as any}
@@ -606,7 +1177,7 @@ describe("Select Component", () => {
     });
 
     it("collapses selected group when all items are deselected", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -657,7 +1228,7 @@ describe("Select Component", () => {
 
   describe("defaultSearchValue and open/close", () => {
     it("restores defaultSearchValue when opening and resets when closing", async () => {
-      const onSearch = jest.fn();
+      const onSearch = mock();
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -722,7 +1293,7 @@ describe("Select Component", () => {
 
   describe("selectedValueRenderer", () => {
     it("uses selectedValueRenderer for each selected option in display", async () => {
-      const selectedValueRenderer = jest.fn((option: any) => (
+      const selectedValueRenderer = mock((option: any) => (
         <span data-testid="custom-label">{option?.label ?? option}</span>
       ));
       render(
@@ -742,16 +1313,16 @@ describe("Select Component", () => {
   });
 
   describe("Trigger size and props", () => {
+    it("applies size smaller to trigger", () => {
+      render(<Select options={["A"] as any} placeholder="Select" size="smaller" />);
+      const trigger = screen.getByRole("button");
+      expect(trigger).toHaveClass("sizeSmaller");
+    });
+
     it("applies size small to trigger", () => {
       render(<Select options={["A"] as any} placeholder="Select" size="small" />);
       const trigger = screen.getByRole("button");
       expect(trigger).toHaveClass("sizeSmall");
-    });
-
-    it("applies size large to trigger", () => {
-      render(<Select options={["A"] as any} placeholder="Select" size="large" />);
-      const trigger = screen.getByRole("button");
-      expect(trigger).toHaveClass("sizeLarge");
     });
 
     it("spreads triggerProps onto trigger", () => {
@@ -777,7 +1348,7 @@ describe("Select Component", () => {
 
   describe("searchFilter with empty query", () => {
     it("calls custom searchFilter even with empty query when searchFilter provided", async () => {
-      const searchFilter = jest.fn(() => true);
+      const searchFilter = mock(() => true);
       render(
         <Select
           options={["Apple", "Banana"] as any}
@@ -793,10 +1364,116 @@ describe("Select Component", () => {
 
   describe("onChange when disabled", () => {
     it("does not call onChange when selecting and component is disabled", async () => {
-      const onChange = jest.fn();
+      const onChange = mock();
       render(<Select options={["Apple", "Banana"] as any} placeholder="Select" disabled={true} onChange={onChange} />);
       const trigger = screen.getByRole("button");
       expect(trigger).toBeDisabled();
+    });
+  });
+
+  describe("readOnly", () => {
+    const groupedOptions = [
+      { key: "id", title: "ID", value: "id" },
+      { key: "agreement", title: "Agreement", value: "agreement", group: "Agreement" },
+      { key: "dim_1", title: "Dimension 1", value: "dim_1", group: "Agreement" },
+    ];
+
+    it("keeps the trigger enabled so the dropdown can open", async () => {
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      const trigger = screen.getByTestId("readonly-select");
+      expect(trigger).not.toBeDisabled();
+      fireEvent.click(trigger);
+      await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+    });
+
+    it("does not call onChange when an option is clicked", async () => {
+      const onChange = mock();
+      render(
+        <Select
+          options={["Apple", "Banana"] as any}
+          placeholder="Select"
+          value="Apple"
+          multiple
+          readOnly
+          onChange={onChange}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-Banana")).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId("select-option-Banana"));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("keeps search enabled while blocking selection", async () => {
+      const onSearch = mock();
+      render(
+        <Select
+          options={["Apple", "Banana", "Apricot"] as any}
+          placeholder="Select"
+          value={["Apple"]}
+          multiple
+          searchable
+          readOnly
+          onSearch={onSearch}
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      const searchInput = await screen.findByTestId("select-search-field");
+      expect(searchInput).not.toBeDisabled();
+      fireEvent.change(searchInput, { target: { value: "Ap" } });
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("Ap"));
+    });
+
+    it("hides group All/None actions when readOnly", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          readOnly
+          dataTestid="readonly-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("readonly-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.queryByRole("button", { name: "All" })).toBeNull();
+      expect(screen.queryByRole("button", { name: "None" })).toBeNull();
+    });
+
+    it("shows group All/None actions when editable", async () => {
+      render(
+        <Select
+          options={groupedOptions as any}
+          placeholder="Select"
+          value={["id", "agreement"]}
+          multiple
+          groupBy="group"
+          showGroupActions
+          dataTestid="editable-select"
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("editable-select"));
+      await waitFor(() => expect(screen.getByTestId("select-option-dim_1")).toBeInTheDocument());
+      expect(screen.getAllByRole("button", { name: "All" }).length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("button", { name: "None" }).length).toBeGreaterThan(0);
     });
   });
 
@@ -810,5 +1487,135 @@ describe("Select Component", () => {
       expect(nativeSelect).toBeInTheDocument();
       expect(nativeSelect?.getAttribute("name")).toBe("fruit");
     });
+  });
+});
+
+describe("Select requireApply", () => {
+  const fruits = ["Apple", "Banana", "Cherry"] as any;
+
+  const openSelect = async () => {
+    fireEvent.click(screen.getByRole("button"));
+    await waitFor(() => expect(screen.getByTestId("select-popup")).toBeInTheDocument());
+  };
+
+  const isChecked = (value: string) =>
+    (within(screen.getByTestId(`select-option-${value}`)).getByRole("checkbox") as HTMLInputElement).checked;
+
+  it("keeps picks pending and commits them once on Apply, then closes", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} multiple requireApply value={[]} onChange={onChange} placeholder="Fruits" />);
+    await openSelect();
+
+    fireEvent.click(screen.getByText("Apple"));
+    fireEvent.click(screen.getByText("Cherry"));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(isChecked("Apple")).toBe(true);
+    expect(isChecked("Cherry")).toBe(true);
+
+    fireEvent.click(screen.getByTestId("select-apply"));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith(["Apple", "Cherry"]);
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+  });
+
+  it("disables Apply until the pending picks differ from the value", async () => {
+    render(<Select options={fruits} multiple requireApply value={["Banana"]} onChange={mock()} placeholder="Fruits" />);
+    await openSelect();
+
+    const apply = screen.getByTestId("select-apply");
+    expect(apply).toBeDisabled();
+
+    fireEvent.click(screen.getByTestId("select-option-Apple"));
+    expect(apply).not.toBeDisabled();
+
+    fireEvent.click(screen.getByTestId("select-option-Apple"));
+    expect(apply).toBeDisabled();
+  });
+
+  it("discards pending picks when it closes without Apply", async () => {
+    const onChange = mock();
+    render(
+      <div data-testid="scroller">
+        <Select options={fruits} multiple requireApply value={["Banana"]} onChange={onChange} placeholder="Fruits" />
+      </div>,
+    );
+    await openSelect();
+    fireEvent.click(screen.getByText("Apple"));
+    expect(isChecked("Apple")).toBe(true);
+
+    fireEvent.scroll(screen.getByTestId("scroller"));
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+
+    await openSelect();
+    expect(isChecked("Apple")).toBe(false);
+    expect(isChecked("Banana")).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("calls onOpen and onClose, and onClose after Apply", async () => {
+    const onOpen = mock();
+    const onClose = mock();
+    render(
+      <Select
+        options={fruits}
+        multiple
+        requireApply
+        value={[]}
+        onChange={mock()}
+        onOpen={onOpen}
+        onClose={onClose}
+        placeholder="Fruits"
+      />,
+    );
+    await openSelect();
+    expect(onOpen).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByText("Apple"));
+    fireEvent.click(screen.getByTestId("select-apply"));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the caller's footer next to Apply and prefixes the Apply test id with dataTestid", async () => {
+    render(
+      <Select
+        options={fruits}
+        multiple
+        requireApply
+        value={[]}
+        onChange={mock()}
+        dataTestid="roles"
+        footer={<span data-testid="custom-footer">Footer</span>}
+        placeholder="Fruits"
+      />,
+    );
+    await openSelect();
+    expect(screen.getByTestId("custom-footer")).toBeInTheDocument();
+    expect(screen.getByTestId("roles-apply")).toBeInTheDocument();
+  });
+
+  it("works uncontrolled from defaultValue", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} multiple requireApply defaultValue={["Banana"]} onChange={onChange} />);
+    await openSelect();
+    expect(isChecked("Banana")).toBe(true);
+
+    fireEvent.click(screen.getByText("Cherry"));
+    fireEvent.click(screen.getByTestId("select-apply"));
+    expect(onChange).toHaveBeenCalledWith(["Banana", "Cherry"]);
+
+    await waitFor(() => expect(screen.queryByTestId("select-popup")).not.toBeInTheDocument());
+    await openSelect();
+    expect(isChecked("Cherry")).toBe(true);
+  });
+
+  it("is ignored without multiple: a single select still commits on click", async () => {
+    const onChange = mock();
+    render(<Select options={fruits} requireApply onChange={onChange} placeholder="Fruit" />);
+    await openSelect();
+    expect(screen.queryByTestId("select-apply")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Banana"));
+    expect(onChange).toHaveBeenCalledWith("Banana");
   });
 });

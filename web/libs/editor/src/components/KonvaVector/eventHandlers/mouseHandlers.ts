@@ -34,7 +34,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     // This ensures clean state for each interaction
     handledSelectionInMouseDown.current = false;
 
-    let shiftClickHandled = false;
+    let _shiftClickHandled = false;
 
     // Set up ghost point drag info when Shift is held (for UI feedback)
     // This works even when internal point addition is disabled
@@ -99,7 +99,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
           // Only mark as handled if internal point addition is enabled
           // This prevents other handlers from interfering when we want to add points
           if (!props.disableInternalPointAddition) {
-            shiftClickHandled = true; // Mark that Shift+click was handled
+            _shiftClickHandled = true; // Mark that Shift+click was handled
           }
         }
       }
@@ -303,7 +303,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
     // Update cursor position
     // Note: cursor position is now handled by stage-level events when disableInternalPointAddition is true
-    const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+    const _imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
     // props.setCursorPosition(imagePos); // Removed - handled elsewhere
 
     // Set ghost point when Shift is held - snap to path (but not when dragging or creating bezier points)
@@ -488,8 +488,9 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // Snap to pixel grid if enabled
       const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-      // Apply bounds checking to anchor point
-      const finalPos = constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0];
+      const finalPos = props.allowOutsideBounds
+        ? snappedPos
+        : constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0];
 
       // Update the point position
       newPoints[props.draggedPointIndex] = {
@@ -528,16 +529,14 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           };
         }
 
-        // Apply constraints to anchor point only - control points move with it automatically
-        const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], {
-          width: props.width,
-          height: props.height,
-        })[0];
-
-        // Update the point with constrained positions
-        updatedPoint.x = constrainedPoint.x;
-        updatedPoint.y = constrainedPoint.y;
-        // Control points are already positioned correctly relative to the anchor point
+        if (!props.allowOutsideBounds) {
+          const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], {
+            width: props.width,
+            height: props.height,
+          })[0];
+          updatedPoint.x = constrainedPoint.x;
+          updatedPoint.y = constrainedPoint.y;
+        }
       }
 
       props.onPointsChange?.(newPoints);
@@ -729,7 +728,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // Continue shift-click-drag bezier point creation - update control points to follow cursor
       // Only update actual control points if internal point addition is enabled
       if (!props.disableInternalPointAddition) {
-        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        const _imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
         // Use the shared utility for continuing bezier drag
         continueBezierDrag(props);
       }
@@ -780,7 +779,8 @@ export function createMouseUpHandler(props: EventHandlerProps) {
     if (props.draggedPointIndex !== null && !props.isDragging.current) {
       // Check if this point click should trigger path closing instead of selection
       const pointIndex = props.draggedPointIndex;
-      const shouldClose = shouldClosePathOnPointClick(pointIndex, props, e) && isActivePointEligibleForClosing(props);
+      const shouldClose =
+        shouldClosePathOnPointClick(pointIndex, props, e) && isActivePointEligibleForClosing(props, pointIndex);
 
       if (shouldClose) {
         // Try to close the path instead of selecting the point
@@ -868,50 +868,90 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
       }
     }
 
-    // Handle Shift+click functionality (before other checks)
+    // Handle Shift+click for ghost point insertion (before other checks).
+    // We compute the closest segment point directly from the click event
+    // rather than reading props.ghostPoint, because the ghost point React
+    // state may be stale (batched setState not yet flushed to a render).
     if (e.evt.shiftKey && !e.evt.altKey) {
-      // First, check if we're near a ghost point to add a point
+      const clickPos = e.target.getStage()?.getPointerPosition();
+      const imageClickPos = clickPos
+        ? stageToImageCoordinates(clickPos, props.transform, props.fitScale, props.x, props.y)
+        : null;
+
       if (
-        props.cursorPosition &&
+        imageClickPos &&
+        props.initialPoints.length >= 2 &&
+        (props.maxPoints === undefined || props.initialPoints.length < props.maxPoints) &&
         !props.isDraggingNewBezier &&
         !props.ghostPointDragInfo?.isDragging &&
         !props.isDragging.current
       ) {
-        // Check if we have a ghost point (this should be the persistent one from mouse move)
-        const ghostPoint = props.ghostPoint;
+        const scale = props.transform.zoom * props.fitScale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
 
-        if (ghostPoint) {
-          // Check if we're clicking near the ghost point
-          const distance = Math.sqrt(
-            (props.cursorPosition.x - ghostPoint.x) ** 2 + (props.cursorPosition.y - ghostPoint.y) ** 2,
+        // Make sure we're not clicking on an existing point
+        let isOverPoint = false;
+        for (let i = 0; i < props.initialPoints.length; i++) {
+          const pt = props.initialPoints[i];
+          if (Math.sqrt((imageClickPos.x - pt.x) ** 2 + (imageClickPos.y - pt.y) ** 2) <= hitRadius) {
+            isOverPoint = true;
+            break;
+          }
+        }
+
+        if (!isOverPoint) {
+          const closestPathPoint = findClosestPointOnPath(
+            imageClickPos,
+            props.initialPoints,
+            props.allowClose,
+            props.isPathClosed,
           );
-          const clickRadius = 15 / (props.transform.zoom * props.fitScale);
 
-          if (distance <= clickRadius) {
-            // If internal point addition is disabled, call the callback for programmatic handling
-            if (props.disableInternalPointAddition && props.onGhostPointClick) {
-              props.onGhostPointClick({
-                x: ghostPoint.x,
-                y: ghostPoint.y,
-                prevPointId: ghostPoint.prevPointId,
-                nextPointId: ghostPoint.nextPointId,
-              });
-              return; // Let parent handle point addition
-            }
+          if (closestPathPoint) {
+            const clickRadius = 15 / scale;
+            const distance = getDistance(imageClickPos, closestPathPoint.point);
 
-            // Otherwise, insert a regular point internally between the two points that form the segment
-            if (!props.disableInternalPointAddition) {
-              const insertResult = insertPointBetween(
-                props,
-                ghostPoint.x,
-                ghostPoint.y,
-                ghostPoint.prevPointId,
-                ghostPoint.nextPointId,
-              );
-              if (insertResult.success) {
-                // Clear ghost point immediately after adding a real point
+            if (distance <= clickRadius) {
+              const snapped = snapToPixel(closestPathPoint.point, props.pixelSnapping);
+
+              let prevPointId: string;
+              let nextPointId: string;
+
+              if (closestPathPoint.segmentIndex === props.initialPoints.length) {
+                const lastPt = props.initialPoints[props.initialPoints.length - 1];
+                const firstPt = props.initialPoints[0];
+                prevPointId = lastPt.id;
+                nextPointId = firstPt.id;
+              } else {
+                const currentPt = props.initialPoints[closestPathPoint.segmentIndex];
+                const prevPt = currentPt?.prevPointId
+                  ? props.initialPoints.find((p) => p.id === currentPt.prevPointId)
+                  : null;
+                if (!currentPt || !prevPt) {
+                  // Can't determine segment — fall through
+                  return;
+                }
+                prevPointId = prevPt.id;
+                nextPointId = currentPt.id;
+              }
+
+              if (props.disableInternalPointAddition && props.onGhostPointClick) {
+                props.onGhostPointClick({
+                  x: snapped.x,
+                  y: snapped.y,
+                  prevPointId,
+                  nextPointId,
+                });
                 props.setGhostPoint(null);
-                return; // Successfully added point
+                return;
+              }
+
+              if (!props.disableInternalPointAddition) {
+                const insertResult = insertPointBetween(props, snapped.x, snapped.y, prevPointId, nextPointId);
+                if (insertResult.success) {
+                  props.setGhostPoint(null);
+                  return;
+                }
               }
             }
           }

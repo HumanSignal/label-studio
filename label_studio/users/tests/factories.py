@@ -8,7 +8,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     username = factory.LazyAttribute(lambda u: u.email.split('@')[0])
-    password = factory.Faker('password')
+    # Hash via set_password so has_usable_password() is reliable. Raw Faker strings
+    # can start with '!' and Django treats those as unusable passwords.
+    password = factory.PostGenerationMethodCall('set_password', 'testpassword')
 
     class Meta:
         model = User

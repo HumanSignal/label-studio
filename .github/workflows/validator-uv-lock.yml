@@ -1,0 +1,59 @@
+name: "Check"
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - develop
+      - 'ls-release/**'
+  merge_group:
+
+env:
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+
+jobs:
+  version:
+    name: "uv Lock Change Size"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Validate
+        uses: actions/github-script@v8
+        env:
+          BASE_REF: "${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}"
+          HEAD_REF: "${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.event.after }}"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const {repo, owner} = context.repo;
+            const base_ref = process.env.BASE_REF;
+            const head_ref = process.env.HEAD_REF;
+            
+            const {data: compare} = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              base: base_ref,
+              head: head_ref,
+            });
+            const uv_locks = compare.files.filter(e => e.filename.endsWith('uv.lock'));
+            if (uv_locks.length === 0) {
+              core.notice('No uv.lock changes');
+            
+            } else {
+              for (const uv_lock of uv_locks) {
+                core.startGroup(`${uv_lock.filename}`);
+                core.info(`${uv_lock.filename} changed`);
+                console.log(uv_lock);
+                if (uv_lock.changes > 50) {
+                  core.setFailed(`${uv_lock.filename} has too many changes: ${uv_lock.changes}`);
+                }
+                core.endGroup();
+              }
+            }
+

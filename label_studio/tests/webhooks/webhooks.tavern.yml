@@ -45,6 +45,7 @@ stages:
         send_for_all_actions: true
         organization: !anyint
         is_active: true
+        consecutive_failures: !anyint
         url: "http://127.0.0.1:6666/webhook"
   - name: Get webhook list
     request:
@@ -117,4 +118,5 @@ stages:
         send_for_all_actions: true
         organization: !int "{configured_project.organization.id}"
         is_active: true
+        consecutive_failures: !anyint
         url: "http://127.0.0.1:6666/webhook/proj/"

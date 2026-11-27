@@ -41,7 +41,7 @@ class ImageCacheManager {
   /** Track revoked blob URLs to detect invalid references */
   private revokedUrls: Set<string> = new Set();
 
-  // Limit concurrent XHR requests to avoid connection saturation.
+  // Limit concurrent fetches to avoid connection saturation.
   // With 23 images per task, 23 parallel requests queue behind ~6 connections.
   // Loading 4 at a time lets the first visible images complete in ~400ms instead of ~1200ms.
   private readonly maxConcurrent = 4;
@@ -137,7 +137,7 @@ class ImageCacheManager {
   /**
    * Load an image and cache it
    * If the same image is already being loaded, return the existing promise (deduplication)
-   * Limits concurrent XHR requests to avoid connection saturation (first visible images load faster)
+   * Limits concurrent fetches to avoid connection saturation (first visible images load faster)
    */
   async load(url: string, crossOrigin?: string, onProgress?: (progress: number) => void): Promise<CachedImage> {
     // Check cache first
@@ -206,89 +206,131 @@ class ImageCacheManager {
     crossOrigin?: string,
     onProgress?: (progress: number) => void,
   ): Promise<CachedImage> {
-    return new Promise((resolve, reject) => {
-      // Use fetch with XHR for progress tracking
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = "blob";
+    // Use fetch with default cache mode so the browser HTTP cache can merge
+    // 304 Not Modified responses with the cached body and surface 200 to JS.
+    // XHR with responseType="blob" on cross-origin requests instead surfaces
+    // 304 as a status, which the loader would treat as failure (TRIAG-2331).
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        // HTML `crossorigin` attribute mapping — also matches the old XHR
+        // behavior (no withCredentials → cookies on same-origin only):
+        //   "use-credentials" → credentials: "include"
+        //   "anonymous" / unset → credentials: "same-origin"
+        // NOTE: "omit" would strip cookies on same-origin and break Django
+        // session auth on /data/upload/... and /storage-data/uploaded/.
+        credentials: crossOrigin === "use-credentials" ? "include" : "same-origin",
+        // Do NOT pass cache: "no-cache" / "reload" — that would bypass the
+        // browser HTTP cache and defeat the 304 merge described above.
+      });
+    } catch {
+      throw new ImageCacheError(`Network error loading image: ${url}`);
+    }
 
-      xhr.addEventListener("load", async () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          const blob = xhr.response as Blob;
+    if (!response.ok) {
+      throw new ImageCacheError(`Failed to download image: ${response.status}`);
+    }
 
-          // Validate blob size - reject empty or too small blobs
-          if (!blob || blob.size < this.minBlobSize) {
-            reject(
-              new ImageCacheError(`Empty or invalid image data received: ${url} (size: ${blob?.size ?? 0} bytes)`),
-            );
-            return;
-          }
+    let blob: Blob;
+    try {
+      blob = await this.readResponseAsBlob(response, onProgress);
+    } catch {
+      // Mid-body failure (connection reset, proxy timeout). Match the old XHR
+      // `onerror` shape so callers see ImageCacheError, not a stream TypeError.
+      throw new ImageCacheError(`Network error loading image: ${url}`);
+    }
 
-          // When Content-Type is generic (e.g. binary/octet-stream, application/octet-stream)
-          // or missing, we still attempt to load the image since browsers detect format
-          // by magic bytes. S3 objects uploaded without explicit Content-Type often have
-          // binary/octet-stream but are valid images. Only reject known non-image types.
-          const isGenericType = !blob.type || blob.type.includes("octet-stream");
-          if (!isGenericType && !blob.type.startsWith("image/")) {
-            reject(new ImageCacheError(`Invalid content type for image: ${blob.type} (url: ${url})`));
-            return;
-          }
+    // Validate blob size - reject empty or too small blobs
+    if (!blob || blob.size < this.minBlobSize) {
+      throw new ImageCacheError(`Empty or invalid image data received: ${url} (size: ${blob?.size ?? 0} bytes)`);
+    }
 
-          const blobUrl = URL.createObjectURL(blob);
+    // When Content-Type is generic (e.g. binary/octet-stream, application/octet-stream)
+    // or missing, we still attempt to load the image since browsers detect format
+    // by magic bytes. S3 objects uploaded without explicit Content-Type often have
+    // binary/octet-stream but are valid images. Only reject known non-image types.
+    const isGenericType = !blob.type || blob.type.includes("octet-stream");
+    if (!isGenericType && !blob.type.startsWith("image/")) {
+      throw new ImageCacheError(`Invalid content type for image: ${blob.type} (url: ${url})`);
+    }
 
-          // Get natural dimensions by loading into an Image
-          const img = new Image();
-          if (crossOrigin) img.crossOrigin = crossOrigin;
+    const blobUrl = URL.createObjectURL(blob);
 
-          img.onload = () => {
-            // Validate dimensions - reject if image has no dimensions
-            if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-              URL.revokeObjectURL(blobUrl);
-              this.revokedUrls.add(blobUrl);
-              reject(new ImageCacheError(`Image has invalid dimensions (0x0): ${url}`));
-              return;
-            }
+    return new Promise<CachedImage>((resolve, reject) => {
+      // Get natural dimensions by loading into an Image
+      const img = new Image();
+      if (crossOrigin) img.crossOrigin = crossOrigin;
 
-            const cachedImage: CachedImage = {
-              blobUrl,
-              naturalWidth: img.naturalWidth,
-              naturalHeight: img.naturalHeight,
-              timestamp: Date.now(),
-              refCount: 0,
-              originalUrl: url,
-            };
-
-            // Ensure cache doesn't grow too large
-            this.ensureCacheSize();
-            this.cache.set(url, cachedImage);
-
-            resolve(cachedImage);
-          };
-
-          img.onerror = () => {
-            URL.revokeObjectURL(blobUrl);
-            this.revokedUrls.add(blobUrl);
-            reject(new ImageCacheError(`Failed to load image dimensions: ${url}`));
-          };
-
-          img.src = blobUrl;
-        } else {
-          reject(new ImageCacheError(`Failed to download image: ${xhr.status}`));
+      img.onload = () => {
+        // Validate dimensions - reject if image has no dimensions
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+          URL.revokeObjectURL(blobUrl);
+          this.revokedUrls.add(blobUrl);
+          reject(new ImageCacheError(`Image has invalid dimensions (0x0): ${url}`));
+          return;
         }
-      });
 
-      xhr.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          onProgress?.(e.loaded / e.total);
-        }
-      });
+        const cachedImage: CachedImage = {
+          blobUrl,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          timestamp: Date.now(),
+          refCount: 0,
+          originalUrl: url,
+        };
 
-      xhr.addEventListener("error", () => {
-        reject(new ImageCacheError(`Network error loading image: ${url}`));
-      });
+        // Ensure cache doesn't grow too large
+        this.ensureCacheSize();
+        this.cache.set(url, cachedImage);
 
-      xhr.open("GET", url);
-      xhr.send();
+        resolve(cachedImage);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(blobUrl);
+        this.revokedUrls.add(blobUrl);
+        reject(new ImageCacheError(`Failed to load image dimensions: ${url}`));
+      };
+
+      img.src = blobUrl;
     });
+  }
+
+  /**
+   * Read a Response body into a Blob, streaming chunks so progress can be
+   * reported. Falls back to response.blob() when no readable body is exposed
+   * (e.g. some test mocks).
+   */
+  private async readResponseAsBlob(response: Response, onProgress?: (progress: number) => void): Promise<Blob> {
+    const contentType = response.headers.get("Content-Type") ?? "";
+    const totalHeader = response.headers.get("Content-Length");
+    const total = totalHeader ? Number.parseInt(totalHeader, 10) : 0;
+
+    if (!response.body || typeof response.body.getReader !== "function") {
+      const blob = await response.blob();
+      onProgress?.(1);
+      return blob;
+    }
+
+    const reader = response.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let received = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        received += value.length;
+        if (total > 0) onProgress?.(received / total);
+      }
+    }
+
+    // Without Content-Length we can't compute intermediate progress, so emit
+    // the final 1.0 here so UI spinners can settle.
+    if (total === 0) onProgress?.(1);
+
+    return new Blob(chunks, contentType ? { type: contentType } : undefined);
   }
 
   private ensureCacheSize(): void {

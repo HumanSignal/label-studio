@@ -1,13 +1,9 @@
-import { useRefCallback } from "@humansignal/core/hooks/useRefCallback";
 import { type MutableRefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { TimelineContext } from "../../../components/Timeline/Context";
 import { isTimeRelativelySimilar } from "../Common/Utils";
 import type { Layer } from "../Visual/Layer";
 import { Waveform, type WaveformFrameState, type WaveformOptions } from "../Waveform";
-import { ff } from "@humansignal/core";
-
-const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 export const useWaveform = (
   containter: MutableRefObject<HTMLElement | null | undefined>,
@@ -20,7 +16,6 @@ export const useWaveform = (
     autoLoad?: boolean;
     showLabels?: boolean;
     onFrameChanged?: (frame: { width: number; height: number; zoom: number; scroll: number }) => void;
-    onBuffering?: (buffering: boolean) => void;
   },
 ) => {
   const waveform = useRef<Waveform>();
@@ -28,7 +23,6 @@ export const useWaveform = (
   const [zoom, setZoom] = useState(1);
   const [volume, setVolume] = useState(options?.volume ?? 1);
   const [playing, setPlaying] = useState(false);
-  const setBuffering = useRefCallback(options?.onBuffering ?? (() => {}));
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [amp, setAmp] = useState(options?.amp ?? 1);
@@ -42,13 +36,6 @@ export const useWaveform = (
     if (!waveform.current || !settings) return;
     waveform.current.settings = settings;
   }, [settings, waveform.current]);
-
-  if (isSyncedBuffering) {
-    useEffect(() => {
-      if (!waveform.current) return;
-      waveform.current.buffering = options?.buffering || false;
-    }, [options?.buffering]);
-  }
 
   const onFrameChangedRef = useRef(options?.onFrameChanged);
   onFrameChangedRef.current = options?.onFrameChanged;
@@ -127,10 +114,6 @@ export const useWaveform = (
       setLayers(layersArray);
       setLayerVisibility(layerVis);
     });
-
-    if (isSyncedBuffering) {
-      wf.on("buffering", setBuffering);
-    }
 
     waveform.current = wf;
 

@@ -46,6 +46,7 @@ function configureApplication(params) {
   const osCB = params.submitAnnotation || params.onSubmitAnnotation;
   const ouCB = params.updateAnnotation || params.onUpdateAnnotation;
   const odCB = params.deleteAnnotation || params.onDeleteAnnotation;
+  const odpCB = params.deletePrediction || params.onDeletePrediction;
 
   const options = {
     // communication with the server
@@ -62,6 +63,7 @@ function configureApplication(params) {
     onSubmitAnnotation: params.onSubmitAnnotation ? osCB : External.onSubmitAnnotation,
     onUpdateAnnotation: params.onUpdateAnnotation ? ouCB : External.onUpdateAnnotation,
     onDeleteAnnotation: params.onDeleteAnnotation ? odCB : External.onDeleteAnnotation,
+    onDeletePrediction: params.onDeletePrediction ? odpCB : External.onDeletePrediction,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
     onUnskipTask: params.onUnskipTask ? params.onUnskipTask : External.onUnskipTask,
     onSubmitDraft: params.onSubmitDraft,

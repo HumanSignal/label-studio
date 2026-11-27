@@ -12,7 +12,7 @@ for INSERT-only architectures with millions of records.
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 import uuid_utils
 from core.current_request import CurrentContext
@@ -20,6 +20,8 @@ from core.utils.common import load_func
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+FF_IMPORT_BULK_TASK_STATES = 'fflag_perf_back_import_bulk_task_states_24092026_short'
 
 
 # =============================================================================
@@ -417,6 +419,82 @@ def get_or_initialize_state(
             exc_info=True,
         )
         return None
+
+
+def bulk_initialize_states(
+    entities: list, target_state: str, user=None, reason: str = '', context_data_fn: Optional[Callable] = None
+) -> int:
+    """
+    Insert the initial state record for entities that are known to have no FSM state yet,
+    e.g. rows that were just created with bulk_create().
+
+    Unlike get_or_initialize_state this does no per-entity state lookup or inference, so the
+    caller must guarantee that no state record exists and that target_state is correct.
+    Post-transition hooks are not run; callers update dependent (e.g. project) state once.
+
+    Records are written with bulk_create(), which skips Model.save() and pre_save/post_save signals,
+    as well as StateManager's cache write-through. If a save() override or save signal receiver is
+    ever added to a state model, it will not fire here and must be replicated for this path.
+
+    Returns:
+        Number of state records created
+    """
+    if not entities or not is_fsm_enabled(user) or CurrentContext.is_fsm_disabled():
+        return 0
+
+    from fsm.registry import get_state_model_for_entity
+
+    entity_type = entities[0]._meta.model_name
+    state_model = get_state_model_for_entity(entities[0])
+    if state_model is None:
+        return 0
+
+    transition_name = get_initialization_transition_name(entity_type, target_state)
+    organization_id = resolve_organization_id(entities[0], user)
+    triggered_by = user if getattr(user, 'is_authenticated', False) else None
+
+    records = [
+        state_model(
+            **{entity_type: entity},
+            state=target_state,
+            previous_state=None,
+            transition_name=transition_name,
+            triggered_by=triggered_by,
+            context_data=context_data_fn(entity) if context_data_fn else {},
+            reason=reason,
+            organization_id=organization_id,
+            **state_model.get_denormalized_fields(entity),
+        )
+        for entity in entities
+    ]
+    state_model.objects.bulk_create(records, batch_size=settings.BATCH_SIZE)
+    return len(records)
+
+
+def _task_created_context_data(task) -> dict:
+    return {
+        'task_id': task.id,
+        'project_id': task.project_id,
+        'data_keys': list(task.data.keys()) if isinstance(task.data, dict) else [],
+        'bulk_operation': True,
+    }
+
+
+def bulk_initialize_created_task_states(tasks: list, user=None) -> int:
+    """
+    Insert CREATED state records, matching the task_created transition, for tasks that have no
+    annotations (including cancelled ones) and no state record yet. CREATED is the only state
+    such a task can have, so no inference is needed.
+    """
+    from fsm.state_choices import TaskStateChoices
+
+    return bulk_initialize_states(
+        tasks,
+        TaskStateChoices.CREATED,
+        user=user,
+        reason='Task created in the system',
+        context_data_fn=_task_created_context_data,
+    )
 
 
 def _get_initialization_transition_name(entity_type: str, target_state: str) -> Optional[str]:

@@ -14,6 +14,18 @@ import ToolsManager from "../../../tools/Manager";
 
 export const MIN_SIZE = 5;
 
+/**
+ * BROS-1527: VideoVectorTool is auto-selected whenever VideoVectorLabels exists.
+ * Only consume empty-stage events when the vector tool is actively drawing/resuming
+ * or when it can actually start (correct control + label). Otherwise fall through to
+ * VideoRectangle drag creation.
+ */
+export const shouldRouteToVectorTool = (vectorTool) => {
+  if (!vectorTool) return false;
+  if (vectorTool.isDrawing || vectorTool.canResumeDrawing) return true;
+  return typeof vectorTool.canStartDrawing === "function" ? vectorTool.canStartDrawing() : true;
+};
+
 const SelectionRect = (props) => {
   return (
     <>
@@ -72,6 +84,16 @@ const VideoRegionsPure = ({
       realHeight: videoDimensions.height,
     };
   }, [pan.x, pan.y, zoom, videoDimensions, width, height]);
+
+  useEffect(() => {
+    if (stageRef.current) {
+      item.setStageRef(stageRef.current);
+    }
+  });
+
+  useEffect(() => {
+    item.setWorkingArea(workinAreaCoordinates);
+  }, [workinAreaCoordinates]);
 
   const layerProps = useMemo(
     () => ({
@@ -172,7 +194,7 @@ const VideoRegionsPure = ({
 
     if (!isInBounds) return;
 
-    if (vectorTool) {
+    if (shouldRouteToVectorTool(vectorTool)) {
       vectorTool.event("mousedown", e.evt, [x, y]);
       return;
     }
@@ -229,7 +251,7 @@ const VideoRegionsPure = ({
     (e) => {
       const vectorTool = getVectorTool();
 
-      if (vectorTool) {
+      if (shouldRouteToVectorTool(vectorTool)) {
         const { x, y } = limitCoordinates(normalizeMouseOffsets(e.evt.offsetX, e.evt.offsetY));
 
         vectorTool.event("click", e.evt, [x, y]);
@@ -279,6 +301,7 @@ const VideoRegionsPure = ({
           onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           stageRef={stageRef}
           currentFrame={currentFrame}
+          allowRegionsOutsideWorkingArea={allowRegionsOutsideWorkingArea}
         />
       </Layer>
       {!item.annotation?.isReadOnly() && isDrawing ? (
@@ -303,7 +326,17 @@ const VideoRegionsPure = ({
 };
 
 const RegionsLayer = observer(
-  ({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove, currentFrame }) => {
+  ({
+    regions,
+    item,
+    locked,
+    isDrawing,
+    workinAreaCoordinates,
+    stageRef,
+    onDragMove,
+    currentFrame,
+    allowRegionsOutsideWorkingArea,
+  }) => {
     // Use currentFrame prop (from React state) to ensure regions update during fast scrubbing
     // Since item.frame is volatile, React state triggers re-renders
     const frame = currentFrame ?? item.frame;
@@ -323,6 +356,7 @@ const RegionsLayer = observer(
             stageRef={stageRef}
             onDragMove={onDragMove}
             currentFrame={frame}
+            allowRegionsOutsideWorkingArea={allowRegionsOutsideWorkingArea}
           />
         ))}
       </>
@@ -330,7 +364,7 @@ const RegionsLayer = observer(
   },
 );
 
-const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => {
+const Shape = observer(({ id, reg, item, stageRef, currentFrame, allowRegionsOutsideWorkingArea, ...props }) => {
   const frame = currentFrame ?? item.frame;
   const box = reg.getShape(frame);
 
@@ -348,7 +382,17 @@ const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => 
   };
 
   if (reg.type === "videovectorregion") {
-    return <VideoVectorShape id={id} reg={reg} box={box} frame={frame} onClick={handleClick} {...props} />;
+    return (
+      <VideoVectorShape
+        id={id}
+        reg={reg}
+        box={box}
+        frame={frame}
+        onClick={handleClick}
+        allowOutsideBounds={allowRegionsOutsideWorkingArea}
+        {...props}
+      />
+    );
   }
 
   return <Rectangle id={id} reg={reg} box={box} frame={frame} onClick={handleClick} {...props} />;

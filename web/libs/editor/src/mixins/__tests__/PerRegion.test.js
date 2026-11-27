@@ -194,7 +194,7 @@ describe("PerRegion mixin", () => {
     });
 
     it("returns false and calls annotation.selectArea when a region has invalid value", () => {
-      const selectArea = jest.fn();
+      const selectArea = mock();
       const invalidReg = { results: [] };
       const validReg = { results: [] };
       const store = TestModelWithValidation.create({ perregion: true });
@@ -217,7 +217,7 @@ describe("PerRegion mixin", () => {
 
   describe("createPerRegionResult action", () => {
     it("calls setValue on perRegionArea when area is set", () => {
-      const setValue = jest.fn();
+      const setValue = mock();
       const area = { setValue };
       const m = TestModel.create({ perregion: true });
       m.setAnnotation({ highlightedNode: area });

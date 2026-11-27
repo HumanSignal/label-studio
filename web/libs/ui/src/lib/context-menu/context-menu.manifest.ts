@@ -1,0 +1,12 @@
+import { defineManifest } from "../../ds-manifest";
+
+export default defineManifest({
+  name: "ContextMenu",
+  tier: 1,
+  category: "Navigation",
+  exports: ["ContextMenu"],
+  intent: ["A right-click menu"],
+  use_when: "Actions on an item opened with a right click or a kebab on canvas-like surfaces.",
+  never_when: ["A Dropdown opened by right click by hand"],
+  replaces: [],
+});

@@ -3,8 +3,13 @@
 from decimal import Decimal
 
 import bleach
-from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
-from django.db.models import Q
+from constants import (
+    SAFE_HTML_ATTRIBUTES,
+    SAFE_HTML_PROTOCOLS,
+    SAFE_INSTRUCTION_HTML_TAGS,
+    UNSAFE_ALLOWED_INSTRUCTION_HTML_TAGS,
+)
+from django.db.models import Exists, OuterRef, Q
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
@@ -31,11 +36,12 @@ from label_studio_sdk.label_interface.control_tags import (
     TimeSeriesLabelsTag,
     VideoRectangleTag,
 )
+from organizations.models import Organization
 from projects.models import Project, ProjectImport, ProjectOnboarding, ProjectReimport, ProjectSummary
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import Task
+from tasks.models import Annotation, Task
 from users.serializers import UserSimpleSerializer
 
 
@@ -78,6 +84,11 @@ class ControlTagWeightSerializer(serializers.Serializer):
     )
 
 
+def sanitize_expert_instruction(html, allow_unsafe_tags):
+    tags = UNSAFE_ALLOWED_INSTRUCTION_HTML_TAGS if allow_unsafe_tags else SAFE_INSTRUCTION_HTML_TAGS
+    return bleach.clean(html, tags=tags, attributes=SAFE_HTML_ATTRIBUTES, protocols=SAFE_HTML_PROTOCOLS)
+
+
 class CreatedByFromContext:
     requires_context = True
 
@@ -91,6 +102,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     make sure, that you use correct one(Project.objects.with_counts())
     """
 
+    # Set from the caller's active organization at creation; never writable, or a PATCH moves the project cross-tenant
+    organization = serializers.PrimaryKeyRelatedField(read_only=True)
     task_number = serializers.IntegerField(default=None, read_only=True, help_text='Total task number in project')
     total_annotations_number = serializers.IntegerField(
         default=None,
@@ -233,11 +246,37 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
 
         if 'expert_instruction' in initial_data:
-            data['expert_instruction'] = bleach.clean(
-                initial_data['expert_instruction'], tags=SAFE_HTML_TAGS, attributes=SAFE_HTML_ATTRIBUTES
+            if self.instance is not None:
+                organization_id = self.instance.organization_id
+            else:
+                request = self.context.get('request')
+                organization_id = getattr(getattr(request, 'user', None), 'active_organization_id', None)
+            data['expert_instruction'] = sanitize_expert_instruction(
+                initial_data['expert_instruction'], self._allows_unsafe_instruction_tags(organization_id)
             )
 
         return data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Rows saved before the allowlist was narrowed (or copied past the serializer) must not reach the browser raw
+        instruction = data.get('expert_instruction')
+        if instruction and '<' in instruction:
+            data['expert_instruction'] = sanitize_expert_instruction(
+                instruction, self._allows_unsafe_instruction_tags(getattr(instance, 'organization_id', None))
+            )
+        return data
+
+    def _allows_unsafe_instruction_tags(self, organization_id):
+        if organization_id is None:
+            return False
+        # Shared by every item of a list response, so a page of projects costs one query per organization
+        cache = self.context.setdefault('allow_unsafe_instruction_tags_by_org', {})
+        if organization_id not in cache:
+            cache[organization_id] = Organization.objects.filter(
+                id=organization_id, allow_unsafe_instruction_tags=True
+            ).exists()
+        return cache[organization_id]
 
     def validate_color(self, value):
         # color : "#FF4C25"
@@ -350,10 +389,8 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         return super().update(instance, validated_data)
 
     def get_queue_total(self, project) -> int:
-        remain = project.tasks.filter(
-            Q(is_labeled=False) & ~Q(annotations__completed_by_id=self.user_id)
-            | Q(annotations__completed_by_id=self.user_id)
-        ).distinct()
+        user_annotations = Annotation.objects.filter(task_id=OuterRef('pk'), completed_by_id=self.user_id)
+        remain = project.tasks.filter(Q(is_labeled=False) | Exists(user_annotations))
         return remain.count()
 
     def get_queue_done(self, project) -> int:
@@ -408,6 +445,13 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectImportSerializer(serializers.ModelSerializer):
+    """Detail serializer for async project imports.
+
+    Note: ``tasks`` (raw request payload) is intentionally omitted from the public
+    API for payload size and data-exposure safety. Use ``task_ids`` when
+    ``return_task_ids`` was requested on create.
+    """
+
     class Meta:
         model = ProjectImport
         fields = [
@@ -430,8 +474,29 @@ class ProjectImportSerializer(serializers.ModelSerializer):
             'could_be_tasks_list',
             'found_formats',
             'data_columns',
-            'tasks',
             'task_ids',
+        ]
+
+
+class ProjectImportListSerializer(serializers.ModelSerializer):
+    """Slim list serializer — excludes large fields like task_ids."""
+
+    class Meta:
+        model = ProjectImport
+        fields = [
+            'id',
+            'project',
+            'status',
+            'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
+            'task_count',
+            'annotation_count',
+            'prediction_count',
+            'duration',
+            'file_upload_ids',
+            'commit_to_project',
         ]
 
 
@@ -443,6 +508,9 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
             'project',
             'status',
             'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
             'task_count',
             'annotation_count',
             'prediction_count',
@@ -451,6 +519,25 @@ class ProjectReimportSerializer(serializers.ModelSerializer):
             'files_as_tasks_list',
             'found_formats',
             'data_columns',
+        ]
+
+
+class ProjectReimportListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectReimport
+        fields = [
+            'id',
+            'project',
+            'status',
+            'error',
+            'created_at',
+            'updated_at',
+            'finished_at',
+            'task_count',
+            'annotation_count',
+            'prediction_count',
+            'duration',
+            'file_upload_ids',
         ]
 
 

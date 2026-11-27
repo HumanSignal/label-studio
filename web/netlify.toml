@@ -1,0 +1,8 @@
+# Read by the Netlify sites whose base directory is `web`:
+# label-studio-storybook and label-studio-playground.
+#
+# Skip the build (and the PR deploy preview) when nothing under web/ changed.
+# Exit 0 = skip, non-zero = build. ':/web' is anchored to the repo root, so it
+# works no matter which directory the command runs from.
+[build]
+ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ':/web'"

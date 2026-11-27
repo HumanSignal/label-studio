@@ -57,7 +57,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
     };
 
     const options = useMemo(() => {
-      return pageSizeOptions.map((obj: number, index: number) => {
+      return pageSizeOptions.map((obj: number, _index: number) => {
         return {
           value: obj,
           label: `${obj} per page`,

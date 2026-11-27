@@ -1,0 +1,135 @@
+"use strict";
+
+const selectorParser = require("postcss-selector-parser");
+
+const PREFIX = "lsf-";
+
+function shouldSkipPrefix(className) {
+  if (className.includes("ant")) return true;
+  if (/^(antd|cm)?-|^anticon/.test(className)) return true;
+  return false;
+}
+
+function isPrefixCssFile(from) {
+  if (!from) return false;
+  const normalized = from.split("\\").join("/");
+  return /\.prefix\.css$/i.test(normalized);
+}
+
+/** Storybook preview overlay targets third-party class names (.sbdocs, .docblock-argstable, …); prefixing breaks them. */
+function isStorybookPreviewOverlay(from) {
+  if (!from) return false;
+  const normalized = from.split("\\").join("/");
+  return normalized.includes(".storybook/preview.prefix.css");
+}
+
+function isInsideGlobalPseudo(node) {
+  let n = node.parent;
+  while (n) {
+    if (n.type === "pseudo") {
+      const val = n.value.replace(/^:/, "");
+      if (val === "global") return true;
+    }
+    n = n.parent;
+  }
+  return false;
+}
+
+function unwrapGlobalPseudos(selector) {
+  const pseudos = [];
+  selector.walkPseudos((pseudo) => {
+    const val = pseudo.value.replace(/^:/, "");
+    if (val === "global" && pseudo.nodes && pseudo.nodes.length) {
+      pseudos.push(pseudo);
+    }
+  });
+  pseudos.sort((a, b) => depth(b) - depth(a));
+  for (const pseudo of pseudos) {
+    pseudo.replaceWith(...pseudo.nodes);
+  }
+}
+
+function depth(node) {
+  let d = 0;
+  let n = node;
+  while (n.parent) {
+    d += 1;
+    n = n.parent;
+  }
+  return d;
+}
+
+function processSelector(selectorStr) {
+  return selectorParser((selectors) => {
+    selectors.each((selector) => {
+      selector.walkClasses((classNode) => {
+        if (isInsideGlobalPseudo(classNode)) return;
+        const name = classNode.value;
+        if (shouldSkipPrefix(name)) return;
+        if (name.startsWith(PREFIX)) return;
+        classNode.value = PREFIX + name;
+      });
+      unwrapGlobalPseudos(selector);
+    });
+  }).processSync(selectorStr);
+}
+
+function isInsideKeyframes(rule) {
+  let p = rule.parent;
+  while (p) {
+    if (p.type === "atrule" && /keyframes/i.test(p.name)) return true;
+    p = p.parent;
+  }
+  return false;
+}
+
+function postcssPrefixLsfClasses() {
+  return {
+    postcssPlugin: "postcss-prefix-lsf-classes",
+    OnceExit(root) {
+      const from = root.source?.input?.from;
+      if (!isPrefixCssFile(from)) return;
+      if (isStorybookPreviewOverlay(from)) return;
+
+      root.walkRules((rule) => {
+        if (isInsideKeyframes(rule)) return;
+        try {
+          rule.selector = processSelector(rule.selector);
+        } catch {
+          /* keep original selector */
+        }
+      });
+    },
+  };
+}
+
+postcssPrefixLsfClasses.postcss = true;
+
+function postcssPreProcessGlobalBlocks() {
+  return {
+    postcssPlugin: "postcss-preprocess-global-blocks",
+    Once(root) {
+      const from = root.source?.input?.from;
+      if (!isPrefixCssFile(from)) return;
+
+      // Find rules that are exactly `:global` block wrappers
+      root.walkRules((rule) => {
+        if (rule.selector === ":global") {
+          // Wrap all child rules in :global(...) pseudo class
+          rule.walkRules((child) => {
+            // Split the child selector by comma in case it's a list like `.a, .b`
+            child.selector = child.selector
+              .split(",")
+              .map((s) => `:global(${s.trim()})`)
+              .join(", ");
+          });
+          // Replace the `:global` wrapper block with its children
+          rule.replaceWith(rule.nodes);
+        }
+      });
+    },
+  };
+}
+postcssPreProcessGlobalBlocks.postcss = true;
+
+module.exports = { postcssPrefixLsfClasses, postcssPreProcessGlobalBlocks };

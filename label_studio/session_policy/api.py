@@ -1,7 +1,7 @@
+from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
 from .models import SessionTimeoutPolicy
 from .serializers import SessionTimeoutPolicySerializer
@@ -46,7 +46,10 @@ class SessionTimeoutPolicyView(generics.RetrieveUpdateAPIView):
     """
 
     serializer_class = SessionTimeoutPolicySerializer
-    permission_classes = [IsAuthenticated]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.organizations_view,
+        PATCH=all_permissions.organizations_change,
+    )
     http_method_names = ['get', 'patch']  # Explicitly specify allowed methods
 
     def get_object(self):

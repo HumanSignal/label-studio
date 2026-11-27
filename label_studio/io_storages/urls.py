@@ -50,6 +50,7 @@ from io_storages.localfiles.api import (
     LocalFilesImportStorageValidateAPI,
 )
 from io_storages.localfiles.views import localfiles_data
+from io_storages.react_code_proxy import ReactCodeResolveView, ReactCodeTokenView
 from io_storages.redis.api import (
     RedisExportStorageDetailAPI,
     RedisExportStorageFormLayoutAPI,
@@ -207,6 +208,12 @@ urlpatterns += [
         proxy_api.ProjectResolveStorageUri.as_view(),
         name='project-storage-data-presign',
     ),
+]
+
+# ReactCode token-authenticated proxy for sandboxed iframe storage URL resolution
+urlpatterns += [
+    path('api/react-code/token/', ReactCodeTokenView.as_view(), name='react-code-token'),
+    path('api/react-code/resolve/<str:token>/', ReactCodeResolveView.as_view(), name='react-code-resolve'),
 ]
 
 urlpatterns += [

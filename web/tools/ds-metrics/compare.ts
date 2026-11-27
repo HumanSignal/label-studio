@@ -1,0 +1,168 @@
+/** Head vs base of two snapshots, and the markdown the PR comment carries. */
+import type { Snapshot } from "./snapshot";
+
+/** The comment is found and edited by this marker, so a PR has one for its whole life. */
+export const MARKER = "<!-- ds-metrics -->";
+
+export type Delta = { base: number; head: number; delta: number };
+export type Comparison = {
+  totals: Record<"violations" | "files_with_violations", Delta>;
+  rules: Record<string, Delta>;
+  clusters: Record<string, Delta & { importers: Delta }>;
+  areas: Record<string, { violations: Delta }>;
+  /** `isNew` / `isRemoved`: only one side has the goal, so its delta means nothing. */
+  goals: Record<string, Delta & { target: number | null; isNew: boolean; isRemoved: boolean }>;
+};
+
+const delta = (head: number, base: number): Delta => ({ base, head, delta: Math.round((head - base) * 1000) / 1000 });
+const keys = (...records: Record<string, unknown>[]) =>
+  [...new Set(records.flatMap((r) => Object.keys(r)))].sort((a, b) => a.localeCompare(b));
+
+/** A snapshot from an older checkout may lack keys; every record defaults so the comment still renders. */
+function complete(s: Partial<Snapshot>): Snapshot {
+  return {
+    version: s.version ?? 0,
+    commit: s.commit ?? "unknown",
+    date: s.date ?? "",
+    pr: s.pr ?? null,
+    totals: { violations: s.totals?.violations ?? 0, files_with_violations: s.totals?.files_with_violations ?? 0 },
+    rules: s.rules ?? {},
+    clusters: s.clusters ?? {},
+    areas: s.areas ?? {},
+    goals: s.goals ?? {},
+  };
+}
+
+export function compare(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): Comparison {
+  const head = complete(headIn);
+  const base = complete(baseIn);
+  const rules: Comparison["rules"] = {};
+  for (const k of keys(head.rules, base.rules)) rules[k] = delta(head.rules[k] ?? 0, base.rules[k] ?? 0);
+  const clusters: Comparison["clusters"] = {};
+  for (const k of keys(head.clusters, base.clusters)) {
+    const h = head.clusters[k] ?? { paths_remaining: 0, importers: 0 };
+    const b = base.clusters[k] ?? { paths_remaining: 0, importers: 0 };
+    clusters[k] = { ...delta(h.paths_remaining, b.paths_remaining), importers: delta(h.importers, b.importers) };
+  }
+  const areas: Comparison["areas"] = {};
+  for (const k of keys(head.areas, base.areas)) {
+    const h = head.areas[k] ?? { violations: 0 };
+    const b = base.areas[k] ?? { violations: 0 };
+    areas[k] = {
+      violations: delta(h.violations, b.violations),
+    };
+  }
+  const goals: Comparison["goals"] = {};
+  for (const k of keys(head.goals, base.goals)) {
+    const h = head.goals[k];
+    const b = base.goals[k];
+    goals[k] = {
+      ...delta(h?.value ?? 0, b?.value ?? 0),
+      target: (h ?? b)?.target ?? null,
+      isNew: b === undefined && h !== undefined,
+      isRemoved: h === undefined && b !== undefined,
+    };
+  }
+  return {
+    totals: {
+      violations: delta(head.totals.violations, base.totals.violations),
+      files_with_violations: delta(head.totals.files_with_violations, base.totals.files_with_violations),
+    },
+    rules,
+    clusters,
+    areas,
+    goals,
+  };
+}
+
+/** The label that accepts a rule count increase on purpose, e.g. a new rule landing with tracked debt. */
+export const ACCEPT_LABEL = "ds-debt-accepted";
+
+/** Rules whose whole-repo count rose against the base; the PR gate fails on any of them. */
+export function ruleIncreases(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): ({ rule: string } & Delta)[] {
+  return Object.entries(compare(headIn, baseIn).rules)
+    .filter(([, d]) => d.delta > 0)
+    .map(([rule, d]) => ({ rule, ...d }));
+}
+
+const num = (n: number) => n.toLocaleString("en-US");
+const signed = (n: number) => (n > 0 ? `+${num(n)}` : num(n));
+const paren = (n: number) => (n === 0 ? "" : ` (${signed(n)})`);
+const pct = (n: number) => `${Math.round(n * 100)}%`;
+const isShare = (goal: string) => /_share_/.test(goal);
+
+export function renderComparison(headIn: Partial<Snapshot>, baseIn: Partial<Snapshot>): string {
+  const head = complete(headIn);
+  const base = complete(baseIn);
+  const c = compare(head, base);
+  const total = c.totals.violations;
+  const baseId = base.commit.slice(0, 10);
+  const files = `${num(c.totals.files_with_violations.head)} files${paren(c.totals.files_with_violations.delta)}`;
+  const lines = [MARKER, "## Design-system metrics", ""];
+  const added = Object.values(c.rules).reduce((sum, r) => sum + Math.max(r.delta, 0), 0);
+  const net = total.delta === 0 ? (added ? "no net change: rules shifted" : "no change") : `${signed(total.delta)} net`;
+  // The first line answers "did this PR add any?", so the comment can be dismissed or acted on at a glance.
+  lines.push(
+    added
+      ? `**${num(added)} new ${added === 1 ? "violation" : "violations"}** (${net} against the base branch \`${baseId}\`)`
+      : `**No new violations** (${net} against the base branch \`${baseId}\`)`,
+    "",
+    `of ${num(total.head)} total violations, in ${files}.`,
+  );
+  if (base.version !== head.version) {
+    lines.push(
+      "",
+      `<sub>the base snapshot is schema v${base.version}, this one v${head.version}; rows missing on one side count as 0</sub>`,
+    );
+  }
+  const increases = ruleIncreases(head, base);
+  if (increases.length) {
+    lines.push(
+      "",
+      `**Blocks the merge:** ${increases.map((r) => `\`${r.rule}\` ${signed(r.delta)}`).join(", ")} against the base branch. Fix the new findings, or, when the increase is intended (a new rule landing with tracked debt), add the \`${ACCEPT_LABEL}\` label and rerun the DS job.`,
+    );
+  }
+  lines.push("");
+
+  const changedRules = Object.entries(c.rules).filter(([, d]) => d.delta !== 0);
+  if (changedRules.length) {
+    lines.push("| Rule | Base | Head | Delta |", "|---|---:|---:|---:|");
+    for (const [rule, d] of changedRules)
+      lines.push(`| ${rule} | ${num(d.base)} | ${num(d.head)} | ${signed(d.delta)} |`);
+    lines.push("");
+  }
+
+  const changedClusters = Object.entries(c.clusters).filter(([, d]) => d.delta !== 0 || d.importers.delta !== 0);
+  if (changedClusters.length) {
+    lines.push("| Cluster | Local copies | Importers |", "|---|---:|---:|");
+    for (const [name, d] of changedClusters) {
+      const copies =
+        d.head === 0 && d.base > 0
+          ? "removed"
+          : d.base === 0 && d.head > 0
+            ? `${num(d.head)} (new)`
+            : `${num(d.head)}${paren(d.delta)}`;
+      lines.push(`| ${name} | ${copies} | ${num(d.importers.head)}${paren(d.importers.delta)} |`);
+    }
+    lines.push("");
+  }
+
+  lines.push("| Goal | Head | Delta | Target |", "|---|---:|---:|---:|");
+  const removed = Object.keys(c.goals).filter((goal) => c.goals[goal].isRemoved);
+  for (const [goal, d] of Object.entries(c.goals)) {
+    if (d.isRemoved) continue;
+    const f = isShare(goal) ? pct : num;
+    const change = d.isNew ? "new" : isShare(goal) ? `${signed(Math.round(d.delta * 100))}%` : signed(d.delta);
+    lines.push(
+      `| ${goal.replace(/_/g, " ")} | ${f(d.head)} | ${change} | ${d.target === null ? "not set" : f(d.target)} |`,
+    );
+  }
+  if (removed.length) {
+    lines.push("", `<sub>no longer measured: ${removed.map((goal) => goal.replace(/_/g, " ")).join(", ")}</sub>`);
+  }
+  lines.push(
+    "",
+    `<sub>head \`${head.commit.slice(0, 10)}\` vs base \`${baseId}\` · \`bun run ds:metrics --compare base.json\`</sub>`,
+  );
+  return lines.join("\n");
+}

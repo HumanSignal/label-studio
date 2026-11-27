@@ -1,32 +1,20 @@
-import { Modal } from "antd";
+import { showInfoModal } from "./infomodal-dispatch";
+
+const DEFAULT_TITLES = {
+  error: "Error",
+  warning: "Warning",
+  success: "Success",
+  info: "Info",
+};
+
+const VARIANTS = ["error", "warning", "success", "info"];
 
 const wrapper = (_type, value, title) => {
-  const custom = {
-    type: "",
-    title: "",
-  };
-
-  switch (_type) {
-    case "error":
-      custom.type = Modal.error;
-      custom.title = "Error";
-      break;
-    case "warning":
-      custom.type = Modal.warning;
-      custom.title = "Warning";
-      break;
-    case "success":
-      custom.type = Modal.success;
-      custom.title = "Success";
-      break;
-    default:
-      custom.type = Modal.info;
-      custom.title = "Info";
-  }
-
-  return custom.type({
-    title: title ? title : custom.title,
+  const variant = VARIANTS.includes(_type) ? _type : "info";
+  showInfoModal({
+    variant,
     content: value,
+    title: title ? title : DEFAULT_TITLES[variant],
   });
 };
 

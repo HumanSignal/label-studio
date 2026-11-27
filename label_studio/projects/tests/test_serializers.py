@@ -1,9 +1,17 @@
-"""Tests for projects.serializers (control_weights validation)."""
+"""Tests for project serializers."""
 
+from unittest import mock
+
+import bleach
 import pytest
+from django.db import connection
 from django.test import TestCase
-from projects.serializers import ControlTagWeightSerializer, ProjectSerializer
+from django.test.utils import CaptureQueriesContext
+from projects.serializers import ControlTagWeightSerializer, ProjectSerializer, sanitize_expert_instruction
+from projects.tests.factories import ProjectFactory
 from rest_framework.exceptions import ValidationError
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 
 class TestControlTagWeightSerializer(TestCase):
@@ -84,7 +92,7 @@ class TestControlTagWeightSerializer(TestCase):
 
 
 class TestProjectSerializer(TestCase):
-    """Validates the cross-field validate_control_weights on ProjectSerializer."""
+    """Validates project serializer behavior, including weights and queue counts."""
 
     def _validate(self, value):
         """Run validate_control_weights from a ProjectSerializer instance."""
@@ -124,3 +132,157 @@ class TestProjectSerializer(TestCase):
     def test_accepts_empty_dict(self):
         """Empty dict passes through unchanged."""
         assert self._validate({}) == {}
+
+    def test_queue_total_uses_correlated_user_annotation_lookup(self):
+        project = ProjectFactory()
+        current_user = project.created_by
+        other_user = UserFactory()
+        TaskFactory(project=project, is_labeled=False)
+        current_user_task = TaskFactory(project=project, is_labeled=True)
+        other_user_task = TaskFactory(project=project, is_labeled=True)
+        unlabeled_other_user_task = TaskFactory(project=project, is_labeled=False)
+        mixed_user_task = TaskFactory(project=project, is_labeled=True)
+        AnnotationFactory(task=current_user_task, completed_by=current_user)
+        AnnotationFactory(task=other_user_task, completed_by=other_user)
+        AnnotationFactory(task=unlabeled_other_user_task, completed_by=other_user)
+        AnnotationFactory(task=mixed_user_task, completed_by=other_user)
+        AnnotationFactory(task=mixed_user_task, completed_by=current_user)
+        project.tasks.filter(pk__in=[current_user_task.pk, other_user_task.pk, mixed_user_task.pk]).update(
+            is_labeled=True
+        )
+        serializer = ProjectSerializer(context={'user_cache': {current_user.id: current_user}})
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            queue_total = serializer.get_queue_total(project)
+
+        assert len(captured_queries) == 1
+        assert queue_total == 4, captured_queries[0]['sql']
+        assert 'EXISTS' in captured_queries[0]['sql']
+        assert 'DISTINCT' not in captured_queries[0]['sql']
+
+
+class TestProjectSerializerExpertInstruction(TestCase):
+    """Unsafe tags in expert_instruction are kept only for organizations that opted in."""
+
+    PAYLOAD = '<script>alert(1)</script><iframe src="https://docs.google.com/x"></iframe><p>hi</p>'
+    ESCAPED = (
+        '&lt;script&gt;alert(1)&lt;/script&gt;&lt;iframe src="https://docs.google.com/x"&gt;&lt;/iframe&gt;<p>hi</p>'
+    )
+
+    def _write(self, project, value):
+        serializer = ProjectSerializer(instance=project, data={'expert_instruction': value}, partial=True)
+        assert serializer.is_valid(), serializer.errors
+        return serializer.validated_data['expert_instruction']
+
+    def _read(self, project):
+        return ProjectSerializer(project, include=['id', 'expert_instruction']).data['expert_instruction']
+
+    def _allow_unsafe_tags(self, project):
+        project.organization.allow_unsafe_instruction_tags = True
+        project.organization.save(update_fields=['allow_unsafe_instruction_tags'])
+
+    def test_write_escapes_unsafe_tags_by_default(self):
+        project = ProjectFactory()
+        assert self._write(project, self.PAYLOAD) == self.ESCAPED
+
+    def test_write_keeps_unsafe_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, self.PAYLOAD) == self.PAYLOAD
+
+    def test_write_still_strips_event_handlers_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, '<a href="#" onerror=alert(1)>x</a>') == '<a href="#">x</a>'
+
+    def test_read_escapes_unsafe_tags_stored_before_the_fix(self):
+        project = ProjectFactory()
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.ESCAPED
+
+    def test_read_keeps_unsafe_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.PAYLOAD
+
+    DOCUMENT_LEVEL_PAYLOAD = (
+        '<base href="https://example.com/"><link rel="stylesheet" href="https://example.com/a.css">'
+        '<meta http-equiv="refresh" content="0;url=https://example.com/">'
+        '<embed src="https://example.com/" type="text/html"><object data="https://example.com/"></object>'
+        '<form action="https://example.com/"></form><style>p{color:red}</style><p>hi</p>'
+    )
+    DOCUMENT_LEVEL_ESCAPED = (
+        '&lt;base href="https://example.com/"&gt;&lt;link rel="stylesheet" href="https://example.com/a.css"&gt;'
+        '&lt;meta http-equiv="refresh" content="0;url=https://example.com/"&gt;'
+        '&lt;embed src="https://example.com/" type="text/html"&gt;&lt;object data="https://example.com/"&gt;'
+        '&lt;/object&gt;&lt;form action="https://example.com/"&gt;&lt;/form&gt;<style>p{color:red}</style><p>hi</p>'
+    )
+
+    def test_write_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        assert self._write(project, self.DOCUMENT_LEVEL_PAYLOAD) == self.DOCUMENT_LEVEL_ESCAPED
+
+    def test_read_escapes_document_level_tags_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        type(project).objects.filter(pk=project.pk).update(expert_instruction=self.DOCUMENT_LEVEL_PAYLOAD)
+        project.refresh_from_db()
+        assert self._read(project) == self.DOCUMENT_LEVEL_ESCAPED
+
+    def test_read_of_plain_text_does_not_query_organization(self):
+        project = ProjectFactory(expert_instruction='Label all cats')
+        with CaptureQueriesContext(connection) as captured_queries:
+            assert self._read(project) == 'Label all cats'
+        assert len(captured_queries) == 0
+
+    def test_list_read_queries_organization_once(self):
+        organization = ProjectFactory().organization
+        projects = [ProjectFactory(organization=organization, expert_instruction='<p>x</p>') for _ in range(3)]
+        with CaptureQueriesContext(connection) as captured_queries:
+            data = ProjectSerializer(projects, many=True, include=['id', 'expert_instruction']).data
+        assert [item['expert_instruction'] for item in data] == ['<p>x</p>'] * 3
+        assert len(captured_queries) == 1
+
+    JAVASCRIPT_LINKS = [
+        '<a href="javascript:alert(1)">x</a>',
+        '<a href="JaVaScRiPt:alert(1)">x</a>',
+        '<a href="jav&#x61;script:alert(1)">x</a>',
+        '<a href="&#106;avascript:alert(1)">x</a>',
+        '<a href="java\tscript:alert(1)">x</a>',
+        '<a href=" javascript:alert(1)">x</a>',
+        '<a href="data:text/html,x">x</a>',
+        '<a href="vbscript:x">x</a>',
+    ]
+
+    def test_write_strips_javascript_links(self):
+        project = ProjectFactory()
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                assert self._write(project, payload) == '<a>x</a>'
+
+    def test_write_strips_javascript_links_when_organization_allows(self):
+        project = ProjectFactory()
+        self._allow_unsafe_tags(project)
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                assert self._write(project, payload) == '<a>x</a>'
+        assert self._write(project, '<iframe src="javascript:alert(1)"></iframe>') == '<iframe></iframe>'
+
+    def test_read_strips_javascript_links_stored_before_the_fix(self):
+        project = ProjectFactory()
+        for payload in self.JAVASCRIPT_LINKS:
+            with self.subTest(payload=payload):
+                type(project).objects.filter(pk=project.pk).update(expert_instruction=payload)
+                project.refresh_from_db()
+                assert self._read(project) == '<a>x</a>'
+
+    def test_sanitize_expert_instruction_pins_protocols(self):
+        for allow_unsafe_tags in (False, True):
+            with self.subTest(allow_unsafe_tags=allow_unsafe_tags):
+                with mock.patch('projects.serializers.bleach.clean', wraps=bleach.clean) as clean:
+                    sanitize_expert_instruction('<a href="https://ok.example">x</a>', allow_unsafe_tags)
+                assert clean.call_args.kwargs['protocols'] == ['http', 'https', 'mailto']

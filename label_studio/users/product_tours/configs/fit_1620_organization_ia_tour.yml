@@ -1,0 +1,26 @@
+steps:
+  - target: body
+    placement: center
+    title: 1 of 4
+    content: We've shuffled things around under <strong>Organization</strong> to make navigation clearer.<br><br>Press <em>Next</em> to see where some sections live now.
+    disableBeacon: true
+
+  - target: '[data-testid="org-members-sidebar-nav"]'
+    placement: right
+    title: 2 of 4
+    content: The new left-hand menu lists Members-related sections like <strong>Member Tags</strong> and, if your plan supports it, <strong>Activity Logs</strong>.
+    disableBeacon: true
+
+  - target: '[data-testid="org-menu-security"]'
+    placement: bottom
+    title: 3 of 4
+    content: Role-based permissions, SSO & SCIM setup, and other access and security controls are now under the <strong>Security</strong> section.
+    disableBeacon: true
+
+  - target: '[data-testid="org-menu-settings"]'
+    placement: bottom
+    title: 4 of 4
+    content: Lastly, toggles for features, email notifications settings, and Support Reports are now under the <strong>Settings</strong> section.
+    disableBeacon: true
+    locale:
+      last: Sounds Good!

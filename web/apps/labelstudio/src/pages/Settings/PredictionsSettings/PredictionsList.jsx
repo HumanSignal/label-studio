@@ -1,11 +1,10 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { Menu } from "../../../components";
-import { Button, Dropdown } from "@humansignal/ui";
+import { Button, ConfirmDialog, Dropdown } from "@humansignal/ui";
 import { IconInfoOutline, IconPredictions, IconEllipsis } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
-import { confirm } from "../../../components/Modal/Modal";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 
@@ -41,19 +40,9 @@ export const PredictionsList = ({ project, versions, fetchVersions }) => {
 const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
   const rootClass = cn("prediction-card");
 
-  const confirmDelete = useCallback(
-    (version) => {
-      confirm({
-        title: "Delete Predictions",
-        body: "This action cannot be undone. Are you sure?",
-        buttonLook: "destructive",
-        onOk() {
-          onDelete?.(version);
-        },
-      });
-    },
-    [version, onDelete],
-  );
+  // The version to delete once confirmed; the card's menu closes as soon as Delete is used.
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const confirmDelete = setPendingDelete;
 
   return (
     <div className={rootClass.toClassName()}>
@@ -94,11 +83,20 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
             </Menu>
           }
         >
-          <Button look="string">
+          <Button look="ghost">
             <IconEllipsis />
           </Button>
         </Dropdown.Trigger>
       </div>
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+        title="Delete Predictions"
+        buttonLook="destructive"
+        onOk={() => onDelete?.(pendingDelete)}
+      >
+        This action cannot be undone. Are you sure?
+      </ConfirmDialog>
     </div>
   );
 };
