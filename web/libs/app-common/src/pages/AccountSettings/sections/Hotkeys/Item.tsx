@@ -29,6 +29,15 @@ interface HotkeyItemProps {
   onToggle: (id: string) => void;
 }
 
+const KEY_ALIASES: Record<string, string> = {
+  ArrowLeft: "left",
+  ArrowRight: "right",
+  ArrowUp: "up",
+  ArrowDown: "down",
+};
+
+const normalizeKey = (key: string): string => KEY_ALIASES[key] ?? key.toLowerCase();
+
 /**
  * HotkeyItem component for displaying and editing keyboard shortcuts
  *
@@ -80,7 +89,7 @@ export const HotkeyItem = ({ hotkey, onEdit, isEditing, onSave, onCancel, onTogg
     if (altKey) keyCombo.push("alt");
     if (metaKey) keyCombo.push("meta");
 
-    keyCombo.push(key.toLowerCase());
+    keyCombo.push(normalizeKey(key));
 
     setEditedKey(keyCombo.join("+"));
     setError("");
