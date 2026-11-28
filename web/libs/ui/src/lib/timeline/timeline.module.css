@@ -330,30 +330,15 @@
 }
 
 /*
- * A selectable entry's static marker: it takes pointer events (above the header overlay) only so that hovering the
- * circle can be styled; a click on it is forwarded to the header's select handler.
- */
-.markerHit {
-  @apply relative cursor-pointer;
-  z-index: var(--timeline-z-marker);
-  pointer-events: auto;
-  transition:
-    background-color var(--timeline-transition),
-    color var(--timeline-transition);
-}
-
-/*
  * Marker states on the hover card. Only the NEUTRAL marker changes: on the primary-tinted card it would wash out,
- * so while the entry is hovered it takes `neutral-background`; hovering the circle itself (the toggle, or the
- * circle of a selectable entry) takes `primary-emphasis` with the matching `primary-icon`. Coloured markers
+ * so while the entry is hovered it takes `neutral-background`; hovering the expand toggle itself takes `primary-emphasis` with the matching `primary-icon`. Coloured markers
  * (positive, warning, negative, the selected primary one) keep their own colours.
  */
 .entryInteractive:hover .toneNeutral {
   background-color: var(--timeline-marker-card-hover-bg);
 }
 
-.item .toneNeutral.markerButton:hover,
-.item .toneNeutral.markerHit:hover {
+.item .toneNeutral.markerButton:hover {
   background-color: var(--timeline-marker-hover-bg);
   color: var(--timeline-marker-hover-fg);
 }

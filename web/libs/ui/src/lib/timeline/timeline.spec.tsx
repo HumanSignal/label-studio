@@ -126,20 +126,14 @@ describe("Timeline", () => {
     expect(screen.getByTestId("b-row").querySelector("button")).not.toBeInTheDocument();
   });
 
-  it("lets a selectable entry's marker circle be hovered and forwards its click, and leaves a static entry's alone", () => {
-    const onSelect = jest.fn();
+  it("leaves a static marker as part of the card, so the header overlay takes its hover and click", () => {
     render(
       <Timeline>
-        <Timeline.Item icon={<span />} title="Selectable" onSelect={onSelect} data-testid="a" />
-        <Timeline.Item icon={<span />} title="Static" data-testid="b" />
+        <Timeline.Item icon={<span />} title="Selectable" onSelect={() => {}} data-testid="a" />
       </Timeline>,
     );
 
-    const circle = screen.getByTestId("a-row").querySelector(".markerHit") as HTMLElement;
-    expect(circle).toBeInTheDocument();
-    fireEvent.click(circle);
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("b-row").querySelector(".markerHit")).not.toBeInTheDocument();
+    expect(screen.getByTestId("a-row").querySelector(".markerHit")).not.toBeInTheDocument();
   });
 
   it("renders titles, descriptions, a title badge and a meta row", () => {

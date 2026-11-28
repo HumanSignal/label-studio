@@ -275,12 +275,10 @@ function TimelineItem({
             <span
               className={cnm(
                 styles.marker,
-                onSelect && styles.markerHit,
                 !markerColor && TONE_CLASS[markerTone],
                 !isStrong && !markerColor && styles.markerSubtle,
               )}
               style={markerStyle}
-              onClick={onSelect}
               aria-hidden="true"
             >
               {icon}
