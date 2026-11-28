@@ -529,6 +529,10 @@ const Model = types
         : Math.min(self.containerWidth / self.naturalWidth, self.containerHeight / self.naturalHeight);
     },
 
+    get originalZoom() {
+      return Math.max(1, 1 / self.maxScale);
+    },
+
     get coverScale() {
       return self.isSideways
         ? Math.max(self.containerWidth / self.naturalHeight, self.containerHeight / self.naturalWidth)
@@ -915,10 +919,8 @@ const Model = types
     },
 
     sizeToOriginal() {
-      const { maxScale } = self;
-
       self.defaultzoom = "original";
-      self.setZoom(maxScale > 1 ? 1 : 1 / maxScale);
+      self.setZoom(self.originalZoom);
       self.updateImageAfterZoom();
       self.resetZoomPositionToCenter();
     },
@@ -1092,11 +1094,13 @@ const Model = types
         const prevStageZoom = self.stageZoom;
         const prevZoomScale = self.zoomScale;
 
+        // The toolbar can narrow the viewport after load. Preserve actual size until the user zooms.
+        const keepOriginalSize = self.defaultzoom === "original" && self.currentZoom === self.originalZoom;
+
         self.containerWidth = width;
         self.containerHeight = height;
 
-        // reinit zoom to calc stageW/H
-        self.setZoom(self.currentZoom);
+        self.setZoom(keepOriginalSize ? self.originalZoom : self.currentZoom);
 
         self._recalculateImageParams();
 
@@ -1160,6 +1164,8 @@ const Model = types
 
       if (self.defaultzoom === "fit") {
         self.sizeToFit();
+      } else if (self.defaultzoom === "original") {
+        self.sizeToOriginal();
       } else {
         self.sizeToAuto();
       }

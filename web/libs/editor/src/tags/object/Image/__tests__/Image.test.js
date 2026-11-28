@@ -818,6 +818,27 @@ describe("Image model", () => {
     });
   });
 
+  it("keeps original image pixels at natural size when the toolbar narrows the viewport", () => {
+    const { annotation } = createStore({
+      annotation: { image: { name: "img", value: "$url", type: "image", defaultzoom: "original" } },
+    });
+    const image = annotation.image;
+    image.setContainerRef({ offsetWidth: 400, offsetHeight: 300 });
+    image.updateImageSize({ target: { naturalWidth: 800, naturalHeight: 600 } });
+
+    expect(image.defaultzoom).toBe("original");
+    expect(image.stageWidth * image.zoomScale).toBe(800);
+
+    image.onResize(352, 300, true);
+    expect(image.stageWidth * image.zoomScale).toBeCloseTo(800);
+    expect(image.stageHeight * image.zoomScale).toBeCloseTo(600);
+
+    image.handleZoom(1);
+    const manualZoom = image.currentZoom;
+    image.onResize(320, 300, true);
+    expect(image.currentZoom).toBe(manualZoom);
+  });
+
   describe("sizeToFit, sizeToOriginal, sizeToAuto", () => {
     it("sizeToFit sets defaultzoom to fit and updates zoom", () => {
       const store = createStore();
