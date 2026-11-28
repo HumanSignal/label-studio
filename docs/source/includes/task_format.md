@@ -104,6 +104,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | JSON property name | Description |
 | --- | --- | 
 | id | Identifier for the labeling task from the dataset. |
+| import_id | ID that the task had in the data it was imported or copied from (the `id` of the task in the imported JSON, or the source task when a project is duplicated with tasks or a project is created from selected tasks). `null` if the imported task had no integer `id`. Label Studio sets it on import and does not reuse the source ID as the new task `id`. It points one step back: for a copy of a copy it is the ID of the intermediate copy, so to reach the first task, follow `import_id` through each copy. |
 | data | Data copied from the input data task format. See the documentation for [Task Format](tasks.html#Basic-Label-Studio-JSON-format). |
 | project | Identifier for a specific project in Label Studio. |
 | annotations | Array containing the labeling results for the task. |
