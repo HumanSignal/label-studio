@@ -152,7 +152,7 @@ const Model = types
       },
 
       onChange(e) {
-        const value = +e.target.value;
+        const value = e.target.value === "" ? null : +e.target.value;
 
         if (!isNaN(value)) {
           self.setNumber(value);
