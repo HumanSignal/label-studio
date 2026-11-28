@@ -58,8 +58,21 @@ stateDiagram-v2
 | **Annotating** | At least one task has at least one submitted annotation, meaning annotation work has started. |
 | **Needs Review** | All tasks have been annotated by the required number of users, but there are still tasks that need to be reviewed. <br/><br/>Whether your project enters this state depends on your project settings and task states. See [Additional notes](#Additional-notes) below. |
 | **In Review** | All tasks have received at least one review, but reviews have not yet been completed for all tasks. <br/><br/>Whether your project enters this state depends on your project settings and task states. See [Additional notes](#Additional-notes) below. |
-| **Done** | All tasks have been completed. |
+| **Done** | All tasks have been completed, or the project was [marked as Done](#Mark-a-project-as-Done). |
 
+### Mark a project as Done
+
+Managers, Administrators, and Owners can move a project to **Done** from any state. From the project's overflow menu (on the project card or in the projects table), select **Mark Project as Done**. Task and annotation states don't change. 
+
+To see who marked the project as Done and when, hover over the **Done** state on the **Projects** page. 
+
+To undo it, select **Reset Project State** from the same menu. The project state is recalculated from its tasks. 
+
+### Annotators and reviewers in Done projects
+
+When a project is **Done**, whether it was marked as Done or all of its tasks were completed, annotators and reviewers can no longer get tasks from the label and review streams. The stream buttons on the project card are disabled. 
+
+Annotators and reviewers who can access the Data Manager (see [**Show Data Manager to annotators**](project_settings_lse#annotating-options) and [**Show the Data Manager to reviewers**](project_settings_lse#data-manager)) can still open the project and work on tasks in **Quick View**. Without Data Manager access, they cannot open the project. 
 
 
 ## Task states
